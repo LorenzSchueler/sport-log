@@ -141,6 +141,12 @@ pub fn check_user_id_derive(input: TokenStream) -> TokenStream {
     impl_check_user_id(Identifiers::from_ast(&ast))
 }
 
+#[proc_macro_derive(CheckOptionalUserId)]
+pub fn check_optional_user_id_derive(input: TokenStream) -> TokenStream {
+    let ast = syn::parse(input).unwrap();
+    impl_check_optional_user_id(Identifiers::from_ast(&ast))
+}
+
 #[proc_macro_derive(CheckAPId)]
 pub fn check_ap_id_derive(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();

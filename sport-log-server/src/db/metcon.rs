@@ -2,15 +2,15 @@ use axum::http::StatusCode;
 use chrono::{DateTime, Utc};
 use diesel::{prelude::*, PgConnection, QueryResult};
 use sport_log_types::{
-    schema::{metcon, metcon_item, metcon_movement, movement, training_plan},
-    Metcon, MetconId, MetconItem, MetconItemId, MetconMovement, MetconMovementId, MetconSession,
+    schema::{metcon, metcon_item, metcon_movement, training_plan},
+    Metcon, MetconId, MetconItem, MetconMovement, MetconMovementId, MetconSession,
     MetconSessionDescription, MetconSessionId, Movement, UserId,
 };
 use sport_log_types_derive::*;
 
 use crate::{auth::*, db::*};
 
-#[derive(Db, Create, GetById, GetByIds, Update, HardDelete, CheckUserId)]
+#[derive(Db, Create, GetById, GetByIds, Update, HardDelete, CheckOptionalUserId)]
 pub struct MetconDb;
 
 impl GetByUser for MetconDb {
@@ -47,44 +47,6 @@ impl GetByUserSync for MetconDb {
             .filter(metcon::columns::last_change.ge(last_sync))
             .select(Metcon::as_select())
             .get_results(db)
-    }
-}
-
-impl CheckOptionalUserId for MetconDb {
-    type Id = MetconId;
-
-    fn check_optional_user_id(
-        id: Self::Id,
-        user_id: UserId,
-        db: &mut PgConnection,
-    ) -> QueryResult<bool> {
-        metcon::table
-            .filter(metcon::columns::id.eq(id))
-            .filter(
-                metcon::columns::user_id
-                    .eq(user_id)
-                    .or(metcon::columns::user_id.is_null()),
-            )
-            .count()
-            .get_result(db)
-            .map(|count: i64| count == 1)
-    }
-
-    fn check_optional_user_ids(
-        ids: &[Self::Id],
-        user_id: UserId,
-        db: &mut PgConnection,
-    ) -> QueryResult<bool> {
-        metcon::table
-            .filter(metcon::columns::id.eq_any(ids))
-            .filter(
-                metcon::columns::user_id
-                    .eq(user_id)
-                    .or(metcon::columns::user_id.is_null()),
-            )
-            .count()
-            .get_result(db)
-            .map(|count: i64| count == ids.len() as i64)
     }
 }
 
@@ -227,22 +189,14 @@ impl GetByUserSync for MetconMovementDb {
 }
 
 impl CheckUserId for MetconMovementDb {
-    type Id = MetconMovementId;
-
     fn check_user_id(id: Self::Id, user_id: UserId, db: &mut PgConnection) -> QueryResult<bool> {
         metcon_movement::table
             .inner_join(metcon::table)
-            .inner_join(movement::table)
             .filter(metcon_movement::columns::id.eq(id))
-            .filter(metcon::columns::user_id.eq(user_id))
-            .filter(
-                movement::columns::user_id
-                    .eq(user_id)
-                    .or(movement::columns::user_id.is_null()),
-            )
-            .count()
+            .select(metcon::columns::user_id.is_not_distinct_from(user_id))
             .get_result(db)
-            .map(|count: i64| count == 1)
+            .optional()
+            .map(|eq| eq.unwrap_or(false))
     }
 
     fn check_user_ids(
@@ -252,23 +206,14 @@ impl CheckUserId for MetconMovementDb {
     ) -> QueryResult<bool> {
         metcon_movement::table
             .inner_join(metcon::table)
-            .inner_join(movement::table)
             .filter(metcon_movement::columns::id.eq_any(ids))
-            .filter(metcon::columns::user_id.eq(user_id))
-            .filter(
-                movement::columns::user_id
-                    .eq(user_id)
-                    .or(movement::columns::user_id.is_null()),
-            )
-            .count()
-            .get_result(db)
-            .map(|count: i64| count == ids.len() as i64)
+            .select(metcon::columns::user_id.is_not_distinct_from(user_id))
+            .get_results(db)
+            .map(|eqs: Vec<bool>| eqs.into_iter().all(|eq| eq))
     }
 }
 
 impl CheckOptionalUserId for MetconMovementDb {
-    type Id = MetconMovementId;
-
     fn check_optional_user_id(
         id: Self::Id,
         user_id: UserId,
@@ -276,21 +221,15 @@ impl CheckOptionalUserId for MetconMovementDb {
     ) -> QueryResult<bool> {
         metcon_movement::table
             .inner_join(metcon::table)
-            .inner_join(movement::table)
             .filter(metcon_movement::columns::id.eq(id))
-            .filter(
+            .select(
                 metcon::columns::user_id
-                    .eq(user_id)
+                    .is_not_distinct_from(user_id)
                     .or(metcon::columns::user_id.is_null()),
             )
-            .filter(
-                movement::columns::user_id
-                    .eq(user_id)
-                    .or(movement::columns::user_id.is_null()),
-            )
-            .count()
             .get_result(db)
-            .map(|count: i64| count == 1)
+            .optional()
+            .map(|eq| eq.unwrap_or(false))
     }
 
     fn check_optional_user_ids(
@@ -300,21 +239,14 @@ impl CheckOptionalUserId for MetconMovementDb {
     ) -> QueryResult<bool> {
         metcon_movement::table
             .inner_join(metcon::table)
-            .inner_join(movement::table)
             .filter(metcon_movement::columns::id.eq_any(ids))
-            .filter(
+            .select(
                 metcon::columns::user_id
-                    .eq(user_id)
+                    .is_not_distinct_from(user_id)
                     .or(metcon::columns::user_id.is_null()),
             )
-            .filter(
-                movement::columns::user_id
-                    .eq(user_id)
-                    .or(movement::columns::user_id.is_null()),
-            )
-            .count()
-            .get_result(db)
-            .map(|count: i64| count == ids.len() as i64)
+            .get_results(db)
+            .map(|eqs: Vec<bool>| eqs.into_iter().all(|eq| eq))
     }
 }
 
@@ -467,18 +399,14 @@ impl GetByUserSync for MetconItemDb {
 }
 
 impl CheckUserId for MetconItemDb {
-    type Id = MetconItemId;
-
     fn check_user_id(id: Self::Id, user_id: UserId, db: &mut PgConnection) -> QueryResult<bool> {
         metcon_item::table
-            .inner_join(metcon::table)
             .inner_join(training_plan::table)
             .filter(metcon_item::columns::id.eq(id))
-            .filter(metcon::columns::user_id.eq(user_id))
-            .filter(training_plan::columns::user_id.eq(user_id))
-            .count()
+            .select(training_plan::columns::user_id.eq(user_id))
             .get_result(db)
-            .map(|count: i64| count == 1)
+            .optional()
+            .map(|eq| eq.unwrap_or(false))
     }
 
     fn check_user_ids(
@@ -487,38 +415,27 @@ impl CheckUserId for MetconItemDb {
         db: &mut PgConnection,
     ) -> QueryResult<bool> {
         metcon_item::table
-            .inner_join(metcon::table)
             .inner_join(training_plan::table)
             .filter(metcon_item::columns::id.eq_any(ids))
-            .filter(metcon::columns::user_id.eq(user_id))
-            .filter(training_plan::columns::user_id.eq(user_id))
-            .count()
-            .get_result(db)
-            .map(|count: i64| count == ids.len() as i64)
+            .select(training_plan::columns::user_id.eq(user_id))
+            .get_results(db)
+            .map(|eqs: Vec<bool>| eqs.into_iter().all(|eq| eq))
     }
 }
 
 impl CheckOptionalUserId for MetconItemDb {
-    type Id = MetconItemId;
-
     fn check_optional_user_id(
         id: Self::Id,
         user_id: UserId,
         db: &mut PgConnection,
     ) -> QueryResult<bool> {
         metcon_item::table
-            .inner_join(metcon::table)
             .inner_join(training_plan::table)
             .filter(metcon_item::columns::id.eq(id))
-            .filter(
-                metcon::columns::user_id
-                    .eq(user_id)
-                    .or(metcon::columns::user_id.is_null()),
-            )
-            .filter(training_plan::columns::user_id.eq(user_id))
-            .count()
+            .select(training_plan::columns::user_id.eq(user_id))
             .get_result(db)
-            .map(|count: i64| count == 1)
+            .optional()
+            .map(|eq| eq.unwrap_or(false))
     }
 
     fn check_optional_user_ids(
@@ -527,18 +444,11 @@ impl CheckOptionalUserId for MetconItemDb {
         db: &mut PgConnection,
     ) -> QueryResult<bool> {
         metcon_item::table
-            .inner_join(metcon::table)
             .inner_join(training_plan::table)
             .filter(metcon_item::columns::id.eq_any(ids))
-            .filter(
-                metcon::columns::user_id
-                    .eq(user_id)
-                    .or(metcon::columns::user_id.is_null()),
-            )
-            .filter(training_plan::columns::user_id.eq(user_id))
-            .count()
-            .get_result(db)
-            .map(|count: i64| count == ids.len() as i64)
+            .select(training_plan::columns::user_id.eq(user_id))
+            .get_results(db)
+            .map(|eqs: Vec<bool>| eqs.into_iter().all(|eq| eq))
     }
 }
 

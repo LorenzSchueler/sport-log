@@ -194,8 +194,6 @@ pub struct ActionRuleDb;
 pub struct ActionEventDb;
 
 impl CheckAPId for ActionEventDb {
-    type Id = ActionEventId;
-
     fn check_ap_id(
         id: Self::Id,
         ap_id: ActionProviderId,
@@ -204,10 +202,10 @@ impl CheckAPId for ActionEventDb {
         action_event::table
             .inner_join(action::table)
             .filter(action_event::columns::id.eq(id))
-            .filter(action::columns::action_provider_id.eq(ap_id))
-            .count()
+            .select(action::columns::action_provider_id.eq(ap_id))
             .get_result(db)
-            .map(|count: i64| count == 1)
+            .optional()
+            .map(|eq| eq.unwrap_or(false))
     }
 
     fn check_ap_ids(
@@ -218,10 +216,9 @@ impl CheckAPId for ActionEventDb {
         action_event::table
             .inner_join(action::table)
             .filter(action_event::columns::id.eq_any(ids))
-            .filter(action::columns::action_provider_id.eq(ap_id))
-            .count()
-            .get_result(db)
-            .map(|count: i64| count == ids.len() as i64)
+            .select(action::columns::action_provider_id.eq(ap_id))
+            .get_results(db)
+            .map(|eqs: Vec<bool>| eqs.into_iter().all(|eq| eq))
     }
 }
 

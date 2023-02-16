@@ -177,9 +177,7 @@ pub trait HardDelete: Db {
 /// ### Deriving
 ///
 /// This trait can be automatically derived by adding `#[derive(CheckUserId)]` to your struct if the struct has a field `user_id` of type [UserId].
-pub trait CheckUserId {
-    type Id;
-
+pub trait CheckUserId: Db {
     /// Check if the entry with id `id` in the database belongs to the [User](sport_log_types::User) with `user_id`.
     fn check_user_id(id: Self::Id, user_id: UserId, db: &mut PgConnection) -> QueryResult<bool>;
 
@@ -192,9 +190,7 @@ pub trait CheckUserId {
 }
 
 /// A type which can be checked if it belongs to a User or is public.
-pub trait CheckOptionalUserId {
-    type Id;
-
+pub trait CheckOptionalUserId: Db {
     /// Check if the entry with id `id` in the database belongs to the [User](sport_log_types::User) with `user_id` or is public (`user_id` is None).
     fn check_optional_user_id(
         id: Self::Id,
@@ -210,9 +206,7 @@ pub trait CheckOptionalUserId {
     ) -> QueryResult<bool>;
 }
 
-pub trait CheckAPId {
-    type Id;
-
+pub trait CheckAPId: Db {
     fn check_ap_id(
         id: Self::Id,
         ap_id: ActionProviderId,

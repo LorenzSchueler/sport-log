@@ -18,7 +18,7 @@ use crate::{auth::*, db::*};
     GetByIds,
     Update,
     HardDelete,
-    CheckUserId,
+    CheckOptionalUserId,
     VerifyForAdminWithoutDb,
 )]
 pub struct MovementDb;
@@ -57,44 +57,6 @@ impl GetByUserSync for MovementDb {
             .filter(movement::columns::last_change.ge(last_sync))
             .select(Movement::as_select())
             .get_results(db)
-    }
-}
-
-impl CheckOptionalUserId for MovementDb {
-    type Id = MovementId;
-
-    fn check_optional_user_id(
-        id: Self::Id,
-        user_id: UserId,
-        db: &mut PgConnection,
-    ) -> QueryResult<bool> {
-        movement::table
-            .filter(movement::columns::id.eq(id))
-            .filter(
-                movement::columns::user_id
-                    .eq(user_id)
-                    .or(movement::columns::user_id.is_null()),
-            )
-            .count()
-            .get_result(db)
-            .map(|count: i64| count == 1)
-    }
-
-    fn check_optional_user_ids(
-        ids: &[Self::Id],
-        user_id: UserId,
-        db: &mut PgConnection,
-    ) -> QueryResult<bool> {
-        movement::table
-            .filter(movement::columns::id.eq_any(ids))
-            .filter(
-                movement::columns::user_id
-                    .eq(user_id)
-                    .or(movement::columns::user_id.is_null()),
-            )
-            .count()
-            .get_result(db)
-            .map(|count: i64| count == ids.len() as i64)
     }
 }
 
@@ -353,16 +315,14 @@ impl GetByUserSync for MovementMuscleDb {
 }
 
 impl CheckUserId for MovementMuscleDb {
-    type Id = MovementMuscleId;
-
     fn check_user_id(id: Self::Id, user_id: UserId, db: &mut PgConnection) -> QueryResult<bool> {
         movement_muscle::table
             .inner_join(movement::table)
             .filter(movement_muscle::columns::id.eq(id))
-            .filter(movement::columns::user_id.eq(user_id))
-            .count()
+            .select(movement::columns::user_id.is_not_distinct_from(user_id))
             .get_result(db)
-            .map(|count: i64| count == 1)
+            .optional()
+            .map(|eq| eq.unwrap_or(false))
     }
 
     fn check_user_ids(
@@ -373,16 +333,13 @@ impl CheckUserId for MovementMuscleDb {
         movement_muscle::table
             .inner_join(movement::table)
             .filter(movement_muscle::columns::id.eq_any(ids))
-            .filter(movement::columns::user_id.eq(user_id))
-            .count()
-            .get_result(db)
-            .map(|count: i64| count == ids.len() as i64)
+            .select(movement::columns::user_id.is_not_distinct_from(user_id))
+            .get_results(db)
+            .map(|eqs: Vec<bool>| eqs.into_iter().all(|eq| eq))
     }
 }
 
 impl CheckOptionalUserId for MovementMuscleDb {
-    type Id = MovementMuscleId;
-
     fn check_optional_user_id(
         id: Self::Id,
         user_id: UserId,
@@ -391,14 +348,14 @@ impl CheckOptionalUserId for MovementMuscleDb {
         movement_muscle::table
             .inner_join(movement::table)
             .filter(movement_muscle::columns::id.eq(id))
-            .filter(
+            .select(
                 movement::columns::user_id
-                    .eq(user_id)
+                    .is_not_distinct_from(user_id)
                     .or(movement::columns::user_id.is_null()),
             )
-            .count()
             .get_result(db)
-            .map(|count: i64| count == 1)
+            .optional()
+            .map(|eq| eq.unwrap_or(false))
     }
 
     fn check_optional_user_ids(
@@ -409,14 +366,13 @@ impl CheckOptionalUserId for MovementMuscleDb {
         movement_muscle::table
             .inner_join(movement::table)
             .filter(movement_muscle::columns::id.eq_any(ids))
-            .filter(
+            .select(
                 movement::columns::user_id
-                    .eq(user_id)
+                    .is_not_distinct_from(user_id)
                     .or(movement::columns::user_id.is_null()),
             )
-            .count()
-            .get_result(db)
-            .map(|count: i64| count == ids.len() as i64)
+            .get_results(db)
+            .map(|eqs: Vec<bool>| eqs.into_iter().all(|eq| eq))
     }
 }
 

@@ -64,15 +64,13 @@ impl UserDb {
 }
 
 impl CheckUserId for UserDb {
-    type Id = UserId;
-
     fn check_user_id(id: Self::Id, user_id: UserId, db: &mut PgConnection) -> QueryResult<bool> {
         user::table
             .filter(user::columns::id.eq(id))
-            .filter(user::columns::id.eq(user_id))
-            .count()
+            .select(user::columns::id.eq(user_id))
             .get_result(db)
-            .map(|count: i64| count == 1)
+            .optional()
+            .map(|eq| eq.unwrap_or(false))
     }
 
     fn check_user_ids(

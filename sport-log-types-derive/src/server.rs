@@ -242,7 +242,6 @@ pub(crate) fn impl_hard_delete(
 pub(crate) fn impl_check_user_id(
     Identifiers {
         db_type,
-        id_type,
         entity_name,
         ..
     }: Identifiers,
@@ -251,15 +250,13 @@ pub(crate) fn impl_check_user_id(
         use diesel::prelude::*;
 
         impl crate::db::CheckUserId for crate::db::#db_type {
-            type Id = sport_log_types::#id_type;
-
             fn check_user_id(id: Self::Id, user_id: sport_log_types::UserId, db: &mut PgConnection) -> QueryResult<bool> {
                 sport_log_types::schema::#entity_name::table
                     .filter(sport_log_types::schema::#entity_name::columns::id.eq(id))
-                    .filter(sport_log_types::schema::#entity_name::columns::user_id.eq(user_id))
-                    .count()
+                    .select(sport_log_types::schema::#entity_name::columns::user_id.eq(user_id))
                     .get_result(db)
-                    .map(|count: i64| count == 1)
+                    .optional()
+                    .map(|eq| eq.unwrap_or(false))
             }
 
             fn check_user_ids(
@@ -269,10 +266,74 @@ pub(crate) fn impl_check_user_id(
             ) -> QueryResult<bool> {
                 sport_log_types::schema::#entity_name::table
                     .filter(sport_log_types::schema::#entity_name::columns::id.eq_any(ids))
-                    .filter(sport_log_types::schema::#entity_name::columns::user_id.eq(user_id))
-                    .count()
+                    .select(sport_log_types::schema::#entity_name::columns::user_id.eq(user_id))
+                    .get_results(db)
+                    .map(|eqs: Vec<bool>| eqs.into_iter().all(|eq| eq))
+            }
+        }
+    }
+    .into()
+}
+
+pub(crate) fn impl_check_optional_user_id(
+    Identifiers {
+        db_type,
+        entity_name,
+        ..
+    }: Identifiers,
+) -> TokenStream {
+    quote! {
+        use diesel::prelude::*;
+
+        impl crate::db::CheckOptionalUserId for crate::db::#db_type {
+            fn check_optional_user_id(id: Self::Id, user_id: sport_log_types::UserId, db: &mut PgConnection) -> QueryResult<bool> {
+                sport_log_types::schema::#entity_name::table
+                    .filter(sport_log_types::schema::#entity_name::columns::id.eq(id))
+                    .select(sport_log_types::schema::#entity_name::columns::user_id
+                        .is_not_distinct_from(user_id)                    
+                        .or(sport_log_types::schema::#entity_name::columns::user_id.is_null())
+                    )
                     .get_result(db)
-                    .map(|count: i64| count == ids.len() as i64)
+                    .optional()
+                    .map(|eq| eq.unwrap_or(false))
+            }
+
+            fn check_optional_user_ids(
+                ids: &[Self::Id],
+                user_id: sport_log_types::UserId,
+                db: &mut PgConnection,
+            ) -> QueryResult<bool> {
+                sport_log_types::schema::#entity_name::table
+                    .filter(sport_log_types::schema::#entity_name::columns::id.eq_any(ids))
+                    .select(sport_log_types::schema::#entity_name::columns::user_id
+                        .is_not_distinct_from(user_id)                    
+                        .or(sport_log_types::schema::#entity_name::columns::user_id.is_null())
+                    )
+                    .get_results(db)
+                    .map(|eqs: Vec<bool>| eqs.into_iter().all(|eq| eq))
+            }
+        }
+
+        impl crate::db::CheckUserId for crate::db::#db_type {
+            fn check_user_id(id: Self::Id, user_id: sport_log_types::UserId, db: &mut PgConnection) -> QueryResult<bool> {
+                sport_log_types::schema::#entity_name::table
+                    .filter(sport_log_types::schema::#entity_name::columns::id.eq(id))
+                    .select(sport_log_types::schema::#entity_name::columns::user_id.is_not_distinct_from(user_id))
+                    .get_result(db)
+                    .optional()
+                    .map(|eq| eq.unwrap_or(false))
+            }
+
+            fn check_user_ids(
+                ids: &[Self::Id],
+                user_id: sport_log_types::UserId,
+                db: &mut PgConnection,
+            ) -> QueryResult<bool> {
+                sport_log_types::schema::#entity_name::table
+                    .filter(sport_log_types::schema::#entity_name::columns::id.eq_any(ids))
+                    .select(sport_log_types::schema::#entity_name::columns::user_id.is_not_distinct_from(user_id))
+                    .get_results(db)
+                    .map(|eqs: Vec<bool>| eqs.into_iter().all(|eq| eq))
             }
         }
     }
@@ -282,7 +343,6 @@ pub(crate) fn impl_check_user_id(
 pub(crate) fn impl_check_ap_id(
     Identifiers {
         db_type,
-        id_type,
         entity_name,
         ..
     }: Identifiers,
@@ -291,15 +351,13 @@ pub(crate) fn impl_check_ap_id(
         use diesel::prelude::*;
 
         impl crate::db::CheckAPId for crate::db::#db_type {
-            type Id = sport_log_types::#id_type;
-
             fn check_ap_id(id: Self::Id, ap_id: ActionProviderId, db: &mut PgConnection) -> QueryResult<bool> {
                 sport_log_types::schema::#entity_name::table
                     .filter(sport_log_types::schema::#entity_name::columns::id.eq(id))
-                    .filter(sport_log_types::schema::#entity_name::columns::action_provider_id.eq(ap_id))
-                    .count()
+                    .select(sport_log_types::schema::#entity_name::columns::action_provider_id.eq(ap_id))
                     .get_result(db)
-                    .map(|count: i64| count == 1)
+                    .optional()
+                    .map(|eq| eq.unwrap_or(false))
             }
 
             fn check_ap_ids(
@@ -309,10 +367,9 @@ pub(crate) fn impl_check_ap_id(
             ) -> QueryResult<bool> {
                 sport_log_types::schema::#entity_name::table
                     .filter(sport_log_types::schema::#entity_name::columns::id.eq_any(ids))
-                    .filter(sport_log_types::schema::#entity_name::columns::action_provider_id.eq(ap_id))
-                    .count()
-                    .get_result(db)
-                    .map(|count: i64| count == ids.len() as i64)
+                    .select(sport_log_types::schema::#entity_name::columns::action_provider_id.eq(ap_id))
+                    .get_results(db)
+                    .map(|eqs: Vec<bool>| eqs.into_iter().all(|eq| eq))
             }
         }
     }

@@ -2,11 +2,9 @@ use axum::http::StatusCode;
 use chrono::{DateTime, Utc};
 use diesel::{prelude::*, PgConnection, QueryResult};
 use sport_log_types::{
-    schema::{
-        movement, strength_blueprint, strength_blueprint_set, strength_session, strength_set,
-    },
-    StrengthBlueprintId, StrengthBlueprintSet, StrengthBlueprintSetId, StrengthSession,
-    StrengthSessionDescription, StrengthSessionId, StrengthSet, StrengthSetId, UserId,
+    schema::{strength_blueprint, strength_blueprint_set, strength_session, strength_set},
+    StrengthBlueprintSet, StrengthSession, StrengthSessionDescription, StrengthSessionId,
+    StrengthSet, UserId,
 };
 use sport_log_types_derive::*;
 
@@ -22,48 +20,11 @@ use crate::{auth::*, db::*};
     GetByUserSync,
     Update,
     HardDelete,
+    CheckUserId,
     VerifyForUserOrAPWithDb,
     VerifyForUserOrAPWithoutDb,
 )]
 pub struct StrengthBlueprintDb;
-
-impl CheckUserId for StrengthBlueprintDb {
-    type Id = StrengthBlueprintId;
-
-    fn check_user_id(id: Self::Id, user_id: UserId, db: &mut PgConnection) -> QueryResult<bool> {
-        strength_blueprint::table
-            .inner_join(movement::table)
-            .filter(strength_blueprint::columns::id.eq(id))
-            .filter(strength_blueprint::columns::user_id.eq(user_id))
-            .filter(
-                movement::columns::user_id
-                    .eq(user_id)
-                    .or(movement::columns::user_id.is_null()),
-            )
-            .count()
-            .get_result(db)
-            .map(|count: i64| count == 1)
-    }
-
-    fn check_user_ids(
-        ids: &[Self::Id],
-        user_id: UserId,
-        db: &mut PgConnection,
-    ) -> QueryResult<bool> {
-        strength_blueprint::table
-            .inner_join(movement::table)
-            .filter(strength_blueprint::columns::id.eq_any(ids))
-            .filter(strength_blueprint::columns::user_id.eq(user_id))
-            .filter(
-                movement::columns::user_id
-                    .eq(user_id)
-                    .or(movement::columns::user_id.is_null()),
-            )
-            .count()
-            .get_result(db)
-            .map(|count: i64| count == ids.len() as i64)
-    }
-}
 
 #[derive(Db, VerifyIdForUserOrAP, Create, GetById, GetByIds, Update, HardDelete)]
 pub struct StrengthBlueprintSetDb;
@@ -110,16 +71,14 @@ impl GetByUserSync for StrengthBlueprintSetDb {
 }
 
 impl CheckUserId for StrengthBlueprintSetDb {
-    type Id = StrengthBlueprintSetId;
-
     fn check_user_id(id: Self::Id, user_id: UserId, db: &mut PgConnection) -> QueryResult<bool> {
         strength_blueprint_set::table
             .inner_join(strength_blueprint::table)
             .filter(strength_blueprint_set::columns::id.eq(id))
-            .filter(strength_blueprint::columns::user_id.eq(user_id))
-            .count()
+            .select(strength_blueprint::columns::user_id.eq(user_id))
             .get_result(db)
-            .map(|count: i64| count == 1)
+            .optional()
+            .map(|eq| eq.unwrap_or(false))
     }
 
     fn check_user_ids(
@@ -130,10 +89,9 @@ impl CheckUserId for StrengthBlueprintSetDb {
         strength_blueprint_set::table
             .inner_join(strength_blueprint::table)
             .filter(strength_blueprint_set::columns::id.eq_any(ids))
-            .filter(strength_blueprint::columns::user_id.eq(user_id))
-            .count()
-            .get_result(db)
-            .map(|count: i64| count == ids.len() as i64)
+            .select(strength_blueprint::columns::user_id.eq(user_id))
+            .get_results(db)
+            .map(|eqs: Vec<bool>| eqs.into_iter().all(|eq| eq))
     }
 }
 
@@ -237,48 +195,11 @@ impl VerifyMultipleForUserOrAPCreate for Unverified<Vec<StrengthBlueprintSet>> {
     GetByUserSync,
     Update,
     HardDelete,
+    CheckUserId,
     VerifyForUserOrAPWithDb,
     VerifyForUserOrAPWithoutDb,
 )]
 pub struct StrengthSessionDb;
-
-impl CheckUserId for StrengthSessionDb {
-    type Id = StrengthSessionId;
-
-    fn check_user_id(id: Self::Id, user_id: UserId, db: &mut PgConnection) -> QueryResult<bool> {
-        strength_session::table
-            .inner_join(movement::table)
-            .filter(strength_session::columns::id.eq(id))
-            .filter(strength_session::columns::user_id.eq(user_id))
-            .filter(
-                movement::columns::user_id
-                    .eq(user_id)
-                    .or(movement::columns::user_id.is_null()),
-            )
-            .count()
-            .get_result(db)
-            .map(|count: i64| count == 1)
-    }
-
-    fn check_user_ids(
-        ids: &[Self::Id],
-        user_id: UserId,
-        db: &mut PgConnection,
-    ) -> QueryResult<bool> {
-        strength_session::table
-            .inner_join(movement::table)
-            .filter(strength_session::columns::id.eq_any(ids))
-            .filter(strength_session::columns::user_id.eq(user_id))
-            .filter(
-                movement::columns::user_id
-                    .eq(user_id)
-                    .or(movement::columns::user_id.is_null()),
-            )
-            .count()
-            .get_result(db)
-            .map(|count: i64| count == ids.len() as i64)
-    }
-}
 
 #[derive(Db, VerifyIdForUserOrAP, Create, GetById, GetByIds, Update, HardDelete)]
 pub struct StrengthSetDb;
@@ -325,16 +246,14 @@ impl GetByUserSync for StrengthSetDb {
 }
 
 impl CheckUserId for StrengthSetDb {
-    type Id = StrengthSetId;
-
     fn check_user_id(id: Self::Id, user_id: UserId, db: &mut PgConnection) -> QueryResult<bool> {
         strength_set::table
             .inner_join(strength_session::table)
             .filter(strength_set::columns::id.eq(id))
-            .filter(strength_session::columns::user_id.eq(user_id))
-            .count()
+            .select(strength_session::columns::user_id.eq(user_id))
             .get_result(db)
-            .map(|count: i64| count == 1)
+            .optional()
+            .map(|eq| eq.unwrap_or(false))
     }
 
     fn check_user_ids(
@@ -345,10 +264,9 @@ impl CheckUserId for StrengthSetDb {
         strength_set::table
             .inner_join(strength_session::table)
             .filter(strength_set::columns::id.eq_any(ids))
-            .filter(strength_session::columns::user_id.eq(user_id))
-            .count()
-            .get_result(db)
-            .map(|count: i64| count == ids.len() as i64)
+            .select(strength_session::columns::user_id.eq(user_id))
+            .get_results(db)
+            .map(|eqs: Vec<bool>| eqs.into_iter().all(|eq| eq))
     }
 }
 

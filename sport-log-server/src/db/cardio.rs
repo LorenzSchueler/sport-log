@@ -1,7 +1,7 @@
 use diesel::{prelude::*, PgConnection, QueryResult};
 use sport_log_types::{
     schema::{cardio_blueprint, cardio_session, movement},
-    CardioBlueprintId, CardioSession, CardioSessionDescription, CardioSessionId, UserId,
+    CardioSession, CardioSessionDescription, CardioSessionId, UserId,
 };
 use sport_log_types_derive::*;
 
@@ -39,21 +39,14 @@ pub struct RouteDb;
 pub struct CardioBlueprintDb;
 
 impl CheckUserId for CardioBlueprintDb {
-    type Id = CardioBlueprintId;
-
     fn check_user_id(id: Self::Id, user_id: UserId, db: &mut PgConnection) -> QueryResult<bool> {
         cardio_blueprint::table
             .inner_join(movement::table)
             .filter(cardio_blueprint::columns::id.eq(id))
-            .filter(cardio_blueprint::columns::user_id.eq(user_id))
-            .filter(
-                movement::columns::user_id
-                    .eq(user_id)
-                    .or(movement::columns::user_id.is_null()),
-            )
-            .count()
+            .select(cardio_blueprint::columns::user_id.eq(user_id))
             .get_result(db)
-            .map(|count: i64| count == 1)
+            .optional()
+            .map(|eq| eq.unwrap_or(false))
     }
 
     fn check_user_ids(
@@ -64,15 +57,9 @@ impl CheckUserId for CardioBlueprintDb {
         cardio_blueprint::table
             .inner_join(movement::table)
             .filter(cardio_blueprint::columns::id.eq_any(ids))
-            .filter(cardio_blueprint::columns::user_id.eq(user_id))
-            .filter(
-                movement::columns::user_id
-                    .eq(user_id)
-                    .or(movement::columns::user_id.is_null()),
-            )
-            .count()
-            .get_result(db)
-            .map(|count: i64| count == ids.len() as i64)
+            .select(cardio_blueprint::columns::user_id.eq(user_id))
+            .get_results(db)
+            .map(|eqs: Vec<bool>| eqs.into_iter().all(|eq| eq))
     }
 }
 
@@ -92,21 +79,13 @@ impl CheckUserId for CardioBlueprintDb {
 pub struct CardioSessionDb;
 
 impl CheckUserId for CardioSessionDb {
-    type Id = CardioSessionId;
-
     fn check_user_id(id: Self::Id, user_id: UserId, db: &mut PgConnection) -> QueryResult<bool> {
         cardio_session::table
-            .inner_join(movement::table)
             .filter(cardio_session::columns::id.eq(id))
-            .filter(cardio_session::columns::user_id.eq(user_id))
-            .filter(
-                movement::columns::user_id
-                    .eq(user_id)
-                    .or(movement::columns::user_id.is_null()),
-            )
-            .count()
+            .select(cardio_session::columns::user_id.eq(user_id))
             .get_result(db)
-            .map(|count: i64| count == 1)
+            .optional()
+            .map(|eq| eq.unwrap_or(false))
     }
 
     fn check_user_ids(
@@ -115,17 +94,10 @@ impl CheckUserId for CardioSessionDb {
         db: &mut PgConnection,
     ) -> QueryResult<bool> {
         cardio_session::table
-            .inner_join(movement::table)
             .filter(cardio_session::columns::id.eq_any(ids))
-            .filter(cardio_session::columns::user_id.eq(user_id))
-            .filter(
-                movement::columns::user_id
-                    .eq(user_id)
-                    .or(movement::columns::user_id.is_null()),
-            )
-            .count()
-            .get_result(db)
-            .map(|count: i64| count == ids.len() as i64)
+            .select(cardio_session::columns::user_id.eq(user_id))
+            .get_results(db)
+            .map(|eqs: Vec<bool>| eqs.into_iter().all(|eq| eq))
     }
 }
 
