@@ -147,10 +147,3 @@ pub struct StrengthSet {
     pub weight: Option<f32>,
     pub deleted: bool,
 }
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct StrengthSessionDescription {
-    pub strength_session: StrengthSession,
-    pub strength_sets: Vec<StrengthSet>,
-    pub movement: Movement,
-}

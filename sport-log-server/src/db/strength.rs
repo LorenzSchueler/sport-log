@@ -3,8 +3,7 @@ use chrono::{DateTime, Utc};
 use diesel::{prelude::*, PgConnection, QueryResult};
 use sport_log_types::{
     schema::{strength_blueprint, strength_blueprint_set, strength_session, strength_set},
-    StrengthBlueprintSet, StrengthSession, StrengthSessionDescription, StrengthSessionId,
-    StrengthSet, UserId,
+    StrengthBlueprintSet, StrengthSessionId, StrengthSet, UserId,
 };
 use sport_log_types_derive::*;
 
@@ -353,75 +352,5 @@ impl VerifyMultipleForUserOrAPCreate for Unverified<Vec<StrengthSet>> {
         } else {
             Err(StatusCode::FORBIDDEN)
         }
-    }
-}
-
-pub struct StrengthSessionDescriptionDb;
-
-impl Db for StrengthSessionDescriptionDb {
-    type Id = StrengthSessionId;
-    type Entity = StrengthSessionDescription;
-}
-
-impl GetById for StrengthSessionDescriptionDb {
-    fn get_by_id(
-        strength_session_id: Self::Id,
-        db: &mut PgConnection,
-    ) -> QueryResult<<Self as Db>::Entity> {
-        let strength_session = StrengthSessionDb::get_by_id(strength_session_id, db)?;
-        StrengthSessionDescriptionDb::from_session(strength_session, db)
-    }
-}
-
-impl GetByUser for StrengthSessionDescriptionDb {
-    fn get_by_user(
-        user_id: UserId,
-        db: &mut PgConnection,
-    ) -> QueryResult<Vec<<Self as Db>::Entity>> {
-        let strength_sessions = StrengthSessionDb::get_by_user(user_id, db)?;
-        StrengthSessionDescriptionDb::from_sessions(strength_sessions, db)
-    }
-}
-
-impl StrengthSessionDescriptionDb {
-    fn from_session(
-        strength_session: StrengthSession,
-        db: &mut PgConnection,
-    ) -> QueryResult<<Self as Db>::Entity> {
-        let strength_sets = StrengthSet::belonging_to(&strength_session)
-            .select(StrengthSet::as_select())
-            .get_results(db)?;
-        let movement = MovementDb::get_by_id(strength_session.movement_id, db)?;
-        Ok(StrengthSessionDescription {
-            strength_session,
-            strength_sets,
-            movement,
-        })
-    }
-
-    fn from_sessions(
-        strength_sessions: Vec<StrengthSession>,
-        db: &mut PgConnection,
-    ) -> QueryResult<Vec<<Self as Db>::Entity>> {
-        let strength_sets = StrengthSet::belonging_to(&strength_sessions)
-            .select(StrengthSet::as_select())
-            .get_results(db)?
-            .grouped_by(&strength_sessions);
-        let mut movements = vec![];
-        for strength_session in &strength_sessions {
-            movements.push(MovementDb::get_by_id(strength_session.movement_id, db)?);
-        }
-        Ok(strength_sessions
-            .into_iter()
-            .zip(strength_sets)
-            .zip(movements)
-            .map(
-                |((strength_session, strength_sets), movement)| StrengthSessionDescription {
-                    strength_session,
-                    strength_sets,
-                    movement,
-                },
-            )
-            .collect())
     }
 }

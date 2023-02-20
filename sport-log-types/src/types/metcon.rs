@@ -182,10 +182,3 @@ pub struct MetconItem {
     pub metcon_id: MetconId,
     pub deleted: bool,
 }
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct MetconSessionDescription {
-    pub metcon_session: MetconSession,
-    pub metcon: Metcon,
-    pub movements: Vec<(MetconMovement, Movement)>,
-}

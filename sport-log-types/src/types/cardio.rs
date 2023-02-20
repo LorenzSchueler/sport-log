@@ -229,10 +229,3 @@ pub struct CardioSession {
     pub comments: Option<String>,
     pub deleted: bool,
 }
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct CardioSessionDescription {
-    pub cardio_session: CardioSession,
-    pub route: Option<Route>,
-    pub movement: Movement,
-}

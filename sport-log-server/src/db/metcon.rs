@@ -3,8 +3,7 @@ use chrono::{DateTime, Utc};
 use diesel::{prelude::*, PgConnection, QueryResult};
 use sport_log_types::{
     schema::{metcon, metcon_item, metcon_movement, training_plan},
-    Metcon, MetconId, MetconItem, MetconMovement, MetconMovementId, MetconSession,
-    MetconSessionDescription, MetconSessionId, Movement, UserId,
+    Metcon, MetconId, MetconItem, MetconMovement, MetconMovementId, UserId,
 };
 use sport_log_types_derive::*;
 
@@ -553,95 +552,3 @@ impl VerifyMultipleForUserOrAPCreate for Unverified<Vec<MetconItem>> {
     VerifyForUserOrAPWithoutDb,
 )]
 pub struct MetconSessionDb;
-
-pub struct MetconSessionDescriptionDb;
-
-impl Db for MetconSessionDescriptionDb {
-    type Id = MetconSessionId;
-    type Entity = MetconSessionDescription;
-}
-
-impl GetById for MetconSessionDescriptionDb {
-    fn get_by_id(
-        metcon_session_id: Self::Id,
-        db: &mut PgConnection,
-    ) -> QueryResult<<Self as Db>::Entity> {
-        let metcon_session = MetconSessionDb::get_by_id(metcon_session_id, db)?;
-        MetconSessionDescriptionDb::from_session(metcon_session, db)
-    }
-}
-
-impl GetByUser for MetconSessionDescriptionDb {
-    fn get_by_user(
-        user_id: UserId,
-        db: &mut PgConnection,
-    ) -> QueryResult<Vec<<Self as Db>::Entity>> {
-        let metcon_sessions = MetconSessionDb::get_by_user(user_id, db)?;
-        MetconSessionDescriptionDb::from_sessions(metcon_sessions, db)
-    }
-}
-
-impl MetconSessionDescriptionDb {
-    fn from_session(
-        metcon_session: MetconSession,
-        db: &mut PgConnection,
-    ) -> QueryResult<<Self as Db>::Entity> {
-        let metcon = MetconDb::get_by_id(metcon_session.metcon_id, db)?;
-        let metcon_movements: Vec<MetconMovement> = MetconMovement::belonging_to(&metcon)
-            .select(MetconMovement::as_select())
-            .get_results(db)?;
-        let mut movements = vec![];
-        for metcon_movement in &metcon_movements {
-            movements.push(MovementDb::get_by_id(metcon_movement.movement_id, db)?);
-        }
-        let movements = metcon_movements.into_iter().zip(movements).collect();
-        Ok(MetconSessionDescription {
-            metcon_session,
-            metcon,
-            movements,
-        })
-    }
-
-    fn from_sessions(
-        metcon_sessions: Vec<MetconSession>,
-        db: &mut PgConnection,
-    ) -> QueryResult<Vec<<Self as Db>::Entity>> {
-        let mut metcons = vec![];
-        for metcon_session in &metcon_sessions {
-            metcons.push(MetconDb::get_by_id(metcon_session.metcon_id, db)?);
-        }
-        let metcon_movements: Vec<Vec<MetconMovement>> = MetconMovement::belonging_to(&metcons)
-            .select(MetconMovement::as_select())
-            .get_results(db)?
-            .grouped_by(&metcons);
-        let mut movements = vec![];
-        let mut movements_len;
-        for metcon_movements in &metcon_movements {
-            movements.push(vec![]);
-            movements_len = movements.len();
-            for metcon_session in metcon_movements {
-                movements[movements_len - 1]
-                    .push(MovementDb::get_by_id(metcon_session.movement_id, db)?);
-            }
-        }
-        let movements: Vec<Vec<(MetconMovement, Movement)>> = metcon_movements
-            .into_iter()
-            .zip(movements)
-            .map(|(metcon_movements, movements)| {
-                metcon_movements.into_iter().zip(movements).collect()
-            })
-            .collect();
-        Ok(metcon_sessions
-            .into_iter()
-            .zip(metcons)
-            .zip(movements)
-            .map(
-                |((metcon_session, metcon), movements)| MetconSessionDescription {
-                    metcon_session,
-                    metcon,
-                    movements,
-                },
-            )
-            .collect())
-    }
-}
