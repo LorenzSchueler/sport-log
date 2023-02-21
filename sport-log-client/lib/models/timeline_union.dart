@@ -73,3 +73,27 @@ class TimelineRecords {
   final StrengthRecords strengthRecords;
   final MetconRecords metconRecords;
 }
+
+class MovementOrMetcon {
+  MovementOrMetcon.movement(Movement this.movement) : metcon = null;
+  MovementOrMetcon.metcon(Metcon this.metcon) : movement = null;
+
+  final Movement? movement;
+  final Metcon? metcon;
+
+  bool get isMovement => movement != null;
+  bool get isMetcon => metcon != null;
+
+  String get name => movement?.name ?? metcon!.name;
+
+  @override
+  bool operator ==(Object other) =>
+      other is MovementOrMetcon &&
+      isMovement == other.isMovement &&
+      movement?.id == other.movement?.id &&
+      metcon?.id == other.metcon?.id;
+
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, isMovement, movement?.id, metcon?.id);
+}

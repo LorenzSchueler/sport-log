@@ -13,6 +13,7 @@ import 'package:sport_log/routes.dart';
 import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
+import 'package:sport_log/widgets/picker/picker.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
 import 'package:sport_log/widgets/provider_consumer.dart';
 import 'package:sport_log/widgets/sync_refresh_indicator.dart';
@@ -27,14 +28,16 @@ class TimelinePage extends StatelessWidget {
     return NeverPop(
       child: ProviderConsumer<
           OverviewDataProvider<TimelineUnion, TimelineRecords,
-              TimelineDataProvider, void>>(
+              TimelineDataProvider, MovementOrMetcon>>(
         create: (_) => OverviewDataProvider(
           dataProvider: TimelineDataProvider(),
           entityAccessor: (dataProvider) =>
-              (start, end, _, search) => dataProvider.getByTimerangeAndComment(
+              (start, end, movementOrMetcon, search) =>
+                  dataProvider.getByTimerangeAndMovementOrMetconAndComment(
                     from: start,
                     until: end,
                     comment: search,
+                    movementOrMetcon: movementOrMetcon,
                   ),
           recordAccessor: (dataProvider) => () => dataProvider.getRecords(),
           loggerName: "TimelinePage",
@@ -58,6 +61,27 @@ class TimelinePage extends StatelessWidget {
                 },
                 icon: Icon(
                   dataProvider.isSearch ? AppIcons.close : AppIcons.search,
+                ),
+              ),
+              IconButton(
+                // ignore: prefer-extracting-callbacks
+                onPressed: () async {
+                  final movementOrMetcon = await showMovementOrMetconPicker(
+                    context: context,
+                    selectedMovementOrMetcon: dataProvider.selected,
+                  );
+                  if (movementOrMetcon == null) {
+                    return;
+                  } else if (movementOrMetcon == dataProvider.selected) {
+                    dataProvider.selected = null;
+                  } else {
+                    dataProvider.selected = movementOrMetcon;
+                  }
+                },
+                icon: Icon(
+                  dataProvider.isSelected
+                      ? AppIcons.filterFilled
+                      : AppIcons.filter,
                 ),
               ),
             ],

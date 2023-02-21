@@ -5,13 +5,14 @@ import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:sport_log/data_provider/data_providers/cardio_data_provider.dart';
 import 'package:sport_log/data_provider/data_providers/metcon_data_provider.dart';
 import 'package:sport_log/data_provider/data_providers/movement_data_provider.dart';
+import 'package:sport_log/helpers/extensions/sort_extension.dart';
 import 'package:sport_log/models/action/action.dart';
 import 'package:sport_log/models/action/weekday.dart';
 import 'package:sport_log/models/cardio/cardio_session.dart';
 import 'package:sport_log/models/cardio/route.dart';
-import 'package:sport_log/models/entity_interfaces.dart';
 import 'package:sport_log/models/metcon/metcon.dart';
 import 'package:sport_log/models/movement/movement.dart';
+import 'package:sport_log/models/timeline_union.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_state.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/theme.dart';
@@ -54,11 +55,12 @@ class Picker<T> extends StatelessWidget {
   }
 }
 
-class PickerWithSearch<T extends HasId> extends StatefulWidget {
+class PickerWithSearch<T> extends StatefulWidget {
   const PickerWithSearch({
     required this.selectedItem,
     required this.getByName,
     required this.editRoute,
+    required this.compareWith,
     required this.title,
     required this.subtitle,
     super.key,
@@ -66,16 +68,16 @@ class PickerWithSearch<T extends HasId> extends StatefulWidget {
 
   final T? selectedItem;
   final Future<List<T>> Function(String) getByName;
-  final String editRoute;
+  final String? editRoute;
+  final bool Function(T, T?) compareWith;
   final String Function(T) title;
-  final String Function(T)? subtitle;
+  final String? Function(T)? subtitle;
 
   @override
-  State<PickerWithSearch> createState() => _PickerWithSearchState<T>();
+  State<PickerWithSearch<T>> createState() => _PickerWithSearchState<T>();
 }
 
-class _PickerWithSearchState<T extends HasId>
-    extends State<PickerWithSearch<T>> {
+class _PickerWithSearchState<T> extends State<PickerWithSearch<T>> {
   late final StreamSubscription<bool> _keyboardSubscription =
       KeyboardVisibilityController().onChange.listen((isVisible) {
     if (!isVisible) {
@@ -101,8 +103,8 @@ class _PickerWithSearchState<T extends HasId>
   Future<void> _update(String search) async {
     final items = await widget.getByName(search.trim());
     if (widget.selectedItem != null) {
-      final index =
-          items.indexWhere((item) => item.id == widget.selectedItem?.id);
+      final index = items
+          .indexWhere((item) => widget.compareWith(item, widget.selectedItem));
       if (index >= 0) {
         items.insert(0, items.removeAt(index));
       }
@@ -152,11 +154,11 @@ class _PickerWithSearchState<T extends HasId>
         decoration: Theme.of(context).textFormFieldDecoration.copyWith(
               labelText: 'Search',
               prefixIcon: const Icon(AppIcons.search),
-              suffixIcon: _search.isNotEmpty
+              suffixIcon: _search.isNotEmpty && widget.editRoute != null
                   ? IconButton(
                       onPressed: () => Navigator.pushNamed(
                         context,
-                        widget.editRoute,
+                        widget.editRoute!,
                       ),
                       icon: const Icon(AppIcons.add),
                     )
@@ -168,12 +170,13 @@ class _PickerWithSearchState<T extends HasId>
 
   Widget _routeBuilder(BuildContext context, int index) {
     final item = _items[index];
+    final subtitle =
+        widget.subtitle != null ? widget.subtitle!.call(item) : null;
 
     return ListTile(
       title: Text(widget.title(item)),
-      subtitle:
-          widget.subtitle != null ? Text(widget.subtitle!.call(item)) : null,
-      selected: item.id == widget.selectedItem?.id,
+      subtitle: subtitle != null ? Text(subtitle) : null,
+      selected: widget.compareWith(item, widget.selectedItem),
       onTap: () => Navigator.pop(context, item),
     );
   }
@@ -241,6 +244,7 @@ Future<Metcon?> showMetconPicker({
       selectedItem: selectedMetcon,
       getByName: (name) => MetconDataProvider().getByName(name),
       editRoute: Routes.metconEdit,
+      compareWith: (m1, m2) => m1.id == m2?.id,
       title: (metcon) => metcon.name,
       subtitle: null,
     ),
@@ -262,8 +266,34 @@ Future<Movement?> showMovementPicker({
       getByName: (name) => MovementDataProvider()
           .getByName(name, cardioOnly: cardioOnly, distanceOnly: distanceOnly),
       editRoute: Routes.movementEdit,
+      compareWith: (m1, m2) => m1.id == m2?.id,
       title: (movement) => movement.name,
       subtitle: (movement) => movement.dimension.name,
+    ),
+    barrierDismissible: dismissible,
+    context: context,
+  );
+}
+
+Future<MovementOrMetcon?> showMovementOrMetconPicker({
+  required MovementOrMetcon? selectedMovementOrMetcon,
+  bool dismissible = true,
+  required BuildContext context,
+}) async {
+  return showDialog<MovementOrMetcon>(
+    builder: (_) => PickerWithSearch<MovementOrMetcon>(
+      selectedItem: selectedMovementOrMetcon,
+      getByName: (name) async => ((await MovementDataProvider().getNonDeleted())
+                  .map(MovementOrMetcon.movement)
+                  .toList() +
+              (await MetconDataProvider().getNonDeleted())
+                  .map(MovementOrMetcon.metcon)
+                  .toList())
+          .fuzzySort(query: name, toString: (m) => m.name),
+      editRoute: null,
+      compareWith: (m1, m2) => m1 == m2,
+      title: (movementOrMetcon) => movementOrMetcon.name,
+      subtitle: (movementOrMetcon) => movementOrMetcon.movement?.dimension.name,
     ),
     barrierDismissible: dismissible,
     context: context,
@@ -280,6 +310,7 @@ Future<Route?> showRoutePicker({
       selectedItem: selectedRoute,
       getByName: (name) => RouteDataProvider().getByName(name),
       editRoute: Routes.routeEdit,
+      compareWith: (r1, r2) => r1.id == r2?.id,
       title: (route) => route.name,
       subtitle: null,
     ),

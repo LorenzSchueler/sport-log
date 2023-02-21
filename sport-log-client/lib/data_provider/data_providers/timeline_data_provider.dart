@@ -49,38 +49,44 @@ class TimelineDataProvider extends DataProvider<TimelineUnion> {
         diaries: await _diaryDataProvider.getNonDeleted(),
       );
 
-  Future<List<TimelineUnion>> getByTimerangeAndComment({
+  Future<List<TimelineUnion>> getByTimerangeAndMovementOrMetconAndComment({
     required DateTime? from,
     required DateTime? until,
     required String? comment,
+    required MovementOrMetcon? movementOrMetcon,
   }) async =>
       _combineAndSort(
-        strengthSessionsDescription:
-            await _strengthDataProvider.getByTimerangeAndMovementAndComment(
-          from: from,
-          until: until,
-          movement: null,
-          comment: comment,
-        ),
-        metconSessionsDescription:
-            await _metconDataProvider.getByTimerangeAndMetconAndComment(
-          from: from,
-          until: until,
-          metcon: null,
-          comment: comment,
-        ),
-        cardioSessionsDescription:
-            await _cardioDataProvider.getByTimerangeAndMovementAndComment(
-          from: from,
-          until: until,
-          movement: null,
-          comment: comment,
-        ),
-        diaries: await _diaryDataProvider.getByTimerangeAndComment(
-          from: from,
-          until: until,
-          comment: comment,
-        ),
+        strengthSessionsDescription: movementOrMetcon?.isMetcon ?? false
+            ? []
+            : await _strengthDataProvider.getByTimerangeAndMovementAndComment(
+                from: from,
+                until: until,
+                movement: movementOrMetcon?.movement,
+                comment: comment,
+              ),
+        metconSessionsDescription: movementOrMetcon?.isMovement ?? false
+            ? []
+            : await _metconDataProvider.getByTimerangeAndMetconAndComment(
+                from: from,
+                until: until,
+                metcon: movementOrMetcon?.metcon,
+                comment: comment,
+              ),
+        cardioSessionsDescription: movementOrMetcon?.isMetcon ?? false
+            ? []
+            : await _cardioDataProvider.getByTimerangeAndMovementAndComment(
+                from: from,
+                until: until,
+                movement: movementOrMetcon?.movement,
+                comment: comment,
+              ),
+        diaries: movementOrMetcon != null
+            ? []
+            : await _diaryDataProvider.getByTimerangeAndComment(
+                from: from,
+                until: until,
+                comment: comment,
+              ),
       );
 
   List<TimelineUnion> _combineAndSort({

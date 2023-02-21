@@ -12,12 +12,12 @@ class SortItem<T> {
   }
 }
 
-extension SortExtension<T> on List<T> {
+extension SortExtension<T> on Iterable<T> {
   List<T> fuzzySort({
     required String? query,
     required String Function(T) toString,
   }) {
-    if (query == null || query.isEmpty) return this;
+    if (query == null || query.isEmpty) return toList();
 
     final sortedItems = map(
       (candidate) =>
