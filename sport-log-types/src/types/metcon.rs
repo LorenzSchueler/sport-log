@@ -17,6 +17,7 @@ use crate::{types::IdString, Movement, MovementId, TrainingPlanId, UserId};
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq)]
 #[cfg_attr(feature = "db", derive(DbEnum))]
+#[ExistingTypePath = "crate::schema::sql_types::MetconType"]
 pub enum MetconType {
     Amrap,
     Emom,
@@ -25,6 +26,7 @@ pub enum MetconType {
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq)]
 #[cfg_attr(feature = "db", derive(DbEnum))]
+#[ExistingTypePath = "crate::schema::sql_types::DistanceUnit"]
 pub enum DistanceUnit {
     Meter,
     Km,

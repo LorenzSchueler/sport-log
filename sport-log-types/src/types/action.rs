@@ -95,6 +95,7 @@ pub struct Action {
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq)]
 #[cfg_attr(feature = "db", derive(DbEnum))]
+#[ExistingTypePath = "crate::schema::sql_types::Weekday"]
 
 pub enum Weekday {
     Monday,
