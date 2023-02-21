@@ -40,7 +40,7 @@ class CardioTrackingSettingsPageState
                 caption: "Movement",
                 child: Text(_movement?.name ?? ""),
                 onTap: () async {
-                  Movement? movement = await showMovementPicker(
+                  final movement = await showMovementPicker(
                     selectedMovement: _movement,
                     cardioOnly: true,
                     distanceOnly: true,
@@ -127,7 +127,7 @@ class CardioTrackingSettingsPageState
                             context,
                             Routes.tracking,
                             arguments: [
-                              _movement!,
+                              _movement,
                               _cardioType,
                               _route,
                               heartRateUtils.deviceId != null

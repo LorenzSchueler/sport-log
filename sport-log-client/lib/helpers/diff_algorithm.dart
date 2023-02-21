@@ -11,8 +11,8 @@ Diffing<T> diff<T extends HasId>(List<T> oldList, List<T> newList) {
   oldList.sort(sortingFn);
   newList.sort(sortingFn);
 
-  int indexOld = 0;
-  int indexNew = 0;
+  var indexOld = 0;
+  var indexNew = 0;
 
   final result = Diffing<T>();
 

@@ -67,7 +67,6 @@ class HeartRatePage extends StatelessWidget {
                                       ),
                                     )
                                     .toList(),
-                                underline: null,
                                 onChanged: (deviceId) {
                                   if (deviceId != null) {
                                     heartRateUtils.deviceId = deviceId;

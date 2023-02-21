@@ -6,8 +6,8 @@ import 'package:sport_log/helpers/extensions/map_controller_extension.dart';
 import 'package:sport_log/helpers/lat_lng.dart';
 import 'package:sport_log/settings.dart';
 
-class StaticMapboxMap extends StatelessWidget {
-  StaticMapboxMap({
+class StaticMapboxMap extends StatefulWidget {
+  const StaticMapboxMap({
     this.onMapCreated,
     this.onTap,
     this.onLongTap,
@@ -18,6 +18,11 @@ class StaticMapboxMap extends StatelessWidget {
   final void Function(LatLng)? onTap;
   final void Function(LatLng)? onLongTap;
 
+  @override
+  State<StaticMapboxMap> createState() => _StaticMapboxMapState();
+}
+
+class _StaticMapboxMapState extends State<StaticMapboxMap> {
   MapboxMap? _mapController;
 
   Future<void> _onMapCreated(MapboxMap mapController) async {
@@ -38,7 +43,7 @@ class StaticMapboxMap extends StatelessWidget {
     await mapController.scaleBar.updateSettings(
       ScaleBarSettings(position: OrnamentPosition.BOTTOM_RIGHT),
     );
-    onMapCreated?.call(mapController);
+    widget.onMapCreated?.call(mapController);
   }
 
   @override
@@ -49,8 +54,14 @@ class StaticMapboxMap extends StatelessWidget {
       styleUri: MapboxStyles.OUTDOORS,
       cameraOptions: context.read<Settings>().lastMapPosition.toCameraOptions(),
       onMapCreated: _onMapCreated,
-      onTapListener: _mapController?.invokeWithLatLng(onTap),
-      onLongTapListener: _mapController?.invokeWithLatLng(onLongTap),
+      onTapListener: _mapController != null
+          ? (coord) async => widget.onTap
+              ?.call(await _mapController!.screenCoordToLatLng(coord))
+          : null,
+      onLongTapListener: _mapController != null
+          ? (coord) async => widget.onLongTap
+              ?.call(await _mapController!.screenCoordToLatLng(coord))
+          : null,
     );
   }
 }

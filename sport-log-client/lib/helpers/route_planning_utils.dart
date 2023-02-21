@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:collection/collection.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:http/http.dart';
 import 'package:http/io_client.dart';
@@ -75,7 +74,6 @@ class RoutePlanningUtils {
     try {
       response = await Defaults.mapboxApi.directions.request(
         profile: NavigationProfile.WALKING,
-        geometries: NavigationGeometries.POLYLINE,
         coordinates:
             markedPositions.map((e) => [e.latitude, e.longitude]).toList(),
       );
@@ -83,8 +81,8 @@ class RoutePlanningUtils {
       return Failure(RoutePlanningError.noInternet);
     }
     if (response.routes != null && response.routes!.isNotEmpty) {
-      NavigationRoute navRoute = response.routes![0];
-      List<Position> track = [];
+      final navRoute = response.routes![0];
+      final track = <Position>[];
       final latLngs = PolylinePoints()
           .decodePolyline(navRoute.geometry as String)
           .map((p) => LatLng(lat: p.latitude, lng: p.longitude))
@@ -93,21 +91,18 @@ class RoutePlanningUtils {
       if (elevations.isFailure) {
         return Failure(elevations.failure);
       } else {
-        for (final dynamic zip
-            in IterableZip<dynamic>([latLngs, elevations.success])) {
-          final pointLatLng = zip[0] as LatLng;
-          final elevation = zip[1] as int;
+        assert(latLngs.length == elevations.success.length);
+        for (var i = 0; i < latLngs.length; i++) {
+          final latLng = latLngs[i];
+          final elevation = elevations.success[i];
           track.add(
             Position(
-              latitude: pointLatLng.lat,
-              longitude: pointLatLng.lng,
+              latitude: latLng.lat,
+              longitude: latLng.lng,
               elevation: elevation.toDouble(),
               distance: track.isEmpty
                   ? 0
-                  : track.last.addDistanceTo(
-                      pointLatLng.lat,
-                      pointLatLng.lng,
-                    ),
+                  : track.last.addDistanceTo(latLng.lat, latLng.lng),
               time: Duration.zero,
             ),
           );

@@ -76,7 +76,7 @@ class Config extends JsonSerializable {
     }
     instance.isAndroidEmulator = isAndroidEmulator;
 
-    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    final packageInfo = await PackageInfo.fromPlatform();
     instance.version = Version.fromString(
       isTest ? "0.1.0" : packageInfo.version,
     );

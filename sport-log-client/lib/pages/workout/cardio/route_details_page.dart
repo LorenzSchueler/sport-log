@@ -60,7 +60,7 @@ class _RouteDetailsPageState extends State<RouteDetailsPage> {
       await _lineManager?.addRouteLine(_route.track!);
     }
     if (_route.markedPositions != null) {
-      for (int i = 0; i < _route.markedPositions!.length; i++) {
+      for (var i = 0; i < _route.markedPositions!.length; i++) {
         final latLng = _route.markedPositions![i].latLng;
         await _circleManager?.addLocationMarker(latLng);
         await _pointManager?.addLocationLabel(latLng, "${i + 1}");

@@ -126,7 +126,7 @@ class _RouteEditPageState extends State<RouteEditPage> {
   }
 
   Future<void> _extendLine(LatLng location) async {
-    if (_route.markedPositions!.length == 25) {
+    if (_route.markedPositions!.length >= 25) {
       await showMessageDialog(
         context: context,
         title: "Point maximum reached",
@@ -164,7 +164,7 @@ class _RouteEditPageState extends State<RouteEditPage> {
     setState(() {
       _logger.i("old: $oldIndex, new: $newIndex");
       if (oldIndex < newIndex - 1) {
-        Position location = _route.markedPositions!.removeAt(oldIndex);
+        final location = _route.markedPositions!.removeAt(oldIndex);
         if (newIndex - 1 == _route.markedPositions!.length) {
           _route.markedPositions!.add(location);
         } else {

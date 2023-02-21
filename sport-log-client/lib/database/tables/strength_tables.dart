@@ -191,8 +191,8 @@ class StrengthSessionDescriptionTable {
       ;
     ''',
     );
-    List<StrengthSessionDescription> strengthSessionDescriptions = [];
-    for (final Map<String, Object?> record in records) {
+    final strengthSessionDescriptions = <StrengthSessionDescription>[];
+    for (final record in records) {
       final session = _strengthSessionTable.serde
           .fromDbRecord(record, prefix: _strengthSessionTable.table.prefix);
       strengthSessionDescriptions.add(

@@ -29,7 +29,7 @@ Future<String?> writeToFile({
   var file = File("$dir/$filename.$fileExtension");
   if (!append) {
     var index = 1;
-    while (await file.exists()) {
+    while (file.existsSync()) {
       file = File("$dir/$filename($index).$fileExtension");
       index++;
     }

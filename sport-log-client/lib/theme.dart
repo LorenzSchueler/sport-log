@@ -18,20 +18,18 @@ class AppTheme {
       onSurfaceVariant: Colors.white,
       error: _warning,
       errorContainer: _ok, // used for opposite of error like ok, start, ...
-      brightness: Brightness.dark,
     ),
   );
 
   static final lightTheme = _themeDataFromColors(
     const ColorScheme.light(
       primary: Color(0xff1f67a3),
-      background: Colors.white,
+      // background: Colors.white,
       surface: Color.fromARGB(255, 230, 230, 230),
       surfaceVariant: Color.fromARGB(255, 215, 215, 215),
       onSurfaceVariant: Colors.black,
       error: _warning,
       errorContainer: _ok, // used for opposite of error like ok, start, ...
-      brightness: Brightness.light,
     ),
   );
 

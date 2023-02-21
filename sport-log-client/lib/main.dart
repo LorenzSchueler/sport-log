@@ -56,7 +56,7 @@ class InitAppWrapper extends StatefulWidget {
 class InitAppWrapperState extends State<InitAppWrapper> {
   static final navigatorKey = GlobalKey<NavigatorState>();
 
-  double? _progress = 0.0;
+  double? _progress = 0;
 
   Object? _error;
 

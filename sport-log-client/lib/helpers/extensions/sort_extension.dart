@@ -36,35 +36,35 @@ int distance(
   int edit = 3,
   int delete = 6,
 }) {
-  query = query.toLowerCase().replaceAll("-", " ");
-  candidate = candidate.toLowerCase().replaceAll("-", " ");
+  final queryLc = query.toLowerCase().replaceAll("-", " ");
+  final candidateLc = candidate.toLowerCase().replaceAll("-", " ");
 
-  if (query == candidate) {
+  if (queryLc == candidateLc) {
     return 0;
   }
 
-  if (query.isEmpty) {
-    return candidate.length * insert;
+  if (queryLc.isEmpty) {
+    return candidateLc.length * insert;
   }
 
-  if (candidate.isEmpty) {
-    return query.length * delete;
+  if (candidateLc.isEmpty) {
+    return queryLc.length * delete;
   }
 
-  List<int> v0 = List<int>.generate(
-    candidate.length + 1,
+  var v0 = List<int>.generate(
+    candidateLc.length + 1,
     (i) => i * insert,
     growable: false,
   );
-  List<int> v1 = List<int>.filled(candidate.length + 1, 0, growable: false);
+  var v1 = List<int>.filled(candidateLc.length + 1, 0);
   List<int> vtemp;
 
-  for (var i = 1; i <= query.length; i++) {
+  for (var i = 1; i <= queryLc.length; i++) {
     v1[0] = i * delete;
 
-    for (var j = 1; j <= candidate.length; j++) {
-      int cost = edit;
-      if (query.codeUnitAt(i - 1) == candidate.codeUnitAt(j - 1)) {
+    for (var j = 1; j <= candidateLc.length; j++) {
+      var cost = edit;
+      if (queryLc.codeUnitAt(i - 1) == candidateLc.codeUnitAt(j - 1)) {
         cost = 0;
       }
       v1[j] =
@@ -76,7 +76,7 @@ int distance(
     v1 = vtemp;
   }
 
-  final directMatch = candidate.contains(query) ? 0 : 1000;
+  final directMatch = candidateLc.contains(queryLc) ? 0 : 1000;
 
-  return v0[candidate.length] + directMatch;
+  return v0[candidateLc.length] + directMatch;
 }

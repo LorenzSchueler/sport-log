@@ -136,8 +136,14 @@ class _MapboxMapWrapperState extends State<MapboxMapWrapper> {
                   context.read<Settings>().lastMapPosition)
               .toCameraOptions(),
           onMapCreated: _onMapCreated,
-          onTapListener: _mapController?.invokeWithLatLng(widget.onTap),
-          onLongTapListener: _mapController?.invokeWithLatLng(widget.onLongTap),
+          onTapListener: _mapController != null
+              ? (coord) async => widget.onTap
+                  ?.call(await _mapController!.screenCoordToLatLng(coord))
+              : null,
+          onLongTapListener: _mapController != null
+              ? (coord) async => widget.onLongTap
+                  ?.call(await _mapController!.screenCoordToLatLng(coord))
+              : null,
         ),
         if (_mapController != null &&
             _circleManager != null &&

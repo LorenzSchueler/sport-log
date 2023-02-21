@@ -252,7 +252,7 @@ class StrengthRecordsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String countText = "";
+    String? countText;
     if (strengthRecord != null) {
       switch (movement.dimension) {
         case MovementDimension.reps:
@@ -300,7 +300,7 @@ class StrengthRecordsCard extends StatelessWidget {
                   ),
                   Defaults.sizedBox.horizontal.small,
                   Text(
-                    countText,
+                    countText!,
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
                   if (strengthRecord!.maxEorm != null) ...[

@@ -114,7 +114,7 @@ extension _ToApiResult on Response {
   }
 }
 
-extension ApiResultFromRequest on ApiResult {
+extension ApiResultFromRequest<T> on ApiResult<T> {
   static final _ioClient = HttpClient()..connectionTimeout = Config.httpTimeout;
   static final _client = IOClient(_ioClient);
 
@@ -300,7 +300,7 @@ mixin ApiLogging {
   static final logger = Logger('API');
 
   String _prettyJson(dynamic json, {int indent = 2}) {
-    var spaces = ' ' * indent;
+    final spaces = ' ' * indent;
     return JsonEncoder.withIndent(spaces).convert(json);
   }
 

@@ -1,75 +1,77 @@
-//class MapDownloadUtils extends ChangeNotifier {
-//factory MapDownloadUtils({
-//required Future<void> Function()? onSuccess,
-//required Future<void> Function()? onError,
-//}) {
-//return MapDownloadUtils._(onSuccess: onSuccess, onError: onError)
-//.._updateRegions();
-//}
+import 'package:flutter/foundation.dart';
 
-//MapDownloadUtils._({
-//required this.onSuccess,
-//required this.onError,
-//});
+class MapDownloadUtils extends ChangeNotifier {
+  factory MapDownloadUtils({
+    required Future<void> Function()? onSuccess,
+    required Future<void> Function()? onError,
+  }) {
+    return MapDownloadUtils._(onSuccess: onSuccess, onError: onError)
+      .._updateRegions();
+  }
 
-//final Future<void> Function()? onSuccess;
-//final Future<void> Function()? onError;
+  MapDownloadUtils._({
+    required this.onSuccess,
+    required this.onError,
+  });
 
-//List<OfflineRegion> _regions = [];
-//List<OfflineRegion> get regions => _regions;
+  final Future<void> Function()? onSuccess;
+  final Future<void> Function()? onError;
 
-//double? _progress;
-//double? get progress => _progress;
+  //List<OfflineRegion> _regions = [];
+  //List<OfflineRegion> get regions => _regions;
 
-//bool _disposed = false;
+  double? _progress;
+  double? get progress => _progress;
 
-//@override
-//void dispose() {
-//_disposed = true;
-//super.dispose();
-//}
+  bool _disposed = false;
 
-//Future<void> _updateRegions() async {
-//_regions = await getListOfRegions(accessToken: Config.instance.accessToken);
-//if (!_disposed) {
-//notifyListeners();
-//}
-//}
+  @override
+  void dispose() {
+    _disposed = true;
+    super.dispose();
+  }
 
-//Future<void> deleteRegion(OfflineRegion region) async {
-//await deleteOfflineRegion(region.id);
-//await _updateRegions();
-//}
+  Future<void> _updateRegions() async {
+    //_regions = await getListOfRegions(accessToken: Config.instance.accessToken);
+    if (!_disposed) {
+      notifyListeners();
+    }
+  }
 
-//Future<void> _onMapDownload(DownloadRegionStatus status) async {
-//if (!_disposed) {
-//if (status.runtimeType == Success) {
-//_progress = null;
-//await _updateRegions();
-//notifyListeners();
-//await onSuccess?.call();
-//} else if (status.runtimeType == InProgress) {
-//_progress = (status as InProgress).progress / 100;
-//notifyListeners();
-//} else if (status.runtimeType == Error) {
-//_progress = null;
-//notifyListeners();
-//await onError?.call();
-//}
-//}
-//}
+  //Future<void> deleteRegion(OfflineRegion region) async {
+  //await deleteOfflineRegion(region.id);
+  //await _updateRegions();
+  //}
 
-//Future<OfflineRegion> downloadRegion(LatLngBounds bounds) {
-//return downloadOfflineRegion(
-//OfflineRegionDefinition(
-//bounds: bounds,
-//minZoom: 0,
-//maxZoom: 16,
-//mapStyleUrl: MapboxStyles.OUTDOORS,
-//),
-//onEvent: _onMapDownload,
-//accessToken: Config.instance.accessToken,
-//metadata: <String, dynamic>{"datetime": DateTime.now().toIso8601String()},
-//);
-//}
-//}
+  //Future<void> _onMapDownload(DownloadRegionStatus status) async {
+  //if (!_disposed) {
+  //if (status.runtimeType == Success) {
+  //_progress = null;
+  //await _updateRegions();
+  //notifyListeners();
+  //await onSuccess?.call();
+  //} else if (status.runtimeType == InProgress) {
+  //_progress = (status as InProgress).progress / 100;
+  //notifyListeners();
+  //} else if (status.runtimeType == Error) {
+  //_progress = null;
+  //notifyListeners();
+  //await onError?.call();
+  //}
+  //}
+  //}
+
+  //Future<OfflineRegion> downloadRegion(LatLngBounds bounds) {
+  //return downloadOfflineRegion(
+  //OfflineRegionDefinition(
+  //bounds: bounds,
+  //minZoom: 0,
+  //maxZoom: 16,
+  //mapStyleUrl: MapboxStyles.OUTDOORS,
+  //),
+  //onEvent: _onMapDownload,
+  //accessToken: Config.instance.accessToken,
+  //metadata: <String, dynamic>{"datetime": DateTime.now().toIso8601String()},
+  //);
+  //}
+}

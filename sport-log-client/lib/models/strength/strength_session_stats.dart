@@ -27,16 +27,16 @@ class StrengthSessionStats extends JsonSerializable {
     MovementDimension movementDimension,
     List<StrengthSet> sets,
   ) {
-    int numSets = sets.length;
-    double? maxWeight = sets.map((s) => s.weight).whereNotNull().maxOrNull;
-    double? avgWeight = sets.map((s) => s.weight).whereNotNull().sum / numSets;
-    int minCount = sets.map((s) => s.count).minOrNull ?? 0;
-    int maxCount = sets.map((s) => s.count).maxOrNull ?? 0;
-    int sumCount = sets.map((s) => s.count).sum;
-    double avgCount = sets.isEmpty ? 0 : sumCount / numSets;
-    double? maxEorm =
+    final numSets = sets.length;
+    final maxWeight = sets.map((s) => s.weight).whereNotNull().maxOrNull;
+    final avgWeight = sets.map((s) => s.weight).whereNotNull().sum / numSets;
+    final minCount = sets.map((s) => s.count).minOrNull ?? 0;
+    final maxCount = sets.map((s) => s.count).maxOrNull ?? 0;
+    final sumCount = sets.map((s) => s.count).sum;
+    final avgCount = sets.isEmpty ? 0.0 : sumCount / numSets;
+    final maxEorm =
         sets.map((s) => s.eorm(movementDimension)).whereNotNull().maxOrNull;
-    double? sumVolume = sets.map((s) => s.volume).whereNotNull().sum;
+    final sumVolume = sets.map((s) => s.volume).whereNotNull().sum;
 
     return StrengthSessionStats(
       datetime: datetime,

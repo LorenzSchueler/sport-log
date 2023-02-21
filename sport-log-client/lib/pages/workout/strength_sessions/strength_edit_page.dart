@@ -241,7 +241,7 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
       child: DurationInput(
         setDuration: (d) =>
             setState(() => _strengthSessionDescription.session.interval = d),
-        initialDuration: _strengthSessionDescription.session.interval!,
+        initialDuration: _strengthSessionDescription.session.interval,
       ),
     );
   }

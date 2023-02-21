@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart' hide Route, Action;
+import 'package:flutter/material.dart' hide Action, Route;
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:sport_log/data_provider/data_providers/cardio_data_provider.dart';
 import 'package:sport_log/data_provider/data_providers/metcon_data_provider.dart';
@@ -144,7 +144,7 @@ class _PickerWithSearchState<T extends HasId>
 
   Widget get _searchBar {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 0),
+      padding: const EdgeInsets.symmetric(vertical: 5),
       child: TextFormField(
         autofocus: true,
         initialValue: _search,

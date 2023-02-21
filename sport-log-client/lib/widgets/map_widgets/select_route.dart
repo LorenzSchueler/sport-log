@@ -35,7 +35,7 @@ class _SelectRouteButtonState extends State<SelectRouteButton> {
   }
 
   Future<void> selectRoute() async {
-    Route? route = await showRoutePicker(
+    final route = await showRoutePicker(
       context: context,
       selectedRoute: selectedRoute,
     );

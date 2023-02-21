@@ -7,7 +7,7 @@ class LatLng {
   const LatLng({required this.lat, required this.lng});
 
   factory LatLng.fromMap(Map<String?, dynamic> map) {
-    final List<dynamic> coordinates = map["coordinates"] as List;
+    final coordinates = map["coordinates"] as List;
     return LatLng(lat: coordinates[1] as double, lng: coordinates[0] as double);
   }
 
@@ -31,10 +31,10 @@ extension LatLngsExtension on Iterable<LatLng> {
       return null;
     }
 
-    double north = map((p) => p.lat).max;
-    double south = map((p) => p.lat).min;
-    double east = map((p) => p.lng).max;
-    double west = map((p) => p.lng).min;
+    final north = map((p) => p.lat).max;
+    final south = map((p) => p.lat).min;
+    final east = map((p) => p.lng).max;
+    final west = map((p) => p.lng).min;
 
     return LatLngBounds(
       northeast: LatLng(lat: north, lng: east),
@@ -85,15 +85,15 @@ class LatLngBounds {
   }
 
   LatLngBounds padded([double factor = 0.1]) {
-    double north = northeast.lat;
-    double south = southwest.lat;
-    final double latDiff = north - south;
+    var north = northeast.lat;
+    var south = southwest.lat;
+    final latDiff = north - south;
     north += latDiff * 0.1;
     south -= latDiff * 0.1;
 
-    double east = northeast.lng;
-    double west = southwest.lng;
-    final double lngDiff = east - west;
+    var east = northeast.lng;
+    var west = southwest.lng;
+    final lngDiff = east - west;
     east += lngDiff * factor;
     west -= lngDiff * factor;
 

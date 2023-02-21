@@ -22,7 +22,7 @@ class CardioValueUnitDescriptionTable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    TableRow rowSpacer = TableRow(
+    final rowSpacer = TableRow(
       children: [
         Defaults.sizedBox.vertical.small,
         Defaults.sizedBox.vertical.small,

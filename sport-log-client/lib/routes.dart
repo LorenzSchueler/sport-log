@@ -217,7 +217,7 @@ abstract class Routes {
           );
         }),
     Routes.metconSessionEdit: (context) => _checkLogin(() {
-          var arg = ModalRoute.of(context)?.settings.arguments;
+          final arg = ModalRoute.of(context)?.settings.arguments;
           final bool isNew;
           final MetconSessionDescription? metconSessionDescription;
           if (arg is MetconSessionDescription) {

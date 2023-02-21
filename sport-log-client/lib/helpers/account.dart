@@ -36,7 +36,7 @@ class Account {
     Settings.instance.serverUrl = serverUrl;
     final result = await Api.user.getSingle(username, password);
     if (result.isSuccess) {
-      User user = result.success;
+      final user = result.success;
       Settings.instance.user = user;
       await Sync.instance.startSync();
       return Success(user);

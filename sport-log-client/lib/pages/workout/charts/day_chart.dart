@@ -30,7 +30,7 @@ class DayChart extends DateTimePeriodChart {
             color: Theme.of(context).colorScheme.primary,
           ),
         ],
-        minX: 1.0,
+        minX: 1,
         minY: minY,
         maxY: maxY,
         titlesData: titlesData(

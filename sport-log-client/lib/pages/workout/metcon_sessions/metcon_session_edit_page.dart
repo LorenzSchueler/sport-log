@@ -114,7 +114,7 @@ class _MetconSessionEditPageState extends State<MetconSessionEditPage> {
                     _metconSessionDescription.metconDescription.metcon.name,
                   ),
                   onTap: () async {
-                    Metcon? metcon = await showMetconPicker(
+                    final metcon = await showMetconPicker(
                       selectedMetcon:
                           _metconSessionDescription.metconDescription.metcon,
                       context: context,
@@ -170,7 +170,7 @@ class _MetconSessionEditPageState extends State<MetconSessionEditPage> {
                         .toHumanDateTime(),
                   ),
                   onTap: () async {
-                    DateTime? datetime = await showDateTimePicker(
+                    final datetime = await showDateTimePicker(
                       context: context,
                       initial: _metconSessionDescription.metconSession.datetime,
                     );
@@ -228,7 +228,7 @@ class _MetconSessionEditPageState extends State<MetconSessionEditPage> {
                         () => _metconSessionDescription.metconSession.time = d,
                       ),
                       initialDuration:
-                          _metconSessionDescription.metconSession.time!,
+                          _metconSessionDescription.metconSession.time,
                     ),
                   ),
                 if (_metconSessionDescription

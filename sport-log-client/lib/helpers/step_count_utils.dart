@@ -8,7 +8,7 @@ class StepCountUtils {
   StepCountUtils(this.onStepCountUpdate);
 
   void Function(StepCount stepCount) onStepCountUpdate;
-  StreamSubscription? _stepCountSubscription;
+  StreamSubscription<StepCount>? _stepCountSubscription;
   late StepCount _lastStepCount;
 
   Future<bool> startStepCountStream() async {
@@ -21,7 +21,7 @@ class StepCountUtils {
         return false;
       }
     }
-    Stream<StepCount> stepCountStream = Pedometer.stepCountStream;
+    final stepCountStream = Pedometer.stepCountStream;
     _stepCountSubscription = stepCountStream.listen((stepCount) {
       onStepCountUpdate(stepCount);
       _lastStepCount = stepCount;

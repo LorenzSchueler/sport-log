@@ -22,13 +22,13 @@ List<Position>? gpxToTrack(String gpxString) {
   final startTime = points
       .map((p) => p.time)
       .firstWhere((element) => element != null, orElse: () => null);
-  List<Position> track = [];
+  final track = <Position>[];
   for (final point in points) {
     track.add(
       Position(
         longitude: point.lon ?? 0.0,
         latitude: point.lat ?? 0.0,
-        elevation: point.ele?.toDouble() ?? 0.0,
+        elevation: point.ele ?? 0.0,
         distance: track.isEmpty
             ? 0
             : track.last.addDistanceTo(point.lat ?? 0.0, point.lon ?? 0.0),
@@ -78,12 +78,11 @@ Future<String?> saveTrackAsGpx(
 
 Future<List<Position>?> loadTrackFromGpxFile() async {
   await FilePicker.platform.clearTemporaryFiles();
-  FilePickerResult? result = await FilePicker.platform.pickFiles();
-
+  final result = await FilePicker.platform.pickFiles();
   if (result == null) {
     return null;
   }
-  File file = File(result.files.single.path!);
+  final file = File(result.files.single.path!);
   final gpxString = await file.readAsString();
   return gpxToTrack(gpxString);
 }

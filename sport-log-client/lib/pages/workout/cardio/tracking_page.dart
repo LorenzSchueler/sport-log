@@ -4,7 +4,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart' hide Route;
 import 'package:location/location.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart'
-    hide Settings, Position;
+    hide Position, Settings;
 import 'package:pedometer/pedometer.dart';
 import 'package:polar/polar.dart';
 import 'package:provider/provider.dart';
@@ -172,12 +172,12 @@ class _CardioTrackingPageState extends State<CardioTrackingPage> {
             .add(_trackingUtils.currentDuration);
       } else {
         /// interpolate steps since last stepCount update
-        int newSteps = stepCount.steps - _stepUtils.lastStepCount.steps;
-        int timeDiff = stepCount.timeStamp
+        final newSteps = stepCount.steps - _stepUtils.lastStepCount.steps;
+        final timeDiff = stepCount.timeStamp
             .difference(_stepUtils.lastStepCount.timeStamp)
             .inMilliseconds;
-        int avgTimeDiff = (timeDiff / newSteps).floor();
-        for (int ms = 0; ms < timeDiff; ms += avgTimeDiff) {
+        final avgTimeDiff = (timeDiff / newSteps).floor();
+        for (var ms = 0; ms < timeDiff; ms += avgTimeDiff) {
           _cardioSessionDescription.cardioSession.cadence!.add(
             _trackingUtils.currentDuration +
                 Duration(milliseconds: -timeDiff + ms),
@@ -208,7 +208,8 @@ class _CardioTrackingPageState extends State<CardioTrackingPage> {
 
     _locationInfo = """
 provider:   ${location.provider}
-accuracy: ${location.accuracy?.toInt()} m
+accuracy: ${location.accuracy?.round()} m
+elevation GPS: ${location.altitude?.round()} m
 time: ${location.time! ~/ 1000} s
 satellites: ${location.satelliteNumber}
 points:      ${_cardioSessionDescription.cardioSession.track?.length}""";

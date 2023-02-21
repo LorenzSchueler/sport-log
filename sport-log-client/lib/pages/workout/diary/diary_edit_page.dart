@@ -85,7 +85,7 @@ class _DiaryEditPageState extends State<DiaryEditPage> {
                   caption: "Date",
                   child: Text(_diary.date.toHumanDate()),
                   onTap: () async {
-                    DateTime? date = await showDatePickerWithDefaults(
+                    final date = await showDatePickerWithDefaults(
                       context: context,
                       initialDate: _diary.date,
                     );

@@ -73,7 +73,7 @@ class DistanceChart extends StatelessWidget {
 
   final List<DistanceChartLine> chartLines;
   final bool yFromZero;
-  final Function(double? distance)? touchCallback;
+  final void Function(double? distance)? touchCallback;
   final double height;
   final Color labelColor;
 
@@ -97,7 +97,7 @@ class DistanceChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    double minY = yFromZero
+    var minY = yFromZero
         ? 0.0
         : chartLines
             .map(
@@ -105,7 +105,7 @@ class DistanceChart extends StatelessWidget {
                   chartLine.chartValues.map((v) => v.value).minOrNull ?? 0,
             )
             .min;
-    double maxY = chartLines
+    var maxY = chartLines
         .map(
           (chartLine) =>
               chartLine.chartValues.map((v) => v.value).maxOrNull ?? 0,
@@ -116,11 +116,11 @@ class DistanceChart extends StatelessWidget {
       minY -= 1;
     }
 
-    double xInterval = chartLines
+    final xInterval = chartLines
         .map(
           (chartLine) =>
               max(
-                1.0,
+                1,
                 (chartLine.chartValues.lastOrNull?.distance ?? 0) / 8 / 100,
               ).ceil().toDouble() *
               100,
@@ -150,7 +150,7 @@ class DistanceChart extends StatelessWidget {
             ],
             minY: minY,
             maxY: maxY,
-            minX: 0.0,
+            minX: 0,
             lineTouchData: LineTouchData(
               touchSpotThreshold: double.infinity, // always get nearest point
               touchCallback: _onLongPress,

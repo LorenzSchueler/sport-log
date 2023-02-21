@@ -10,8 +10,8 @@ class DbDurationListConverter {
     if (fromDb == null) {
       return null;
     }
-    final List<int> list = [];
-    for (int index = 0; index < fromDb.length; index += 8) {
+    final list = <int>[];
+    for (var index = 0; index < fromDb.length; index += 8) {
       list.add(ByteData.sublistView(fromDb).getInt64(index, Endian.host));
     }
     return list.map((e) => Duration(milliseconds: e)).toList();
@@ -34,8 +34,8 @@ class DbPositionListConverter {
       return null;
     }
     assert(fromDb.length % Position.byteSize == 0);
-    final List<Position> positions = [];
-    for (int i = 0; i < fromDb.length; i += Position.byteSize) {
+    final positions = <Position>[];
+    for (var i = 0; i < fromDb.length; i += Position.byteSize) {
       positions.add(
         Position.fromBytesList(fromDb.sublist(i, i + Position.byteSize)),
       );
@@ -48,10 +48,10 @@ class DbPositionListConverter {
       return null;
     }
     final bytes = Uint8List(value.length * Position.byteSize);
-    int p = 0;
+    var pos = 0;
     for (final position in value) {
-      bytes.setAll(p, position.asBytesList());
-      p += Position.byteSize;
+      bytes.setAll(pos, position.asBytesList());
+      pos += Position.byteSize;
     }
     return bytes;
   }

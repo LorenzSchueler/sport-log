@@ -33,8 +33,8 @@ class WeekChart extends DateTimePeriodChart {
             color: Theme.of(context).colorScheme.primary,
           ),
         ],
-        minX: 1.0,
-        maxX: 7.0,
+        minX: 1,
+        maxX: 7,
         minY: minY,
         maxY: maxY,
         titlesData: titlesData(

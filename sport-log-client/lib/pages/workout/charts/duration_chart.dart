@@ -23,7 +23,7 @@ class DurationChartLine {
     required List<DurationChartValue> ungroupedChartValues,
     required Color lineColor,
   }) {
-    final List<DurationChartValue> chartValues = ungroupedChartValues
+    final chartValues = ungroupedChartValues
         .groupListsBy((v) => _groupFunction(v.duration))
         .entries
         .map(
@@ -106,7 +106,7 @@ class DurationChart extends StatefulWidget {
             .map(
               (chartLine) =>
                   max(
-                    1.0,
+                    1,
                     (chartLine.chartValues.lastOrNull?.duration.inMinutes ??
                             0) /
                         6,
@@ -128,7 +128,7 @@ class DurationChart extends StatefulWidget {
 
   final List<DurationChartLine> chartLines;
   final bool yFromZero;
-  final Function(Duration? x)? touchCallback;
+  final void Function(Duration? x)? touchCallback;
   final double height;
   final Color labelColor;
 
@@ -183,7 +183,7 @@ class _DurationChartState extends State<DurationChart> {
             ],
             minY: 0,
             maxY: 1,
-            minX: 0.0,
+            minX: 0,
             maxX: widget.maxX,
             extraLinesData: lastX == null
                 ? null

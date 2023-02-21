@@ -146,7 +146,7 @@ class CardioSession extends AtomicEntity {
       if (startIndex != null && endIndex != null) {
         final startCadence = cadence![startIndex];
         final endCadence = cadence![endIndex];
-        double minutes =
+        final minutes =
             (endCadence - startCadence).inMilliseconds / (1000 * 60);
         if (minutes > 0) {
           return ((endIndex - startIndex) / minutes).round();
@@ -166,7 +166,7 @@ class CardioSession extends AtomicEntity {
       if (startIndex != null && endIndex != null) {
         final startHR = heartRate![startIndex];
         final endHR = heartRate![endIndex];
-        double minutes = (endHR - startHR).inMilliseconds / (1000 * 60);
+        final minutes = (endHR - startHR).inMilliseconds / (1000 * 60);
         if (minutes > 0) {
           return ((endIndex - startIndex) / minutes).round();
         }
@@ -195,11 +195,10 @@ class CardioSession extends AtomicEntity {
       this.descent = null;
       return;
     }
-    double ascent = 0;
-    double descent = 0;
-    for (int i = 0; i < track!.length - 1; i++) {
-      double elevationDifference =
-          track![i + 1].elevation - track![i].elevation;
+    var ascent = 0.0;
+    var descent = 0.0;
+    for (var i = 0; i < track!.length - 1; i++) {
+      final elevationDifference = track![i + 1].elevation - track![i].elevation;
       if (elevationDifference > 0) {
         ascent += elevationDifference;
       } else {

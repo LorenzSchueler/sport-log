@@ -64,11 +64,10 @@ class Route extends AtomicEntity with Comparable<Route> {
       this.descent = null;
       return;
     }
-    double ascent = 0;
-    double descent = 0;
-    for (int i = 0; i < track!.length - 1; i++) {
-      double elevationDifference =
-          track![i + 1].elevation - track![i].elevation;
+    var ascent = 0.0;
+    var descent = 0.0;
+    for (var i = 0; i < track!.length - 1; i++) {
+      final elevationDifference = track![i + 1].elevation - track![i].elevation;
       if (elevationDifference > 0) {
         ascent += elevationDifference;
       } else {

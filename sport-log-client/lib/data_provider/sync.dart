@@ -88,7 +88,7 @@ class Sync extends ChangeNotifier {
       }
     }
 
-    bool syncSuccessful =
+    var syncSuccessful =
         await EntityDataProvider.downSync(onNoInternet: onNoInternet);
     if (syncSuccessful) {
       syncSuccessful =

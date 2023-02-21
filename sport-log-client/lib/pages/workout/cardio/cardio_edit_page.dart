@@ -8,7 +8,6 @@ import 'package:sport_log/helpers/extensions/map_controller_extension.dart';
 import 'package:sport_log/helpers/page_return.dart';
 import 'package:sport_log/helpers/pointer.dart';
 import 'package:sport_log/helpers/validation.dart';
-import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/cardio/cardio_session_description.dart';
 import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
@@ -332,7 +331,7 @@ class _CardioEditPageState extends State<CardioEditPage> {
                               _cardioSessionDescription.movement.name,
                             ),
                             onTap: () async {
-                              Movement? movement = await showMovementPicker(
+                              final movement = await showMovementPicker(
                                 selectedMovement:
                                     _cardioSessionDescription.movement,
                                 cardioOnly: true,

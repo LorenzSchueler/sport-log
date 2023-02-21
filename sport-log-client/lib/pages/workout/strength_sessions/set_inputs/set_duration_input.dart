@@ -356,7 +356,7 @@ class _PaddedIntInputState extends State<_PaddedIntInput> {
     if (maybeValue == null) {
       return oldValue;
     }
-    final int value = maybeValue;
+    final value = maybeValue;
 
     if (widget.maxValue != null && value > widget.maxValue! ||
         value >= pow(10, widget.numberOfDigits)) {

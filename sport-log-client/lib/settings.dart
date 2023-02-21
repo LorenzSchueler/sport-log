@@ -23,7 +23,7 @@ class Settings extends ChangeNotifier {
 
   static final _logger = Logger('Settings');
 
-  static Box? _storage;
+  static Box<dynamic>? _storage;
 
   static const String _accountCreated = "accountCreated";
   static const String _syncEnabled = "syncEnabled";

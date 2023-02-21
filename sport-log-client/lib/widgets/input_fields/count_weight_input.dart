@@ -92,14 +92,14 @@ class _CountWeightInputState extends State<CountWeightInput> {
   }
 
   void _setWeight(double weight) {
-    weight = _weightUnit == "lb" ? weight * _lbToKg : weight;
-    setState(() => _weight = weight);
+    setState(() => _weight = _weightUnit == "lb" ? weight * _lbToKg : weight);
     _submit();
   }
 
   void _setFemaleWeight(double weight) {
-    weight = _weightUnit == "lb" ? weight * _lbToKg : weight;
-    setState(() => _secondWeight = weight);
+    setState(
+      () => _secondWeight = _weightUnit == "lb" ? weight * _lbToKg : weight,
+    );
     _submit();
   }
 

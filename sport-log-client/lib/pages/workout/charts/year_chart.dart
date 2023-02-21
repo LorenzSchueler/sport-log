@@ -33,7 +33,7 @@ class YearChart extends DateTimePeriodChart {
             color: Theme.of(context).colorScheme.primary,
           ),
         ],
-        minX: 1.0,
+        minX: 1,
         maxX: startDateTime.numDaysInYear.toDouble(),
         minY: minY,
         maxY: maxY,

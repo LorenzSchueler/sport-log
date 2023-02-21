@@ -14,7 +14,7 @@ class LocationUtils {
   static final Location _location = Location();
 
   void Function(LocationData) onLocationUpdate;
-  StreamSubscription? _locationSubscription;
+  StreamSubscription<LocationData>? _locationSubscription;
   LatLng? _lastLatLng;
 
   static Future<bool> enableLocation() async {
@@ -64,8 +64,8 @@ class LocationUtils {
           return false;
         }
       }
-      await _location.enableBackgroundMode(enable: true);
-      await _location.changeSettings(accuracy: LocationAccuracy.high);
+      await _location.enableBackgroundMode();
+      await _location.changeSettings();
       _locationSubscription =
           _location.onLocationChanged.listen((locationData) {
         _lastLatLng = locationData.latLng;

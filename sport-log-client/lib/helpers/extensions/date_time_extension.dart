@@ -174,7 +174,7 @@ extension DateTimeExtension on DateTime {
   }
 
   DateTime endOfMonth() {
-    return DateTime(year, month + 1, 1);
+    return DateTime(year, month + 1);
   }
 
   DateTime endOfYear() {

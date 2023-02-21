@@ -16,7 +16,6 @@ class Column {
   String? _defaultValue;
   String? _referenceTable;
   String? _referenceColumn;
-  OnAction? _onUpdateReference;
   OnAction? _onDeleteReference;
   String? _check;
 
@@ -36,12 +35,10 @@ class Column {
     String table, {
     String? column,
     required OnAction? onDelete,
-    OnAction? onUpdate,
   }) {
     _referenceTable = table;
     _referenceColumn = column;
     _onDeleteReference = onDelete;
-    _onUpdateReference = onUpdate;
   }
 
   void checkBetween(num start, num end) {
@@ -116,16 +113,13 @@ class Column {
     if (_referenceTable == null) {
       return '';
     }
-    final String referenceName = _referenceColumn == null
+    final referenceName = _referenceColumn == null
         ? _referenceTable!
         : '${_referenceTable!}(${_referenceColumn!})';
-    final onUpdateStr = _onUpdateReference == null
-        ? ''
-        : ' on update ${_onActionToString(_onUpdateReference!)}';
     final onDeleteStr = _onDeleteReference == null
         ? ''
         : 'on delete ${_onActionToString(_onDeleteReference!)}';
-    return 'references $referenceName $onDeleteStr'.trimRight() + onUpdateStr;
+    return 'references $referenceName $onDeleteStr'.trimRight();
   }
 
   String setUpSql() {

@@ -26,8 +26,8 @@ class HeartRateUtils extends ChangeNotifier {
   String? deviceId;
   void Function(PolarHeartRateEvent)? _onHeartRateEvent;
 
-  StreamSubscription? _heartRateSubscription;
-  StreamSubscription? _batterySubscription;
+  StreamSubscription<PolarHeartRateEvent>? _heartRateSubscription;
+  StreamSubscription<PolarBatteryLevelEvent>? _batterySubscription;
 
   int? _hr;
   int? get hr => _hr;

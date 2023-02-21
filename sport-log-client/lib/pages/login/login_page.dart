@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:result_type/result_type.dart';
-import 'package:sport_log/api/api.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/account.dart';
 import 'package:sport_log/helpers/extensions/navigator_extension.dart';
@@ -233,7 +231,7 @@ class _LoginPageState extends State<LoginPage> {
       return;
     }
     setState(() => _loginPending = true);
-    final Result<User, ApiError> result = widget.loginType.isRegister
+    final result = widget.loginType.isRegister
         ? await Account.register(_serverUrl, _user)
         : await Account.login(_serverUrl, _user.username, _user.password);
     if (mounted) {

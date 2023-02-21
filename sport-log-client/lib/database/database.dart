@@ -121,8 +121,8 @@ class AppDatabase {
             }
           }
         },
-        onUpgrade: null,
-        onDowngrade: null,
+        //onUpgrade: null,
+        //onDowngrade: null,
         onOpen: (db) => _logger.d("Database initialization done"),
       ),
     );

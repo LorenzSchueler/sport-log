@@ -83,7 +83,7 @@ class Validator {
     if (value == null || value.isEmpty) {
       return "Field must not be empty.";
     }
-    int? intValue = int.tryParse(value);
+    final intValue = int.tryParse(value);
     if (intValue == null) {
       return "Number is invalid.";
     } else if (intValue <= 0) {
@@ -97,7 +97,7 @@ class Validator {
     if (value == null || value.isEmpty) {
       return "Field must not be empty.";
     }
-    int? intValue = int.tryParse(value);
+    final intValue = int.tryParse(value);
     if (intValue == null) {
       return "Number is invalid.";
     } else if (intValue < 0) {
@@ -116,7 +116,7 @@ class Validator {
     if (value == null || value.isEmpty) {
       return "Field must not be empty.";
     }
-    int? intValue = int.tryParse(value);
+    final intValue = int.tryParse(value);
     if (intValue == null) {
       return "Number is invalid.";
     } else if (intValue < lowerBound || intValue > upperBound) {
@@ -130,7 +130,7 @@ class Validator {
     if (value == null || value.isEmpty) {
       return "Field must not be empty.";
     }
-    int? intValue = int.tryParse(value);
+    final intValue = int.tryParse(value);
     if (intValue == null) {
       return "Number is invalid.";
     } else if (intValue < 0 || intValue >= upperBound) {
@@ -144,7 +144,7 @@ class Validator {
     if (value == null || value.isEmpty) {
       return "Field must not be empty.";
     }
-    int? intValue = int.tryParse(value);
+    final intValue = int.tryParse(value);
     if (intValue == null) {
       return "Number is invalid.";
     } else if (intValue < 0 || intValue > upperBound) {
@@ -158,7 +158,7 @@ class Validator {
     if (value == null || value.isEmpty) {
       return "Field must not be empty.";
     }
-    double? doubleValue = double.tryParse(value);
+    final doubleValue = double.tryParse(value);
     if (doubleValue == null) {
       return "Number is invalid.";
     } else if (doubleValue <= 0) {

@@ -345,12 +345,10 @@ class _MetconEditPageState extends State<MetconEditPage> {
 
   void _reorder(int oldIndex, int newIndex) {
     FocusManager.instance.primaryFocus?.unfocus();
-    if (oldIndex < newIndex) {
-      newIndex -= 1;
-    }
+    final insertAt = oldIndex < newIndex ? newIndex - 1 : newIndex;
     setState(() {
       final oldMove = _metconDescription.moves.removeAt(oldIndex);
-      _metconDescription.moves.insert(newIndex, oldMove);
+      _metconDescription.moves.insert(insertAt, oldMove);
     });
   }
 }

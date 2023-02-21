@@ -21,22 +21,15 @@ extension StrengthRecordExtension on StrengthRecords {
   List<StrengthRecordType> _getRecordTypesFromStats(
     StrengthSessionStats strengthSessionStats,
     StrengthRecord? strengthRecord,
-  ) {
-    List<StrengthRecordType> recordTypes = [];
-    if (strengthRecord != null) {
-      if (isRecord(strengthSessionStats.maxWeight, strengthRecord.maxWeight)) {
-        recordTypes.add(StrengthRecordType.maxWeight);
-      }
-      if (strengthSessionStats.maxCount >= strengthRecord.maxCount) {
-        recordTypes.add(StrengthRecordType.maxCount);
-      }
-      if (isRecord(strengthSessionStats.maxEorm, strengthRecord.maxEorm)) {
-        recordTypes.add(StrengthRecordType.maxEorm);
-      }
-    }
-
-    return recordTypes;
-  }
+  ) =>
+      [
+        if (isRecord(strengthSessionStats.maxWeight, strengthRecord?.maxWeight))
+          StrengthRecordType.maxWeight,
+        if (isRecord(strengthSessionStats.maxCount, strengthRecord?.maxCount))
+          StrengthRecordType.maxCount,
+        if (isRecord(strengthSessionStats.maxEorm, strengthRecord?.maxEorm))
+          StrengthRecordType.maxEorm
+      ];
 
   List<StrengthRecordType> getRecordTypes(
     StrengthSet strengthSet,

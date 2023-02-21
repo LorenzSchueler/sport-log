@@ -2,10 +2,8 @@ import 'package:flutter/material.dart' hide Action;
 import 'package:sport_log/data_provider/data_providers/action_data_provider.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
-import 'package:sport_log/models/action/action.dart';
 import 'package:sport_log/models/action/action_provider_description.dart';
 import 'package:sport_log/models/action/action_rule.dart';
-import 'package:sport_log/models/action/weekday.dart';
 import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/message_dialog.dart';
@@ -95,7 +93,7 @@ class _ActionRuleEditPageState extends State<ActionRuleEditPage> {
                       .name,
                 ),
                 onTap: () async {
-                  Action? action = await showActionPicker(
+                  final action = await showActionPicker(
                     actions: widget.actionProviderDescription.actions,
                     selectedAction:
                         widget.actionProviderDescription.actions.firstWhere(
@@ -113,7 +111,7 @@ class _ActionRuleEditPageState extends State<ActionRuleEditPage> {
                 caption: "Weekday",
                 child: Text(_actionRule.weekday.name),
                 onTap: () async {
-                  Weekday? weekday = await showWeekdayPicker(
+                  final weekday = await showWeekdayPicker(
                     selectedWeekday: _actionRule.weekday,
                     context: context,
                   );
@@ -127,7 +125,7 @@ class _ActionRuleEditPageState extends State<ActionRuleEditPage> {
                 caption: "Time",
                 child: Text(_actionRule.time.formatHm),
                 onTap: () async {
-                  DateTime? time = await showScrollableTimePicker(
+                  final time = await showScrollableTimePicker(
                     context: context,
                     initialTime: _actionRule.time,
                   );

@@ -113,7 +113,7 @@ class MetconDescriptionDataProvider extends DataProvider<MetconDescription> {
   Future<DbResult> createSingle(MetconDescription object) async {
     object.sanitize();
     assert(object.isValid());
-    var result =
+    final result =
         await _metconDataProvider.createSingle(object.metcon, notify: false);
     if (result.isFailure) {
       return result;

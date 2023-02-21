@@ -13,13 +13,6 @@ class RouteValueUnitDescriptionTable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final TableRow rowSpacer = TableRow(
-      children: [
-        Defaults.sizedBox.vertical.small,
-        Defaults.sizedBox.vertical.small,
-      ],
-    );
-
     return Table(
       children: [
         TableRow(
@@ -28,7 +21,12 @@ class RouteValueUnitDescriptionTable extends StatelessWidget {
             ValueUnitDescription.name(route.name)
           ],
         ),
-        rowSpacer,
+        TableRow(
+          children: [
+            Defaults.sizedBox.vertical.small,
+            Defaults.sizedBox.vertical.small,
+          ],
+        ),
         TableRow(
           children: [
             ValueUnitDescription.ascent(route.ascent),

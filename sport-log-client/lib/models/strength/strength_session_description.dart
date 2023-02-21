@@ -97,7 +97,7 @@ class StrengthSessionDescription extends CompoundEntity {
   @override
   void sanitize() {
     session.sanitize();
-    for (final StrengthSet set in sets) {
+    for (final set in sets) {
       set.sanitize();
     }
   }

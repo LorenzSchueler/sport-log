@@ -4,7 +4,7 @@ import 'package:sport_log/models/all.dart';
 
 void main() {
   test('test position list', () {
-    List<Position> positions1 = [
+    final positions1 = [
       Position(
         longitude: 32.234,
         latitude: 52.3423,
@@ -35,7 +35,7 @@ void main() {
     expect(positions2 != null, true);
     expect(positions1.length, positions2!.length);
 
-    for (int i = 0; i < positions1.length; ++i) {
+    for (var i = 0; i < positions1.length; ++i) {
       expect(positions1[i] == positions2[i], true);
     }
   });

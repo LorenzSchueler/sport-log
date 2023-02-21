@@ -27,15 +27,15 @@ extension MapControllerExtension on MapboxMap {
   Future<void> setNorth() => flyTo(CameraOptions(bearing: 0), null);
 
   Future<void> setBoundsX(LatLngBounds bounds, {required bool padded}) async {
-    if (padded) {
-      bounds = bounds.padded();
-    }
-    final center = bounds.center;
+    final paddedBounds = padded ? bounds.padded() : bounds;
+    final center = paddedBounds.center;
     await setCamera(CameraOptions(center: center.toJsonPoint()));
     final screenCorner =
         await screenCoordToLatLng(ScreenCoordinate(x: 0, y: 0));
-    final northwest =
-        LatLng(lat: bounds.northeast.lat, lng: bounds.southwest.lng);
+    final northwest = LatLng(
+      lat: paddedBounds.northeast.lat,
+      lng: paddedBounds.southwest.lng,
+    );
     final latRatio =
         (center.lat - screenCorner.lat) / (center.lat - northwest.lat);
     final lngRatio =
@@ -64,15 +64,6 @@ extension MapControllerExtension on MapboxMap {
     ScreenCoordinate screenCoordinate,
   ) async =>
       LatLng.fromMap(await coordinateForPixel(screenCoordinate));
-
-  Function(ScreenCoordinate)? invokeWithLatLng(Function(LatLng)? fn) {
-    return fn == null
-        ? null
-        : (ScreenCoordinate screenCoord) async {
-            final latLng = await screenCoordToLatLng(screenCoord);
-            fn(latLng);
-          };
-  }
 }
 
 class LineManager {
@@ -179,13 +170,13 @@ class CircleManager {
     return (await _manager.createMulti([
       CircleAnnotationOptions(
         geometry: latLng.toJsonPoint(),
-        circleRadius: 8.0,
+        circleRadius: 8,
         circleColor: Defaults.mapbox.markerColor,
         circleOpacity: 0.5,
       ),
       CircleAnnotationOptions(
         geometry: latLng.toJsonPoint(),
-        circleRadius: 20.0,
+        circleRadius: 20,
         circleColor: Defaults.mapbox.markerColor,
         circleOpacity: 0.3,
       ),
@@ -220,7 +211,7 @@ class CircleManager {
     return _manager.create(
       CircleAnnotationOptions(
         geometry: latLng.toJsonPoint(),
-        circleRadius: 8.0,
+        circleRadius: 8,
         circleColor: Defaults.mapbox.markerColor,
         circleOpacity: 0.5,
       ),

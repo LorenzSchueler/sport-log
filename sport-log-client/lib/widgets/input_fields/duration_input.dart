@@ -50,7 +50,6 @@ class _DurationInputState extends State<DurationInput> {
   Widget build(BuildContext context) {
     return Row(
       mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         RepeatIconButton(
           icon: const Icon(AppIcons.subtractBox),
