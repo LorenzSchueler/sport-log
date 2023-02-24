@@ -175,7 +175,7 @@ class _MetconEditPageState extends State<MetconEditPage> {
   }
 
   Widget _typeInput() {
-    return SegmentedButton<MetconType>(
+    return SegmentedButton(
       segments: MetconType.values
           .map(
             (md) => ButtonSegment(
@@ -185,6 +185,7 @@ class _MetconEditPageState extends State<MetconEditPage> {
           )
           .toList(),
       selected: {_metconDescription.metcon.metconType},
+      showSelectedIcon: false,
       onSelectionChanged: (selected) => _setType(selected.first),
     );
   }

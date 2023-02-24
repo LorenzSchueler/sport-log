@@ -64,7 +64,7 @@ class _CardioChartState extends State<CardioChart> {
         Scrollbar(
           child: SingleChildScrollView(
             scrollDirection: Axis.horizontal,
-            child: SegmentedButton<_SeriesType>(
+            child: SegmentedButton(
               segments: _SeriesType.values
                   .map(
                     (md) => ButtonSegment(
@@ -74,6 +74,7 @@ class _CardioChartState extends State<CardioChart> {
                   )
                   .toList(),
               selected: {_selectedSeries},
+              showSelectedIcon: false,
               onSelectionChanged: (selected) =>
                   setState(() => _selectedSeries = selected.first),
             ),

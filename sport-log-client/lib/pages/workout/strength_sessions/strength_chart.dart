@@ -117,7 +117,7 @@ class _StrengthChartState extends State<StrengthChart> {
         Scrollbar(
           child: SingleChildScrollView(
             scrollDirection: Axis.horizontal,
-            child: SegmentedButton<_SeriesType>(
+            child: SegmentedButton(
               segments: _availableSeries
                   .map(
                     (md) => ButtonSegment(
@@ -127,6 +127,7 @@ class _StrengthChartState extends State<StrengthChart> {
                   )
                   .toList(),
               selected: {_selectedSeries},
+              showSelectedIcon: false,
               onSelectionChanged: (selected) =>
                   setState(() => _selectedSeries = selected.first),
             ),

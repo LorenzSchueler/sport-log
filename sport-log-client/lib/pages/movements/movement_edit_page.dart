@@ -182,7 +182,7 @@ class _MovementEditPageState extends State<MovementEditPage> {
   }
 
   Widget get _dimInput {
-    return SegmentedButton<MovementDimension>(
+    return SegmentedButton(
       segments: MovementDimension.values
           .map(
             (md) => ButtonSegment(
@@ -192,6 +192,7 @@ class _MovementEditPageState extends State<MovementEditPage> {
           )
           .toList(),
       selected: {_movementDescription.movement.dimension},
+      showSelectedIcon: false,
       onSelectionChanged: (selected) => setState(
         () => _movementDescription.movement.dimension = selected.first,
       ),
