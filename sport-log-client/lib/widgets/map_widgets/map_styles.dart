@@ -32,14 +32,47 @@ class MapStylesBottomSheet extends StatefulWidget {
 
 class _MapStylesBottomSheetState extends State<MapStylesBottomSheet> {
   bool _hillshade = false;
+  // ignore: non_constant_identifier_names
+  bool _3D = false;
 
-  static const _hillshadeSourceId = "mapbox-terrain-dem-v1";
+  static const _terrainSourceId = "mapbox-terrain-dem-v1";
   static const _hillshadeLayerId = "custom-hillshade";
+  static const _exaggeration = 1.0;
+  static const _pitch = 60.0;
 
   final style = ButtonStyle(
     shape: MaterialStateProperty.all(const CircleBorder()),
     padding: MaterialStateProperty.all(const EdgeInsets.all(10)),
   );
+
+  @override
+  void initState() {
+    _setOptionState();
+    super.initState();
+  }
+
+  Future<void> _setOptionState() async {
+    _hillshade =
+        await widget.mapController.style.styleLayerExists(_hillshadeLayerId);
+    _3D = double.tryParse(
+          (await widget.mapController.style
+                  .getStyleTerrainProperty("exaggeration"))
+              .value,
+        ) ==
+        _exaggeration;
+    setState(() {});
+  }
+
+  Future<void> _addTerrainSource() async {
+    if (!await widget.mapController.style.styleSourceExists(_terrainSourceId)) {
+      await widget.mapController.style.addSource(
+        RasterDemSource(
+          id: _terrainSourceId,
+          url: 'mapbox://mapbox.mapbox-terrain-dem-v1',
+        ),
+      );
+    }
+  }
 
   Future<void> _toggleHillshade() async {
     if (_hillshade) {
@@ -47,23 +80,33 @@ class _MapStylesBottomSheetState extends State<MapStylesBottomSheet> {
       await widget.mapController.style.removeStyleLayer(_hillshadeLayerId);
     } else {
       setState(() => _hillshade = true);
-      if (!await widget.mapController.style
-          .styleSourceExists(_hillshadeSourceId)) {
-        await widget.mapController.style.addSource(
-          RasterDemSource(
-            id: _hillshadeSourceId,
-            url: 'mapbox://mapbox.mapbox-terrain-dem-v1',
-          ),
-        );
-      }
+      await _addTerrainSource();
       await widget.mapController.style.addLayer(
         HillshadeLayer(
           id: _hillshadeLayerId,
-          sourceId: _hillshadeSourceId,
+          sourceId: _terrainSourceId,
           hillshadeShadowColor: 0x404040,
           hillshadeHighlightColor: 0x404040,
         ),
       );
+    }
+  }
+
+  Future<void> _toggle3D() async {
+    if (_3D) {
+      setState(() => _3D = false);
+      await widget.mapController.style
+          .setStyleTerrainProperty("exaggeration", "0");
+      // while exaggeration is 0 this does not matter but it is needed so that setting it back to 60 works
+      await widget.mapController.pitchBy(-_pitch, MapAnimationOptions());
+    } else {
+      setState(() => _3D = true);
+      await _addTerrainSource();
+      await widget.mapController.style
+          .setStyleTerrainProperty("source", _terrainSourceId);
+      await widget.mapController.style
+          .setStyleTerrainProperty("exaggeration", _exaggeration);
+      await widget.mapController.pitchBy(_pitch, MapAnimationOptions());
     }
   }
 
@@ -106,6 +149,18 @@ class _MapStylesBottomSheetState extends State<MapStylesBottomSheet> {
                 Icon(_hillshade ? AppIcons.close : AppIcons.add),
                 Defaults.sizedBox.horizontal.normal,
                 const Text("Hillshade"),
+              ],
+            ),
+          ),
+          Defaults.sizedBox.vertical.normal,
+          ElevatedButton(
+            onPressed: _toggle3D,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(_3D ? AppIcons.close : AppIcons.add),
+                Defaults.sizedBox.horizontal.normal,
+                const Text("3D"),
               ],
             ),
           ),

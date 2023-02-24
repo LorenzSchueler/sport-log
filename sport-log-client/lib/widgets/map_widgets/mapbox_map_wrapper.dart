@@ -36,6 +36,7 @@ class MapboxMapWrapper extends StatefulWidget {
     this.scrollGesturesEnabled = true,
     this.zoomGesturesEnabled = true,
     this.doubleClickZoomEnabled = true,
+    this.pitchGestureEnabled = true,
     super.key,
   });
 
@@ -66,6 +67,7 @@ class MapboxMapWrapper extends StatefulWidget {
   final bool scrollGesturesEnabled;
   final bool zoomGesturesEnabled;
   final bool doubleClickZoomEnabled;
+  final bool pitchGestureEnabled;
 
   @override
   State<MapboxMapWrapper> createState() => _MapboxMapWrapperState();
@@ -92,7 +94,7 @@ class _MapboxMapWrapperState extends State<MapboxMapWrapper> {
         doubleTouchToZoomOutEnabled: false,
         rotateEnabled: widget.rotateGesturesEnabled,
         scrollEnabled: widget.scrollGesturesEnabled,
-        pitchEnabled: false,
+        pitchEnabled: widget.pitchGestureEnabled,
         pinchToZoomEnabled: widget.zoomGesturesEnabled,
         quickZoomEnabled: false,
         pinchPanEnabled: false,
