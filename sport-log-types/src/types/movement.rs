@@ -15,8 +15,11 @@ use crate::{
 use crate::{types::IdString, UserId};
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq)]
-#[cfg_attr(feature = "db", derive(DbEnum))]
-#[ExistingTypePath = "crate::schema::sql_types::MovementDimension"]
+#[cfg_attr(
+    feature = "db",
+    derive(DbEnum),
+    ExistingTypePath = "crate::schema::sql_types::MovementDimension"
+)]
 pub enum MovementDimension {
     Reps,
     Time,

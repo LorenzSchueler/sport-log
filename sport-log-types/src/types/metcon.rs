@@ -11,13 +11,16 @@ use sport_log_types_derive::{IdFromSql, IdToSql};
 #[cfg(feature = "db")]
 use crate::{
     schema::{metcon, metcon_item, metcon_movement, metcon_session},
-    TrainingPlan, User,
+    Movement, TrainingPlan, User,
 };
-use crate::{types::IdString, Movement, MovementId, TrainingPlanId, UserId};
+use crate::{types::IdString, MovementId, TrainingPlanId, UserId};
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq)]
-#[cfg_attr(feature = "db", derive(DbEnum))]
-#[ExistingTypePath = "crate::schema::sql_types::MetconType"]
+#[cfg_attr(
+    feature = "db",
+    derive(DbEnum),
+    ExistingTypePath = "crate::schema::sql_types::MetconType"
+)]
 pub enum MetconType {
     Amrap,
     Emom,
@@ -25,8 +28,11 @@ pub enum MetconType {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq)]
-#[cfg_attr(feature = "db", derive(DbEnum))]
-#[ExistingTypePath = "crate::schema::sql_types::DistanceUnit"]
+#[cfg_attr(
+    feature = "db",
+    derive(DbEnum),
+    ExistingTypePath = "crate::schema::sql_types::DistanceUnit"
+)]
 pub enum DistanceUnit {
     Meter,
     Km,

@@ -9,9 +9,9 @@ use sport_log_types_derive::{IdFromSql, IdToSql};
 #[cfg(feature = "db")]
 use crate::{
     schema::{strength_blueprint, strength_blueprint_set, strength_session, strength_set},
-    TrainingPlan, User,
+    Movement, TrainingPlan, User,
 };
-use crate::{types::IdString, Movement, MovementId, TrainingPlanId, UserId};
+use crate::{types::IdString, MovementId, TrainingPlanId, UserId};
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, IdString)]
 #[serde(try_from = "IdString", into = "IdString")]

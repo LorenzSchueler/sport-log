@@ -18,4 +18,4 @@ err-derive = "0.3.0"
 lazy_static = "1.4.0"
 tracing = "0.1.26"
 tracing-subscriber = { version = "0.3", features = ["env-filter"]}
-sysinfo = "0.27"
+sysinfo = "0.28"
