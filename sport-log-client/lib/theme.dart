@@ -66,6 +66,11 @@ class AppTheme {
           ),
         ),
       ),
+      segmentedButtonTheme: const SegmentedButtonThemeData(
+        style: ButtonStyle(
+          iconSize: MaterialStatePropertyAll(24),
+        ),
+      ),
       iconTheme: IconThemeData(
         color: colorScheme.primary,
       ),

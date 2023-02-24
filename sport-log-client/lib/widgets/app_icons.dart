@@ -51,6 +51,8 @@ class AppIcons {
   static const IconData visibilityOff = Icons.visibility_off_outlined;
   static const IconData centerFocus = Icons.center_focus_strong_rounded;
   static const IconData centerFocusOff = Icons.center_focus_weak_rounded;
+  static const IconData threeD = Icons.threed_rotation_rounded;
+  static const IconData invertColors = Icons.invert_colors_rounded;
 
   // arrows
   static const IconData arrowBack = Icons.arrow_back_rounded;

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart' hide Visibility;
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:sport_log/defaults.dart';
+import 'package:sport_log/helpers/extensions/map_controller_extension.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 
 class MapStylesButton extends StatelessWidget {
@@ -30,42 +31,23 @@ class MapStylesBottomSheet extends StatefulWidget {
   State<MapStylesBottomSheet> createState() => _MapStylesBottomSheetState();
 }
 
-class _MapStylesBottomSheetState extends State<MapStylesBottomSheet> {
-  bool _hillshade = false;
-  // ignore: non_constant_identifier_names
-  bool _3D = false;
+abstract class _MapOption {
+  const _MapOption();
 
-  static const _terrainSourceId = "mapbox-terrain-dem-v1";
-  static const _hillshadeLayerId = "custom-hillshade";
-  static const _exaggeration = 1.0;
-  static const _pitch = 60.0;
+  Future<void> enable(MapboxMap mapController);
 
-  final style = ButtonStyle(
-    shape: MaterialStateProperty.all(const CircleBorder()),
-    padding: MaterialStateProperty.all(const EdgeInsets.all(10)),
-  );
+  Future<void> disable(MapboxMap mapController);
+}
 
-  @override
-  void initState() {
-    _setOptionState();
-    super.initState();
-  }
+class _HillshadeOption extends _MapOption {
+  const _HillshadeOption();
 
-  Future<void> _setOptionState() async {
-    _hillshade =
-        await widget.mapController.style.styleLayerExists(_hillshadeLayerId);
-    _3D = double.tryParse(
-          (await widget.mapController.style
-                  .getStyleTerrainProperty("exaggeration"))
-              .value,
-        ) ==
-        _exaggeration;
-    setState(() {});
-  }
+  static const _terrainSourceId = "mapbox-terrain-dem-v1-hillshade";
+  static const _hillshadeLayerId = "hillshade-layer";
 
-  Future<void> _addTerrainSource() async {
-    if (!await widget.mapController.style.styleSourceExists(_terrainSourceId)) {
-      await widget.mapController.style.addSource(
+  Future<void> _addTerrainSource(MapboxMap mapController) async {
+    if (!await mapController.style.styleSourceExists(_terrainSourceId)) {
+      await mapController.style.addSource(
         RasterDemSource(
           id: _terrainSourceId,
           url: 'mapbox://mapbox.mapbox-terrain-dem-v1',
@@ -74,40 +56,111 @@ class _MapStylesBottomSheetState extends State<MapStylesBottomSheet> {
     }
   }
 
-  Future<void> _toggleHillshade() async {
-    if (_hillshade) {
-      setState(() => _hillshade = false);
-      await widget.mapController.style.removeStyleLayer(_hillshadeLayerId);
-    } else {
-      setState(() => _hillshade = true);
-      await _addTerrainSource();
-      await widget.mapController.style.addLayer(
-        HillshadeLayer(
-          id: _hillshadeLayerId,
-          sourceId: _terrainSourceId,
-          hillshadeShadowColor: 0x404040,
-          hillshadeHighlightColor: 0x404040,
+  @override
+  Future<void> enable(MapboxMap mapController) async {
+    await _addTerrainSource(mapController);
+    await mapController.style.addLayer(
+      HillshadeLayer(
+        id: _hillshadeLayerId,
+        sourceId: _terrainSourceId,
+        hillshadeShadowColor: 0x404040,
+        hillshadeHighlightColor: 0x404040,
+      ),
+    );
+  }
+
+  @override
+  Future<void> disable(MapboxMap mapController) async {
+    await mapController.style.removeStyleLayer(_hillshadeLayerId);
+  }
+}
+
+class _ThreeDOption extends _MapOption {
+  const _ThreeDOption();
+
+  static const _terrainSourceId = "mapbox-terrain-dem-v1-3d";
+  static const _exaggeration = 1.0;
+  static const _pitch = 60.0;
+
+  Future<void> _addTerrainSource(MapboxMap mapController) async {
+    if (!await mapController.style.styleSourceExists(_terrainSourceId)) {
+      await mapController.style.addSource(
+        RasterDemSource(
+          id: _terrainSourceId,
+          url: 'mapbox://mapbox.mapbox-terrain-dem-v1',
         ),
       );
     }
   }
 
-  Future<void> _toggle3D() async {
-    if (_3D) {
-      setState(() => _3D = false);
-      await widget.mapController.style
-          .setStyleTerrainProperty("exaggeration", "0");
-      // while exaggeration is 0 this does not matter but it is needed so that setting it back to 60 works
-      await widget.mapController.pitchBy(-_pitch, MapAnimationOptions());
-    } else {
-      setState(() => _3D = true);
-      await _addTerrainSource();
-      await widget.mapController.style
-          .setStyleTerrainProperty("source", _terrainSourceId);
-      await widget.mapController.style
-          .setStyleTerrainProperty("exaggeration", _exaggeration);
-      await widget.mapController.pitchBy(_pitch, MapAnimationOptions());
+  @override
+  Future<void> enable(MapboxMap mapController) async {
+    await _addTerrainSource(mapController);
+    await mapController.style
+        .setStyleTerrainProperty("source", _terrainSourceId);
+    await mapController.style
+        .setStyleTerrainProperty("exaggeration", _exaggeration);
+    await mapController.pitchBy(_pitch, MapAnimationOptions());
+  }
+
+  @override
+  Future<void> disable(MapboxMap mapController) async {
+    await mapController.style.setStyleTerrainProperty("exaggeration", "0");
+    // while exaggeration is 0 this does not matter but it is needed so that setting it back to 60 works
+    final pitch = await mapController.pitch;
+    await mapController.pitchBy(-pitch, MapAnimationOptions());
+  }
+}
+
+class _MapStylesBottomSheetState extends State<MapStylesBottomSheet> {
+  Set<_MapOption> _options = {};
+  String _style = MapboxStyles.OUTDOORS;
+
+  final style = ButtonStyle(
+    shape: MaterialStateProperty.all(const CircleBorder()),
+    padding: MaterialStateProperty.all(const EdgeInsets.all(10)),
+  );
+
+  @override
+  void initState() {
+    _setCurrentState();
+    super.initState();
+  }
+
+  Future<void> _setCurrentState() async {
+    final style = await widget.mapController.style.getStyleURI();
+    final hasHillshade = await widget.mapController.style
+        .styleLayerExists(_HillshadeOption._hillshadeLayerId);
+    final hasThreeD = ![null, 0.0].contains(
+      double.tryParse(
+        (await widget.mapController.style
+                .getStyleTerrainProperty("exaggeration"))
+            .value,
+      ),
+    );
+    setState(() {
+      _style = style;
+      _options = {
+        if (hasHillshade) const _HillshadeOption(),
+        if (hasThreeD) const _ThreeDOption()
+      };
+    });
+  }
+
+  Future<void> _setStyle(Set<String> style) async {
+    await _setOptions({}); // disable all options
+    await widget.mapController.style.setStyleURI(style.first);
+    setState(() => _style = style.first);
+  }
+
+  Future<void> _setOptions(Set<_MapOption> options) async {
+    for (final option in _options.difference(options)) {
+      await option.disable(widget.mapController);
     }
+    for (final option in options.difference(_options)) {
+      await option.enable(widget.mapController);
+    }
+    setState(() => _options = options);
   }
 
   @override
@@ -117,52 +170,44 @@ class _MapStylesBottomSheetState extends State<MapStylesBottomSheet> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              ElevatedButton(
-                onPressed: () => widget.mapController.style
-                    .setStyleURI(MapboxStyles.OUTDOORS),
-                style: style,
-                child: const Icon(AppIcons.mountains),
+          SegmentedButton(
+            segments: const [
+              ButtonSegment(
+                value: MapboxStyles.OUTDOORS,
+                icon: Icon(AppIcons.mountains),
               ),
-              ElevatedButton(
-                onPressed: () => widget.mapController.style
-                    .setStyleURI(MapboxStyles.MAPBOX_STREETS),
-                style: style,
-                child: const Icon(AppIcons.car),
+              ButtonSegment(
+                value: MapboxStyles.MAPBOX_STREETS,
+                icon: Icon(AppIcons.car),
               ),
-              ElevatedButton(
-                onPressed: () => widget.mapController.style
-                    .setStyleURI(MapboxStyles.SATELLITE),
-                style: style,
-                child: const Icon(AppIcons.satellite),
+              ButtonSegment(
+                value: MapboxStyles.SATELLITE,
+                icon: Icon(AppIcons.satellite),
               ),
             ],
+            selected: {_style},
+            onSelectionChanged: _setStyle,
+            showSelectedIcon: false,
           ),
           Defaults.sizedBox.vertical.normal,
-          ElevatedButton(
-            onPressed: _toggleHillshade,
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(_hillshade ? AppIcons.close : AppIcons.add),
-                Defaults.sizedBox.horizontal.normal,
-                const Text("Hillshade"),
-              ],
-            ),
-          ),
-          Defaults.sizedBox.vertical.normal,
-          ElevatedButton(
-            onPressed: _toggle3D,
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(_3D ? AppIcons.close : AppIcons.add),
-                Defaults.sizedBox.horizontal.normal,
-                const Text("3D"),
-              ],
-            ),
+          SegmentedButton(
+            segments: const [
+              ButtonSegment(
+                value: _HillshadeOption(),
+                icon: Icon(AppIcons.invertColors),
+                label: Text("Hillshade"),
+              ),
+              ButtonSegment(
+                value: _ThreeDOption(),
+                icon: Icon(AppIcons.threeD),
+                label: Text("3D"),
+              ),
+            ],
+            multiSelectionEnabled: true,
+            emptySelectionAllowed: true,
+            selected: _options,
+            onSelectionChanged: _setOptions,
+            showSelectedIcon: false,
           ),
         ],
       ),

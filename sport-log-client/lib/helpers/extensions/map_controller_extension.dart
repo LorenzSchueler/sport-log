@@ -18,6 +18,8 @@ extension MapControllerExtension on MapboxMap {
     return LatLngZoom(latLng: LatLng.fromMap(state.center), zoom: state.zoom);
   }
 
+  Future<double> get pitch async => (await getCameraState()).pitch;
+
   // TODO diff to flyTo ??
   Future<void> animateCenter(LatLng center) =>
       easeTo(center.toCameraOptions(), null);
