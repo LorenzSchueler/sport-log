@@ -79,7 +79,7 @@ jobs:
 
   build-linux:
     name: "Flutter: Build Linux"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
 
     steps:
     - name: Checkout
