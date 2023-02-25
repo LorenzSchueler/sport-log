@@ -68,7 +68,7 @@ class Validator {
   static String? validateHour(String? value) => validateIntGeZero(value);
 
   static String? validateMinOrSec(String? value) =>
-      validateIntGeZeroLtValue(value, 60);
+      validateIntBetween(value, 0, 59);
 
   static String? validateStringNotEmpty(String? value) {
     // ignore: prefer-conditional-expressions
@@ -93,19 +93,8 @@ class Validator {
     }
   }
 
-  static String? validateIntGeZero(String? value) {
-    if (value == null || value.isEmpty) {
-      return "Field must not be empty.";
-    }
-    final intValue = int.tryParse(value);
-    if (intValue == null) {
-      return "Number is invalid.";
-    } else if (intValue < 0) {
-      return "Number must be greater or equal than 0.";
-    } else {
-      return null;
-    }
-  }
+  static String? validateIntGeZero(String? value) =>
+      validateIntBetween(value, 0, null);
 
   /// inclusive range [lowerBound, upperBound]
   static String? validateIntBetween(
@@ -121,35 +110,13 @@ class Validator {
       return "Number is invalid.";
     } else if (lowerBound != null && intValue < lowerBound ||
         upperBound != null && intValue > upperBound) {
-      return "Number must be between $lowerBound and $upperBound";
-    } else {
-      return null;
-    }
-  }
-
-  static String? validateIntGeZeroLtValue(String? value, int upperBound) {
-    if (value == null || value.isEmpty) {
-      return "Field must not be empty.";
-    }
-    final intValue = int.tryParse(value);
-    if (intValue == null) {
-      return "Number is invalid.";
-    } else if (intValue < 0 || intValue >= upperBound) {
-      return "Number must be between 0 and ${upperBound - 1}";
-    } else {
-      return null;
-    }
-  }
-
-  static String? validateIntGeZeroLeValue(String? value, int upperBound) {
-    if (value == null || value.isEmpty) {
-      return "Field must not be empty.";
-    }
-    final intValue = int.tryParse(value);
-    if (intValue == null) {
-      return "Number is invalid.";
-    } else if (intValue < 0 || intValue > upperBound) {
-      return "Number must be between 0 and $upperBound.";
+      if (lowerBound != null && upperBound != null) {
+        return "Number must be between $lowerBound and $upperBound";
+      } else if (lowerBound != null) {
+        return "Number must be greater or equal than $lowerBound";
+      } else {
+        return "Number must be less or equal than $upperBound";
+      }
     } else {
       return null;
     }
@@ -183,7 +150,13 @@ class Validator {
       return "Number is invalid.";
     } else if (lowerBound != null && intValue < lowerBound ||
         upperBound != null && intValue > upperBound) {
-      return "Number must be between $lowerBound and $upperBound";
+      if (lowerBound != null && upperBound != null) {
+        return "Number must be between $lowerBound and $upperBound";
+      } else if (lowerBound != null) {
+        return "Number must be greater or equal than $lowerBound";
+      } else {
+        return "Number must be less or equal than $upperBound";
+      }
     } else {
       return null;
     }
