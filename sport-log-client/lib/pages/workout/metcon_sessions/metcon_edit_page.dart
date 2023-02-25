@@ -240,7 +240,7 @@ class _MetconEditPageState extends State<MetconEditPage> {
         initialValue:
             _metconDescription.metcon.rounds ?? Metcon.roundsDefaultValue,
         minValue: 1,
-        setValue: (rounds) {
+        onUpdate: (rounds) {
           FocusManager.instance.primaryFocus?.unfocus();
           setState(() => _metconDescription.metcon.rounds = rounds);
         },

@@ -131,7 +131,7 @@ class _SetDurationInputState extends State<SetDurationInput> {
             builder: (context, settings, _) => DoubleInput(
               initialValue: _weight!,
               stepSize: settings.weightIncrement,
-              setValue: _setWeight,
+              onUpdate: _setWeight,
             ),
           ),
         ),

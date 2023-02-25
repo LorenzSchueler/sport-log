@@ -159,7 +159,7 @@ class _CountWeightInputState extends State<CountWeightInput> {
                       : widget.dimension.name,
                   child: IntInput(
                     initialValue: _count,
-                    setValue: _setCount,
+                    onUpdate: _setCount,
                   ),
                 ),
                 if (_weight != null && widget.editWeightUnit)
@@ -194,7 +194,7 @@ class _CountWeightInputState extends State<CountWeightInput> {
                       initialValue:
                           _weightUnit == "lb" ? _weight! / _lbToKg : _weight!,
                       stepSize: settings.weightIncrement,
-                      setValue: _setWeight,
+                      onUpdate: _setWeight,
                     ),
                   ),
                 if (widget.secondWeight && _secondWeight != null)
@@ -206,7 +206,7 @@ class _CountWeightInputState extends State<CountWeightInput> {
                           ? _secondWeight! / _lbToKg
                           : _secondWeight!,
                       stepSize: settings.weightIncrement,
-                      setValue: _setFemaleWeight,
+                      onUpdate: _setFemaleWeight,
                     ),
                   ),
                 _weight == null

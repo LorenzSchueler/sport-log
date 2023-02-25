@@ -110,8 +110,8 @@ class Validator {
   /// inclusive range [lowerBound, upperBound]
   static String? validateIntBetween(
     String? value,
-    int lowerBound,
-    int upperBound,
+    int? lowerBound,
+    int? upperBound,
   ) {
     if (value == null || value.isEmpty) {
       return "Field must not be empty.";
@@ -119,7 +119,8 @@ class Validator {
     final intValue = int.tryParse(value);
     if (intValue == null) {
       return "Number is invalid.";
-    } else if (intValue < lowerBound || intValue > upperBound) {
+    } else if (lowerBound != null && intValue < lowerBound ||
+        upperBound != null && intValue > upperBound) {
       return "Number must be between $lowerBound and $upperBound";
     } else {
       return null;
@@ -163,6 +164,26 @@ class Validator {
       return "Number is invalid.";
     } else if (doubleValue <= 0) {
       return "Number must be greater than 0.";
+    } else {
+      return null;
+    }
+  }
+
+  /// inclusive range [lowerBound, upperBound]
+  static String? validateDoubleBetween(
+    String? value,
+    double? lowerBound,
+    double? upperBound,
+  ) {
+    if (value == null || value.isEmpty) {
+      return "Field must not be empty.";
+    }
+    final intValue = double.tryParse(value);
+    if (intValue == null) {
+      return "Number is invalid.";
+    } else if (lowerBound != null && intValue < lowerBound ||
+        upperBound != null && intValue > upperBound) {
+      return "Number must be between $lowerBound and $upperBound";
     } else {
       return null;
     }

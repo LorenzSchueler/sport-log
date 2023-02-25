@@ -262,7 +262,7 @@ class SettingsPage extends StatelessWidget {
                     child: IntInput(
                       initialValue: settings.syncInterval.inMinutes,
                       minValue: 1,
-                      setValue: (syncInterval) {
+                      onUpdate: (syncInterval) {
                         settings.syncInterval = Duration(minutes: syncInterval);
                         Sync.instance.stopSync();
                         Sync.instance.startSync();

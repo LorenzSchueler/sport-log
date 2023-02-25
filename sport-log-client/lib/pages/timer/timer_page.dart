@@ -157,7 +157,7 @@ class TimerPage extends StatelessWidget {
       child: IntInput(
         initialValue: timerState.rounds,
         minValue: 1,
-        setValue: (rounds) => timerState.rounds = rounds,
+        onUpdate: (rounds) => timerState.rounds = rounds,
       ),
     );
   }

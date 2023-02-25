@@ -255,7 +255,7 @@ class _MetconSessionEditPageState extends State<MetconSessionEditPage> {
                                         .metconDescription.metcon.rounds! -
                                     1
                                 : 999,
-                            setValue: (rounds) => setState(
+                            onUpdate: (rounds) => setState(
                               () => _metconSessionDescription
                                   .metconSession.rounds = rounds,
                             ),
@@ -276,7 +276,7 @@ class _MetconSessionEditPageState extends State<MetconSessionEditPage> {
                                     .map((e) => e.metconMovement.count)
                                     .sum -
                                 1,
-                            setValue: (reps) => setState(
+                            onUpdate: (reps) => setState(
                               () => _metconSessionDescription
                                   .metconSession.reps = reps,
                             ),
