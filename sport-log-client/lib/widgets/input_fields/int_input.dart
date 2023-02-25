@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/message_dialog.dart';
@@ -29,6 +32,34 @@ class _IntInputState extends State<IntInput> {
 
   late final TextEditingController _textController =
       TextEditingController(text: _value.toString());
+  late StreamSubscription<bool> _keyboardSubscription;
+
+  @override
+  void initState() {
+    super.initState();
+    _keyboardSubscription =
+        KeyboardVisibilityController().onChange.listen((visible) {
+      if (!visible) {
+        final value = _textController.text;
+        final validated = Validator.validateIntBetween(
+          value,
+          widget.minValue,
+          widget.maxValue,
+        );
+        if (validated != null) {
+          showMessageDialog(context: context, text: validated);
+          _textController.text = "$_value";
+        }
+        // if value is valid it is already set
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _keyboardSubscription.cancel();
+    super.dispose();
+  }
 
   void _setValue(int value) {
     setState(() => _value = value);
@@ -63,15 +94,9 @@ class _IntInputState extends State<IntInput> {
                       widget.maxValue,
                     ) ==
                     null) {
-                  final v = int.parse(value);
-                  setState(() => _value = v);
-                } else {
-                  showMessageDialog(
-                    context: context,
-                    text:
-                        "value must be between ${widget.minValue} and ${widget.maxValue}",
-                  );
+                  setState(() => _value = int.parse(value));
                 }
+                // if value was valid it is already set
               },
               decoration: const InputDecoration(
                 isCollapsed: true,

@@ -15,12 +15,12 @@ class CountWeightInput extends StatefulWidget {
     required this.confirmChanges,
     required this.dimension,
     required this.editWeightUnit,
-    this.distanceUnit,
-    this.editDistanceUnit,
-    this.initialCount = 0,
-    this.initialWeight,
-    this.secondWeight = false,
-    this.initialSecondWeight,
+    required this.distanceUnit,
+    required this.editDistanceUnit,
+    required this.initialCount,
+    required this.initialWeight,
+    required this.secondWeight,
+    required this.initialSecondWeight,
     super.key,
   });
 

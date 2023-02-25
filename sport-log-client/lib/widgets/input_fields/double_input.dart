@@ -1,6 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/widgets/app_icons.dart';
+import 'package:sport_log/widgets/dialogs/message_dialog.dart';
 import 'package:sport_log/widgets/input_fields/repeat_icon_button.dart';
 
 class DoubleInput extends StatefulWidget {
@@ -24,6 +28,30 @@ class _DoubleInputState extends State<DoubleInput> {
 
   late final TextEditingController _textController =
       TextEditingController(text: _value.toStringAsFixed(2));
+  late StreamSubscription<bool> _keyboardSubscription;
+
+  @override
+  void initState() {
+    super.initState();
+    _keyboardSubscription =
+        KeyboardVisibilityController().onChange.listen((visible) {
+      if (!visible) {
+        final value = _textController.text;
+        final validated = Validator.validateDoubleGtZero(value);
+        if (validated != null) {
+          showMessageDialog(context: context, text: validated);
+          _textController.text = "$_value";
+        }
+        // if value is valid it is already set
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _keyboardSubscription.cancel();
+    super.dispose();
+  }
 
   void _setValue(double value) {
     setState(() => _value = value);
@@ -54,9 +82,9 @@ class _DoubleInputState extends State<DoubleInput> {
               onChanged: (value) {
                 final validated = Validator.validateDoubleGtZero(value);
                 if (validated == null) {
-                  final v = double.parse(value);
-                  setState(() => _value = v);
+                  setState(() => _value = double.parse(value));
                 }
+                // ignore error for now and report it once keyboard is dismissed
               },
               decoration: const InputDecoration(
                 isCollapsed: true,

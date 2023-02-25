@@ -152,7 +152,15 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
                 editDistanceUnit: false,
               ),
               const Divider(),
-              Expanded(child: _setList),
+              Expanded(
+                child: ListView.builder(
+                  controller: _scrollController,
+                  shrinkWrap: true,
+                  itemBuilder: (context, index) =>
+                      _setWidget(_strengthSessionDescription.sets[index]),
+                  itemCount: _strengthSessionDescription.sets.length,
+                ),
+              ),
             ],
           ),
         ),
@@ -271,16 +279,6 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
         _commentsNode.unfocus();
         setState(() => _strengthSessionDescription.session.comments = null);
       },
-    );
-  }
-
-  Widget get _setList {
-    return ListView.builder(
-      controller: _scrollController,
-      shrinkWrap: true,
-      itemBuilder: (context, index) =>
-          _setWidget(_strengthSessionDescription.sets[index]),
-      itemCount: _strengthSessionDescription.sets.length,
     );
   }
 
