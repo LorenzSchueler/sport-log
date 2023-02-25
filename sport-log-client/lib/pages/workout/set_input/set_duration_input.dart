@@ -4,20 +4,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:sport_log/helpers/extensions/text_editing_controller_extension.dart';
-import 'package:sport_log/pages/workout/strength_sessions/new_set_input.dart';
+import 'package:sport_log/pages/workout/set_input/new_set_input.dart';
 import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/input_fields/double_input.dart';
 import 'package:sport_log/widgets/input_fields/edit_tile.dart';
 
 class SetDurationInput extends StatefulWidget {
-  SetDurationInput({
+  const SetDurationInput({
     required this.onNewSet,
     required this.confirmChanges,
-    required int initialCount,
+    required this.initialDuration,
     required this.initialWeight,
     super.key,
-  }) : initialDuration = Duration(milliseconds: initialCount);
+  });
 
   final void Function(int count, double? weight) onNewSet;
   final bool confirmChanges;

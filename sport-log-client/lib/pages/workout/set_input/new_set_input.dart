@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:sport_log/models/all.dart';
-import 'package:sport_log/pages/workout/strength_sessions/set_inputs/set_duration_input.dart';
+import 'package:sport_log/pages/workout/set_input/count_weight_input.dart';
+import 'package:sport_log/pages/workout/set_input/set_duration_input.dart';
 import 'package:sport_log/widgets/app_icons.dart';
-import 'package:sport_log/widgets/input_fields/count_weight_input.dart';
 
 class NewSetInput extends StatelessWidget {
   const NewSetInput({
@@ -41,7 +41,7 @@ class NewSetInput extends StatelessWidget {
         ? SetDurationInput(
             onNewSet: (count, weight) => onNewSet(count, weight, null, null),
             confirmChanges: confirmChanges,
-            initialCount: initialCount,
+            initialDuration: Duration(milliseconds: initialCount),
             initialWeight: initialWeight,
           )
         : CountWeightInput(
