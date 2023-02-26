@@ -13,15 +13,22 @@ class NeverPop extends StatelessWidget {
 }
 
 class DiscardWarningOnPop extends StatelessWidget {
-  const DiscardWarningOnPop({required this.child, super.key});
+  const DiscardWarningOnPop({required this.child, this.onDiscard, super.key});
 
   final Widget child;
+  final void Function()? onDiscard;
 
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
       child: child,
-      onWillPop: () => showDiscardWarningDialog(context),
+      onWillPop: () async {
+        final discard = await showDiscardWarningDialog(context);
+        if (discard) {
+          onDiscard?.call();
+        }
+        return discard;
+      },
     );
   }
 }
