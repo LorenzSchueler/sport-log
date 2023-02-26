@@ -1,5 +1,6 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/models/all.dart';
+import 'package:sport_log/models/clone_extensions.dart';
 
 part 'action_provider_description.g.dart';
 
@@ -26,9 +27,9 @@ class ActionProviderDescription extends CompoundEntity {
   @override
   ActionProviderDescription clone() => ActionProviderDescription(
         actionProvider: actionProvider.clone(),
-        actions: actions.map((a) => a.clone()).toList(),
-        actionRules: actionRules.map((a) => a.clone()).toList(),
-        actionEvents: actionEvents.map((a) => a.clone()).toList(),
+        actions: actions.clone(),
+        actionRules: actionRules.clone(),
+        actionEvents: actionEvents.clone(),
       );
 
   @override

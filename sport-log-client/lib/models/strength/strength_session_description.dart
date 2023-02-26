@@ -3,6 +3,7 @@ import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/helpers/extensions/iterable_extension.dart';
 import 'package:sport_log/helpers/id_generation.dart';
+import 'package:sport_log/models/clone_extensions.dart';
 import 'package:sport_log/models/entity_interfaces.dart';
 import 'package:sport_log/models/movement/all.dart';
 import 'package:sport_log/models/strength/strength_session.dart';
@@ -57,7 +58,7 @@ class StrengthSessionDescription extends CompoundEntity {
   StrengthSessionDescription clone() => StrengthSessionDescription(
         session: session.clone(),
         movement: movement.clone(),
-        sets: sets.map((s) => s.clone()).toList(),
+        sets: sets.clone(),
       );
 
   @override

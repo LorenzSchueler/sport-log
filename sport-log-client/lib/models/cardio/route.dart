@@ -89,8 +89,8 @@ class Route extends AtomicEntity with Comparable<Route> {
         distance: distance,
         ascent: ascent,
         descent: descent,
-        track: track?.map((p) => p.clone()).toList(),
-        markedPositions: markedPositions?.map((p) => p.clone()).toList(),
+        track: track?.clone(),
+        markedPositions: markedPositions?.clone(),
         deleted: deleted,
       );
 

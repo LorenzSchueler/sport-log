@@ -1,6 +1,7 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/helpers/validation.dart';
 import 'package:sport_log/models/all.dart';
+import 'package:sport_log/models/clone_extensions.dart';
 
 part 'platform_description.g.dart';
 
@@ -26,7 +27,7 @@ class PlatformDescription extends CompoundEntity {
   PlatformDescription clone() => PlatformDescription(
         platform: platform.clone(),
         platformCredential: platformCredential?.clone(),
-        actionProviders: actionProviders.map((a) => a.clone()).toList(),
+        actionProviders: actionProviders.clone(),
       );
 
   @override

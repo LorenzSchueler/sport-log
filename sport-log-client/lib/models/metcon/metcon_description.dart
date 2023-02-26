@@ -3,6 +3,7 @@ import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/extensions/iterable_extension.dart';
 import 'package:sport_log/models/all.dart';
+import 'package:sport_log/models/clone_extensions.dart';
 
 part 'metcon_description.g.dart';
 
@@ -41,7 +42,7 @@ class MetconDescription extends CompoundEntity {
   @override
   MetconDescription clone() => MetconDescription(
         metcon: metcon.clone(),
-        moves: moves.map((m) => m.clone()).toList(),
+        moves: moves.clone(),
         hasReference: hasReference,
       );
 
