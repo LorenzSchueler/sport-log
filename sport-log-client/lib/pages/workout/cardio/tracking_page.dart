@@ -62,6 +62,7 @@ class _CardioTrackingPageState extends State<CardioTrackingPage> {
     movement: widget.movement,
     route: widget.route,
   );
+  bool _isSaved = false;
 
   bool _fullscreen = false;
   bool _centerLocation = true;
@@ -70,7 +71,8 @@ class _CardioTrackingPageState extends State<CardioTrackingPage> {
   String _stepInfo = "no data";
   String _heartRateInfo = "no data";
 
-  late final Timer _timer;
+  late final Timer _refreshTimer;
+  late final Timer _autosaveTimer;
   final TrackingUtils _trackingUtils = TrackingUtils();
   late final LocationUtils _locationUtils = LocationUtils(_onLocationUpdate);
   late final StepCountUtils _stepUtils = StepCountUtils(_onStepCountUpdate);
@@ -90,18 +92,25 @@ class _CardioTrackingPageState extends State<CardioTrackingPage> {
 
   @override
   void initState() {
-    _timer = Timer.periodic(const Duration(seconds: 1), (_) => _refresh());
+    _refreshTimer =
+        Timer.periodic(const Duration(seconds: 1), (_) => _refresh());
+    _autosaveTimer = Timer.periodic(
+      const Duration(minutes: 1),
+      (_) => _autoSaveCardioSession(),
+    );
     super.initState();
   }
 
   @override
   void dispose() {
-    _timer.cancel();
+    _refreshTimer.cancel();
+    _autosaveTimer.cancel();
     _stepUtils.stopStepCountStream();
     _locationUtils.stopLocationStream();
     _heartRateUtils.stopHeartRateStream();
-    if (_locationUtils.lastLatLng != null) {
-      Settings.instance.lastGpsLatLng = _locationUtils.lastLatLng!;
+    final lastGpsPosition = _locationUtils.lastLatLng;
+    if (lastGpsPosition != null) {
+      Settings.instance.lastGpsLatLng = lastGpsPosition;
     }
     super.dispose();
   }
@@ -114,7 +123,9 @@ class _CardioTrackingPageState extends State<CardioTrackingPage> {
     _cardioSessionDescription.cardioSession.setAvgCadence();
     _cardioSessionDescription.cardioSession.setAvgHeartRate();
     _cardioSessionDescription.cardioSession.setDistance();
-    final result = await _dataProvider.createSingle(_cardioSessionDescription);
+    final result = _isSaved
+        ? await _dataProvider.updateSingle(_cardioSessionDescription)
+        : await _dataProvider.createSingle(_cardioSessionDescription);
     if (mounted) {
       if (result.isSuccess) {
         Navigator.pop(context); // pop dialog
@@ -123,7 +134,46 @@ class _CardioTrackingPageState extends State<CardioTrackingPage> {
       } else {
         await showMessageDialog(
           context: context,
-          text: 'Creating Cardio Session failed:\n${result.failure}',
+          text: 'Saving Cardio Session failed:\n${result.failure}',
+        );
+      }
+    }
+  }
+
+  Future<void> _autoSaveCardioSession() async {
+    if (_trackingUtils.mode != TrackingMode.notStarted) {
+      final cardioSessionDescription = _cardioSessionDescription.clone();
+      cardioSessionDescription.cardioSession.time =
+          _trackingUtils.currentDuration;
+      cardioSessionDescription.cardioSession.setEmptyListsToNull();
+      cardioSessionDescription.cardioSession.setAscentDescent();
+      cardioSessionDescription.cardioSession.setAvgCadence();
+      cardioSessionDescription.cardioSession.setAvgHeartRate();
+      cardioSessionDescription.cardioSession.setDistance();
+      final result = _isSaved
+          ? await _dataProvider.updateSingle(_cardioSessionDescription)
+          : await _dataProvider.createSingle(_cardioSessionDescription);
+      if (mounted) {
+        if (result.isSuccess) {
+          _isSaved = true;
+        } else {
+          await showMessageDialog(
+            context: context,
+            text: 'Saving Cardio Session failed:\n${result.failure}',
+          );
+        }
+      }
+    }
+  }
+
+  Future<void> _deleteIfSaved() async {
+    if (_isSaved) {
+      final result =
+          await _dataProvider.deleteSingle(_cardioSessionDescription);
+      if (mounted && result.isFailure) {
+        await showMessageDialog(
+          context: context,
+          text: 'Deleting Cardio Session failed:\n${result.failure}',
         );
       }
     }
@@ -292,6 +342,7 @@ points:      ${_cardioSessionDescription.cardioSession.track?.length}""";
   @override
   Widget build(BuildContext context) {
     return DiscardWarningOnPop(
+      onDiscard: _deleteIfSaved,
       child: SafeArea(
         child: Scaffold(
           resizeToAvoidBottomInset: false,

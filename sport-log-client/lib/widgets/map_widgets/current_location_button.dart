@@ -32,8 +32,9 @@ class _CurrentLocationButtonState extends State<CurrentLocationButton> {
   @override
   void dispose() {
     _locationUtils.stopLocationStream();
-    if (_locationUtils.lastLatLng != null) {
-      Settings.instance.lastGpsLatLng = _locationUtils.lastLatLng!;
+    final lastGpsPosition = _locationUtils.lastLatLng;
+    if (lastGpsPosition != null) {
+      Settings.instance.lastGpsLatLng = lastGpsPosition;
     }
     super.dispose();
   }
