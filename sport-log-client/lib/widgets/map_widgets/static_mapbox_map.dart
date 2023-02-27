@@ -54,14 +54,22 @@ class _StaticMapboxMapState extends State<StaticMapboxMap> {
       styleUri: MapboxStyles.OUTDOORS,
       cameraOptions: context.read<Settings>().lastMapPosition.toCameraOptions(),
       onMapCreated: _onMapCreated,
-      onTapListener: _mapController != null
-          ? (coord) async => widget.onTap
-              ?.call(await _mapController!.screenCoordToLatLng(coord))
-          : null,
-      onLongTapListener: _mapController != null
-          ? (coord) async => widget.onLongTap
-              ?.call(await _mapController!.screenCoordToLatLng(coord))
-          : null,
+      onTapListener: (coord) async {
+        final latLng = await _mapController?.screenCoordToLatLng(coord);
+        if (latLng != null) {
+          // TODO fix until upstream is fixed
+          final latLng = LatLng(lat: coord.x, lng: coord.y);
+          widget.onTap?.call(latLng);
+        }
+      },
+      onLongTapListener: (coord) async {
+        final latLng = await _mapController?.screenCoordToLatLng(coord);
+        if (latLng != null) {
+          // TODO fix until upstream is fixed
+          final latLng = LatLng(lat: coord.x, lng: coord.y);
+          widget.onLongTap?.call(latLng);
+        }
+      },
     );
   }
 }
