@@ -7,9 +7,9 @@ import 'package:sport_log/helpers/lat_lng.dart';
 import 'package:sport_log/helpers/map_controller.dart';
 import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/map_widgets/current_location_button.dart';
-import 'package:sport_log/widgets/map_widgets/map_styles.dart';
-import 'package:sport_log/widgets/map_widgets/select_route.dart';
-import 'package:sport_log/widgets/map_widgets/set_north.dart';
+import 'package:sport_log/widgets/map_widgets/map_styles_button.dart';
+import 'package:sport_log/widgets/map_widgets/select_route_button.dart';
+import 'package:sport_log/widgets/map_widgets/set_north_button.dart';
 import 'package:sport_log/widgets/map_widgets/toggle_center_location_button.dart';
 import 'package:sport_log/widgets/map_widgets/toggle_fullscreen_button.dart';
 

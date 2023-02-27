@@ -37,6 +37,20 @@ abstract class _MapOption {
   Future<void> enable(MapController mapController);
 
   Future<void> disable(MapController mapController);
+
+  Future<void> _addTerrainSource(
+    MapController mapController,
+    String sourceId,
+  ) async {
+    if (!(await mapController.sourceExists(sourceId) ?? true)) {
+      await mapController.addSource(
+        RasterDemSource(
+          id: sourceId,
+          url: 'mapbox://mapbox.mapbox-terrain-dem-v1',
+        ),
+      );
+    }
+  }
 }
 
 class _HillshadeOption extends _MapOption {
@@ -45,20 +59,9 @@ class _HillshadeOption extends _MapOption {
   static const _terrainSourceId = "mapbox-terrain-dem-v1-hillshade";
   static const _hillshadeLayerId = "hillshade-layer";
 
-  Future<void> _addTerrainSource(MapController mapController) async {
-    if (!(await mapController.sourceExists(_terrainSourceId) ?? true)) {
-      await mapController.addSource(
-        RasterDemSource(
-          id: _terrainSourceId,
-          url: 'mapbox://mapbox.mapbox-terrain-dem-v1',
-        ),
-      );
-    }
-  }
-
   @override
   Future<void> enable(MapController mapController) async {
-    await _addTerrainSource(mapController);
+    await super._addTerrainSource(mapController, _terrainSourceId);
     await mapController.addLayer(
       HillshadeLayer(
         id: _hillshadeLayerId,
@@ -82,32 +85,23 @@ class _ThreeDOption extends _MapOption {
   static const _exaggeration = 1.0;
   static const _pitch = 60.0;
 
-  Future<void> _addTerrainSource(MapController mapController) async {
-    if (!(await mapController.sourceExists(_terrainSourceId) ?? true)) {
-      await mapController.addSource(
-        RasterDemSource(
-          id: _terrainSourceId,
-          url: 'mapbox://mapbox.mapbox-terrain-dem-v1',
-        ),
-      );
-    }
-  }
-
   @override
   Future<void> enable(MapController mapController) async {
-    await _addTerrainSource(mapController);
+    await super._addTerrainSource(mapController, _terrainSourceId);
     await mapController.setStyleTerrainProperty("source", _terrainSourceId);
     await mapController.setStyleTerrainProperty("exaggeration", _exaggeration);
-    await mapController.pitchBy(_pitch);
+    final currentPitch = await mapController.pitch;
+    if (currentPitch != null) {
+      await mapController.pitchBy(_pitch - currentPitch);
+    }
   }
 
   @override
   Future<void> disable(MapController mapController) async {
     await mapController.setStyleTerrainProperty("exaggeration", "0");
-    // while exaggeration is 0 this does not matter but it is needed so that setting it back to 60 works
-    final pitch = await mapController.pitch;
-    if (pitch != null) {
-      await mapController.pitchBy(-pitch);
+    final currentPitch = await mapController.pitch;
+    if (currentPitch != null) {
+      await mapController.pitchBy(-currentPitch);
     }
   }
 }
@@ -136,12 +130,12 @@ class _MapStylesBottomSheetState extends State<MapStylesBottomSheet> {
     if (style == null || hasHillshade == null || exaggeration == null) {
       return;
     }
-    final hasThreeD = ![null, 0.0].contains(double.tryParse(exaggeration));
+    final isThreeD = ![null, 0.0].contains(double.tryParse(exaggeration));
     setState(() {
       _style = style;
       _options = {
         if (hasHillshade) const _HillshadeOption(),
-        if (hasThreeD) const _ThreeDOption()
+        if (isThreeD) const _ThreeDOption()
       };
     });
   }
@@ -169,26 +163,40 @@ class _MapStylesBottomSheetState extends State<MapStylesBottomSheet> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
+          Text(
+            "Map Type",
+            style: Theme.of(context).textTheme.bodyLarge,
+          ),
+          Defaults.sizedBox.vertical.small,
           SegmentedButton(
             segments: const [
               ButtonSegment(
                 value: MapboxStyles.OUTDOORS,
                 icon: Icon(AppIcons.mountains),
+                label: Text("Outdoor"),
               ),
               ButtonSegment(
                 value: MapboxStyles.MAPBOX_STREETS,
                 icon: Icon(AppIcons.car),
+                label: Text("Street"),
               ),
               ButtonSegment(
                 value: MapboxStyles.SATELLITE,
                 icon: Icon(AppIcons.satellite),
+                label: Text("Satellite"),
               ),
             ],
             selected: {_style},
             onSelectionChanged: _setStyle,
             showSelectedIcon: false,
           ),
-          Defaults.sizedBox.vertical.normal,
+          Defaults.sizedBox.vertical.small,
+          const Divider(),
+          Text(
+            "Map Options",
+            style: Theme.of(context).textTheme.bodyLarge,
+          ),
+          Defaults.sizedBox.vertical.small,
           SegmentedButton(
             segments: const [
               ButtonSegment(
