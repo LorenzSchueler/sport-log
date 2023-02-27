@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:sport_log/data_provider/data_providers/cardio_data_provider.dart';
 import 'package:sport_log/data_provider/overview_data_provider.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
-import 'package:sport_log/helpers/extensions/map_controller_extension.dart';
 import 'package:sport_log/helpers/extensions/navigator_extension.dart';
+import 'package:sport_log/helpers/map_controller.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/cardio/cardio_session_description.dart';
 import 'package:sport_log/pages/workout/cardio/cardio_chart.dart';
@@ -181,21 +180,18 @@ class CardioSessionCard extends StatelessWidget {
 
   final CardioSessionDescription cardioSessionDescription;
 
-  Future<void> _onMapCreated(MapboxMap mapController) async {
-    final lineManager = LineManager(
-      await mapController.annotations.createPolylineAnnotationManager(),
-    );
+  Future<void> _onMapCreated(MapController mapController) async {
     await mapController.setBoundsFromTracks(
       cardioSessionDescription.cardioSession.track,
       cardioSessionDescription.route?.track,
       padded: true,
     );
     if (cardioSessionDescription.cardioSession.track != null) {
-      await lineManager
+      await mapController
           .addTrackLine(cardioSessionDescription.cardioSession.track!);
     }
     if (cardioSessionDescription.route?.track != null) {
-      await lineManager.addRouteLine(cardioSessionDescription.route!.track!);
+      await mapController.addRouteLine(cardioSessionDescription.route!.track!);
     }
   }
 

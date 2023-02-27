@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart' hide Route;
-import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:sport_log/data_provider/data_providers/all.dart';
 import 'package:sport_log/data_provider/overview_data_provider.dart';
 import 'package:sport_log/defaults.dart';
-import 'package:sport_log/helpers/extensions/map_controller_extension.dart';
 import 'package:sport_log/helpers/extensions/navigator_extension.dart';
+import 'package:sport_log/helpers/map_controller.dart';
 import 'package:sport_log/models/cardio/all.dart';
 import 'package:sport_log/pages/workout/session_tab_utils.dart';
 import 'package:sport_log/routes.dart';
@@ -123,13 +122,10 @@ class RouteCard extends StatelessWidget {
     Navigator.pushNamed(context, Routes.routeDetails, arguments: route);
   }
 
-  Future<void> _onMapCreated(MapboxMap mapController) async {
-    final lineManager = LineManager(
-      await mapController.annotations.createPolylineAnnotationManager(),
-    );
+  Future<void> _onMapCreated(MapController mapController) async {
     await mapController.setBoundsFromTracks(route.track, null, padded: true);
     if (route.track != null) {
-      await lineManager.addRouteLine(route.track!);
+      await mapController.addRouteLine(route.track!);
     }
   }
 

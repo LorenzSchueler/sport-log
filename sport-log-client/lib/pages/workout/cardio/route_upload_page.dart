@@ -2,9 +2,9 @@ import 'package:flutter/material.dart' hide Route;
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:sport_log/data_provider/data_providers/cardio_data_provider.dart';
 import 'package:sport_log/defaults.dart';
-import 'package:sport_log/helpers/extensions/map_controller_extension.dart';
 import 'package:sport_log/helpers/gpx.dart';
 import 'package:sport_log/helpers/logger.dart';
+import 'package:sport_log/helpers/map_controller.dart';
 import 'package:sport_log/helpers/pointer.dart';
 import 'package:sport_log/helpers/validation.dart';
 import 'package:sport_log/models/cardio/route.dart';
@@ -27,8 +27,7 @@ class _RouteUploadPageState extends State<RouteUploadPage> {
   final _formKey = GlobalKey<FormState>();
   final _dataProvider = RouteDataProvider();
 
-  MapboxMap? _mapController;
-  LineManager? _lineManager;
+  MapController? _mapController;
 
   final NullablePointer<PolylineAnnotation> _line =
       NullablePointer.nullPointer();
@@ -50,11 +49,8 @@ class _RouteUploadPageState extends State<RouteUploadPage> {
     }
   }
 
-  Future<void> _onMapCreated(MapboxMap mapController) async {
+  Future<void> _onMapCreated(MapController mapController) async {
     _mapController = mapController;
-    _lineManager = LineManager(
-      await mapController.annotations.createPolylineAnnotationManager(),
-    );
     await _mapController?.setBoundsFromTracks(
       _route.track,
       _route.markedPositions,
@@ -145,7 +141,7 @@ class _RouteUploadPageState extends State<RouteUploadPage> {
             ..setDistance()
             ..setAscentDescent();
         });
-        await _lineManager?.updateRouteLine(_line, _route.track);
+        await _mapController?.updateRouteLine(_line, _route.track);
       }
     }
   }

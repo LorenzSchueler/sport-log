@@ -12,10 +12,10 @@ import 'package:sport_log/data_provider/data_providers/cardio_data_provider.dart
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/extensions/location_data_extension.dart';
-import 'package:sport_log/helpers/extensions/map_controller_extension.dart';
 import 'package:sport_log/helpers/heart_rate_utils.dart';
 import 'package:sport_log/helpers/lat_lng.dart';
 import 'package:sport_log/helpers/location_utils.dart';
+import 'package:sport_log/helpers/map_controller.dart';
 import 'package:sport_log/helpers/pointer.dart';
 import 'package:sport_log/helpers/step_count_utils.dart';
 import 'package:sport_log/helpers/tracking_utils.dart';
@@ -79,9 +79,7 @@ class _CardioTrackingPageState extends State<CardioTrackingPage> {
   late final HeartRateUtils _heartRateUtils =
       HeartRateUtils(_onHeartRateUpdate);
 
-  MapboxMap? _mapController;
-  LineManager? _lineManager;
-  CircleManager? _circleManager;
+  MapController? _mapController;
 
   final NullablePointer<PolylineAnnotation> _line =
       NullablePointer.nullPointer();
@@ -256,19 +254,24 @@ class _CardioTrackingPageState extends State<CardioTrackingPage> {
       }
     }
 
-    _locationInfo = """
-provider:   ${location.provider}
-accuracy: ${location.accuracy?.round()} m
-elevation GPS: ${location.altitude?.round()} m
-time: ${location.time! ~/ 1000} s
-satellites: ${location.satelliteNumber}
-points:      ${_cardioSessionDescription.cardioSession.track?.length}""";
+    // TODO use elevation from mapbox
+    //final elevation =
+    //(await _mapController?.getElevation(location.latLng.toJsonPoint()))
+    //?.round();
+
+    _locationInfo = "provider:   ${location.provider}\n"
+        "accuracy: ${location.accuracy?.round()} m\n"
+        "elevation GPS: ${location.altitude?.round()} m\n"
+        //"elevation Mbx: $elevation m\n"
+        "time: ${location.time! ~/ 1000} s\n"
+        "satellites: ${location.satelliteNumber}\n"
+        "points:      ${_cardioSessionDescription.cardioSession.track?.length}";
 
     if (_centerLocation) {
       await _mapController?.animateCenter(location.latLng);
     }
 
-    await _circleManager?.updateCurrentLocationMarker(
+    await _mapController?.updateCurrentLocationMarker(
       _currentLocationMarker,
       location.latLng,
     );
@@ -286,7 +289,7 @@ points:      ${_cardioSessionDescription.cardioSession.track?.length}""";
           time: _trackingUtils.currentDuration,
         ),
       );
-      await _lineManager?.updateTrackLine(
+      await _mapController?.updateTrackLine(
         _line,
         _cardioSessionDescription.cardioSession.track,
       );
@@ -325,16 +328,11 @@ points:      ${_cardioSessionDescription.cardioSession.track?.length}""";
     );
   }
 
-  Future<void> _onMapCreated(MapboxMap mapController) async {
+  Future<void> _onMapCreated(MapController mapController) async {
     _mapController = mapController;
-    _lineManager = LineManager(
-      await mapController.annotations.createPolylineAnnotationManager(),
-    );
-    _circleManager = CircleManager(
-      await mapController.annotations.createCircleAnnotationManager(),
-    );
     if (_cardioSessionDescription.route?.track != null) {
-      await _lineManager?.addRouteLine(_cardioSessionDescription.route!.track!);
+      await _mapController
+          ?.addRouteLine(_cardioSessionDescription.route!.track!);
     }
     await _startStreams();
   }

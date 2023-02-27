@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:location/location.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' hide Settings;
 import 'package:sport_log/helpers/extensions/location_data_extension.dart';
-import 'package:sport_log/helpers/extensions/map_controller_extension.dart';
 import 'package:sport_log/helpers/location_utils.dart';
+import 'package:sport_log/helpers/map_controller.dart';
 import 'package:sport_log/helpers/pointer.dart';
 import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/app_icons.dart';
@@ -11,13 +11,11 @@ import 'package:sport_log/widgets/app_icons.dart';
 class CurrentLocationButton extends StatefulWidget {
   const CurrentLocationButton({
     required this.mapController,
-    required this.circleManager,
     required this.centerLocation,
     super.key,
   });
 
-  final MapboxMap mapController;
-  final CircleManager circleManager;
+  final MapController mapController;
   final bool centerLocation;
 
   @override
@@ -42,7 +40,7 @@ class _CurrentLocationButtonState extends State<CurrentLocationButton> {
   Future<void> _toggleCurrentLocation() async {
     if (_locationUtils.enabled) {
       _locationUtils.stopLocationStream();
-      await widget.circleManager.updateCurrentLocationMarker(
+      await widget.mapController.updateCurrentLocationMarker(
         _currentLocationMarker,
         null,
       );
@@ -58,7 +56,7 @@ class _CurrentLocationButtonState extends State<CurrentLocationButton> {
     if (widget.centerLocation) {
       await widget.mapController.animateCenter(location.latLng);
     }
-    await widget.circleManager.updateCurrentLocationMarker(
+    await widget.mapController.updateCurrentLocationMarker(
       _currentLocationMarker,
       location.latLng,
     );

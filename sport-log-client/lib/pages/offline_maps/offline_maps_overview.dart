@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' hide Settings;
 import 'package:sport_log/defaults.dart';
-import 'package:sport_log/helpers/extensions/map_controller_extension.dart';
 import 'package:sport_log/helpers/lat_lng.dart';
+import 'package:sport_log/helpers/map_controller.dart';
 import 'package:sport_log/helpers/map_download_utils.dart';
 import 'package:sport_log/helpers/pointer.dart';
 import 'package:sport_log/routes.dart';
@@ -23,9 +23,7 @@ class OfflineMapsPage extends StatefulWidget {
 }
 
 class _OfflineMapsPageState extends State<OfflineMapsPage> {
-  MapboxMap? _mapController;
-  LineManager? _lineManager;
-  CircleManager? _circleManager;
+  MapController? _mapController;
 
   LatLng? _point1;
   LatLng? _point2;
@@ -45,13 +43,7 @@ class _OfflineMapsPageState extends State<OfflineMapsPage> {
     }
   }
 
-  Future<void> _onMapCreated(MapboxMap mapController) async {
-    _lineManager = LineManager(
-      await mapController.annotations.createPolylineAnnotationManager(),
-    );
-    _circleManager = CircleManager(
-      await mapController.annotations.createCircleAnnotationManager(),
-    );
+  Future<void> _onMapCreated(MapController mapController) async {
     _mapController = mapController;
   }
 
@@ -78,7 +70,7 @@ class _OfflineMapsPageState extends State<OfflineMapsPage> {
   Future<void> _downloadMap(MapDownloadUtils mapDownloadUtils) async {
     if (_point1 != null && _point2 != null) {
       //final bounds = [_point1!, _point2!].latLngBounds!;
-      //await mapDownloadUtils.downloadRegion(bounds); TODO
+      //await mapDownloadUtils.downloadRegion(bounds); TODO map download
     } else {
       await showMessageDialog(
         context: context,
@@ -89,13 +81,13 @@ class _OfflineMapsPageState extends State<OfflineMapsPage> {
 
   Future<void> _updatePoint1(LatLng? latLng) async {
     setState(() => _point1 = latLng);
-    await _circleManager?.updateLocationMarker(_point1Marker, _point1);
+    await _mapController?.updateLocationMarker(_point1Marker, _point1);
   }
 
   Future<void> _updatePoint2(LatLng? latLng) async {
     setState(() => _point2 = latLng);
-    await _circleManager?.updateLocationMarker(_point2Marker, _point2);
-    await _lineManager?.updateBoundingBoxLine(
+    await _mapController?.updateLocationMarker(_point2Marker, _point2);
+    await _mapController?.updateBoundingBoxLine(
       _boundingBoxLine,
       [_point1, _point2].whereType<LatLng>().latLngBounds,
     );
@@ -199,16 +191,13 @@ class RegionCard extends StatelessWidget {
   //final OfflineRegion region;
   final MapDownloadUtils mapDownloadUtils;
 
-  Future<void> _onMapCreated(MapboxMap mapController) async {
-    // ignore: unused_local_variable
-    final lineManager = LineManager(
-      await mapController.annotations.createPolylineAnnotationManager(),
-    );
+  // ignore: avoid-unused-parameters
+  Future<void> _onMapCreated(MapController mapController) async {
     //await mapController.setBoundsX(
     //region.definition.bounds,
     //padded: true,
     //);
-    //await lineManager.addBoundingBoxLine([
+    //await mapController.addBoundingBoxLine([
     //region.definition.bounds.northeast,
     //region.definition.bounds.southwest
     //].latLngBounds);

@@ -2,8 +2,8 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart' hide Route;
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:sport_log/defaults.dart';
-import 'package:sport_log/helpers/extensions/map_controller_extension.dart';
 import 'package:sport_log/helpers/gpx.dart';
+import 'package:sport_log/helpers/map_controller.dart';
 import 'package:sport_log/helpers/page_return.dart';
 import 'package:sport_log/helpers/pointer.dart';
 import 'package:sport_log/models/cardio/route.dart';
@@ -26,27 +26,15 @@ class RouteDetailsPage extends StatefulWidget {
 class _RouteDetailsPageState extends State<RouteDetailsPage> {
   late Route _route = widget.route.clone();
 
-  MapboxMap? _mapController;
-  LineManager? _lineManager;
-  CircleManager? _circleManager;
-  PointManager? _pointManager;
+  MapController? _mapController;
 
   final NullablePointer<CircleAnnotation> _touchLocationMarker =
       NullablePointer.nullPointer();
 
   bool _fullscreen = false;
 
-  Future<void> _onMapCreated(MapboxMap mapController) async {
+  Future<void> _onMapCreated(MapController mapController) async {
     _mapController = mapController;
-    _lineManager = LineManager(
-      await mapController.annotations.createPolylineAnnotationManager(),
-    );
-    _circleManager = CircleManager(
-      await mapController.annotations.createCircleAnnotationManager(),
-    );
-    _pointManager = PointManager(
-      await mapController.annotations.createPointAnnotationManager(),
-    );
     await _setBoundsAndLine();
   }
 
@@ -57,13 +45,13 @@ class _RouteDetailsPageState extends State<RouteDetailsPage> {
       padded: true,
     );
     if (_route.track != null) {
-      await _lineManager?.addRouteLine(_route.track!);
+      await _mapController?.addRouteLine(_route.track!);
     }
     if (_route.markedPositions != null) {
       for (var i = 0; i < _route.markedPositions!.length; i++) {
         final latLng = _route.markedPositions![i].latLng;
-        await _circleManager?.addLocationMarker(latLng);
-        await _pointManager?.addLocationLabel(latLng, "${i + 1}");
+        await _mapController?.addLocationMarker(latLng);
+        await _mapController?.addLocationLabel(latLng, "${i + 1}");
       }
     }
   }
@@ -199,6 +187,6 @@ class _RouteDetailsPageState extends State<RouteDetailsPage> {
             ?.latLng
         : null;
 
-    await _circleManager?.updateLocationMarker(_touchLocationMarker, latLng);
+    await _mapController?.updateLocationMarker(_touchLocationMarker, latLng);
   }
 }

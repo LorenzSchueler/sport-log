@@ -2,9 +2,9 @@ import 'package:flutter/material.dart' hide Route;
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' hide Position;
 import 'package:sport_log/data_provider/data_providers/all.dart';
 import 'package:sport_log/defaults.dart';
-import 'package:sport_log/helpers/extensions/map_controller_extension.dart';
 import 'package:sport_log/helpers/lat_lng.dart';
 import 'package:sport_log/helpers/logger.dart';
+import 'package:sport_log/helpers/map_controller.dart';
 import 'package:sport_log/helpers/page_return.dart';
 import 'package:sport_log/helpers/pointer.dart';
 import 'package:sport_log/helpers/route_planning_utils.dart';
@@ -39,10 +39,7 @@ class _RouteEditPageState extends State<RouteEditPage> {
 
   bool _listExpanded = false;
 
-  MapboxMap? _mapController;
-  LineManager? _lineManager;
-  CircleManager? _circleManager;
-  PointManager? _pointManager;
+  MapController? _mapController;
 
   late final Route _route = (widget.route?.clone() ?? Route.defaultValue())
     ..track ??= []
@@ -102,23 +99,27 @@ class _RouteEditPageState extends State<RouteEditPage> {
               ..setDistance()
               ..setAscentDescent();
           });
-          await _lineManager?.updateRouteLine(_line, _route.track);
+          await _mapController?.updateRouteLine(_line, _route.track);
         }
       }
     }
   }
 
   Future<void> _addPoint(LatLng latLng, int number) async {
-    if (_pointManager != null && _circleManager != null) {
-      _labels.add(await _pointManager!.addLocationLabel(latLng, "$number"));
-      _circles.add(await _circleManager!.addLocationMarker(latLng));
+    final label = await _mapController?.addLocationLabel(latLng, "$number");
+    if (label != null) {
+      _labels.add(label);
+    }
+    final circle = await _mapController?.addLocationMarker(latLng);
+    if (circle != null) {
+      _circles.add(circle);
     }
   }
 
   Future<void> _updatePoints() async {
-    await _circleManager?.removeAll();
+    await _mapController?.removeAllCircles();
     _circles = [];
-    await _pointManager?.removeAll();
+    await _mapController?.removeAllPoints();
     _labels = [];
     _route.markedPositions!.asMap().forEach((index, pos) {
       _addPoint(pos.latLng, index + 1);
@@ -230,17 +231,8 @@ class _RouteEditPageState extends State<RouteEditPage> {
           );
   }
 
-  Future<void> _onMapCreated(MapboxMap mapController) async {
+  Future<void> _onMapCreated(MapController mapController) async {
     _mapController = mapController;
-    _lineManager = LineManager(
-      await mapController.annotations.createPolylineAnnotationManager(),
-    );
-    _circleManager = CircleManager(
-      await mapController.annotations.createCircleAnnotationManager(),
-    );
-    _pointManager = PointManager(
-      await mapController.annotations.createPointAnnotationManager(),
-    );
     await _mapController?.setBoundsFromTracks(
       _route.track,
       _route.markedPositions,

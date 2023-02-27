@@ -3,8 +3,8 @@ import 'package:flutter/material.dart' hide Route;
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' hide Position;
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/double_extension.dart';
-import 'package:sport_log/helpers/extensions/map_controller_extension.dart';
 import 'package:sport_log/helpers/gpx.dart';
+import 'package:sport_log/helpers/map_controller.dart';
 import 'package:sport_log/helpers/page_return.dart';
 import 'package:sport_log/helpers/pointer.dart';
 import 'package:sport_log/helpers/rate_limiter.dart';
@@ -32,9 +32,7 @@ class _CardioDetailsPageState extends State<CardioDetailsPage> {
   late CardioSessionDescription _cardioSessionDescription =
       widget.cardioSessionDescription.clone();
 
-  MapboxMap? _mapController;
-  LineManager? _lineManager;
-  CircleManager? _circleManager;
+  MapController? _mapController;
 
   final NullablePointer<PolylineAnnotation> _trackLine =
       NullablePointer.nullPointer();
@@ -58,14 +56,8 @@ class _CardioDetailsPageState extends State<CardioDetailsPage> {
   static const _heartRateColor = Colors.orange;
   static const _cadenceColor = Colors.green;
 
-  Future<void> _onMapCreated(MapboxMap mapController) async {
+  Future<void> _onMapCreated(MapController mapController) async {
     _mapController = mapController;
-    _lineManager = LineManager(
-      await mapController.annotations.createPolylineAnnotationManager(),
-    );
-    _circleManager = CircleManager(
-      await mapController.annotations.createCircleAnnotationManager(),
-    );
     await _setBoundsAndLines();
   }
 
@@ -75,11 +67,11 @@ class _CardioDetailsPageState extends State<CardioDetailsPage> {
       _cardioSessionDescription.route?.track,
       padded: true,
     );
-    await _lineManager?.updateTrackLine(
+    await _mapController?.updateTrackLine(
       _trackLine,
       _cardioSessionDescription.cardioSession.track,
     );
-    await _lineManager?.updateRouteLine(
+    await _mapController?.updateRouteLine(
       _routeLine,
       _cardioSessionDescription.route?.track,
     );
@@ -334,7 +326,7 @@ class _CardioDetailsPageState extends State<CardioDetailsPage> {
           touchDuration,
         );
       });
-      await _circleManager?.updateLocationMarker(_touchMarker, pos?.latLng);
+      await _mapController?.updateLocationMarker(_touchMarker, pos?.latLng);
     } else {
       setState(() {
         _speed = null;
@@ -342,7 +334,7 @@ class _CardioDetailsPageState extends State<CardioDetailsPage> {
         _heartRate = null;
         _cadence = null;
       });
-      await _circleManager?.updateLocationMarker(_touchMarker, null);
+      await _mapController?.updateLocationMarker(_touchMarker, null);
     }
   }
 }

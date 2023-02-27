@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart' hide Visibility;
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:sport_log/defaults.dart';
-import 'package:sport_log/helpers/extensions/map_controller_extension.dart';
+import 'package:sport_log/helpers/map_controller.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 
 class MapStylesButton extends StatelessWidget {
   const MapStylesButton({required this.mapController, super.key});
 
-  final MapboxMap mapController;
+  final MapController mapController;
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +25,7 @@ class MapStylesButton extends StatelessWidget {
 class MapStylesBottomSheet extends StatefulWidget {
   const MapStylesBottomSheet({required this.mapController, super.key});
 
-  final MapboxMap mapController;
+  final MapController mapController;
 
   @override
   State<MapStylesBottomSheet> createState() => _MapStylesBottomSheetState();
@@ -34,9 +34,9 @@ class MapStylesBottomSheet extends StatefulWidget {
 abstract class _MapOption {
   const _MapOption();
 
-  Future<void> enable(MapboxMap mapController);
+  Future<void> enable(MapController mapController);
 
-  Future<void> disable(MapboxMap mapController);
+  Future<void> disable(MapController mapController);
 }
 
 class _HillshadeOption extends _MapOption {
@@ -45,9 +45,9 @@ class _HillshadeOption extends _MapOption {
   static const _terrainSourceId = "mapbox-terrain-dem-v1-hillshade";
   static const _hillshadeLayerId = "hillshade-layer";
 
-  Future<void> _addTerrainSource(MapboxMap mapController) async {
-    if (!await mapController.style.styleSourceExists(_terrainSourceId)) {
-      await mapController.style.addSource(
+  Future<void> _addTerrainSource(MapController mapController) async {
+    if (!(await mapController.sourceExists(_terrainSourceId) ?? true)) {
+      await mapController.addSource(
         RasterDemSource(
           id: _terrainSourceId,
           url: 'mapbox://mapbox.mapbox-terrain-dem-v1',
@@ -57,9 +57,9 @@ class _HillshadeOption extends _MapOption {
   }
 
   @override
-  Future<void> enable(MapboxMap mapController) async {
+  Future<void> enable(MapController mapController) async {
     await _addTerrainSource(mapController);
-    await mapController.style.addLayer(
+    await mapController.addLayer(
       HillshadeLayer(
         id: _hillshadeLayerId,
         sourceId: _terrainSourceId,
@@ -70,8 +70,8 @@ class _HillshadeOption extends _MapOption {
   }
 
   @override
-  Future<void> disable(MapboxMap mapController) async {
-    await mapController.style.removeStyleLayer(_hillshadeLayerId);
+  Future<void> disable(MapController mapController) async {
+    await mapController.removeLayer(_hillshadeLayerId);
   }
 }
 
@@ -82,9 +82,9 @@ class _ThreeDOption extends _MapOption {
   static const _exaggeration = 1.0;
   static const _pitch = 60.0;
 
-  Future<void> _addTerrainSource(MapboxMap mapController) async {
-    if (!await mapController.style.styleSourceExists(_terrainSourceId)) {
-      await mapController.style.addSource(
+  Future<void> _addTerrainSource(MapController mapController) async {
+    if (!(await mapController.sourceExists(_terrainSourceId) ?? true)) {
+      await mapController.addSource(
         RasterDemSource(
           id: _terrainSourceId,
           url: 'mapbox://mapbox.mapbox-terrain-dem-v1',
@@ -94,21 +94,21 @@ class _ThreeDOption extends _MapOption {
   }
 
   @override
-  Future<void> enable(MapboxMap mapController) async {
+  Future<void> enable(MapController mapController) async {
     await _addTerrainSource(mapController);
-    await mapController.style
-        .setStyleTerrainProperty("source", _terrainSourceId);
-    await mapController.style
-        .setStyleTerrainProperty("exaggeration", _exaggeration);
-    await mapController.pitchBy(_pitch, MapAnimationOptions());
+    await mapController.setStyleTerrainProperty("source", _terrainSourceId);
+    await mapController.setStyleTerrainProperty("exaggeration", _exaggeration);
+    await mapController.pitchBy(_pitch);
   }
 
   @override
-  Future<void> disable(MapboxMap mapController) async {
-    await mapController.style.setStyleTerrainProperty("exaggeration", "0");
+  Future<void> disable(MapController mapController) async {
+    await mapController.setStyleTerrainProperty("exaggeration", "0");
     // while exaggeration is 0 this does not matter but it is needed so that setting it back to 60 works
     final pitch = await mapController.pitch;
-    await mapController.pitchBy(-pitch, MapAnimationOptions());
+    if (pitch != null) {
+      await mapController.pitchBy(-pitch);
+    }
   }
 }
 
@@ -128,16 +128,15 @@ class _MapStylesBottomSheetState extends State<MapStylesBottomSheet> {
   }
 
   Future<void> _setCurrentState() async {
-    final style = await widget.mapController.style.getStyleURI();
-    final hasHillshade = await widget.mapController.style
-        .styleLayerExists(_HillshadeOption._hillshadeLayerId);
-    final hasThreeD = ![null, 0.0].contains(
-      double.tryParse(
-        (await widget.mapController.style
-                .getStyleTerrainProperty("exaggeration"))
-            .value,
-      ),
-    );
+    final style = await widget.mapController.getStyle();
+    final hasHillshade = await widget.mapController
+        .layerExists(_HillshadeOption._hillshadeLayerId);
+    final exaggeration =
+        await widget.mapController.getStyleTerrainProperty("exaggeration");
+    if (style == null || hasHillshade == null || exaggeration == null) {
+      return;
+    }
+    final hasThreeD = ![null, 0.0].contains(double.tryParse(exaggeration));
     setState(() {
       _style = style;
       _options = {
@@ -149,7 +148,7 @@ class _MapStylesBottomSheetState extends State<MapStylesBottomSheet> {
 
   Future<void> _setStyle(Set<String> style) async {
     await _setOptions({}); // disable all options
-    await widget.mapController.style.setStyleURI(style.first);
+    await widget.mapController.setStyle(style.first);
     setState(() => _style = style.first);
   }
 

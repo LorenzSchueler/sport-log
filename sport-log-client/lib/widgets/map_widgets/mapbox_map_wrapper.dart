@@ -3,8 +3,8 @@ import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' hide Settings;
 import 'package:provider/provider.dart';
 import 'package:sport_log/config.dart';
 import 'package:sport_log/defaults.dart';
-import 'package:sport_log/helpers/extensions/map_controller_extension.dart';
 import 'package:sport_log/helpers/lat_lng.dart';
+import 'package:sport_log/helpers/map_controller.dart';
 import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/map_widgets/current_location_button.dart';
 import 'package:sport_log/widgets/map_widgets/map_styles.dart';
@@ -59,7 +59,7 @@ class MapboxMapWrapper extends StatefulWidget {
   /// defaults to [Settings.lastMapPosition]
   final LatLngZoom? initialCameraPosition;
 
-  final void Function(MapboxMap)? onMapCreated;
+  final void Function(MapController)? onMapCreated;
   final void Function(LatLng)? onTap;
   final void Function(LatLng)? onLongTap;
 
@@ -74,47 +74,31 @@ class MapboxMapWrapper extends StatefulWidget {
 }
 
 class _MapboxMapWrapperState extends State<MapboxMapWrapper> {
-  MapboxMap? _mapController;
-  LineManager? _lineManager;
-  CircleManager? _circleManager;
+  MapController? _mapController;
 
   bool _centerLocation = true;
 
-  Future<void> _onMapCreated(MapboxMap mapController) async {
+  Future<void> _onMapCreated(MapController mapController) async {
     _mapController = mapController;
-    _lineManager = LineManager(
-      await mapController.annotations.createPolylineAnnotationManager(),
+    await mapController.setGestureSettings(
+      doubleTapZoomEnabled: widget.doubleClickZoomEnabled,
+      zoomEnabled: widget.zoomGesturesEnabled,
+      rotateEnabled: widget.rotateGesturesEnabled,
+      scrollEnabled: widget.scrollGesturesEnabled,
+      pitchEnabled: widget.pitchGestureEnabled,
     );
-    _circleManager = CircleManager(
-      await mapController.annotations.createCircleAnnotationManager(),
+    await mapController.setScaleBarSettings(
+      position: widget.scaleAtTop
+          ? OrnamentPosition.TOP_LEFT
+          : OrnamentPosition.BOTTOM_RIGHT,
+      enabled: widget.showScale,
     );
-    await mapController.gestures.updateSettings(
-      GesturesSettings(
-        doubleTapToZoomInEnabled: widget.doubleClickZoomEnabled,
-        doubleTouchToZoomOutEnabled: false,
-        rotateEnabled: widget.rotateGesturesEnabled,
-        scrollEnabled: widget.scrollGesturesEnabled,
-        pitchEnabled: widget.pitchGestureEnabled,
-        pinchToZoomEnabled: widget.zoomGesturesEnabled,
-        quickZoomEnabled: false,
-        pinchPanEnabled: false,
-        simultaneousRotateAndPinchToZoomEnabled:
-            widget.rotateGesturesEnabled && widget.zoomGesturesEnabled,
-      ),
-    );
-    await mapController.compass.updateSettings(CompassSettings(enabled: false));
-    await mapController.scaleBar.updateSettings(
-      ScaleBarSettings(
-        enabled: widget.showScale,
-        position: widget.scaleAtTop
-            ? OrnamentPosition.TOP_LEFT
-            : OrnamentPosition.BOTTOM_RIGHT,
-      ),
-    );
+    await mapController.hideAttribution();
+    await mapController.hideCompass();
+    widget.onMapCreated?.call(mapController);
     if (mounted) {
       setState(() {});
     }
-    widget.onMapCreated?.call(mapController);
   }
 
   @override
@@ -137,7 +121,12 @@ class _MapboxMapWrapperState extends State<MapboxMapWrapper> {
           cameraOptions: (widget.initialCameraPosition ??
                   context.read<Settings>().lastMapPosition)
               .toCameraOptions(),
-          onMapCreated: _onMapCreated,
+          onMapCreated: (mapboxMap) async {
+            final controller = await MapController.from(mapboxMap, context);
+            if (controller != null) {
+              await _onMapCreated(controller);
+            }
+          },
           onTapListener: (coord) async {
             final latLng = await _mapController?.screenCoordToLatLng(coord);
             if (latLng != null) {
@@ -155,10 +144,7 @@ class _MapboxMapWrapperState extends State<MapboxMapWrapper> {
             }
           },
         ),
-        if (_mapController != null &&
-            _circleManager != null &&
-            _lineManager != null &&
-            widget.showOverlays)
+        if (_mapController != null && widget.showOverlays)
           Positioned(
             top: widget.buttonTopOffset + 15,
             right: 15,
@@ -173,10 +159,7 @@ class _MapboxMapWrapperState extends State<MapboxMapWrapper> {
                   Defaults.sizedBox.vertical.normal,
                 ],
                 if (widget.showSelectRouteButton) ...[
-                  SelectRouteButton(
-                    mapController: _mapController!,
-                    lineManager: _lineManager!,
-                  ),
+                  SelectRouteButton(mapController: _mapController!),
                   Defaults.sizedBox.vertical.normal,
                 ],
                 if (widget.showSetNorthButton) ...[
@@ -186,7 +169,6 @@ class _MapboxMapWrapperState extends State<MapboxMapWrapper> {
                 if (widget.showCurrentLocationButton) ...[
                   CurrentLocationButton(
                     mapController: _mapController!,
-                    circleManager: _circleManager!,
                     centerLocation: _centerLocation,
                   ),
                   Defaults.sizedBox.vertical.normal,

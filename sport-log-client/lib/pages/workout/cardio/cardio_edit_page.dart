@@ -4,7 +4,7 @@ import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:sport_log/data_provider/data_providers/all.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
-import 'package:sport_log/helpers/extensions/map_controller_extension.dart';
+import 'package:sport_log/helpers/map_controller.dart';
 import 'package:sport_log/helpers/page_return.dart';
 import 'package:sport_log/helpers/pointer.dart';
 import 'package:sport_log/helpers/validation.dart';
@@ -37,9 +37,7 @@ class _CardioEditPageState extends State<CardioEditPage> {
   final _formKey = GlobalKey<FormState>();
   final _dataProvider = CardioSessionDescriptionDataProvider();
 
-  MapboxMap? _mapController;
-  LineManager? _lineManager;
-  CircleManager? _circleManager;
+  MapController? _mapController;
 
   final NullablePointer<PolylineAnnotation> _trackLine =
       NullablePointer.nullPointer();
@@ -92,14 +90,8 @@ class _CardioEditPageState extends State<CardioEditPage> {
     }
   }
 
-  Future<void> _onMapCreated(MapboxMap mapController) async {
+  Future<void> _onMapCreated(MapController mapController) async {
     _mapController = mapController;
-    _lineManager = LineManager(
-      await mapController.annotations.createPolylineAnnotationManager(),
-    );
-    _circleManager = CircleManager(
-      await mapController.annotations.createCircleAnnotationManager(),
-    );
     await _setBoundsAndLines();
     await _updateCutLocationMarker();
   }
@@ -138,8 +130,8 @@ class _CardioEditPageState extends State<CardioEditPage> {
             ?.latLng
         : null;
 
-    await _circleManager?.updateLocationMarker(_cutStartMarker, startLatLng);
-    await _circleManager?.updateLocationMarker(_cutEndMarker, endLatLng);
+    await _mapController?.updateLocationMarker(_cutStartMarker, startLatLng);
+    await _mapController?.updateLocationMarker(_cutEndMarker, endLatLng);
   }
 
   Future<void> _cutCardioSession() async {
@@ -168,11 +160,11 @@ class _CardioEditPageState extends State<CardioEditPage> {
       _cardioSessionDescription.route?.track,
       padded: true,
     );
-    await _lineManager?.updateTrackLine(
+    await _mapController?.updateTrackLine(
       _trackLine,
       _cardioSessionDescription.cardioSession.track,
     );
-    await _lineManager?.updateRouteLine(
+    await _mapController?.updateRouteLine(
       _routeLine,
       _cardioSessionDescription.route?.track,
     );
