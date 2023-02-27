@@ -25,7 +25,7 @@ class CurrentLocationButton extends StatefulWidget {
 class _CurrentLocationButtonState extends State<CurrentLocationButton> {
   final NullablePointer<List<CircleAnnotation>> _currentLocationMarker =
       NullablePointer.nullPointer();
-  late final LocationUtils _locationUtils = LocationUtils(_onLocationUpdate);
+  final LocationUtils _locationUtils = LocationUtils();
 
   @override
   void dispose() {
@@ -45,7 +45,7 @@ class _CurrentLocationButtonState extends State<CurrentLocationButton> {
         null,
       );
     } else {
-      await _locationUtils.startLocationStream();
+      await _locationUtils.startLocationStream(_onLocationUpdate);
     }
     if (mounted) {
       setState(() {});

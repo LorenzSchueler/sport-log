@@ -5,13 +5,15 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:sport_log/widgets/dialogs/system_settings_dialog.dart';
 
 class StepCountUtils {
-  StepCountUtils(this.onStepCountUpdate);
-
-  void Function(StepCount stepCount) onStepCountUpdate;
   StreamSubscription<StepCount>? _stepCountSubscription;
   late StepCount _lastStepCount;
 
-  Future<bool> startStepCountStream() async {
+  Future<bool> startStepCountStream(
+    void Function(StepCount stepCount) onStepCountUpdate,
+  ) async {
+    if (_stepCountSubscription != null) {
+      return false;
+    }
     while (!await Permission.activityRecognition.request().isGranted) {
       final ignore = await showSystemSettingsDialog(
         text:

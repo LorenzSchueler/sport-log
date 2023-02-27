@@ -74,10 +74,8 @@ class _CardioTrackingPageState extends State<CardioTrackingPage> {
   late final Timer _refreshTimer;
   late final Timer _autosaveTimer;
   final TrackingUtils _trackingUtils = TrackingUtils();
-  late final LocationUtils _locationUtils = LocationUtils(_onLocationUpdate);
-  late final StepCountUtils _stepUtils = StepCountUtils(_onStepCountUpdate);
-  late final HeartRateUtils _heartRateUtils =
-      HeartRateUtils(_onHeartRateUpdate);
+  final LocationUtils _locationUtils = LocationUtils();
+  final StepCountUtils _stepUtils = StepCountUtils();
 
   MapController? _mapController;
 
@@ -105,7 +103,7 @@ class _CardioTrackingPageState extends State<CardioTrackingPage> {
     _autosaveTimer.cancel();
     _stepUtils.stopStepCountStream();
     _locationUtils.stopLocationStream();
-    _heartRateUtils.stopHeartRateStream();
+    widget.heartRateUtils?.stopHeartRateStream();
     final lastGpsPosition = _locationUtils.lastLatLng;
     if (lastGpsPosition != null) {
       Settings.instance.lastGpsLatLng = lastGpsPosition;
@@ -190,9 +188,9 @@ class _CardioTrackingPageState extends State<CardioTrackingPage> {
   }
 
   Future<void> _startStreams() async {
-    await _locationUtils.startLocationStream();
-    await _stepUtils.startStepCountStream();
-    await widget.heartRateUtils?.startHeartRateStream();
+    await _locationUtils.startLocationStream(_onLocationUpdate);
+    await _stepUtils.startStepCountStream(_onStepCountUpdate);
+    await widget.heartRateUtils?.startHeartRateStream(_onHeartRateUpdate);
   }
 
   void _onHeartRateUpdate(PolarHeartRateEvent event) {

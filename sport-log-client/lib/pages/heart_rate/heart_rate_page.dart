@@ -22,7 +22,7 @@ class HeartRatePage extends StatelessWidget {
           padding: Defaults.edgeInsets.normal,
           child: Center(
             child: ProviderConsumer<HeartRateUtils>(
-              create: (_) => HeartRateUtils.consumer(),
+              create: (_) => HeartRateUtils(),
               builder: (_, heartRateUtils, __) => Column(
                 children: [
                   SizedBox(
@@ -80,7 +80,8 @@ class HeartRatePage extends StatelessWidget {
                             heartRateUtils.canStartStream) ...[
                           Defaults.sizedBox.vertical.normal,
                           ElevatedButton(
-                            onPressed: heartRateUtils.startHeartRateStream,
+                            onPressed: () =>
+                                heartRateUtils.startHeartRateStream(null),
                             child: const Text("Connect"),
                           ),
                         ],

@@ -32,7 +32,7 @@ class CardioTrackingSettingsPageState
       body: Container(
         padding: Defaults.edgeInsets.normal,
         child: ProviderConsumer<HeartRateUtils>(
-          create: (_) => HeartRateUtils.consumer(),
+          create: (_) => HeartRateUtils(),
           builder: (_, heartRateUtils, __) => Column(
             children: [
               EditTile(
