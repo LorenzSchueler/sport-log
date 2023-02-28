@@ -32,6 +32,9 @@ class RoutePlanningUtils {
   static Future<Result<List<int>, RoutePlanningError>> getElevations(
     List<LatLng> track,
   ) async {
+    // TODO currently the public API is overlaoded and often resuts with timeout
+    return Success(track.map((e) => 0).toList());
+    // ignore: dead_code
     final trackMap = {
       "locations": [
         for (final pos in track) {"latitude": pos.lat, "longitude": pos.lng}

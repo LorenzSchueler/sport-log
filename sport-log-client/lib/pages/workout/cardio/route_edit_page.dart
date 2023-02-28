@@ -135,11 +135,9 @@ class _RouteEditPageState extends State<RouteEditPage> {
       );
       return;
     }
-    // TODO currently the public API is overloaded and often returns with timeout
-    //final elevationResult = await RoutePlanningUtils.getElevations([location]);
-    //final elevation =
-    //elevationResult.isSuccess ? elevationResult.success[0] : 0;
-    const elevation = 0;
+    final elevationResult = await RoutePlanningUtils.getElevations([location]);
+    final elevation =
+        elevationResult.isSuccess ? elevationResult.success[0] : 0;
     if (mounted) {
       setState(() {
         _route.markedPositions!.add(
