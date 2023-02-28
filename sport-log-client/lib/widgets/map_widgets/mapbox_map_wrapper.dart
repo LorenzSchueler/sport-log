@@ -78,23 +78,33 @@ class _MapboxMapWrapperState extends State<MapboxMapWrapper> {
 
   bool _centerLocation = true;
 
-  Future<void> _onMapCreated(MapController mapController) async {
-    _mapController = mapController;
-    await mapController.setGestureSettings(
+  @override
+  void didUpdateWidget(MapboxMapWrapper old) {
+    super.didUpdateWidget(old);
+    _setMapSettings();
+  }
+
+  Future<void> _setMapSettings() async {
+    await _mapController?.setGestureSettings(
       doubleTapZoomEnabled: widget.doubleClickZoomEnabled,
       zoomEnabled: widget.zoomGesturesEnabled,
       rotateEnabled: widget.rotateGesturesEnabled,
       scrollEnabled: widget.scrollGesturesEnabled,
       pitchEnabled: widget.pitchGestureEnabled,
     );
-    await mapController.setScaleBarSettings(
+    await _mapController?.setScaleBarSettings(
       position: widget.scaleAtTop
           ? OrnamentPosition.TOP_LEFT
           : OrnamentPosition.BOTTOM_RIGHT,
       enabled: widget.showScale,
     );
-    await mapController.hideAttribution();
-    await mapController.hideCompass();
+    await _mapController?.hideAttribution();
+    await _mapController?.hideCompass();
+  }
+
+  Future<void> _onMapCreated(MapController mapController) async {
+    _mapController = mapController;
+    await _setMapSettings();
     widget.onMapCreated?.call(mapController);
     if (mounted) {
       setState(() {});
