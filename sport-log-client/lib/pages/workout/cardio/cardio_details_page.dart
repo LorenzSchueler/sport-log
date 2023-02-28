@@ -2,6 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart' hide Route;
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' hide Position;
 import 'package:sport_log/defaults.dart';
+import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/extensions/double_extension.dart';
 import 'package:sport_log/helpers/gpx.dart';
 import 'package:sport_log/helpers/map_controller.dart';
@@ -43,6 +44,7 @@ class _CardioDetailsPageState extends State<CardioDetailsPage> {
 
   bool _fullScreen = false;
 
+  Duration? _time;
   double? _speed;
   int? _elevation;
   int? _heartRate;
@@ -51,8 +53,9 @@ class _CardioDetailsPageState extends State<CardioDetailsPage> {
   late final _rateLimiter =
       RateLimiter(_touchCallback, const Duration(milliseconds: 200));
 
+  static const _timeColor = Colors.white;
   static const _speedColor = Colors.blue;
-  static const _elevationColor = Colors.white;
+  static const _elevationColor = Color.fromARGB(255, 180, 140, 120);
   static const _heartRateColor = Colors.orange;
   static const _cadenceColor = Colors.green;
 
@@ -127,7 +130,7 @@ class _CardioDetailsPageState extends State<CardioDetailsPage> {
                         showSetNorthButton: true,
                         showCurrentLocationButton: false,
                         showCenterLocationButton: false,
-                        scaleAtTop: true,
+                        scaleAtTop: !_fullScreen,
                         onFullscreenToggle: (fullScreen) =>
                             setState(() => _fullScreen = fullScreen),
                         onMapCreated: _onMapCreated,
@@ -158,6 +161,11 @@ class _CardioDetailsPageState extends State<CardioDetailsPage> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
+                              if (_time != null)
+                                Text(
+                                  _time!.formatHms,
+                                  style: const TextStyle(color: _timeColor),
+                                ),
                               if (_speed != null)
                                 Text(
                                   "$_speed km/h",
@@ -289,8 +297,8 @@ class _CardioDetailsPageState extends State<CardioDetailsPage> {
   }
 
   Future<void> _touchCallback(Duration? touchDuration) async {
+    // needed because RateLimiter calls callback later
     if (!mounted) {
-      // needed because RateLimiter calls callback later
       return;
     }
 
@@ -313,6 +321,7 @@ class _CardioDetailsPageState extends State<CardioDetailsPage> {
       }
 
       setState(() {
+        _time = touchDuration;
         _speed = session
             .currentSpeed(touchDuration - currentDurationOffset, touchDuration)
             ?.roundToPrecision(1);
@@ -329,6 +338,7 @@ class _CardioDetailsPageState extends State<CardioDetailsPage> {
       await _mapController?.updateLocationMarker(_touchMarker, pos?.latLng);
     } else {
       setState(() {
+        _time = null;
         _speed = null;
         _elevation = null;
         _heartRate = null;
