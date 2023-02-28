@@ -28,6 +28,8 @@ class _RouteDetailsPageState extends State<RouteDetailsPage> {
 
   MapController? _mapController;
 
+  final NullablePointer<PolylineAnnotation> _routeLine =
+      NullablePointer.nullPointer();
   final NullablePointer<CircleAnnotation> _touchLocationMarker =
       NullablePointer.nullPointer();
 
@@ -44,9 +46,9 @@ class _RouteDetailsPageState extends State<RouteDetailsPage> {
       _route.markedPositions,
       padded: true,
     );
-    if (_route.track != null) {
-      await _mapController?.addRouteLine(_route.track!);
-    }
+    await _mapController?.updateRouteLine(_routeLine, _route.track);
+    await _mapController?.removeAllCircles();
+    await _mapController?.removeAllPoints();
     if (_route.markedPositions != null) {
       for (var i = 0; i < _route.markedPositions!.length; i++) {
         final latLng = _route.markedPositions![i].latLng;
@@ -76,82 +78,80 @@ class _RouteDetailsPageState extends State<RouteDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text(_route.name),
-          actions: [
-            if (_route.track != null && _route.track!.isNotEmpty)
-              IconButton(
-                onPressed: _exportFile,
-                icon: const Icon(AppIcons.download),
-              ),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(_route.name),
+        actions: [
+          if (_route.track != null && _route.track!.isNotEmpty)
             IconButton(
-              onPressed: _pushEditPage,
-              icon: const Icon(AppIcons.edit),
-            )
-          ],
-        ),
-        body: Column(
-          children: [
-            Expanded(
-              child: Stack(
-                children: [
-                  _route.track != null
-                      ? MapboxMapWrapper(
-                          showScale: true,
-                          showFullscreenButton:
-                              _route.track != null && _route.track!.isNotEmpty,
-                          showMapStylesButton: true,
-                          showSelectRouteButton: false,
-                          showSetNorthButton: true,
-                          showCurrentLocationButton: false,
-                          showCenterLocationButton: false,
-                          onFullscreenToggle: (fullscreen) =>
-                              setState(() => _fullscreen = fullscreen),
-                          scaleAtTop: true,
-                          onMapCreated: _onMapCreated,
-                        )
-                      : Center(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                AppIcons.route,
-                                color: Theme.of(context).colorScheme.onSurface,
-                              ),
-                              Defaults.sizedBox.horizontal.normal,
-                              const Text("no track available"),
-                            ],
-                          ),
-                        ),
-                  if (_route.track != null && !_fullscreen)
-                    Positioned(
-                      bottom: 0,
-                      left: 0,
-                      right: 0,
-                      child: Container(
-                        color: const Color.fromARGB(150, 0, 0, 0),
-                        child: DistanceChart(
-                          chartLines: [_elevationLine()],
-                          yFromZero: true,
-                          touchCallback: _touchCallback,
+              onPressed: _exportFile,
+              icon: const Icon(AppIcons.download),
+            ),
+          IconButton(
+            onPressed: _pushEditPage,
+            icon: const Icon(AppIcons.edit),
+          )
+        ],
+      ),
+      body: Column(
+        children: [
+          Expanded(
+            child: Stack(
+              children: [
+                _route.track != null
+                    ? MapboxMapWrapper(
+                        showScale: true,
+                        showFullscreenButton:
+                            _route.track != null && _route.track!.isNotEmpty,
+                        showMapStylesButton: true,
+                        showSelectRouteButton: false,
+                        showSetNorthButton: true,
+                        showCurrentLocationButton: false,
+                        showCenterLocationButton: false,
+                        onFullscreenToggle: (fullscreen) =>
+                            setState(() => _fullscreen = fullscreen),
+                        scaleAtTop: !_fullscreen,
+                        onMapCreated: _onMapCreated,
+                      )
+                    : Center(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              AppIcons.route,
+                              color: Theme.of(context).colorScheme.onSurface,
+                            ),
+                            Defaults.sizedBox.horizontal.normal,
+                            const Text("no track available"),
+                          ],
                         ),
                       ),
+                if (_route.track != null && !_fullscreen)
+                  Positioned(
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    child: Container(
+                      color: const Color.fromARGB(150, 0, 0, 0),
+                      child: DistanceChart(
+                        chartLines: [_elevationLine()],
+                        yFromZero: true,
+                        touchCallback: _touchCallback,
+                      ),
                     ),
-                ],
+                  ),
+              ],
+            ),
+          ),
+          if (!_fullscreen)
+            Container(
+              padding: Defaults.edgeInsets.normal,
+              color: Theme.of(context).colorScheme.background,
+              child: RouteValueUnitDescriptionTable(
+                route: _route,
               ),
             ),
-            if (!_fullscreen)
-              Container(
-                padding: Defaults.edgeInsets.normal,
-                color: Theme.of(context).colorScheme.background,
-                child: RouteValueUnitDescriptionTable(
-                  route: _route,
-                ),
-              ),
-          ],
-        ),
+        ],
       ),
     );
   }
