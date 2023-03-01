@@ -2,6 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart' hide Route;
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' hide Position;
 import 'package:sport_log/defaults.dart';
+import 'package:sport_log/helpers/bool_toggle.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/extensions/double_extension.dart';
 import 'package:sport_log/helpers/gpx.dart';
@@ -19,6 +20,7 @@ import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/message_dialog.dart';
 import 'package:sport_log/widgets/map_widgets/mapbox_map_wrapper.dart';
+import 'package:sport_log/widgets/provider_consumer.dart';
 
 class CardioDetailsPage extends StatefulWidget {
   const CardioDetailsPage({required this.cardioSessionDescription, super.key});
@@ -41,8 +43,6 @@ class _CardioDetailsPageState extends State<CardioDetailsPage> {
       NullablePointer.nullPointer();
   final NullablePointer<CircleAnnotation> _touchMarker =
       NullablePointer.nullPointer();
-
-  bool _fullScreen = false;
 
   Duration? _time;
   double? _speed;
@@ -116,126 +116,127 @@ class _CardioDetailsPageState extends State<CardioDetailsPage> {
           )
         ],
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: Stack(
-              children: [
-                _cardioSessionDescription.cardioSession.track != null
-                    ? MapboxMapWrapper(
-                        showScale: true,
-                        showFullscreenButton: _cardioSessionDescription
-                                    .cardioSession.track !=
-                                null &&
-                            _cardioSessionDescription
-                                .cardioSession.track!.isNotEmpty &&
-                            _cardioSessionDescription.route?.track != null &&
-                            _cardioSessionDescription.route!.track!.isNotEmpty,
-                        showMapStylesButton: true,
-                        showSelectRouteButton: false,
-                        showSetNorthButton: true,
-                        showCurrentLocationButton: false,
-                        showCenterLocationButton: false,
-                        scaleAtTop: !_fullScreen,
-                        onFullscreenToggle: (fullScreen) =>
-                            setState(() => _fullScreen = fullScreen),
-                        onMapCreated: _onMapCreated,
-                      )
-                    : Center(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
+      body: ProviderConsumer(
+        create: (_) => BoolToggle.off(),
+        builder: (context, fullscreen, _) => Column(
+          children: [
+            Expanded(
+              child: Stack(
+                children: [
+                  _cardioSessionDescription.cardioSession.track != null &&
+                              _cardioSessionDescription
+                                  .cardioSession.track!.isNotEmpty ||
+                          _cardioSessionDescription.route?.track != null &&
+                              _cardioSessionDescription.route!.track!.isNotEmpty
+                      ? MapboxMapWrapper(
+                          showScale: true,
+                          showFullscreenButton: true,
+                          showMapStylesButton: true,
+                          showSelectRouteButton: false,
+                          showSetNorthButton: true,
+                          showCurrentLocationButton: false,
+                          showCenterLocationButton: false,
+                          scaleAtTop: fullscreen.isOff,
+                          onFullscreenToggle: fullscreen.setState,
+                          onMapCreated: _onMapCreated,
+                        )
+                      : Center(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                AppIcons.route,
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
+                              Defaults.sizedBox.horizontal.normal,
+                              const Text("no track available"),
+                            ],
+                          ),
+                        ),
+                  if (_cardioSessionDescription.cardioSession.track != null &&
+                      fullscreen.isOff)
+                    Positioned(
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                      child: Container(
+                        color: const Color.fromARGB(150, 0, 0, 0),
+                        child: Column(
                           children: [
-                            Icon(
-                              AppIcons.route,
-                              color: Theme.of(context).colorScheme.onSurface,
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                if (_time != null)
+                                  Text(
+                                    _time!.formatHms,
+                                    style: const TextStyle(color: _timeColor),
+                                  ),
+                                if (_speed != null)
+                                  Text(
+                                    "$_speed km/h",
+                                    style: const TextStyle(color: _speedColor),
+                                  ),
+                                if (_elevation != null)
+                                  Text(
+                                    "$_elevation m",
+                                    style:
+                                        const TextStyle(color: _elevationColor),
+                                  ),
+                                if (_heartRate != null)
+                                  Text(
+                                    "$_heartRate bpm",
+                                    style:
+                                        const TextStyle(color: _heartRateColor),
+                                  ),
+                                if (_cadence != null)
+                                  Text(
+                                    "$_cadence rpm",
+                                    style:
+                                        const TextStyle(color: _cadenceColor),
+                                  ),
+                              ],
                             ),
-                            Defaults.sizedBox.horizontal.normal,
-                            const Text("no track available"),
+                            DurationChart(
+                              chartLines: [
+                                _speedLine(),
+                                _elevationLine(),
+                                _cadenceLine(),
+                                _heartRateLine()
+                              ],
+                              yFromZero: true,
+                              touchCallback: _rateLimiter.execute,
+                            ),
                           ],
                         ),
                       ),
-                if (_cardioSessionDescription.cardioSession.track != null &&
-                    !_fullScreen)
-                  Positioned(
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    child: Container(
-                      color: const Color.fromARGB(150, 0, 0, 0),
-                      child: Column(
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              if (_time != null)
-                                Text(
-                                  _time!.formatHms,
-                                  style: const TextStyle(color: _timeColor),
-                                ),
-                              if (_speed != null)
-                                Text(
-                                  "$_speed km/h",
-                                  style: const TextStyle(color: _speedColor),
-                                ),
-                              if (_elevation != null)
-                                Text(
-                                  "$_elevation m",
-                                  style:
-                                      const TextStyle(color: _elevationColor),
-                                ),
-                              if (_heartRate != null)
-                                Text(
-                                  "$_heartRate bpm",
-                                  style:
-                                      const TextStyle(color: _heartRateColor),
-                                ),
-                              if (_cadence != null)
-                                Text(
-                                  "$_cadence rpm",
-                                  style: const TextStyle(color: _cadenceColor),
-                                ),
-                            ],
-                          ),
-                          DurationChart(
-                            chartLines: [
-                              _speedLine(),
-                              _elevationLine(),
-                              _cadenceLine(),
-                              _heartRateLine()
-                            ],
-                            yFromZero: true,
-                            touchCallback: _rateLimiter.execute,
-                          ),
-                        ],
-                      ),
                     ),
-                  ),
-              ],
-            ),
-          ),
-          if (!_fullScreen)
-            Container(
-              padding: Defaults.edgeInsets.normal,
-              color: Theme.of(context).colorScheme.background,
-              child: Column(
-                children: [
-                  CardioValueUnitDescriptionTable(
-                    cardioSessionDescription: _cardioSessionDescription,
-                    currentDuration: null,
-                    showDatetimeCardioType: true,
-                  ),
-                  if (_cardioSessionDescription.cardioSession.comments !=
-                      null) ...[
-                    Defaults.sizedBox.vertical.normal,
-                    CommentsBox(
-                      comments:
-                          _cardioSessionDescription.cardioSession.comments!,
-                    ),
-                  ]
                 ],
               ),
             ),
-        ],
+            if (fullscreen.isOff)
+              Container(
+                padding: Defaults.edgeInsets.normal,
+                color: Theme.of(context).colorScheme.background,
+                child: Column(
+                  children: [
+                    CardioValueUnitDescriptionTable(
+                      cardioSessionDescription: _cardioSessionDescription,
+                      currentDuration: null,
+                      showDatetimeCardioType: true,
+                    ),
+                    if (_cardioSessionDescription.cardioSession.comments !=
+                        null) ...[
+                      Defaults.sizedBox.vertical.normal,
+                      CommentsBox(
+                        comments:
+                            _cardioSessionDescription.cardioSession.comments!,
+                      ),
+                    ]
+                  ],
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }

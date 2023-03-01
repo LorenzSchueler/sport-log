@@ -2,6 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart' hide Route;
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:sport_log/defaults.dart';
+import 'package:sport_log/helpers/bool_toggle.dart';
 import 'package:sport_log/helpers/gpx.dart';
 import 'package:sport_log/helpers/map_controller.dart';
 import 'package:sport_log/helpers/page_return.dart';
@@ -13,6 +14,7 @@ import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/message_dialog.dart';
 import 'package:sport_log/widgets/map_widgets/mapbox_map_wrapper.dart';
+import 'package:sport_log/widgets/provider_consumer.dart';
 
 class RouteDetailsPage extends StatefulWidget {
   const RouteDetailsPage({required this.route, super.key});
@@ -32,8 +34,6 @@ class _RouteDetailsPageState extends State<RouteDetailsPage> {
       NullablePointer.nullPointer();
   final NullablePointer<CircleAnnotation> _touchLocationMarker =
       NullablePointer.nullPointer();
-
-  bool _fullscreen = false;
 
   Future<void> _onMapCreated(MapController mapController) async {
     _mapController = mapController;
@@ -93,65 +93,66 @@ class _RouteDetailsPageState extends State<RouteDetailsPage> {
           )
         ],
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: Stack(
-              children: [
-                _route.track != null
-                    ? MapboxMapWrapper(
-                        showScale: true,
-                        showFullscreenButton:
-                            _route.track != null && _route.track!.isNotEmpty,
-                        showMapStylesButton: true,
-                        showSelectRouteButton: false,
-                        showSetNorthButton: true,
-                        showCurrentLocationButton: false,
-                        showCenterLocationButton: false,
-                        onFullscreenToggle: (fullscreen) =>
-                            setState(() => _fullscreen = fullscreen),
-                        scaleAtTop: !_fullscreen,
-                        onMapCreated: _onMapCreated,
-                      )
-                    : Center(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              AppIcons.route,
-                              color: Theme.of(context).colorScheme.onSurface,
-                            ),
-                            Defaults.sizedBox.horizontal.normal,
-                            const Text("no track available"),
-                          ],
+      body: ProviderConsumer(
+        create: (_) => BoolToggle.off(),
+        builder: (context, fullscreen, _) => Column(
+          children: [
+            Expanded(
+              child: Stack(
+                children: [
+                  _route.track != null && _route.track!.isNotEmpty
+                      ? MapboxMapWrapper(
+                          showScale: true,
+                          showFullscreenButton: true,
+                          showMapStylesButton: true,
+                          showSelectRouteButton: false,
+                          showSetNorthButton: true,
+                          showCurrentLocationButton: false,
+                          showCenterLocationButton: false,
+                          onFullscreenToggle: fullscreen.setState,
+                          scaleAtTop: fullscreen.isOff,
+                          onMapCreated: _onMapCreated,
+                        )
+                      : Center(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                AppIcons.route,
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
+                              Defaults.sizedBox.horizontal.normal,
+                              const Text("no track available"),
+                            ],
+                          ),
+                        ),
+                  if (_route.track != null && fullscreen.isOff)
+                    Positioned(
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                      child: Container(
+                        color: const Color.fromARGB(150, 0, 0, 0),
+                        child: DistanceChart(
+                          chartLines: [_elevationLine()],
+                          yFromZero: true,
+                          touchCallback: _touchCallback,
                         ),
                       ),
-                if (_route.track != null && !_fullscreen)
-                  Positioned(
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    child: Container(
-                      color: const Color.fromARGB(150, 0, 0, 0),
-                      child: DistanceChart(
-                        chartLines: [_elevationLine()],
-                        yFromZero: true,
-                        touchCallback: _touchCallback,
-                      ),
                     ),
-                  ),
-              ],
-            ),
-          ),
-          if (!_fullscreen)
-            Container(
-              padding: Defaults.edgeInsets.normal,
-              color: Theme.of(context).colorScheme.background,
-              child: RouteValueUnitDescriptionTable(
-                route: _route,
+                ],
               ),
             ),
-        ],
+            if (fullscreen.isOff)
+              Container(
+                padding: Defaults.edgeInsets.normal,
+                color: Theme.of(context).colorScheme.background,
+                child: RouteValueUnitDescriptionTable(
+                  route: _route,
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }

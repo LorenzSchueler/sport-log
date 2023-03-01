@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart' hide Route;
 import 'package:provider/provider.dart';
 import 'package:sport_log/defaults.dart';
+import 'package:sport_log/helpers/bool_toggle.dart';
 import 'package:sport_log/helpers/heart_rate_utils.dart';
 import 'package:sport_log/helpers/lat_lng.dart';
 import 'package:sport_log/helpers/tracking_utils.dart';
@@ -33,8 +34,6 @@ class CardioTrackingPage extends StatefulWidget {
 }
 
 class _CardioTrackingPageState extends State<CardioTrackingPage> {
-  bool _fullscreen = false;
-
   Future<void> _saveDialog(TrackingUtils trackingUtils) async {
     await showDialog<void>(
       context: context,
@@ -83,63 +82,65 @@ class _CardioTrackingPageState extends State<CardioTrackingPage> {
         child: SafeArea(
           child: Scaffold(
             resizeToAvoidBottomInset: false,
-            body: Column(
-              children: [
-                if (context.read<Settings>().developerMode)
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(trackingUtils.locationInfo),
-                      Text(trackingUtils.stepInfo),
-                      Text(trackingUtils.heartRateInfo),
-                    ],
-                  ),
-                Expanded(
-                  child: MapboxMapWrapper(
-                    showScale: true,
-                    showFullscreenButton: true,
-                    showMapStylesButton: true,
-                    showSelectRouteButton: false,
-                    showSetNorthButton: true,
-                    showCurrentLocationButton: false,
-                    showCenterLocationButton: true,
-                    onFullscreenToggle: (fullscreen) =>
-                        setState(() => _fullscreen = fullscreen),
-                    onCenterLocationToggle: trackingUtils.setCenterLocation,
-                    initialCameraPosition: LatLngZoom(
-                      latLng: context.read<Settings>().lastGpsLatLng,
-                      zoom: 15,
-                    ),
-                    onMapCreated: trackingUtils.onMapCreated,
-                  ),
-                ),
-                if (!_fullscreen)
-                  Container(
-                    padding: Defaults.edgeInsets.normal,
-                    child: Column(
+            body: ProviderConsumer(
+              create: (_) => BoolToggle.off(),
+              builder: (context, fullscreen, _) => Column(
+                children: [
+                  if (context.read<Settings>().developerMode)
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        CardioValueUnitDescriptionTable(
-                          cardioSessionDescription:
-                              trackingUtils.cardioSessionDescription,
-                          currentDuration: trackingUtils.currentDuration,
-                          showCurrentElevation: true,
-                        ),
-                        Defaults.sizedBox.vertical.normal,
-                        _TrackingPageButtons(
-                          trackingMode: trackingUtils.mode,
-                          onStart: trackingUtils.start,
-                          onPause: trackingUtils.pause,
-                          onResume: trackingUtils.resume,
-                          onSave: () => _saveDialog(trackingUtils),
-                          hasGPS: trackingUtils.lastLatLng != null,
-                          hasHR: widget.heartRateUtils == null ||
-                              widget.heartRateUtils!.isActive,
-                        ),
+                        Text(trackingUtils.locationInfo),
+                        Text(trackingUtils.stepInfo),
+                        Text(trackingUtils.heartRateInfo),
                       ],
                     ),
+                  Expanded(
+                    child: MapboxMapWrapper(
+                      showScale: true,
+                      showFullscreenButton: true,
+                      showMapStylesButton: true,
+                      showSelectRouteButton: false,
+                      showSetNorthButton: true,
+                      showCurrentLocationButton: false,
+                      showCenterLocationButton: true,
+                      onFullscreenToggle: fullscreen.setState,
+                      onCenterLocationToggle: trackingUtils.setCenterLocation,
+                      initialCameraPosition: LatLngZoom(
+                        latLng: context.read<Settings>().lastGpsLatLng,
+                        zoom: 15,
+                      ),
+                      onMapCreated: trackingUtils.onMapCreated,
+                    ),
                   ),
-              ],
+                  if (!fullscreen.isOn)
+                    Container(
+                      padding: Defaults.edgeInsets.normal,
+                      child: Column(
+                        children: [
+                          CardioValueUnitDescriptionTable(
+                            cardioSessionDescription:
+                                trackingUtils.cardioSessionDescription,
+                            currentDuration: trackingUtils.currentDuration,
+                            showCurrentElevation: true,
+                          ),
+                          Defaults.sizedBox.vertical.normal,
+                          _TrackingPageButtons(
+                            trackingMode: trackingUtils.mode,
+                            onStart: trackingUtils.start,
+                            onPause: trackingUtils.pause,
+                            onResume: trackingUtils.resume,
+                            onSave: () => _saveDialog(trackingUtils),
+                            hasGPS: trackingUtils.lastLatLng != null,
+                            hasHR: widget.heartRateUtils == null ||
+                                widget.heartRateUtils!.isActive,
+                          ),
+                        ],
+                      ),
+                    ),
+                ],
+              ),
             ),
           ),
         ),

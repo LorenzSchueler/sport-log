@@ -4,6 +4,7 @@ import 'package:sport_log/data_provider/sync.dart';
 import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/account.dart';
+import 'package:sport_log/helpers/bool_toggle.dart';
 import 'package:sport_log/helpers/extensions/navigator_extension.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/settings.dart';
@@ -17,6 +18,7 @@ import 'package:sport_log/widgets/input_fields/int_input.dart';
 import 'package:sport_log/widgets/input_fields/text_tile.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
+import 'package:sport_log/widgets/provider_consumer.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
@@ -285,8 +287,9 @@ class SettingsPage extends StatelessWidget {
                   onFieldSubmitted: (username) =>
                       _setUsername(context, username),
                 ),
-                VisibilityToggle(
-                  builder: (_, visible, toggle) {
+                ProviderConsumer(
+                  create: (_) => BoolToggle.on(),
+                  builder: (context, obscure, _) {
                     return TextFormField(
                       key: UniqueKey(),
                       decoration:
@@ -294,13 +297,13 @@ class SettingsPage extends StatelessWidget {
                                 icon: const Icon(AppIcons.key),
                                 labelText: "Password",
                                 suffixIcon: IconButton(
-                                  icon: visible
-                                      ? const Icon(AppIcons.visibilityOff)
-                                      : const Icon(AppIcons.visibility),
-                                  onPressed: toggle,
+                                  icon: obscure.isOn
+                                      ? const Icon(AppIcons.visibility)
+                                      : const Icon(AppIcons.visibilityOff),
+                                  onPressed: obscure.toggle,
                                 ),
                               ),
-                      obscureText: !visible,
+                      obscureText: obscure.isOn,
                       initialValue: settings.password,
                       validator: Validator.validatePassword,
                       autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -462,28 +465,6 @@ class SettingsPage extends StatelessWidget {
         ),
         drawer: const MainDrawer(selectedRoute: Routes.settings),
       ),
-    );
-  }
-}
-
-class VisibilityToggle extends StatefulWidget {
-  const VisibilityToggle({required this.builder, super.key});
-
-  final Widget Function(BuildContext, bool, void Function()) builder;
-
-  @override
-  State<VisibilityToggle> createState() => _VisibilityToggleState();
-}
-
-class _VisibilityToggleState extends State<VisibilityToggle> {
-  bool _visible = false;
-
-  @override
-  Widget build(BuildContext context) {
-    return widget.builder(
-      context,
-      _visible,
-      () => setState(() => _visible = !_visible),
     );
   }
 }
