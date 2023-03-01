@@ -15,7 +15,7 @@ import 'package:sport_log/widgets/map_widgets/mapbox_map_wrapper.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
 import 'package:sport_log/widgets/provider_consumer.dart';
 
-class CardioTrackingPage extends StatefulWidget {
+class CardioTrackingPage extends StatelessWidget {
   const CardioTrackingPage({
     required this.route,
     required this.movement,
@@ -29,21 +29,19 @@ class CardioTrackingPage extends StatefulWidget {
   final Route? route;
   final HeartRateUtils? heartRateUtils;
 
-  @override
-  State<CardioTrackingPage> createState() => _CardioTrackingPageState();
-}
-
-class _CardioTrackingPageState extends State<CardioTrackingPage> {
-  Future<void> _saveDialog(TrackingUtils trackingUtils) async {
+  Future<void> _saveDialog(
+    BuildContext context,
+    TrackingUtils trackingUtils,
+  ) async {
     await showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text("Save Recording"),
         content: TextFormField(
-          onChanged: (comments) => setState(
-            () => trackingUtils
-                .cardioSessionDescription.cardioSession.comments = comments,
-          ),
+          initialValue:
+              trackingUtils.cardioSessionDescription.cardioSession.comments,
+          onChanged: (comments) => trackingUtils
+              .cardioSessionDescription.cardioSession.comments = comments,
           decoration: Theme.of(context).textFormFieldDecoration.copyWith(
                 labelText: "Comments",
               ),
@@ -72,10 +70,10 @@ class _CardioTrackingPageState extends State<CardioTrackingPage> {
   Widget build(BuildContext context) {
     return ProviderConsumer(
       create: (_) => TrackingUtils(
-        movement: widget.movement,
-        cardioType: widget.cardioType,
-        route: widget.route,
-        heartRateUtils: widget.heartRateUtils,
+        movement: movement,
+        cardioType: cardioType,
+        route: route,
+        heartRateUtils: heartRateUtils,
       ),
       builder: (context, trackingUtils, _) => DiscardWarningOnPop(
         onDiscard: () => trackingUtils.deleteIfSaved(context),
@@ -131,10 +129,10 @@ class _CardioTrackingPageState extends State<CardioTrackingPage> {
                             onStart: trackingUtils.start,
                             onPause: trackingUtils.pause,
                             onResume: trackingUtils.resume,
-                            onSave: () => _saveDialog(trackingUtils),
+                            onSave: () => _saveDialog(context, trackingUtils),
                             hasGPS: trackingUtils.lastLatLng != null,
-                            hasHR: widget.heartRateUtils == null ||
-                                widget.heartRateUtils!.isActive,
+                            hasHR: heartRateUtils == null ||
+                                heartRateUtils!.isActive,
                           ),
                         ],
                       ),
