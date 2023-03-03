@@ -65,3 +65,21 @@ class _StaticMapboxMapState extends State<StaticMapboxMap> {
     );
   }
 }
+
+class ElevationMap extends StatelessWidget {
+  const ElevationMap({required this.onMapCreated, super.key});
+
+  final void Function(ElevationMapController) onMapCreated;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 50,
+      width: 50,
+      child: StaticMapboxMap(
+        onMapCreated: (mapController) =>
+            onMapCreated(ElevationMapController(mapController)),
+      ),
+    );
+  }
+}

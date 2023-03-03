@@ -18,18 +18,18 @@ class MapController {
   );
 
   static Future<MapController?> from(
-    MapboxMap mapController,
+    MapboxMap mapboxMap,
     BuildContext context,
   ) async {
-    final controller = MountedWrapper(mapController, context);
+    final controller = MountedWrapper(mapboxMap, context);
     final lineManager = MountedWrapper(
-      await mapController.annotations.createPolylineAnnotationManager(),
+      await mapboxMap.annotations.createPolylineAnnotationManager(),
       context,
     );
     final MountedWrapper<CircleAnnotationManager> circleManager;
     if (context.mounted) {
       circleManager = MountedWrapper(
-        await mapController.annotations.createCircleAnnotationManager(),
+        await mapboxMap.annotations.createCircleAnnotationManager(),
         context,
       );
     } else {
@@ -38,7 +38,7 @@ class MapController {
     final MountedWrapper<PointAnnotationManager> pointManager;
     if (context.mounted) {
       pointManager = MountedWrapper(
-        await mapController.annotations.createPointAnnotationManager(),
+        await mapboxMap.annotations.createPointAnnotationManager(),
         context,
       );
     } else {
@@ -97,6 +97,9 @@ class MapController {
   // TODO diff to flyTo
   Future<void> animateCenter(LatLng center) async =>
       await _controller.ifMounted?.easeTo(center.toCameraOptions(), null);
+
+  Future<void> setCenter(LatLng center) async =>
+      await _controller.ifMounted?.setCamera(center.toCameraOptions());
 
   Future<void> setZoom(double zoom) async =>
       await _controller.ifMounted?.flyTo(CameraOptions(zoom: zoom), null);
@@ -445,4 +448,18 @@ class MapController {
         pitchEnabled: false,
         zoomEnabled: false,
       );
+}
+
+class ElevationMapController {
+  const ElevationMapController(this._mapController);
+
+  final MapController _mapController;
+
+  Future<double?> getElevation(LatLng latLng) async {
+    await _mapController.setCenter(latLng);
+    await _mapController.setZoom(15);
+    await _mapController.enableTerrain("elevation-terrain-source", 0);
+    return _mapController._controller.ifMounted
+        ?.getElevation(latLng.toJsonPoint());
+  }
 }
