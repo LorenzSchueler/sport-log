@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:collection/collection.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:gpx/gpx.dart';
+import 'package:sport_log/helpers/lat_lng.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/write_to_file.dart';
 import 'package:sport_log/models/cardio/position.dart';
@@ -24,14 +25,19 @@ List<Position>? gpxToTrack(String gpxString) {
       .firstWhere((element) => element != null, orElse: () => null);
   final track = <Position>[];
   for (final point in points) {
+    final lat = point.lat;
+    final lng = point.lon;
+    if (lat == null || lng == null) {
+      continue;
+    }
     track.add(
       Position(
-        longitude: point.lon ?? 0.0,
-        latitude: point.lat ?? 0.0,
+        longitude: lng,
+        latitude: lat,
         elevation: point.ele ?? 0.0,
         distance: track.isEmpty
             ? 0
-            : track.last.addDistanceTo(point.lat ?? 0.0, point.lon ?? 0.0),
+            : track.last.addDistanceTo(LatLng(lat: lat, lng: lng)),
         time: startTime == null || point.time == null
             ? Duration.zero
             : point.time!.difference(startTime),

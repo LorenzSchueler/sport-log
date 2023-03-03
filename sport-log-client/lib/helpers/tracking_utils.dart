@@ -258,9 +258,7 @@ class TrackingUtils extends ChangeNotifier {
     if (isTracking &&
         _cardioSessionDescription.cardioSession.track!.isNotEmpty) {
       final lastPosition = _cardioSessionDescription.cardioSession.track!.last;
-      final km =
-          lastPosition.distanceTo(location.latitude!, location.longitude!) /
-              1000;
+      final km = lastPosition.distanceTo(location.latLng) / 1000;
       final hour = (currentDuration - lastPosition.time).inMilliseconds /
           (1000 * 60 * 60);
       final speed = km / hour;
@@ -298,7 +296,7 @@ class TrackingUtils extends ChangeNotifier {
           distance: _cardioSessionDescription.cardioSession.track!.isEmpty
               ? 0
               : _cardioSessionDescription.cardioSession.track!.last
-                  .addDistanceTo(location.latitude!, location.longitude!),
+                  .addDistanceTo(location.latLng),
           time: currentDuration,
         ),
       );

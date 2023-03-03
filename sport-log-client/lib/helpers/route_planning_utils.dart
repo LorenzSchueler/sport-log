@@ -105,7 +105,7 @@ class RoutePlanningUtils {
               elevation: elevation.toDouble(),
               distance: track.isEmpty
                   ? 0
-                  : track.last.addDistanceTo(latLng.lat, latLng.lng),
+                  : track.last.addDistanceTo(latLng),
               time: Duration.zero,
             ),
           );

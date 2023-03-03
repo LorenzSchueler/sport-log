@@ -88,17 +88,13 @@ class Position {
 
   LatLng get latLng => LatLng(lat: latitude, lng: longitude);
 
-  double distanceTo(double otherLatitude, double otherLongitude) {
-    return const latlong.Distance().as(
-      latlong.LengthUnit.Meter,
-      latlong.LatLng(latitude, longitude),
-      latlong.LatLng(otherLatitude, otherLongitude),
-    );
-  }
+  double distanceTo(LatLng other) =>
+      const latlong.Distance(roundResult: false).distance(
+        latlong.LatLng(latitude, longitude),
+        latlong.LatLng(other.lat, other.lng),
+      ); // in m
 
-  double addDistanceTo(double otherLatitude, double otherLongitude) {
-    return distance + distanceTo(otherLatitude, otherLongitude);
-  }
+  double addDistanceTo(LatLng latLng) => distance + distanceTo(latLng);
 }
 
 extension TrackExtension on List<Position> {
