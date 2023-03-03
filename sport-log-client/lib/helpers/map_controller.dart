@@ -11,10 +11,10 @@ import 'package:synchronized/synchronized.dart';
 
 class MapController {
   MapController._(
-    this._controller,
-    this._lineManager,
-    this._circleManager,
-    this._pointManager,
+    this.__controller,
+    this.__lineManager,
+    this.__circleManager,
+    this.__pointManager,
   );
 
   static Future<MapController?> from(
@@ -52,25 +52,28 @@ class MapController {
     );
   }
 
-  final MountedWrapper<MapboxMap> _controller;
-  final MountedWrapper<PolylineAnnotationManager> _lineManager;
-  final MountedWrapper<CircleAnnotationManager> _circleManager;
-  final MountedWrapper<PointAnnotationManager> _pointManager;
+  final MountedWrapper<MapboxMap> __controller;
+  MapboxMap? get _controller => __controller.ifMounted;
+  final MountedWrapper<PolylineAnnotationManager> __lineManager;
+  PolylineAnnotationManager? get _lineManager => __lineManager.ifMounted;
+  final MountedWrapper<CircleAnnotationManager> __circleManager;
+  CircleAnnotationManager? get _circleManager => __circleManager.ifMounted;
+  final MountedWrapper<PointAnnotationManager> __pointManager;
+  PointAnnotationManager? get _pointManager => __pointManager.ifMounted;
   final _lock = Lock();
 
   Future<LatLng?> get center async {
-    final latLngMap = (await _controller.ifMounted?.getCameraState())?.center;
+    final latLngMap = (await _controller?.getCameraState())?.center;
     if (latLngMap == null) {
       return null;
     }
     return LatLng.fromMap(latLngMap);
   }
 
-  Future<double?> get zoom async =>
-      (await _controller.ifMounted?.getCameraState())?.zoom;
+  Future<double?> get zoom async => (await _controller?.getCameraState())?.zoom;
 
   Future<LatLngZoom?> get latLngZoom async {
-    final state = await _controller.ifMounted?.getCameraState();
+    final state = await _controller?.getCameraState();
     if (state == null) {
       return null;
     }
@@ -78,16 +81,15 @@ class MapController {
   }
 
   Future<double?> get pitch async =>
-      (await _controller.ifMounted?.getCameraState())?.pitch;
+      (await _controller?.getCameraState())?.pitch;
 
   Future<void> _animatePitchBy(double pitch) async =>
-      _controller.ifMounted?.pitchBy(pitch, null);
+      _controller?.pitchBy(pitch, null);
 
   Future<LatLng?> screenCoordToLatLng(
     ScreenCoordinate screenCoordinate,
   ) async {
-    final latLngMap =
-        await _controller.ifMounted?.coordinateForPixel(screenCoordinate);
+    final latLngMap = await _controller?.coordinateForPixel(screenCoordinate);
     if (latLngMap == null) {
       return null;
     }
@@ -95,25 +97,24 @@ class MapController {
   }
 
   Future<void> animateCenter(LatLng center) async =>
-      await _controller.ifMounted?.flyTo(center.toCameraOptions(), null);
+      await _controller?.flyTo(center.toCameraOptions(), null);
 
   Future<void> setCenter(LatLng center) async =>
-      await _controller.ifMounted?.setCamera(center.toCameraOptions());
+      await _controller?.setCamera(center.toCameraOptions());
 
   Future<void> setZoom(double zoom) async =>
-      await _controller.ifMounted?.setCamera(CameraOptions(zoom: zoom));
+      await _controller?.setCamera(CameraOptions(zoom: zoom));
 
   Future<void> animateNorth() async =>
-      await _controller.ifMounted?.flyTo(CameraOptions(bearing: 0), null);
+      await _controller?.flyTo(CameraOptions(bearing: 0), null);
 
   Future<void> setBoundsX(LatLngBounds bounds, {required bool padded}) async {
     final paddedBounds = padded ? bounds.padded() : bounds;
     final center = paddedBounds.center;
-    if (_controller.ifMounted == null) {
+    if (_controller == null) {
       return;
     }
-    await _controller.ifMounted
-        ?.setCamera(CameraOptions(center: center.toJsonPoint()));
+    await _controller?.setCamera(CameraOptions(center: center.toJsonPoint()));
 
     final screenCorner =
         await screenCoordToLatLng(ScreenCoordinate(x: 0, y: 0));
@@ -130,11 +131,11 @@ class MapController {
         (center.lng - screenCorner.lng) / (center.lng - northwest.lng);
     final ratio = latRatio < lngRatio ? latRatio : lngRatio;
     final zoomAdd = log(ratio) / log(2);
-    final cameraState = await _controller.ifMounted?.getCameraState();
+    final cameraState = await _controller?.getCameraState();
     if (cameraState == null) {
       return;
     }
-    await _controller.ifMounted
+    await _controller
         ?.setCamera(CameraOptions(zoom: cameraState.zoom + zoomAdd));
   }
 
@@ -153,7 +154,7 @@ class MapController {
   }
 
   Future<PolylineAnnotation?> addBoundingBoxLine(LatLngBounds bounds) async =>
-      await _lineManager.ifMounted?.create(
+      await _lineManager?.create(
         PolylineAnnotationOptions(
           geometry: bounds.toGeoJsonLineString(),
           lineWidth: 2,
@@ -170,16 +171,16 @@ class MapController {
         line.object = await addBoundingBoxLine(bounds);
       } else if (line.isNotNull && bounds != null) {
         line.object!.geometry = bounds.toGeoJsonLineString();
-        await _lineManager.ifMounted?.update(line.object!);
+        await _lineManager?.update(line.object!);
       } else if (line.isNotNull && bounds == null) {
-        await _lineManager.ifMounted?.delete(line.object!);
+        await _lineManager?.delete(line.object!);
         line.setNull();
       }
     });
   }
 
   Future<PolylineAnnotation?> addRouteLine(Iterable<Position> route) async =>
-      await _lineManager.ifMounted?.create(
+      await _lineManager?.create(
         PolylineAnnotationOptions(
           geometry: route.map((p) => p.latLng).toGeoJsonLineString(),
           lineWidth: 2,
@@ -197,16 +198,16 @@ class MapController {
       } else if (line.isNotNull && track != null) {
         line.object!.geometry =
             track.map((p) => p.latLng).toGeoJsonLineString();
-        await _lineManager.ifMounted?.update(line.object!);
+        await _lineManager?.update(line.object!);
       } else if (line.isNotNull && track == null) {
-        await _lineManager.ifMounted?.delete(line.object!);
+        await _lineManager?.delete(line.object!);
         line.setNull();
       }
     });
   }
 
   Future<PolylineAnnotation?> addTrackLine(Iterable<Position> track) async =>
-      await _lineManager.ifMounted?.create(
+      await _lineManager?.create(
         PolylineAnnotationOptions(
           geometry: track.map((p) => p.latLng).toGeoJsonLineString(),
           lineWidth: 2,
@@ -224,9 +225,9 @@ class MapController {
       } else if (line.isNotNull && track != null) {
         line.object!.geometry =
             track.map((p) => p.latLng).toGeoJsonLineString();
-        await _lineManager.ifMounted?.update(line.object!);
+        await _lineManager?.update(line.object!);
       } else if (line.isNotNull && track == null) {
-        await _lineManager.ifMounted?.delete(line.object!);
+        await _lineManager?.delete(line.object!);
         line.setNull();
       }
     });
@@ -235,7 +236,7 @@ class MapController {
   Future<List<CircleAnnotation>?> addCurrentLocationMarker(
     LatLng latLng,
   ) async {
-    return (await _circleManager.ifMounted?.createMulti([
+    return (await _circleManager?.createMulti([
       CircleAnnotationOptions(
         geometry: latLng.toJsonPoint(),
         circleRadius: 8,
@@ -264,11 +265,11 @@ class MapController {
             .map((c) => c..geometry = latLng.toJsonPoint())
             .toList();
         for (final circle in circles.object!) {
-          await _circleManager.ifMounted?.update(circle);
+          await _circleManager?.update(circle);
         }
       } else if (circles.isNotNull && latLng == null) {
         for (final circle in circles.object!) {
-          await _circleManager.ifMounted?.delete(circle);
+          await _circleManager?.delete(circle);
         }
         circles.setNull();
       }
@@ -276,7 +277,7 @@ class MapController {
   }
 
   Future<CircleAnnotation?> addLocationMarker(LatLng latLng) async =>
-      await _circleManager.ifMounted?.create(
+      await _circleManager?.create(
         CircleAnnotationOptions(
           geometry: latLng.toJsonPoint(),
           circleRadius: 8,
@@ -286,7 +287,7 @@ class MapController {
       );
 
   Future<void> removeLocationMarker(CircleAnnotation circle) async =>
-      await _circleManager.ifMounted?.delete(circle);
+      await _circleManager?.delete(circle);
 
   Future<void> updateLocationMarker(
     NullablePointer<CircleAnnotation> circle,
@@ -297,22 +298,21 @@ class MapController {
         circle.object = await addLocationMarker(latLng);
       } else if (circle.isNotNull && latLng != null) {
         circle.object!.geometry = latLng.toJsonPoint();
-        await _circleManager.ifMounted?.update(circle.object!);
+        await _circleManager?.update(circle.object!);
       } else if (circle.isNotNull && latLng == null) {
-        await _circleManager.ifMounted?.delete(circle.object!);
+        await _circleManager?.delete(circle.object!);
         circle.setNull();
       }
     });
   }
 
-  Future<void> removeAllCircles() async =>
-      await _circleManager.ifMounted?.deleteAll();
+  Future<void> removeAllCircles() async => await _circleManager?.deleteAll();
 
   Future<PointAnnotation?> addLocationLabel(
     LatLng latLng,
     String label,
   ) async =>
-      await _pointManager.ifMounted?.create(
+      await _pointManager?.create(
         PointAnnotationOptions(
           geometry: latLng.toJsonPoint(),
           textField: label,
@@ -320,14 +320,12 @@ class MapController {
         ),
       );
 
-  Future<void> removeAllPoints() async =>
-      await _pointManager.ifMounted?.deleteAll();
+  Future<void> removeAllPoints() async => await _pointManager?.deleteAll();
 
   Future<void> setStyle(String styleUri) async =>
-      await _controller.ifMounted?.style.setStyleURI(styleUri);
+      await _controller?.style.setStyleURI(styleUri);
 
-  Future<String?> getStyle() async =>
-      await _controller.ifMounted?.style.getStyleURI();
+  Future<String?> getStyle() async => await _controller?.style.getStyleURI();
 
   Future<void> _addTerrainSource(String sourceId) async {
     if (!(await _sourceExists(sourceId) ?? true)) {
@@ -383,39 +381,39 @@ class MapController {
   }
 
   Future<bool?> _sourceExists(String sourceId) async =>
-      await _controller.ifMounted?.style.styleSourceExists(sourceId);
+      await _controller?.style.styleSourceExists(sourceId);
 
   Future<void> _addSource(Source source) async =>
-      await _controller.ifMounted?.style.addSource(source);
+      await _controller?.style.addSource(source);
 
   Future<bool?> _layerExists(String layerId) async =>
-      await _controller.ifMounted?.style.styleLayerExists(layerId);
+      await _controller?.style.styleLayerExists(layerId);
 
   Future<void> _addLayer(Layer layer) async =>
-      await _controller.ifMounted?.style.addLayer(layer);
+      await _controller?.style.addLayer(layer);
 
   Future<void> _removeLayer(String layerId) async =>
-      await _controller.ifMounted?.style.removeStyleLayer(layerId);
+      await _controller?.style.removeStyleLayer(layerId);
 
   Future<String?> _getStyleTerrainProperty(String key) async =>
-      (await _controller.ifMounted?.style.getStyleTerrainProperty(key))?.value;
+      (await _controller?.style.getStyleTerrainProperty(key))?.value;
 
   Future<void> _setStyleTerrainProperty(String key, Object value) async =>
-      await _controller.ifMounted?.style.setStyleTerrainProperty(key, value);
+      await _controller?.style.setStyleTerrainProperty(key, value);
 
   Future<void> hideAttribution() async =>
-      await _controller.ifMounted?.attribution.updateSettings(
+      await _controller?.attribution.updateSettings(
         AttributionSettings(iconColor: 0x00000000, clickable: false),
       );
 
-  Future<void> hideCompass() async => await _controller.ifMounted?.compass
+  Future<void> hideCompass() async => await _controller?.compass
       .updateSettings(CompassSettings(enabled: false));
 
   Future<void> setScaleBarSettings({
     OrnamentPosition position = OrnamentPosition.BOTTOM_RIGHT,
     bool enabled = true,
   }) async =>
-      await _controller.ifMounted?.scaleBar.updateSettings(
+      await _controller?.scaleBar.updateSettings(
         ScaleBarSettings(position: position, enabled: enabled),
       );
 
@@ -426,7 +424,7 @@ class MapController {
     required bool scrollEnabled,
     required bool pitchEnabled,
   }) async =>
-      await _controller.ifMounted?.gestures.updateSettings(
+      await _controller?.gestures.updateSettings(
         GesturesSettings(
           doubleTapToZoomInEnabled: doubleTapZoomEnabled,
           doubleTouchToZoomOutEnabled: false,
@@ -453,12 +451,25 @@ class ElevationMapController {
   const ElevationMapController(this._mapController);
 
   final MapController _mapController;
+  MapboxMap? get _controller => _mapController._controller;
 
   Future<double?> getElevation(LatLng latLng) async {
+    // setZoom = 15 & enableTerrain called in ElevationMap.onMapCreated
+    if (_controller == null) {
+      return null;
+    }
     await _mapController.setCenter(latLng);
-    await _mapController.setZoom(15);
-    await _mapController.enableTerrain("elevation-terrain-source", 0);
-    return _mapController._controller.ifMounted
-        ?.getElevation(latLng.toJsonPoint());
+    double? elevation;
+    for (var attempt = 0; attempt < 8; attempt++) {
+      elevation = await _controller?.getElevation(latLng.toJsonPoint());
+      if (elevation != null) {
+        break;
+      }
+      // ignore: inference_failure_on_instance_creation
+      await Future.delayed(
+        Duration(milliseconds: 10 * pow(2, attempt) as int),
+      );
+    }
+    return elevation;
   }
 }
