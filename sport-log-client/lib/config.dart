@@ -115,6 +115,9 @@ class Config extends JsonSerializable {
   late final Version version;
 
   static final Version apiVersion = Version(0, 3);
+  // ignore: do_not_use_environment
+  static const String gitRef = String.fromEnvironment("GIT_REF");
+
   static const String databaseName = 'database.sqlite';
   static const String hiveBoxName = 'settings';
   static const Duration httpTimeout = Duration(seconds: 20);

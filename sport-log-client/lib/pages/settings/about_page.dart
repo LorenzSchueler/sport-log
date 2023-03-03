@@ -39,8 +39,8 @@ class AboutPage extends StatelessWidget {
               caption: "Version",
               child: Text(
                 Config.debugMode
-                    ? "${Config.instance.version} (debug build)"
-                    : "${Config.instance.version}",
+                    ? "${Config.instance.version} [${Config.gitRef}] (debug build)"
+                    : "${Config.instance.version} [${Config.gitRef}]",
               ),
             ),
             TextTile(

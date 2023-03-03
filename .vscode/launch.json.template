@@ -7,7 +7,15 @@
             "request": "launch",
             "type": "dart",
             "flutterMode": "debug",
-            "args": [],
+            "args": [
+                "--flavor",
+                "development",
+                //"production",
+            ],
+            "toolArgs": [
+                "--dart-define",
+                "GIT_REF=$(git show-ref --head --hash=7 HEAD)",
+            ],
             "env": {
                 "SDK_REGISTRY_TOKEN": "<token>"
             }
@@ -18,7 +26,15 @@
             "request": "launch",
             "type": "dart",
             "flutterMode": "profile",
-            "args": [],
+            "args": [
+                "--flavor",
+                "development",
+                //"production",
+            ],
+            "toolArgs": [
+                "--dart-define",
+                "GIT_REF=$(git show-ref --head --hash=7 HEAD)",
+            ],
             "env": {
                 "SDK_REGISTRY_TOKEN": "<token>"
             }
@@ -29,7 +45,15 @@
             "request": "launch",
             "type": "dart",
             "flutterMode": "release",
-            "args": [],
+            "args": [
+                "--flavor",
+                "development",
+                //"production",
+            ],
+            "toolArgs": [
+                "--dart-define",
+                "GIT_REF=$(git show-ref --head --hash=7 HEAD)",
+            ],
             "env": {
                 "SDK_REGISTRY_TOKEN": "<token>"
             }
