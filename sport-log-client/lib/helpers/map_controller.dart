@@ -99,10 +99,10 @@ class MapController {
       await _controller.ifMounted?.easeTo(center.toCameraOptions(), null);
 
   Future<void> setZoom(double zoom) async =>
-      _controller.ifMounted?.flyTo(CameraOptions(zoom: zoom), null);
+      await _controller.ifMounted?.flyTo(CameraOptions(zoom: zoom), null);
 
   Future<void> setNorth() async =>
-      _controller.ifMounted?.flyTo(CameraOptions(bearing: 0), null);
+      await _controller.ifMounted?.flyTo(CameraOptions(bearing: 0), null);
 
   Future<void> setBoundsX(LatLngBounds bounds, {required bool padded}) async {
     final paddedBounds = padded ? bounds.padded() : bounds;
@@ -150,15 +150,14 @@ class MapController {
     }
   }
 
-  Future<PolylineAnnotation?> addBoundingBoxLine(LatLngBounds bounds) async {
-    return _lineManager.ifMounted?.create(
-      PolylineAnnotationOptions(
-        geometry: bounds.toGeoJsonLineString(),
-        lineWidth: 2,
-        lineColor: Defaults.mapbox.trackLineColor,
-      ),
-    );
-  }
+  Future<PolylineAnnotation?> addBoundingBoxLine(LatLngBounds bounds) async =>
+      await _lineManager.ifMounted?.create(
+        PolylineAnnotationOptions(
+          geometry: bounds.toGeoJsonLineString(),
+          lineWidth: 2,
+          lineColor: Defaults.mapbox.trackLineColor,
+        ),
+      );
 
   Future<void> updateBoundingBoxLine(
     NullablePointer<PolylineAnnotation> line,
@@ -177,15 +176,14 @@ class MapController {
     });
   }
 
-  Future<PolylineAnnotation?> addRouteLine(Iterable<Position> route) async {
-    return _lineManager.ifMounted?.create(
-      PolylineAnnotationOptions(
-        geometry: route.map((p) => p.latLng).toGeoJsonLineString(),
-        lineWidth: 2,
-        lineColor: Defaults.mapbox.routeLineColor,
-      ),
-    );
-  }
+  Future<PolylineAnnotation?> addRouteLine(Iterable<Position> route) async =>
+      await _lineManager.ifMounted?.create(
+        PolylineAnnotationOptions(
+          geometry: route.map((p) => p.latLng).toGeoJsonLineString(),
+          lineWidth: 2,
+          lineColor: Defaults.mapbox.routeLineColor,
+        ),
+      );
 
   Future<void> updateRouteLine(
     NullablePointer<PolylineAnnotation> line,
@@ -205,15 +203,14 @@ class MapController {
     });
   }
 
-  Future<PolylineAnnotation?> addTrackLine(Iterable<Position> track) async {
-    return _lineManager.ifMounted?.create(
-      PolylineAnnotationOptions(
-        geometry: track.map((p) => p.latLng).toGeoJsonLineString(),
-        lineWidth: 2,
-        lineColor: Defaults.mapbox.trackLineColor,
-      ),
-    );
-  }
+  Future<PolylineAnnotation?> addTrackLine(Iterable<Position> track) async =>
+      await _lineManager.ifMounted?.create(
+        PolylineAnnotationOptions(
+          geometry: track.map((p) => p.latLng).toGeoJsonLineString(),
+          lineWidth: 2,
+          lineColor: Defaults.mapbox.trackLineColor,
+        ),
+      );
 
   Future<void> updateTrackLine(
     NullablePointer<PolylineAnnotation> line,
@@ -276,19 +273,18 @@ class MapController {
     });
   }
 
-  Future<CircleAnnotation?> addLocationMarker(LatLng latLng) async {
-    return _circleManager.ifMounted?.create(
-      CircleAnnotationOptions(
-        geometry: latLng.toJsonPoint(),
-        circleRadius: 8,
-        circleColor: Defaults.mapbox.markerColor,
-        circleOpacity: 0.5,
-      ),
-    );
-  }
+  Future<CircleAnnotation?> addLocationMarker(LatLng latLng) async =>
+      await _circleManager.ifMounted?.create(
+        CircleAnnotationOptions(
+          geometry: latLng.toJsonPoint(),
+          circleRadius: 8,
+          circleColor: Defaults.mapbox.markerColor,
+          circleOpacity: 0.5,
+        ),
+      );
 
   Future<void> removeLocationMarker(CircleAnnotation circle) async =>
-      _circleManager.ifMounted?.delete(circle);
+      await _circleManager.ifMounted?.delete(circle);
 
   Future<void> updateLocationMarker(
     NullablePointer<CircleAnnotation> circle,
@@ -308,19 +304,22 @@ class MapController {
   }
 
   Future<void> removeAllCircles() async =>
-      _circleManager.ifMounted?.deleteAll();
+      await _circleManager.ifMounted?.deleteAll();
 
-  Future<PointAnnotation?> addLocationLabel(LatLng latLng, String label) async {
-    return _pointManager.ifMounted?.create(
-      PointAnnotationOptions(
-        geometry: latLng.toJsonPoint(),
-        textField: label,
-        textOffset: [0, 1],
-      ),
-    );
-  }
+  Future<PointAnnotation?> addLocationLabel(
+    LatLng latLng,
+    String label,
+  ) async =>
+      await _pointManager.ifMounted?.create(
+        PointAnnotationOptions(
+          geometry: latLng.toJsonPoint(),
+          textField: label,
+          textOffset: [0, 1],
+        ),
+      );
 
-  Future<void> removeAllPoints() async => _pointManager.ifMounted?.deleteAll();
+  Future<void> removeAllPoints() async =>
+      await _pointManager.ifMounted?.deleteAll();
 
   Future<void> setStyle(String styleUri) async =>
       await _controller.ifMounted?.style.setStyleURI(styleUri);
@@ -328,25 +327,78 @@ class MapController {
   Future<String?> getStyle() async =>
       await _controller.ifMounted?.style.getStyleURI();
 
-  Future<bool?> sourceExists(String sourceId) async =>
+  Future<void> _addTerrainSource(String sourceId) async {
+    if (!(await _sourceExists(sourceId) ?? true)) {
+      await _addSource(
+        RasterDemSource(
+          id: sourceId,
+          url: 'mapbox://mapbox.mapbox-terrain-dem-v1',
+        ),
+      );
+    }
+  }
+
+  Future<void> enableHillshade(String sourceId, String layerId) async {
+    await _addTerrainSource(sourceId);
+    await _addLayer(
+      HillshadeLayer(
+        id: layerId,
+        sourceId: sourceId,
+        hillshadeShadowColor: 0x404040,
+        hillshadeHighlightColor: 0x404040,
+      ),
+    );
+  }
+
+  Future<void> disableHillshade(String layerId) => _removeLayer(layerId);
+
+  Future<bool?> hillshadeEnabled(String layerId) => _layerExists(layerId);
+
+  Future<void> enableTerrain(String sourceId, double initPitch) async {
+    await _addTerrainSource(sourceId);
+    await _setStyleTerrainProperty("source", sourceId);
+    await _setStyleTerrainProperty("exaggeration", 1);
+    final currentPitch = await pitch;
+    if (currentPitch != null) {
+      await pitchBy(initPitch - currentPitch);
+    }
+  }
+
+  Future<void> disableTerrain() async {
+    await _setStyleTerrainProperty("exaggeration", 0);
+    final currentPitch = await pitch;
+    if (currentPitch != null) {
+      await pitchBy(-currentPitch);
+    }
+  }
+
+  Future<bool?> terrainEnabled() async {
+    final exaggeration = await _getStyleTerrainProperty("exaggeration");
+    if (exaggeration == null) {
+      return null;
+    }
+    return ![null, 0.0].contains(double.tryParse(exaggeration));
+  }
+
+  Future<bool?> _sourceExists(String sourceId) async =>
       await _controller.ifMounted?.style.styleSourceExists(sourceId);
 
-  Future<void> addSource(Source source) async =>
+  Future<void> _addSource(Source source) async =>
       await _controller.ifMounted?.style.addSource(source);
 
-  Future<bool?> layerExists(String layerId) async =>
+  Future<bool?> _layerExists(String layerId) async =>
       await _controller.ifMounted?.style.styleLayerExists(layerId);
 
-  Future<void> addLayer(Layer layer) async =>
-      _controller.ifMounted?.style.addLayer(layer);
+  Future<void> _addLayer(Layer layer) async =>
+      await _controller.ifMounted?.style.addLayer(layer);
 
-  Future<void> removeLayer(String layerId) async =>
-      _controller.ifMounted?.style.removeStyleLayer(layerId);
+  Future<void> _removeLayer(String layerId) async =>
+      await _controller.ifMounted?.style.removeStyleLayer(layerId);
 
-  Future<String?> getStyleTerrainProperty(String key) async =>
+  Future<String?> _getStyleTerrainProperty(String key) async =>
       (await _controller.ifMounted?.style.getStyleTerrainProperty(key))?.value;
 
-  Future<void> setStyleTerrainProperty(String key, Object value) async =>
+  Future<void> _setStyleTerrainProperty(String key, Object value) async =>
       await _controller.ifMounted?.style.setStyleTerrainProperty(key, value);
 
   Future<void> hideAttribution() async =>
@@ -371,21 +423,20 @@ class MapController {
     required bool rotateEnabled,
     required bool scrollEnabled,
     required bool pitchEnabled,
-  }) async {
-    return await _controller.ifMounted?.gestures.updateSettings(
-      GesturesSettings(
-        doubleTapToZoomInEnabled: doubleTapZoomEnabled,
-        doubleTouchToZoomOutEnabled: false,
-        rotateEnabled: rotateEnabled,
-        scrollEnabled: scrollEnabled,
-        pitchEnabled: pitchEnabled,
-        pinchToZoomEnabled: zoomEnabled,
-        quickZoomEnabled: false,
-        pinchPanEnabled: false,
-        simultaneousRotateAndPinchToZoomEnabled: rotateEnabled && zoomEnabled,
-      ),
-    );
-  }
+  }) async =>
+      await _controller.ifMounted?.gestures.updateSettings(
+        GesturesSettings(
+          doubleTapToZoomInEnabled: doubleTapZoomEnabled,
+          doubleTouchToZoomOutEnabled: false,
+          rotateEnabled: rotateEnabled,
+          scrollEnabled: scrollEnabled,
+          pitchEnabled: pitchEnabled,
+          pinchToZoomEnabled: zoomEnabled,
+          quickZoomEnabled: false,
+          pinchPanEnabled: false,
+          simultaneousRotateAndPinchToZoomEnabled: rotateEnabled && zoomEnabled,
+        ),
+      );
 
   Future<void> disableAllGestures() => setGestureSettings(
         doubleTapZoomEnabled: false,

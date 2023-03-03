@@ -37,20 +37,6 @@ abstract class _MapOption {
   Future<void> enable(MapController mapController);
 
   Future<void> disable(MapController mapController);
-
-  Future<void> _addTerrainSource(
-    MapController mapController,
-    String sourceId,
-  ) async {
-    if (!(await mapController.sourceExists(sourceId) ?? true)) {
-      await mapController.addSource(
-        RasterDemSource(
-          id: sourceId,
-          url: 'mapbox://mapbox.mapbox-terrain-dem-v1',
-        ),
-      );
-    }
-  }
 }
 
 class _HillshadeOption extends _MapOption {
@@ -60,50 +46,27 @@ class _HillshadeOption extends _MapOption {
   static const _hillshadeLayerId = "hillshade-layer";
 
   @override
-  Future<void> enable(MapController mapController) async {
-    await super._addTerrainSource(mapController, _terrainSourceId);
-    await mapController.addLayer(
-      HillshadeLayer(
-        id: _hillshadeLayerId,
-        sourceId: _terrainSourceId,
-        hillshadeShadowColor: 0x404040,
-        hillshadeHighlightColor: 0x404040,
-      ),
-    );
-  }
+  Future<void> enable(MapController mapController) =>
+      mapController.enableHillshade(_terrainSourceId, _hillshadeLayerId);
 
   @override
-  Future<void> disable(MapController mapController) async {
-    await mapController.removeLayer(_hillshadeLayerId);
-  }
+  Future<void> disable(MapController mapController) =>
+      mapController.disableHillshade(_hillshadeLayerId);
 }
 
-class _ThreeDOption extends _MapOption {
-  const _ThreeDOption();
+class _TerrainOption extends _MapOption {
+  const _TerrainOption();
 
   static const _terrainSourceId = "mapbox-terrain-dem-v1-3d";
-  static const _exaggeration = 1.0;
   static const _pitch = 60.0;
 
   @override
-  Future<void> enable(MapController mapController) async {
-    await super._addTerrainSource(mapController, _terrainSourceId);
-    await mapController.setStyleTerrainProperty("source", _terrainSourceId);
-    await mapController.setStyleTerrainProperty("exaggeration", _exaggeration);
-    final currentPitch = await mapController.pitch;
-    if (currentPitch != null) {
-      await mapController.pitchBy(_pitch - currentPitch);
-    }
-  }
+  Future<void> enable(MapController mapController) =>
+      mapController.enableTerrain(_terrainSourceId, _pitch);
 
   @override
-  Future<void> disable(MapController mapController) async {
-    await mapController.setStyleTerrainProperty("exaggeration", "0");
-    final currentPitch = await mapController.pitch;
-    if (currentPitch != null) {
-      await mapController.pitchBy(-currentPitch);
-    }
-  }
+  Future<void> disable(MapController mapController) =>
+      mapController.disableTerrain();
 }
 
 class _MapStylesBottomSheetState extends State<MapStylesBottomSheet> {
@@ -124,18 +87,16 @@ class _MapStylesBottomSheetState extends State<MapStylesBottomSheet> {
   Future<void> _setCurrentState() async {
     final style = await widget.mapController.getStyle();
     final hasHillshade = await widget.mapController
-        .layerExists(_HillshadeOption._hillshadeLayerId);
-    final exaggeration =
-        await widget.mapController.getStyleTerrainProperty("exaggeration");
-    if (style == null || hasHillshade == null || exaggeration == null) {
+        .hillshadeEnabled(_HillshadeOption._hillshadeLayerId);
+    final hasTerrain = await widget.mapController.terrainEnabled();
+    if (style == null || hasHillshade == null || hasTerrain == null) {
       return;
     }
-    final isThreeD = ![null, 0.0].contains(double.tryParse(exaggeration));
     setState(() {
       _style = style;
       _options = {
         if (hasHillshade) const _HillshadeOption(),
-        if (isThreeD) const _ThreeDOption()
+        if (hasTerrain) const _TerrainOption()
       };
     });
   }
@@ -205,7 +166,7 @@ class _MapStylesBottomSheetState extends State<MapStylesBottomSheet> {
                 label: Text("Hillshade"),
               ),
               ButtonSegment(
-                value: _ThreeDOption(),
+                value: _TerrainOption(),
                 icon: Icon(AppIcons.threeD),
                 label: Text("3D"),
               ),
