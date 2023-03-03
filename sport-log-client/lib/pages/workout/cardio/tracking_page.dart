@@ -12,6 +12,7 @@ import 'package:sport_log/pages/workout/cardio/cardio_value_unit_description_tab
 import 'package:sport_log/settings.dart';
 import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/map_widgets/mapbox_map_wrapper.dart';
+import 'package:sport_log/widgets/map_widgets/static_mapbox_map.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
 import 'package:sport_log/widgets/provider_consumer.dart';
 
@@ -111,6 +112,9 @@ class CardioTrackingPage extends StatelessWidget {
                       ),
                       onMapCreated: trackingUtils.onMapCreated,
                     ),
+                  ),
+                  ElevationMap(
+                    onMapCreated: trackingUtils.onElevationMapCreated,
                   ),
                   if (!fullscreen.isOn)
                     Container(

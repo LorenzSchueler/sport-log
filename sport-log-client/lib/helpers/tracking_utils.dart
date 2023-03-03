@@ -83,6 +83,7 @@ class TrackingUtils extends ChangeNotifier {
   final HeartRateUtils? _heartRateUtils;
 
   MapController? _mapController;
+  ElevationMapController? _elevationMapController;
 
   final NullablePointer<PolylineAnnotation> _line =
       NullablePointer.nullPointer();
@@ -120,6 +121,10 @@ class TrackingUtils extends ChangeNotifier {
     await _locationUtils.startLocationStream(_onLocationUpdate);
     await _stepUtils.startStepCountStream(_onStepCountUpdate);
     await _heartRateUtils?.startHeartRateStream(_onHeartRateUpdate);
+  }
+
+  void onElevationMapCreated(ElevationMapController mapController) {
+    _elevationMapController = mapController;
   }
 
   void start() {
@@ -267,15 +272,13 @@ class TrackingUtils extends ChangeNotifier {
       }
     }
 
-    // TODO use elevation from mapbox
-    //final elevation =
-    //(await _mapController?.getElevation(location.latLng.toJsonPoint()))
-    //?.round();
+    final elevation =
+        await _elevationMapController?.getElevation(location.latLng);
 
     _locationInfo = "provider:   ${location.provider}\n"
         "accuracy: ${location.accuracy?.round()} m\n"
         "elevation GPS: ${location.altitude?.round()} m\n"
-        //"elevation Mbx: $elevation m\n"
+        "elevation Mbx: ${elevation?.round()} m\n"
         "time: ${location.time! ~/ 1000} s\n"
         "satellites: ${location.satelliteNumber}\n"
         "points:      ${_cardioSessionDescription.cardioSession.track?.length}";
@@ -292,7 +295,7 @@ class TrackingUtils extends ChangeNotifier {
         Position(
           latitude: location.latitude!,
           longitude: location.longitude!,
-          elevation: location.altitude!,
+          elevation: elevation ?? location.altitude!,
           distance: _cardioSessionDescription.cardioSession.track!.isEmpty
               ? 0
               : _cardioSessionDescription.cardioSession.track!.last
