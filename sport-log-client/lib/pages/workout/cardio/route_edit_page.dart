@@ -15,6 +15,7 @@ import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/message_dialog.dart';
 import 'package:sport_log/widgets/map_widgets/mapbox_map_wrapper.dart';
+import 'package:sport_log/widgets/map_widgets/static_mapbox_map.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
 import 'package:sport_log/widgets/snackbar.dart';
 
@@ -40,6 +41,7 @@ class _RouteEditPageState extends State<RouteEditPage> {
   bool _listExpanded = false;
 
   MapController? _mapController;
+  ElevationMapController? _elevationMapController;
 
   late final Route _route = (widget.route?.clone() ?? Route.defaultValue())
     ..track ??= []
@@ -87,8 +89,10 @@ class _RouteEditPageState extends State<RouteEditPage> {
 
   Future<void> _updateLine() async {
     if (_route.markedPositions!.length >= 2) {
-      final track =
-          await RoutePlanningUtils.matchLocations(_route.markedPositions!);
+      final track = await RoutePlanningUtils.matchLocations(
+        _route.markedPositions!,
+        _elevationMapController?.getElevation,
+      );
       if (mounted) {
         if (track.isFailure) {
           showSimpleToast(context, track.failure.message);
@@ -102,6 +106,8 @@ class _RouteEditPageState extends State<RouteEditPage> {
           await _mapController?.updateRouteLine(_line, _route.track);
         }
       }
+    } else {
+      await _mapController?.updateRouteLine(_line, null);
     }
   }
 
@@ -135,16 +141,14 @@ class _RouteEditPageState extends State<RouteEditPage> {
       );
       return;
     }
-    final elevationResult = await RoutePlanningUtils.getElevations([location]);
-    final elevation =
-        elevationResult.isSuccess ? elevationResult.success[0] : 0;
+    final elevation = await _elevationMapController?.getElevation(location);
     if (mounted) {
       setState(() {
         _route.markedPositions!.add(
           Position(
             latitude: location.lat,
             longitude: location.lng,
-            elevation: elevation.toDouble(),
+            elevation: elevation ?? 0,
             distance: 0,
             time: Duration.zero,
           ),
@@ -240,6 +244,9 @@ class _RouteEditPageState extends State<RouteEditPage> {
     await _updateLine();
   }
 
+  void _onElevationMapCreated(ElevationMapController mapController) =>
+      _elevationMapController = mapController;
+
   @override
   Widget build(BuildContext context) {
     return DiscardWarningOnPop(
@@ -276,6 +283,7 @@ class _RouteEditPageState extends State<RouteEditPage> {
                 onLongTap: _extendLine,
               ),
             ),
+            ElevationMap(onMapCreated: _onElevationMapCreated),
             Padding(
               padding: Defaults.edgeInsets.normal,
               child: Column(
