@@ -80,7 +80,7 @@ class MapController {
   Future<double?> get pitch async =>
       (await _controller.ifMounted?.getCameraState())?.pitch;
 
-  Future<void> pitchBy(double pitch) async =>
+  Future<void> _animatePitchBy(double pitch) async =>
       _controller.ifMounted?.pitchBy(pitch, null);
 
   Future<LatLng?> screenCoordToLatLng(
@@ -94,17 +94,16 @@ class MapController {
     return LatLng.fromMap(latLngMap);
   }
 
-  // TODO diff to flyTo
   Future<void> animateCenter(LatLng center) async =>
-      await _controller.ifMounted?.easeTo(center.toCameraOptions(), null);
+      await _controller.ifMounted?.flyTo(center.toCameraOptions(), null);
 
   Future<void> setCenter(LatLng center) async =>
       await _controller.ifMounted?.setCamera(center.toCameraOptions());
 
   Future<void> setZoom(double zoom) async =>
-      await _controller.ifMounted?.flyTo(CameraOptions(zoom: zoom), null);
+      await _controller.ifMounted?.setCamera(CameraOptions(zoom: zoom));
 
-  Future<void> setNorth() async =>
+  Future<void> animateNorth() async =>
       await _controller.ifMounted?.flyTo(CameraOptions(bearing: 0), null);
 
   Future<void> setBoundsX(LatLngBounds bounds, {required bool padded}) async {
@@ -363,7 +362,7 @@ class MapController {
     await _setStyleTerrainProperty("exaggeration", 1);
     final currentPitch = await pitch;
     if (currentPitch != null) {
-      await pitchBy(initPitch - currentPitch);
+      await _animatePitchBy(initPitch - currentPitch);
     }
   }
 
@@ -371,7 +370,7 @@ class MapController {
     await _setStyleTerrainProperty("exaggeration", 0);
     final currentPitch = await pitch;
     if (currentPitch != null) {
-      await pitchBy(-currentPitch);
+      await _animatePitchBy(-currentPitch);
     }
   }
 

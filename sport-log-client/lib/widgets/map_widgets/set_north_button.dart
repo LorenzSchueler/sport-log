@@ -14,7 +14,7 @@ class SetNorthButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return FloatingActionButton.small(
       heroTag: null,
-      onPressed: mapController.setNorth,
+      onPressed: mapController.animateNorth,
       child: const Icon(AppIcons.compass),
     );
   }
