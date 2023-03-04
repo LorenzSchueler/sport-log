@@ -32,8 +32,8 @@ class StepCountUtils {
     return true;
   }
 
-  void stopStepCountStream() {
-    _stepCountSubscription?.cancel();
+  Future<void> stopStepCountStream() async {
+    await _stepCountSubscription?.cancel();
     _stepCountSubscription = null;
   }
 

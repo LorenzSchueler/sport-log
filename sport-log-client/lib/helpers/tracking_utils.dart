@@ -93,16 +93,16 @@ class TrackingUtils extends ChangeNotifier {
   static const maxSpeed = 250;
 
   @override
-  Future<void> dispose() async {
+  void dispose() {
     _refreshTimer?.cancel();
     _autosaveTimer?.cancel();
-    _stepUtils.stopStepCountStream();
-    _locationUtils.stopLocationStream();
-    await _heartRateUtils?.stopHeartRateStream();
     final lastGpsPosition = _locationUtils.lastLatLng;
     if (lastGpsPosition != null) {
       Settings.instance.lastGpsLatLng = lastGpsPosition;
     }
+    _stepUtils.stopStepCountStream();
+    _locationUtils.stopLocationStream();
+    _heartRateUtils?.stopHeartRateStream();
     super.dispose();
   }
 
@@ -261,7 +261,8 @@ class TrackingUtils extends ChangeNotifier {
   Future<void> _onLocationUpdate(LocationData location) async {
     // filter GPS jumps in tracking mode
     if (isTracking &&
-        _cardioSessionDescription.cardioSession.track!.isNotEmpty) {
+        ((_cardioSessionDescription.cardioSession.track?.isNotEmpty) ??
+            false)) {
       final lastPosition = _cardioSessionDescription.cardioSession.track!.last;
       final km = lastPosition.distanceTo(location.latLng) / 1000;
       final hour = (currentDuration - lastPosition.time).inMilliseconds /
@@ -275,12 +276,10 @@ class TrackingUtils extends ChangeNotifier {
     final elevation =
         await _elevationMapController?.getElevation(location.latLng);
 
-    _locationInfo = "provider:   ${location.provider}\n"
-        "accuracy: ${location.accuracy?.round()} m\n"
+    _locationInfo = "accuracy: ${location.accuracy?.round()} m\n"
+        "satellites: ${location.satellites}\n"
         "elevation GPS: ${location.altitude?.round()} m\n"
         "elevation Mbx: ${elevation?.round()} m\n"
-        "time: ${location.time! ~/ 1000} s\n"
-        "satellites: ${location.satelliteNumber}\n"
         "points:      ${_cardioSessionDescription.cardioSession.track?.length}";
 
     await centerCurrentLocation();
@@ -291,7 +290,7 @@ class TrackingUtils extends ChangeNotifier {
     );
 
     if (isTracking) {
-      _cardioSessionDescription.cardioSession.track!.add(
+      _cardioSessionDescription.cardioSession.track?.add(
         Position(
           latitude: location.latitude!,
           longitude: location.longitude!,

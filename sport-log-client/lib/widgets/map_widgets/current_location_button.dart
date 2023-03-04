@@ -29,17 +29,17 @@ class _CurrentLocationButtonState extends State<CurrentLocationButton> {
 
   @override
   void dispose() {
-    _locationUtils.stopLocationStream();
     final lastGpsPosition = _locationUtils.lastLatLng;
     if (lastGpsPosition != null) {
       Settings.instance.lastGpsLatLng = lastGpsPosition;
     }
+    _locationUtils.stopLocationStream();
     super.dispose();
   }
 
   Future<void> _toggleCurrentLocation() async {
     if (_locationUtils.enabled) {
-      _locationUtils.stopLocationStream();
+      await _locationUtils.stopLocationStream();
       await widget.mapController.updateCurrentLocationMarker(
         _currentLocationMarker,
         null,

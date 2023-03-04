@@ -1,29 +1,55 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="org.sport_log.sport_log_client">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="org.sport_log.sport_log_client">
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" /> <!-- location -->
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" /> <!-- location -->
-    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" /> <!-- location background mode-->
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" /> <!-- location background mode-->
-    <uses-permission android:name="android.permission.BLUETOOTH_SCAN" /> <!-- polar heart rate tracking -->
-    <uses-permission android:name="android.permission.BLUETOOTH" /> <!-- flutter blue -->
-    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" /> <!-- flutter blue -->
-    <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" /> <!-- pedometer -->
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" /> <!-- gpx export -->
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" /> <!-- gpx export -->
-    <uses-permission android:name="android.permission.ACCESS_MEDIA_LOCATION" /> <!-- gpx export -->
+
+    <!-- location -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <!-- location + flutter_blue_plus-->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <!-- location background mode-->
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+    <!-- location background mode-->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+
+    <!-- polar  -->
+    <uses-permission android:name="android.permission.BLUETOOTH_SCAN"
+        android:usesPermissionFlags="neverForLocation" />
+    <!-- flutter_blue_plus-->
+    <!-- Request legacy Bluetooth permissions on older devices. -->
+    <uses-permission android:name="android.permission.BLUETOOTH"
+        android:maxSdkVersion="30" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"
+        android:maxSdkVersion="30" />
+
+
+    <!-- pedometer -->
+    <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
+
+    <!-- gpx export/ error log -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <!-- gpx export/ error log -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <!-- gpx export/ error log -->
+    <uses-permission android:name="android.permission.ACCESS_MEDIA_LOCATION" />
+
     <queries>
         <intent>
             <action android:name="android.intent.action.VIEW" />
             <data android:scheme="https" />
         </intent>
     </queries>
-    <application android:label="sport_log_client" android:name="${applicationName}" android:icon="@mipmap/ic_launcher">
-        <activity android:name=".MainActivity" android:exported="true" android:launchMode="singleTop" android:theme="@style/LaunchTheme" android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode" android:hardwareAccelerated="true" android:windowSoftInputMode="adjustResize">
+    <application android:label="sport_log_client" android:name="${applicationName}"
+        android:icon="@mipmap/ic_launcher">
+        <activity android:name=".MainActivity" android:exported="true"
+            android:launchMode="singleTop" android:theme="@style/LaunchTheme"
+            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
+            android:hardwareAccelerated="true" android:windowSoftInputMode="adjustResize">
             <!-- Specifies an Android theme to apply to this Activity as soon as
                  the Android process has started. This theme is visible to the user
                  while the Flutter UI initializes. After that, this theme continues
                  to determine the Window background behind the Flutter UI. -->
-            <meta-data android:name="io.flutter.embedding.android.NormalTheme" android:resource="@style/NormalTheme" />
+            <meta-data android:name="io.flutter.embedding.android.NormalTheme"
+                android:resource="@style/NormalTheme" />
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

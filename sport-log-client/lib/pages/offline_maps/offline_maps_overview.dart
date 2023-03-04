@@ -6,7 +6,6 @@ import 'package:sport_log/helpers/map_controller.dart';
 import 'package:sport_log/helpers/map_download_utils.dart';
 import 'package:sport_log/helpers/pointer.dart';
 import 'package:sport_log/routes.dart';
-import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/message_dialog.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
@@ -33,15 +32,6 @@ class _OfflineMapsPageState extends State<OfflineMapsPage> {
       NullablePointer.nullPointer();
   final NullablePointer<PolylineAnnotation> _boundingBoxLine =
       NullablePointer.nullPointer();
-
-  @override
-  Future<void> dispose() async {
-    super.dispose();
-    final lastMapPosition = await _mapController?.latLngZoom;
-    if (lastMapPosition != null) {
-      Settings.instance.lastMapPosition = lastMapPosition;
-    }
-  }
 
   Future<void> _onMapCreated(MapController mapController) async {
     _mapController = mapController;

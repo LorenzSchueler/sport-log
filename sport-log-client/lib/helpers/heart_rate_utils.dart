@@ -1,16 +1,14 @@
 import 'dart:async';
 
-import 'package:app_settings/app_settings.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_blue/flutter_blue.dart';
+import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:polar/polar.dart';
-import 'package:sport_log/helpers/location_utils.dart';
 import 'package:sport_log/widgets/dialogs/system_settings_dialog.dart';
 
 class HeartRateUtils extends ChangeNotifier {
   static final _polar = Polar();
-  static final FlutterBlue _flutterBlue = FlutterBlue.instance;
+  static final FlutterBluePlus _flutterBlue = FlutterBluePlus.instance;
 
   static const _searchDuration = Duration(seconds: 10);
 
@@ -44,30 +42,19 @@ class HeartRateUtils extends ChangeNotifier {
     await stopHeartRateStream();
 
     while (!await _flutterBlue.isOn) {
-      final ignore = await showSystemSettingsDialog(
-        text:
-            "In order to discover heart rate monitors bluetooth must be enabled.",
-      );
+      final ignore =
+          await showSystemSettingsDialog(text: "Please enable bluetooth.");
       if (ignore) {
         return;
       }
-      await AppSettings.openBluetoothSettings();
-    }
-
-    if (!await LocationUtils.enableLocation()) {
-      return;
     }
 
     _devices = {
-      //await for (final d in _polar.searchForDevice().timeout(
-      //_searchDuration,
-      //onTimeout: (sink) => sink.close(),
-      //))
-      //d.name: d.deviceId.toString()
-      await for (final d in _flutterBlue
-          .scan(timeout: _searchDuration)
-          .where((d) => d.device.name.toLowerCase().contains("polar h")))
-        d.device.name: d.device.id.toString()
+      await for (final d in _polar.searchForDevice().timeout(
+            _searchDuration,
+            onTimeout: (sink) => sink.close(),
+          ))
+        d.name: d.deviceId
     };
 
     deviceId = devices.values.firstOrNull;

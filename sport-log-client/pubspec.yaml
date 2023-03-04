@@ -27,17 +27,16 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
-  app_settings: ^4.1.1
   audioplayers: ^3.0.1
   collection: ^1.16.0
   device_info_plus: ^8.0.0
   equatable: ^2.0.0 # makes classes equatable with little boilerplate code
   file_picker: ^5.0.0
   fixnum: ^1.0.0 # used for ids (in web ints go only up to 2^53-1)
-  fl_chart: ^0.60.0
+  fl_chart: ^0.61.0
   flutter:
     sdk: flutter
-  flutter_blue: ^0.8.0
+  flutter_blue_plus: ^1.4.0
   flutter_keyboard_visibility: ^5.0.3
   flutter_localizations:
     sdk: flutter
@@ -50,15 +49,17 @@ dependencies:
   intl: ^0.17.0  # used for date formatting
   json_annotation: ^4.4.0
   latlong2: ^0.8.1
-  location: ^4.3.0
+  location: 
+    git:
+      url: https://github.com/Lyokone/flutterlocation
+      path: packages/location
+      ref: 9000a61402aaa437df447e9c5b0544cce2adcc0c
   logger: ^1.0.0
   mapbox_api: ^1.0.0
-  #mapbox_gl: ^0.16.0 # mapping lib for osm
-  #mapbox_maps_flutter: ^0.4.0
   mapbox_maps_flutter: 
     git:
       url: https://github.com/mapbox/mapbox-maps-flutter
-      ref: main
+      ref: 47e0ec050aac30f7052e1090a61c5a8d5295d01e
   mapbox_search: ^3.0.1+2
   package_info_plus: ^3.0.1
   path_provider: ^2.0.10
@@ -74,6 +75,13 @@ dependencies:
   validators: ^3.0.0
   wakelock: ^0.6.1+2
   yaml: ^3.1.0
+
+dependency_overrides:
+  location_android: 
+    git:
+      url: https://github.com/Lyokone/flutterlocation
+      path: packages/location_android
+      ref: 9000a61402aaa437df447e9c5b0544cce2adcc0c
 
 dev_dependencies:
   build_runner: ^2.1.0 # json
@@ -104,21 +112,17 @@ flutter:
     - assets/audio/beep_long.mp3
     - assets/audio/beep_short.mp3
 
-  # The following line ensures that the Material Icons font is
-  # included with your application, so that you can use the icons in
-  # the material Icons class.
-  uses-material-design: true
-
-  # To add assets to your application, add an assets section, like this:
-  # assets:
-  #   - images/a_dot_burr.jpeg
-  #   - images/a_dot_ham.jpeg
-
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
 
   # For details regarding adding assets from package dependencies, see
   # https://flutter.dev/assets-and-images/#from-packages
+
+  # The following line ensures that the Material Icons font is
+  # included with your application, so that you can use the icons in
+  # the material Icons class.
+  uses-material-design: true
+
 
   # To add custom fonts to your application, add a fonts section here,
   # in this "flutter" section. Each entry in this list should have a

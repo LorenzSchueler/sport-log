@@ -112,15 +112,6 @@ class _MapboxMapWrapperState extends State<MapboxMapWrapper> {
   }
 
   @override
-  Future<void> dispose() async {
-    super.dispose();
-    final lastMapPosition = await _mapController?.latLngZoom;
-    if (lastMapPosition != null) {
-      Settings.instance.lastMapPosition = lastMapPosition;
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
@@ -135,6 +126,12 @@ class _MapboxMapWrapperState extends State<MapboxMapWrapper> {
             final controller = await MapController.from(mapboxMap, context);
             if (controller != null) {
               await _onMapCreated(controller);
+            }
+          },
+          onCameraChangeListener: (_) async {
+            final lastMapPosition = await _mapController?.latLngZoom;
+            if (lastMapPosition != null) {
+              Settings.instance.lastMapPosition = lastMapPosition;
             }
           },
           onTapListener: (coord) async {
