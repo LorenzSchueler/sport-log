@@ -100,9 +100,9 @@ class TrackingUtils extends ChangeNotifier {
     if (lastGpsPosition != null) {
       Settings.instance.lastGpsLatLng = lastGpsPosition;
     }
-    _stepUtils.stopStepCountStream();
-    _locationUtils.stopLocationStream();
-    _heartRateUtils?.stopHeartRateStream();
+    _stepUtils.dispose();
+    _locationUtils.dispose();
+    _heartRateUtils?.dispose();
     super.dispose();
   }
 

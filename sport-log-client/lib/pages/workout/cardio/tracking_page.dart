@@ -180,6 +180,7 @@ class _TrackingPageButtons extends StatelessWidget {
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Theme.of(context).colorScheme.error,
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 ),
                 onPressed: onPause,
                 child: const Text("Pause"),
@@ -194,6 +195,7 @@ class _TrackingPageButtons extends StatelessWidget {
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Theme.of(context).colorScheme.errorContainer,
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 ),
                 onPressed: onResume,
                 child: const Text("Resume"),
@@ -204,6 +206,7 @@ class _TrackingPageButtons extends StatelessWidget {
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Theme.of(context).colorScheme.error,
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 ),
                 onPressed: onSave,
                 child: const Text("Save"),
@@ -218,6 +221,7 @@ class _TrackingPageButtons extends StatelessWidget {
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Theme.of(context).colorScheme.errorContainer,
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 ),
                 onPressed: hasGPS && hasHR ? onStart : null,
                 child: Text(
@@ -234,6 +238,7 @@ class _TrackingPageButtons extends StatelessWidget {
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Theme.of(context).colorScheme.error,
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 ),
                 onPressed: () => Navigator.pop(context),
                 child: const Text("Cancel"),

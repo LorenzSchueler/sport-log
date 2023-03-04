@@ -1,15 +1,30 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:location/location.dart';
 import 'package:permission_handler/permission_handler.dart'
     as permission_handler;
 import 'package:sport_log/helpers/extensions/location_data_extension.dart';
 import 'package:sport_log/helpers/lat_lng.dart';
+import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/dialogs/system_settings_dialog.dart';
 
-class LocationUtils {
+class LocationUtils extends ChangeNotifier {
   StreamSubscription<LocationData>? _locationSubscription;
   LatLng? _lastLatLng;
+
+  bool _disposed = false;
+
+  @override
+  void dispose() {
+    _disposed = true;
+    final lastGpsPosition = lastLatLng;
+    if (lastGpsPosition != null) {
+      Settings.instance.lastGpsLatLng = lastGpsPosition;
+    }
+    stopLocationStream();
+    super.dispose();
+  }
 
   Future<bool> startLocationStream(
     void Function(LocationData) onLocationUpdate,
@@ -55,27 +70,37 @@ class LocationUtils {
       }
     }
 
-    // wait for first location before starting stream
-    await getLocation(settings: LocationSettings(useGooglePlayServices: false));
     await setLocationSettings(useGooglePlayServices: false);
-    _locationSubscription =
-        onLocationChanged(inBackground: true).listen((locationData) async {
-      await updateBackgroundNotification(
-        title: "Sport Log Tracking",
-        subtitle:
-            "(${locationData.latitude?.toStringAsFixed(5)}, ${locationData.longitude?.toStringAsFixed(5)}) ~ ${locationData.accuracy?.round()} m [${locationData.satellites} satellites]",
-        description: "test",
-        onTapBringToFront: true,
-      );
-      _lastLatLng = locationData.latLng;
-      onLocationUpdate(locationData);
-    });
+    _locationSubscription = onLocationChanged(inBackground: true).listen(
+      (locationData) => _onLocationUpdate(locationData, onLocationUpdate),
+    );
+    notifyListeners();
     return true;
+  }
+
+  Future<void> _onLocationUpdate(
+    LocationData locationData,
+    void Function(LocationData) onLocationUpdate,
+  ) async {
+    await updateBackgroundNotification(
+      title: "Sport Log Tracking",
+      subtitle:
+          "(${locationData.latitude?.toStringAsFixed(5)}, ${locationData.longitude?.toStringAsFixed(5)}) ~ ${locationData.accuracy?.round()} m [${locationData.satellites} satellites]",
+      description: "test",
+      onTapBringToFront: true,
+    );
+    _lastLatLng = locationData.latLng;
+    onLocationUpdate(locationData);
+    notifyListeners();
   }
 
   Future<void> stopLocationStream() async {
     await _locationSubscription?.cancel();
     _locationSubscription = null;
+    _lastLatLng = null;
+    if (!_disposed) {
+      notifyListeners();
+    }
   }
 
   LatLng? get lastLatLng => _lastLatLng;

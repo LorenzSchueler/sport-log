@@ -8,6 +8,10 @@ class StepCountUtils {
   StreamSubscription<StepCount>? _stepCountSubscription;
   late StepCount _lastStepCount;
 
+  void dispose() {
+    stopStepCountStream();
+  }
+
   Future<bool> startStepCountStream(
     void Function(StepCount stepCount) onStepCountUpdate,
   ) async {

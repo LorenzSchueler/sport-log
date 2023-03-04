@@ -28,6 +28,10 @@ class HeartRateUtils extends ChangeNotifier {
 
   bool _disposed = false;
 
+  bool get canStartStream => deviceId != null;
+
+  bool get isActive => _heartRateSubscription != null;
+
   @override
   void dispose() {
     _disposed = true;
@@ -70,8 +74,6 @@ class HeartRateUtils extends ChangeNotifier {
     notifyListeners();
   }
 
-  bool get canStartStream => deviceId != null;
-
   Future<bool> startHeartRateStream(
     void Function(PolarHeartRateEvent)? onHeartRateEvent,
   ) async {
@@ -107,6 +109,4 @@ class HeartRateUtils extends ChangeNotifier {
       notifyListeners();
     }
   }
-
-  bool get isActive => _heartRateSubscription != null;
 }
