@@ -43,9 +43,9 @@ enum Error {
 
 type Result<T> = StdResult<T, Error>;
 
-/// The config for [sport-log-action-provider-wodify-wod](crate).
+/// The config for [`sport-log-action-provider-wodify-wod`](crate).
 ///
-/// The name of the config file is specified in [CONFIG_FILE].
+/// The name of the config file is specified in [`CONFIG_FILE`].
 ///
 /// `admin_password` is the password for the admin endpoints.
 ///
@@ -139,7 +139,7 @@ async fn setup() {
         0,
     )
     .await
-    .unwrap()
+    .unwrap();
 }
 
 fn help() {
@@ -226,14 +226,12 @@ async fn get_wod(mode: Mode) -> Result<()> {
         match task.await {
             Ok(result) => match result {
                 Ok(action_event_id) => delete_action_event_ids.push(action_event_id),
-                Err(Error::NoCredential(action_event_id)) => {
-                    delete_action_event_ids.push(action_event_id)
-                }
-                Err(Error::LoginFailed(action_event_id)) => {
-                    delete_action_event_ids.push(action_event_id)
-                }
-                Err(Error::WodNotFound(action_event_id)) => {
-                    delete_action_event_ids.push(action_event_id)
+                Err(
+                    Error::NoCredential(action_event_id)
+                    | Error::LoginFailed(action_event_id)
+                    | Error::WodNotFound(action_event_id),
+                ) => {
+                    delete_action_event_ids.push(action_event_id);
                 }
                 Err(error) => error!("{}", error),
             },
@@ -335,7 +333,7 @@ async fn try_get_wod(
             .await
             .map_err(Error::WebDriver)?;
 
-        let mut description = "".to_owned();
+        let mut description = String::new();
         for element in elements {
             let name = element
                 .find(By::ClassName("component_name"))

@@ -2,7 +2,8 @@
 
 use inflector::Inflector;
 use proc_macro::TokenStream;
-use proc_macro2::{Ident, Span};
+use proc_macro2::Ident;
+use quote::format_ident;
 
 mod server;
 mod types;
@@ -21,10 +22,10 @@ impl Identifiers {
     fn from_ast(ast: &syn::DeriveInput) -> Identifiers {
         let db_type = ast.ident.clone();
         let db_type_str = db_type.to_string();
-        let entity_type = Ident::new(&db_type_str[..db_type_str.len() - 2], Span::call_site());
-        let id_type = Ident::new(&(entity_type.to_string() + "Id"), Span::call_site());
-        let id_name = Ident::new(&id_type.to_string().to_snake_case(), Span::call_site());
-        let entity_name = Ident::new(&entity_type.to_string().to_snake_case(), Span::call_site());
+        let entity_type = Ident::new(&db_type_str[..db_type_str.len() - 2], db_type.span());
+        let id_type = format_ident!("{entity_type}Id");
+        let id_name = Ident::new(&id_type.to_string().to_snake_case(), db_type.span());
+        let entity_name = Ident::new(&entity_type.to_string().to_snake_case(), db_type.span());
         Identifiers {
             db_type,
             entity_type,
@@ -128,7 +129,7 @@ pub fn update_derive(input: TokenStream) -> TokenStream {
 ///
 /// This macro only works if the following conditions are satisfied:
 /// - the corresponding table has the same name like this type but in snake_case
-/// - the table has the columns `deleted` ([bool]) and `last_change` (chrono::DateTime)
+/// - the table has the columns `deleted` ([`bool`]) and `last_change` (`chrono::DateTime`)
 #[proc_macro_derive(HardDelete)]
 pub fn hard_delete_derive(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();

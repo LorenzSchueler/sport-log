@@ -1,15 +1,15 @@
-//! **Map Matcher** is an [ActionProvider](sport_log_types::ActionProvider) which matches GPS tracks to the nearest path in OSM.
+//! **Map Matcher** is an [`ActionProvider`](sport_log_types::ActionProvider) which matches GPS tracks to the nearest path in OSM.
 //!
-//! Like all [ActionProvider](sport_log_types::ActionProvider) **Map Matcher** executes [ActionEvents](sport_log_types::ActionEvent).
-//! The `arguments` field has to be a valid [CardioSessionId] for which the GPS track should be matched.
+//! Like all [`ActionProvider`](sport_log_types::ActionProvider) **Map Matcher** executes [`ActionEvents`](sport_log_types::ActionEvent).
+//! The `arguments` field has to be a valid [`CardioSessionId`] for which the GPS track should be matched.
 //!
-//! The resulting path will be converted into a [Route] and compared to all [Routes](Route) of the [User](sport_log_types::User).
-//! If no similar [Route] is found the new [Route] will be saved.
-//! The `route_id` field of the [CardioSession] will be updated to the id of the new [Route] or a similar existing [Route] if one exists.
+//! The resulting path will be converted into a [`Route`] and compared to all [`Routes`](Route) of the [`User`](sport_log_types::User).
+//! If no similar [`Route`] is found the new [`Route`] will be saved.
+//! The `route_id` field of the [`CardioSession`] will be updated to the id of the new [`Route`] or a similar existing [`Route`] if one exists.
 //!
 //! # Time of execution
 //!
-//! [ActionEvents](sport_log_types::ActionEvent) will be executed if their `datetime` lies (up to 7 days) in the past.
+//! [`ActionEvents`](sport_log_types::ActionEvent) will be executed if their `datetime` lies (up to 7 days) in the past.
 //!
 //! # Usage
 //!
@@ -17,7 +17,7 @@
 //!
 //! # Config
 //!
-//! Please refer to [Config].
+//! Please refer to [`Config`].
 
 use std::{
     env,
@@ -67,9 +67,9 @@ enum Error {
 
 type Result<T> = StdResult<T, Error>;
 
-/// The config for [sport-log-action-provider-map-matcher](crate).
+/// The config for [`sport-log-action-provider-map-matcher`](crate).
 ///
-/// The name of the config file is specified in [CONFIG_FILE].
+/// The name of the config file is specified in [`CONFIG_FILE`].
 ///
 /// `admin_password` is the password for the admin endpoints.
 ///
@@ -272,11 +272,11 @@ async fn map_match() -> Result<()> {
         match task.await {
             Ok(result) => match result {
                 Ok(action_event_id) => delete_action_event_ids.push(action_event_id),
-                Err(Error::CardioSessionIdMissing(action_event_id)) => {
-                    delete_action_event_ids.push(action_event_id)
-                }
-                Err(Error::NoTrack(action_event_id)) => {
-                    delete_action_event_ids.push(action_event_id)
+                Err(
+                    Error::CardioSessionIdMissing(action_event_id)
+                    | Error::NoTrack(action_event_id),
+                ) => {
+                    delete_action_event_ids.push(action_event_id);
                 }
                 Err(error) => error!("{}", error),
             },
@@ -303,9 +303,8 @@ async fn match_to_map(
     cardio_session: &CardioSession,
     action_event_id: ActionEventId,
 ) -> Result<Route> {
-    let track = match &cardio_session.track {
-        Some(track) => track,
-        None => return Err(Error::NoTrack(action_event_id)),
+    let Some(track) = &cardio_session.track else {
+         return Err(Error::NoTrack(action_event_id));
     };
 
     let gpx = to_gpx(track);
@@ -428,8 +427,7 @@ async fn to_route(gpx: Gpx, cardio_session: &CardioSession) -> Result<Route> {
         name: format!("{} workout route", cardio_session.datetime),
         distance: positions
             .last()
-            .map(|position| position.distance)
-            .unwrap_or(0.0)
+            .map_or(0.0, |position| position.distance)
             .round() as i32,
         ascent: Some(ascent.round() as i32),
         descent: Some(descent.round() as i32),

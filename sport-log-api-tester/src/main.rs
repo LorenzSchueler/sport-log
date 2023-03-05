@@ -18,7 +18,7 @@
 //!
 //! # Examples
 //!
-//! Create a [User](../sport_log_types/types/struct.User.html)
+//! Create a [`User`](../sport_log_types/types/struct.User.html)
 //!
 //! ```sh
 //! sport-log-api-tester POST /v0.2/user '
@@ -29,7 +29,7 @@
 //! }'
 //! ```
 //!
-//! Create new [PlatformCredential](../sport_log_types/types/struct.PlatformCredential.html)
+//! Create new [`PlatformCredential`](../sport_log_types/types/struct.PlatformCredential.html)
 //!
 //! ```sh
 //! sport-log-api-tester POST /v0.2/platform_credential MyUsername MyPassword '
@@ -41,13 +41,13 @@
 //! }'
 //! ```
 //!
-//! Get own [User](../sport_log_types/types/struct.User.html)
+//! Get own [`User`](../sport_log_types/types/struct.User.html)
 //!
 //! ```sh
 //! sport-log-api-tester GET /v0.2/user MyUsername MyPassword
 //! ```
 //!
-//! Update own [User](../sport_log_types/types/struct.User.html)
+//! Update own [`User`](../sport_log_types/types/struct.User.html)
 //!
 //! ```sh
 //! sport-log-api-tester PUT /v0.2/user MyUsername MyPassword '
@@ -59,7 +59,7 @@
 //! }'
 //! ```
 //!
-//! Delete own [User](../sport_log_types/types/struct.User.html)
+//! Delete own [`User`](../sport_log_types/types/struct.User.html)
 //!
 //! ```sh
 //! sport-log-api-tester DELETE /v0.2/user MyUsername MyPassword
@@ -119,7 +119,7 @@ fn main() {
         request = request.basic_auth(username, Some(password));
     }
     if let Some(data) = data {
-        request = request.body(data.to_owned());
+        request = request.body(data.clone());
         request = request.header(CONTENT_TYPE, "application/json");
     }
     let response = request.send().unwrap();

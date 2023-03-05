@@ -1,15 +1,15 @@
-//! **Sport Log Scheduler** is responsible for scheduling [ActionEvents](ActionEvent).
+//! **Sport Log Scheduler** is responsible for scheduling [`ActionEvents`](ActionEvent).
 //!
-//! **Sport Log Scheduler** creates [ActionEvents](sport_log_types::ActionEvent) from [ActionRules](sport_log_types::ActionRule)
-//! and deletes old [ActionEvents](sport_log_types::ActionEvent).
+//! **Sport Log Scheduler** creates [`ActionEvents`](sport_log_types::ActionEvent) from [`ActionRules`](sport_log_types::ActionRule)
+//! and deletes old [`ActionEvents`](sport_log_types::ActionEvent).
 //!
-//! [ActionEvents](sport_log_types::ActionEvent) are only created from enabled [ActionRules](sport_log_types::ActionRule).
+//! [`ActionEvents`](sport_log_types::ActionEvent) are only created from enabled [`ActionRules`](sport_log_types::ActionRule).
 //!
-//! The timespan they are created before their `datetime` is determined by the `create_before` field of the corresponding [Action](sport_log_types::Action).
+//! The timespan they are created before their `datetime` is determined by the `create_before` field of the corresponding [`Action`](sport_log_types::Action).
 //!
-//! Similarly the timespan they are deleted after their `datetime` is determined by the `delete_after` field of the corresponding [Action](sport_log_types::Action).
+//! Similarly the timespan they are deleted after their `datetime` is determined by the `delete_after` field of the corresponding [`Action`](sport_log_types::Action).
 //!
-//! However most [ActionProvider](sport_log_types::ActionProvider) will delete a [ActionEvents](sport_log_types::ActionEvent) directly after execution.
+//! However most [`ActionProvider`](sport_log_types::ActionProvider) will delete a [`ActionEvents`](sport_log_types::ActionEvent) directly after execution.
 //!
 //! # Usage
 //!
@@ -17,7 +17,7 @@
 //!
 //! # Config
 //!
-//! The config file must be called `sport-log-scheduler.toml` and must be deserializable to a [Config].
+//! The config file must be called `sport-log-scheduler.toml` and must be deserializable to a [`Config`].
 
 use std::{env, fs};
 
@@ -37,9 +37,9 @@ use tracing_subscriber::EnvFilter;
 
 pub const CONFIG_FILE: &str = "sport-log-scheduler.toml";
 
-/// The config for [sport-log-scheduler](crate).
+/// The config for [`sport-log-scheduler`](crate).
 ///
-/// The name of the config file is specified in [CONFIG_FILE].
+/// The name of the config file is specified in [`CONFIG_FILE`].
 ///
 /// `admin_password` is the password for the admin endpoints.
 ///

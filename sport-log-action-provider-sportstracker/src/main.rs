@@ -47,17 +47,18 @@ enum UserError {
 impl UserError {
     fn action_event_id(&self) -> ActionEventId {
         match self {
-            Self::NoCredential(action_event_id) => *action_event_id,
-            Self::LoginFailed(action_event_id) => *action_event_id,
-            Self::UnknownActivityId(_, action_event_id) => *action_event_id,
-            Self::UnknownMovement(_, action_event_id) => *action_event_id,
+            Self::NoCredential(action_event_id)
+            | Self::LoginFailed(action_event_id)
+            | Self::UnknownActivityId(_, action_event_id)
+            | Self::UnknownMovement(_, action_event_id) => *action_event_id,
         }
     }
 }
 
-/// The config for [sport-log-action-provider-sportstracker](crate).
+/// The config for [`sport-log-action-provider-sportstracker`](crate).
 ///
-/// The name of the config file is specified in [CONFIG_FILE].
+/// The name of the config file is specified in [`CONFIG_FILE`].
+/// The name of the config file is specified in [`CONFIG_FILE`].
 ///
 /// `admin_password` is the password for the admin endpoints.
 ///
@@ -198,7 +199,7 @@ async fn setup() {
         0,
     )
     .await
-    .unwrap()
+    .unwrap();
 }
 
 fn help() {
@@ -330,7 +331,7 @@ async fn fetch() -> Result<(), Error> {
             Ok(action_event_id) => delete_action_event_ids.push(action_event_id),
             Err(error) => {
                 info!("{error}");
-                delete_action_event_ids.push(error.action_event_id())
+                delete_action_event_ids.push(error.action_event_id());
             }
         }
     }
@@ -392,7 +393,10 @@ fn to_cardio_session(
     };
 
     let avg_cadence = if workout_stats.step_count > 0 {
-        Some((workout_stats.step_count as f64 / (workout_stats.total_time as f64 / 60.)) as i32)
+        Some(
+            (f64::from(workout_stats.step_count) / (f64::from(workout_stats.total_time) / 60.))
+                as i32,
+        )
     } else {
         None
     };
@@ -403,8 +407,8 @@ fn to_cardio_session(
         .map(|location| Position {
             latitude: location.la,
             longitude: location.ln,
-            elevation: location.h as f64,
-            distance: location.s as f64,
+            elevation: f64::from(location.h),
+            distance: f64::from(location.s),
             time: location.t as i32 * 1000,
         })
         .collect();
@@ -423,7 +427,7 @@ fn to_cardio_session(
         ascent: Some(workout_stats.total_ascent as i32),
         descent: Some(workout_stats.total_descent as i32),
         time: Some(workout_stats.total_time as i32 * 1000),
-        calories: Some(workout_stats.energy_consumption as i32),
+        calories: Some(i32::from(workout_stats.energy_consumption)),
         track: Some(track),
         avg_cadence,
         cadence: None,

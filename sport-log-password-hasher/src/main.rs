@@ -1,6 +1,6 @@
 //! The sport-log-password-hasher can hash passwords and verify if a password matches a password hash.
 //!
-//! The hashing method is the same as the one used in [sport-log-server](../sport_log_server/index.html).
+//! The hashing method is the same as the one used in [`sport-log-server`](../sport_log_server/index.html).
 //!
 //! # Usage
 //!

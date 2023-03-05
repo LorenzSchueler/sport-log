@@ -15,11 +15,11 @@ use crate::{
     AppState, Config,
 };
 
-/// [AuthUser] is used as a request guard to authenticate a user.
+/// [`AuthUser`] is used as a request guard to authenticate a user.
 ///
-/// For the creation of an [AuthUser] the username and password have to be transmitted via HTTP basic auth.
+/// For the creation of an [`AuthUser`] the username and password have to be transmitted via HTTP basic auth.
 ///
-/// The admin can also use endpoints with an [AuthUser] as request guard.
+/// The admin can also use endpoints with an [`AuthUser`] as request guard.
 ///
 /// In order to do so, the username has to be set to `admin$id$<user_id>`
 /// and the password must be the `admin_password` as configured in `sport-log-server.toml`.
@@ -72,16 +72,16 @@ where
     }
 }
 
-/// [AuthUserOrAP] is used as a request guard to authenticate a user.
+/// [`AuthUserOrAP`] is used as a request guard to authenticate a user.
 ///
-/// For the creation of an [AuthUserOrAP] the username and password have to be transmitted via HTTP basic auth.
+/// For the creation of an [`AuthUserOrAP`] the username and password have to be transmitted via HTTP basic auth.
 ///
-/// [ActionProvider](sport_log_types::ActionProvider) can also use endpoints with an [AuthUserOrAP] as request guard
-/// if the user has an enabled [ActionEvent](sport_log_types::ActionEvent) for an [Action](sport_log_types::Action) of this [ActionProvider](sport_log_types::ActionProvider).
+/// [`ActionProvider`](sport_log_types::ActionProvider) can also use endpoints with an [`AuthUserOrAP`] as request guard
+/// if the user has an enabled [`ActionEvent`](sport_log_types::ActionEvent) for an [`Action`](sport_log_types::Action) of this [`ActionProvider`](sport_log_types::ActionProvider).
 ///
-/// In this case the username has to be set to `<ap_name>$id$<user_id>` and the password is the password of the [ActionProvider](sport_log_types::ActionProvider).
+/// In this case the username has to be set to `<ap_name>$id$<user_id>` and the password is the password of the [`ActionProvider`](sport_log_types::ActionProvider).
 ///
-/// The admin can also use endpoints with an [AuthUserOrAP] as request guard.
+/// The admin can also use endpoints with an [`AuthUserOrAP`] as request guard.
 ///
 /// In order to do so, the username has to be set to `admin$id$<user_id>`
 /// and the password must be the `admin_password` as configured in `sport-log-server.toml`.
@@ -145,11 +145,11 @@ pub enum AuthApForUser {
     Forbidden,
 }
 
-/// [AuthAP] is used as a request guard to authenticate an action provider.
+/// [`AuthAP`] is used as a request guard to authenticate an action provider.
 ///
-/// For the creation of an [AuthAP] the username and password have to be transmitted via HTTP basic auth.
+/// For the creation of an [`AuthAP`] the username and password have to be transmitted via HTTP basic auth.
 ///
-/// The admin can also use endpoints with an [AuthAP] as request guard.
+/// The admin can also use endpoints with an [`AuthAP`] as request guard.
 ///
 /// In order to do so, the username has to be set to `admin$id$<action_provider_id>`
 /// and the password must be the `admin_password` as configured in `sport-log-server.toml`.
@@ -202,9 +202,9 @@ where
     }
 }
 
-/// [AuthAdmin] is used as a request guard to authenticate the admin.
+/// [`AuthAdmin`] is used as a request guard to authenticate the admin.
 ///
-/// For the creation of an [AuthAdmin] the username and password have to be transmitted via HTTP basic auth.
+/// For the creation of an [`AuthAdmin`] the username and password have to be transmitted via HTTP basic auth.
 ///
 /// The username has to be set to `admin` and the password must be the `admin_password` as configured in `sport-log-server.toml`.
 #[derive(Debug, Clone, Copy)]

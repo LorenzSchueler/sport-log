@@ -31,25 +31,25 @@ const ADMIN_PASSWORD: &str = "admin-passwd";
 
 lazy_static! {
     static ref TEST_USER: User = User {
-        id: UserId(123456789),
+        id: UserId(123_456_789),
         username: String::from("test-user-username-123456789"),
         password: String::from("test-user-password-123456789"),
         email: String::from("test-user-email-123456789"),
     };
     static ref TEST_USER2: User = User {
-        id: UserId(213456789),
+        id: UserId(213_456_789),
         username: String::from("test-user2-username-213456789"),
         password: String::from("test-user2-password-213456789"),
         email: String::from("test-user2-email-213456789"),
     };
     static ref TEST_PLATFORM: Platform = Platform {
-        id: PlatformId(123456789),
+        id: PlatformId(123_456_789),
         name: String::from("test-platform-123456789"),
         credential: false,
         deleted: false,
     };
     static ref TEST_AP: ActionProvider = ActionProvider {
-        id: ActionProviderId(123456789),
+        id: ActionProviderId(123_456_789),
         name: String::from("test-ap-name-123456789"),
         password: String::from("test-ap-password-123456789"),
         platform_id: TEST_PLATFORM.id,
@@ -57,7 +57,7 @@ lazy_static! {
         deleted: false,
     };
     static ref TEST_ACTION: Action = Action {
-        id: ActionId(123456789),
+        id: ActionId(123_456_789),
         name: String::from("test-action-name-123456789"),
         action_provider_id: TEST_AP.id,
         description: None,
@@ -66,7 +66,7 @@ lazy_static! {
         deleted: false,
     };
     static ref TEST_DIARY: Diary = Diary {
-        id: DiaryId(123456789),
+        id: DiaryId(123_456_789),
         user_id: TEST_USER.id,
         date: Utc::now().date_naive(),
         bodyweight: None,

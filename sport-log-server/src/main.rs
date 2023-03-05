@@ -10,8 +10,8 @@
 //!
 //! # Config
 //!
-//! The config must be deserializable to [Config].
-//! The name of the config file is specified in [CONFIG_FILE].
+//! The config must be deserializable to [`Config`].
+//! The name of the config file is specified in [`CONFIG_FILE`].
 
 use std::env;
 
@@ -68,7 +68,7 @@ async fn get_config() -> Result<Config, String> {
     toml::from_str(&config_file).map_err(|err| format!("failed to parse config file: {err}"))
 }
 
-async fn get_db_pool(config: &Config) -> Result<DbPool, String> {
+fn get_db_pool(config: &Config) -> Result<DbPool, String> {
     let pool = Pool::new(ConnectionManager::<PgConnection>::new(&config.database_url))
         .map_err(|err| format!("failed to create database connection pool: {err}"))?;
 
@@ -113,7 +113,7 @@ async fn main() {
         }
     };
 
-    let db_pool = match get_db_pool(config).await {
+    let db_pool = match get_db_pool(config) {
         Ok(db_pool) => db_pool,
         Err(err) => {
             error!("{}", err);

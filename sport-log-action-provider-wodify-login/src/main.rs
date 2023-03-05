@@ -55,18 +55,18 @@ enum UserError {
 impl UserError {
     fn action_event_id(&self) -> ActionEventId {
         match self {
-            Self::NoCredential(action_event_id) => *action_event_id,
-            Self::LoginFailed(action_event_id) => *action_event_id,
-            Self::ClassNotFound(action_event_id) => *action_event_id,
+            Self::NoCredential(action_event_id)
+            | Self::LoginFailed(action_event_id)
+            | Self::ClassNotFound(action_event_id) => *action_event_id,
         }
     }
 }
 
 type UserResult<T> = StdResult<T, UserError>;
 
-/// The config for [sport-log-action-provider-wodify-login](crate).
+/// The config for [`sport-log-action-provider-wodify-login`](crate).
 ///
-/// The name of the config file is specified in [CONFIG_FILE].
+/// The name of the config file is specified in [`CONFIG_FILE`].
 ///
 /// `admin_password` is the password for the admin endpoints.
 ///
@@ -245,7 +245,7 @@ async fn login(mode: Mode) -> Result<()> {
             Ok(action_event_id) => disable_action_event_ids.push(action_event_id),
             Err(error) => {
                 info!("{error}");
-                disable_action_event_ids.push(error.action_event_id())
+                disable_action_event_ids.push(error.action_event_id());
             }
         }
     }
@@ -395,10 +395,9 @@ async fn wodify_login(
                 .attr("title")
                 .await
                 .map_err(Error::WebDriver)?
-                .map(|title| {
+                .map_or(false, |title| {
                     title.contains(&exec_action_event.action_name) && title.contains(&time)
-                })
-                .unwrap_or(false);
+                });
 
             if row_matches {
                 let icon = row
