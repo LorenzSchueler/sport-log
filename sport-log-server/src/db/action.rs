@@ -33,7 +33,7 @@ impl ActionProviderDb {
     ) -> QueryResult<usize> {
         let salt = SaltString::generate(&mut OsRng);
         action_provider.password = Argon2::default()
-            .hash_password(action_provider.password.as_bytes(), salt.as_ref())
+            .hash_password(action_provider.password.as_bytes(), &salt)
             .map_err(|_| Error::RollbackTransaction)? // this should not happen but prevents panic
             .to_string();
 
@@ -49,7 +49,7 @@ impl ActionProviderDb {
         for action_provider in &mut *action_providers {
             let salt = SaltString::generate(&mut OsRng);
             action_provider.password = Argon2::default()
-                .hash_password(action_provider.password.as_bytes(), salt.as_ref())
+                .hash_password(action_provider.password.as_bytes(), &salt)
                 .map_err(|_| Error::RollbackTransaction)? // this should not happen but prevents panic
                 .to_string();
         }
