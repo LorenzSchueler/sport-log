@@ -88,12 +88,11 @@ class TimerPage extends StatelessWidget {
                           _roundsFormField(timerState),
                           Defaults.sizedBox.vertical.huge,
                           _startStopButton(context, timerState),
-                          const SizedBox(height: 100),
-                          if (timerState.isRunning)
-                            Text(
-                              "Round ${timerState.currentRound}",
-                              style: const TextStyle(fontSize: 50),
-                            ),
+                          const SizedBox(height: 80),
+                          Text(
+                            "Round ${timerState.currentRound ?? '0'}",
+                            style: const TextStyle(fontSize: 80),
+                          ),
                           timeText(timerState),
                         ],
                       ),
@@ -157,6 +156,7 @@ class TimerPage extends StatelessWidget {
       child: IntInput(
         initialValue: timerState.rounds,
         minValue: 1,
+        maxValue: 99,
         onUpdate: (rounds) => timerState.rounds = rounds,
       ),
     );
@@ -166,10 +166,10 @@ class TimerPage extends StatelessWidget {
     return timerState.isRunning
         ? ElevatedButton(
             onPressed: timerState.stop,
-            child: const Text(
-              "Stop",
-              style: TextStyle(fontSize: 40),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Theme.of(context).colorScheme.error,
             ),
+            child: const Text("Stop", style: TextStyle(fontSize: 50)),
           )
         : ElevatedButton(
             onPressed: () => timerState.time.inSeconds > 0
@@ -178,34 +178,23 @@ class TimerPage extends StatelessWidget {
                     context: context,
                     text: "The time must be greater than 0.",
                   ),
-            child: const Text(
-              "Start",
-              style: TextStyle(fontSize: 40),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Theme.of(context).colorScheme.errorContainer,
             ),
+            child: const Text("Start", style: TextStyle(fontSize: 50)),
           );
   }
 
   Text timeText(TimerState timerState) {
-    const disabledStyle = TextStyle(
-      fontSize: 120,
-      color: Color.fromARGB(255, 150, 150, 150),
+    final timeText = timerState.isRunning
+        ? timerState.displayTime!.abs().formatTimeShort
+        : "00:10";
+    final color = timerState.isNotRunning || timerState.displayTime!.isNegative
+        ? const Color.fromARGB(255, 150, 150, 150)
+        : null;
+    return Text(
+      timeText,
+      style: TextStyle(fontSize: 150, color: color),
     );
-    if (timerState.isNotRunning) {
-      return const Text(
-        "-- : --",
-        style: disabledStyle,
-      );
-    } else {
-      final displayTime = timerState.displayTime!;
-      return displayTime.isNegative
-          ? Text(
-              displayTime.abs().formatTimeShort,
-              style: disabledStyle,
-            )
-          : Text(
-              displayTime.formatTimeShort,
-              style: const TextStyle(fontSize: 120),
-            );
-    }
   }
 }
