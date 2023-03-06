@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:mapbox_search/mapbox_search.dart';
 import 'package:sport_log/config.dart';
 import 'package:sport_log/defaults.dart';
+import 'package:sport_log/helpers/bool_toggle.dart';
 import 'package:sport_log/helpers/lat_lng.dart';
 import 'package:sport_log/helpers/map_controller.dart';
 import 'package:sport_log/routes.dart';
@@ -13,6 +14,7 @@ import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
 import 'package:sport_log/widgets/map_widgets/mapbox_map_wrapper.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
+import 'package:sport_log/widgets/provider_consumer.dart';
 import 'package:sport_log/widgets/snackbar.dart';
 
 class MapPage extends StatefulWidget {
@@ -28,21 +30,8 @@ class _MapPageState extends State<MapPage> {
   final _placesSearch =
       PlacesSearch(apiKey: Config.instance.accessToken, limit: 10);
 
-  bool _showOverlays = true;
   String? _search;
   List<MapBoxPlace> _searchResults = [];
-
-  Future<void> _openDrawer(BuildContext context) async {
-    await SystemChrome.setEnabledSystemUIMode(
-      SystemUiMode.edgeToEdge,
-    );
-    await SystemChrome.setPreferredOrientations(
-      [DeviceOrientation.portraitUp],
-    );
-    if (mounted) {
-      Scaffold.of(context).openDrawer();
-    }
-  }
 
   Future<void> _searchPlaces(String name) async {
     setState(() => _search = name);
@@ -91,81 +80,93 @@ class _MapPageState extends State<MapPage> {
 
   static const _searchBackgroundColor = Color.fromARGB(150, 255, 255, 255);
 
-  @override
-  Widget build(BuildContext context) {
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
-    SystemChrome.setPreferredOrientations([
+  Future<void> _onDrawerChanged(bool open) async {
+    if (open) {
+      await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+      await SystemChrome.setPreferredOrientations(
+        [DeviceOrientation.portraitUp],
+      );
+    } else {
+      await _setOrientation();
+    }
+  }
+
+  Future<void> _setOrientation() async {
+    await SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+    await SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.landscapeLeft,
       DeviceOrientation.landscapeRight,
     ]);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    _setOrientation();
 
     return NeverPop(
-      child: Scaffold(
-        extendBodyBehindAppBar: true,
-        appBar: _showOverlays
-            ? AppBar(
-                leading: Builder(
-                  builder: (context) => IconButton(
-                    icon: const Icon(AppIcons.drawer),
-                    onPressed: () => _openDrawer(context),
-                  ),
-                ),
-                title: _search == null
-                    ? null
-                    : TextFormField(
-                        focusNode: _searchBar,
-                        onChanged: _searchPlaces,
-                        onTap: () => _searchPlaces(_search ?? ""),
-                        decoration: Theme.of(context).textFormFieldDecoration,
-                        style: Theme.of(context)
-                            .textTheme
-                            .titleLarge!
-                            .copyWith(color: Colors.black),
+      child: ProviderConsumer(
+        create: (_) => BoolToggle.on(),
+        builder: (context, showOverlays, _) => Scaffold(
+          extendBodyBehindAppBar: true,
+          appBar: showOverlays.isOn
+              ? AppBar(
+                  title: _search == null
+                      ? null
+                      : TextFormField(
+                          focusNode: _searchBar,
+                          onChanged: _searchPlaces,
+                          onTap: () => _searchPlaces(_search ?? ""),
+                          decoration: Theme.of(context).textFormFieldDecoration,
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleLarge!
+                              .copyWith(color: Colors.black),
+                        ),
+                  actions: [
+                    IconButton(
+                      onPressed: _toggleSearch,
+                      icon: Icon(
+                        _search != null ? AppIcons.close : AppIcons.search,
                       ),
-                actions: [
-                  IconButton(
-                    onPressed: _toggleSearch,
-                    icon: Icon(
-                      _search != null ? AppIcons.close : AppIcons.search,
                     ),
-                  ),
-                ],
-                foregroundColor: Theme.of(context).colorScheme.background,
-                backgroundColor: _searchBackgroundColor,
-                elevation: 0,
-              )
-            : null,
-        drawer: const MainDrawer(selectedRoute: Routes.map),
-        body: Stack(
-          alignment: Alignment.center,
-          children: [
-            MapboxMapWrapper(
-              showScale: true,
-              showFullscreenButton: false,
-              showMapStylesButton: true,
-              showSelectRouteButton: true,
-              showSetNorthButton: true,
-              showCurrentLocationButton: true,
-              showCenterLocationButton: true,
-              showOverlays: _showOverlays,
-              buttonTopOffset: 120,
-              onMapCreated: (controller) =>
-                  setState(() => _mapController = controller),
-              onTap: (_) => setState(() => _showOverlays = !_showOverlays),
-            ),
-            if (_showOverlays && _searchResults.isNotEmpty)
-              Positioned(
-                top: 56, // height of AppBar
-                right: 0,
-                left: 0,
-                child: MapSearchResults(
-                  searchResults: _searchResults,
+                  ],
+                  foregroundColor: Theme.of(context).colorScheme.background,
                   backgroundColor: _searchBackgroundColor,
-                  onItemTap: _goToSearchItem,
-                ),
+                  elevation: 0,
+                )
+              : null,
+          drawer: const MainDrawer(selectedRoute: Routes.map),
+          onDrawerChanged: _onDrawerChanged,
+          body: Stack(
+            alignment: Alignment.center,
+            children: [
+              MapboxMapWrapper(
+                showScale: true,
+                showFullscreenButton: false,
+                showMapStylesButton: true,
+                showSelectRouteButton: true,
+                showSetNorthButton: true,
+                showCurrentLocationButton: true,
+                showCenterLocationButton: true,
+                showOverlays: showOverlays.isOn,
+                buttonTopOffset: 100,
+                onMapCreated: (controller) => _mapController = controller,
+                onTap: (_) => showOverlays.toggle(),
               ),
-          ],
+              if (showOverlays.isOn && _searchResults.isNotEmpty)
+                Positioned(
+                  top: 56, // height of AppBar
+                  right: 0,
+                  left: 0,
+                  child: MapSearchResults(
+                    searchResults: _searchResults,
+                    backgroundColor: _searchBackgroundColor,
+                    onItemTap: _goToSearchItem,
+                  ),
+                ),
+            ],
+          ),
         ),
       ),
     );

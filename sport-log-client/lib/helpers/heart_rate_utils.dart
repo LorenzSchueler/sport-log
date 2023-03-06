@@ -8,7 +8,6 @@ import 'package:sport_log/widgets/dialogs/system_settings_dialog.dart';
 
 class HeartRateUtils extends ChangeNotifier {
   static final _polar = Polar();
-  static final FlutterBluePlus _flutterBlue = FlutterBluePlus.instance;
 
   static const _searchDuration = Duration(seconds: 10);
 
@@ -45,7 +44,7 @@ class HeartRateUtils extends ChangeNotifier {
 
     await stopHeartRateStream();
 
-    while (!await _flutterBlue.isOn) {
+    while (!await FlutterBluePlus.instance.isOn) {
       final ignore =
           await showSystemSettingsDialog(text: "Please enable bluetooth.");
       if (ignore) {

@@ -30,7 +30,6 @@ dependencies:
   audioplayers: ^3.0.1
   collection: ^1.16.0
   device_info_plus: ^8.0.0
-  equatable: ^2.0.0 # makes classes equatable with little boilerplate code
   file_picker: ^5.0.0
   fixnum: ^1.0.0 # used for ids (in web ints go only up to 2^53-1)
   fl_chart: ^0.61.0
