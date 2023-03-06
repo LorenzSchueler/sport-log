@@ -29,7 +29,7 @@ fn main() {
         [mode, password] if mode == "-g" => {
             let salt = SaltString::generate(&mut OsRng);
             let password_hash = Argon2::default()
-                .hash_password(password.as_bytes(), salt.as_ref())
+                .hash_password(password.as_bytes(), &salt)
                 .unwrap()
                 .to_string();
 
