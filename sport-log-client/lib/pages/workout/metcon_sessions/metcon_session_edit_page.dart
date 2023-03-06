@@ -224,11 +224,13 @@ class _MetconSessionEditPageState extends State<MetconSessionEditPage> {
                     caption: 'Time',
                     leading: AppIcons.timeInterval,
                     child: DurationInput(
-                      setDuration: (d) => setState(
+                      onUpdate: (d) => setState(
                         () => _metconSessionDescription.metconSession.time = d,
                       ),
                       initialDuration:
-                          _metconSessionDescription.metconSession.time,
+                          _metconSessionDescription.metconSession.time ??
+                              Duration.zero,
+                      minDuration: const Duration(seconds: 1),
                     ),
                   ),
                 if (_metconSessionDescription
@@ -248,6 +250,7 @@ class _MetconSessionEditPageState extends State<MetconSessionEditPage> {
                             initialValue: _metconSessionDescription
                                     .metconSession.rounds ??
                                 0,
+                            minValue: 0,
                             maxValue: _metconSessionDescription
                                         .metconDescription.metcon.metconType ==
                                     MetconType.forTime
@@ -271,6 +274,7 @@ class _MetconSessionEditPageState extends State<MetconSessionEditPage> {
                             initialValue:
                                 _metconSessionDescription.metconSession.reps ??
                                     0,
+                            minValue: 0,
                             maxValue: _metconSessionDescription
                                     .metconDescription.moves
                                     .map((e) => e.metconMovement.count)

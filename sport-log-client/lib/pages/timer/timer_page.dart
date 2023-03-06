@@ -122,8 +122,9 @@ class TimerPage extends StatelessWidget {
       caption: caption,
       leading: AppIcons.timeInterval,
       child: DurationInput(
-        setDuration: (d) => timerState.time = d,
+        onUpdate: (d) => timerState.time = d,
         initialDuration: timerState.time,
+        minDuration: const Duration(seconds: 1),
       ),
     );
   }
@@ -143,8 +144,9 @@ class TimerPage extends StatelessWidget {
             leading: AppIcons.timeInterval,
             onCancel: () => timerState.restTime = null,
             child: DurationInput(
-              setDuration: (d) => timerState.restTime = d,
-              initialDuration: timerState.restTime,
+              onUpdate: (d) => timerState.restTime = d,
+              initialDuration: timerState.restTime ?? Duration.zero,
+              minDuration: const Duration(seconds: 1),
             ),
           );
   }

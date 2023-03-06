@@ -158,6 +158,8 @@ class _CountWeightInputState extends State<CountWeightInput> {
                       ? "${widget.dimension.name} (${_distanceUnit!.name})"
                       : widget.dimension.name,
                   child: IntInput(
+                    minValue: 0,
+                    maxValue: null,
                     initialValue: _count,
                     onUpdate: _setCount,
                   ),
@@ -191,6 +193,8 @@ class _CountWeightInputState extends State<CountWeightInput> {
                     leading: null,
                     caption: widget.secondWeight ? "Male Weight" : "Weight",
                     child: DoubleInput(
+                      minValue: 0,
+                      maxValue: null,
                       initialValue:
                           _weightUnit == "lb" ? _weight! / _lbToKg : _weight!,
                       stepSize: settings.weightIncrement,
@@ -202,6 +206,8 @@ class _CountWeightInputState extends State<CountWeightInput> {
                     leading: null,
                     caption: "Female Weight",
                     child: DoubleInput(
+                      minValue: 0,
+                      maxValue: null,
                       initialValue: _weightUnit == "lb"
                           ? _secondWeight! / _lbToKg
                           : _secondWeight!,

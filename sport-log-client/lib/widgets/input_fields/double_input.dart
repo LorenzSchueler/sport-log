@@ -7,18 +7,18 @@ import 'package:sport_log/widgets/input_fields/repeat_icon_button.dart';
 class DoubleInput extends StatefulWidget {
   const DoubleInput({
     required this.onUpdate,
-    this.initialValue = 0,
-    this.minValue = 0,
-    this.maxValue,
+    required this.initialValue,
+    required this.minValue,
+    required this.maxValue,
     this.stepSize = 1,
     super.key,
   });
 
+  final void Function(double) onUpdate;
   final double initialValue;
   final double minValue;
   final double? maxValue;
   final double stepSize;
-  final void Function(double value) onUpdate;
 
   @override
   State<DoubleInput> createState() => _DoubleInputState();
@@ -86,7 +86,6 @@ class _DoubleInputState extends State<DoubleInput> {
                 isDense: true,
                 border: InputBorder.none,
               ),
-              style: Theme.of(context).textTheme.titleMedium,
             ),
             onFocusChange: (focus) {
               if (!focus) {

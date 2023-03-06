@@ -240,6 +240,7 @@ class _MetconEditPageState extends State<MetconEditPage> {
         initialValue:
             _metconDescription.metcon.rounds ?? Metcon.roundsDefaultValue,
         minValue: 1,
+        maxValue: 999,
         onUpdate: (rounds) {
           FocusManager.instance.primaryFocus?.unfocus();
           setState(() => _metconDescription.metcon.rounds = rounds);
@@ -256,7 +257,8 @@ class _MetconEditPageState extends State<MetconEditPage> {
       child: DurationInput(
         initialDuration: _metconDescription.metcon.timecap ??=
             Metcon.timecapDefaultValue,
-        setDuration: (timecap) {
+        minDuration: const Duration(minutes: 1),
+        onUpdate: (timecap) {
           FocusManager.instance.primaryFocus?.unfocus();
           setState(() => _metconDescription.metcon.timecap = timecap);
         },

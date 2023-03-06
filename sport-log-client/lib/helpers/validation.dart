@@ -65,11 +65,6 @@ class Validator {
     }
   }
 
-  static String? validateHour(String? value) => validateIntGeZero(value);
-
-  static String? validateMinOrSec(String? value) =>
-      validateIntBetween(value, 0, 59);
-
   static String? validateStringNotEmpty(String? value) {
     // ignore: prefer-conditional-expressions
     if (value == null || value.isEmpty) {

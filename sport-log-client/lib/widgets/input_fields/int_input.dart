@@ -7,18 +7,18 @@ import 'package:sport_log/widgets/input_fields/repeat_icon_button.dart';
 class IntInput extends StatefulWidget {
   const IntInput({
     required this.onUpdate,
-    this.initialValue = 0,
-    this.minValue = 0,
-    this.maxValue,
+    required this.initialValue,
+    required this.minValue,
+    required this.maxValue,
     this.stepSize = 1,
     super.key,
   });
 
+  final void Function(int) onUpdate;
   final int initialValue;
   final int minValue;
   final int? maxValue;
   final int stepSize;
-  final void Function(int value) onUpdate;
 
   @override
   State<IntInput> createState() => _IntInputState();
@@ -83,7 +83,6 @@ class _IntInputState extends State<IntInput> {
                 isDense: true,
                 border: InputBorder.none,
               ),
-              style: Theme.of(context).textTheme.titleMedium,
             ),
             onFocusChange: (focus) {
               if (!focus) {

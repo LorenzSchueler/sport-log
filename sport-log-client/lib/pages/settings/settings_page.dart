@@ -191,21 +191,6 @@ class SettingsPage extends StatelessWidget {
     }
   }
 
-  void _setDurationIncrement(BuildContext context, Duration increment) {
-    if (increment.inSeconds > 0) {
-      context.read<Settings>().durationIncrement = increment;
-    } else {
-      showMessageDialog(
-        context: context,
-        text: "Duration Increment must be greater 0",
-      );
-    }
-  }
-
-  void _setDeveloperMode(BuildContext context, bool developerMode) {
-    context.read<Settings>().developerMode = developerMode;
-  }
-
   @override
   Widget build(BuildContext context) {
     return NeverPop(
@@ -264,6 +249,7 @@ class SettingsPage extends StatelessWidget {
                     child: IntInput(
                       initialValue: settings.syncInterval.inMinutes,
                       minValue: 1,
+                      maxValue: null,
                       onUpdate: (syncInterval) {
                         settings.syncInterval = Duration(minutes: syncInterval);
                         Sync.instance.stopSync();
@@ -428,9 +414,10 @@ class SettingsPage extends StatelessWidget {
                   caption: "Duration Increment",
                   child: DurationInput(
                     initialDuration: settings.durationIncrement,
-                    setDuration: (increment) =>
-                        _setDurationIncrement(context, increment),
+                    onUpdate: (increment) =>
+                        settings.durationIncrement = increment,
                     durationIncrement: const Duration(minutes: 1),
+                    minDuration: const Duration(seconds: 1),
                   ),
                 ),
                 Defaults.sizedBox.vertical.small,
@@ -444,8 +431,8 @@ class SettingsPage extends StatelessWidget {
                     width: 34,
                     child: Switch(
                       value: settings.developerMode,
-                      onChanged: (enabled) =>
-                          _setDeveloperMode(context, enabled),
+                      onChanged: (developerMode) =>
+                          settings.developerMode = developerMode,
                       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     ),
                   ),
