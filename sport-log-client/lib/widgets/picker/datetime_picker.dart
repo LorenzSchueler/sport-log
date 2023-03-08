@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_time_picker_spinner/flutter_time_picker_spinner.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
+import 'package:sport_log/widgets/time_spinner.dart';
 
 class TimePickerDialog extends StatefulWidget {
   const TimePickerDialog({
@@ -22,16 +22,15 @@ class _TimePickerDialogState extends State<TimePickerDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      content: TimePickerSpinner(
-        time: widget.datetime,
+      content: TimeSpinner(
         onTimeChange: (datetime) => _datetime = datetime,
+        time: widget.datetime,
+        isShowSeconds: widget.withSeconds,
         normalTextStyle: Theme.of(context)
             .textTheme
             .headlineSmall!
             .copyWith(color: Theme.of(context).disabledColor),
-        highlightedTextStyle: Theme.of(context).textTheme.headlineSmall,
-        isForce2Digits: true,
-        isShowSeconds: widget.withSeconds,
+        selectedTextStyle: Theme.of(context).textTheme.headlineSmall!,
       ),
       actions: [
         TextButton(
