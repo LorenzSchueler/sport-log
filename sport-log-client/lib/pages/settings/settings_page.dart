@@ -210,14 +210,12 @@ class SettingsPage extends StatelessWidget {
                   leading: AppIcons.sync,
                   child: settings.accountCreated
                       ? SizedBox(
-                          height: 20,
-                          width: 34,
+                          height: 29, // make it fit into EditTile
+                          width: 34, // remove left padding
                           child: Switch(
                             value: settings.syncEnabled,
                             onChanged: (enabled) =>
                                 _setSyncEnabled(context, enabled),
-                            materialTapTargetSize:
-                                MaterialTapTargetSize.shrinkWrap,
                           ),
                         )
                       : ElevatedButton(
@@ -427,13 +425,12 @@ class SettingsPage extends StatelessWidget {
                   caption: "Developer Mode",
                   leading: AppIcons.developerMode,
                   child: SizedBox(
-                    height: 20,
-                    width: 34,
+                    height: 29, // make it fit into EditTile
+                    width: 34, // remove left padding
                     child: Switch(
                       value: settings.developerMode,
                       onChanged: (developerMode) =>
                           settings.developerMode = developerMode,
-                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     ),
                   ),
                 ),

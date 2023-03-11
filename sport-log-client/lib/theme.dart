@@ -67,9 +67,16 @@ class AppTheme {
           ),
         ),
       ),
-      segmentedButtonTheme: const SegmentedButtonThemeData(
+      segmentedButtonTheme: SegmentedButtonThemeData(
         style: ButtonStyle(
-          iconSize: MaterialStatePropertyAll(24),
+          iconSize: const MaterialStatePropertyAll(24),
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          backgroundColor: MaterialStateProperty.resolveWith((states) {
+            if (states.contains(MaterialState.selected)) {
+              return colorScheme.primary.withAlpha(200);
+            }
+            return null;
+          }),
         ),
       ),
       iconTheme: IconThemeData(
@@ -88,6 +95,28 @@ class AppTheme {
       ),
       snackBarTheme: SnackBarThemeData(
         backgroundColor: colorScheme.surface,
+      ),
+      switchTheme: SwitchThemeData(
+        trackColor: MaterialStateProperty.resolveWith((states) {
+          if (states.contains(MaterialState.selected)) {
+            return colorScheme.primary.withAlpha(200);
+          }
+          return null;
+        }),
+        thumbColor: MaterialStateProperty.resolveWith((states) {
+          if (states.contains(MaterialState.selected)) {
+            return colorScheme.primary;
+          }
+          return null;
+        }),
+      ),
+      checkboxTheme: CheckboxThemeData(
+        fillColor: MaterialStateProperty.resolveWith((states) {
+          if (states.contains(MaterialState.selected)) {
+            return colorScheme.primary;
+          }
+          return null;
+        }),
       ),
       textTheme: const TextTheme(
         //headline1    96.0  light
