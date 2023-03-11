@@ -268,16 +268,19 @@ class _MetconEditPageState extends State<MetconEditPage> {
 
   Widget _maybeTimecapInput() {
     return _metconDescription.metcon.timecap == null
-        ? ActionChip(
-            avatar: const Icon(AppIcons.add),
-            label: const Text("Add Timecap"),
-            onPressed: () {
-              FocusManager.instance.primaryFocus?.unfocus();
-              setState(
-                () => _metconDescription.metcon.timecap =
-                    Metcon.timecapDefaultValue,
-              );
-            },
+        ? EditTile(
+            leading: AppIcons.timeInterval,
+            child: ActionChip(
+              avatar: const Icon(AppIcons.add),
+              label: const Text("Timecap"),
+              onPressed: () {
+                FocusManager.instance.primaryFocus?.unfocus();
+                setState(
+                  () => _metconDescription.metcon.timecap =
+                      Metcon.timecapDefaultValue,
+                );
+              },
+            ),
           )
         : _timecapInput(
             caption: "Timecap",

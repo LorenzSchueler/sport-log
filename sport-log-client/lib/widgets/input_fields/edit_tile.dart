@@ -12,13 +12,13 @@ class CaptionTile extends StatelessWidget {
       padding: const EdgeInsets.only(top: 2, bottom: 2),
       child: Text(
         caption,
-        style: const TextStyle(color: Colors.white70),
-        //Theme.of(context).colorScheme.onBackground),
+        style: const TextStyle(color: EditTile.iconCaptionColor),
       ),
     );
   }
 }
 
+/// A container with a style similar to TextFormField with style ThemeDataExtension.textFormFieldDecoration
 class EditTile extends StatelessWidget {
   const EditTile({
     required this.child,
@@ -39,8 +39,11 @@ class EditTile extends StatelessWidget {
   /// if enabled [child] must have a bounded width
   final bool shrink;
 
+  static const Color iconCaptionColor = Colors.white70;
+
   Widget _captionChildColumn(BuildContext context) {
     return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (caption != null) CaptionTile(caption: caption!),
@@ -57,26 +60,27 @@ class EditTile extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
-      child: Row(
-        mainAxisSize: shrink ? MainAxisSize.min : MainAxisSize.max,
-        children: [
-          if (leading != null) ...[
-            Icon(leading, color: Colors.white70),
-            const SizedBox(width: 15),
-          ],
-          shrink
-              ? _captionChildColumn(context)
-              : Expanded(child: _captionChildColumn(context)),
-          if (onCancel != null)
-            IconButton(
-              padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(),
-              onPressed: onCancel,
-              icon: const Icon(
-                AppIcons.close,
+      child: SizedBox(
+        height: 49, // height of TextFormField
+        child: Row(
+          mainAxisSize: shrink ? MainAxisSize.min : MainAxisSize.max,
+          children: [
+            if (leading != null) ...[
+              Icon(leading, color: iconCaptionColor),
+              const SizedBox(width: 15),
+            ],
+            shrink
+                ? _captionChildColumn(context)
+                : Expanded(child: _captionChildColumn(context)),
+            if (onCancel != null)
+              IconButton(
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+                onPressed: onCancel,
+                icon: const Icon(AppIcons.close),
               ),
-            ),
-        ],
+          ],
+        ),
       ),
     );
   }

@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:sport_log/defaults.dart';
+import 'package:sport_log/widgets/input_fields/edit_tile.dart';
 
 class AppTheme {
   AppTheme._();
@@ -183,5 +184,6 @@ extension ThemeDataExtension on ThemeData {
   InputDecoration get textFormFieldDecoration => const InputDecoration(
         contentPadding: EdgeInsets.symmetric(vertical: 5),
         border: InputBorder.none,
+        iconColor: EditTile.iconCaptionColor,
       );
 }

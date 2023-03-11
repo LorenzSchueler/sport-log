@@ -145,7 +145,7 @@ class TimerPage extends StatelessWidget {
             onCancel: () => timerState.restTime = null,
             child: DurationInput(
               onUpdate: (d) => timerState.restTime = d,
-              initialDuration: timerState.restTime ?? Duration.zero,
+              initialDuration: timerState.restTime!,
               minDuration: const Duration(seconds: 1),
             ),
           );
