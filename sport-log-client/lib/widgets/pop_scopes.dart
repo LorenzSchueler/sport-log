@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sport_log/widgets/dialogs/approve_dialog.dart';
+import 'package:sport_log/widgets/dialogs/dialogs.dart';
 
 class NeverPop extends StatelessWidget {
   const NeverPop({required this.child, super.key});

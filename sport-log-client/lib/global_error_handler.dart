@@ -5,7 +5,7 @@ import 'package:sport_log/app.dart';
 import 'package:sport_log/config.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/write_to_file.dart';
-import 'package:sport_log/widgets/dialogs/message_dialog.dart';
+import 'package:sport_log/widgets/dialogs/dialogs.dart';
 
 class GlobalErrorHandler {
   static final _logger = Logger("GlobalErrorHandler");

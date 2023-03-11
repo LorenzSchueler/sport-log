@@ -8,7 +8,7 @@ import 'package:sport_log/models/action/action_provider.dart';
 import 'package:sport_log/models/action/action_provider_description.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/app_icons.dart';
-import 'package:sport_log/widgets/dialogs/message_dialog.dart';
+import 'package:sport_log/widgets/dialogs/dialogs.dart';
 import 'package:sport_log/widgets/input_fields/edit_tile.dart';
 import 'package:sport_log/widgets/sync_refresh_indicator.dart';
 

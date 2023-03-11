@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/widgets/app_icons.dart';
-import 'package:sport_log/widgets/dialogs/message_dialog.dart';
+import 'package:sport_log/widgets/dialogs/dialogs.dart';
 import 'package:sport_log/widgets/input_fields/repeat_icon_button.dart';
 
 class IntInput extends StatefulWidget {

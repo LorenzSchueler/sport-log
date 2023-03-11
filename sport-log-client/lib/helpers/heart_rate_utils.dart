@@ -4,7 +4,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:polar/polar.dart';
-import 'package:sport_log/widgets/dialogs/system_settings_dialog.dart';
+import 'package:sport_log/widgets/dialogs/dialogs.dart';
 
 class HeartRateUtils extends ChangeNotifier {
   static final _polar = Polar();
@@ -45,9 +45,9 @@ class HeartRateUtils extends ChangeNotifier {
     await stopHeartRateStream();
 
     while (!await FlutterBluePlus.instance.isOn) {
-      final ignore =
+      final systemSettings =
           await showSystemSettingsDialog(text: "Please enable bluetooth.");
-      if (ignore) {
+      if (systemSettings.isIgnore) {
         return;
       }
     }

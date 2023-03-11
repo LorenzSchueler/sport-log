@@ -4,7 +4,7 @@ import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/timer_utils.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/app_icons.dart';
-import 'package:sport_log/widgets/dialogs/message_dialog.dart';
+import 'package:sport_log/widgets/dialogs/dialogs.dart';
 import 'package:sport_log/widgets/disable_tab_bar.dart';
 import 'package:sport_log/widgets/input_fields/duration_input.dart';
 import 'package:sport_log/widgets/input_fields/edit_tile.dart';

@@ -6,7 +6,6 @@ import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/extensions/navigator_extension.dart';
 import 'package:sport_log/helpers/map_controller.dart';
 import 'package:sport_log/models/all.dart';
-import 'package:sport_log/models/cardio/cardio_session_description.dart';
 import 'package:sport_log/pages/workout/cardio/cardio_chart.dart';
 import 'package:sport_log/pages/workout/comments_box.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter.dart';

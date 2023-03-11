@@ -12,7 +12,7 @@ import 'package:sport_log/pages/workout/cardio/route_value_unit_description_tabl
 import 'package:sport_log/pages/workout/charts/distance_chart.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/app_icons.dart';
-import 'package:sport_log/widgets/dialogs/message_dialog.dart';
+import 'package:sport_log/widgets/dialogs/dialogs.dart';
 import 'package:sport_log/widgets/map_widgets/mapbox_map_wrapper.dart';
 import 'package:sport_log/widgets/provider_consumer.dart';
 

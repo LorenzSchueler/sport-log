@@ -3,7 +3,6 @@ import 'package:sport_log/config.dart';
 import 'package:sport_log/helpers/heart_rate_utils.dart';
 import 'package:sport_log/models/action/action_provider_description.dart';
 import 'package:sport_log/models/all.dart';
-import 'package:sport_log/models/cardio/cardio_session_description.dart';
 import 'package:sport_log/pages/action/action_event_edit_page.dart';
 import 'package:sport_log/pages/action/action_provider_overview_page.dart';
 import 'package:sport_log/pages/action/action_rule_edit_page.dart';
@@ -42,7 +41,6 @@ import 'package:sport_log/pages/workout/strength_sessions/strength_edit_page.dar
 import 'package:sport_log/pages/workout/strength_sessions/strength_overview_page.dart';
 import 'package:sport_log/pages/workout/timeline/timeline_page.dart';
 import 'package:sport_log/settings.dart';
-import 'package:sport_log/widgets/dialogs/message_dialog.dart';
 
 abstract class Routes {
   static const landing = '/landing';
@@ -104,12 +102,7 @@ abstract class Routes {
     return Settings.instance.userExists()
         ? Config.isAndroid || Config.isIOS
             ? builder()
-            : ModalRoute.of(context)!.isFirst
-                ? const PlatformNotSupportedPage()
-                : const MessageDialog(
-                    text: "The selected page is not supported on you platform.",
-                    title: null,
-                  )
+            : const PlatformNotSupportedPage()
         : const LandingPage();
   }
 

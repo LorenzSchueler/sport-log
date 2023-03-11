@@ -7,7 +7,6 @@ import 'package:sport_log/database/tables/cardio_tables.dart';
 import 'package:sport_log/helpers/extensions/sort_extension.dart';
 import 'package:sport_log/models/account_data/account_data.dart';
 import 'package:sport_log/models/cardio/all.dart';
-import 'package:sport_log/models/cardio/cardio_session_description.dart';
 import 'package:sport_log/models/movement/movement.dart';
 
 class RouteDataProvider extends EntityDataProvider<Route> {

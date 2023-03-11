@@ -21,11 +21,17 @@ class MapController {
     MapboxMap mapboxMap,
     BuildContext context,
   ) async {
-    final controller = MountedWrapper(mapboxMap, context);
-    final lineManager = MountedWrapper(
-      await mapboxMap.annotations.createPolylineAnnotationManager(),
-      context,
-    );
+    final MountedWrapper<MapboxMap> controller;
+    final MountedWrapper<PolylineAnnotationManager> lineManager;
+    if (context.mounted) {
+      controller = MountedWrapper(mapboxMap, context);
+      lineManager = MountedWrapper(
+        await mapboxMap.annotations.createPolylineAnnotationManager(),
+        context,
+      );
+    } else {
+      return null;
+    }
     final MountedWrapper<CircleAnnotationManager> circleManager;
     if (context.mounted) {
       circleManager = MountedWrapper(

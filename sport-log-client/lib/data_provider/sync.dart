@@ -13,7 +13,7 @@ import 'package:sport_log/models/metcon/metcon_description.dart';
 import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/models/server_version/server_version.dart';
 import 'package:sport_log/settings.dart';
-import 'package:sport_log/widgets/dialogs/message_dialog.dart';
+import 'package:sport_log/widgets/dialogs/dialogs.dart';
 
 class Sync extends ChangeNotifier {
   Sync._() : _isSyncing = false;

@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:pedometer/pedometer.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:sport_log/widgets/dialogs/system_settings_dialog.dart';
+import 'package:sport_log/widgets/dialogs/dialogs.dart';
 
 class StepCountUtils {
   StreamSubscription<StepCount>? _stepCountSubscription;
@@ -19,11 +19,11 @@ class StepCountUtils {
       return false;
     }
     while (!await Permission.activityRecognition.request().isGranted) {
-      final ignore = await showSystemSettingsDialog(
+      final systemSettings = await showSystemSettingsDialog(
         text:
             "In order to record your steps 'Activity Recognition' must be allowed.",
       );
-      if (ignore) {
+      if (systemSettings.isIgnore) {
         return false;
       }
     }

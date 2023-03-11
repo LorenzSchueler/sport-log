@@ -1,5 +1,4 @@
 import 'package:sport_log/models/all.dart';
-import 'package:sport_log/models/cardio/cardio_session_description.dart';
 import 'package:sport_log/models/metcon/metcon_records.dart';
 import 'package:sport_log/models/strength/strength_records.dart';
 

@@ -3,7 +3,7 @@ import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/validation.dart';
 import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/app_icons.dart';
-import 'package:sport_log/widgets/dialogs/message_dialog.dart';
+import 'package:sport_log/widgets/dialogs/dialogs.dart';
 import 'package:sport_log/widgets/input_fields/repeat_icon_button.dart';
 
 class DurationInput extends StatefulWidget {

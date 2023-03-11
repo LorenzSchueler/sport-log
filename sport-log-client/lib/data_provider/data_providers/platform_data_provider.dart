@@ -1,6 +1,6 @@
 import 'package:sport_log/api/api.dart';
 import 'package:sport_log/data_provider/data_provider.dart';
-import 'package:sport_log/data_provider/data_providers/all.dart';
+import 'package:sport_log/data_provider/data_providers/action_data_provider.dart';
 import 'package:sport_log/database/database.dart';
 import 'package:sport_log/database/table_accessor.dart';
 import 'package:sport_log/database/tables/all.dart';

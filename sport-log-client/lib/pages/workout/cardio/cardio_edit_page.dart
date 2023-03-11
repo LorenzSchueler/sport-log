@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart' hide Route;
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
-import 'package:sport_log/data_provider/data_providers/all.dart';
+import 'package:sport_log/data_provider/data_providers/cardio_data_provider.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/map_controller.dart';
@@ -11,7 +11,7 @@ import 'package:sport_log/models/cardio/cardio_session_description.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
-import 'package:sport_log/widgets/dialogs/message_dialog.dart';
+import 'package:sport_log/widgets/dialogs/dialogs.dart';
 import 'package:sport_log/widgets/input_fields/edit_tile.dart';
 import 'package:sport_log/widgets/map_widgets/mapbox_map_wrapper.dart';
 import 'package:sport_log/widgets/picker/datetime_picker.dart';

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sport_log/data_provider/data_providers/all.dart';
+import 'package:sport_log/data_provider/data_providers/platform_data_provider.dart';
 import 'package:sport_log/data_provider/overview_data_provider.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/models/platform/platform_credential.dart';
@@ -7,7 +7,7 @@ import 'package:sport_log/models/platform/platform_description.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
-import 'package:sport_log/widgets/dialogs/message_dialog.dart';
+import 'package:sport_log/widgets/dialogs/dialogs.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
 import 'package:sport_log/widgets/provider_consumer.dart';

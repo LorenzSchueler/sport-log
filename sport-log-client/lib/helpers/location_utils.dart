@@ -7,7 +7,7 @@ import 'package:permission_handler/permission_handler.dart'
 import 'package:sport_log/helpers/extensions/location_data_extension.dart';
 import 'package:sport_log/helpers/lat_lng.dart';
 import 'package:sport_log/settings.dart';
-import 'package:sport_log/widgets/dialogs/system_settings_dialog.dart';
+import 'package:sport_log/widgets/dialogs/dialogs.dart';
 
 class LocationUtils extends ChangeNotifier {
   StreamSubscription<LocationData>? _locationSubscription;
@@ -39,33 +39,33 @@ class LocationUtils extends ChangeNotifier {
       PermissionStatus.authorizedWhenInUse,
       PermissionStatus.authorizedAlways
     ].contains(await requestPermission())) {
-      final ignore = await showSystemSettingsDialog(
+      final systemSettings = await showSystemSettingsDialog(
         text:
             "In order to track your location, the permission for location must be set to 'Allow When In Use'.",
       );
-      if (ignore) {
+      if (systemSettings.isIgnore) {
         return false;
       }
     }
 
     // now that "Allow While In Use" is granted we can request "Allow Always"
     if (!await permission_handler.Permission.locationAlways.isGranted) {
-      final ignore = await showSystemSettingsDialog(
+      final systemSettings = await showSystemSettingsDialog(
         text:
             "In order to track your location in the background, the permission for location must be set to 'Allow Always'.",
       );
-      if (ignore) {
+      if (systemSettings.isIgnore) {
         return false;
       }
     }
     while (!await permission_handler.Permission.locationAlways
         .request()
         .isGranted) {
-      final ignore = await showSystemSettingsDialog(
+      final systemSettings = await showSystemSettingsDialog(
         text:
             "In order to track your location in the background, the permission for location must be set to 'Allow Always'.",
       );
-      if (ignore) {
+      if (systemSettings.isIgnore) {
         return false;
       }
     }

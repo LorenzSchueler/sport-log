@@ -5,7 +5,6 @@ import 'package:sport_log/data_provider/data_providers/metcon_data_provider.dart
 import 'package:sport_log/data_provider/data_providers/strength_data_provider.dart';
 import 'package:sport_log/database/database.dart';
 import 'package:sport_log/models/all.dart';
-import 'package:sport_log/models/cardio/cardio_session_description.dart';
 
 class TimelineDataProvider extends DataProvider<TimelineUnion> {
   factory TimelineDataProvider() {
