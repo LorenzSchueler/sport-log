@@ -16,7 +16,7 @@ use rand::Rng;
 use sport_log_types::{
     uri::{route_max_version, ADM_PLATFORM, AP_ACTION_PROVIDER, AP_PLATFORM, DIARY, USER},
     Action, ActionEvent, ActionEventId, ActionId, ActionProvider, ActionProviderId, Diary, DiaryId,
-    Platform, PlatformId, User, UserId, ADMIN_USERNAME,
+    Platform, PlatformId, User, UserId, ADMIN_USERNAME, ID_HEADER,
 };
 use tower::{Service, ServiceExt};
 
@@ -27,7 +27,7 @@ use crate::{
     state::{AppState, DbPool},
 };
 
-const ADMIN_PASSWORD: &str = "admin-passwd";
+const ADMIN_PASSWORD_PLAINTEXT: &str = "admin-passwd";
 
 lazy_static! {
     static ref TEST_USER: User = User {
@@ -194,7 +194,7 @@ fn rnd() -> i64 {
     rand::thread_rng().gen()
 }
 
-fn basic_auth(username: &str, password: &str) -> (HeaderName, String) {
+fn auth_header(username: &str, password: &str) -> (HeaderName, String) {
     (
         AUTHORIZATION,
         format!(
@@ -204,18 +204,8 @@ fn basic_auth(username: &str, password: &str) -> (HeaderName, String) {
     )
 }
 
-fn basic_auth_as(username: &str, id: i64, password: &str) -> (HeaderName, String) {
-    (
-        AUTHORIZATION,
-        format!(
-            "Basic {}",
-            STANDARD.encode(format!("{username}$id${id}:{password}"))
-        ),
-    )
-}
-
-fn assert_status(response: &Response, status: StatusCode) {
-    assert_eq!(status, response.status());
+fn auth_as_headers(username: &str, id: i64, password: &str) -> [(HeaderName, String); 2] {
+    [auth_header(username, password), (ID_HEADER, id.to_string())]
 }
 
 fn assert_json(response: &Response) {
@@ -227,7 +217,7 @@ fn assert_json(response: &Response) {
 
 /// Use a get request to make sure that the authentication succeeds.
 async fn auth(router: &mut Router, route: &str, username: &str, password: &str) {
-    let header = basic_auth(username, password);
+    let header = auth_header(username, password);
     let response = router
         .ready()
         .await
@@ -241,13 +231,13 @@ async fn auth(router: &mut Router, route: &str, username: &str, password: &str) 
         .await
         .unwrap();
 
-    assert_status(&response, StatusCode::OK);
+    assert_eq!(response.status(), StatusCode::OK);
     assert_json(&response);
 }
 
 /// Use a get request to make sure that the authentication with wrong credentials does not succeed.
 async fn auth_wrong_credentials(router: &mut Router, route: &str, username: &str) {
-    let header = basic_auth(username, "wrong password");
+    let header = auth_header(username, "wrong password");
     let response = router
         .ready()
         .await
@@ -261,10 +251,10 @@ async fn auth_wrong_credentials(router: &mut Router, route: &str, username: &str
         .await
         .unwrap();
 
-    assert_status(&response, StatusCode::UNAUTHORIZED);
+    assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
     assert_json(&response);
 
-    let header = basic_auth("wrong username", "wrong password");
+    let header = auth_header("wrong username", "wrong password");
     let response = router
         .ready()
         .await
@@ -278,7 +268,7 @@ async fn auth_wrong_credentials(router: &mut Router, route: &str, username: &str
         .await
         .unwrap();
 
-    assert_status(&response, StatusCode::UNAUTHORIZED);
+    assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
     assert_json(&response);
 }
 
@@ -292,27 +282,28 @@ async fn auth_without_credentials(router: &mut Router, route: &str) {
         .await
         .unwrap();
 
-    assert_status(&response, StatusCode::UNAUTHORIZED);
+    assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
     assert_json(&response);
 }
 
 /// Use a get request to make sure that the authentication as a user succeeds.
 async fn auth_as(router: &mut Router, route: &str, username: &str, id: i64, password: &str) {
-    let header = basic_auth_as(username, id, password);
+    let [basic_header, user_id_header] = auth_as_headers(username, id, password);
     let response = router
         .ready()
         .await
         .unwrap()
         .call(
             Request::get(route)
-                .header(header.0, header.1)
+                .header(basic_header.0, basic_header.1)
+                .header(user_id_header.0, user_id_header.1)
                 .body(Body::empty())
                 .unwrap(),
         )
         .await
         .unwrap();
 
-    assert_status(&response, StatusCode::OK);
+    assert_eq!(response.status(), StatusCode::OK);
     assert_json(&response);
 }
 
@@ -324,78 +315,82 @@ async fn auth_as_not_allowed(
     id: i64,
     password: &str,
 ) {
-    let header = basic_auth_as(username, id, password);
+    let [basic_header, user_id_header] = auth_as_headers(username, id, password);
     let response = router
         .ready()
         .await
         .unwrap()
         .call(
             Request::get(route)
-                .header(header.0, header.1)
+                .header(basic_header.0, basic_header.1)
+                .header(user_id_header.0, user_id_header.1)
                 .body(Body::empty())
                 .unwrap(),
         )
         .await
         .unwrap();
 
-    assert_status(&response, StatusCode::FORBIDDEN);
+    assert_eq!(response.status(), StatusCode::FORBIDDEN);
     assert_json(&response);
 }
 
 /// Use a get request to make sure that the authentication as a user with wrong credentials does not succeed.
 async fn auth_as_wrong_credentials(router: &mut Router, route: &str, username: &str, id: i64) {
-    let header = basic_auth_as(username, id, "wrong password");
+    let [basic_header, user_id_header] = auth_as_headers(username, id, "wrong password");
     let response = router
         .ready()
         .await
         .unwrap()
         .call(
             Request::get(route)
-                .header(header.0, header.1)
+                .header(basic_header.0, basic_header.1)
+                .header(user_id_header.0, user_id_header.1)
                 .body(Body::empty())
                 .unwrap(),
         )
         .await
         .unwrap();
 
-    assert_status(&response, StatusCode::UNAUTHORIZED);
+    assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
     assert_json(&response);
 
-    let header = basic_auth_as("wrong username", 1, "wrong password");
+    let [basic_header, user_id_header] = auth_as_headers("wrong username", 1, "wrong password");
     let response = router
         .ready()
         .await
         .unwrap()
         .call(
             Request::get(route)
-                .header(header.0, header.1)
+                .header(basic_header.0, basic_header.1)
+                .header(user_id_header.0, user_id_header.1)
                 .body(Body::empty())
                 .unwrap(),
         )
         .await
         .unwrap();
 
-    assert_status(&response, StatusCode::UNAUTHORIZED);
+    assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
     assert_json(&response);
 }
 
 /// Use a get request to make sure that the authentication as a user without credentials does not succeed.
 async fn auth_as_without_credentials(router: &mut Router, route: &str, id: i64) {
-    let header = basic_auth_as("", id, "wrong password");
+    let [basic_header, user_id_header] = auth_as_headers("", id, "wrong password");
     let response = router
         .ready()
         .await
         .unwrap()
         .call(
             Request::get(route)
-                .header(header.0, header.1)
+                .header(basic_header.0, basic_header.1)
+                .header(user_id_header.0, user_id_header.1)
                 .body(Body::empty())
                 .unwrap(),
         )
         .await
         .unwrap();
 
-    assert_status(&response, StatusCode::UNAUTHORIZED);
+    assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
     assert_json(&response);
 }
 
@@ -406,7 +401,7 @@ async fn admin_auth() {
         &mut router,
         &route_max_version("", ADM_PLATFORM, &[]),
         ADMIN_USERNAME,
-        ADMIN_PASSWORD,
+        ADMIN_PASSWORD_PLAINTEXT,
     )
     .await
 }
@@ -465,7 +460,7 @@ async fn admin_as_ap_auth() {
         &route_max_version("", AP_ACTION_PROVIDER, &[]),
         ADMIN_USERNAME,
         TEST_AP.id.0,
-        ADMIN_PASSWORD,
+        ADMIN_PASSWORD_PLAINTEXT,
     )
     .await;
 }
@@ -530,7 +525,7 @@ async fn admin_as_user_auth() {
         &route_max_version("", USER, &[]),
         ADMIN_USERNAME,
         TEST_USER.id.0,
-        ADMIN_PASSWORD,
+        ADMIN_PASSWORD_PLAINTEXT,
     )
     .await;
 }
@@ -710,7 +705,7 @@ async fn admin_as_user_ap_auth() {
         &route_max_version("", DIARY, &[]),
         ADMIN_USERNAME,
         TEST_USER.id.0,
-        ADMIN_PASSWORD,
+        ADMIN_PASSWORD_PLAINTEXT,
     )
     .await;
 }
@@ -745,7 +740,7 @@ async fn own_create() {
     let (mut router, _, _) = init().await;
 
     // check that create works for same user
-    let header = basic_auth(&TEST_USER.username, &TEST_USER.password);
+    let header = auth_header(&TEST_USER.username, &TEST_USER.password);
     let response = router
         .ready()
         .await
@@ -760,7 +755,7 @@ async fn own_create() {
         .await
         .unwrap();
 
-    assert_status(&response, StatusCode::OK);
+    assert_eq!(response.status(), StatusCode::OK);
 }
 
 #[tokio::test]
@@ -768,7 +763,7 @@ async fn foreign_create() {
     let (mut router, _, _) = init().await;
 
     // check that create does not work for other user
-    let header = basic_auth(&TEST_USER2.username, &TEST_USER2.password);
+    let header = auth_header(&TEST_USER2.username, &TEST_USER2.password);
     let response = router
         .ready()
         .await
@@ -783,7 +778,7 @@ async fn foreign_create() {
         .await
         .unwrap();
 
-    assert_status(&response, StatusCode::FORBIDDEN);
+    assert_eq!(response.status(), StatusCode::FORBIDDEN);
 }
 
 #[tokio::test]
@@ -793,7 +788,7 @@ async fn own_get() {
     DiaryDb::create(&TEST_DIARY, &mut db_pool.get().unwrap()).unwrap();
 
     // check that get works for same user
-    let header = basic_auth(&TEST_USER.username, &TEST_USER.password);
+    let header = auth_header(&TEST_USER.username, &TEST_USER.password);
     let response = router
         .ready()
         .await
@@ -811,7 +806,7 @@ async fn own_get() {
         .await
         .unwrap();
 
-    assert_status(&response, StatusCode::OK);
+    assert_eq!(response.status(), StatusCode::OK);
 }
 
 #[tokio::test]
@@ -821,7 +816,7 @@ async fn foreign_get() {
     DiaryDb::create(&TEST_DIARY, &mut db_pool.get().unwrap()).unwrap();
 
     // check that get does not work for other user
-    let header = basic_auth(&TEST_USER2.username, &TEST_USER2.password);
+    let header = auth_header(&TEST_USER2.username, &TEST_USER2.password);
     let response = router
         .ready()
         .await
@@ -839,7 +834,7 @@ async fn foreign_get() {
         .await
         .unwrap();
 
-    assert_status(&response, StatusCode::FORBIDDEN);
+    assert_eq!(response.status(), StatusCode::FORBIDDEN);
 }
 
 #[tokio::test]
@@ -849,7 +844,7 @@ async fn own_update() {
     DiaryDb::create(&TEST_DIARY, &mut db_pool.get().unwrap()).unwrap();
 
     // check that update works for same user
-    let header = basic_auth(&TEST_USER.username, &TEST_USER.password);
+    let header = auth_header(&TEST_USER.username, &TEST_USER.password);
     let response = router
         .ready()
         .await
@@ -864,7 +859,7 @@ async fn own_update() {
         .await
         .unwrap();
 
-    assert_status(&response, StatusCode::OK);
+    assert_eq!(response.status(), StatusCode::OK);
 }
 
 #[tokio::test]
@@ -874,7 +869,7 @@ async fn foreign_update() {
     DiaryDb::create(&TEST_DIARY, &mut db_pool.get().unwrap()).unwrap();
 
     // check that update does not work for other user
-    let header = basic_auth(&TEST_USER2.username, &TEST_USER2.password);
+    let header = auth_header(&TEST_USER2.username, &TEST_USER2.password);
     let response = router
         .ready()
         .await
@@ -889,7 +884,7 @@ async fn foreign_update() {
         .await
         .unwrap();
 
-    assert_status(&response, StatusCode::FORBIDDEN);
+    assert_eq!(response.status(), StatusCode::FORBIDDEN);
 }
 
 #[tokio::test]
@@ -918,9 +913,9 @@ async fn user_self_registration() {
         .unwrap();
 
     if config.user_self_registration {
-        assert_status(&response, StatusCode::OK);
+        assert_eq!(response.status(), StatusCode::OK);
     } else {
-        assert_status(&response, StatusCode::FORBIDDEN);
+        assert_eq!(response.status(), StatusCode::FORBIDDEN);
     }
 }
 
@@ -950,9 +945,9 @@ async fn ap_self_registration() {
         .unwrap();
 
     if config.ap_self_registration {
-        assert_status(&response, StatusCode::OK);
+        assert_eq!(response.status(), StatusCode::OK);
     } else {
-        assert_status(&response, StatusCode::FORBIDDEN);
+        assert_eq!(response.status(), StatusCode::FORBIDDEN);
     }
 
     let response = router
@@ -968,9 +963,9 @@ async fn ap_self_registration() {
         .unwrap();
 
     if config.ap_self_registration {
-        assert_status(&response, StatusCode::OK);
+        assert_eq!(response.status(), StatusCode::OK);
     } else {
-        assert_status(&response, StatusCode::FORBIDDEN);
+        assert_eq!(response.status(), StatusCode::FORBIDDEN);
     }
 
     let ap_id = ActionProviderId(rnd());
@@ -997,9 +992,9 @@ async fn ap_self_registration() {
         .unwrap();
 
     if config.ap_self_registration {
-        assert_status(&response, StatusCode::OK);
+        assert_eq!(response.status(), StatusCode::OK);
     } else {
-        assert_status(&response, StatusCode::FORBIDDEN);
+        assert_eq!(response.status(), StatusCode::FORBIDDEN);
     }
 }
 
@@ -1007,7 +1002,7 @@ async fn ap_self_registration() {
 async fn update_non_existing() {
     let (mut router, _, _) = init().await;
 
-    let header = basic_auth(&TEST_USER.username, &TEST_USER.password);
+    let header = auth_header(&TEST_USER.username, &TEST_USER.password);
     let response = router
         .ready()
         .await
@@ -1022,5 +1017,5 @@ async fn update_non_existing() {
         .await
         .unwrap();
 
-    assert_status(&response, StatusCode::FORBIDDEN);
+    assert_eq!(response.status(), StatusCode::FORBIDDEN);
 }

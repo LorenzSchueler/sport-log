@@ -7,7 +7,7 @@ use axum::{
     http::{request::Parts, StatusCode},
     TypedHeader,
 };
-use sport_log_types::{ActionProviderId, UserId};
+use sport_log_types::{ActionProviderId, UserId, ID_HEADER};
 
 use crate::{
     db::{ActionProviderDb, AdminDb, UserDb},
@@ -21,8 +21,8 @@ use crate::{
 ///
 /// The admin can also use endpoints with an [`AuthUser`] as request guard.
 ///
-/// In order to do so, the username has to be set to `admin$id$<user_id>`
-/// and the password must be the `admin_password` as configured in `sport-log-server.toml`.
+/// In order to do so, the username must be `admin`, the password must be the `admin_password` as configured in `sport-log-server.toml`
+/// and a `id` header must be preset that is set to the id of the user the admin wants to authenticate as.
 #[derive(Debug, Clone, Copy)]
 pub struct AuthUser(UserId);
 
@@ -55,20 +55,14 @@ where
 
         let admin_password = &config.admin_password;
 
-        match UserDb::auth(username, password, &mut db) {
-            Ok(id) => Ok(AuthUser(id)),
-            Err(_) => {
-                if let Some((name, Ok(user_id))) = username
-                    .split_once("$id$")
-                    .map(|(name, id)| (name, id.parse().map(UserId)))
-                {
-                    if AdminDb::auth(name, password, admin_password).is_ok() {
-                        return Ok(AuthUser(user_id));
-                    }
-                };
-                Err(StatusCode::UNAUTHORIZED.into())
-            }
+        if let Ok(id) = UserDb::auth(username, password, &mut db) {
+            return Ok(Self(id));
         }
+        let user_id = parse_id_header(parts, UserId).map_err(HandlerError::from)?;
+        if AdminDb::auth(username, password, admin_password).is_ok() {
+            return Ok(Self(user_id));
+        }
+        Err(StatusCode::UNAUTHORIZED.into())
     }
 }
 
@@ -79,12 +73,13 @@ where
 /// [`ActionProvider`](sport_log_types::ActionProvider) can also use endpoints with an [`AuthUserOrAP`] as request guard
 /// if the user has an enabled [`ActionEvent`](sport_log_types::ActionEvent) for an [`Action`](sport_log_types::Action) of this [`ActionProvider`](sport_log_types::ActionProvider).
 ///
-/// In this case the username has to be set to `<ap_name>$id$<user_id>` and the password is the password of the [`ActionProvider`](sport_log_types::ActionProvider).
+/// In order to do so, the username and password must the ones from the [`ActionProvider`](sport_log_types::ActionProvider).
+/// and a `id` header must be preset that is set to the id of the user the action provider wants to authenticate as.
 ///
 /// The admin can also use endpoints with an [`AuthUserOrAP`] as request guard.
 ///
-/// In order to do so, the username has to be set to `admin$id$<user_id>`
-/// and the password must be the `admin_password` as configured in `sport-log-server.toml`.
+/// In order to do so, the username must be `admin`, the password must be the `admin_password` as configured in `sport-log-server.toml`
+/// and a `id` header must be preset that is set to the id of the user the admin wants to authenticate as.
 #[derive(Debug, Clone, Copy)]
 pub struct AuthUserOrAP(UserId);
 
@@ -117,26 +112,20 @@ where
 
         let admin_password = &config.admin_password;
 
-        match UserDb::auth(username, password, &mut db) {
-            Ok(id) => Ok(AuthUserOrAP(id)),
-            Err(_) => {
-                if let Some((name, Ok(user_id))) = username
-                    .split_once("$id$")
-                    .map(|(name, id)| (name, id.parse().map(UserId)))
-                {
-                    match ActionProviderDb::auth_as_user(name, password, user_id, &mut db) {
-                        Ok(AuthApForUser::Allowed(_)) => Ok(AuthUserOrAP(user_id)),
-                        Ok(AuthApForUser::Forbidden) => Err(StatusCode::FORBIDDEN.into()),
-                        Err(_) => match AdminDb::auth(name, password, admin_password) {
-                            Ok(()) => Ok(AuthUserOrAP(user_id)),
-                            Err(_) => Err(StatusCode::UNAUTHORIZED.into()),
-                        },
-                    }
-                } else {
-                    Err(StatusCode::UNAUTHORIZED.into())
-                }
+        if let Ok(id) = UserDb::auth(username, password, &mut db) {
+            return Ok(Self(id));
+        }
+        let user_id = parse_id_header(parts, UserId).map_err(HandlerError::from)?;
+        if let Ok(auth) = ActionProviderDb::auth_as_user(username, password, user_id, &mut db) {
+            match auth {
+                AuthApForUser::Allowed(_) => return Ok(Self(user_id)),
+                AuthApForUser::Forbidden => return Err(StatusCode::FORBIDDEN.into()),
             }
         }
+        if AdminDb::auth(username, password, admin_password).is_ok() {
+            return Ok(Self(user_id));
+        }
+        Err(StatusCode::UNAUTHORIZED.into())
     }
 }
 
@@ -151,8 +140,8 @@ pub enum AuthApForUser {
 ///
 /// The admin can also use endpoints with an [`AuthAP`] as request guard.
 ///
-/// In order to do so, the username has to be set to `admin$id$<action_provider_id>`
-/// and the password must be the `admin_password` as configured in `sport-log-server.toml`.
+/// In order to do so, the username must be `admin`, the password must be the `admin_password` as configured in `sport-log-server.toml`
+/// and a `id` header must be preset that is set to the id of the action provider the admin wants to authenticate as.
 #[derive(Debug, Clone, Copy)]
 pub struct AuthAP(ActionProviderId);
 
@@ -185,20 +174,14 @@ where
 
         let admin_password = &config.admin_password;
 
-        match ActionProviderDb::auth(username, password, &mut db) {
-            Ok(id) => Ok(AuthAP(id)),
-            Err(_) => {
-                if let Some((name, Ok(id))) = username
-                    .split_once("$id$")
-                    .map(|(name, id)| (name, id.parse()))
-                {
-                    if AdminDb::auth(name, password, admin_password).is_ok() {
-                        return Ok(AuthAP(ActionProviderId(id)));
-                    }
-                };
-                Err(StatusCode::UNAUTHORIZED.into())
-            }
+        if let Ok(id) = ActionProviderDb::auth(username, password, &mut db) {
+            return Ok(Self(id));
         }
+        let ap_id = parse_id_header(parts, ActionProviderId).map_err(HandlerError::from)?;
+        if AdminDb::auth(username, password, admin_password).is_ok() {
+            return Ok(Self(ap_id));
+        }
+        Err(StatusCode::UNAUTHORIZED.into())
     }
 }
 
@@ -233,4 +216,16 @@ where
             Err(_) => Err(StatusCode::UNAUTHORIZED.into()),
         }
     }
+}
+
+fn parse_id_header<T>(parts: &Parts, builder: fn(i64) -> T) -> Result<T, StatusCode> {
+    parts
+        .headers
+        .get(ID_HEADER)
+        .ok_or(StatusCode::UNAUTHORIZED)?
+        .to_str()
+        .map_err(|_| StatusCode::UNPROCESSABLE_ENTITY)?
+        .parse()
+        .map(builder)
+        .map_err(|_| StatusCode::UNPROCESSABLE_ENTITY)
 }

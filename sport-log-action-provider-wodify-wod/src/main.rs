@@ -12,7 +12,7 @@ use serde::Deserialize;
 use sport_log_ap_utils::{disable_events, get_events, setup as setup_db};
 use sport_log_types::{
     uri::{route_max_version, WOD},
-    ActionEventId, ExecutableActionEvent, Wod, WodId,
+    ActionEventId, ExecutableActionEvent, Wod, WodId, ID_HEADER,
 };
 use thirtyfour::{error::WebDriverError, prelude::*, WebDriver};
 use tokio::{process::Command, time};
@@ -370,10 +370,8 @@ async fn try_get_wod(
 
         let response = client
             .post(route_max_version(&CONFIG.base_url, WOD, &[]))
-            .basic_auth(
-                format!("{}$id${}", NAME, exec_action_event.user_id.0),
-                Some(&CONFIG.password),
-            )
+            .basic_auth(NAME, Some(&CONFIG.password))
+            .header(ID_HEADER, exec_action_event.user_id.0)
             .json(&wod)
             .send()
             .await
@@ -387,10 +385,8 @@ async fn try_get_wod(
                         WOD,
                         &[("start", &today), ("end", &today)],
                     ))
-                    .basic_auth(
-                        format!("{}$id${}", NAME, exec_action_event.user_id.0),
-                        Some(&CONFIG.password),
-                    )
+                    .basic_auth(NAME, Some(&CONFIG.password))
+                    .header(ID_HEADER, exec_action_event.user_id.0)
                     .send()
                     .await
                     .map_err(Error::Reqwest)?
@@ -408,10 +404,8 @@ async fn try_get_wod(
                 }
                 client
                     .put(route_max_version(&CONFIG.base_url, WOD, &[]))
-                    .basic_auth(
-                        format!("{}$id${}", NAME, exec_action_event.user_id.0),
-                        Some(&CONFIG.password),
-                    )
+                    .basic_auth(NAME, Some(&CONFIG.password))
+                    .header(ID_HEADER, exec_action_event.user_id.0)
                     .json(&wod)
                     .send()
                     .await

@@ -1787,6 +1787,7 @@ dependencies = [
  "const_format",
  "diesel",
  "diesel-derive-enum",
+ "http",
  "serde",
  "sport-log-types-derive",
 ]

@@ -10,7 +10,7 @@ use sport_log_ap_utils::{disable_events, get_events, setup as setup_db};
 use sport_log_types::{
     uri::{route_max_version, CARDIO_SESSION, MOVEMENT},
     ActionEventId, CardioSession, CardioSessionId, CardioType, ExecutableActionEvent, Movement,
-    Position,
+    Position, ID_HEADER,
 };
 use tokio::task::JoinError;
 use tracing::{debug, error, info, warn};
@@ -261,10 +261,10 @@ async fn fetch() -> Result<(), Error> {
 
             let workout_keys = get_workout_keys(&client, &token).await?;
 
-            let username = format!("{}$id${}", NAME, exec_action_event.user_id.0);
             let movements: Vec<Movement> = client
                 .get(route_max_version(&CONFIG.server_url, MOVEMENT, &[]))
-                .basic_auth(&username, Some(&CONFIG.password))
+                .basic_auth(NAME, Some(&CONFIG.password))
+                .header(ID_HEADER, exec_action_event.user_id.0)
                 .send()
                 .await?
                 .json::<Vec<Movement>>()
@@ -295,7 +295,8 @@ async fn fetch() -> Result<(), Error> {
 
                 let response = client
                     .post(route_max_version(&CONFIG.server_url, CARDIO_SESSION, &[]))
-                    .basic_auth(&username, Some(&CONFIG.password))
+                    .basic_auth(NAME, Some(&CONFIG.password))
+                    .header(ID_HEADER, exec_action_event.user_id.0)
                     .json(&cardio_session)
                     .send()
                     .await?;

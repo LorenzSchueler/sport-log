@@ -39,7 +39,7 @@ use serde::{Deserialize, Serialize};
 use sport_log_ap_utils::{disable_events, get_events, setup as setup_db};
 use sport_log_types::{
     uri::{route_max_version, CARDIO_SESSION, ROUTE},
-    ActionEventId, CardioSession, CardioSessionId, Position, Route, RouteId,
+    ActionEventId, CardioSession, CardioSessionId, Position, Route, RouteId, ID_HEADER,
 };
 use tokio::process::Command;
 use tracing::{debug, error, info};
@@ -207,8 +207,6 @@ async fn map_match() -> Result<()> {
         tasks.push(tokio::spawn(async move {
             info!("processing {:#?}", exec_action_event);
 
-            let username = format!("{}$id${}", NAME, exec_action_event.user_id.0);
-
             let cardio_session_id: CardioSessionId = exec_action_event
                 .arguments
                 .and_then(|arg| arg.parse().ok())
@@ -223,7 +221,8 @@ async fn map_match() -> Result<()> {
                     CARDIO_SESSION,
                     &[("id", &cardio_session_id.0.to_string())],
                 ))
-                .basic_auth(&username, Some(&CONFIG.password))
+                .basic_auth(NAME, Some(&CONFIG.password))
+                .header(ID_HEADER, exec_action_event.user_id.0)
                 .send()
                 .await
                 .map_err(Error::Reqwest)?
@@ -235,7 +234,8 @@ async fn map_match() -> Result<()> {
 
             let routes: Vec<Route> = client
                 .get(route_max_version(&CONFIG.base_url, ROUTE, &[]))
-                .basic_auth(&username, Some(&CONFIG.password))
+                .basic_auth(NAME, Some(&CONFIG.password))
+                .header(ID_HEADER, exec_action_event.user_id.0)
                 .send()
                 .await
                 .map_err(Error::Reqwest)?
@@ -248,7 +248,8 @@ async fn map_match() -> Result<()> {
             } else {
                 client
                     .post(route_max_version(&CONFIG.base_url, ROUTE, &[]))
-                    .basic_auth(&username, Some(&CONFIG.password))
+                    .basic_auth(NAME, Some(&CONFIG.password))
+                    .header(ID_HEADER, exec_action_event.user_id.0)
                     .json(&route)
                     .send()
                     .await
@@ -257,7 +258,8 @@ async fn map_match() -> Result<()> {
 
             client
                 .put(route_max_version(&CONFIG.base_url, CARDIO_SESSION, &[]))
-                .basic_auth(&username, Some(&CONFIG.password))
+                .basic_auth(NAME, Some(&CONFIG.password))
+                .header(ID_HEADER, exec_action_event.user_id.0)
                 .json(&cardio_session)
                 .send()
                 .await

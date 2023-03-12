@@ -1,3 +1,4 @@
+use http::HeaderName;
 use serde::{Deserialize, Serialize};
 
 mod account;
@@ -32,3 +33,6 @@ pub use version::*;
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(transparent)]
 struct IdString(String);
+
+#[allow(clippy::declare_interior_mutable_const)]
+pub const ID_HEADER: HeaderName = HeaderName::from_static("id");
