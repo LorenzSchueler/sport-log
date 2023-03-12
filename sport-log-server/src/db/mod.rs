@@ -1,6 +1,7 @@
+use argon2::{Algorithm, Argon2, Params, Version};
 use axum::http::StatusCode;
 use chrono::{DateTime, Utc};
-use diesel::{PgConnection, QueryResult};
+use diesel::{result::Error, PgConnection, QueryResult};
 use serde::Deserialize;
 use sport_log_types::{ActionProviderId, UserId};
 
@@ -31,6 +32,14 @@ pub use training_plan::*;
 pub use user::*;
 
 use crate::auth::*;
+
+pub fn build_hasher() -> QueryResult<Argon2<'static>> {
+    Ok(Argon2::new(
+        Algorithm::Argon2id,
+        Version::V0x13,
+        Params::new(4096, 3, 1, Some(32)).map_err(|_| Error::RollbackTransaction)?, // this should not happen but prevents panic
+    ))
+}
 
 /// Wrapper around incoming json data for which the access permissions for the [`AuthUserOrAP`], [`AuthAP`] or [`AuthAdmin`] have not been checked.
 ///

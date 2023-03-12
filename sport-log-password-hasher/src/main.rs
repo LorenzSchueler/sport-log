@@ -18,7 +18,7 @@ use std::env;
 
 use argon2::{
     password_hash::{PasswordHash, PasswordHasher, PasswordVerifier, SaltString},
-    Argon2,
+    Algorithm, Argon2, Params, Version,
 };
 use rand_core::OsRng;
 
@@ -28,7 +28,7 @@ fn main() {
     match &args[1..] {
         [mode, password] if mode == "-g" => {
             let salt = SaltString::generate(&mut OsRng);
-            let password_hash = Argon2::default()
+            let password_hash = build_hasher()
                 .hash_password(password.as_bytes(), &salt)
                 .unwrap()
                 .to_string();
@@ -37,7 +37,7 @@ fn main() {
         }
         [mode, hash, password] if mode == "-v" => {
             let hash = PasswordHash::new(hash.as_str()).unwrap();
-            if Argon2::default()
+            if build_hasher()
                 .verify_password(password.as_bytes(), &hash)
                 .is_ok()
             {
@@ -55,4 +55,12 @@ fn main() {
             );
         }
     }
+}
+
+pub fn build_hasher() -> Argon2<'static> {
+    Argon2::new(
+        Algorithm::Argon2id,
+        Version::V0x13,
+        Params::new(4096, 3, 1, Some(32)).unwrap(),
+    )
 }

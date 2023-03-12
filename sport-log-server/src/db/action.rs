@@ -1,4 +1,4 @@
-use argon2::{password_hash::SaltString, Argon2, PasswordHash, PasswordHasher, PasswordVerifier};
+use argon2::{password_hash::SaltString, PasswordHash, PasswordHasher, PasswordVerifier};
 use chrono::{DateTime, Utc};
 use diesel::{prelude::*, result::Error};
 use rand_core::OsRng;
@@ -32,7 +32,7 @@ impl ActionProviderDb {
         db: &mut PgConnection,
     ) -> QueryResult<usize> {
         let salt = SaltString::generate(&mut OsRng);
-        action_provider.password = Argon2::default()
+        action_provider.password = build_hasher()?
             .hash_password(action_provider.password.as_bytes(), &salt)
             .map_err(|_| Error::RollbackTransaction)? // this should not happen but prevents panic
             .to_string();
@@ -48,7 +48,7 @@ impl ActionProviderDb {
     ) -> QueryResult<usize> {
         for action_provider in &mut *action_providers {
             let salt = SaltString::generate(&mut OsRng);
-            action_provider.password = Argon2::default()
+            action_provider.password = build_hasher()?
                 .hash_password(action_provider.password.as_bytes(), &salt)
                 .map_err(|_| Error::RollbackTransaction)? // this should not happen but prevents panic
                 .to_string();
@@ -77,7 +77,7 @@ impl ActionProviderDb {
 
         let password_hash =
             PasswordHash::new(password_hash.as_str()).map_err(|_| Error::RollbackTransaction)?; // this should not happen but prevents panic
-        if Argon2::default()
+        if build_hasher()?
             .verify_password(password.as_bytes(), &password_hash)
             .is_ok()
         {
@@ -104,7 +104,7 @@ impl ActionProviderDb {
 
         let password_hash =
             PasswordHash::new(password_hash.as_str()).map_err(|_| Error::RollbackTransaction)?; // this should not happen but prevents panic
-        if Argon2::default()
+        if build_hasher()?
             .verify_password(password.as_bytes(), &password_hash)
             .is_ok()
         {
