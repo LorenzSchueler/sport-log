@@ -8,9 +8,10 @@ import 'package:sport_log/models/entity_interfaces.dart';
 
 part 'platform.g.dart';
 
-@JsonSerializable()
+@JsonSerializable(constructor: "_")
 class Platform extends AtomicEntity {
-  Platform({
+  /// Platforms should never be created.
+  Platform._({
     required this.id,
     required this.name,
     required this.credential,
@@ -32,27 +33,22 @@ class Platform extends AtomicEntity {
   Map<String, dynamic> toJson() => _$PlatformToJson(this);
 
   @override
-  Platform clone() => Platform(
+  Platform clone() => Platform._(
         id: id.clone(),
         name: name,
         credential: credential,
         deleted: deleted,
       );
 
+  /// Platforms should never be created.
   @override
-  bool isValidBeforeSanitation() {
-    return validate(!deleted, 'Platform: deleted == true') &&
-        validate(
-          name.length >= 2 && name.length <= 80,
-          'Platform: name.length is < 2 or > 80',
-        );
-  }
+  bool isValidBeforeSanitation() => true;
 
+  /// Platforms should never be created.
   @override
-  bool isValid() {
-    return isValidBeforeSanitation();
-  }
+  bool isValid() => true;
 
+  /// Platforms should never be created.
   @override
   void sanitize() {}
 }
@@ -60,7 +56,7 @@ class Platform extends AtomicEntity {
 class DbPlatformSerializer extends DbSerializer<Platform> {
   @override
   Platform fromDbRecord(DbRecord r, {String prefix = ''}) {
-    return Platform(
+    return Platform._(
       id: Int64(r[prefix + Columns.id]! as int),
       name: r[prefix + Columns.name]! as String,
       credential: r[prefix + Columns.credential]! as int == 1,

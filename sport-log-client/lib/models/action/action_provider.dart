@@ -8,9 +8,10 @@ import 'package:sport_log/models/entity_interfaces.dart';
 
 part 'action_provider.g.dart';
 
-@JsonSerializable()
+@JsonSerializable(constructor: "_")
 class ActionProvider extends AtomicEntity {
-  ActionProvider({
+  /// ActionProviders should never be created.
+  ActionProvider._({
     required this.id,
     required this.name,
     required this.password,
@@ -37,7 +38,7 @@ class ActionProvider extends AtomicEntity {
   Map<String, dynamic> toJson() => _$ActionProviderToJson(this);
 
   @override
-  ActionProvider clone() => ActionProvider(
+  ActionProvider clone() => ActionProvider._(
         id: id.clone(),
         name: name,
         password: password,
@@ -46,40 +47,23 @@ class ActionProvider extends AtomicEntity {
         deleted: deleted,
       );
 
+  /// ActionProviders should never be created.
   @override
-  bool isValidBeforeSanitation() {
-    return validate(!deleted, 'ActionProvider: deleted is true') &&
-        validate(
-          name.length >= 2 && name.length <= 80,
-          'ActionProvider: name.length is < 2 or > 80',
-        ) &&
-        validate(
-          password.length >= 2 && password.length <= 96,
-          'ActionProvider: password.length is < 2 or > 96',
-        );
-  }
+  bool isValidBeforeSanitation() => true;
 
+  /// ActionProviders should never be created.
   @override
-  bool isValid() {
-    return isValidBeforeSanitation() &&
-        validate(
-          description == null || description!.isNotEmpty,
-          'ActionProvider: description is empty but not null',
-        );
-  }
+  bool isValid() => true;
 
+  /// ActionProviders should never be created.
   @override
-  void sanitize() {
-    if (description != null && description!.isEmpty) {
-      description = null;
-    }
-  }
+  void sanitize() {}
 }
 
 class DbActionProviderSerializer extends DbSerializer<ActionProvider> {
   @override
   ActionProvider fromDbRecord(DbRecord r, {String prefix = ''}) {
-    return ActionProvider(
+    return ActionProvider._(
       id: Int64(r[prefix + Columns.id]! as int),
       name: r[prefix + Columns.name]! as String,
       password: r[prefix + Columns.password]! as String,

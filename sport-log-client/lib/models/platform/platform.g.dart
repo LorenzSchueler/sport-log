@@ -6,7 +6,7 @@ part of 'platform.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-Platform _$PlatformFromJson(Map<String, dynamic> json) => Platform(
+Platform _$PlatformFromJson(Map<String, dynamic> json) => Platform._(
       id: const IdConverter().fromJson(json['id'] as String),
       name: json['name'] as String,
       credential: json['credential'] as bool,

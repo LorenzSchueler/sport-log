@@ -7,7 +7,7 @@ part of 'action_provider.dart';
 // **************************************************************************
 
 ActionProvider _$ActionProviderFromJson(Map<String, dynamic> json) =>
-    ActionProvider(
+    ActionProvider._(
       id: const IdConverter().fromJson(json['id'] as String),
       name: json['name'] as String,
       password: json['password'] as String,

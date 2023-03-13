@@ -8,9 +8,10 @@ import 'package:sport_log/models/entity_interfaces.dart';
 
 part 'action.g.dart';
 
-@JsonSerializable()
+@JsonSerializable(constructor: "_")
 class Action extends AtomicEntity {
-  Action({
+  /// Actions should never be created.
+  Action._({
     required this.id,
     required this.name,
     required this.actionProviderId,
@@ -40,7 +41,7 @@ class Action extends AtomicEntity {
   Map<String, dynamic> toJson() => _$ActionToJson(this);
 
   @override
-  Action clone() => Action(
+  Action clone() => Action._(
         id: id.clone(),
         name: name,
         actionProviderId: actionProviderId.clone(),
@@ -50,44 +51,23 @@ class Action extends AtomicEntity {
         deleted: deleted,
       );
 
+  /// Actions should never be created.
   @override
-  bool isValidBeforeSanitation() {
-    return validate(!deleted, 'Action: deleted is true') &&
-        validate(
-          name.length >= 2 && name.length <= 80,
-          'Action: name.length < 2 or > 80',
-        ) &&
-        validate(
-          createBefore > Duration.zero,
-          'Action: createBefore < 0',
-        ) &&
-        validate(
-          deleteAfter > Duration.zero,
-          'Action: deleteAfter < 0',
-        );
-  }
+  bool isValidBeforeSanitation() => true;
 
+  /// Actions should never be created.
   @override
-  bool isValid() {
-    return isValidBeforeSanitation() &&
-        validate(
-          description == null || description!.isNotEmpty,
-          'Action: description is empty but not null',
-        );
-  }
+  bool isValid() => true;
 
+  /// Actions should never be created.
   @override
-  void sanitize() {
-    if (description != null && description!.isEmpty) {
-      description = null;
-    }
-  }
+  void sanitize() {}
 }
 
 class DbActionSerializer extends DbSerializer<Action> {
   @override
   Action fromDbRecord(DbRecord r, {String prefix = ''}) {
-    return Action(
+    return Action._(
       id: Int64(r[prefix + Columns.id]! as int),
       name: r[prefix + Columns.name]! as String,
       actionProviderId: Int64(r[prefix + Columns.actionProviderId]! as int),

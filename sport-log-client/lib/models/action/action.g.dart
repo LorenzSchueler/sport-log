@@ -6,7 +6,7 @@ part of 'action.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-Action _$ActionFromJson(Map<String, dynamic> json) => Action(
+Action _$ActionFromJson(Map<String, dynamic> json) => Action._(
       id: const IdConverter().fromJson(json['id'] as String),
       name: json['name'] as String,
       actionProviderId:
