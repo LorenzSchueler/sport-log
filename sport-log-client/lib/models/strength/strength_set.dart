@@ -55,12 +55,13 @@ class StrengthSet extends AtomicEntity {
     return validate(!deleted, 'StrengthSet: deleted == true') &&
         validate(setNumber >= 0, 'StrengthSet: setNumber < 0') &&
         validate(count >= 1, 'StrengthSet: count < 1') &&
-        validate(weight == null || weight! > 0, 'StrengthSet: weight <= 0');
+        validate(weight == null || weight! >= 0, 'StrengthSet: weight < 0');
   }
 
   @override
   bool isValid() {
-    return isValidBeforeSanitation();
+    return isValidBeforeSanitation() &&
+        validate(weight == null || weight! > 0, 'StrengthSet: weight <= 0');
   }
 
   @override

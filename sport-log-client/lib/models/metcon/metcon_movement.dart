@@ -85,6 +85,19 @@ class MetconMovement extends AtomicEntity {
         validate(movementNumber >= 0, 'MetconMovement: movement number < 0') &&
         validate(count > 0, 'MetconMovement: count <= 0') &&
         validate(
+          maleWeight == null || maleWeight! >= 0,
+          'MetconMovement: maleWeight < 0',
+        ) &&
+        validate(
+          femaleWeight == null || femaleWeight! >= 0,
+          'MetconMovement: femaleWeight < 0',
+        );
+  }
+
+  @override
+  bool isValid() {
+    return isValidBeforeSanitation() &&
+        validate(
           maleWeight == null || maleWeight! > 0,
           'MetconMovement: maleWeight <= 0',
         ) &&
@@ -92,11 +105,6 @@ class MetconMovement extends AtomicEntity {
           femaleWeight == null || femaleWeight! > 0,
           'MetconMovement: femaleWeight <= 0',
         );
-  }
-
-  @override
-  bool isValid() {
-    return isValidBeforeSanitation();
   }
 
   @override

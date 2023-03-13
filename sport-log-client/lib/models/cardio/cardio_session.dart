@@ -297,12 +297,20 @@ class CardioSession extends AtomicEntity {
   bool isValidBeforeSanitation() {
     return validate(!deleted, 'CardioSession: deleted is true') &&
         validate(
+          distance == null || distance! >= 0,
+          'CardioSession: distance < 0',
+        ) &&
+        validate(
           ascent == null || ascent! >= 0,
           'CardioSession: ascent < 0',
         ) &&
         validate(
           descent == null || descent! >= 0,
           'CardioSession: descent < 0',
+        ) &&
+        validate(
+          time == null || time! >= Duration.zero,
+          'CardioSession: time < 0',
         ) &&
         validate(
           calories == null || calories! >= 0,
@@ -315,10 +323,6 @@ class CardioSession extends AtomicEntity {
         validate(
           avgHeartRate == null || avgHeartRate! >= 0,
           'CardioSession: avgHeartRate < 0',
-        ) &&
-        validate(
-          time == null || time! > Duration.zero,
-          'CardioSession: time <= 0',
         ) &&
         validate(
           track == null || track!.length <= 1 || distance != null,
@@ -342,16 +346,20 @@ class CardioSession extends AtomicEntity {
           'CardioSession: distance <= 0',
         ) &&
         validate(
+          time == null || time! > Duration.zero,
+          'CardioSession: time <= 0',
+        ) &&
+        validate(
+          track == null || track!.isNotEmpty,
+          'CardioSession: track is empty but not null',
+        ) &&
+        validate(
           avgCadence == null || avgCadence! > 0,
           'CardioSession: avgCadence <= 0',
         ) &&
         validate(
           avgHeartRate == null || avgHeartRate! > 0,
           'CardioSession: avgHeartRate <= 0',
-        ) &&
-        validate(
-          track == null || track!.isNotEmpty,
-          'CardioSession: track is empty but not null',
         ) &&
         validate(
           cadence == null || cadence!.isNotEmpty,
@@ -369,12 +377,12 @@ class CardioSession extends AtomicEntity {
 
   @override
   void sanitize() {
-    if (time != null && time! <= Duration.zero) {
-      time = null;
-    }
     if (distance != null && distance! <= 0) {
       distance = null;
       track = null;
+    }
+    if (time != null && time! <= Duration.zero) {
+      time = null;
     }
     if (track != null && track!.isEmpty) {
       track = null;

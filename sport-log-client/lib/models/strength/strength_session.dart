@@ -50,14 +50,18 @@ class StrengthSession extends AtomicEntity {
   bool isValidBeforeSanitation() {
     return validate(!deleted, 'StrengthSession: deleted == true') &&
         validate(
-          interval == null || interval! > Duration.zero,
-          'StrengthSession: interval <= 0',
+          interval == null || interval! >= Duration.zero,
+          'StrengthSession: interval < 0',
         );
   }
 
   @override
   bool isValid() {
     return isValidBeforeSanitation() &&
+        validate(
+          interval == null || interval! > Duration.zero,
+          'StrengthSession: interval <= 0',
+        ) &&
         validate(
           comments == null || comments!.isNotEmpty,
           'StrengthSession: comments are empty but not null',
@@ -66,6 +70,9 @@ class StrengthSession extends AtomicEntity {
 
   @override
   void sanitize() {
+    if (interval != null && interval! <= Duration.zero) {
+      interval = null;
+    }
     if (comments != null && comments!.isEmpty) {
       comments = null;
     }

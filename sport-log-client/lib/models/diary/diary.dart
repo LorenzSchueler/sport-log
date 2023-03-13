@@ -60,11 +60,12 @@ class Diary extends AtomicEntity {
   bool isValidBeforeSanitation() {
     return validate(!deleted, "Diary: deleted == true") &&
         validate(
-          bodyweight == null || bodyweight! > 0,
-          'Diary: bodyweight <= 0',
+          bodyweight == null || bodyweight! >= 0,
+          'Diary: bodyweight < 0',
         ) &&
         validate(
-          bodyweight != null || comments != null && comments!.isNotEmpty,
+          bodyweight != null && bodyweight! > 0 ||
+              comments != null && comments!.isNotEmpty,
           'Diary: bodyweight and comments are null',
         );
   }
@@ -73,11 +74,16 @@ class Diary extends AtomicEntity {
   bool isValid() {
     return isValidBeforeSanitation() &&
         validate(
+          bodyweight == null || bodyweight! > 0,
+          'Diary: bodyweight <= 0',
+        ) &&
+        validate(
           comments == null || comments!.isNotEmpty,
           'Diary: comments are empty but not null',
         ) &&
         validate(
-          bodyweight != null || comments != null,
+          bodyweight != null && bodyweight! > 0 ||
+              comments != null && comments!.isNotEmpty,
           'Diary: bodyweight and comments are null',
         );
   }
