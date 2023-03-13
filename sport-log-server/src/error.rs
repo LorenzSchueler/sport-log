@@ -55,7 +55,7 @@ impl From<TypedHeaderRejection> for HandlerError {
             TypedHeaderRejectionReason::Missing => HandlerError {
                 status: StatusCode::UNAUTHORIZED,
                 message: Some(ErrorMessage::Other {
-                    error: "authorization header missing".to_owned(),
+                    error: format!("header {} missing", rejection.name()),
                 }),
             },
             TypedHeaderRejectionReason::Error(error) => HandlerError {
@@ -67,7 +67,7 @@ impl From<TypedHeaderRejection> for HandlerError {
             _ => HandlerError {
                 status: StatusCode::BAD_REQUEST,
                 message: Some(ErrorMessage::Other {
-                    error: format!("header {} invalid", rejection.name(),),
+                    error: format!("header {} invalid", rejection.name()),
                 }),
             },
         }
