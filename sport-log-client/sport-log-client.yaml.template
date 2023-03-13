@@ -6,6 +6,7 @@ debug:
   output_request_json: true
   output_request_headers: true
   output_response_json: true
+  output_response_headers: true
   output_db_statement: true
 
 profile:
@@ -16,6 +17,7 @@ profile:
   # output_request_json: false
   # output_request_headers: false
   # output_response_json: false
+  # output_response_headers: false
   # output_db_statement: false
 
 release:
@@ -26,4 +28,5 @@ release:
   # output_request_json: false
   # output_request_headers: false
   # output_response_json: false
+  # output_response_headers: false
   # output_db_statement: false

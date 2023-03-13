@@ -20,6 +20,7 @@ Config _$ConfigFromJson(Map<String, dynamic> json) {
     outputRequestJson: json['output_request_json'] as bool? ?? false,
     outputRequestHeaders: json['output_request_headers'] as bool? ?? false,
     outputResponseJson: json['output_response_json'] as bool? ?? false,
+    outputResponseHeaders: json['output_response_headers'] as bool? ?? false,
     outputDbStatement: json['output_db_statement'] as bool? ?? false,
   );
 }
@@ -32,6 +33,7 @@ Map<String, dynamic> _$ConfigToJson(Config instance) => <String, dynamic>{
       'output_request_json': instance.outputRequestJson,
       'output_request_headers': instance.outputRequestHeaders,
       'output_response_json': instance.outputResponseJson,
+      'output_response_headers': instance.outputResponseHeaders,
       'output_db_statement': instance.outputDbStatement,
     };
 

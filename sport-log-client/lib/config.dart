@@ -21,6 +21,7 @@ class Config extends JsonSerializable {
     required this.outputRequestJson,
     required this.outputRequestHeaders,
     required this.outputResponseJson,
+    required this.outputResponseHeaders,
     required this.outputDbStatement,
   });
 
@@ -107,6 +108,8 @@ class Config extends JsonSerializable {
   final bool outputRequestHeaders;
   @JsonKey(defaultValue: false)
   final bool outputResponseJson;
+  @JsonKey(defaultValue: false)
+  final bool outputResponseHeaders;
   @JsonKey(defaultValue: false)
   final bool outputDbStatement;
   @JsonKey(includeFromJson: false)

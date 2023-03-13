@@ -311,25 +311,29 @@ mixin ApiLogging {
     dynamic json,
   ]) {
     final headersStr = Config.instance.outputRequestHeaders
-        ? "\n${headers.entries.map((e) => '${e.key}:${e.value}').join('\n')}"
+        ? "\n${headers.entries.map((e) => '${e.key}: ${e.value}').join('\n')}"
         : "";
-    json != null && Config.instance.outputRequestJson
-        ? logger.d(
-            'request: $httpMethod ${Settings.instance.serverUrl}$route$headersStr\n${_prettyJson(json)}',
-          )
-        : logger.d(
-            'request: $httpMethod ${Settings.instance.serverUrl}$route$headersStr',
-          );
+    final jsonStr = json != null && Config.instance.outputRequestJson
+        ? "\n\n${_prettyJson(json)}"
+        : "";
+    logger.d(
+      "request: $httpMethod ${Settings.instance.serverUrl}$route$headersStr$jsonStr",
+    );
   }
 
   void _logResponse(Response response) {
-    final body = utf8.decode(response.bodyBytes);
     final successful = response.statusCode >= 200 && response.statusCode < 300;
+    final headerStr = Config.instance.outputResponseHeaders
+        ? "\n${response.headers.entries.map((e) => "${e.key}: ${e.value}").join("\n")}"
+        : "";
+    final body = utf8.decode(response.bodyBytes);
+    final bodyStr =
+        body.isNotEmpty && (!successful || Config.instance.outputResponseJson)
+            ? '\n\n${_prettyJson(jsonDecode(body))}'
+            : "";
     logger.log(
       successful ? l.Level.debug : l.Level.error,
-      body.isNotEmpty && (!successful || Config.instance.outputResponseJson)
-          ? 'response: ${response.statusCode}\n${_prettyJson(jsonDecode(body))}'
-          : 'response: ${response.statusCode}',
+      'response: ${response.statusCode}$headerStr$bodyStr',
     );
   }
 }
