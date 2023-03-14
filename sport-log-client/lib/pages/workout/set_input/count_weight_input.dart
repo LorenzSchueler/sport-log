@@ -134,21 +134,19 @@ class _CountWeightInputState extends State<CountWeightInput> {
                   EditTile(
                     leading: null,
                     caption: "Distance Unit",
-                    child: SizedBox(
-                      height: 24,
-                      child: DropdownButtonHideUnderline(
-                        child: DropdownButton(
-                          value: _distanceUnit,
-                          items: DistanceUnit.values
-                              .map(
-                                (unit) => DropdownMenuItem(
-                                  value: unit,
-                                  child: Text(unit.name),
-                                ),
-                              )
-                              .toList(),
-                          onChanged: _setDistanceUnit,
-                        ),
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton(
+                        value: _distanceUnit,
+                        items: DistanceUnit.values
+                            .map(
+                              (unit) => DropdownMenuItem(
+                                value: unit,
+                                child: Text(unit.name),
+                              ),
+                            )
+                            .toList(),
+                        onChanged: _setDistanceUnit,
+                        isDense: true,
                       ),
                     ),
                   ),
@@ -168,23 +166,21 @@ class _CountWeightInputState extends State<CountWeightInput> {
                   EditTile(
                     leading: null,
                     caption: "Weight Unit",
-                    child: SizedBox(
-                      height: 24,
-                      child: DropdownButtonHideUnderline(
-                        child: DropdownButton(
-                          value: _weightUnit,
-                          items: const [
-                            DropdownMenuItem(
-                              value: "kg",
-                              child: Text("kg"),
-                            ),
-                            DropdownMenuItem(
-                              value: "lb",
-                              child: Text("lb"),
-                            ),
-                          ],
-                          onChanged: _setUnit,
-                        ),
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton(
+                        value: _weightUnit,
+                        items: const [
+                          DropdownMenuItem(
+                            value: "kg",
+                            child: Text("kg"),
+                          ),
+                          DropdownMenuItem(
+                            value: "lb",
+                            child: Text("lb"),
+                          ),
+                        ],
+                        onChanged: _setUnit,
+                        isDense: true,
                       ),
                     ),
                   ),
