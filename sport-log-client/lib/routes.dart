@@ -99,7 +99,7 @@ abstract class Routes {
     BuildContext context,
     Widget Function() builder,
   ) {
-    return Settings.instance.userExists()
+    return Settings.instance.userId != null
         ? Config.isAndroid || Config.isIOS
             ? builder()
             : const PlatformNotSupportedPage()

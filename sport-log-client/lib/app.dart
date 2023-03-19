@@ -19,10 +19,11 @@ class App extends StatelessWidget {
   Widget build(BuildContext context) {
     return KeyboardDismissOnTap(
       child: Selector<Settings, bool>(
-        selector: (_, settings) => settings.userExists(),
-        builder: (context, userExists, _) => MaterialApp(
+        // userId is set after the user has registered/ logged in/ chosen to use without account.
+        selector: (_, settings) => settings.userId != null,
+        builder: (context, userIdSet, _) => MaterialApp(
           routes: Routes.all,
-          initialRoute: userExists ? Routes.timelineOverview : Routes.landing,
+          initialRoute: userIdSet ? Routes.timelineOverview : Routes.landing,
           navigatorKey: navigatorKey,
           debugShowCheckedModeBanner: false,
           theme: AppTheme.lightTheme,

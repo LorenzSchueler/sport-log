@@ -34,23 +34,21 @@ class Sync extends ChangeNotifier {
       _logger.i('Removing last sync...');
       await Settings.instance.setLastSync(null);
     }
-    if (Settings.instance.userExists()) {
-      await startSync();
-    }
+    await startSync();
   }
 
   // ignore: long-method
   Future<bool> sync({VoidCallback? onNoInternet}) async {
+    if (!Settings.instance.userExists()) {
+      _logger.d('Sync cannot run: no user');
+      return false;
+    }
     if (!Settings.instance.syncEnabled) {
-      _logger.i("sync disabled");
+      _logger.i("Sync cannot run: sync disabled");
       return false;
     }
     if (_isSyncing) {
       _logger.d('Sync job already running');
-      return false;
-    }
-    if (!Settings.instance.userExists()) {
-      _logger.d('Sync cannot be run: no user');
       return false;
     }
 
@@ -106,9 +104,12 @@ class Sync extends ChangeNotifier {
   }
 
   Future<void> startSync() async {
-    assert(Settings.instance.userExists());
+    if (!Settings.instance.userExists()) {
+      _logger.i('Sync cannot run: no user');
+      return;
+    }
     if (!Settings.instance.syncEnabled) {
-      _logger.i("sync disabled.");
+      _logger.i("Sync cannot run: sync disabled");
       return;
     }
     if (_syncTimer != null && _syncTimer!.isActive) {
