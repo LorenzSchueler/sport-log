@@ -43,9 +43,6 @@ class _LoginPageState extends State<LoginPage> {
 
   bool _loginPending = false;
 
-  late final TextEditingController _serverUrlInputController =
-      TextEditingController(text: _serverUrl);
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -90,22 +87,22 @@ class _LoginPageState extends State<LoginPage> {
 
   Widget _serverUrlInput(BuildContext context) {
     return TextFormField(
+      // use new initialValue if url changed
+      key: ValueKey(_serverUrl),
+      initialValue: _serverUrl,
       onChanged: (serverUrl) {
         final validated = Validator.validateUrl(serverUrl);
         if (validated == null) {
           setState(() => _serverUrl = serverUrl);
         }
       },
-      controller: _serverUrlInputController,
       decoration: Theme.of(context).textFormFieldDecoration.copyWith(
             icon: const Icon(AppIcons.cloudUpload),
             labelText: "Server URL",
             suffixIcon: IconButton(
-              onPressed: () async {
-                final url =
-                    await context.read<Settings>().setDefaultServerUrl();
+              onPressed: () {
                 setState(() {
-                  _serverUrlInputController.text = url;
+                  _serverUrl = context.read<Settings>().getDefaultServerUrl();
                 });
               },
               icon: const Icon(AppIcons.restore),

@@ -103,13 +103,11 @@ class Settings extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<String> setDefaultServerUrl() async {
-    final url = Config.instance.isAndroidEmulator
-        ? Defaults.server.emulatorUrl
-        : Config.instance.serverAddress;
-    await _put(_serverUrl, url);
-    return url;
-  }
+  String getDefaultServerUrl() => Config.instance.isAndroidEmulator
+      ? Defaults.server.emulatorUrl
+      : Config.instance.serverAddress;
+
+  Future<void> setDefaultServerUrl() => _put(_serverUrl, getDefaultServerUrl());
 
   bool _contains(String key) => _storage!.containsKey(key);
 
