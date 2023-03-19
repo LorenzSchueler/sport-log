@@ -221,10 +221,16 @@ class SettingsPage extends StatelessWidget {
                     ),
                   ),
                   TextFormField(
+                    // use new initialValue if url changed
+                    key: ValueKey(settings.serverUrl),
                     decoration:
                         Theme.of(context).textFormFieldDecoration.copyWith(
                               icon: const Icon(AppIcons.cloudUpload),
                               labelText: "Server URL",
+                              suffixIcon: IconButton(
+                                onPressed: settings.setDefaultServerUrl,
+                                icon: const Icon(AppIcons.restore),
+                              ),
                             ),
                     initialValue: settings.serverUrl,
                     validator: Validator.validateUrl,
@@ -254,7 +260,8 @@ class SettingsPage extends StatelessWidget {
                 if (settings.accountCreated) ...[
                   const CaptionTile(caption: "Account"),
                   TextFormField(
-                    key: UniqueKey(),
+                    // use new initialValue if username changed
+                    key: ValueKey(settings.username),
                     decoration:
                         Theme.of(context).textFormFieldDecoration.copyWith(
                               icon: const Icon(AppIcons.account),
@@ -270,7 +277,8 @@ class SettingsPage extends StatelessWidget {
                     create: (_) => BoolToggle.on(),
                     builder: (context, obscure, _) {
                       return TextFormField(
-                        key: UniqueKey(),
+                        // use new initialValue if password changed
+                        key: ValueKey(settings.password),
                         decoration:
                             Theme.of(context).textFormFieldDecoration.copyWith(
                                   icon: const Icon(AppIcons.key),
@@ -292,7 +300,8 @@ class SettingsPage extends StatelessWidget {
                     },
                   ),
                   TextFormField(
-                    key: UniqueKey(),
+                    // use new initialValue if email changed
+                    key: ValueKey(settings.email),
                     decoration:
                         Theme.of(context).textFormFieldDecoration.copyWith(
                               icon: const Icon(AppIcons.email),

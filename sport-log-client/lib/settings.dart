@@ -107,7 +107,7 @@ class Settings extends ChangeNotifier {
     final url = Config.instance.isAndroidEmulator
         ? Defaults.server.emulatorUrl
         : Config.instance.serverAddress;
-    await _storage!.put(_serverUrl, url);
+    await _put(_serverUrl, url);
     return url;
   }
 
