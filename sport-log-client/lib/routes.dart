@@ -95,7 +95,7 @@ abstract class Routes {
     return Settings.instance.userId != null ? builder() : const LandingPage();
   }
 
-  static Widget _checkUserIdLoginAndroidIos(
+  static Widget _checkUserIdAndroidIos(
     BuildContext context,
     Widget Function() builder,
   ) {
@@ -107,7 +107,7 @@ abstract class Routes {
   }
 
   static Widget _checkNotUserId(Widget Function() builder) {
-    return Settings.instance.userId == null ? TimelinePage() : builder();
+    return Settings.instance.userId == null ? builder() : TimelinePage();
   }
 
   static final Map<String, Widget Function(BuildContext)> _routeList = {
@@ -118,11 +118,11 @@ abstract class Routes {
         _checkNotUserId(() => const LoginPage(loginType: LoginType.register)),
     Routes.timer: (_) => _checkUserId(() => const TimerPage()),
     Routes.map: (context) =>
-        _checkUserIdLoginAndroidIos(context, () => const MapPage()),
+        _checkUserIdAndroidIos(context, () => const MapPage()),
     Routes.offlineMaps: (context) =>
-        _checkUserIdLoginAndroidIos(context, () => const OfflineMapsPage()),
+        _checkUserIdAndroidIos(context, () => const OfflineMapsPage()),
     Routes.heartRate: (context) =>
-        _checkUserIdLoginAndroidIos(context, () => const HeartRatePage()),
+        _checkUserIdAndroidIos(context, () => const HeartRatePage()),
     Routes.settings: (_) => _checkUserId(() => const SettingsPage()),
     Routes.about: (_) => _checkUserId(() => const AboutPage()),
     // platform & ap
@@ -279,11 +279,11 @@ abstract class Routes {
             cardioSessionDescription: cardioSessionDescription,
           );
         }),
-    Routes.trackingSettings: (context) => _checkUserIdLoginAndroidIos(
+    Routes.trackingSettings: (context) => _checkUserIdAndroidIos(
           context,
           () => const CardioTrackingSettingsPage(),
         ),
-    Routes.tracking: (context) => _checkUserIdLoginAndroidIos(context, () {
+    Routes.tracking: (context) => _checkUserIdAndroidIos(context, () {
           final args =
               ModalRoute.of(context)!.settings.arguments! as List<dynamic>;
           return CardioTrackingPage(
