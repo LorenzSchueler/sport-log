@@ -46,7 +46,6 @@ abstract class Routes {
   static const landing = '/landing';
   static const login = '/login';
   static const registration = '/register';
-  static const noAccount = '/no_account';
   static const timer = "/timer";
   static const map = "/map";
   static const offlineMaps = "/offline_maps";
@@ -91,11 +90,12 @@ abstract class Routes {
   static const String diaryOverview = '/diary/overview';
   static const String diaryEdit = '/diary/edit';
 
-  static Widget _checkLogin(Widget Function() builder) {
-    return Settings.instance.userExists() ? builder() : const LandingPage();
+  /// userId is set after the user has registered/ logged in/ chosen to use without account.
+  static Widget _checkUserId(Widget Function() builder) {
+    return Settings.instance.userId != null ? builder() : const LandingPage();
   }
 
-  static Widget _checkLoginAndroidIos(
+  static Widget _checkUserIdLoginAndroidIos(
     BuildContext context,
     Widget Function() builder,
   ) {
@@ -106,36 +106,34 @@ abstract class Routes {
         : const LandingPage();
   }
 
-  static Widget _checkNotLogin(Widget Function() builder) {
-    return Settings.instance.userExists() ? TimelinePage() : builder();
+  static Widget _checkNotUserId(Widget Function() builder) {
+    return Settings.instance.userId == null ? TimelinePage() : builder();
   }
 
   static final Map<String, Widget Function(BuildContext)> _routeList = {
-    Routes.landing: (_) => _checkNotLogin(() => const LandingPage()),
+    Routes.landing: (_) => _checkNotUserId(() => const LandingPage()),
     Routes.login: (_) =>
-        _checkNotLogin(() => const LoginPage(loginType: LoginType.login)),
+        _checkNotUserId(() => const LoginPage(loginType: LoginType.login)),
     Routes.registration: (_) =>
-        _checkNotLogin(() => const LoginPage(loginType: LoginType.register)),
-    Routes.noAccount: (_) =>
-        _checkNotLogin(() => const LoginPage(loginType: LoginType.noAccount)),
-    Routes.timer: (_) => _checkLogin(() => const TimerPage()),
+        _checkNotUserId(() => const LoginPage(loginType: LoginType.register)),
+    Routes.timer: (_) => _checkUserId(() => const TimerPage()),
     Routes.map: (context) =>
-        _checkLoginAndroidIos(context, () => const MapPage()),
+        _checkUserIdLoginAndroidIos(context, () => const MapPage()),
     Routes.offlineMaps: (context) =>
-        _checkLoginAndroidIos(context, () => const OfflineMapsPage()),
+        _checkUserIdLoginAndroidIos(context, () => const OfflineMapsPage()),
     Routes.heartRate: (context) =>
-        _checkLoginAndroidIos(context, () => const HeartRatePage()),
-    Routes.settings: (_) => _checkLogin(() => const SettingsPage()),
-    Routes.about: (_) => _checkLogin(() => const AboutPage()),
+        _checkUserIdLoginAndroidIos(context, () => const HeartRatePage()),
+    Routes.settings: (_) => _checkUserId(() => const SettingsPage()),
+    Routes.about: (_) => _checkUserId(() => const AboutPage()),
     // platform & ap
     Routes.platformOverview: (_) =>
-        _checkLogin(() => const PlatformOverviewPage()),
-    Routes.actionProviderOverview: (context) => _checkLogin(() {
+        _checkUserId(() => const PlatformOverviewPage()),
+    Routes.actionProviderOverview: (context) => _checkUserId(() {
           final actionProvider =
               ModalRoute.of(context)!.settings.arguments! as ActionProvider;
           return ActionProviderOverviewPage(actionProvider: actionProvider);
         }),
-    Routes.actionRuleEdit: (context) => _checkLogin(() {
+    Routes.actionRuleEdit: (context) => _checkUserId(() {
           final args =
               ModalRoute.of(context)!.settings.arguments! as List<dynamic>;
           return ActionRuleEditPage(
@@ -143,7 +141,7 @@ abstract class Routes {
             actionRule: args[1] as ActionRule?,
           );
         }),
-    Routes.actionEventEdit: (context) => _checkLogin(() {
+    Routes.actionEventEdit: (context) => _checkUserId(() {
           final args =
               ModalRoute.of(context)!.settings.arguments! as List<dynamic>;
           return ActionEventEditPage(
@@ -152,8 +150,8 @@ abstract class Routes {
           );
         }),
     // movement
-    Routes.movementOverview: (_) => _checkLogin(MovementsPage.new),
-    Routes.movementEdit: (context) => _checkLogin(() {
+    Routes.movementOverview: (_) => _checkUserId(MovementsPage.new),
+    Routes.movementEdit: (context) => _checkUserId(() {
           final arg = ModalRoute.of(context)?.settings.arguments;
           if (arg is MovementDescription) {
             return MovementEditPage(movementDescription: arg);
@@ -163,10 +161,10 @@ abstract class Routes {
           return const MovementEditPage(movementDescription: null);
         }),
     // timeline
-    Routes.timelineOverview: (_) => _checkLogin(TimelinePage.new),
+    Routes.timelineOverview: (_) => _checkUserId(TimelinePage.new),
     // strength
-    Routes.strengthOverview: (_) => _checkLogin(StrengthSessionsPage.new),
-    Routes.strengthDetails: (context) => _checkLogin(() {
+    Routes.strengthOverview: (_) => _checkUserId(StrengthSessionsPage.new),
+    Routes.strengthDetails: (context) => _checkUserId(() {
           final strengthSessionDescription = ModalRoute.of(context)!
               .settings
               .arguments! as StrengthSessionDescription;
@@ -174,7 +172,7 @@ abstract class Routes {
             strengthSessionDescription: strengthSessionDescription,
           );
         }),
-    Routes.strengthEdit: (context) => _checkLogin(() {
+    Routes.strengthEdit: (context) => _checkUserId(() {
           var isNew = false;
           var arg = ModalRoute.of(context)?.settings.arguments
               as StrengthSessionDescription?;
@@ -190,20 +188,20 @@ abstract class Routes {
                 );
         }),
     // metcon
-    Routes.metconOverview: (_) => _checkLogin(MetconsPage.new),
-    Routes.metconDetails: (context) => _checkLogin(() {
+    Routes.metconOverview: (_) => _checkUserId(MetconsPage.new),
+    Routes.metconDetails: (context) => _checkUserId(() {
           final metconDescription =
               ModalRoute.of(context)!.settings.arguments! as MetconDescription;
           return MetconDetailsPage(metconDescription: metconDescription);
         }),
-    Routes.metconEdit: (context) => _checkLogin(() {
+    Routes.metconEdit: (context) => _checkUserId(() {
           final metconDescription =
               ModalRoute.of(context)?.settings.arguments as MetconDescription?;
           return MetconEditPage(metconDescription: metconDescription);
         }),
     // metcon session
-    Routes.metconSessionOverview: (_) => _checkLogin(MetconSessionsPage.new),
-    Routes.metconSessionDetails: (context) => _checkLogin(() {
+    Routes.metconSessionOverview: (_) => _checkUserId(MetconSessionsPage.new),
+    Routes.metconSessionDetails: (context) => _checkUserId(() {
           final metconSessionDescription = ModalRoute.of(context)!
               .settings
               .arguments! as MetconSessionDescription;
@@ -211,7 +209,7 @@ abstract class Routes {
             metconSessionDescription: metconSessionDescription,
           );
         }),
-    Routes.metconSessionEdit: (context) => _checkLogin(() {
+    Routes.metconSessionEdit: (context) => _checkUserId(() {
           final arg = ModalRoute.of(context)?.settings.arguments;
           final bool isNew;
           final MetconSessionDescription? metconSessionDescription;
@@ -235,21 +233,21 @@ abstract class Routes {
                 );
         }),
     // route
-    Routes.routeOverview: (_) => _checkLogin(RoutePage.new),
-    Routes.routeDetails: (context) => _checkLogin(() {
+    Routes.routeOverview: (_) => _checkUserId(RoutePage.new),
+    Routes.routeDetails: (context) => _checkUserId(() {
           final route = ModalRoute.of(context)!.settings.arguments! as Route;
           return RouteDetailsPage(route: route);
         }),
-    Routes.routeEdit: (context) => _checkLogin(() {
+    Routes.routeEdit: (context) => _checkUserId(() {
           final route = ModalRoute.of(context)?.settings.arguments as Route?;
           return RouteEditPage(
             route: route,
           );
         }),
-    Routes.routeUpload: (_) => _checkLogin(() => const RouteUploadPage()),
+    Routes.routeUpload: (_) => _checkUserId(() => const RouteUploadPage()),
     // cardio
-    Routes.cardioOverview: (_) => _checkLogin(CardioSessionsPage.new),
-    Routes.cardioDetails: (context) => _checkLogin(() {
+    Routes.cardioOverview: (_) => _checkUserId(CardioSessionsPage.new),
+    Routes.cardioDetails: (context) => _checkUserId(() {
           final cardioSessionDescription = ModalRoute.of(context)!
               .settings
               .arguments! as CardioSessionDescription;
@@ -257,7 +255,7 @@ abstract class Routes {
             cardioSessionDescription: cardioSessionDescription,
           );
         }),
-    Routes.cardioEdit: (context) => _checkLogin(() {
+    Routes.cardioEdit: (context) => _checkUserId(() {
           var isNew = false;
           var cardioSessionDescription = ModalRoute.of(context)
               ?.settings
@@ -273,7 +271,7 @@ abstract class Routes {
                   isNew: isNew,
                 );
         }),
-    Routes.cardioCut: (context) => _checkLogin(() {
+    Routes.cardioCut: (context) => _checkUserId(() {
           final cardioSessionDescription = ModalRoute.of(context)!
               .settings
               .arguments! as CardioSessionDescription;
@@ -281,11 +279,11 @@ abstract class Routes {
             cardioSessionDescription: cardioSessionDescription,
           );
         }),
-    Routes.trackingSettings: (context) => _checkLoginAndroidIos(
+    Routes.trackingSettings: (context) => _checkUserIdLoginAndroidIos(
           context,
           () => const CardioTrackingSettingsPage(),
         ),
-    Routes.tracking: (context) => _checkLoginAndroidIos(context, () {
+    Routes.tracking: (context) => _checkUserIdLoginAndroidIos(context, () {
           final args =
               ModalRoute.of(context)!.settings.arguments! as List<dynamic>;
           return CardioTrackingPage(
@@ -296,8 +294,8 @@ abstract class Routes {
           );
         }),
     // diary
-    Routes.diaryOverview: (_) => _checkLogin(DiaryPage.new),
-    Routes.diaryEdit: (context) => _checkLogin(() {
+    Routes.diaryOverview: (_) => _checkUserId(DiaryPage.new),
+    Routes.diaryEdit: (context) => _checkUserId(() {
           final diary = ModalRoute.of(context)?.settings.arguments as Diary?;
           return DiaryEditPage(diary: diary);
         })

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sport_log/defaults.dart';
+import 'package:sport_log/helpers/account.dart';
+import 'package:sport_log/helpers/extensions/navigator_extension.dart';
 import 'package:sport_log/pages/login/welcome_screen.dart';
 import 'package:sport_log/routes.dart';
 
@@ -35,7 +37,8 @@ class LandingPage extends StatelessWidget {
           ),
           ElevatedButton(
             onPressed: () {
-              Navigator.pushNamed(context, Routes.noAccount);
+              Account.noAccount();
+              Navigator.of(context).newBase(Routes.timelineOverview);
             },
             style: ButtonStyle(
               backgroundColor: MaterialStateProperty.all(

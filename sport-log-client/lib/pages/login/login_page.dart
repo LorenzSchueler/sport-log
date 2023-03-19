@@ -14,12 +14,10 @@ import 'package:sport_log/widgets/dialogs/dialogs.dart';
 
 enum LoginType {
   login,
-  register,
-  noAccount;
+  register;
 
   bool get isLogin => this == LoginType.login;
   bool get isRegister => this == LoginType.register;
-  bool get isNoAccount => this == LoginType.noAccount;
 }
 
 class LoginPage extends StatefulWidget {
@@ -62,15 +60,13 @@ class _LoginPageState extends State<LoginPage> {
             child: ListView(
               shrinkWrap: true,
               children: [
-                if (!widget.loginType.isNoAccount) ...[
-                  _serverUrlInput(context),
-                  Defaults.sizedBox.vertical.normal,
-                ],
+                _serverUrlInput(context),
+                Defaults.sizedBox.vertical.normal,
                 _usernameInput(context),
                 Defaults.sizedBox.vertical.normal,
                 _passwordInput(context),
                 Defaults.sizedBox.vertical.normal,
-                if (!widget.loginType.isLogin) ...[
+                if (widget.loginType.isRegister) ...[
                   _passwordInput2(context),
                   Defaults.sizedBox.vertical.normal,
                   _emailInput(context),
@@ -225,17 +221,12 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> _submit(BuildContext context) async {
-    if (widget.loginType.isNoAccount) {
-      await Account.noAccount();
-      await Navigator.of(context).newBase(Routes.timelineOverview);
-      return;
-    }
     setState(() => _loginPending = true);
     final result = widget.loginType.isRegister
         ? await Account.register(_serverUrl, _user)
         : await Account.login(_serverUrl, _user.username, _user.password);
     if (mounted) {
-      setState(() => _loginPending = true);
+      setState(() => _loginPending = false);
       if (result.isSuccess) {
         await Navigator.of(context).newBase(Routes.timelineOverview);
       } else {

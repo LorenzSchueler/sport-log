@@ -23,20 +23,28 @@ class Account {
 
   static Future<void> noAccount() async {
     await Settings.instance.setUserId(randomId());
+    // keep username, password and email as is
     await Settings.instance.setAccountCreated(false);
     await Settings.instance.setDefaultServerUrl();
     await Settings.instance.setSyncEnabled(false);
+    // keep syncInterval as is
+    await Settings.instance.setLastSync(null);
   }
 
-  static Future<ApiResult<User>> register(String serverUrl, User user) async {
+  static Future<ApiResult<void>> register(String serverUrl, User user) async {
     await Settings.instance.setServerUrl(serverUrl);
     final result = await Api.user.postSingle(user);
     if (result.isSuccess) {
       await Settings.instance.setUser(user);
       await Settings.instance.setAccountCreated(true);
+      // serverUrl already set
+      await Settings.instance.setSyncEnabled(true);
+      // keep syncInterval as is
+
       await Sync.instance.startSync();
-      return Success(user);
+      return Success(null);
     } else {
+      // keep new serverUrl
       return Failure(result.failure);
     }
   }
@@ -52,9 +60,14 @@ class Account {
       final user = result.success;
       await Settings.instance.setUser(user);
       await Settings.instance.setAccountCreated(true);
+      // serverUrl already set
+      await Settings.instance.setSyncEnabled(true);
+      // keep syncInterval as is
+
       await Sync.instance.startSync();
       return Success(user);
     } else {
+      // keep new serverUrl
       return Failure(result.failure);
     }
   }
@@ -66,6 +79,7 @@ class Account {
   }) async {
     final user = Settings.instance.user!;
     if (username == null && password == null && email == null) {
+      // nothing to change
       return Success(user);
     }
     if (username != null) {
@@ -87,18 +101,23 @@ class Account {
   }
 
   static Future<void> updateUserFromDownSync(User user) async {
-    // preserve password because User from server only contains password hash
+    // preserve password because user from server only contains password hash
     user.password = Settings.instance.password!;
     await Settings.instance.setUser(user);
   }
 
   static Future<void> logout() async {
     Sync.instance.stopSync();
-    await Settings.instance.setAccountCreated(false);
-    await Settings.instance.setLastSync(null);
     await Settings.instance.setUser(null);
+    await Settings.instance.setAccountCreated(false);
+    // keep serverUrl as is
+    await Settings.instance.setSyncEnabled(false);
+    // keep syncInterval as is
+    await Settings.instance.setLastSync(null);
+
     Movement.defaultMovement = null;
     MetconDescription.defaultMetconDescription = null;
+
     await AppDatabase.reset();
   }
 
@@ -106,11 +125,16 @@ class Account {
     Sync.instance.stopSync();
     final result = await Api.user.deleteSingle();
     if (result.isSuccess) {
-      await Settings.instance.setAccountCreated(false);
-      await Settings.instance.setLastSync(null);
       await Settings.instance.setUser(null);
+      await Settings.instance.setAccountCreated(false);
+      // keep serverUrl as is
+      await Settings.instance.setSyncEnabled(false);
+      // keep syncInterval as is
+      await Settings.instance.setLastSync(null);
+
       Movement.defaultMovement = null;
       MetconDescription.defaultMetconDescription = null;
+
       await AppDatabase.reset();
       return Success(null);
     } else {
@@ -119,7 +143,7 @@ class Account {
   }
 
   static Future<ApiResult<void>> newInitSync() async {
-    // check if current User is able to login
+    // check if current user is able to login
     final result = await Api.user
         .getSingle(Settings.instance.username!, Settings.instance.password!);
     if (result.isFailure) {
@@ -127,9 +151,12 @@ class Account {
     }
 
     Sync.instance.stopSync();
+
     await Settings.instance.setLastSync(null);
+
     Movement.defaultMovement = null;
     MetconDescription.defaultMetconDescription = null;
+
     await AppDatabase.reset();
 
     await Sync.instance.startSync();

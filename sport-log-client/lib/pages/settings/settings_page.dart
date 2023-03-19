@@ -42,28 +42,6 @@ class SettingsPage extends StatelessWidget {
     }
   }
 
-  Future<void> _createAccount(BuildContext context) async {
-    final settings = context.read<Settings>()
-      ..setAccountCreated(true)
-      ..setSyncEnabled(true);
-    final result = await Account.register(
-      settings.serverUrl,
-      settings.user!,
-    );
-    if (result.isFailure) {
-      settings
-        ..setAccountCreated(false)
-        ..setSyncEnabled(false);
-      if (context.mounted) {
-        await showMessageDialog(
-          context: context,
-          title: "An Error occurred:",
-          text: result.failure.toString(),
-        );
-      }
-    }
-  }
-
   Future<void> _setServerUrl(BuildContext context, String serverUrl) async {
     final validated = Validator.validateUrl(serverUrl);
     if (validated == null) {
@@ -206,41 +184,56 @@ class SettingsPage extends StatelessWidget {
               children: [
                 const CaptionTile(caption: "Server Settings"),
                 Defaults.sizedBox.vertical.small,
-                EditTile(
-                  caption: "Server Synchronization",
-                  leading: AppIcons.sync,
-                  child: settings.accountCreated
-                      ? SizedBox(
-                          height: 29, // make it fit into EditTile
-                          width: 34, // remove left padding
-                          child: Switch(
-                            value: settings.syncEnabled,
-                            onChanged: (enabled) =>
-                                _setSyncEnabled(context, enabled),
+                if (!settings.accountCreated)
+                  TextTile(
+                    leading: AppIcons.sync,
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: () =>
+                                Navigator.of(context).pushNamed(Routes.login),
+                            child: const Text('Login'),
                           ),
-                        )
-                      : ElevatedButton(
-                          style: ButtonStyle(
-                            backgroundColor: MaterialStateProperty.all(
-                              Theme.of(context).colorScheme.errorContainer,
-                            ),
-                          ),
-                          onPressed: () => _createAccount(context),
-                          child: const Text('Create Account'),
                         ),
-                ),
-                TextFormField(
-                  decoration:
-                      Theme.of(context).textFormFieldDecoration.copyWith(
-                            icon: const Icon(AppIcons.cloudUpload),
-                            labelText: "Server URL",
+                        Defaults.sizedBox.horizontal.normal,
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: () => Navigator.of(context)
+                                .pushNamed(Routes.registration),
+                            child: const Text('Register'),
                           ),
-                  initialValue: settings.serverUrl,
-                  validator: Validator.validateUrl,
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                  onFieldSubmitted: (serverUrl) =>
-                      _setServerUrl(context, serverUrl),
-                ),
+                        ),
+                      ],
+                    ),
+                  ),
+                if (settings.accountCreated) ...[
+                  EditTile(
+                    caption: "Server Synchronization",
+                    leading: AppIcons.sync,
+                    child: SizedBox(
+                      height: 29, // make it fit into EditTile
+                      width: 34, // remove left padding
+                      child: Switch(
+                        value: settings.syncEnabled,
+                        onChanged: (enabled) =>
+                            _setSyncEnabled(context, enabled),
+                      ),
+                    ),
+                  ),
+                  TextFormField(
+                    decoration:
+                        Theme.of(context).textFormFieldDecoration.copyWith(
+                              icon: const Icon(AppIcons.cloudUpload),
+                              labelText: "Server URL",
+                            ),
+                    initialValue: settings.serverUrl,
+                    validator: Validator.validateUrl,
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    onFieldSubmitted: (serverUrl) =>
+                        _setServerUrl(context, serverUrl),
+                  ),
+                ],
                 if (settings.syncEnabled)
                   EditTile(
                     leading: AppIcons.timeInterval,
@@ -259,93 +252,82 @@ class SettingsPage extends StatelessWidget {
                   ),
                 Defaults.sizedBox.vertical.small,
                 const Divider(),
-                const CaptionTile(caption: "Account"),
-                TextFormField(
-                  key: UniqueKey(),
-                  decoration:
-                      Theme.of(context).textFormFieldDecoration.copyWith(
-                            icon: const Icon(AppIcons.account),
-                            labelText: "Username",
-                          ),
-                  initialValue: settings.username,
-                  validator: Validator.validateUsername,
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                  onFieldSubmitted: (username) =>
-                      _setUsername(context, username),
-                ),
-                ProviderConsumer(
-                  create: (_) => BoolToggle.on(),
-                  builder: (context, obscure, _) {
-                    return TextFormField(
-                      key: UniqueKey(),
-                      decoration:
-                          Theme.of(context).textFormFieldDecoration.copyWith(
-                                icon: const Icon(AppIcons.key),
-                                labelText: "Password",
-                                suffixIcon: IconButton(
-                                  icon: obscure.isOn
-                                      ? const Icon(AppIcons.visibility)
-                                      : const Icon(AppIcons.visibilityOff),
-                                  onPressed: obscure.toggle,
-                                ),
-                              ),
-                      obscureText: obscure.isOn,
-                      initialValue: settings.password,
-                      validator: Validator.validatePassword,
-                      autovalidateMode: AutovalidateMode.onUserInteraction,
-                      onFieldSubmitted: (password) =>
-                          _setPassword(context, password),
-                    );
-                  },
-                ),
-                TextFormField(
-                  key: UniqueKey(),
-                  decoration:
-                      Theme.of(context).textFormFieldDecoration.copyWith(
-                            icon: const Icon(AppIcons.email),
-                            labelText: "Email",
-                          ),
-                  initialValue: settings.email,
-                  validator: Validator.validateEmail,
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                  keyboardType: TextInputType.emailAddress,
-                  onFieldSubmitted: (email) => _setEmail(context, email),
-                ),
-                Consumer<Sync>(
-                  builder: (context, sync, _) => TextTile(
-                    leading: AppIcons.logout,
-                    child: Row(
-                      children: [
-                        if (settings.accountCreated) ...[
-                          Expanded(
-                            child: ElevatedButton(
-                              style: ButtonStyle(
-                                backgroundColor: MaterialStateProperty.all(
-                                  Theme.of(context).colorScheme.errorContainer,
-                                ),
-                              ),
-                              onPressed: sync.isSyncing
-                                  ? null
-                                  : () => _initSync(context),
-                              child: const Text('Init Sync'),
+                if (settings.accountCreated) ...[
+                  const CaptionTile(caption: "Account"),
+                  TextFormField(
+                    key: UniqueKey(),
+                    decoration:
+                        Theme.of(context).textFormFieldDecoration.copyWith(
+                              icon: const Icon(AppIcons.account),
+                              labelText: "Username",
                             ),
-                          ),
-                          Defaults.sizedBox.horizontal.normal,
-                        ],
-                        Expanded(
-                          child: ElevatedButton(
-                            style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.all(
-                                Theme.of(context).colorScheme.error,
+                    initialValue: settings.username,
+                    validator: Validator.validateUsername,
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    onFieldSubmitted: (username) =>
+                        _setUsername(context, username),
+                  ),
+                  ProviderConsumer(
+                    create: (_) => BoolToggle.on(),
+                    builder: (context, obscure, _) {
+                      return TextFormField(
+                        key: UniqueKey(),
+                        decoration:
+                            Theme.of(context).textFormFieldDecoration.copyWith(
+                                  icon: const Icon(AppIcons.key),
+                                  labelText: "Password",
+                                  suffixIcon: IconButton(
+                                    icon: obscure.isOn
+                                        ? const Icon(AppIcons.visibility)
+                                        : const Icon(AppIcons.visibilityOff),
+                                    onPressed: obscure.toggle,
+                                  ),
+                                ),
+                        obscureText: obscure.isOn,
+                        initialValue: settings.password,
+                        validator: Validator.validatePassword,
+                        autovalidateMode: AutovalidateMode.onUserInteraction,
+                        onFieldSubmitted: (password) =>
+                            _setPassword(context, password),
+                      );
+                    },
+                  ),
+                  TextFormField(
+                    key: UniqueKey(),
+                    decoration:
+                        Theme.of(context).textFormFieldDecoration.copyWith(
+                              icon: const Icon(AppIcons.email),
+                              labelText: "Email",
+                            ),
+                    initialValue: settings.email,
+                    validator: Validator.validateEmail,
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    keyboardType: TextInputType.emailAddress,
+                    onFieldSubmitted: (email) => _setEmail(context, email),
+                  ),
+                  Consumer<Sync>(
+                    builder: (context, sync, _) => TextTile(
+                      leading: AppIcons.logout,
+                      child: Row(
+                        children: [
+                          if (settings.accountCreated) ...[
+                            Expanded(
+                              child: ElevatedButton(
+                                style: ButtonStyle(
+                                  backgroundColor: MaterialStateProperty.all(
+                                    Theme.of(context)
+                                        .colorScheme
+                                        .errorContainer,
+                                  ),
+                                ),
+                                onPressed: sync.isSyncing
+                                    ? null
+                                    : () => _initSync(context),
+                                child: const Text('Init Sync'),
                               ),
                             ),
-                            onPressed:
-                                sync.isSyncing ? null : () => _logout(context),
-                            child: const Text('Logout'),
-                          ),
-                        ),
-                        if (settings.accountCreated) ...[
-                          Defaults.sizedBox.horizontal.normal,
+                            Defaults.sizedBox.horizontal.normal,
+                          ],
                           Expanded(
                             child: ElevatedButton(
                               style: ButtonStyle(
@@ -355,17 +337,33 @@ class SettingsPage extends StatelessWidget {
                               ),
                               onPressed: sync.isSyncing
                                   ? null
-                                  : () => _deleteAccount(context),
-                              child: const Text('Delete Account'),
+                                  : () => _logout(context),
+                              child: const Text('Logout'),
                             ),
                           ),
+                          if (settings.accountCreated) ...[
+                            Defaults.sizedBox.horizontal.normal,
+                            Expanded(
+                              child: ElevatedButton(
+                                style: ButtonStyle(
+                                  backgroundColor: MaterialStateProperty.all(
+                                    Theme.of(context).colorScheme.error,
+                                  ),
+                                ),
+                                onPressed: sync.isSyncing
+                                    ? null
+                                    : () => _deleteAccount(context),
+                                child: const Text('Delete Account'),
+                              ),
+                            ),
+                          ],
                         ],
-                      ],
+                      ),
                     ),
                   ),
-                ),
-                Defaults.sizedBox.vertical.small,
-                const Divider(),
+                  Defaults.sizedBox.vertical.small,
+                  const Divider(),
+                ],
                 const CaptionTile(caption: "Other Settings"),
                 Defaults.sizedBox.vertical.small,
                 //EditTile(
