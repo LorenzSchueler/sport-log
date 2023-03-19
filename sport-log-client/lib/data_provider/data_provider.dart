@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:fixnum/fixnum.dart';
 import 'package:flutter/foundation.dart' show ChangeNotifier, VoidCallback;
+import 'package:result_type/result_type.dart';
 import 'package:sport_log/api/api.dart';
 import 'package:sport_log/app.dart';
 import 'package:sport_log/data_provider/data_providers/action_data_provider.dart';
@@ -18,6 +19,7 @@ import 'package:sport_log/helpers/account.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/account_data/account_data.dart';
 import 'package:sport_log/models/entity_interfaces.dart';
+import 'package:sport_log/models/server_version/server_version.dart';
 import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/dialogs/dialogs.dart';
 import 'package:sport_log/widgets/dialogs/new_credentials_dialog.dart';
@@ -40,7 +42,7 @@ abstract class DataProvider<T> extends ChangeNotifier {
     _logger.e('Api error: $error', error.errorType);
     switch (error.errorType) {
       case ApiErrorType.serverUnreachable:
-        _logger.i("on no internet: $onNoInternet");
+        _logger.i("on no internet != null: ${onNoInternet != null}");
         onNoInternet?.call();
         return null;
       case ApiErrorType.unauthorized:
@@ -78,6 +80,22 @@ abstract class DataProvider<T> extends ChangeNotifier {
       title: "An error occurred.",
       text: error.toString(),
     );
+  }
+
+  static Future<Result<ServerVersion, void>> getServerVersion({
+    VoidCallback? onNoInternet,
+  }) async {
+    final result = await Api.getServerVersion();
+
+    if (result.isFailure) {
+      await DataProvider._handleApiError(
+        result.failure,
+        onNoInternet,
+      );
+      return Failure(null);
+    } else {
+      return result;
+    }
   }
 }
 

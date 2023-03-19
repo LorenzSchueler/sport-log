@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:fixnum/fixnum.dart';
 import 'package:flutter/foundation.dart' show ChangeNotifier, VoidCallback;
-import 'package:sport_log/api/api.dart';
 import 'package:sport_log/app.dart';
 import 'package:sport_log/config.dart';
 import 'package:sport_log/data_provider/data_provider.dart';
@@ -56,7 +55,8 @@ class Sync extends ChangeNotifier {
     notifyListeners();
 
     if (serverVersion == null) {
-      final serverVersionResult = await Api.getServerVersion();
+      final serverVersionResult =
+          await DataProvider.getServerVersion(onNoInternet: onNoInternet);
       if (serverVersionResult.isSuccess) {
         serverVersion = serverVersionResult.success;
         if (!serverVersion!.compatibleWithClientApiVersion()) {
