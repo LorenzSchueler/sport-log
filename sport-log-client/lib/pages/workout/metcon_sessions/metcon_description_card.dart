@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/models/metcon/metcon_description.dart';
-import 'package:sport_log/widgets/input_fields/text_tile.dart';
+import 'package:sport_log/widgets/input_fields/edit_tile.dart';
 
 class MetconDescriptionCard extends StatelessWidget {
   const MetconDescriptionCard({required this.metconDescription, super.key});
@@ -22,11 +22,13 @@ class MetconDescriptionCard extends StatelessWidget {
               "Metcon",
               style: Theme.of(context).textTheme.headlineSmall,
             ),
-            TextTile(
+            EditTile(
+              leading: null,
               caption: "Type",
               child: Text(metconDescription.typeLengthDescription),
             ),
-            TextTile(
+            EditTile(
+              leading: null,
               caption: "Movements",
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -37,7 +39,8 @@ class MetconDescriptionCard extends StatelessWidget {
               ),
             ),
             if (metconDescription.metcon.description != null)
-              TextTile(
+              EditTile(
+                leading: null,
                 caption: "Description",
                 child: Text(
                   metconDescription.metcon.description!,

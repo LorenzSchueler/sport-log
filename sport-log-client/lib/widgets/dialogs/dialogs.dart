@@ -41,8 +41,8 @@ enum ConflictResolution {
   manual,
   automatic;
 
-  bool get isManual => index == ConflictResolution.manual.index;
-  bool get isAutomatic => index == ConflictResolution.automatic.index;
+  bool get isManual => this == ConflictResolution.manual;
+  bool get isAutomatic => this == ConflictResolution.automatic;
 }
 
 Future<ConflictResolution> showConflictDialog({
@@ -71,8 +71,8 @@ enum SystemSettings {
   change,
   ignore;
 
-  bool get isChange => index == SystemSettings.change.index;
-  bool get isIgnore => index == SystemSettings.ignore.index;
+  bool get isChange => this == SystemSettings.change;
+  bool get isIgnore => this == SystemSettings.ignore;
 }
 
 Future<SystemSettings> showSystemSettingsDialog({required String text}) async {

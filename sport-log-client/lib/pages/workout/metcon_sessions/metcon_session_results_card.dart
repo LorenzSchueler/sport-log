@@ -4,7 +4,7 @@ import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/models/metcon/metcon_records.dart';
 import 'package:sport_log/models/metcon/metcon_session_description.dart';
 import 'package:sport_log/widgets/app_icons.dart';
-import 'package:sport_log/widgets/input_fields/text_tile.dart';
+import 'package:sport_log/widgets/input_fields/edit_tile.dart';
 
 class MetconSessionResultsCard extends StatelessWidget {
   const MetconSessionResultsCard({
@@ -33,18 +33,21 @@ class MetconSessionResultsCard extends StatelessWidget {
               style: Theme.of(context).textTheme.headlineSmall,
             ),
             if (metconSessionDescription != null)
-              TextTile(
+              EditTile(
+                leading: null,
                 caption: "Score",
                 child: Text(
                   "${metconSessionDescription!.shortResultDescription} (${metconSessionDescription!.metconSession.datetime.toHumanDate()})",
                 ),
               ),
             if (metconSessionDescription?.metconSession.comments != null)
-              TextTile(
+              EditTile(
+                leading: null,
                 caption: "Comments",
                 child: Text(metconSessionDescription!.metconSession.comments!),
               ),
-            TextTile(
+            EditTile(
+              leading: null,
               caption: "Previous Scores",
               child: Column(
                 children: [

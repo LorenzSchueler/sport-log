@@ -14,7 +14,6 @@ import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/dialogs.dart';
 import 'package:sport_log/widgets/input_fields/duration_input.dart';
 import 'package:sport_log/widgets/input_fields/edit_tile.dart';
-import 'package:sport_log/widgets/input_fields/text_tile.dart';
 import 'package:sport_log/widgets/picker/datetime_picker.dart';
 import 'package:sport_log/widgets/picker/picker.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
@@ -285,7 +284,8 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
   }
 
   Widget _setWidget(StrengthSet strengthSet) {
-    return TextTile(
+    return EditTile(
+      leading: null,
       caption: "Set ${strengthSet.setNumber + 1}",
       onCancel: () => setState(() {
         _strengthSessionDescription.sets.remove(strengthSet);

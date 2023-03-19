@@ -9,7 +9,7 @@ import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/models/strength/all.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/app_icons.dart';
-import 'package:sport_log/widgets/input_fields/text_tile.dart';
+import 'package:sport_log/widgets/input_fields/edit_tile.dart';
 
 class StrengthSessionDetailsPage extends StatefulWidget {
   const StrengthSessionDetailsPage({
@@ -79,14 +79,16 @@ class StrengthSessionDetailsPageState
               padding: Defaults.edgeInsets.normal,
               child: Column(
                 children: [
-                  TextTile(
+                  EditTile(
+                    leading: null,
                     caption: "Date",
                     child: Text(
                       _strengthSessionDescription.session.datetime
                           .toHumanDateTime(),
                     ),
                   ),
-                  TextTile(
+                  EditTile(
+                    leading: null,
                     caption: "Sets",
                     child: Text(
                       '${_strengthSessionDescription.sets.length} sets',
@@ -94,7 +96,8 @@ class StrengthSessionDetailsPageState
                   ),
                   if (widget.strengthSessionDescription.session.interval !=
                       null)
-                    TextTile(
+                    EditTile(
+                      leading: null,
                       caption: "Interval",
                       child: Text(
                         _strengthSessionDescription
@@ -112,7 +115,8 @@ class StrengthSessionDetailsPageState
               margin: EdgeInsets.zero,
               child: Padding(
                 padding: Defaults.edgeInsets.normal,
-                child: TextTile(
+                child: EditTile(
+                  leading: null,
                   caption: 'Comments',
                   child: Text(
                     _strengthSessionDescription.session.comments!,
@@ -130,7 +134,8 @@ class StrengthSessionDetailsPageState
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: _strengthSessionDescription.sets
                     .mapIndexed(
-                      (index, set) => TextTile(
+                      (index, set) => EditTile(
+                        leading: null,
                         caption: "Set ${index + 1}",
                         child: Text(
                           set.toDisplayName(
@@ -149,6 +154,7 @@ class StrengthSessionDetailsPageState
     );
   }
 
+  // ignore: long-method
   List<Widget> _bestValuesInfo(StrengthSessionDescription session) {
     final stats = session.stats;
     switch (session.movement.dimension) {
@@ -158,42 +164,49 @@ class StrengthSessionDetailsPageState
         final sumVolume = stats.sumVolume;
         return [
           if (maxEorm != null)
-            TextTile(
+            EditTile(
+              leading: null,
               caption: 'Max Eorm',
               child: Text(formatWeight(maxEorm)),
             ),
           if (sumVolume != null)
-            TextTile(
+            EditTile(
+              leading: null,
               caption: 'Volume',
               child: Text(formatWeight(sumVolume)),
             ),
           if (maxWeight != null)
-            TextTile(
+            EditTile(
+              leading: null,
               caption: 'Max Weight',
               child: Text(formatWeight(maxWeight)),
             ),
-          TextTile(
+          EditTile(
+            leading: null,
             caption: 'Avg Reps',
             child: Text(stats.avgCount.toStringAsFixed(1)),
           )
         ];
       case MovementDimension.time:
         return [
-          TextTile(
+          EditTile(
+            leading: null,
             caption: 'Best Time',
             child: Text(Duration(milliseconds: stats.minCount).formatMsMill),
           ),
         ];
       case MovementDimension.distance:
         return [
-          TextTile(
+          EditTile(
+            leading: null,
             caption: 'Best Distance',
             child: Text("${stats.maxCount} m"),
           ),
         ];
       case MovementDimension.energy:
         return [
-          TextTile(
+          EditTile(
+            leading: null,
             caption: 'Total Energy',
             child: Text('${stats.sumCount} cal'),
           ),

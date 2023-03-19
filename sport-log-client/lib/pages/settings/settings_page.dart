@@ -14,7 +14,6 @@ import 'package:sport_log/widgets/dialogs/dialogs.dart';
 import 'package:sport_log/widgets/input_fields/duration_input.dart';
 import 'package:sport_log/widgets/input_fields/edit_tile.dart';
 import 'package:sport_log/widgets/input_fields/int_input.dart';
-import 'package:sport_log/widgets/input_fields/text_tile.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
 import 'package:sport_log/widgets/provider_consumer.dart';
@@ -185,7 +184,7 @@ class SettingsPage extends StatelessWidget {
                 const CaptionTile(caption: "Server Settings"),
                 Defaults.sizedBox.vertical.small,
                 if (!settings.accountCreated)
-                  TextTile(
+                  EditTile(
                     leading: AppIcons.sync,
                     child: Row(
                       children: [
@@ -306,7 +305,7 @@ class SettingsPage extends StatelessWidget {
                     onFieldSubmitted: (email) => _setEmail(context, email),
                   ),
                   Consumer<Sync>(
-                    builder: (context, sync, _) => TextTile(
+                    builder: (context, sync, _) => EditTile(
                       leading: AppIcons.logout,
                       child: Row(
                         children: [
@@ -436,7 +435,7 @@ class SettingsPage extends StatelessWidget {
                 const Divider(),
                 const CaptionTile(caption: "About"),
                 GestureDetector(
-                  child: const TextTile(
+                  child: const EditTile(
                     leading: AppIcons.questionMark,
                     child: Text('About'),
                   ),

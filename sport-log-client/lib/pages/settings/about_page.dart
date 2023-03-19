@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:sport_log/config.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/widgets/app_icons.dart';
-import 'package:sport_log/widgets/input_fields/text_tile.dart';
+import 'package:sport_log/widgets/input_fields/edit_tile.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 class _Contributor {
@@ -34,7 +34,7 @@ class AboutPage extends StatelessWidget {
         padding: Defaults.edgeInsets.normal,
         child: Column(
           children: [
-            TextTile(
+            EditTile(
               leading: AppIcons.radio,
               caption: "Version",
               child: Text(
@@ -43,12 +43,12 @@ class AboutPage extends StatelessWidget {
                     : "${Config.instance.version} [${Config.gitRef}]",
               ),
             ),
-            TextTile(
+            EditTile(
               leading: AppIcons.radio,
               caption: "Api Version",
               child: Text("${Config.apiVersion}"),
             ),
-            TextTile(
+            EditTile(
               leading: AppIcons.github,
               caption: "GitHub",
               child: GestureDetector(
@@ -61,7 +61,7 @@ class AboutPage extends StatelessWidget {
                 ),
               ),
             ),
-            TextTile(
+            EditTile(
               leading: AppIcons.copyright,
               caption: "Copyright & License",
               child: GestureDetector(
@@ -76,7 +76,7 @@ class AboutPage extends StatelessWidget {
                 ),
               ),
             ),
-            TextTile(
+            EditTile(
               leading: AppIcons.contributors,
               caption: "Contributors",
               child: Column(
