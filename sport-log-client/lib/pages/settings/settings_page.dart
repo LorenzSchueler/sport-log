@@ -33,8 +33,8 @@ class SettingsPage extends StatelessWidget {
   }
 
   Future<void> _setSyncEnabled(BuildContext context, bool syncEnabled) async {
-    context.read<Settings>().syncEnabled = syncEnabled;
-    if (syncEnabled) {
+    await context.read<Settings>().setSyncEnabled(syncEnabled);
+    if (context.mounted && syncEnabled) {
       await checkSync(context);
       await Sync.instance.startSync();
     } else {
@@ -44,16 +44,16 @@ class SettingsPage extends StatelessWidget {
 
   Future<void> _createAccount(BuildContext context) async {
     final settings = context.read<Settings>()
-      ..accountCreated = true
-      ..syncEnabled = true;
+      ..setAccountCreated(true)
+      ..setSyncEnabled(true);
     final result = await Account.register(
       settings.serverUrl,
       settings.user!,
     );
     if (result.isFailure) {
       settings
-        ..accountCreated = false
-        ..syncEnabled = false;
+        ..setAccountCreated(false)
+        ..setSyncEnabled(false);
       if (context.mounted) {
         await showMessageDialog(
           context: context,
@@ -67,9 +67,11 @@ class SettingsPage extends StatelessWidget {
   Future<void> _setServerUrl(BuildContext context, String serverUrl) async {
     final validated = Validator.validateUrl(serverUrl);
     if (validated == null) {
-      context.read<Settings>().serverUrl = serverUrl;
+      await context.read<Settings>().setServerUrl(serverUrl);
       Sync.instance.stopSync();
-      await checkSync(context);
+      if (context.mounted) {
+        await checkSync(context);
+      }
       await Sync.instance.startSync();
     } else {
       await showMessageDialog(
@@ -247,10 +249,11 @@ class SettingsPage extends StatelessWidget {
                       initialValue: settings.syncInterval.inMinutes,
                       minValue: 1,
                       maxValue: null,
-                      onUpdate: (syncInterval) {
-                        settings.syncInterval = Duration(minutes: syncInterval);
+                      onUpdate: (syncInterval) async {
+                        await settings
+                            .setSyncInterval(Duration(minutes: syncInterval));
                         Sync.instance.stopSync();
-                        Sync.instance.startSync();
+                        await Sync.instance.startSync();
                       },
                     ),
                   ),
@@ -401,7 +404,8 @@ class SettingsPage extends StatelessWidget {
                   autovalidateMode: AutovalidateMode.onUserInteraction,
                   onFieldSubmitted: (increment) async {
                     if (Validator.validateDoubleGtZero(increment) == null) {
-                      settings.weightIncrement = double.parse(increment);
+                      await settings
+                          .setWeightIncrement(double.parse(increment));
                     }
                   },
                 ),
@@ -411,8 +415,7 @@ class SettingsPage extends StatelessWidget {
                   caption: "Duration Increment",
                   child: DurationInput(
                     initialDuration: settings.durationIncrement,
-                    onUpdate: (increment) =>
-                        settings.durationIncrement = increment,
+                    onUpdate: settings.setDurationIncrement,
                     durationIncrement: const Duration(minutes: 1),
                     minDuration: const Duration(seconds: 1),
                   ),
@@ -428,8 +431,7 @@ class SettingsPage extends StatelessWidget {
                     width: 34, // remove left padding
                     child: Switch(
                       value: settings.developerMode,
-                      onChanged: (developerMode) =>
-                          settings.developerMode = developerMode,
+                      onChanged: settings.setDeveloperMode,
                     ),
                   ),
                 ),

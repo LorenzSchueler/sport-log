@@ -2,25 +2,38 @@ import 'package:result_type/result_type.dart';
 import 'package:sport_log/api/api.dart';
 import 'package:sport_log/data_provider/sync.dart';
 import 'package:sport_log/database/database.dart';
+import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/models/metcon/metcon_description.dart';
 import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/models/user/user.dart';
 import 'package:sport_log/settings.dart';
 
+// id
+//   username
+//   password
+//   email
+// =user
+//   accountCreated
+//     serverUrl
+//     syncEnabled
+//       syncInterval
+//       lastSync
 class Account {
   Account._();
 
-  static void noAccount(User user) {
-    Settings.instance.accountCreated = false;
-    Settings.instance.syncEnabled = false;
-    Settings.instance.user = user;
+  static Future<void> noAccount() async {
+    await Settings.instance.setUserId(randomId());
+    await Settings.instance.setAccountCreated(false);
+    await Settings.instance.setDefaultServerUrl();
+    await Settings.instance.setSyncEnabled(false);
   }
 
   static Future<ApiResult<User>> register(String serverUrl, User user) async {
-    Settings.instance.serverUrl = serverUrl;
+    await Settings.instance.setServerUrl(serverUrl);
     final result = await Api.user.postSingle(user);
     if (result.isSuccess) {
-      Settings.instance.user = user;
+      await Settings.instance.setUser(user);
+      await Settings.instance.setAccountCreated(true);
       await Sync.instance.startSync();
       return Success(user);
     } else {
@@ -33,11 +46,12 @@ class Account {
     String username,
     String password,
   ) async {
-    Settings.instance.serverUrl = serverUrl;
+    await Settings.instance.setServerUrl(serverUrl);
     final result = await Api.user.getSingle(username, password);
     if (result.isSuccess) {
       final user = result.success;
-      Settings.instance.user = user;
+      await Settings.instance.setUser(user);
+      await Settings.instance.setAccountCreated(true);
       await Sync.instance.startSync();
       return Success(user);
     } else {
@@ -65,25 +79,26 @@ class Account {
     }
     final result = await Api.user.putSingle(user);
     if (result.isSuccess) {
-      Settings.instance.user = user;
+      await Settings.instance.setUser(user);
       return Success(user);
     } else {
       return Failure(result.failure);
     }
   }
 
-  static void updateUserFromDownSync(User user) {
+  static Future<void> updateUserFromDownSync(User user) async {
+    // preserve password because User from server only contains password hash
     user.password = Settings.instance.password!;
-    Settings.instance.user = user;
+    await Settings.instance.setUser(user);
   }
 
   static Future<void> logout() async {
     Sync.instance.stopSync();
-    Settings.instance.lastSync = null;
-    Settings.instance.user = null;
+    await Settings.instance.setAccountCreated(false);
+    await Settings.instance.setLastSync(null);
+    await Settings.instance.setUser(null);
     Movement.defaultMovement = null;
     MetconDescription.defaultMetconDescription = null;
-    await Settings.instance.setDefaults(override: true);
     await AppDatabase.reset();
   }
 
@@ -91,11 +106,11 @@ class Account {
     Sync.instance.stopSync();
     final result = await Api.user.deleteSingle();
     if (result.isSuccess) {
-      Settings.instance.lastSync = null;
-      Settings.instance.user = null;
+      await Settings.instance.setAccountCreated(false);
+      await Settings.instance.setLastSync(null);
+      await Settings.instance.setUser(null);
       Movement.defaultMovement = null;
       MetconDescription.defaultMetconDescription = null;
-      await Settings.instance.setDefaults(override: true);
       await AppDatabase.reset();
       return Success(null);
     } else {
@@ -104,6 +119,7 @@ class Account {
   }
 
   static Future<ApiResult<void>> newInitSync() async {
+    // check if current User is able to login
     final result = await Api.user
         .getSingle(Settings.instance.username!, Settings.instance.password!);
     if (result.isFailure) {
@@ -111,7 +127,7 @@ class Account {
     }
 
     Sync.instance.stopSync();
-    Settings.instance.lastSync = null;
+    await Settings.instance.setLastSync(null);
     Movement.defaultMovement = null;
     MetconDescription.defaultMetconDescription = null;
     await AppDatabase.reset();

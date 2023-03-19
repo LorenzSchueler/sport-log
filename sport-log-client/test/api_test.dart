@@ -154,7 +154,7 @@ Future<void> main() async {
 
     setUpAll(() async {
       assert((await Api.user.postSingle(sampleUser)).isSuccess);
-      Settings.instance.user = sampleUser;
+      await Settings.instance.setUser(sampleUser);
     });
 
     tearDownAll(() async {
@@ -176,8 +176,8 @@ Future<void> main() async {
       email: faker.internet.email(),
     );
 
-    setUpAll(() {
-      Settings.instance.user = user;
+    setUpAll(() async {
+      await Settings.instance.setUser(user);
     });
 
     final updatedUser = user

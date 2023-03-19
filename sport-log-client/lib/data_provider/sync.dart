@@ -32,7 +32,7 @@ class Sync extends ChangeNotifier {
   Future<void> init() async {
     if (Config.instance.deleteDatabase) {
       _logger.i('Removing last sync...');
-      Settings.instance.lastSync = null;
+      await Settings.instance.setLastSync(null);
     }
     if (Settings.instance.userExists()) {
       await startSync();
@@ -96,7 +96,7 @@ class Sync extends ChangeNotifier {
       // account for time difference
       final now = DateTime.now().add(const Duration(milliseconds: 100));
       _logger.i('Setting last sync to $now.');
-      Settings.instance.lastSync = now;
+      await Settings.instance.setLastSync(now);
     }
 
     _isSyncing = false;

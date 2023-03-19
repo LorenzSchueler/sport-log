@@ -226,7 +226,7 @@ class _LoginPageState extends State<LoginPage> {
 
   Future<void> _submit(BuildContext context) async {
     if (widget.loginType.isNoAccount) {
-      Account.noAccount(_user);
+      await Account.noAccount();
       await Navigator.of(context).newBase(Routes.timelineOverview);
       return;
     }

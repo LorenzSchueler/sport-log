@@ -20,7 +20,7 @@ class LocationUtils extends ChangeNotifier {
     _disposed = true;
     final lastGpsPosition = lastLatLng;
     if (lastGpsPosition != null) {
-      Settings.instance.lastGpsLatLng = lastGpsPosition;
+      Settings.instance.setLastGpsLatLng(lastGpsPosition);
     }
     stopLocationStream();
     super.dispose();

@@ -131,7 +131,7 @@ class _MapboxMapWrapperState extends State<MapboxMapWrapper> {
           onCameraChangeListener: (_) async {
             final lastMapPosition = await _mapController?.latLngZoom;
             if (lastMapPosition != null) {
-              Settings.instance.lastMapPosition = lastMapPosition;
+              await Settings.instance.setLastMapPosition(lastMapPosition);
             }
           },
           onTapListener: (coord) async {

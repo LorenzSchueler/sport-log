@@ -286,7 +286,7 @@ abstract class EntityDataProvider<T extends AtomicEntity>
     } else {
       final accountData = accountDataResult.success;
       if (accountData.user != null) {
-        Account.updateUserFromDownSync(accountData.user!);
+        await Account.updateUserFromDownSync(accountData.user!);
       }
       // order matters => no parallel execution possible
       for (final dp in EntityDataProvider.all) {

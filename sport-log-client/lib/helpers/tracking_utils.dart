@@ -19,7 +19,6 @@ import 'package:sport_log/helpers/pointer.dart';
 import 'package:sport_log/helpers/step_count_utils.dart';
 import 'package:sport_log/models/cardio/all.dart';
 import 'package:sport_log/models/movement/movement.dart';
-import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/dialogs/dialogs.dart';
 
 enum TrackingMode { notStarted, tracking, paused }
@@ -95,10 +94,6 @@ class TrackingUtils extends ChangeNotifier {
   void dispose() {
     _refreshTimer?.cancel();
     _autosaveTimer?.cancel();
-    final lastGpsPosition = _locationUtils.lastLatLng;
-    if (lastGpsPosition != null) {
-      Settings.instance.lastGpsLatLng = lastGpsPosition;
-    }
     _stepUtils.dispose();
     _locationUtils.dispose();
     _heartRateUtils?.dispose();
