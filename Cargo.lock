@@ -1679,7 +1679,6 @@ dependencies = [
  "chrono",
  "err-derive",
  "lazy_static",
- "rand",
  "reqwest",
  "serde",
  "sport-log-ap-utils",
