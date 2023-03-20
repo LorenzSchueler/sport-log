@@ -1,5 +1,9 @@
 name: Rust
 
+permissions:
+  contents: read
+  checks: write
+
 on:
   push:
     branches: [ master, develop ]
@@ -11,54 +15,70 @@ env:
 
 jobs:
   format:
-    name: "Rust: Check Formatting"
+    name: format
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout
+    - name: checkout
       uses: actions/checkout@v2
-    - name: Install Rust
+    - name: install rust
       uses: actions-rs/toolchain@v1
       with:
         toolchain: stable
         override: true
         components: rustfmt
-    - name: Cargo fmt
-      run: cargo fmt --all -- --check
+    - name: cargo fmt
+      uses: actions-rs/cargo@v1
+      with:
+        command: fmt
+        args: --check
 
   clippy:
-    name: "Rust: Run Clippy"
+    name: clippy
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout
+    - name: checkout
       uses: actions/checkout@v2
-    - name: Install Rust
-      uses: actions-rs/toolchain@v1
+    - name: cargo clippy
+      uses: actions-rs/clippy-check@v1
       with:
-        toolchain: stable
-        override: true
-        components: clippy
-    - name: Load cache
+        token: ${{ secrets.GITHUB_TOKEN }}
+        args: --all-features
+    
+  doc:
+    name: doc
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: checkout
+      uses: actions/checkout@v3
+    - name: install rust
+      uses: actions-rs/toolchain@v1
+    - name: load cache
       uses: Swatinem/rust-cache@v1
-    - name: Cargo clippy
-      run: cargo clippy --all-targets -- -D warnings
+    - name: cargo doc
+      uses: actions-rs/cargo@v1
+      with:
+        command: doc
+        args: --no-deps --all-features
 
   build:
-    name: "Rust: Build"
+    name: check
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout
+    - name: checkout
       uses: actions/checkout@v2
-    - name: Install Rust
+    - name: install rust
       uses: actions-rs/toolchain@v1
       with:
         toolchain: stable
         override: true
-    - name: Load cache
+    - name: load cache
       uses: Swatinem/rust-cache@v1
-    - name: Build
+    - name: cargo check
+      # build every crate on its own to make sure enabled features from other crates do not mask missing dependencies
       run: cargo check --manifest-path sport-log-action-provider-map-matcher/Cargo.toml &&
            cargo check --manifest-path sport-log-action-provider-sportstracker/Cargo.toml &&
            cargo check --manifest-path sport-log-action-provider-wodify-login/Cargo.toml &&
@@ -73,3 +93,18 @@ jobs:
 
     #- name: Run tests
     #  run: cargo test --verbose
+
+  check:
+    name: unused deps
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: checkout
+      uses: actions/checkout@v2
+    - name: install cargo-machete
+      uses: actions-rs/install@v0.1
+      with:
+        crate: cargo-machete
+        version: latest
+    - name: cargo machete
+      run: cargo machete
