@@ -79,6 +79,7 @@ class AboutPage extends StatelessWidget {
             EditTile(
               leading: AppIcons.contributors,
               caption: "Contributors",
+              unboundedHeight: true,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [

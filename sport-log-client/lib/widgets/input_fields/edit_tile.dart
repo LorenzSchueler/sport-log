@@ -26,7 +26,8 @@ class EditTile extends StatelessWidget {
     this.caption,
     this.onTap,
     this.onCancel,
-    this.shrink = false,
+    this.unboundedHeight = false,
+    this.shrinkWidth = false,
     super.key,
   });
 
@@ -36,8 +37,11 @@ class EditTile extends StatelessWidget {
   final VoidCallback? onTap;
   final VoidCallback? onCancel;
 
+  /// if enabled [child] must have a bounded height
+  final bool unboundedHeight;
+
   /// if enabled [child] must have a bounded width
-  final bool shrink;
+  final bool shrinkWidth;
 
   static const Color iconCaptionColor = Colors.white70;
 
@@ -61,15 +65,15 @@ class EditTile extends StatelessWidget {
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: SizedBox(
-        height: 49, // height of TextFormField
+        height: unboundedHeight ? null : 49, // height of TextFormField
         child: Row(
-          mainAxisSize: shrink ? MainAxisSize.min : MainAxisSize.max,
+          mainAxisSize: shrinkWidth ? MainAxisSize.min : MainAxisSize.max,
           children: [
             if (leading != null) ...[
               Icon(leading, color: iconCaptionColor),
               const SizedBox(width: 15),
             ],
-            shrink
+            shrinkWidth
                 ? _captionChildColumn(context)
                 : Expanded(child: _captionChildColumn(context)),
             if (onCancel != null)

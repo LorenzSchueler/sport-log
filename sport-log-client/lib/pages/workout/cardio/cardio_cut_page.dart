@@ -132,7 +132,7 @@ class _CardioCutPageState extends State<CardioCutPage> {
                 EditTile(
                   leading: null,
                   caption: "Start",
-                  shrink: true,
+                  shrinkWidth: true,
                   onTap: () async {
                     final duration = await showScrollableDurationPicker(
                       context: context,
@@ -155,7 +155,7 @@ class _CardioCutPageState extends State<CardioCutPage> {
                 EditTile(
                   leading: null,
                   caption: "End",
-                  shrink: true,
+                  shrinkWidth: true,
                   onTap: () async {
                     final duration = await showScrollableDurationPicker(
                       context: context,
