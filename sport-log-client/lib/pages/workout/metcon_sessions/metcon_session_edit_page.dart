@@ -195,23 +195,27 @@ class _MetconSessionEditPageState extends State<MetconSessionEditPage> {
                         width: 34,
                         child: Switch(
                           value: _finished,
-                          onChanged: (finished) => setState(() {
-                            _finished = finished;
-                            if (_finished) {
-                              _metconSessionDescription.metconSession.time =
-                                  Duration.zero;
-                              _metconSessionDescription.metconSession.rounds =
-                                  null;
-                              _metconSessionDescription.metconSession.rounds =
-                                  null;
-                            } else {
-                              _metconSessionDescription.metconSession.time =
-                                  null;
-                              _metconSessionDescription.metconSession.rounds =
-                                  0;
-                              _metconSessionDescription.metconSession.reps = 0;
-                            }
-                          }),
+                          onChanged: (finished) {
+                            FocusManager.instance.primaryFocus?.unfocus();
+                            setState(() {
+                              _finished = finished;
+                              if (_finished) {
+                                _metconSessionDescription.metconSession.time =
+                                    Duration.zero;
+                                _metconSessionDescription.metconSession.rounds =
+                                    null;
+                                _metconSessionDescription.metconSession.rounds =
+                                    null;
+                              } else {
+                                _metconSessionDescription.metconSession.time =
+                                    null;
+                                _metconSessionDescription.metconSession.rounds =
+                                    0;
+                                _metconSessionDescription.metconSession.reps =
+                                    0;
+                              }
+                            });
+                          },
                         ),
                       ),
                     ],
@@ -298,6 +302,7 @@ class _MetconSessionEditPageState extends State<MetconSessionEditPage> {
                     child: Switch(
                       value: _metconSessionDescription.metconSession.rx,
                       onChanged: (rx) {
+                        FocusManager.instance.primaryFocus?.unfocus();
                         setState(() {
                           _metconSessionDescription.metconSession.rx = rx;
                         });

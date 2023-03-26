@@ -51,6 +51,7 @@ Future<DateTime?> showScrollableTimePicker({
   required DateTime? initialTime,
   bool withSeconds = false,
 }) async {
+  FocusManager.instance.primaryFocus?.unfocus();
   final datetime = await showDialog<DateTime>(
     context: context,
     builder: (context) =>
@@ -65,6 +66,7 @@ Future<Duration?> showScrollableDurationPicker({
   required BuildContext context,
   required Duration? initialDuration,
 }) async {
+  FocusManager.instance.primaryFocus?.unfocus();
   final datetime = await showDialog<DateTime>(
     context: context,
     builder: (context) => TimePickerDialog(
@@ -87,6 +89,7 @@ Future<DateTime?> showDatePickerWithDefaults({
   required DateTime initialDate,
   bool future = false,
 }) async {
+  FocusManager.instance.primaryFocus?.unfocus();
   return (await showDatePicker(
     context: context,
     initialDate: initialDate,
@@ -103,6 +106,7 @@ Future<DateTime?> showDateTimePicker({
   required DateTime initial,
   bool future = false,
 }) async {
+  FocusManager.instance.primaryFocus?.unfocus();
   final date = await showDatePickerWithDefaults(
     context: context,
     initialDate: initial,

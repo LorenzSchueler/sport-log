@@ -341,6 +341,7 @@ class _CardioEditPageState extends State<CardioEditPage> {
                               avatar: const Icon(AppIcons.add),
                               label: const Text("Time"),
                               onPressed: () => setState(() {
+                                FocusManager.instance.primaryFocus?.unfocus();
                                 _cardioSessionDescription.cardioSession.time =
                                     const Duration(minutes: 1);
                               }),

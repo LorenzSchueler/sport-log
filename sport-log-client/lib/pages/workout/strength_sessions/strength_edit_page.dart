@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:sport_log/data_provider/data_providers/strength_data_provider.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
@@ -41,18 +40,6 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
 
   final _commentsNode = FocusNode();
   final _scrollController = ScrollController();
-  final StreamSubscription<bool> _keyboardSubscription =
-      KeyboardVisibilityController().onChange.listen((isVisible) {
-    if (!isVisible) {
-      FocusManager.instance.primaryFocus?.unfocus();
-    }
-  });
-
-  @override
-  void dispose() {
-    _keyboardSubscription.cancel();
-    super.dispose();
-  }
 
   Future<void> _saveStrengthSession() async {
     final result = widget.isNew
@@ -197,6 +184,7 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
             label: const Text('Interval'),
             avatar: const Icon(AppIcons.add),
             onPressed: () {
+              FocusManager.instance.primaryFocus?.unfocus();
               setState(() {
                 _strengthSessionDescription.session.interval =
                     StrengthSession.defaultInterval;
@@ -208,6 +196,7 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
             label: const Text('Comment'),
             avatar: const Icon(AppIcons.add),
             onPressed: () {
+              FocusManager.instance.primaryFocus?.unfocus();
               setState(() {
                 _strengthSessionDescription.session.comments = '';
               });
@@ -276,10 +265,6 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
               icon: const Icon(AppIcons.close),
             ),
           ),
-      onEditingComplete: () {
-        _commentsNode.unfocus();
-        setState(() => _strengthSessionDescription.session.comments = null);
-      },
     );
   }
 

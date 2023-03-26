@@ -40,6 +40,8 @@ class _DurationInputState extends State<DurationInput> {
   void _setDuration(Duration duration, {required bool updateTextField}) {
     setState(() => _duration = duration);
     if (updateTextField) {
+      // unfocus text field and thereby also close keyboard
+      FocusManager.instance.primaryFocus?.unfocus();
       _textController.text = _duration.formatM99S;
     }
     widget.onUpdate(_duration);

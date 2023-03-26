@@ -215,8 +215,10 @@ class SettingsPage extends StatelessWidget {
                       width: 34, // remove left padding
                       child: Switch(
                         value: settings.syncEnabled,
-                        onChanged: (enabled) =>
-                            _setSyncEnabled(context, enabled),
+                        onChanged: (enabled) {
+                          FocusManager.instance.primaryFocus?.unfocus();
+                          _setSyncEnabled(context, enabled);
+                        },
                       ),
                     ),
                   ),
@@ -437,7 +439,10 @@ class SettingsPage extends StatelessWidget {
                     width: 34, // remove left padding
                     child: Switch(
                       value: settings.developerMode,
-                      onChanged: settings.setDeveloperMode,
+                      onChanged: (devMode) {
+                        FocusManager.instance.primaryFocus?.unfocus();
+                        settings.setDeveloperMode(devMode);
+                      },
                     ),
                   ),
                 ),

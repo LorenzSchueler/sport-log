@@ -141,12 +141,18 @@ class _SetDurationInputState extends State<SetDurationInput> {
           ? ActionChip(
               avatar: const Icon(AppIcons.add),
               label: const Text("Add Weight"),
-              onPressed: _addWeight,
+              onPressed: () {
+                FocusManager.instance.primaryFocus?.unfocus();
+                _addWeight();
+              },
             )
           : ActionChip(
               avatar: const Icon(AppIcons.close),
               label: const Text("Remove Weight"),
-              onPressed: _removeWeight,
+              onPressed: () {
+                FocusManager.instance.primaryFocus?.unfocus();
+                _removeWeight();
+              },
             )
     ];
   }

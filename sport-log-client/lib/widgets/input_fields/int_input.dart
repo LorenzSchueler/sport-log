@@ -33,6 +33,8 @@ class _IntInputState extends State<IntInput> {
   void _setValue(int value, {required bool updateTextField}) {
     setState(() => _value = value);
     if (updateTextField) {
+      // unfocus text field and thereby also close keyboard
+      FocusManager.instance.primaryFocus?.unfocus();
       _textController.text = _value.toString();
     }
     widget.onUpdate(_value);

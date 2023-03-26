@@ -77,46 +77,43 @@ class _MetconEditPageState extends State<MetconEditPage> {
   @override
   Widget build(BuildContext context) {
     return DiscardWarningOnPop(
-      child: GestureDetector(
-        onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
-        child: Scaffold(
-          appBar: AppBar(
-            title: Text(
-              widget.metconDescription != null ? "Edit Metcon" : "New Metcon",
-            ),
-            actions: [
-              if (!_metconDescription.hasReference &&
-                  _metconDescription.metcon.userId != null)
-                IconButton(
-                  onPressed: _deleteMetcon,
-                  icon: const Icon(AppIcons.delete),
-                ),
-              IconButton(
-                onPressed: _formKey.currentContext != null &&
-                        _formKey.currentState!.validate() &&
-                        _metconDescription.isValid()
-                    ? _saveMetcon
-                    : null,
-                icon: const Icon(AppIcons.save),
-              ),
-            ],
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(
+            widget.metconDescription != null ? "Edit Metcon" : "New Metcon",
           ),
-          body: Container(
-            padding: Defaults.edgeInsets.normal,
-            child: Form(
-              key: _formKey,
-              child: ListView(
-                children: [
-                  _nameInput(context),
-                  _descriptionInput(),
-                  _typeInput(),
-                  Defaults.sizedBox.vertical.small,
-                  _additionalFieldsInput(),
-                  const Divider(thickness: 2),
-                  _metconMovementsList(),
-                  _addMetconMovementButton(context),
-                ],
+          actions: [
+            if (!_metconDescription.hasReference &&
+                _metconDescription.metcon.userId != null)
+              IconButton(
+                onPressed: _deleteMetcon,
+                icon: const Icon(AppIcons.delete),
               ),
+            IconButton(
+              onPressed: _formKey.currentContext != null &&
+                      _formKey.currentState!.validate() &&
+                      _metconDescription.isValid()
+                  ? _saveMetcon
+                  : null,
+              icon: const Icon(AppIcons.save),
+            ),
+          ],
+        ),
+        body: Container(
+          padding: Defaults.edgeInsets.normal,
+          child: Form(
+            key: _formKey,
+            child: ListView(
+              children: [
+                _nameInput(),
+                _descriptionInput(),
+                _typeInput(),
+                Defaults.sizedBox.vertical.small,
+                _additionalFieldsInput(),
+                const Divider(thickness: 2),
+                _metconMovementsList(),
+                _addMetconMovementButton(),
+              ],
             ),
           ),
         ),
@@ -124,7 +121,7 @@ class _MetconEditPageState extends State<MetconEditPage> {
     );
   }
 
-  Widget _nameInput(BuildContext context) {
+  Widget _nameInput() {
     return TextFormField(
       initialValue: _metconDescription.metcon.name,
       onChanged: (name) =>
@@ -146,6 +143,7 @@ class _MetconEditPageState extends State<MetconEditPage> {
             avatar: const Icon(AppIcons.add),
             label: const Text("Add Description"),
             onPressed: () {
+              FocusManager.instance.primaryFocus?.unfocus();
               setState(() => _metconDescription.metcon.description = "");
               _descriptionFocusNode.requestFocus();
             },
@@ -242,7 +240,6 @@ class _MetconEditPageState extends State<MetconEditPage> {
         minValue: 1,
         maxValue: 999,
         onUpdate: (rounds) {
-          FocusManager.instance.primaryFocus?.unfocus();
           setState(() => _metconDescription.metcon.rounds = rounds);
         },
       ),
@@ -259,7 +256,6 @@ class _MetconEditPageState extends State<MetconEditPage> {
             Metcon.timecapDefaultValue,
         minDuration: const Duration(minutes: 1),
         onUpdate: (timecap) {
-          FocusManager.instance.primaryFocus?.unfocus();
           setState(() => _metconDescription.metcon.timecap = timecap);
         },
       ),
@@ -275,17 +271,16 @@ class _MetconEditPageState extends State<MetconEditPage> {
               label: const Text("Timecap"),
               onPressed: () {
                 FocusManager.instance.primaryFocus?.unfocus();
-                setState(
-                  () => _metconDescription.metcon.timecap =
-                      Metcon.timecapDefaultValue,
-                );
+                setState(() {
+                  _metconDescription.metcon.timecap =
+                      Metcon.timecapDefaultValue;
+                });
               },
             ),
           )
         : _timecapInput(
             caption: "Timecap",
             onCancel: () {
-              FocusManager.instance.primaryFocus?.unfocus();
               setState(() => _metconDescription.metcon.timecap = null);
             },
           );
@@ -297,18 +292,16 @@ class _MetconEditPageState extends State<MetconEditPage> {
       physics: const NeverScrollableScrollPhysics(),
       shrinkWrap: true,
       itemBuilder: (context, index) {
-        final move = _metconDescription.moves[index];
+        final mmd = _metconDescription.moves[index];
         return MetconMovementCard(
-          key: ObjectKey(move),
-          deleteMetconMovement: () {
-            FocusManager.instance.primaryFocus?.unfocus();
+          key: ObjectKey(mmd),
+          onDelete: () {
             setState(() => _metconDescription.moves.removeAt(index));
           },
-          editMetconMovementDescription: (mmd) {
-            FocusManager.instance.primaryFocus?.unfocus();
+          onUpdate: (mmd) {
             setState(() => _metconDescription.moves[index] = mmd);
           },
-          mmd: move,
+          mmd: mmd,
         );
       },
       itemCount: _metconDescription.moves.length,
@@ -316,12 +309,13 @@ class _MetconEditPageState extends State<MetconEditPage> {
     );
   }
 
-  Widget _addMetconMovementButton(BuildContext context) {
+  Widget _addMetconMovementButton() {
     return ActionChip(
       avatar: const Icon(AppIcons.add),
       label: const Text("Add movement"),
       // ignore: prefer-extracting-callbacks
       onPressed: () async {
+        FocusManager.instance.primaryFocus?.unfocus();
         final movement = await showMovementPicker(
           selectedMovement: null,
           context: context,
@@ -334,7 +328,6 @@ class _MetconEditPageState extends State<MetconEditPage> {
   }
 
   void _addMetconMovementWithMovement(Movement movement) {
-    FocusManager.instance.primaryFocus?.unfocus();
     setState(() {
       _metconDescription.moves.add(
         MetconMovementDescription(
@@ -361,15 +354,15 @@ class _MetconEditPageState extends State<MetconEditPage> {
 
 class MetconMovementCard extends StatelessWidget {
   const MetconMovementCard({
-    required this.deleteMetconMovement,
-    required this.editMetconMovementDescription,
+    required this.onDelete,
+    required this.onUpdate,
     required this.mmd,
     super.key,
   });
 
   final MetconMovementDescription mmd;
-  final void Function(MetconMovementDescription) editMetconMovementDescription;
-  final VoidCallback deleteMetconMovement;
+  final void Function(MetconMovementDescription) onUpdate;
+  final VoidCallback onDelete;
 
   @override
   Widget build(BuildContext context) {
@@ -390,7 +383,7 @@ class MetconMovementCard extends StatelessWidget {
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(),
                   icon: const Icon(AppIcons.delete),
-                  onPressed: deleteMetconMovement,
+                  onPressed: onDelete,
                 ),
                 Defaults.sizedBox.horizontal.big,
                 ReorderableDragStartListener(
@@ -406,7 +399,7 @@ class MetconMovementCard extends StatelessWidget {
                 mmd.metconMovement.maleWeight = weight;
                 mmd.metconMovement.femaleWeight = secondWeight;
                 mmd.metconMovement.distanceUnit = distanceUnit;
-                editMetconMovementDescription(mmd);
+                onUpdate(mmd);
               },
               confirmChanges: false,
               dimension: mmd.movement.dimension,

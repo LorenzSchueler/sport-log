@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart' hide Route;
-import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:sport_log/main.dart';
@@ -17,7 +16,8 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return KeyboardDismissOnTap(
+    return GestureDetector(
+      onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Selector<Settings, bool>(
         // userId is set after the user has registered/ logged in/ chosen to use without account.
         selector: (_, settings) => settings.userId != null,

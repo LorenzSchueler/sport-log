@@ -33,6 +33,8 @@ class _DoubleInputState extends State<DoubleInput> {
   void _setValue(double value, {required bool updateTextField}) {
     setState(() => _value = value);
     if (updateTextField) {
+      // unfocus text field and thereby also close keyboard
+      FocusManager.instance.primaryFocus?.unfocus();
       _textController.text = _value.toStringAsFixed(2);
     }
     widget.onUpdate(_value);

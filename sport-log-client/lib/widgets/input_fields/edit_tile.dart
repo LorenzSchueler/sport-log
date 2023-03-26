@@ -62,7 +62,12 @@ class EditTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTap,
+      onTap: onTap != null
+          ? () {
+              FocusManager.instance.primaryFocus?.unfocus();
+              onTap!();
+            }
+          : null,
       behavior: HitTestBehavior.opaque,
       child: SizedBox(
         height: unboundedHeight ? null : 49, // height of TextFormField
@@ -80,7 +85,12 @@ class EditTile extends StatelessWidget {
               IconButton(
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(),
-                onPressed: onCancel,
+                onPressed: onCancel != null
+                    ? () {
+                        FocusManager.instance.primaryFocus?.unfocus();
+                        onCancel!();
+                      }
+                    : null,
                 icon: const Icon(AppIcons.close),
               ),
           ],

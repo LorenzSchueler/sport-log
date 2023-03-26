@@ -136,7 +136,10 @@ class TimerPage extends StatelessWidget {
             child: ActionChip(
               avatar: const Icon(AppIcons.add),
               label: const Text("Rest Time"),
-              onPressed: () => timerState.restTime = const Duration(minutes: 1),
+              onPressed: () {
+                FocusManager.instance.primaryFocus?.unfocus();
+                timerState.restTime = const Duration(minutes: 1);
+              },
             ),
           )
         : EditTile(

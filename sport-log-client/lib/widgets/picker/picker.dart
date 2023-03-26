@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart' hide Action, Route;
-import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:sport_log/data_provider/data_providers/cardio_data_provider.dart';
 import 'package:sport_log/data_provider/data_providers/metcon_data_provider.dart';
 import 'package:sport_log/data_provider/data_providers/movement_data_provider.dart';
@@ -78,13 +77,6 @@ class PickerWithSearch<T> extends StatefulWidget {
 }
 
 class _PickerWithSearchState<T> extends State<PickerWithSearch<T>> {
-  late final StreamSubscription<bool> _keyboardSubscription =
-      KeyboardVisibilityController().onChange.listen((isVisible) {
-    if (!isVisible) {
-      FocusManager.instance.primaryFocus?.unfocus();
-    }
-  });
-
   List<T> _items = [];
   String _search = '';
 
@@ -92,12 +84,6 @@ class _PickerWithSearchState<T> extends State<PickerWithSearch<T>> {
   void initState() {
     _update('');
     super.initState();
-  }
-
-  @override
-  void dispose() {
-    _keyboardSubscription.cancel();
-    super.dispose();
   }
 
   Future<void> _update(String search) async {
@@ -188,6 +174,7 @@ Future<Action?> showActionPicker({
   bool dismissible = true,
   required BuildContext context,
 }) async {
+  FocusManager.instance.primaryFocus?.unfocus();
   return showDialog<Action>(
     builder: (_) => Picker<Action>(
       items: actions,
@@ -205,6 +192,7 @@ Future<CardioType?> showCardioTypePicker({
   bool dismissible = true,
   required BuildContext context,
 }) async {
+  FocusManager.instance.primaryFocus?.unfocus();
   return showDialog<CardioType>(
     builder: (_) => Picker<CardioType>(
       items: CardioType.values,
@@ -222,6 +210,7 @@ Future<DateFilterState?> showDateFilterStatePicker({
   bool dismissible = true,
   required BuildContext context,
 }) async {
+  FocusManager.instance.primaryFocus?.unfocus();
   return showDialog<DateFilterState>(
     builder: (_) => Picker<DateFilterState>(
       items: DateFilterState.all(selectedDateFilterState),
@@ -239,6 +228,7 @@ Future<Metcon?> showMetconPicker({
   bool dismissible = true,
   required BuildContext context,
 }) async {
+  FocusManager.instance.primaryFocus?.unfocus();
   return showDialog<Metcon>(
     builder: (_) => PickerWithSearch<Metcon>(
       selectedItem: selectedMetcon,
@@ -260,6 +250,7 @@ Future<Movement?> showMovementPicker({
   bool dismissible = true,
   required BuildContext context,
 }) async {
+  FocusManager.instance.primaryFocus?.unfocus();
   return showDialog<Movement>(
     builder: (_) => PickerWithSearch<Movement>(
       selectedItem: selectedMovement,
@@ -280,6 +271,7 @@ Future<MovementOrMetcon?> showMovementOrMetconPicker({
   bool dismissible = true,
   required BuildContext context,
 }) async {
+  FocusManager.instance.primaryFocus?.unfocus();
   return showDialog<MovementOrMetcon>(
     builder: (_) => PickerWithSearch<MovementOrMetcon>(
       selectedItem: selectedMovementOrMetcon,
@@ -305,6 +297,7 @@ Future<Route?> showRoutePicker({
   bool dismissible = true,
   required BuildContext context,
 }) async {
+  FocusManager.instance.primaryFocus?.unfocus();
   return showDialog<Route>(
     builder: (_) => PickerWithSearch<Route>(
       selectedItem: selectedRoute,
@@ -324,6 +317,7 @@ Future<Weekday?> showWeekdayPicker({
   bool dismissible = true,
   required BuildContext context,
 }) async {
+  FocusManager.instance.primaryFocus?.unfocus();
   return showDialog<Weekday>(
     builder: (_) => Picker<Weekday>(
       items: Weekday.values,

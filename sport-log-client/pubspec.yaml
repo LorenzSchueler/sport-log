@@ -36,7 +36,6 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_blue_plus: ^1.4.0
-  flutter_keyboard_visibility: ^5.0.3
   flutter_localizations:
     sdk: flutter
   flutter_polyline_points: ^1.0.0
