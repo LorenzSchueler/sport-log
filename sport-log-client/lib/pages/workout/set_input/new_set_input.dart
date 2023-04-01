@@ -74,7 +74,12 @@ class SubmitSetButton extends StatelessWidget {
     return IconButton(
       icon: const Icon(AppIcons.check),
       iconSize: 40,
-      onPressed: isSubmittable ? onSubmitted : null,
+      onPressed: isSubmittable
+          ? () {
+              FocusManager.instance.primaryFocus?.unfocus();
+              onSubmitted();
+            }
+          : null,
       padding: EdgeInsets.zero,
       constraints: const BoxConstraints(),
     );
