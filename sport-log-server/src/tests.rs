@@ -767,6 +767,27 @@ async fn own_get() {
 }
 
 #[tokio::test]
+async fn own_get_non_existing() {
+    let (mut router, _, _) = init().await;
+
+    let header = auth_header(&TEST_USER.username, &TEST_USER.password);
+    let response = request(
+        &mut router,
+        Request::get(route_max_version(
+            "",
+            DIARY,
+            &[("id", &TEST_DIARY.id.0.to_string())],
+        ))
+        .header(header.0, header.1)
+        .body(Body::empty())
+        .unwrap(),
+    )
+    .await;
+
+    assert_eq!(response.status(), StatusCode::FORBIDDEN);
+}
+
+#[tokio::test]
 async fn foreign_get() {
     let (mut router, db_pool, _) = init().await;
 
