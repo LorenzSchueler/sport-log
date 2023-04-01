@@ -51,50 +51,31 @@ class AboutPage extends StatelessWidget {
             EditTile(
               leading: AppIcons.github,
               caption: "GitHub",
-              child: GestureDetector(
-                child: Icon(
-                  AppIcons.openInBrowser,
-                  color: Theme.of(context).colorScheme.onBackground,
-                ),
-                onTap: () => launchUrlString(
-                  "https://github.com/LorenzSchueler/sport-log",
-                ),
+              child: const Text("github.com/LorenzSchueler/sport-log"),
+              onTap: () => launchUrlString(
+                "https://github.com/LorenzSchueler/sport-log",
               ),
             ),
             EditTile(
               leading: AppIcons.copyright,
               caption: "Copyright & License",
-              child: GestureDetector(
-                child: const Text(
-                  "GPLv3 license",
-                  style: TextStyle(
-                    decoration: TextDecoration.underline,
-                  ),
-                ),
-                onTap: () => launchUrlString(
-                  "https://www.gnu.org/licenses/gpl-3.0.html",
-                ),
+              child: const Text("GPLv3 license"),
+              onTap: () => launchUrlString(
+                "https://www.gnu.org/licenses/gpl-3.0.html",
               ),
             ),
             EditTile(
               leading: AppIcons.contributors,
               caption: "Contributors",
               unboundedHeight: true,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  ..._Contributor.all.map(
-                    (c) => GestureDetector(
-                      child: Text(
-                        c.name,
-                        style: const TextStyle(
-                          decoration: TextDecoration.underline,
-                        ),
-                      ),
-                      onTap: () => launchUrlString(c.github),
-                    ),
-                  )
-                ],
+              child: ListView.separated(
+                shrinkWrap: true,
+                itemBuilder: (context, index) => GestureDetector(
+                  child: Text(_Contributor.all[index].name),
+                  onTap: () => launchUrlString(_Contributor.all[index].github),
+                ),
+                separatorBuilder: (context, index) => const SizedBox(height: 5),
+                itemCount: _Contributor.all.length,
               ),
             ),
           ],
