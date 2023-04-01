@@ -2,7 +2,6 @@ import 'package:sport_log/api/api.dart';
 import 'package:sport_log/data_provider/data_provider.dart';
 import 'package:sport_log/data_provider/data_providers/movement_data_provider.dart';
 import 'package:sport_log/database/database.dart';
-import 'package:sport_log/database/table_accessor.dart';
 import 'package:sport_log/database/tables/cardio_tables.dart';
 import 'package:sport_log/helpers/extensions/sort_extension.dart';
 import 'package:sport_log/models/account_data/account_data.dart';
@@ -42,11 +41,23 @@ class CardioSessionDataProvider extends EntityDataProvider<CardioSession> {
   final Api<CardioSession> api = Api.cardioSessions;
 
   @override
-  final TableAccessor<CardioSession> db = AppDatabase.cardioSessions;
+  final CardioSessionTable db = AppDatabase.cardioSessions;
 
   @override
   List<CardioSession> getFromAccountData(AccountData accountData) =>
       accountData.cardioSessions;
+
+  Future<List<CardioSession>> getSimilarCardioSessions(
+    CardioSessionDescription cardioSessionDescription,
+  ) async {
+    final all = await db.getByMovementWithTrackOrderDatetime(
+      movement: cardioSessionDescription.movement,
+    );
+    return all
+        .where((c) => cardioSessionDescription.cardioSession.similarTo(c))
+        .where((c) => cardioSessionDescription.cardioSession.id != c.id)
+        .toList();
+  }
 }
 
 class CardioSessionDescriptionDataProvider

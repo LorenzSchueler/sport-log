@@ -85,6 +85,10 @@ abstract class TableAccessor<T extends AtomicEntity> {
   String commentFilter(String? comment) =>
       commentFilterOfTable(tableName, comment);
 
+  static String withTrackOfTable(String tableName) =>
+      "$tableName.${Columns.track} is not null";
+  String get withTrack => withTrackOfTable(tableName);
+
   static String groupByIdOfTable(String tableName) =>
       "$tableName.${Columns.id}";
   String get groupById => groupByIdOfTable(tableName);
