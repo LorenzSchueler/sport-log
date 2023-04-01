@@ -268,6 +268,12 @@ class CardioSession extends AtomicEntity {
     }
   }
 
+  bool similarTo(CardioSession other) =>
+      movementId == other.movementId &&
+      track != null &&
+      other.track != null &&
+      track!.similarTo(other.track!);
+
   @override
   Map<String, dynamic> toJson() => _$CardioSessionToJson(this);
 
