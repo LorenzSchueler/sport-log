@@ -30,6 +30,7 @@ class MetconDescriptionCard extends StatelessWidget {
             EditTile(
               leading: null,
               caption: "Movements",
+              unboundedHeight: true,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -42,9 +43,7 @@ class MetconDescriptionCard extends StatelessWidget {
               EditTile(
                 leading: null,
                 caption: "Description",
-                child: Text(
-                  metconDescription.metcon.description!,
-                ),
+                child: Text(metconDescription.metcon.description!),
               ),
           ],
         ),

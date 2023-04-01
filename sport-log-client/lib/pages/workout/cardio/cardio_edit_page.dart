@@ -173,9 +173,7 @@ class _CardioEditPageState extends State<CardioEditPage> {
                     EditTile(
                       leading: AppIcons.exercise,
                       caption: "Movement",
-                      child: Text(
-                        _cardioSessionDescription.movement.name,
-                      ),
+                      child: Text(_cardioSessionDescription.movement.name),
                       onTap: () async {
                         final movement = await showMovementPicker(
                           selectedMovement: _cardioSessionDescription.movement,
@@ -235,9 +233,7 @@ class _CardioEditPageState extends State<CardioEditPage> {
                     EditTile(
                       leading: AppIcons.route,
                       caption: "Route",
-                      child: Text(
-                        _cardioSessionDescription.route?.name ?? "",
-                      ),
+                      child: Text(_cardioSessionDescription.route?.name ?? ""),
                       onTap: () async {
                         final route = await showRoutePicker(
                           selectedRoute: _cardioSessionDescription.route,

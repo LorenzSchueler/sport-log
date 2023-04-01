@@ -49,6 +49,7 @@ class MetconSessionResultsCard extends StatelessWidget {
             EditTile(
               leading: null,
               caption: "Previous Scores",
+              unboundedHeight: true,
               child: Column(
                 children: [
                   for (final metconSessionDescription
