@@ -9,14 +9,17 @@ use axum::{
     Router,
 };
 use base64::{engine::general_purpose::STANDARD, Engine};
-use chrono::{Duration, Utc};
+use chrono::{DateTime, Duration, Utc};
 use diesel::r2d2::{ConnectionManager, CustomizeConnection, Pool};
+use hyper::body;
 use mime::APPLICATION_JSON;
 use rand::Rng;
 use sport_log_types::{
-    uri::{route_max_version, ADM_PLATFORM, AP_ACTION_PROVIDER, AP_PLATFORM, DIARY, USER},
-    Action, ActionEvent, ActionEventId, ActionId, ActionProvider, ActionProviderId, Diary, DiaryId,
-    Platform, PlatformId, User, UserId, ADMIN_USERNAME, ID_HEADER,
+    uri::{
+        route_max_version, ACCOUNT_DATA, ADM_PLATFORM, AP_ACTION_PROVIDER, AP_PLATFORM, DIARY, USER,
+    },
+    AccountData, Action, ActionEvent, ActionEventId, ActionId, ActionProvider, ActionProviderId,
+    Diary, DiaryId, Platform, PlatformId, User, UserId, ADMIN_USERNAME, ID_HEADER,
 };
 use tower::{Service, ServiceExt};
 
@@ -869,6 +872,58 @@ async fn foreign_update() {
     .await;
 
     assert_eq!(response.status(), StatusCode::FORBIDDEN);
+}
+
+#[tokio::test]
+async fn get_account_data() {
+    async fn inner(router: &mut Router, now: &DateTime<Utc>) -> (StatusCode, AccountData) {
+        let header = auth_header(&TEST_USER.username, &TEST_USER.password);
+        let now = &now.to_rfc3339().replace("+00:00", "Z");
+        let response = request(
+            router,
+            Request::get(route_max_version("", ACCOUNT_DATA, &[("last_sync", now)]))
+                .header(header.0, header.1)
+                .body(Body::empty())
+                .unwrap(),
+        )
+        .await;
+
+        let status = response.status();
+        let data = String::from_utf8(body::to_bytes(response.into_body()).await.unwrap().to_vec())
+            .unwrap();
+        let account_data = serde_json::from_str(&data).unwrap();
+        (status, account_data)
+    }
+
+    let (mut router, db_pool, _) = init().await;
+
+    let now = Utc::now();
+    let (status, account_data) = inner(&mut router, &now).await;
+
+    assert_eq!(status, StatusCode::OK);
+    assert!(account_data.diaries.is_empty());
+
+    let now = Utc::now() - Duration::seconds(10); // TODO
+    DiaryDb::create(&TEST_DIARY, &mut db_pool.get().unwrap()).unwrap();
+    let (status, account_data) = inner(&mut router, &now).await;
+
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(account_data.diaries.len(), 1);
+    assert_eq!(account_data.diaries[0].id, TEST_DIARY.id);
+
+    let now = Utc::now();
+    let (status, account_data) = inner(&mut router, &now).await;
+
+    assert_eq!(status, StatusCode::OK);
+    assert!(account_data.diaries.is_empty());
+
+    let now = Utc::now() - Duration::seconds(10); // TODO
+    DiaryDb::update(&TEST_DIARY, &mut db_pool.get().unwrap()).unwrap();
+    let (status, account_data) = inner(&mut router, &now).await;
+
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(account_data.diaries.len(), 1);
+    assert_eq!(account_data.diaries[0].id, TEST_DIARY.id);
 }
 
 #[tokio::test]
