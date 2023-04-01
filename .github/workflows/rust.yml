@@ -92,12 +92,13 @@ jobs:
            cargo check --manifest-path sport-log-scheduler/Cargo.toml &&
            cargo check --manifest-path sport-log-server/Cargo.toml &&
            cargo check --manifest-path sport-log-types/Cargo.toml &&
-           cargo check --manifest-path sport-log-types-derive/Cargo.toml
+           cargo check --manifest-path sport-log-types-derive/Cargo.toml &&
+           cargo check --tests
 
     #- name: Run tests
     #  run: cargo test --verbose
 
-  check:
+  deps:
     name: unused deps
     runs-on: ubuntu-latest
 
