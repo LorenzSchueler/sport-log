@@ -1,5 +1,5 @@
 use axum::{
-    body::Body,
+    body::{Body, HttpBody},
     headers::HeaderName,
     http::{
         header::{AUTHORIZATION, CONTENT_TYPE},
@@ -215,21 +215,24 @@ fn assert_json(response: &Response) {
     );
 }
 
+async fn request<B>(router: &mut Router<(), B>, request: Request<B>) -> Response
+where
+    B: HttpBody + Send + 'static,
+{
+    router.ready().await.unwrap().call(request).await.unwrap()
+}
+
 /// Use a get request to make sure that the authentication succeeds.
 async fn auth(router: &mut Router, route: &str, username: &str, password: &str) {
     let header = auth_header(username, password);
-    let response = router
-        .ready()
-        .await
-        .unwrap()
-        .call(
-            Request::get(route)
-                .header(header.0, header.1)
-                .body(Body::empty())
-                .unwrap(),
-        )
-        .await
-        .unwrap();
+    let response = request(
+        router,
+        Request::get(route)
+            .header(header.0, header.1)
+            .body(Body::empty())
+            .unwrap(),
+    )
+    .await;
 
     assert_eq!(response.status(), StatusCode::OK);
     assert_json(&response);
@@ -238,35 +241,27 @@ async fn auth(router: &mut Router, route: &str, username: &str, password: &str) 
 /// Use a get request to make sure that the authentication with wrong credentials does not succeed.
 async fn auth_wrong_credentials(router: &mut Router, route: &str, username: &str) {
     let header = auth_header(username, "wrong password");
-    let response = router
-        .ready()
-        .await
-        .unwrap()
-        .call(
-            Request::get(route)
-                .header(header.0, header.1)
-                .body(Body::empty())
-                .unwrap(),
-        )
-        .await
-        .unwrap();
+    let response = request(
+        router,
+        Request::get(route)
+            .header(header.0, header.1)
+            .body(Body::empty())
+            .unwrap(),
+    )
+    .await;
 
     assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
     assert_json(&response);
 
     let header = auth_header("wrong username", "wrong password");
-    let response = router
-        .ready()
-        .await
-        .unwrap()
-        .call(
-            Request::get(route)
-                .header(header.0, header.1)
-                .body(Body::empty())
-                .unwrap(),
-        )
-        .await
-        .unwrap();
+    let response = request(
+        router,
+        Request::get(route)
+            .header(header.0, header.1)
+            .body(Body::empty())
+            .unwrap(),
+    )
+    .await;
 
     assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
     assert_json(&response);
@@ -274,13 +269,7 @@ async fn auth_wrong_credentials(router: &mut Router, route: &str, username: &str
 
 /// Use a get request to make sure that the authentication without credentials does not succeed.
 async fn auth_without_credentials(router: &mut Router, route: &str) {
-    let response = router
-        .ready()
-        .await
-        .unwrap()
-        .call(Request::get(route).body(Body::empty()).unwrap())
-        .await
-        .unwrap();
+    let response = request(router, Request::get(route).body(Body::empty()).unwrap()).await;
 
     assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
     assert_json(&response);
@@ -289,19 +278,15 @@ async fn auth_without_credentials(router: &mut Router, route: &str) {
 /// Use a get request to make sure that the authentication as a user succeeds.
 async fn auth_as(router: &mut Router, route: &str, username: &str, id: i64, password: &str) {
     let [basic_header, user_id_header] = auth_as_headers(username, id, password);
-    let response = router
-        .ready()
-        .await
-        .unwrap()
-        .call(
-            Request::get(route)
-                .header(basic_header.0, basic_header.1)
-                .header(user_id_header.0, user_id_header.1)
-                .body(Body::empty())
-                .unwrap(),
-        )
-        .await
-        .unwrap();
+    let response = request(
+        router,
+        Request::get(route)
+            .header(basic_header.0, basic_header.1)
+            .header(user_id_header.0, user_id_header.1)
+            .body(Body::empty())
+            .unwrap(),
+    )
+    .await;
 
     assert_eq!(response.status(), StatusCode::OK);
     assert_json(&response);
@@ -316,19 +301,15 @@ async fn auth_as_not_allowed(
     password: &str,
 ) {
     let [basic_header, user_id_header] = auth_as_headers(username, id, password);
-    let response = router
-        .ready()
-        .await
-        .unwrap()
-        .call(
-            Request::get(route)
-                .header(basic_header.0, basic_header.1)
-                .header(user_id_header.0, user_id_header.1)
-                .body(Body::empty())
-                .unwrap(),
-        )
-        .await
-        .unwrap();
+    let response = request(
+        router,
+        Request::get(route)
+            .header(basic_header.0, basic_header.1)
+            .header(user_id_header.0, user_id_header.1)
+            .body(Body::empty())
+            .unwrap(),
+    )
+    .await;
 
     assert_eq!(response.status(), StatusCode::FORBIDDEN);
     assert_json(&response);
@@ -337,37 +318,29 @@ async fn auth_as_not_allowed(
 /// Use a get request to make sure that the authentication as a user with wrong credentials does not succeed.
 async fn auth_as_wrong_credentials(router: &mut Router, route: &str, username: &str, id: i64) {
     let [basic_header, user_id_header] = auth_as_headers(username, id, "wrong password");
-    let response = router
-        .ready()
-        .await
-        .unwrap()
-        .call(
-            Request::get(route)
-                .header(basic_header.0, basic_header.1)
-                .header(user_id_header.0, user_id_header.1)
-                .body(Body::empty())
-                .unwrap(),
-        )
-        .await
-        .unwrap();
+    let response = request(
+        router,
+        Request::get(route)
+            .header(basic_header.0, basic_header.1)
+            .header(user_id_header.0, user_id_header.1)
+            .body(Body::empty())
+            .unwrap(),
+    )
+    .await;
 
     assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
     assert_json(&response);
 
     let [basic_header, user_id_header] = auth_as_headers("wrong username", 1, "wrong password");
-    let response = router
-        .ready()
-        .await
-        .unwrap()
-        .call(
-            Request::get(route)
-                .header(basic_header.0, basic_header.1)
-                .header(user_id_header.0, user_id_header.1)
-                .body(Body::empty())
-                .unwrap(),
-        )
-        .await
-        .unwrap();
+    let response = request(
+        router,
+        Request::get(route)
+            .header(basic_header.0, basic_header.1)
+            .header(user_id_header.0, user_id_header.1)
+            .body(Body::empty())
+            .unwrap(),
+    )
+    .await;
 
     assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
     assert_json(&response);
@@ -376,19 +349,15 @@ async fn auth_as_wrong_credentials(router: &mut Router, route: &str, username: &
 /// Use a get request to make sure that the authentication as a user without credentials does not succeed.
 async fn auth_as_without_credentials(router: &mut Router, route: &str, id: i64) {
     let [basic_header, user_id_header] = auth_as_headers("", id, "wrong password");
-    let response = router
-        .ready()
-        .await
-        .unwrap()
-        .call(
-            Request::get(route)
-                .header(basic_header.0, basic_header.1)
-                .header(user_id_header.0, user_id_header.1)
-                .body(Body::empty())
-                .unwrap(),
-        )
-        .await
-        .unwrap();
+    let response = request(
+        router,
+        Request::get(route)
+            .header(basic_header.0, basic_header.1)
+            .header(user_id_header.0, user_id_header.1)
+            .body(Body::empty())
+            .unwrap(),
+    )
+    .await;
 
     assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
     assert_json(&response);
@@ -741,19 +710,15 @@ async fn own_create() {
 
     // check that create works for same user
     let header = auth_header(&TEST_USER.username, &TEST_USER.password);
-    let response = router
-        .ready()
-        .await
-        .unwrap()
-        .call(
-            Request::post(route_max_version("", DIARY, &[]))
-                .header(header.0, header.1)
-                .header(CONTENT_TYPE, APPLICATION_JSON.as_ref())
-                .body(serde_json::to_string(&TEST_DIARY as &Diary).unwrap().into())
-                .unwrap(),
-        )
-        .await
-        .unwrap();
+    let response = request(
+        &mut router,
+        Request::post(route_max_version("", DIARY, &[]))
+            .header(header.0, header.1)
+            .header(CONTENT_TYPE, APPLICATION_JSON.as_ref())
+            .body(serde_json::to_string(&TEST_DIARY as &Diary).unwrap().into())
+            .unwrap(),
+    )
+    .await;
 
     assert_eq!(response.status(), StatusCode::OK);
 }
@@ -764,19 +729,15 @@ async fn foreign_create() {
 
     // check that create does not work for other user
     let header = auth_header(&TEST_USER2.username, &TEST_USER2.password);
-    let response = router
-        .ready()
-        .await
-        .unwrap()
-        .call(
-            Request::post(route_max_version("", DIARY, &[]))
-                .header(header.0, header.1)
-                .header(CONTENT_TYPE, APPLICATION_JSON.as_ref())
-                .body(serde_json::to_string(&TEST_DIARY as &Diary).unwrap().into())
-                .unwrap(),
-        )
-        .await
-        .unwrap();
+    let response = request(
+        &mut router,
+        Request::post(route_max_version("", DIARY, &[]))
+            .header(header.0, header.1)
+            .header(CONTENT_TYPE, APPLICATION_JSON.as_ref())
+            .body(serde_json::to_string(&TEST_DIARY as &Diary).unwrap().into())
+            .unwrap(),
+    )
+    .await;
 
     assert_eq!(response.status(), StatusCode::FORBIDDEN);
 }
@@ -789,22 +750,18 @@ async fn own_get() {
 
     // check that get works for same user
     let header = auth_header(&TEST_USER.username, &TEST_USER.password);
-    let response = router
-        .ready()
-        .await
-        .unwrap()
-        .call(
-            Request::get(route_max_version(
-                "",
-                DIARY,
-                &[("id", &TEST_DIARY.id.0.to_string())],
-            ))
-            .header(header.0, header.1)
-            .body(Body::empty())
-            .unwrap(),
-        )
-        .await
-        .unwrap();
+    let response = request(
+        &mut router,
+        Request::get(route_max_version(
+            "",
+            DIARY,
+            &[("id", &TEST_DIARY.id.0.to_string())],
+        ))
+        .header(header.0, header.1)
+        .body(Body::empty())
+        .unwrap(),
+    )
+    .await;
 
     assert_eq!(response.status(), StatusCode::OK);
 }
@@ -817,22 +774,18 @@ async fn foreign_get() {
 
     // check that get does not work for other user
     let header = auth_header(&TEST_USER2.username, &TEST_USER2.password);
-    let response = router
-        .ready()
-        .await
-        .unwrap()
-        .call(
-            Request::get(route_max_version(
-                "",
-                DIARY,
-                &[("id", &TEST_DIARY.id.0.to_string())],
-            ))
-            .header(header.0, header.1)
-            .body(Body::empty())
-            .unwrap(),
-        )
-        .await
-        .unwrap();
+    let response = request(
+        &mut router,
+        Request::get(route_max_version(
+            "",
+            DIARY,
+            &[("id", &TEST_DIARY.id.0.to_string())],
+        ))
+        .header(header.0, header.1)
+        .body(Body::empty())
+        .unwrap(),
+    )
+    .await;
 
     assert_eq!(response.status(), StatusCode::FORBIDDEN);
 }
@@ -845,21 +798,35 @@ async fn own_update() {
 
     // check that update works for same user
     let header = auth_header(&TEST_USER.username, &TEST_USER.password);
-    let response = router
-        .ready()
-        .await
-        .unwrap()
-        .call(
-            Request::put(&route_max_version("", DIARY, &[]))
-                .header(header.0, header.1)
-                .header(CONTENT_TYPE, APPLICATION_JSON.as_ref())
-                .body(serde_json::to_string(&TEST_DIARY as &Diary).unwrap().into())
-                .unwrap(),
-        )
-        .await
-        .unwrap();
+    let response = request(
+        &mut router,
+        Request::put(&route_max_version("", DIARY, &[]))
+            .header(header.0, header.1)
+            .header(CONTENT_TYPE, APPLICATION_JSON.as_ref())
+            .body(serde_json::to_string(&TEST_DIARY as &Diary).unwrap().into())
+            .unwrap(),
+    )
+    .await;
 
     assert_eq!(response.status(), StatusCode::OK);
+}
+
+#[tokio::test]
+async fn own_update_non_existing() {
+    let (mut router, _, _) = init().await;
+
+    let header = auth_header(&TEST_USER.username, &TEST_USER.password);
+    let response = request(
+        &mut router,
+        Request::put(&route_max_version("", DIARY, &[]))
+            .header(header.0, header.1)
+            .header(CONTENT_TYPE, APPLICATION_JSON.as_ref())
+            .body(serde_json::to_string(&TEST_DIARY as &Diary).unwrap().into())
+            .unwrap(),
+    )
+    .await;
+
+    assert_eq!(response.status(), StatusCode::FORBIDDEN);
 }
 
 #[tokio::test]
@@ -870,19 +837,15 @@ async fn foreign_update() {
 
     // check that update does not work for other user
     let header = auth_header(&TEST_USER2.username, &TEST_USER2.password);
-    let response = router
-        .ready()
-        .await
-        .unwrap()
-        .call(
-            Request::put(&route_max_version("", DIARY, &[]))
-                .header(header.0, header.1)
-                .header(CONTENT_TYPE, APPLICATION_JSON.as_ref())
-                .body(serde_json::to_string(&TEST_DIARY as &Diary).unwrap().into())
-                .unwrap(),
-        )
-        .await
-        .unwrap();
+    let response = request(
+        &mut router,
+        Request::put(&route_max_version("", DIARY, &[]))
+            .header(header.0, header.1)
+            .header(CONTENT_TYPE, APPLICATION_JSON.as_ref())
+            .body(serde_json::to_string(&TEST_DIARY as &Diary).unwrap().into())
+            .unwrap(),
+    )
+    .await;
 
     assert_eq!(response.status(), StatusCode::FORBIDDEN);
 }
@@ -899,18 +862,14 @@ async fn user_self_registration() {
         email: format!("email{}", user_id.0),
     };
 
-    let response = router
-        .ready()
-        .await
-        .unwrap()
-        .call(
-            Request::post(&route_max_version("", USER, &[]))
-                .header(CONTENT_TYPE, APPLICATION_JSON.as_ref())
-                .body(serde_json::to_string(&user).unwrap().into())
-                .unwrap(),
-        )
-        .await
-        .unwrap();
+    let response = request(
+        &mut router,
+        Request::post(&route_max_version("", USER, &[]))
+            .header(CONTENT_TYPE, APPLICATION_JSON.as_ref())
+            .body(serde_json::to_string(&user).unwrap().into())
+            .unwrap(),
+    )
+    .await;
 
     if config.user_self_registration {
         assert_eq!(response.status(), StatusCode::OK);
@@ -931,18 +890,14 @@ async fn ap_self_registration() {
         deleted: false,
     };
 
-    let response = router
-        .ready()
-        .await
-        .unwrap()
-        .call(
-            Request::post(&route_max_version("", AP_PLATFORM, &[]))
-                .header(CONTENT_TYPE, APPLICATION_JSON.as_ref())
-                .body(serde_json::to_string(&platform).unwrap().into())
-                .unwrap(),
-        )
-        .await
-        .unwrap();
+    let response = request(
+        &mut router,
+        Request::post(&route_max_version("", AP_PLATFORM, &[]))
+            .header(CONTENT_TYPE, APPLICATION_JSON.as_ref())
+            .body(serde_json::to_string(&platform).unwrap().into())
+            .unwrap(),
+    )
+    .await;
 
     if config.ap_self_registration {
         assert_eq!(response.status(), StatusCode::OK);
@@ -950,17 +905,13 @@ async fn ap_self_registration() {
         assert_eq!(response.status(), StatusCode::FORBIDDEN);
     }
 
-    let response = router
-        .ready()
-        .await
-        .unwrap()
-        .call(
-            Request::get(&route_max_version("", AP_PLATFORM, &[]))
-                .body(Body::empty())
-                .unwrap(),
-        )
-        .await
-        .unwrap();
+    let response = request(
+        &mut router,
+        Request::get(&route_max_version("", AP_PLATFORM, &[]))
+            .body(Body::empty())
+            .unwrap(),
+    )
+    .await;
 
     if config.ap_self_registration {
         assert_eq!(response.status(), StatusCode::OK);
@@ -978,44 +929,18 @@ async fn ap_self_registration() {
         deleted: false,
     };
 
-    let response = router
-        .ready()
-        .await
-        .unwrap()
-        .call(
-            Request::post(&route_max_version("", AP_ACTION_PROVIDER, &[]))
-                .header(CONTENT_TYPE, APPLICATION_JSON.as_ref())
-                .body(serde_json::to_string(&action_provider).unwrap().into())
-                .unwrap(),
-        )
-        .await
-        .unwrap();
+    let response = request(
+        &mut router,
+        Request::post(&route_max_version("", AP_ACTION_PROVIDER, &[]))
+            .header(CONTENT_TYPE, APPLICATION_JSON.as_ref())
+            .body(serde_json::to_string(&action_provider).unwrap().into())
+            .unwrap(),
+    )
+    .await;
 
     if config.ap_self_registration {
         assert_eq!(response.status(), StatusCode::OK);
     } else {
         assert_eq!(response.status(), StatusCode::FORBIDDEN);
     }
-}
-
-#[tokio::test]
-async fn update_non_existing() {
-    let (mut router, _, _) = init().await;
-
-    let header = auth_header(&TEST_USER.username, &TEST_USER.password);
-    let response = router
-        .ready()
-        .await
-        .unwrap()
-        .call(
-            Request::put(&route_max_version("", DIARY, &[]))
-                .header(header.0, header.1)
-                .header(CONTENT_TYPE, APPLICATION_JSON.as_ref())
-                .body(serde_json::to_string(&TEST_DIARY as &Diary).unwrap().into())
-                .unwrap(),
-        )
-        .await
-        .unwrap();
-
-    assert_eq!(response.status(), StatusCode::FORBIDDEN);
 }
