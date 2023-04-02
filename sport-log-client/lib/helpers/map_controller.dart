@@ -185,59 +185,66 @@ class MapController {
     });
   }
 
-  Future<PolylineAnnotation?> addRouteLine(Iterable<Position> route) async =>
+  Future<PolylineAnnotation?> _addLine(
+    Iterable<Position> route,
+    int color,
+  ) async =>
       await _lineManager?.create(
         PolylineAnnotationOptions(
           geometry: route.map((p) => p.latLng).toGeoJsonLineString(),
           lineWidth: 2,
-          lineColor: Defaults.mapbox.routeLineColor,
+          lineColor: color,
         ),
       );
+
+  Future<PolylineAnnotation?> addLine(
+    Iterable<Position> route,
+    Color color,
+  ) =>
+      _addLine(
+        route,
+        0xFF000000 + color.red * 0x10000 + color.green * 0x100 + color.blue,
+      );
+
+  Future<void> _updateLine(
+    NullablePointer<PolylineAnnotation> line,
+    Iterable<Position>? track,
+    int color,
+  ) async {
+    await _lock.synchronized(() async {
+      if (line.isNull && track != null) {
+        line.object = await _addLine(track, color);
+      } else if (line.isNotNull && track != null) {
+        line.object!.geometry =
+            track.map((p) => p.latLng).toGeoJsonLineString();
+        await _lineManager?.update(line.object!);
+      } else if (line.isNotNull && track == null) {
+        await removeLine(line.object!);
+        line.setNull();
+      }
+    });
+  }
+
+  Future<void> removeLine(PolylineAnnotation line) async =>
+      await _lineManager?.delete(line);
+
+  Future<PolylineAnnotation?> addRouteLine(Iterable<Position> route) =>
+      _addLine(route, Defaults.mapbox.routeLineColor);
 
   Future<void> updateRouteLine(
     NullablePointer<PolylineAnnotation> line,
     Iterable<Position>? track,
-  ) async {
-    await _lock.synchronized(() async {
-      if (line.isNull && track != null) {
-        line.object = await addRouteLine(track);
-      } else if (line.isNotNull && track != null) {
-        line.object!.geometry =
-            track.map((p) => p.latLng).toGeoJsonLineString();
-        await _lineManager?.update(line.object!);
-      } else if (line.isNotNull && track == null) {
-        await _lineManager?.delete(line.object!);
-        line.setNull();
-      }
-    });
-  }
+  ) =>
+      _updateLine(line, track, Defaults.mapbox.routeLineColor);
 
-  Future<PolylineAnnotation?> addTrackLine(Iterable<Position> track) async =>
-      await _lineManager?.create(
-        PolylineAnnotationOptions(
-          geometry: track.map((p) => p.latLng).toGeoJsonLineString(),
-          lineWidth: 2,
-          lineColor: Defaults.mapbox.trackLineColor,
-        ),
-      );
+  Future<PolylineAnnotation?> addTrackLine(Iterable<Position> track) =>
+      _addLine(track, Defaults.mapbox.trackLineColor);
 
   Future<void> updateTrackLine(
     NullablePointer<PolylineAnnotation> line,
     Iterable<Position>? track,
-  ) async {
-    await _lock.synchronized(() async {
-      if (line.isNull && track != null) {
-        line.object = await addTrackLine(track);
-      } else if (line.isNotNull && track != null) {
-        line.object!.geometry =
-            track.map((p) => p.latLng).toGeoJsonLineString();
-        await _lineManager?.update(line.object!);
-      } else if (line.isNotNull && track == null) {
-        await _lineManager?.delete(line.object!);
-        line.setNull();
-      }
-    });
-  }
+  ) =>
+      _updateLine(line, track, Defaults.mapbox.trackLineColor);
 
   Future<List<CircleAnnotation>?> addCurrentLocationMarker(
     LatLng latLng,
