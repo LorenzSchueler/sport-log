@@ -121,8 +121,23 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
     });
   }
 
-  Color randomColor() =>
-      Color((Random().nextDouble() * 0xFFFFFF).toInt()).withOpacity(1);
+  Future<void> _showSession(CardioSession session) async {
+    final color =
+        Color((Random().nextDouble() * 0xFFFFFF).toInt()).withOpacity(1);
+    final line = await _mapController?.addLine(session.track!, color);
+    if (line != null) {
+      _similarTrackLines.putIfAbsent(session, () => line);
+      _similarTrackColors.putIfAbsent(session, () => color);
+      setState(() {});
+    }
+  }
+
+  void _hideSession(CardioSession session) {
+    final line = _similarTrackLines.remove(session);
+    _mapController?.removeLine(line!);
+    _similarTrackColors.remove(session);
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -308,37 +323,12 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
                             itemCount: _similarSessions!.length,
                             itemBuilder: (_, index) {
                               final session = _similarSessions![index];
-                              final line = _similarTrackLines[session];
-                              final color = _similarTrackColors[session];
                               return SimilarCardioSessionCard(
                                 session: session,
-                                line: line,
-                                color: color,
-                                onShow: () async {
-                                  final color = randomColor();
-                                  final line = await _mapController?.addLine(
-                                    session.track!,
-                                    color,
-                                  );
-                                  if (line != null) {
-                                    _similarTrackLines.putIfAbsent(
-                                      session,
-                                      () => line,
-                                    );
-                                    _similarTrackColors.putIfAbsent(
-                                      session,
-                                      () => color,
-                                    );
-                                    setState(() {});
-                                  }
-                                },
-                                onHide: () {
-                                  assert(line != null);
-                                  _mapController?.removeLine(line!);
-                                  _similarTrackLines.remove(session);
-                                  _similarTrackColors.remove(session);
-                                  setState(() {});
-                                },
+                                line: _similarTrackLines[session],
+                                color: _similarTrackColors[session],
+                                onShow: () => _showSession(session),
+                                onHide: () => _hideSession(session),
                               );
                             },
                             separatorBuilder: (_, __) =>
