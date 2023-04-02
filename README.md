@@ -38,7 +38,6 @@ The server and action providers as well as helper tools and libraries are struct
 - [**sport-log-api-tester**](sport-log-api-tester) command line HTTP client for API testing and manual communication with the server
 - [**sport-log-password-hasher**](sport-log-password-hasher) hash passwords and verify hashes and passwords that can be stored in the server backend
 - [**sport-log-ap-utils**](sport-log-ap-utils) helper functions for rust action providers
-- [**sport-log-action-provider-map-matcher**](sport-log-action-provider-map-matcher) matches tracked cardio sessions against OSM paths and stores them as routes
 - [**sport-log-action-provider-sportstracker**](sport-log-action-provider-sportstracker) fetches new cardio sessions from sportstracker
 - [**sport-log-action-provider-wodify-login**](sport-log-action-provider-wodify-login) reserves spots in crossfit classes
 - [**sport-log-action-provider-wodify-wod**](sport-log-action-provider-wodify-wod) fetches and saved the wod
