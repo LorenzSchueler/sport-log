@@ -86,7 +86,7 @@ class DistanceChart extends StatelessWidget {
           ? null
           : xValues[xValues.length ~/ 2]; // median
       if (xValue != null && xValue != lastX) {
-        touchCallback?.call(xValue * 1000);
+        touchCallback?.call(xValue);
       }
       lastX = xValue;
     } else if (event is FlLongPressEnd) {
@@ -116,14 +116,15 @@ class DistanceChart extends StatelessWidget {
       minY -= 1;
     }
 
+    // interval in m only at whole km at most 8
     final xInterval = chartLines
         .map(
           (chartLine) =>
               max(
                 1,
-                (chartLine.chartValues.lastOrNull?.distance ?? 0) / 8 / 100,
+                (chartLine.chartValues.lastOrNull?.distance ?? 0) / 8 / 1000,
               ).ceil().toDouble() *
-              100,
+              1000,
         )
         .max;
 
@@ -137,12 +138,7 @@ class DistanceChart extends StatelessWidget {
               for (final chartLine in chartLines)
                 LineChartBarData(
                   spots: chartLine.chartValues
-                      .map(
-                        (v) => FlSpot(
-                          v.distance / 1000,
-                          v.value,
-                        ),
-                      )
+                      .map((v) => FlSpot(v.distance, v.value))
                       .toList(),
                   color: chartLine.lineColor,
                   dotData: FlDotData(show: false),
@@ -162,10 +158,10 @@ class DistanceChart extends StatelessWidget {
               bottomTitles: AxisTitles(
                 sideTitles: SideTitles(
                   showTitles: true,
-                  interval: xInterval / 1000,
-                  getTitlesWidget: (km, _) => Text(
-                    (km * 1000).round() % xInterval.round() == 0
-                        ? km.toStringAsFixed(1)
+                  interval: xInterval,
+                  getTitlesWidget: (m, _) => Text(
+                    m.round() % xInterval.round() == 0
+                        ? (m / 1000).round().toString()
                         : "", // remove label at last value
                     style: TextStyle(color: labelColor),
                   ),
