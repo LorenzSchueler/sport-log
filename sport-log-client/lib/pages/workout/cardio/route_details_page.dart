@@ -25,10 +25,13 @@ class RouteDetailsPage extends StatefulWidget {
   State<RouteDetailsPage> createState() => _RouteDetailsPageState();
 }
 
-class _RouteDetailsPageState extends State<RouteDetailsPage> {
+class _RouteDetailsPageState extends State<RouteDetailsPage>
+    with SingleTickerProviderStateMixin {
   late Route _route = widget.route.clone();
 
   MapController? _mapController;
+  late final TabController _tabController =
+      TabController(length: 2, vsync: this)..addListener(() => setState(() {}));
 
   final NullablePointer<PolylineAnnotation> _routeLine =
       NullablePointer.nullPointer();
@@ -98,59 +101,74 @@ class _RouteDetailsPageState extends State<RouteDetailsPage> {
         builder: (context, fullscreen, _) => Column(
           children: [
             Expanded(
-              child: Stack(
-                children: [
-                  _route.track != null && _route.track!.isNotEmpty
-                      ? MapboxMapWrapper(
-                          showScale: true,
-                          showFullscreenButton: true,
-                          showMapStylesButton: true,
-                          showSelectRouteButton: false,
-                          showSetNorthButton: true,
-                          showCurrentLocationButton: false,
-                          showCenterLocationButton: false,
-                          onFullscreenToggle: fullscreen.setState,
-                          scaleAtTop: fullscreen.isOff,
-                          onMapCreated: _onMapCreated,
-                        )
-                      : Center(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                AppIcons.route,
-                                color: Theme.of(context).colorScheme.onSurface,
-                              ),
-                              Defaults.sizedBox.horizontal.normal,
-                              const Text("no track available"),
-                            ],
+              child: _route.track != null && _route.track!.isNotEmpty
+                  ? MapboxMapWrapper(
+                      showScale: true,
+                      showFullscreenButton: true,
+                      showMapStylesButton: true,
+                      showSelectRouteButton: false,
+                      showSetNorthButton: true,
+                      showCurrentLocationButton: false,
+                      showCenterLocationButton: false,
+                      onFullscreenToggle: fullscreen.setState,
+                      scaleAtTop: fullscreen.isOff,
+                      onMapCreated: _onMapCreated,
+                    )
+                  : Center(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            AppIcons.route,
+                            color: Theme.of(context).colorScheme.onSurface,
                           ),
-                        ),
-                  if (_route.track != null && fullscreen.isOff)
-                    Positioned(
-                      bottom: 0,
-                      left: 0,
-                      right: 0,
-                      child: Container(
-                        color: const Color.fromARGB(150, 0, 0, 0),
-                        child: DistanceChart(
-                          chartLines: [_elevationLine()],
-                          yFromZero: true,
-                          touchCallback: _touchCallback,
-                        ),
+                          Defaults.sizedBox.horizontal.normal,
+                          const Text("no track available"),
+                        ],
                       ),
                     ),
-                ],
-              ),
             ),
             if (fullscreen.isOff)
+              TabBar(
+                controller: _tabController,
+                indicatorColor: Theme.of(context).colorScheme.primary,
+                tabs: const [
+                  Tab(
+                    text: "Stats",
+                    icon: Icon(Icons.format_list_numbered_rounded),
+                  ),
+                  Tab(text: "Chart", icon: Icon(Icons.show_chart_rounded)),
+                ],
+              ),
+            if (fullscreen.isOff && _tabController.index == 0)
               Container(
                 padding: Defaults.edgeInsets.normal,
                 color: Theme.of(context).colorScheme.background,
-                child: RouteValueUnitDescriptionTable(
-                  route: _route,
-                ),
+                child: RouteValueUnitDescriptionTable(route: _route),
               ),
+            if (fullscreen.isOff && _tabController.index == 1)
+              _route.track != null
+                  ? Container(
+                      color: const Color.fromARGB(150, 0, 0, 0),
+                      child: DistanceChart(
+                        chartLines: [_elevationLine()],
+                        yFromZero: false,
+                        touchCallback: _touchCallback,
+                      ),
+                    )
+                  : Center(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            AppIcons.route,
+                            color: Theme.of(context).colorScheme.onSurface,
+                          ),
+                          Defaults.sizedBox.horizontal.normal,
+                          const Text("no track available"),
+                        ],
+                      ),
+                    ),
           ],
         ),
       ),

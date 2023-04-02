@@ -175,7 +175,7 @@ class DistanceChart extends StatelessWidget {
               leftTitles: AxisTitles(
                 sideTitles: SideTitles(
                   showTitles: true,
-                  reservedSize: 30,
+                  reservedSize: 40,
                   getTitlesWidget: (value, _) => Text(
                     value.round().toString(),
                     style: TextStyle(color: labelColor),
@@ -185,10 +185,10 @@ class DistanceChart extends StatelessWidget {
             ),
             gridData: FlGridData(
               getDrawingHorizontalLine:
-                  gridLineDrawer(context: context, color: Colors.black),
+                  gridLineDrawer(context: context, color: Colors.grey),
               verticalInterval: xInterval,
               getDrawingVerticalLine:
-                  gridLineDrawer(context: context, color: Colors.black),
+                  gridLineDrawer(context: context, color: Colors.grey),
             ),
             borderData: FlBorderData(show: false),
           ),
