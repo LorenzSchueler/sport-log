@@ -187,7 +187,11 @@ class _DurationChartState extends State<DurationChart> {
             maxX: widget.maxX,
             extraLinesData: lastX == null
                 ? null
-                : ExtraLinesData(verticalLines: [VerticalLine(x: lastX!)]),
+                : ExtraLinesData(
+                    verticalLines: [
+                      VerticalLine(x: lastX!, color: Colors.white)
+                    ],
+                  ),
             lineTouchData: LineTouchData(
               enabled: false,
               touchSpotThreshold: double.infinity, // always get nearest point
@@ -215,9 +219,11 @@ class _DurationChartState extends State<DurationChart> {
               leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
             ),
             gridData: FlGridData(
+              getDrawingHorizontalLine:
+                  gridLineDrawer(context: context, color: Colors.grey),
               verticalInterval: widget.xInterval,
               getDrawingVerticalLine:
-                  gridLineDrawer(context: context, color: Colors.black),
+                  gridLineDrawer(context: context, color: Colors.grey),
             ),
             borderData: FlBorderData(show: false),
           ),
