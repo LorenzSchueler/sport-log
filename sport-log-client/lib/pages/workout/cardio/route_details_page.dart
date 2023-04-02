@@ -133,11 +133,8 @@ class _RouteDetailsPageState extends State<RouteDetailsPage>
                 controller: _tabController,
                 indicatorColor: Theme.of(context).colorScheme.primary,
                 tabs: const [
-                  Tab(
-                    text: "Stats",
-                    icon: Icon(Icons.format_list_numbered_rounded),
-                  ),
-                  Tab(text: "Chart", icon: Icon(Icons.show_chart_rounded)),
+                  Tab(text: "Stats", icon: Icon(AppIcons.numberedList)),
+                  Tab(text: "Chart", icon: Icon(AppIcons.chart)),
                 ],
               ),
             if (fullscreen.isOff && _tabController.index == 0)

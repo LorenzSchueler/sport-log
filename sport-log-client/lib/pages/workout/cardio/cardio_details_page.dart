@@ -69,8 +69,8 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
 
   static const _timeColor = Colors.white;
   static const _speedColor = Colors.blue;
-  static const _elevationColor = Color.fromARGB(255, 180, 140, 120);
-  static const _heartRateColor = Colors.orange;
+  static const _elevationColor = Color.fromARGB(255, 170, 130, 100);
+  static const _heartRateColor = Colors.red;
   static const _cadenceColor = Colors.green;
 
   Future<void> _onMapCreated(MapController mapController) async {
@@ -183,12 +183,9 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
                 controller: _tabController,
                 indicatorColor: Theme.of(context).colorScheme.primary,
                 tabs: const [
-                  Tab(
-                    text: "Stats",
-                    icon: Icon(Icons.format_list_numbered_rounded),
-                  ),
-                  Tab(text: "Chart", icon: Icon(Icons.show_chart_rounded)),
-                  Tab(text: "Compare", icon: Icon(Icons.compare)),
+                  Tab(text: "Stats", icon: Icon(AppIcons.numberedList)),
+                  Tab(text: "Chart", icon: Icon(AppIcons.chart)),
+                  Tab(text: "Compare", icon: Icon(AppIcons.compare)),
                 ],
               ),
             // TabBarView needs bounded height so different heights for tabs does not work
@@ -252,7 +249,7 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
                                   "$_cadence rpm",
                                   style: const TextStyle(color: _cadenceColor),
                                 ),
-                              // place holder when no value is set
+                              // placeholder when no value is set
                               if (_time == null &&
                                   _speed == null &&
                                   _elevation == null &&
@@ -518,13 +515,10 @@ class SimilarCardioSessionCard extends StatelessWidget {
                 ? Icon(AppIcons.route, color: color)
                 : const SizedBox(width: 24),
             line == null
-                ? IconButton(
-                    onPressed: onShow,
-                    icon: const Icon(Icons.add),
-                  )
+                ? IconButton(onPressed: onShow, icon: const Icon(AppIcons.add))
                 : IconButton(
                     onPressed: onHide,
-                    icon: const Icon(Icons.remove),
+                    icon: const Icon(AppIcons.remove),
                   )
           ],
         ),

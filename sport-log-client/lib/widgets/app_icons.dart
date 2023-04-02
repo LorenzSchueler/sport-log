@@ -25,6 +25,7 @@ class AppIcons {
 
   // actions
   static const IconData add = Icons.add_rounded;
+  static const IconData remove = Icons.remove_rounded;
   static const IconData addBox = Icons.add_box_rounded;
   static const IconData subtractBox = Icons.indeterminate_check_box_rounded;
   static const IconData delete = Icons.delete_rounded;
@@ -95,4 +96,7 @@ class AppIcons {
   static const IconData mountains = Icons.filter_hdr_rounded;
   static const IconData layers = Icons.layers_rounded;
   static const IconData developerMode = Icons.developer_mode;
+  static const IconData numberedList = Icons.format_list_numbered_rounded;
+  static const IconData chart = Icons.show_chart_rounded;
+  static const IconData compare = Icons.compare_rounded;
 }
