@@ -22,6 +22,7 @@ class CardioTrackingSettingsPageState
   Movement? _movement;
   CardioType _cardioType = CardioType.training;
   Route? _route;
+  bool _routeAlarm = false;
 
   @override
   Widget build(BuildContext context) {
@@ -75,10 +76,33 @@ class CardioTrackingSettingsPageState
                     context: context,
                   );
                   if (mounted) {
-                    setState(() => _route = route);
+                    setState(() {
+                      if (route == null) {
+                        return;
+                      } else if (route.id == _route?.id) {
+                        _route = null;
+                      } else {
+                        _route = route;
+                      }
+                    });
                   }
                 },
               ),
+              if (_route != null)
+                EditTile(
+                  leading: AppIcons.map,
+                  caption: "Alarm when off Route",
+                  child: SizedBox(
+                    height: 29, // make it fit into EditTile
+                    width: 34, // remove left padding
+                    child: Switch(
+                      value: _routeAlarm,
+                      onChanged: (alarm) {
+                        setState(() => _routeAlarm = alarm);
+                      },
+                    ),
+                  ),
+                ),
               heartRateUtils.devices.isEmpty
                   ? EditTile(
                       leading: AppIcons.heartbeat,
@@ -130,6 +154,7 @@ class CardioTrackingSettingsPageState
                               _movement,
                               _cardioType,
                               _route,
+                              _routeAlarm,
                               heartRateUtils.deviceId != null
                                   ? heartRateUtils
                                   : null,

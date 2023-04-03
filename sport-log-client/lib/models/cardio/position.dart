@@ -106,6 +106,17 @@ class Position {
     return R * sqrt(x * x + y * y);
   } // in m
 
+  double minDistanceTo(List<Position> track) {
+    var minDistance = double.infinity;
+    for (final point in track) {
+      final distance = _fastDistanceTo(point);
+      if (distance < minDistance) {
+        minDistance = distance;
+      }
+    }
+    return minDistance;
+  }
+
   double addDistanceTo(LatLng latLng) => distance + distanceTo(latLng);
 }
 

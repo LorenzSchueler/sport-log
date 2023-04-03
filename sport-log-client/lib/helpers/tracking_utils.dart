@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart' hide Route;
+import 'package:flutter_tts/flutter_tts.dart';
 import 'package:location/location.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart'
     hide Position, Settings;
@@ -28,6 +29,7 @@ class TrackingUtils extends ChangeNotifier {
     required Movement movement,
     required CardioType cardioType,
     required Route? route,
+    required bool routeAlarm,
     required HeartRateUtils? heartRateUtils,
   })  : _cardioSessionDescription = CardioSessionDescription(
           cardioSession: CardioSession.defaultValue(movement.id)
@@ -40,6 +42,7 @@ class TrackingUtils extends ChangeNotifier {
           movement: movement,
           route: route,
         ),
+        _routeAlarm = routeAlarm && route?.track != null,
         _heartRateUtils = heartRateUtils;
 
   final _dataProvider = CardioSessionDescriptionDataProvider();
@@ -87,6 +90,16 @@ class TrackingUtils extends ChangeNotifier {
       NullablePointer.nullPointer();
   final NullablePointer<List<CircleAnnotation>> _currentLocationMarker =
       NullablePointer.nullPointer();
+
+  final bool _routeAlarm;
+  DateTime? _lastAlarm;
+  static const _alarmInterval = Duration(minutes: 1);
+  final tts = FlutterTts()
+    ..setVoice({"name": "en-US-language", "locale": "en-US"});
+  //var voices = ((await tts.getVoices) as List).cast<Map>().where((m) {
+  //var d = m.cast<String, String>();
+  //return d["locale"] == "en-US";
+  //}).toList();
 
   static const maxSpeed = 250;
 
@@ -140,21 +153,20 @@ class TrackingUtils extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> saveCardioSession(BuildContext context) async {
-    _cardioSessionDescription.cardioSession.time = currentDuration;
-    _cardioSessionDescription.cardioSession.setEmptyListsToNull();
-    _cardioSessionDescription.cardioSession.setAscentDescent();
-    _cardioSessionDescription.cardioSession.setAvgCadence();
-    _cardioSessionDescription.cardioSession.setAvgHeartRate();
-    _cardioSessionDescription.cardioSession.setDistance();
+  Future<void> _save(BuildContext context, void Function() onSuccess) async {
+    final cardioSessionDescription = _cardioSessionDescription.clone();
+    cardioSessionDescription.cardioSession.time = currentDuration;
+    cardioSessionDescription.cardioSession.setEmptyListsToNull();
+    cardioSessionDescription.cardioSession.setAscentDescent();
+    cardioSessionDescription.cardioSession.setAvgCadence();
+    cardioSessionDescription.cardioSession.setAvgHeartRate();
+    cardioSessionDescription.cardioSession.setDistance();
     final result = _isSaved
-        ? await _dataProvider.updateSingle(_cardioSessionDescription)
-        : await _dataProvider.createSingle(_cardioSessionDescription);
+        ? await _dataProvider.updateSingle(cardioSessionDescription)
+        : await _dataProvider.createSingle(cardioSessionDescription);
     if (context.mounted) {
       if (result.isSuccess) {
-        Navigator.pop(context); // pop dialog
-        Navigator.pop(context); // pop tracking page
-        Navigator.pop(context); // pop tracking settings page
+        onSuccess();
       } else {
         await showMessageDialog(
           context: context,
@@ -164,29 +176,18 @@ class TrackingUtils extends ChangeNotifier {
     }
   }
 
+  Future<void> saveCardioSession(BuildContext context) async {
+    await _save(context, () {
+      Navigator.pop(context); // pop dialog
+      Navigator.pop(context); // pop tracking page
+      Navigator.pop(context); // pop tracking settings page
+    });
+  }
+
   Future<void> _autoSaveCardioSession() async {
     if (mode != TrackingMode.notStarted) {
-      final cardioSessionDescription = _cardioSessionDescription.clone();
-      cardioSessionDescription.cardioSession.time = currentDuration;
-      cardioSessionDescription.cardioSession.setEmptyListsToNull();
-      cardioSessionDescription.cardioSession.setAscentDescent();
-      cardioSessionDescription.cardioSession.setAvgCadence();
-      cardioSessionDescription.cardioSession.setAvgHeartRate();
-      cardioSessionDescription.cardioSession.setDistance();
-      final result = _isSaved
-          ? await _dataProvider.updateSingle(_cardioSessionDescription)
-          : await _dataProvider.createSingle(_cardioSessionDescription);
-      if (result.isSuccess) {
-        _isSaved = true;
-      } else {
-        final context = App.globalContext;
-        if (context.mounted) {
-          await showMessageDialog(
-            context: context,
-            text: 'Saving Cardio Session failed:\n${result.failure}',
-          );
-        }
-      }
+      final context = App.globalContext;
+      await _save(context, () => _isSaved = true);
     }
   }
 
@@ -252,11 +253,11 @@ class TrackingUtils extends ChangeNotifier {
         "step count: ${stepCount.steps}\ntime: ${stepCount.timeStamp.formatHms}";
   }
 
+  // ignore: long-method
   Future<void> _onLocationUpdate(LocationData location) async {
     // filter GPS jumps in tracking mode
     if (isTracking &&
-        ((_cardioSessionDescription.cardioSession.track?.isNotEmpty) ??
-            false)) {
+        _cardioSessionDescription.cardioSession.track!.isNotEmpty) {
       final lastPosition = _cardioSessionDescription.cardioSession.track!.last;
       final km = lastPosition.distanceTo(location.latLng) / 1000;
       final hour = (currentDuration - lastPosition.time).inMilliseconds /
@@ -270,36 +271,48 @@ class TrackingUtils extends ChangeNotifier {
     final elevation =
         await _elevationMapController?.getElevation(location.latLng);
 
+    final position = Position(
+      latitude: location.latitude!,
+      longitude: location.longitude!,
+      elevation: elevation ?? location.altitude!,
+      distance: _cardioSessionDescription.cardioSession.track!.isEmpty
+          ? 0
+          : _cardioSessionDescription.cardioSession.track!.last
+              .addDistanceTo(location.latLng),
+      time: currentDuration,
+    );
+
     _locationInfo = "accuracy: ${location.accuracy?.round()} m\n"
         "satellites: ${location.satellites}\n"
         "elevation GPS: ${location.altitude?.round()} m\n"
         "elevation Mbx: ${elevation?.round()} m\n"
-        "points:      ${_cardioSessionDescription.cardioSession.track?.length}";
-
-    await centerCurrentLocation();
-
-    await _mapController?.updateCurrentLocationMarker(
-      _currentLocationMarker,
-      location.latLng,
-    );
+        "points:      ${_cardioSessionDescription.cardioSession.track!.length}";
 
     if (isTracking) {
-      _cardioSessionDescription.cardioSession.track?.add(
-        Position(
-          latitude: location.latitude!,
-          longitude: location.longitude!,
-          elevation: elevation ?? location.altitude!,
-          distance: _cardioSessionDescription.cardioSession.track!.isEmpty
-              ? 0
-              : _cardioSessionDescription.cardioSession.track!.last
-                  .addDistanceTo(location.latLng),
-          time: currentDuration,
-        ),
-      );
+      _cardioSessionDescription.cardioSession.track!.add(position);
       await _mapController?.updateTrackLine(
         _line,
         _cardioSessionDescription.cardioSession.track,
       );
+    }
+
+    await centerCurrentLocation();
+    await _mapController?.updateCurrentLocationMarker(
+      _currentLocationMarker,
+      position.latLng,
+    );
+
+    if (isTracking &&
+        _routeAlarm &&
+        (_lastAlarm?.isBefore(DateTime.now().subtract(_alarmInterval)) ??
+            true)) {
+      final distance = position
+          .minDistanceTo(cardioSessionDescription.route!.track!)
+          .round();
+      if (distance > 50) {
+        _lastAlarm = DateTime.now();
+        await tts.speak("You are off route by $distance meters.");
+      }
     }
   }
 

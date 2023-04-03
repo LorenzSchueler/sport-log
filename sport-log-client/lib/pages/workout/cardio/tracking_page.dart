@@ -18,9 +18,10 @@ import 'package:sport_log/widgets/provider_consumer.dart';
 
 class CardioTrackingPage extends StatelessWidget {
   const CardioTrackingPage({
-    required this.route,
     required this.movement,
     required this.cardioType,
+    required this.route,
+    required this.routeAlarm,
     required this.heartRateUtils,
     super.key,
   });
@@ -28,6 +29,7 @@ class CardioTrackingPage extends StatelessWidget {
   final Movement movement;
   final CardioType cardioType;
   final Route? route;
+  final bool routeAlarm;
   final HeartRateUtils? heartRateUtils;
 
   Future<void> _saveDialog(
@@ -74,6 +76,7 @@ class CardioTrackingPage extends StatelessWidget {
         movement: movement,
         cardioType: cardioType,
         route: route,
+        routeAlarm: routeAlarm,
         heartRateUtils: heartRateUtils,
       ),
       builder: (context, trackingUtils, _) => DiscardWarningOnPop(

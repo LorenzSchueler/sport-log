@@ -39,6 +39,7 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   flutter_polyline_points: ^1.0.0
+  flutter_tts: ^3.6.3
   fluttertoast: ^8.0.8
   gpx: ^2.1.1
   hive_flutter: ^1.1.0

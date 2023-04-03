@@ -290,7 +290,8 @@ abstract class Routes {
             movement: args[0] as Movement,
             cardioType: args[1] as CardioType,
             route: args[2] as Route?,
-            heartRateUtils: args[3] as HeartRateUtils?,
+            routeAlarm: args[3] as bool,
+            heartRateUtils: args[4] as HeartRateUtils?,
           );
         }),
     // diary
