@@ -29,7 +29,7 @@ class TrackingUtils extends ChangeNotifier {
     required Movement movement,
     required CardioType cardioType,
     required Route? route,
-    required bool routeAlarm,
+    required int? routeAlarmDistance,
     required HeartRateUtils? heartRateUtils,
   })  : _cardioSessionDescription = CardioSessionDescription(
           cardioSession: CardioSession.defaultValue(movement.id)
@@ -42,7 +42,7 @@ class TrackingUtils extends ChangeNotifier {
           movement: movement,
           route: route,
         ),
-        _routeAlarm = routeAlarm && route?.track != null,
+        _routeAlarmDistance = route?.track != null ? routeAlarmDistance : null,
         _heartRateUtils = heartRateUtils;
 
   final _dataProvider = CardioSessionDescriptionDataProvider();
@@ -91,7 +91,7 @@ class TrackingUtils extends ChangeNotifier {
   final NullablePointer<List<CircleAnnotation>> _currentLocationMarker =
       NullablePointer.nullPointer();
 
-  final bool _routeAlarm;
+  final int? _routeAlarmDistance;
   DateTime? _lastAlarm;
   static const _alarmInterval = Duration(minutes: 1);
   final tts = FlutterTts()
@@ -253,7 +253,6 @@ class TrackingUtils extends ChangeNotifier {
         "step count: ${stepCount.steps}\ntime: ${stepCount.timeStamp.formatHms}";
   }
 
-  // ignore: long-method
   Future<void> _onLocationUpdate(LocationData location) async {
     // filter GPS jumps in tracking mode
     if (isTracking &&
@@ -302,14 +301,18 @@ class TrackingUtils extends ChangeNotifier {
       position.latLng,
     );
 
+    await _checkRoutDistance(position);
+  }
+
+  Future<void> _checkRoutDistance(Position position) async {
     if (isTracking &&
-        _routeAlarm &&
+        _routeAlarmDistance != null &&
         (_lastAlarm?.isBefore(DateTime.now().subtract(_alarmInterval)) ??
             true)) {
       final distance = position
           .minDistanceTo(cardioSessionDescription.route!.track!)
           .round();
-      if (distance > 50) {
+      if (distance > _routeAlarmDistance!) {
         _lastAlarm = DateTime.now();
         await tts.speak("You are off route by $distance meters.");
       }

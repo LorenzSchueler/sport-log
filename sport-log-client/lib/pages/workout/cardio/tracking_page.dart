@@ -21,7 +21,7 @@ class CardioTrackingPage extends StatelessWidget {
     required this.movement,
     required this.cardioType,
     required this.route,
-    required this.routeAlarm,
+    required this.routeAlarmDistance,
     required this.heartRateUtils,
     super.key,
   });
@@ -29,7 +29,7 @@ class CardioTrackingPage extends StatelessWidget {
   final Movement movement;
   final CardioType cardioType;
   final Route? route;
-  final bool routeAlarm;
+  final int? routeAlarmDistance;
   final HeartRateUtils? heartRateUtils;
 
   Future<void> _saveDialog(
@@ -76,7 +76,7 @@ class CardioTrackingPage extends StatelessWidget {
         movement: movement,
         cardioType: cardioType,
         route: route,
-        routeAlarm: routeAlarm,
+        routeAlarmDistance: routeAlarmDistance,
         heartRateUtils: heartRateUtils,
       ),
       builder: (context, trackingUtils, _) => DiscardWarningOnPop(

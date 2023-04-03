@@ -5,6 +5,7 @@ import 'package:sport_log/models/all.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/input_fields/edit_tile.dart';
+import 'package:sport_log/widgets/input_fields/int_input.dart';
 import 'package:sport_log/widgets/picker/picker.dart';
 import 'package:sport_log/widgets/provider_consumer.dart';
 import 'package:sport_log/widgets/snackbar.dart';
@@ -22,7 +23,7 @@ class CardioTrackingSettingsPageState
   Movement? _movement;
   CardioType _cardioType = CardioType.training;
   Route? _route;
-  bool _routeAlarm = false;
+  int? _routeAlarmDistance;
 
   @override
   Widget build(BuildContext context) {
@@ -89,19 +90,42 @@ class CardioTrackingSettingsPageState
                 },
               ),
               if (_route != null)
-                EditTile(
-                  leading: AppIcons.map,
-                  caption: "Alarm when off Route",
-                  child: SizedBox(
-                    height: 29, // make it fit into EditTile
-                    width: 34, // remove left padding
-                    child: Switch(
-                      value: _routeAlarm,
-                      onChanged: (alarm) {
-                        setState(() => _routeAlarm = alarm);
-                      },
+                Row(
+                  children: [
+                    const SizedBox(width: 24 + 15), // 24 icon + 15 SizedBox
+                    EditTile(
+                      leading: null,
+                      caption: "Alarm when off Route",
+                      shrinkWidth: true,
+                      child: SizedBox(
+                        height: 29, // make it fit into EditTile
+                        width: 34, // remove left padding
+                        child: Switch(
+                          value: _routeAlarmDistance != null,
+                          onChanged: (alarm) {
+                            setState(() {
+                              _routeAlarmDistance = alarm ? 50 : null;
+                            });
+                          },
+                        ),
+                      ),
                     ),
-                  ),
+                    Defaults.sizedBox.horizontal.big,
+                    if (_routeAlarmDistance != null)
+                      EditTile(
+                        leading: null,
+                        caption: "Maximal Distance",
+                        shrinkWidth: true,
+                        child: IntInput(
+                          onUpdate: (alarm) => setState(() {
+                            _routeAlarmDistance = alarm;
+                          }),
+                          initialValue: 50,
+                          minValue: 20,
+                          maxValue: null,
+                        ),
+                      ),
+                  ],
                 ),
               heartRateUtils.devices.isEmpty
                   ? EditTile(
@@ -154,7 +178,7 @@ class CardioTrackingSettingsPageState
                               _movement,
                               _cardioType,
                               _route,
-                              _routeAlarm,
+                              _routeAlarmDistance,
                               heartRateUtils.deviceId != null
                                   ? heartRateUtils
                                   : null,
