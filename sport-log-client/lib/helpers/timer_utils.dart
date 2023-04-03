@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
+import 'package:sport_log/defaults.dart';
 import 'package:wakelock/wakelock.dart';
 
 enum TimerType {
@@ -101,8 +102,6 @@ class TimerUtils {
   }
 
   final _player = AudioPlayer();
-  final _beepLong = AssetSource('audio/beep_long.mp3');
-  final _beepShort = AssetSource('audio/beep_short.mp3');
 
   static const initialCountdown = Duration(seconds: 10);
 
@@ -129,11 +128,11 @@ class TimerUtils {
   void _tickCallback() {
     onTick();
     if (_currentTime.inSeconds == 0) {
-      _player.play(_beepLong);
+      _player.play(Defaults.assets.beepLong);
     } else if (_currentTime >=
         totalTime * (timerType == TimerType.interval ? rounds : 1)) {
       stopTimer();
-      _player.play(_beepLong);
+      _player.play(Defaults.assets.beepLong);
     } else if (_currentTime.inSeconds > 0 && timerType == TimerType.interval) {
       final roundStart =
           Duration(seconds: _currentTime.inSeconds % totalTime.inSeconds)
@@ -144,7 +143,7 @@ class TimerUtils {
           ).inSeconds ==
           0;
       if (roundStart || restStart) {
-        _player.play(_beepShort);
+        _player.play(Defaults.assets.beepShort);
       }
     }
   }

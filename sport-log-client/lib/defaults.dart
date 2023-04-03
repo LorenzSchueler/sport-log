@@ -1,3 +1,4 @@
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:mapbox_api/mapbox_api.dart';
 import 'package:sport_log/config.dart';
@@ -10,6 +11,7 @@ abstract class Defaults {
   static final mapbox = _Mapbox();
   static final mapboxApi = MapboxApi(accessToken: Config.instance.accessToken);
   static final server = _Server();
+  static final assets = _Assets();
 }
 
 class _Server {
@@ -64,4 +66,11 @@ class _Mapbox {
   final trackLineColor = 0xffff0000;
   final routeLineColor = 0xff0000ff;
   final cameraPosition = const LatLng(lat: 47.27, lng: 11.33);
+}
+
+class _Assets {
+  _Assets();
+
+  final beepLong = AssetSource('audio/beep_long.mp3'); // 0.99s
+  final beepShort = AssetSource('audio/beep_short.mp3'); // 0.39s
 }
