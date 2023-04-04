@@ -97,6 +97,7 @@ class AppIcons {
   static const IconData layers = Icons.layers_rounded;
   static const IconData developerMode = Icons.developer_mode;
   static const IconData numberedList = Icons.format_list_numbered_rounded;
-  static const IconData chart = Icons.show_chart_rounded;
+  static const IconData chart = Icons.timeline_rounded;
   static const IconData compare = Icons.compare_rounded;
+  static const IconData notification = Icons.notifications_active_rounded;
 }

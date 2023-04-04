@@ -161,13 +161,16 @@ class _PlatformCredentialDialogState extends State<PlatformCredentialDialog> {
             _usernameInput,
             _passwordInput,
             Defaults.sizedBox.vertical.normal,
-            Row(
-              children: [
-                const SizedBox(width: 39),
-                _updateButton,
-                const Spacer(),
-                _deleteButton,
-              ],
+            Padding(
+              // 24 icon + 15 padding
+              padding: const EdgeInsets.only(left: 24 + 15),
+              child: Row(
+                children: [
+                  _updateButton,
+                  const Spacer(),
+                  _deleteButton,
+                ],
+              ),
             ),
           ],
         ),

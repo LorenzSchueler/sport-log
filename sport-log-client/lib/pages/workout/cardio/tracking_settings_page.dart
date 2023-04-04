@@ -28,9 +28,7 @@ class CardioTrackingSettingsPageState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Tracking Settings"),
-      ),
+      appBar: AppBar(title: const Text("Tracking Settings")),
       body: Container(
         padding: Defaults.edgeInsets.normal,
         child: ProviderConsumer<HeartRateUtils>(
@@ -92,9 +90,8 @@ class CardioTrackingSettingsPageState
               if (_route != null)
                 Row(
                   children: [
-                    const SizedBox(width: 24 + 15), // 24 icon + 15 SizedBox
                     EditTile(
-                      leading: null,
+                      leading: AppIcons.notification,
                       caption: "Alarm when off Route",
                       shrinkWidth: true,
                       child: SizedBox(
@@ -114,7 +111,7 @@ class CardioTrackingSettingsPageState
                     if (_routeAlarmDistance != null)
                       EditTile(
                         leading: null,
-                        caption: "Maximal Distance",
+                        caption: "Maximal Distance (m)",
                         shrinkWidth: true,
                         child: IntInput(
                           onUpdate: (alarm) => setState(() {

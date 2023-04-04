@@ -133,10 +133,11 @@ class EditTile extends StatelessWidget {
         child: Row(
           mainAxisSize: shrinkWidth ? MainAxisSize.min : MainAxisSize.max,
           children: [
-            if (leading != null) ...[
-              Icon(leading, color: iconCaptionColor),
-              const SizedBox(width: 15),
-            ],
+            if (leading != null)
+              Padding(
+                padding: const EdgeInsets.only(right: 15),
+                child: Icon(leading, color: iconCaptionColor),
+              ),
             shrinkWidth
                 ? _captionChildColumn(context)
                 : Expanded(child: _captionChildColumn(context)),
