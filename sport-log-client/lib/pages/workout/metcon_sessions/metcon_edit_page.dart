@@ -212,19 +212,19 @@ class _MetconEditPageState extends State<MetconEditPage> {
   Widget _additionalFieldsInput() {
     switch (_metconDescription.metcon.metconType) {
       case MetconType.amrap:
-        return _timecapInput(caption: "Time");
+        return _timecapInput(caption: "Time", allowCancel: false);
       case MetconType.emom:
         return Column(
           children: [
             _roundsInput(),
-            _timecapInput(caption: "Total Time"),
+            _timecapInput(caption: "Total Time", allowCancel: false),
           ],
         );
       case MetconType.forTime:
         return Column(
           children: [
             _roundsInput(),
-            _maybeTimecapInput(),
+            _timecapInput(caption: "Timecap", allowCancel: true),
           ],
         );
     }
@@ -246,12 +246,15 @@ class _MetconEditPageState extends State<MetconEditPage> {
     );
   }
 
-  Widget _timecapInput({required String caption, VoidCallback? onCancel}) {
-    return EditTile(
+  Widget _timecapInput({required String caption, required bool allowCancel}) {
+    return EditTile.optionalActionChip(
       leading: AppIcons.timeInterval,
       caption: caption,
-      onCancel: onCancel,
-      child: DurationInput(
+      showActionChip: _metconDescription.metcon.timecap == null,
+      onActionChipTap: () => setState(() {
+        _metconDescription.metcon.timecap = Metcon.timecapDefaultValue;
+      }),
+      builder: () => DurationInput(
         initialDuration: _metconDescription.metcon.timecap ??=
             Metcon.timecapDefaultValue,
         minDuration: const Duration(minutes: 1),
@@ -259,31 +262,10 @@ class _MetconEditPageState extends State<MetconEditPage> {
           setState(() => _metconDescription.metcon.timecap = timecap);
         },
       ),
+      onCancel: allowCancel
+          ? () => setState(() => _metconDescription.metcon.timecap = null)
+          : null,
     );
-  }
-
-  Widget _maybeTimecapInput() {
-    return _metconDescription.metcon.timecap == null
-        ? EditTile(
-            leading: AppIcons.timeInterval,
-            child: ActionChip(
-              avatar: const Icon(AppIcons.add),
-              label: const Text("Timecap"),
-              onPressed: () {
-                FocusManager.instance.primaryFocus?.unfocus();
-                setState(() {
-                  _metconDescription.metcon.timecap =
-                      Metcon.timecapDefaultValue;
-                });
-              },
-            ),
-          )
-        : _timecapInput(
-            caption: "Timecap",
-            onCancel: () {
-              setState(() => _metconDescription.metcon.timecap = null);
-            },
-          );
   }
 
   Widget _metconMovementsList() {

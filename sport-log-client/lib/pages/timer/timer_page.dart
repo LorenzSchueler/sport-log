@@ -130,28 +130,20 @@ class TimerPage extends StatelessWidget {
   }
 
   Widget _restTimeFormField(TimerState timerState) {
-    return timerState.restTime == null
-        ? EditTile(
-            leading: AppIcons.timeInterval,
-            child: ActionChip(
-              avatar: const Icon(AppIcons.add),
-              label: const Text("Rest Time"),
-              onPressed: () {
-                FocusManager.instance.primaryFocus?.unfocus();
-                timerState.restTime = const Duration(minutes: 1);
-              },
-            ),
-          )
-        : EditTile(
-            caption: "Rest Time",
-            leading: AppIcons.timeInterval,
-            onCancel: () => timerState.restTime = null,
-            child: DurationInput(
-              onUpdate: (d) => timerState.restTime = d,
-              initialDuration: timerState.restTime!,
-              minDuration: const Duration(seconds: 1),
-            ),
-          );
+    return EditTile.optionalActionChip(
+      caption: "Rest Time",
+      leading: AppIcons.timeInterval,
+      showActionChip: timerState.restTime == null,
+      onActionChipTap: () {
+        timerState.restTime = const Duration(minutes: 1);
+      },
+      onCancel: () => timerState.restTime = null,
+      builder: () => DurationInput(
+        onUpdate: (d) => timerState.restTime = d,
+        initialDuration: timerState.restTime!,
+        minDuration: const Duration(seconds: 1),
+      ),
+    );
   }
 
   Widget _roundsFormField(TimerState timerState) {

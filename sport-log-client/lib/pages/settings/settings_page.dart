@@ -207,20 +207,11 @@ class SettingsPage extends StatelessWidget {
                     ),
                   ),
                 if (settings.accountCreated) ...[
-                  EditTile(
+                  EditTile.Switch(
                     caption: "Server Synchronization",
                     leading: AppIcons.sync,
-                    child: SizedBox(
-                      height: 29, // make it fit into EditTile
-                      width: 34, // remove left padding
-                      child: Switch(
-                        value: settings.syncEnabled,
-                        onChanged: (enabled) {
-                          FocusManager.instance.primaryFocus?.unfocus();
-                          _setSyncEnabled(context, enabled);
-                        },
-                      ),
-                    ),
+                    value: settings.syncEnabled,
+                    onChanged: (enabled) => _setSyncEnabled(context, enabled),
                   ),
                   TextFormField(
                     // use new initialValue if url changed
@@ -431,28 +422,17 @@ class SettingsPage extends StatelessWidget {
                 Defaults.sizedBox.vertical.small,
                 const Divider(),
                 const CaptionTile(caption: "Developer Mode"),
-                EditTile(
+                EditTile.Switch(
                   caption: "Developer Mode",
                   leading: AppIcons.developerMode,
-                  child: SizedBox(
-                    height: 29, // make it fit into EditTile
-                    width: 34, // remove left padding
-                    child: Switch(
-                      value: settings.developerMode,
-                      onChanged: (devMode) {
-                        FocusManager.instance.primaryFocus?.unfocus();
-                        settings.setDeveloperMode(devMode);
-                      },
-                    ),
-                  ),
+                  value: settings.developerMode,
+                  onChanged: settings.setDeveloperMode,
                 ),
                 const Divider(),
                 const CaptionTile(caption: "About"),
-                GestureDetector(
-                  child: const EditTile(
-                    leading: AppIcons.questionMark,
-                    child: Text('About'),
-                  ),
+                EditTile(
+                  leading: AppIcons.questionMark,
+                  child: const Text('About'),
                   onTap: () => Navigator.pushNamed(context, Routes.about),
                 ),
               ],

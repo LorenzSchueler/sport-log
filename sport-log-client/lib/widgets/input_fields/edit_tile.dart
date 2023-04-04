@@ -31,6 +31,65 @@ class EditTile extends StatelessWidget {
     super.key,
   });
 
+  // ignore: non_constant_identifier_names
+  EditTile.Switch({
+    required IconData? leading,
+    String? caption,
+    required bool value,
+    required void Function(bool) onChanged,
+    void Function()? onCancel,
+    bool shrinkWidth = false,
+    Key? key,
+  }) : this(
+          child: SizedBox(
+            height: 29, // make it fit into EditTile
+            width: 34, // remove left padding
+            child: Switch(
+              value: value,
+              onChanged: (isSet) {
+                FocusManager.instance.primaryFocus?.unfocus();
+                onChanged(isSet);
+              },
+            ),
+          ),
+          leading: leading,
+          caption: caption,
+          onCancel: onCancel,
+          shrinkWidth: shrinkWidth,
+          key: key,
+        );
+
+  EditTile.optionalActionChip({
+    required Widget Function() builder,
+    required IconData leading,
+    required String caption,
+    required bool showActionChip,
+    required void Function() onActionChipTap,
+    void Function()? onTap,
+    void Function()? onCancel,
+    bool unboundedHeight = false,
+    bool shrinkWidth = false,
+    Key? key,
+  }) : this(
+          leading: leading,
+          caption: showActionChip ? null : caption,
+          onTap: showActionChip ? null : onTap,
+          onCancel: showActionChip ? null : onCancel,
+          unboundedHeight: showActionChip ? false : unboundedHeight,
+          shrinkWidth: shrinkWidth,
+          key: key,
+          child: showActionChip
+              ? ActionChip(
+                  avatar: const Icon(AppIcons.add),
+                  label: Text(caption),
+                  onPressed: () {
+                    FocusManager.instance.primaryFocus?.unfocus();
+                    onActionChipTap();
+                  },
+                )
+              : builder(),
+        );
+
   final String? caption;
   final Widget child;
   final IconData? leading;

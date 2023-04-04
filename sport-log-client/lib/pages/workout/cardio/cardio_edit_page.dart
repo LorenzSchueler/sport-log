@@ -330,45 +330,35 @@ class _CardioEditPageState extends State<CardioEditPage> {
                                 labelText: "Descent (m)",
                               ),
                     ),
-                    _cardioSessionDescription.cardioSession.time == null
-                        ? EditTile(
-                            leading: AppIcons.timeInterval,
-                            child: ActionChip(
-                              avatar: const Icon(AppIcons.add),
-                              label: const Text("Time"),
-                              onPressed: () => setState(() {
-                                FocusManager.instance.primaryFocus?.unfocus();
-                                _cardioSessionDescription.cardioSession.time =
-                                    const Duration(minutes: 1);
-                              }),
-                            ),
-                          )
-                        : EditTile(
-                            leading: AppIcons.timeInterval,
-                            caption: "Time",
-                            child: Text(
-                              _cardioSessionDescription
-                                  .cardioSession.time!.formatHms,
-                            ),
-                            onTap: () async {
-                              final duration =
-                                  await showScrollableDurationPicker(
-                                context: context,
-                                initialDuration: _cardioSessionDescription
-                                    .cardioSession.time,
-                              );
-                              if (mounted && duration != null) {
-                                setState(
-                                  () => _cardioSessionDescription
-                                      .cardioSession.time = duration,
-                                );
-                              }
-                            },
-                            onCancel: () => setState(() {
-                              _cardioSessionDescription.cardioSession.time =
-                                  null;
-                            }),
-                          ),
+                    EditTile.optionalActionChip(
+                      leading: AppIcons.timeInterval,
+                      caption: "Time",
+                      showActionChip:
+                          _cardioSessionDescription.cardioSession.time == null,
+                      onActionChipTap: () => setState(() {
+                        _cardioSessionDescription.cardioSession.time =
+                            const Duration(minutes: 1);
+                      }),
+                      builder: () => Text(
+                        _cardioSessionDescription.cardioSession.time!.formatHms,
+                      ),
+                      onTap: () async {
+                        final duration = await showScrollableDurationPicker(
+                          context: context,
+                          initialDuration:
+                              _cardioSessionDescription.cardioSession.time,
+                        );
+                        if (mounted && duration != null) {
+                          setState(
+                            () => _cardioSessionDescription.cardioSession.time =
+                                duration,
+                          );
+                        }
+                      },
+                      onCancel: () => setState(() {
+                        _cardioSessionDescription.cardioSession.time = null;
+                      }),
+                    ),
                     TextFormField(
                       keyboardType: TextInputType.number,
                       validator: (calories) =>
