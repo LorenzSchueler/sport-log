@@ -2,8 +2,10 @@ import 'package:flutter/material.dart' hide Route;
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/heart_rate_utils.dart';
 import 'package:sport_log/models/all.dart';
+import 'package:sport_log/pages/workout/cardio/audio_feedback_config.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/app_icons.dart';
+import 'package:sport_log/widgets/input_fields/double_input.dart';
 import 'package:sport_log/widgets/input_fields/edit_tile.dart';
 import 'package:sport_log/widgets/input_fields/int_input.dart';
 import 'package:sport_log/widgets/picker/picker.dart';
@@ -24,6 +26,7 @@ class CardioTrackingSettingsPageState
   CardioType _cardioType = CardioType.training;
   Route? _route;
   int? _routeAlarmDistance;
+  AudioFeedbackConfig? _audioFeedback;
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +36,7 @@ class CardioTrackingSettingsPageState
         padding: Defaults.edgeInsets.normal,
         child: ProviderConsumer<HeartRateUtils>(
           create: (_) => HeartRateUtils(),
-          builder: (_, heartRateUtils, __) => Column(
+          builder: (_, heartRateUtils, __) => ListView(
             children: [
               EditTile(
                 leading: AppIcons.exercise,
@@ -99,11 +102,9 @@ class CardioTrackingSettingsPageState
                         width: 34, // remove left padding
                         child: Switch(
                           value: _routeAlarmDistance != null,
-                          onChanged: (alarm) {
-                            setState(() {
-                              _routeAlarmDistance = alarm ? 50 : null;
-                            });
-                          },
+                          onChanged: (alarm) => setState(() {
+                            _routeAlarmDistance = alarm ? 50 : null;
+                          }),
                         ),
                       ),
                     ),
@@ -124,6 +125,65 @@ class CardioTrackingSettingsPageState
                       ),
                   ],
                 ),
+              EditTile.Switch(
+                leading: Icons.record_voice_over_rounded,
+                caption: "Audio Feedback",
+                value: _audioFeedback != null,
+                onChanged: (feedback) => setState(() {
+                  _audioFeedback = feedback ? AudioFeedbackConfig() : null;
+                }),
+              ),
+              if (_audioFeedback != null) ...[
+                Padding(
+                  // 24 icon + 15 padding
+                  padding: const EdgeInsets.only(left: 24 + 15),
+                  child: EditTile(
+                    leading: null,
+                    caption: "Feedback Interval (km)",
+                    shrinkWidth: true,
+                    child: DoubleInput(
+                      onUpdate: (interval) => setState(() {
+                        _audioFeedback!.interval = interval;
+                      }),
+                      initialValue: 1,
+                      minValue: 0.1,
+                      maxValue: null,
+                    ),
+                  ),
+                ),
+                Padding(
+                  // 24 icon + 15 padding
+                  padding: const EdgeInsets.only(left: 24 + 15),
+                  child: EditTile(
+                    leading: null,
+                    caption: "Feedback Metrics",
+                    unboundedHeight: true,
+                    child: ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: _audioFeedback!.metrics.length,
+                      itemBuilder: (context, index) {
+                        final metric = _audioFeedback!.metrics[index];
+                        return Row(
+                          children: [
+                            SizedBox(
+                              height: 32,
+                              width: 34,
+                              child: Switch(
+                                value: metric.isEnabled,
+                                onChanged: (enabled) => setState(() {
+                                  metric.isEnabled = enabled;
+                                }),
+                              ),
+                            ),
+                            Defaults.sizedBox.horizontal.normal,
+                            Text(metric.name),
+                          ],
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ],
               heartRateUtils.devices.isEmpty
                   ? EditTile(
                       leading: AppIcons.heartbeat,
