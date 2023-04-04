@@ -1,25 +1,42 @@
-class AudioFeedbackConfig {
-  AudioFeedbackConfig()
-      : _intervalMeter = 1000,
-        distance = AudioFeedbackMetric("Distance", true),
-        time = AudioFeedbackMetric("Time", true),
-        elevation = AudioFeedbackMetric("Elevation", false),
-        avgSpeed = AudioFeedbackMetric("Average Speed", true),
-        currentSpeed = AudioFeedbackMetric("Current Speed", true),
-        avgTempo = AudioFeedbackMetric("Average Tempo", false),
-        currentTempo = AudioFeedbackMetric("Current Tempo", false);
+import 'package:flutter/material.dart';
 
-  int _intervalMeter;
-  double get interval => _intervalMeter / 1000.0;
-  set interval(double km) => _intervalMeter = (km * 1000).round();
+class AudioFeedbackConfig extends ChangeNotifier {
+  factory AudioFeedbackConfig() {
+    final audioFeedback = AudioFeedbackConfig._();
+    audioFeedback.distance.addListener(audioFeedback.notifyListeners);
+    audioFeedback.time.addListener(audioFeedback.notifyListeners);
+    audioFeedback.elevation.addListener(audioFeedback.notifyListeners);
+    audioFeedback.avgSpeed.addListener(audioFeedback.notifyListeners);
+    audioFeedback.currentSpeed.addListener(audioFeedback.notifyListeners);
+    audioFeedback.avgTempo.addListener(audioFeedback.notifyListeners);
+    audioFeedback.currentTempo.addListener(audioFeedback.notifyListeners);
+    return audioFeedback;
+  }
 
-  AudioFeedbackMetric distance;
-  AudioFeedbackMetric time;
-  AudioFeedbackMetric elevation;
-  AudioFeedbackMetric avgSpeed;
-  AudioFeedbackMetric currentSpeed;
-  AudioFeedbackMetric avgTempo;
-  AudioFeedbackMetric currentTempo;
+  AudioFeedbackConfig._()
+      : _interval = 1000,
+        distance = AudioFeedbackMetric.enabled("Distance"),
+        time = AudioFeedbackMetric.enabled("Time"),
+        elevation = AudioFeedbackMetric.disabled("Elevation"),
+        avgSpeed = AudioFeedbackMetric.enabled("Average Speed"),
+        currentSpeed = AudioFeedbackMetric.enabled("Current Speed"),
+        avgTempo = AudioFeedbackMetric.disabled("Average Tempo"),
+        currentTempo = AudioFeedbackMetric.disabled("Current Tempo");
+
+  int _interval;
+  int get interval => _interval;
+  set interval(int interval) {
+    _interval = interval;
+    notifyListeners();
+  }
+
+  final AudioFeedbackMetric distance;
+  final AudioFeedbackMetric time;
+  final AudioFeedbackMetric elevation;
+  final AudioFeedbackMetric avgSpeed;
+  final AudioFeedbackMetric currentSpeed;
+  final AudioFeedbackMetric avgTempo;
+  final AudioFeedbackMetric currentTempo;
 
   List<AudioFeedbackMetric> get metrics => [
         distance,
@@ -32,9 +49,16 @@ class AudioFeedbackConfig {
       ];
 }
 
-class AudioFeedbackMetric {
-  AudioFeedbackMetric(this.name, this.isEnabled);
+class AudioFeedbackMetric extends ChangeNotifier {
+  AudioFeedbackMetric.enabled(this.name) : _isEnabled = true;
+  AudioFeedbackMetric.disabled(this.name) : _isEnabled = false;
 
   final String name;
-  bool isEnabled;
+
+  bool _isEnabled;
+  bool get isEnabled => _isEnabled;
+  set isEnabled(bool isEnabled) {
+    _isEnabled = isEnabled;
+    notifyListeners();
+  }
 }
