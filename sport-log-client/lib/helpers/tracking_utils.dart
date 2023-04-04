@@ -19,31 +19,31 @@ import 'package:sport_log/helpers/map_controller.dart';
 import 'package:sport_log/helpers/pointer.dart';
 import 'package:sport_log/helpers/step_count_utils.dart';
 import 'package:sport_log/models/cardio/all.dart';
-import 'package:sport_log/models/movement/movement.dart';
+import 'package:sport_log/pages/workout/cardio/tracking_settings.dart';
 import 'package:sport_log/widgets/dialogs/dialogs.dart';
 
 enum TrackingMode { notStarted, tracking, paused }
 
 class TrackingUtils extends ChangeNotifier {
-  TrackingUtils({
-    required Movement movement,
-    required CardioType cardioType,
-    required Route? route,
-    required int? routeAlarmDistance,
-    required HeartRateUtils? heartRateUtils,
-  })  : _cardioSessionDescription = CardioSessionDescription(
-          cardioSession: CardioSession.defaultValue(movement.id)
-            ..cardioType = cardioType
-            ..time = Duration.zero
-            ..track = []
-            ..cadence = []
-            ..heartRate = []
-            ..routeId = route?.id,
-          movement: movement,
-          route: route,
+  TrackingUtils({required TrackingSettings trackingSettings})
+      : _cardioSessionDescription = CardioSessionDescription(
+          cardioSession:
+              CardioSession.defaultValue(trackingSettings.movement.id)
+                ..cardioType = trackingSettings.cardioType
+                ..time = Duration.zero
+                ..track = []
+                ..cadence = []
+                ..heartRate = []
+                ..routeId = trackingSettings.route?.id,
+          movement: trackingSettings.movement,
+          route: trackingSettings.route,
         ),
-        _routeAlarmDistance = route?.track != null ? routeAlarmDistance : null,
-        _heartRateUtils = heartRateUtils;
+        _routeAlarmDistance = trackingSettings.route?.track != null
+            ? trackingSettings.routeAlarmDistance
+            : null,
+        _heartRateUtils = trackingSettings.heartRateUtils.deviceId != null
+            ? trackingSettings.heartRateUtils
+            : null;
 
   final _dataProvider = CardioSessionDescriptionDataProvider();
 
@@ -82,6 +82,7 @@ class TrackingUtils extends ChangeNotifier {
   LatLng? get lastLatLng => _locationUtils.lastLatLng;
   final StepCountUtils _stepUtils = StepCountUtils();
   final HeartRateUtils? _heartRateUtils;
+  bool get waitingOnHR => _heartRateUtils?.isNotActive ?? false;
 
   MapController? _mapController;
   ElevationMapController? _elevationMapController;

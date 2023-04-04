@@ -211,15 +211,7 @@ class CardioTrackingSettingsPage extends StatelessWidget {
                   onPressed: () => Navigator.pushNamed(
                     context,
                     Routes.tracking,
-                    arguments: [
-                      trackingSettings.movement,
-                      trackingSettings.cardioType,
-                      trackingSettings.route,
-                      trackingSettings.routeAlarmDistance,
-                      trackingSettings.heartRateUtils.deviceId != null
-                          ? trackingSettings.heartRateUtils
-                          : null,
-                    ],
+                    arguments: trackingSettings,
                   ),
                   child: const Text("OK"),
                 ),

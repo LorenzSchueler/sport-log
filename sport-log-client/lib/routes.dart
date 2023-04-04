@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart' hide Route;
 import 'package:sport_log/config.dart';
-import 'package:sport_log/helpers/heart_rate_utils.dart';
 import 'package:sport_log/models/action/action_provider_description.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/pages/action/action_event_edit_page.dart';
@@ -27,6 +26,7 @@ import 'package:sport_log/pages/workout/cardio/route_edit_page.dart';
 import 'package:sport_log/pages/workout/cardio/route_overview_page.dart';
 import 'package:sport_log/pages/workout/cardio/route_upload_page.dart';
 import 'package:sport_log/pages/workout/cardio/tracking_page.dart';
+import 'package:sport_log/pages/workout/cardio/tracking_settings.dart';
 import 'package:sport_log/pages/workout/cardio/tracking_settings_page.dart';
 import 'package:sport_log/pages/workout/diary/diary_edit_page.dart';
 import 'package:sport_log/pages/workout/diary/diary_overview_page.dart';
@@ -284,15 +284,9 @@ abstract class Routes {
           () => const CardioTrackingSettingsPage(),
         ),
     Routes.tracking: (context) => _checkUserIdAndroidIos(context, () {
-          final args =
-              ModalRoute.of(context)!.settings.arguments! as List<dynamic>;
-          return CardioTrackingPage(
-            movement: args[0] as Movement,
-            cardioType: args[1] as CardioType,
-            route: args[2] as Route?,
-            routeAlarmDistance: args[3] as int?,
-            heartRateUtils: args[4] as HeartRateUtils?,
-          );
+          final trackingSettings =
+              ModalRoute.of(context)!.settings.arguments! as TrackingSettings;
+          return CardioTrackingPage(trackingSettings: trackingSettings);
         }),
     // diary
     Routes.diaryOverview: (_) => _checkUserId(DiaryPage.new),

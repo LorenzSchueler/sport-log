@@ -30,6 +30,7 @@ class HeartRateUtils extends ChangeNotifier {
   bool get canStartStream => deviceId != null;
 
   bool get isActive => _heartRateSubscription != null;
+  bool get isNotActive => _heartRateSubscription == null;
 
   @override
   void dispose() {

@@ -4,11 +4,10 @@ import 'package:flutter/material.dart' hide Route;
 import 'package:provider/provider.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/bool_toggle.dart';
-import 'package:sport_log/helpers/heart_rate_utils.dart';
 import 'package:sport_log/helpers/lat_lng.dart';
 import 'package:sport_log/helpers/tracking_utils.dart';
-import 'package:sport_log/models/all.dart';
 import 'package:sport_log/pages/workout/cardio/cardio_value_unit_description_table.dart';
+import 'package:sport_log/pages/workout/cardio/tracking_settings.dart';
 import 'package:sport_log/settings.dart';
 import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/map_widgets/mapbox_map_wrapper.dart';
@@ -17,20 +16,9 @@ import 'package:sport_log/widgets/pop_scopes.dart';
 import 'package:sport_log/widgets/provider_consumer.dart';
 
 class CardioTrackingPage extends StatelessWidget {
-  const CardioTrackingPage({
-    required this.movement,
-    required this.cardioType,
-    required this.route,
-    required this.routeAlarmDistance,
-    required this.heartRateUtils,
-    super.key,
-  });
+  const CardioTrackingPage({required this.trackingSettings, super.key});
 
-  final Movement movement;
-  final CardioType cardioType;
-  final Route? route;
-  final int? routeAlarmDistance;
-  final HeartRateUtils? heartRateUtils;
+  final TrackingSettings trackingSettings;
 
   Future<void> _saveDialog(
     BuildContext context,
@@ -72,13 +60,7 @@ class CardioTrackingPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ProviderConsumer(
-      create: (_) => TrackingUtils(
-        movement: movement,
-        cardioType: cardioType,
-        route: route,
-        routeAlarmDistance: routeAlarmDistance,
-        heartRateUtils: heartRateUtils,
-      ),
+      create: (_) => TrackingUtils(trackingSettings: trackingSettings),
       builder: (context, trackingUtils, _) => DiscardWarningOnPop(
         onDiscard: () => trackingUtils.deleteIfSaved(context),
         child: SafeArea(
@@ -137,9 +119,8 @@ class CardioTrackingPage extends StatelessWidget {
                             onPause: trackingUtils.pause,
                             onResume: trackingUtils.resume,
                             onSave: () => _saveDialog(context, trackingUtils),
-                            hasGPS: trackingUtils.lastLatLng != null,
-                            hasHR: heartRateUtils == null ||
-                                heartRateUtils!.isActive,
+                            waitingOnHPS: trackingUtils.lastLatLng == null,
+                            waitingOnHR: trackingUtils.waitingOnHR,
                           ),
                         ],
                       ),
@@ -161,8 +142,8 @@ class _TrackingPageButtons extends StatelessWidget {
     required this.onPause,
     required this.onResume,
     required this.onSave,
-    required this.hasGPS,
-    required this.hasHR,
+    required this.waitingOnHPS,
+    required this.waitingOnHR,
   });
 
   final TrackingMode trackingMode;
@@ -170,8 +151,8 @@ class _TrackingPageButtons extends StatelessWidget {
   final VoidCallback onPause;
   final VoidCallback onResume;
   final VoidCallback onSave;
-  final bool hasGPS;
-  final bool hasHR;
+  final bool waitingOnHPS;
+  final bool waitingOnHR;
 
   @override
   Widget build(BuildContext context) {
@@ -226,11 +207,11 @@ class _TrackingPageButtons extends StatelessWidget {
                   backgroundColor: Theme.of(context).colorScheme.errorContainer,
                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 ),
-                onPressed: hasGPS && hasHR ? onStart : null,
+                onPressed: waitingOnHPS || waitingOnHR ? null : onStart,
                 child: Text(
-                  !hasGPS
+                  waitingOnHPS
                       ? "Waiting on GPS"
-                      : !hasHR
+                      : waitingOnHR
                           ? "Waiting on HR Monitor"
                           : "Start",
                 ),
