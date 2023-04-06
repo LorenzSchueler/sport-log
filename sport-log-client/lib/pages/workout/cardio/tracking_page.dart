@@ -110,7 +110,6 @@ class CardioTrackingPage extends StatelessWidget {
                             cardioSessionDescription:
                                 trackingUtils.cardioSessionDescription,
                             currentDuration: trackingUtils.currentDuration,
-                            showCurrentElevation: true,
                           ),
                           Defaults.sizedBox.vertical.normal,
                           _TrackingPageButtons(

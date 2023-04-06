@@ -45,6 +45,7 @@ class TrackingUtils extends ChangeNotifier {
             ? trackingSettings.heartRateUtils
             : null;
 
+  static const currentDurationOffset = Duration(minutes: 1);
   final _dataProvider = CardioSessionDescriptionDataProvider();
 
   final CardioSessionDescription _cardioSessionDescription;

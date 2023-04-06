@@ -1,6 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_log/defaults.dart';
+import 'package:sport_log/helpers/tracking_utils.dart';
 import 'package:sport_log/models/cardio/cardio_session_description.dart';
 import 'package:sport_log/widgets/value_unit_description.dart';
 
@@ -8,17 +9,11 @@ class CardioValueUnitDescriptionTable extends StatelessWidget {
   const CardioValueUnitDescriptionTable({
     required this.cardioSessionDescription,
     required this.currentDuration,
-    this.showDatetimeCardioType = false,
-    this.showCurrentElevation = false,
     super.key,
   });
 
   final CardioSessionDescription cardioSessionDescription;
   final Duration? currentDuration;
-  final bool showDatetimeCardioType;
-  final bool showCurrentElevation;
-
-  static const _currentDurationOffset = Duration(minutes: 1);
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +25,7 @@ class CardioValueUnitDescriptionTable extends StatelessWidget {
     );
     return Table(
       children: [
-        if (showDatetimeCardioType) ...[
+        if (currentDuration == null) ...[
           TableRow(
             children: [
               ValueUnitDescription.datetime(
@@ -63,7 +58,7 @@ class CardioValueUnitDescriptionTable extends StatelessWidget {
                     ),
                     ValueUnitDescription.speed(
                       cardioSessionDescription.cardioSession.currentSpeed(
-                        currentDuration! - _currentDurationOffset,
+                        currentDuration! - TrackingUtils.currentDurationOffset,
                         currentDuration!,
                       ),
                       current: true,
@@ -78,7 +73,7 @@ class CardioValueUnitDescriptionTable extends StatelessWidget {
                     ),
                     ValueUnitDescription.tempo(
                       cardioSessionDescription.cardioSession.currentTempo(
-                        currentDuration! - _currentDurationOffset,
+                        currentDuration! - TrackingUtils.currentDurationOffset,
                         currentDuration!,
                       ),
                       current: true,
@@ -110,7 +105,7 @@ class CardioValueUnitDescriptionTable extends StatelessWidget {
             ),
           ],
         ),
-        if (showCurrentElevation) ...[
+        if (currentDuration != null) ...[
           rowSpacer,
           TableRow(
             children: [
@@ -133,7 +128,7 @@ class CardioValueUnitDescriptionTable extends StatelessWidget {
                     ),
                     ValueUnitDescription.avgCadence(
                       cardioSessionDescription.cardioSession.currentCadence(
-                        currentDuration! - _currentDurationOffset,
+                        currentDuration! - TrackingUtils.currentDurationOffset,
                         currentDuration!,
                       ),
                       current: true,
@@ -148,7 +143,7 @@ class CardioValueUnitDescriptionTable extends StatelessWidget {
                     ),
                     ValueUnitDescription.avgHeartRate(
                       cardioSessionDescription.cardioSession.currentHeartRate(
-                        currentDuration! - _currentDurationOffset,
+                        currentDuration! - TrackingUtils.currentDurationOffset,
                         currentDuration!,
                       ),
                       current: true,

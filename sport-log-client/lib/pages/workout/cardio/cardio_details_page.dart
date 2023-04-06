@@ -214,7 +214,6 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
                     CardioValueUnitDescriptionTable(
                       cardioSessionDescription: _cardioSessionDescription,
                       currentDuration: null,
-                      showDatetimeCardioType: true,
                     ),
                     if (_cardioSessionDescription.cardioSession.comments !=
                         null) ...[
