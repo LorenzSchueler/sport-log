@@ -141,6 +141,7 @@ class CardioTrackingSettingsPage extends StatelessWidget {
                     caption: "Feedback Metrics",
                     unboundedHeight: true,
                     child: ListView.builder(
+                      physics: const NeverScrollableScrollPhysics(),
                       shrinkWrap: true,
                       itemCount: trackingSettings.audioFeedback!.metrics.length,
                       itemBuilder: (context, index) {

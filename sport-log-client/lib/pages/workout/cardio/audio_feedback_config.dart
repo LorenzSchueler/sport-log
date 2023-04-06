@@ -25,77 +25,94 @@ extension on Duration {
 class AudioFeedbackConfig extends ChangeNotifier {
   factory AudioFeedbackConfig() {
     final audioFeedback = AudioFeedbackConfig._();
-    audioFeedback.distance.addListener(audioFeedback.notifyListeners);
-    audioFeedback.duration.addListener(audioFeedback.notifyListeners);
-    audioFeedback.elevation.addListener(audioFeedback.notifyListeners);
-    audioFeedback.avgSpeed.addListener(audioFeedback.notifyListeners);
-    audioFeedback.currentSpeed.addListener(audioFeedback.notifyListeners);
-    audioFeedback.avgTempo.addListener(audioFeedback.notifyListeners);
-    audioFeedback.currentTempo.addListener(audioFeedback.notifyListeners);
+    for (final metric in audioFeedback.metrics) {
+      metric.addListener(audioFeedback.notifyListeners);
+    }
     return audioFeedback;
   }
 
-  AudioFeedbackConfig._()
-      : _interval = 1000,
-        distance = AudioFeedbackMetric.enabled(
-          "Distance",
-          (c) =>
-              "${(c.track!.last.distance / 1000).toStringMaxFixed(1)} kilometers",
-        ),
-        duration = AudioFeedbackMetric.enabled(
-          "Duration",
-          (c) => c.track!.last.time.toSpeech(),
-        ),
-        elevation = AudioFeedbackMetric.disabled(
-          "Elevation",
-          (c) => "${c.track!.last.elevation.round()} meters",
-        ),
-        avgSpeed = AudioFeedbackMetric.enabled(
-          "Average Speed",
-          (c) => "${c.speed!.toStringAsFixed(1)} kilometers per hour",
-        ),
-        currentSpeed = AudioFeedbackMetric.enabled(
-          "Current Speed",
-          (c) {
-            final end = c.track!.last.time;
-            final start = end - TrackingUtils.currentDurationOffset;
-            return "${c.currentSpeed(start, end)!.toStringAsFixed(1)} kilometers per hour";
-          },
-        ),
-        avgTempo = AudioFeedbackMetric.disabled(
-          "Average Tempo",
-          (c) => "${c.tempo!.toSpeech()} per kilometer",
-        ),
-        currentTempo = AudioFeedbackMetric.disabled("Current Tempo", (c) {
-          final end = c.track!.last.time;
-          final start = end - TrackingUtils.currentDurationOffset;
-          return "${c.currentTempo(start, end)!.toSpeech()} per kilometer";
-        });
+  AudioFeedbackConfig._();
 
-  int _interval;
+  int _interval = 1000;
   int get interval => _interval;
   set interval(int interval) {
     _interval = interval;
     notifyListeners();
   }
 
-  final AudioFeedbackMetric distance;
-  final AudioFeedbackMetric duration;
-  final AudioFeedbackMetric elevation;
-  final AudioFeedbackMetric avgSpeed;
-  final AudioFeedbackMetric currentSpeed;
-  final AudioFeedbackMetric avgTempo;
-  final AudioFeedbackMetric currentTempo;
+  List<AudioFeedbackMetric> metrics = [
+    AudioFeedbackMetric.enabled(
+      "Distance",
+      (c) =>
+          "${(c.track!.last.distance / 1000).toStringMaxFixed(1)} kilometers",
+    ),
+    AudioFeedbackMetric.enabled(
+      "Duration",
+      (c) => c.track!.last.time.toSpeech(),
+    ),
+    AudioFeedbackMetric.enabled(
+      "Average Speed",
+      (c) => "${c.speed!.toStringAsFixed(1)} kilometers per hour",
+    ),
+    AudioFeedbackMetric.enabled(
+      "Current Speed",
+      (c) {
+        final end = c.track!.last.time;
+        final start = end - TrackingUtils.currentDurationOffset;
+        return "${c.currentSpeed(start, end)!.toStringAsFixed(1)} kilometers per hour";
+      },
+    ),
+    AudioFeedbackMetric.disabled(
+      "Average Tempo",
+      (c) => "${c.tempo!.toSpeech()} per kilometer",
+    ),
+    AudioFeedbackMetric.disabled("Current Tempo", (c) {
+      final end = c.track!.last.time;
+      final start = end - TrackingUtils.currentDurationOffset;
+      return "${c.currentTempo(start, end)!.toSpeech()} per kilometer";
+    }),
+    AudioFeedbackMetric.disabled(
+      "Average Cadence",
+      (c) => "${c.avgCadence} rounds per minute",
+    ),
+    AudioFeedbackMetric.disabled("Current Cadence", (c) {
+      final end = c.track!.last.time;
+      final start = end - TrackingUtils.currentDurationOffset;
+      return "${c.currentCadence(start, end)} rounds per minute";
+    }),
+    AudioFeedbackMetric.disabled(
+      "Average Heart Rate",
+      (c) => "${c.avgHeartRate} beats per minute",
+    ),
+    AudioFeedbackMetric.disabled("Current Heart Rate", (c) {
+      final end = c.track!.last.time;
+      final start = end - TrackingUtils.currentDurationOffset;
+      return "${c.currentHeartRate(start, end)} beats per minute";
+    }),
+    AudioFeedbackMetric.disabled(
+      "Elevation",
+      (c) {
+        final elevation = c.track!.last.elevation.round();
+        var text = "";
+        if (elevation >= 1000) {
+          text += "${elevation ~/ 1000} thousand ";
+        }
+        if (elevation == 0 || (elevation % 1000) > 0) {
+          text += "${elevation % 1000} ";
+        }
 
-  List<AudioFeedbackMetric> get metrics => [
-        distance,
-        time,
-        elevation,
-        avgSpeed,
-        currentSpeed,
-        avgTempo,
-        currentTempo,
-      ];
+        return "$text meters";
+      },
+    ),
+    AudioFeedbackMetric.disabled(
+      "Ascent",
+      (c) => "${c.ascent} meters",
+    ),
+    AudioFeedbackMetric.disabled(
+      "Descent",
+      (c) => "${c.descent} meters",
+    ),
+  ];
 }
 
 class AudioFeedbackMetric extends ChangeNotifier {
