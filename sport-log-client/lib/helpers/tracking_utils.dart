@@ -19,6 +19,7 @@ import 'package:sport_log/helpers/map_controller.dart';
 import 'package:sport_log/helpers/pointer.dart';
 import 'package:sport_log/helpers/step_count_utils.dart';
 import 'package:sport_log/models/cardio/all.dart';
+import 'package:sport_log/pages/workout/cardio/audio_feedback_config.dart';
 import 'package:sport_log/pages/workout/cardio/tracking_settings.dart';
 import 'package:sport_log/widgets/dialogs/dialogs.dart';
 
@@ -41,11 +42,15 @@ class TrackingUtils extends ChangeNotifier {
         _routeAlarmDistance = trackingSettings.route?.track != null
             ? trackingSettings.routeAlarmDistance
             : null,
+        _audioFeedbackConfig = trackingSettings.audioFeedback,
         _heartRateUtils = trackingSettings.heartRateUtils.deviceId != null
             ? trackingSettings.heartRateUtils
             : null;
 
+  static const maxSpeed = 250; // km/ h
   static const currentDurationOffset = Duration(minutes: 1);
+  static const _minAlarmInterval = Duration(minutes: 1);
+
   final _dataProvider = CardioSessionDescriptionDataProvider();
 
   final CardioSessionDescription _cardioSessionDescription;
@@ -95,15 +100,15 @@ class TrackingUtils extends ChangeNotifier {
 
   final int? _routeAlarmDistance;
   DateTime? _lastAlarm;
-  static const _alarmInterval = Duration(minutes: 1);
   final tts = FlutterTts()
-    ..setVoice({"name": "en-US-language", "locale": "en-US"});
+    ..setVoice({"name": "en-US-language", "locale": "en-US"})
+    ..awaitSpeakCompletion(true);
   //var voices = ((await tts.getVoices) as List).cast<Map>().where((m) {
   //var d = m.cast<String, String>();
   //return d["locale"] == "en-US";
   //}).toList();
 
-  static const maxSpeed = 250;
+  final AudioFeedbackConfig? _audioFeedbackConfig;
 
   @override
   void dispose() {
@@ -303,13 +308,14 @@ class TrackingUtils extends ChangeNotifier {
       position.latLng,
     );
 
-    await _checkRoutDistance(position);
+    await _routeAlarm(position);
+    await _audioFeedback();
   }
 
-  Future<void> _checkRoutDistance(Position position) async {
+  Future<void> _routeAlarm(Position position) async {
     if (isTracking &&
         _routeAlarmDistance != null &&
-        (_lastAlarm?.isBefore(DateTime.now().subtract(_alarmInterval)) ??
+        (_lastAlarm?.isBefore(DateTime.now().subtract(_minAlarmInterval)) ??
             true)) {
       final distance = position
           .minDistanceTo(cardioSessionDescription.route!.track!)
@@ -317,6 +323,24 @@ class TrackingUtils extends ChangeNotifier {
       if (distance > _routeAlarmDistance!) {
         _lastAlarm = DateTime.now();
         await tts.speak("You are off route by $distance meters.");
+      }
+    }
+  }
+
+  Future<void> _audioFeedback() async {
+    final session = _cardioSessionDescription.cardioSession;
+    final track = session.track!;
+    if (isTracking && _audioFeedbackConfig != null && track.length >= 2) {
+      final config = _audioFeedbackConfig!;
+      final prevLap = track[track.length - 2].distance ~/ config.interval;
+      final currLap = track.last.distance ~/ config.interval;
+      if (prevLap < currLap) {
+        await tts.speak("The current metrics are:");
+        for (final metric in config.metrics) {
+          if (metric.isEnabled) {
+            await tts.speak("${metric.name}: ${metric.value(session)}");
+          }
+        }
       }
     }
   }

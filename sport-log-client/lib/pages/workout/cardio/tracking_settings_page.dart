@@ -121,8 +121,11 @@ class CardioTrackingSettingsPage extends StatelessWidget {
                     caption: "Feedback Interval (km)",
                     shrinkWidth: true,
                     child: DoubleInput(
-                      onUpdate: (interval) => trackingSettings
-                          .audioFeedback!.interval = (interval * 1000).round(),
+                      // update if rounded to 100m
+                      key: ValueKey(trackingSettings.audioFeedback!.interval),
+                      onUpdate: (interval) =>
+                          trackingSettings.audioFeedback!.interval =
+                              (interval * 10).round() * 100, // rounded to 100m
                       initialValue:
                           trackingSettings.audioFeedback!.interval / 1000.0,
                       minValue: 0.1,
