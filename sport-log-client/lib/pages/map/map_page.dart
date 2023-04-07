@@ -155,14 +155,14 @@ class _MapPageState extends State<MapPage> {
                 onTap: (_) => showOverlays.toggle(),
               ),
               if (showOverlays.isOn && _searchResults.isNotEmpty)
-                Positioned(
-                  top: 56, // height of AppBar
-                  right: 0,
-                  left: 0,
-                  child: MapSearchResults(
-                    searchResults: _searchResults,
-                    backgroundColor: _searchBackgroundColor,
-                    onItemTap: _goToSearchItem,
+                SafeArea(
+                  child: Align(
+                    alignment: Alignment.topCenter,
+                    child: MapSearchResults(
+                      searchResults: _searchResults,
+                      backgroundColor: _searchBackgroundColor,
+                      onItemTap: _goToSearchItem,
+                    ),
                   ),
                 ),
             ],
