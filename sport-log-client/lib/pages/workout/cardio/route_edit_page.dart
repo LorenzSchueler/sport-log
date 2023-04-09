@@ -2,6 +2,7 @@ import 'package:flutter/material.dart' hide Route;
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' hide Position;
 import 'package:sport_log/data_provider/data_providers/cardio_data_provider.dart';
 import 'package:sport_log/defaults.dart';
+import 'package:sport_log/helpers/bool_toggle.dart';
 import 'package:sport_log/helpers/lat_lng.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/map_controller.dart';
@@ -17,6 +18,7 @@ import 'package:sport_log/widgets/dialogs/dialogs.dart';
 import 'package:sport_log/widgets/map_widgets/mapbox_map_wrapper.dart';
 import 'package:sport_log/widgets/map_widgets/static_mapbox_map.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
+import 'package:sport_log/widgets/provider_consumer.dart';
 import 'package:sport_log/widgets/snackbar.dart';
 
 class RouteEditPage extends StatefulWidget {
@@ -37,8 +39,6 @@ class _RouteEditPageState extends State<RouteEditPage> {
       NullablePointer.nullPointer();
   List<CircleAnnotation> _circles = [];
   List<PointAnnotation> _labels = [];
-
-  bool _listExpanded = false;
 
   MapController? _mapController;
   ElevationMapController? _elevationMapController;
@@ -185,54 +185,6 @@ class _RouteEditPageState extends State<RouteEditPage> {
     await _updateLine();
   }
 
-  Widget _expandableListContainer() {
-    return _listExpanded
-        ? Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () => setState(() {
-                    _listExpanded = false;
-                  }),
-                  child: const Text("hide List"),
-                ),
-              ),
-              ConstrainedBox(
-                constraints: const BoxConstraints(maxHeight: 300),
-                child: ReorderableListView.builder(
-                  itemBuilder: (context, index) => ListTile(
-                    key: ValueKey(index),
-                    leading: IconButton(
-                      onPressed: () => _removePoint(index),
-                      icon: const Icon(AppIcons.delete),
-                    ),
-                    title: Text(
-                      "${index + 1}",
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    trailing: const Icon(AppIcons.dragHandle),
-                    dense: true,
-                  ),
-                  itemCount: _route.markedPositions!.length,
-                  onReorder: _switchPoints,
-                  shrinkWrap: true,
-                ),
-              ),
-            ],
-          )
-        : SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: () => setState(() {
-                _listExpanded = true;
-              }),
-              child: const Text("show List"),
-            ),
-          );
-  }
-
   Future<void> _onMapCreated(MapController mapController) async {
     _mapController = mapController;
     await _mapController?.setBoundsFromTracks(
@@ -286,28 +238,60 @@ class _RouteEditPageState extends State<RouteEditPage> {
             ElevationMap(onMapCreated: _onElevationMapCreated),
             Padding(
               padding: Defaults.edgeInsets.normal,
-              child: Column(
-                children: [
-                  _expandableListContainer(),
-                  const Divider(),
-                  Defaults.sizedBox.vertical.normal,
-                  RouteValueUnitDescriptionTable(route: _route),
-                  Defaults.sizedBox.vertical.normal,
-                  Form(
-                    key: _formKey,
-                    child: TextFormField(
-                      onTap: () => setState(() => _listExpanded = false),
-                      onChanged: (name) => setState(() => _route.name = name),
-                      initialValue: _route.name,
-                      validator: Validator.validateStringNotEmpty,
-                      autovalidateMode: AutovalidateMode.onUserInteraction,
-                      decoration:
-                          Theme.of(context).textFormFieldDecoration.copyWith(
-                                labelText: "Name",
-                              ),
+              child: ProviderConsumer(
+                create: (_) => BoolToggle.off(),
+                builder: (context, listExpanded, _) => Column(
+                  children: [
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: listExpanded.toggle,
+                        child:
+                            Text(listExpanded.isOn ? "hide List" : "show List"),
+                      ),
                     ),
-                  ),
-                ],
+                    if (listExpanded.isOn)
+                      ConstrainedBox(
+                        constraints: const BoxConstraints(maxHeight: 300),
+                        child: ReorderableListView.builder(
+                          itemBuilder: (context, index) => ListTile(
+                            key: ValueKey(index),
+                            leading: IconButton(
+                              onPressed: () => _removePoint(index),
+                              icon: const Icon(AppIcons.delete),
+                            ),
+                            title: Text(
+                              "${index + 1}",
+                              style: Theme.of(context).textTheme.titleMedium,
+                            ),
+                            trailing: const Icon(AppIcons.dragHandle),
+                            dense: true,
+                          ),
+                          itemCount: _route.markedPositions!.length,
+                          onReorder: _switchPoints,
+                          shrinkWrap: true,
+                        ),
+                      ),
+                    const Divider(),
+                    Defaults.sizedBox.vertical.normal,
+                    RouteValueUnitDescriptionTable(route: _route),
+                    Defaults.sizedBox.vertical.normal,
+                    Form(
+                      key: _formKey,
+                      child: TextFormField(
+                        onTap: () => listExpanded.setState(false),
+                        onChanged: (name) => setState(() => _route.name = name),
+                        initialValue: _route.name,
+                        validator: Validator.validateStringNotEmpty,
+                        autovalidateMode: AutovalidateMode.onUserInteraction,
+                        decoration:
+                            Theme.of(context).textFormFieldDecoration.copyWith(
+                                  labelText: "Name",
+                                ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             )
           ],
