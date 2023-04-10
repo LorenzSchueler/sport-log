@@ -53,10 +53,12 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
       NullablePointer.nullPointer();
   final NullablePointer<PolylineAnnotation> _routeLine =
       NullablePointer.nullPointer();
-  final Map<CardioSession, PolylineAnnotation> _similarTrackLines = {};
-  final Map<CardioSession, Color> _similarTrackColors = {};
   final NullablePointer<CircleAnnotation> _touchMarker =
       NullablePointer.nullPointer();
+  final Map<CardioSession, NullablePointer<CircleAnnotation>>
+      _similarTrackTouchMarkers = {};
+  final Map<CardioSession, PolylineAnnotation> _similarTrackLines = {};
+  final Map<CardioSession, Color> _similarTrackColors = {};
 
   Duration? _time;
   double? _speed;
@@ -72,6 +74,8 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
   static const _elevationColor = Color.fromARGB(255, 170, 130, 100);
   static const _heartRateColor = Colors.red;
   static const _cadenceColor = Colors.green;
+
+  static const _currentDurationOffset = Duration(minutes: 1);
 
   Future<void> _onMapCreated(MapController mapController) async {
     _mapController = mapController;
@@ -126,6 +130,10 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
         Color((Random().nextDouble() * 0xFFFFFF).toInt()).withOpacity(1);
     final line = await _mapController?.addLine(session.track!, color);
     if (line != null) {
+      _similarTrackTouchMarkers.putIfAbsent(
+        session,
+        NullablePointer.nullPointer,
+      );
       _similarTrackLines.putIfAbsent(session, () => line);
       _similarTrackColors.putIfAbsent(session, () => color);
       setState(() {});
@@ -133,9 +141,10 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
   }
 
   void _hideSession(CardioSession session) {
+    _similarTrackTouchMarkers.remove(session);
+    _similarTrackColors.remove(session);
     final line = _similarTrackLines.remove(session);
     _mapController?.removeLine(line!);
-    _similarTrackColors.remove(session);
     setState(() {});
   }
 
@@ -324,7 +333,6 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
                               final session = _similarSessions![index];
                               return SimilarCardioSessionCard(
                                 session: session,
-                                line: _similarTrackLines[session],
                                 color: _similarTrackColors[session],
                                 onShow: () => _showSession(session),
                                 onHide: () => _hideSession(session),
@@ -402,13 +410,12 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
     }
   }
 
+  // ignore: long-method
   Future<void> _touchCallback(Duration? touchDuration) async {
     // needed because RateLimiter calls callback later
     if (!mounted) {
       return;
     }
-
-    const currentDurationOffset = Duration(minutes: 1);
 
     if (touchDuration != null) {
       final session = _cardioSessionDescription.cardioSession;
@@ -429,19 +436,35 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
       setState(() {
         _time = touchDuration;
         _speed = session
-            .currentSpeed(touchDuration - currentDurationOffset, touchDuration)
+            .currentSpeed(touchDuration - _currentDurationOffset, touchDuration)
             ?.roundToPrecision(1);
         _elevation = pos?.elevation.round();
         _heartRate = session.currentHeartRate(
-          touchDuration - currentDurationOffset,
+          touchDuration - _currentDurationOffset,
           touchDuration,
         );
         _cadence = session.currentCadence(
-          touchDuration - currentDurationOffset,
+          touchDuration - _currentDurationOffset,
           touchDuration,
         );
       });
       await _mapController?.updateLocationMarker(_touchMarker, pos?.latLng);
+      for (final sessionTouchMarker in _similarTrackTouchMarkers.entries) {
+        final session = sessionTouchMarker.key;
+        final touchMarker = sessionTouchMarker.value;
+        final Position? pos;
+        if (session.track != null) {
+          final index = binarySearchLargestLE(
+            session.track!,
+            (Position pos) => pos.time,
+            touchDuration,
+          );
+          pos = index != null ? session.track![index] : null;
+        } else {
+          pos = null;
+        }
+        await _mapController?.updateLocationMarker(touchMarker, pos?.latLng);
+      }
     } else {
       setState(() {
         _time = null;
@@ -451,6 +474,10 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
         _cadence = null;
       });
       await _mapController?.updateLocationMarker(_touchMarker, null);
+      for (final sessionTouchMarker in _similarTrackTouchMarkers.entries) {
+        final touchMarker = sessionTouchMarker.value;
+        await _mapController?.updateLocationMarker(touchMarker, null);
+      }
     }
   }
 }
@@ -458,7 +485,6 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
 class SimilarCardioSessionCard extends StatelessWidget {
   const SimilarCardioSessionCard({
     required this.session,
-    required this.line,
     required this.color,
     required this.onShow,
     required this.onHide,
@@ -466,7 +492,6 @@ class SimilarCardioSessionCard extends StatelessWidget {
   });
 
   final CardioSession session;
-  final PolylineAnnotation? line;
   final Color? color;
   final void Function() onShow;
   final void Function() onHide;
@@ -503,7 +528,7 @@ class SimilarCardioSessionCard extends StatelessWidget {
             color != null
                 ? Icon(AppIcons.route, color: color)
                 : const SizedBox(width: 24),
-            line == null
+            color == null
                 ? IconButton(onPressed: onShow, icon: const Icon(AppIcons.add))
                 : IconButton(
                     onPressed: onHide,
