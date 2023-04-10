@@ -30,6 +30,7 @@ class RoutePlanningUtils {
     try {
       response = await Defaults.mapboxApi.directions.request(
         profile: NavigationProfile.WALKING,
+        overview: NavigationOverview.FULL,
         coordinates:
             markedPositions.map((e) => [e.latitude, e.longitude]).toList(),
       );
@@ -55,9 +56,6 @@ class RoutePlanningUtils {
           ),
         );
       }
-      _logger
-        ..i("mapbox distance ${navRoute.distance}")
-        ..i("own distance ${track.last.distance}");
       return Success(track);
     } else {
       _logger.i("mapbox api error ${response.error.runtimeType}");
