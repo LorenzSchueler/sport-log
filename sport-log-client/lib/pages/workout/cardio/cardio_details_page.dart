@@ -27,6 +27,18 @@ import 'package:sport_log/widgets/map_widgets/mapbox_map_wrapper.dart';
 import 'package:sport_log/widgets/provider_consumer.dart';
 import 'package:sport_log/widgets/value_unit_description.dart';
 
+class _SimilarSessionAnnotation {
+  _SimilarSessionAnnotation({
+    required this.trackLine,
+    required this.color,
+    required this.touchMarker,
+  });
+
+  final PolylineAnnotation trackLine;
+  final Color color;
+  final NullablePointer<CircleAnnotation> touchMarker;
+}
+
 class CardioDetailsPage extends StatefulWidget {
   const CardioDetailsPage({required this.cardioSessionDescription, super.key});
 
@@ -55,10 +67,8 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
       NullablePointer.nullPointer();
   final NullablePointer<CircleAnnotation> _touchMarker =
       NullablePointer.nullPointer();
-  final Map<CardioSession, NullablePointer<CircleAnnotation>>
-      _similarTrackTouchMarkers = {};
-  final Map<CardioSession, PolylineAnnotation> _similarTrackLines = {};
-  final Map<CardioSession, Color> _similarTrackColors = {};
+  final Map<CardioSession, _SimilarSessionAnnotation>
+      _similarSessionAnnotations = {};
 
   Duration? _time;
   double? _speed;
@@ -130,21 +140,21 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
         Color((Random().nextDouble() * 0xFFFFFF).toInt()).withOpacity(1);
     final line = await _mapController?.addLine(session.track!, color);
     if (line != null) {
-      _similarTrackTouchMarkers.putIfAbsent(
+      _similarSessionAnnotations.putIfAbsent(
         session,
-        NullablePointer.nullPointer,
+        () => _SimilarSessionAnnotation(
+          trackLine: line,
+          color: color,
+          touchMarker: NullablePointer.nullPointer(),
+        ),
       );
-      _similarTrackLines.putIfAbsent(session, () => line);
-      _similarTrackColors.putIfAbsent(session, () => color);
       setState(() {});
     }
   }
 
   void _hideSession(CardioSession session) {
-    _similarTrackTouchMarkers.remove(session);
-    _similarTrackColors.remove(session);
-    final line = _similarTrackLines.remove(session);
-    _mapController?.removeLine(line!);
+    final line = _similarSessionAnnotations.remove(session)!.trackLine;
+    _mapController?.removeLine(line);
     setState(() {});
   }
 
@@ -331,9 +341,10 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
                             itemCount: _similarSessions!.length,
                             itemBuilder: (_, index) {
                               final session = _similarSessions![index];
-                              return SimilarCardioSessionCard(
+                              return _SimilarCardioSessionCard(
                                 session: session,
-                                color: _similarTrackColors[session],
+                                sessionAnnotation:
+                                    _similarSessionAnnotations[session],
                                 onShow: () => _showSession(session),
                                 onHide: () => _hideSession(session),
                               );
@@ -449,9 +460,9 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
         );
       });
       await _mapController?.updateLocationMarker(_touchMarker, pos?.latLng);
-      for (final sessionTouchMarker in _similarTrackTouchMarkers.entries) {
+      for (final sessionTouchMarker in _similarSessionAnnotations.entries) {
         final session = sessionTouchMarker.key;
-        final touchMarker = sessionTouchMarker.value;
+        final touchMarker = sessionTouchMarker.value.touchMarker;
         final Position? pos;
         if (session.track != null) {
           final index = binarySearchLargestLE(
@@ -474,25 +485,24 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
         _cadence = null;
       });
       await _mapController?.updateLocationMarker(_touchMarker, null);
-      for (final sessionTouchMarker in _similarTrackTouchMarkers.entries) {
-        final touchMarker = sessionTouchMarker.value;
+      for (final sessionTouchMarker in _similarSessionAnnotations.entries) {
+        final touchMarker = sessionTouchMarker.value.touchMarker;
         await _mapController?.updateLocationMarker(touchMarker, null);
       }
     }
   }
 }
 
-class SimilarCardioSessionCard extends StatelessWidget {
-  const SimilarCardioSessionCard({
+class _SimilarCardioSessionCard extends StatelessWidget {
+  const _SimilarCardioSessionCard({
     required this.session,
-    required this.color,
+    required this.sessionAnnotation,
     required this.onShow,
     required this.onHide,
-    super.key,
   });
 
   final CardioSession session;
-  final Color? color;
+  final _SimilarSessionAnnotation? sessionAnnotation;
   final void Function() onShow;
   final void Function() onHide;
 
@@ -525,10 +535,10 @@ class SimilarCardioSessionCard extends StatelessWidget {
               ),
             ),
             Defaults.sizedBox.horizontal.big,
-            color != null
-                ? Icon(AppIcons.route, color: color)
+            sessionAnnotation != null
+                ? Icon(AppIcons.route, color: sessionAnnotation!.color)
                 : const SizedBox(width: 24),
-            color == null
+            sessionAnnotation == null
                 ? IconButton(onPressed: onShow, icon: const Icon(AppIcons.add))
                 : IconButton(
                     onPressed: onHide,
