@@ -40,6 +40,8 @@ class _RouteEditPageState extends State<RouteEditPage> {
   List<CircleAnnotation> _circles = [];
   List<PointAnnotation> _labels = [];
 
+  bool _isSearching = false;
+
   MapController? _mapController;
   ElevationMapController? _elevationMapController;
 
@@ -89,10 +91,12 @@ class _RouteEditPageState extends State<RouteEditPage> {
 
   Future<void> _updateLine() async {
     if (_route.markedPositions!.length >= 2) {
+      setState(() => _isSearching = true);
       final track = await RoutePlanningUtils.matchLocations(
         _route.markedPositions!,
         _elevationMapController?.getElevation,
       );
+      setState(() => _isSearching = false);
       if (mounted) {
         if (track.isFailure) {
           showSimpleToast(context, track.failure.message);
@@ -223,16 +227,28 @@ class _RouteEditPageState extends State<RouteEditPage> {
         body: Column(
           children: [
             Expanded(
-              child: MapboxMapWrapper(
-                showScale: true,
-                showFullscreenButton: false,
-                showMapStylesButton: true,
-                showSelectRouteButton: false,
-                showSetNorthButton: true,
-                showCurrentLocationButton: false,
-                showCenterLocationButton: false,
-                onMapCreated: _onMapCreated,
-                onLongTap: _extendLine,
+              child: Stack(
+                children: [
+                  MapboxMapWrapper(
+                    showScale: true,
+                    showFullscreenButton: false,
+                    showMapStylesButton: true,
+                    showSelectRouteButton: false,
+                    showSetNorthButton: true,
+                    showCurrentLocationButton: false,
+                    showCenterLocationButton: false,
+                    onMapCreated: _onMapCreated,
+                    onLongTap: _extendLine,
+                  ),
+                  if (_isSearching)
+                    const Align(
+                      alignment: Alignment.topCenter,
+                      child: Padding(
+                        padding: EdgeInsets.only(top: 10),
+                        child: CircularProgressIndicator(color: Colors.grey),
+                      ),
+                    ),
+                ],
               ),
             ),
             ElevationMap(onMapCreated: _onElevationMapCreated),
