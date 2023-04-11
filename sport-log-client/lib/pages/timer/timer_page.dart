@@ -89,9 +89,12 @@ class TimerPage extends StatelessWidget {
                           Defaults.sizedBox.vertical.huge,
                           _startStopButton(context, timerState),
                           const SizedBox(height: 80),
-                          Text(
-                            "Round ${timerState.currentRound ?? '0'}",
-                            style: const TextStyle(fontSize: 80),
+                          FittedBox(
+                            child: Text(
+                              "Round ${timerState.currentRound ?? '0'}",
+                              softWrap: false,
+                              style: const TextStyle(fontSize: 80),
+                            ),
                           ),
                           timeText(timerState),
                         ],
@@ -182,16 +185,19 @@ class TimerPage extends StatelessWidget {
           );
   }
 
-  Text timeText(TimerState timerState) {
+  Widget timeText(TimerState timerState) {
     final timeText = timerState.isRunning
         ? timerState.displayTime!.abs().formatTimeShort
         : "00:10";
     final color = timerState.isNotRunning || timerState.displayTime!.isNegative
         ? const Color.fromARGB(255, 150, 150, 150)
         : null;
-    return Text(
-      timeText,
-      style: TextStyle(fontSize: 150, color: color),
+    return FittedBox(
+      child: Text(
+        timeText,
+        softWrap: false,
+        style: TextStyle(fontSize: 200, color: color),
+      ),
     );
   }
 }
