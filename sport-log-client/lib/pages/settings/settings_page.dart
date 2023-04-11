@@ -308,27 +308,31 @@ class SettingsPage extends StatelessWidget {
                   ),
                   Consumer<Sync>(
                     builder: (context, sync, _) => EditTile(
+                      leading: AppIcons.sync,
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: ElevatedButton(
+                              style: ButtonStyle(
+                                backgroundColor: MaterialStateProperty.all(
+                                  Theme.of(context).colorScheme.errorContainer,
+                                ),
+                              ),
+                              onPressed: sync.isSyncing
+                                  ? null
+                                  : () => _initSync(context),
+                              child: const Text('Init Sync'),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Consumer<Sync>(
+                    builder: (context, sync, _) => EditTile(
                       leading: AppIcons.logout,
                       child: Row(
                         children: [
-                          if (settings.accountCreated) ...[
-                            Expanded(
-                              child: ElevatedButton(
-                                style: ButtonStyle(
-                                  backgroundColor: MaterialStateProperty.all(
-                                    Theme.of(context)
-                                        .colorScheme
-                                        .errorContainer,
-                                  ),
-                                ),
-                                onPressed: sync.isSyncing
-                                    ? null
-                                    : () => _initSync(context),
-                                child: const Text('Init Sync'),
-                              ),
-                            ),
-                            Defaults.sizedBox.horizontal.normal,
-                          ],
                           Expanded(
                             child: ElevatedButton(
                               style: ButtonStyle(
@@ -342,22 +346,20 @@ class SettingsPage extends StatelessWidget {
                               child: const Text('Logout'),
                             ),
                           ),
-                          if (settings.accountCreated) ...[
-                            Defaults.sizedBox.horizontal.normal,
-                            Expanded(
-                              child: ElevatedButton(
-                                style: ButtonStyle(
-                                  backgroundColor: MaterialStateProperty.all(
-                                    Theme.of(context).colorScheme.error,
-                                  ),
+                          Defaults.sizedBox.horizontal.normal,
+                          Expanded(
+                            child: ElevatedButton(
+                              style: ButtonStyle(
+                                backgroundColor: MaterialStateProperty.all(
+                                  Theme.of(context).colorScheme.error,
                                 ),
-                                onPressed: sync.isSyncing
-                                    ? null
-                                    : () => _deleteAccount(context),
-                                child: const Text('Delete Account'),
                               ),
+                              onPressed: sync.isSyncing
+                                  ? null
+                                  : () => _deleteAccount(context),
+                              child: const Text('Delete Account'),
                             ),
-                          ],
+                          ),
                         ],
                       ),
                     ),
