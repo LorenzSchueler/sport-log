@@ -159,12 +159,16 @@ class MapController {
     }
   }
 
+  // alpha channel seems to be ignored
+  int _colorToInt(Color color) =>
+      (color.alpha << 24) + (color.red << 16) + (color.green << 8) + color.blue;
+
   Future<PolylineAnnotation?> addBoundingBoxLine(LatLngBounds bounds) async =>
       await _lineManager?.create(
         PolylineAnnotationOptions(
           geometry: bounds.toGeoJsonLineString(),
           lineWidth: 2,
-          lineColor: Defaults.mapbox.trackLineColor,
+          lineColor: _colorToInt(Defaults.mapbox.trackLineColor),
         ),
       );
 
@@ -185,35 +189,26 @@ class MapController {
     });
   }
 
-  Future<PolylineAnnotation?> _addLine(
+  Future<PolylineAnnotation?> addLine(
     Iterable<Position> route,
-    int color,
+    Color color,
   ) async =>
       await _lineManager?.create(
         PolylineAnnotationOptions(
           geometry: route.map((p) => p.latLng).toGeoJsonLineString(),
           lineWidth: 2,
-          lineColor: color,
+          lineColor: _colorToInt(color),
         ),
       );
 
-  Future<PolylineAnnotation?> addLine(
-    Iterable<Position> route,
-    Color color,
-  ) =>
-      _addLine(
-        route,
-        0xFF000000 + color.red * 0x10000 + color.green * 0x100 + color.blue,
-      );
-
-  Future<void> _updateLine(
+  Future<void> updateLine(
     NullablePointer<PolylineAnnotation> line,
     Iterable<Position>? track,
-    int color,
+    Color color,
   ) async {
     await _lock.synchronized(() async {
       if (line.isNull && track != null) {
-        line.object = await _addLine(track, color);
+        line.object = await addLine(track, color);
       } else if (line.isNotNull && track != null) {
         line.object!.geometry =
             track.map((p) => p.latLng).toGeoJsonLineString();
@@ -229,37 +224,38 @@ class MapController {
       await _lineManager?.delete(line);
 
   Future<PolylineAnnotation?> addRouteLine(Iterable<Position> route) =>
-      _addLine(route, Defaults.mapbox.routeLineColor);
+      addLine(route, Defaults.mapbox.routeLineColor);
 
   Future<void> updateRouteLine(
     NullablePointer<PolylineAnnotation> line,
     Iterable<Position>? track,
   ) =>
-      _updateLine(line, track, Defaults.mapbox.routeLineColor);
+      updateLine(line, track, Defaults.mapbox.routeLineColor);
 
   Future<PolylineAnnotation?> addTrackLine(Iterable<Position> track) =>
-      _addLine(track, Defaults.mapbox.trackLineColor);
+      addLine(track, Defaults.mapbox.trackLineColor);
 
   Future<void> updateTrackLine(
     NullablePointer<PolylineAnnotation> line,
     Iterable<Position>? track,
   ) =>
-      _updateLine(line, track, Defaults.mapbox.trackLineColor);
+      updateLine(line, track, Defaults.mapbox.trackLineColor);
 
   Future<List<CircleAnnotation>?> addCurrentLocationMarker(
     LatLng latLng,
   ) async {
+    final color = _colorToInt(const Color.fromARGB(0xFF, 0, 0x60, 0xA0));
     return (await _circleManager?.createMulti([
       CircleAnnotationOptions(
         geometry: latLng.toJsonPoint(),
         circleRadius: 8,
-        circleColor: Defaults.mapbox.markerColor,
+        circleColor: color,
         circleOpacity: 0.5,
       ),
       CircleAnnotationOptions(
         geometry: latLng.toJsonPoint(),
         circleRadius: 20,
-        circleColor: Defaults.mapbox.markerColor,
+        circleColor: color,
         circleOpacity: 0.3,
       ),
     ]))
@@ -289,26 +285,24 @@ class MapController {
     });
   }
 
-  Future<CircleAnnotation?> addLocationMarker(LatLng latLng) async =>
+  Future<CircleAnnotation?> addMarker(LatLng latLng, Color color) async =>
       await _circleManager?.create(
         CircleAnnotationOptions(
           geometry: latLng.toJsonPoint(),
           circleRadius: 8,
-          circleColor: Defaults.mapbox.markerColor,
+          circleColor: _colorToInt(color),
           circleOpacity: 0.5,
         ),
       );
 
-  Future<void> removeLocationMarker(CircleAnnotation circle) async =>
-      await _circleManager?.delete(circle);
-
-  Future<void> updateLocationMarker(
+  Future<void> updateMarker(
     NullablePointer<CircleAnnotation> circle,
     LatLng? latLng,
+    Color color,
   ) async {
     await _lock.synchronized(() async {
       if (circle.isNull && latLng != null) {
-        circle.object = await addLocationMarker(latLng);
+        circle.object = await addMarker(latLng, color);
       } else if (circle.isNotNull && latLng != null) {
         circle.object!.geometry = latLng.toJsonPoint();
         await _circleManager?.update(circle.object!);
@@ -319,9 +313,27 @@ class MapController {
     });
   }
 
-  Future<void> removeAllCircles() async => await _circleManager?.deleteAll();
+  Future<void> removeAllMarkers() async => await _circleManager?.deleteAll();
 
-  Future<PointAnnotation?> addLocationLabel(
+  Future<CircleAnnotation?> addTrackMarker(LatLng latLng) =>
+      addMarker(latLng, Defaults.mapbox.trackLineColor);
+
+  Future<CircleAnnotation?> addRouteMarker(LatLng latLng) =>
+      addMarker(latLng, Defaults.mapbox.routeLineColor);
+
+  Future<void> updateTrackMarker(
+    NullablePointer<CircleAnnotation> circle,
+    LatLng? latLng,
+  ) =>
+      updateMarker(circle, latLng, Defaults.mapbox.trackLineColor);
+
+  Future<void> updateRouteMarker(
+    NullablePointer<CircleAnnotation> circle,
+    LatLng? latLng,
+  ) =>
+      updateMarker(circle, latLng, Defaults.mapbox.routeLineColor);
+
+  Future<PointAnnotation?> addLabel(
     LatLng latLng,
     String label,
   ) async =>
@@ -333,7 +345,7 @@ class MapController {
         ),
       );
 
-  Future<void> removeAllPoints() async => await _pointManager?.deleteAll();
+  Future<void> removeAllLabels() async => await _pointManager?.deleteAll();
 
   Future<void> setStyle(String styleUri) async =>
       await _controller?.style.setStyleURI(styleUri);

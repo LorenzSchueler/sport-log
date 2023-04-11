@@ -71,12 +71,12 @@ class _OfflineMapsPageState extends State<OfflineMapsPage> {
 
   Future<void> _updatePoint1(LatLng? latLng) async {
     setState(() => _point1 = latLng);
-    await _mapController?.updateLocationMarker(_point1Marker, _point1);
+    await _mapController?.updateTrackMarker(_point1Marker, _point1);
   }
 
   Future<void> _updatePoint2(LatLng? latLng) async {
     setState(() => _point2 = latLng);
-    await _mapController?.updateLocationMarker(_point2Marker, _point2);
+    await _mapController?.updateTrackMarker(_point2Marker, _point2);
     await _mapController?.updateBoundingBoxLine(
       _boundingBoxLine,
       [_point1, _point2].whereType<LatLng>().latLngBounds,

@@ -85,8 +85,8 @@ class _CardioCutPageState extends State<CardioCutPage> {
     final endLatLng = _cardioSessionDescription.cardioSession.track?.reversed
         .firstWhereOrNull((pos) => pos.time <= _cutEndDuration)
         ?.latLng;
-    await _mapController?.updateLocationMarker(_cutStartMarker, startLatLng);
-    await _mapController?.updateLocationMarker(_cutEndMarker, endLatLng);
+    await _mapController?.updateTrackMarker(_cutStartMarker, startLatLng);
+    await _mapController?.updateTrackMarker(_cutEndMarker, endLatLng);
   }
 
   Future<void> _cutCardioSession() async {

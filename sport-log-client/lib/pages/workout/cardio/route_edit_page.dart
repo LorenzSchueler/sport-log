@@ -116,20 +116,20 @@ class _RouteEditPageState extends State<RouteEditPage> {
   }
 
   Future<void> _addPoint(LatLng latLng, int number) async {
-    final label = await _mapController?.addLocationLabel(latLng, "$number");
+    final label = await _mapController?.addLabel(latLng, "$number");
     if (label != null) {
       _labels.add(label);
     }
-    final circle = await _mapController?.addLocationMarker(latLng);
+    final circle = await _mapController?.addRouteMarker(latLng);
     if (circle != null) {
       _circles.add(circle);
     }
   }
 
   Future<void> _updatePoints() async {
-    await _mapController?.removeAllCircles();
+    await _mapController?.removeAllMarkers();
     _circles = [];
-    await _mapController?.removeAllPoints();
+    await _mapController?.removeAllLabels();
     _labels = [];
     _route.markedPositions!.asMap().forEach((index, pos) {
       _addPoint(pos.latLng, index + 1);

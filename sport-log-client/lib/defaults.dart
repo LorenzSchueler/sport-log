@@ -62,9 +62,8 @@ class _BorderRadius {
 class _Mapbox {
   _Mapbox();
 
-  final markerColor = 0xff0060a0;
-  final trackLineColor = 0xffff0000;
-  final routeLineColor = 0xff0000ff;
+  final trackLineColor = const Color.fromARGB(0xFF, 0xFF, 0, 0);
+  final routeLineColor = const Color.fromARGB(0xFF, 0, 0, 0xFF);
   final cameraPosition = const LatLng(lat: 47.27, lng: 11.33);
 }
 

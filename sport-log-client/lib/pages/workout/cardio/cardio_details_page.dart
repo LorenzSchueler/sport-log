@@ -459,10 +459,10 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
           touchDuration,
         );
       });
-      await _mapController?.updateLocationMarker(_touchMarker, pos?.latLng);
+      await _mapController?.updateTrackMarker(_touchMarker, pos?.latLng);
       for (final sessionTouchMarker in _similarSessionAnnotations.entries) {
         final session = sessionTouchMarker.key;
-        final touchMarker = sessionTouchMarker.value.touchMarker;
+        final sessionAnnotation = sessionTouchMarker.value;
         final Position? pos;
         if (session.track != null) {
           final index = binarySearchLargestLE(
@@ -474,7 +474,11 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
         } else {
           pos = null;
         }
-        await _mapController?.updateLocationMarker(touchMarker, pos?.latLng);
+        await _mapController?.updateMarker(
+          sessionAnnotation.touchMarker,
+          pos?.latLng,
+          sessionAnnotation.color,
+        );
       }
     } else {
       setState(() {
@@ -484,10 +488,14 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
         _heartRate = null;
         _cadence = null;
       });
-      await _mapController?.updateLocationMarker(_touchMarker, null);
+      await _mapController?.updateTrackMarker(_touchMarker, null);
       for (final sessionTouchMarker in _similarSessionAnnotations.entries) {
-        final touchMarker = sessionTouchMarker.value.touchMarker;
-        await _mapController?.updateLocationMarker(touchMarker, null);
+        final sessionAnnotation = sessionTouchMarker.value;
+        await _mapController?.updateMarker(
+          sessionAnnotation.touchMarker,
+          null,
+          sessionAnnotation.color,
+        );
       }
     }
   }

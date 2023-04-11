@@ -50,13 +50,13 @@ class _RouteDetailsPageState extends State<RouteDetailsPage>
       padded: true,
     );
     await _mapController?.updateRouteLine(_routeLine, _route.track);
-    await _mapController?.removeAllCircles();
-    await _mapController?.removeAllPoints();
+    await _mapController?.removeAllMarkers();
+    await _mapController?.removeAllLabels();
     if (_route.markedPositions != null) {
       for (var i = 0; i < _route.markedPositions!.length; i++) {
         final latLng = _route.markedPositions![i].latLng;
-        await _mapController?.addLocationMarker(latLng);
-        await _mapController?.addLocationLabel(latLng, "${i + 1}");
+        await _mapController?.addRouteMarker(latLng);
+        await _mapController?.addLabel(latLng, "${i + 1}");
       }
     }
   }
@@ -203,6 +203,6 @@ class _RouteDetailsPageState extends State<RouteDetailsPage>
             ?.latLng
         : null;
 
-    await _mapController?.updateLocationMarker(_touchLocationMarker, latLng);
+    await _mapController?.updateRouteMarker(_touchLocationMarker, latLng);
   }
 }
