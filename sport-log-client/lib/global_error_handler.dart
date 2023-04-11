@@ -39,11 +39,14 @@ class GlobalErrorHandler {
     DiagnosticsNode? diagnosticsNode,
     String? library,
   ]) async {
-    final now = DateTime.now();
-    final description =
-        "time: $now\ncaught by: $caughtBy\ncontext: $diagnosticsNode\nlibrary: $library\n\nerror:\n$error";
+    final description = "git ref: ${Config.gitRef}\n"
+        "time: ${DateTime.now()}\n"
+        "caught by: $caughtBy\n"
+        "context: $diagnosticsNode\n"
+        "library: $library\n\n"
+        "error:\n$error";
     final descriptionAndStack =
-        "$description\n\nstack trace:\n$stackTrace\n\n\n";
+        "$description\n\n" "stack trace:\n$stackTrace\n\n\n";
 
     final file = await writeToFile(
       content: descriptionAndStack,
