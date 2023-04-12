@@ -99,7 +99,6 @@ class _OfflineMapsPageState extends State<OfflineMapsPage> {
                     SizedBox(
                       height: 400,
                       child: MapboxMapWrapper(
-                        showScale: true,
                         showFullscreenButton: false,
                         showMapStylesButton: false,
                         showSelectRouteButton: false,

@@ -187,7 +187,6 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
                       _cardioSessionDescription.route?.track != null &&
                           _cardioSessionDescription.route!.track!.isNotEmpty
                   ? MapboxMapWrapper(
-                      showScale: true,
                       showFullscreenButton: true,
                       showMapStylesButton: true,
                       showSelectRouteButton: false,

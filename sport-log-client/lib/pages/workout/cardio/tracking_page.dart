@@ -82,7 +82,6 @@ class CardioTrackingPage extends StatelessWidget {
                     ),
                   Expanded(
                     child: MapboxMapWrapper(
-                      showScale: true,
                       showFullscreenButton: true,
                       showMapStylesButton: true,
                       showSelectRouteButton: false,

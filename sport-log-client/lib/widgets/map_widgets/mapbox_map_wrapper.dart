@@ -15,7 +15,6 @@ import 'package:sport_log/widgets/map_widgets/toggle_fullscreen_button.dart';
 
 class MapboxMapWrapper extends StatefulWidget {
   const MapboxMapWrapper({
-    required this.showScale,
     required this.showFullscreenButton,
     required this.showMapStylesButton,
     required this.showSelectRouteButton,
@@ -40,7 +39,6 @@ class MapboxMapWrapper extends StatefulWidget {
     super.key,
   });
 
-  final bool showScale;
   final bool showFullscreenButton;
   final bool showMapStylesButton;
   final bool showSelectRouteButton;
@@ -96,7 +94,6 @@ class _MapboxMapWrapperState extends State<MapboxMapWrapper> {
       position: widget.scaleAtTop
           ? OrnamentPosition.TOP_LEFT
           : OrnamentPosition.BOTTOM_RIGHT,
-      enabled: widget.showScale,
     );
     await _mapController?.hideAttribution();
     await _mapController?.hideCompass();

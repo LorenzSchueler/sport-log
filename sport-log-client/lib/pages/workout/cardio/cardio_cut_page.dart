@@ -115,7 +115,6 @@ class _CardioCutPageState extends State<CardioCutPage> {
             if (_cardioSessionDescription.cardioSession.track != null)
               Expanded(
                 child: MapboxMapWrapper(
-                  showScale: true,
                   showFullscreenButton: false,
                   showMapStylesButton: true,
                   showSelectRouteButton: false,

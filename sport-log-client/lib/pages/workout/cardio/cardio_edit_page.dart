@@ -154,7 +154,6 @@ class _CardioEditPageState extends State<CardioEditPage> {
               SizedBox(
                 height: 250,
                 child: MapboxMapWrapper(
-                  showScale: true,
                   showFullscreenButton: false,
                   showMapStylesButton: true,
                   showSelectRouteButton: false,

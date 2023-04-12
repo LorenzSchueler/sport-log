@@ -230,7 +230,6 @@ class _RouteEditPageState extends State<RouteEditPage> {
               child: Stack(
                 children: [
                   MapboxMapWrapper(
-                    showScale: true,
                     showFullscreenButton: false,
                     showMapStylesButton: true,
                     showSelectRouteButton: false,

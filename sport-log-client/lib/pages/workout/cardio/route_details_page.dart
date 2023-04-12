@@ -103,7 +103,6 @@ class _RouteDetailsPageState extends State<RouteDetailsPage>
             Expanded(
               child: _route.track != null && _route.track!.isNotEmpty
                   ? MapboxMapWrapper(
-                      showScale: true,
                       showFullscreenButton: true,
                       showMapStylesButton: true,
                       showSelectRouteButton: false,

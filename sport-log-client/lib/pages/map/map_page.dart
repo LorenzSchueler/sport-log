@@ -142,7 +142,6 @@ class _MapPageState extends State<MapPage> {
             alignment: Alignment.center,
             children: [
               MapboxMapWrapper(
-                showScale: true,
                 showFullscreenButton: false,
                 showMapStylesButton: true,
                 showSelectRouteButton: true,
