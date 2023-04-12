@@ -337,8 +337,9 @@ class TrackingUtils extends ChangeNotifier {
       if (prevLap < currLap) {
         await tts.speak("The current metrics are:");
         for (final metric in config.metrics) {
-          if (metric.isEnabled) {
-            await tts.speak("${metric.name}: ${metric.value(session)}");
+          final text = metric.text(session);
+          if (text != null) {
+            await tts.speak(text);
           }
         }
       }
