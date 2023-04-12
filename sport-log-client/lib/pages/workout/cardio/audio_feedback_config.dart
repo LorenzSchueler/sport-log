@@ -22,6 +22,20 @@ extension on Duration {
   }
 }
 
+extension on int {
+  String toSpeech() {
+    var text = "";
+    if (this >= 1000) {
+      text += "${this ~/ 1000} thousand ";
+    }
+    if (this == 0 || (this % 1000) > 0) {
+      text += "${this % 1000} ";
+    }
+
+    return text;
+  }
+}
+
 class AudioFeedbackConfig extends ChangeNotifier {
   factory AudioFeedbackConfig() {
     final audioFeedback = AudioFeedbackConfig._();
@@ -93,24 +107,16 @@ class AudioFeedbackConfig extends ChangeNotifier {
       "Elevation",
       (c) {
         final elevation = c.track!.last.elevation.round();
-        var text = "";
-        if (elevation >= 1000) {
-          text += "${elevation ~/ 1000} thousand ";
-        }
-        if (elevation == 0 || (elevation % 1000) > 0) {
-          text += "${elevation % 1000} ";
-        }
-
-        return "$text meters";
+        return "${elevation.toSpeech()} meters";
       },
     ),
     AudioFeedbackMetric.disabled(
       "Ascent",
-      (c) => "${c.ascent} meters",
+      (c) => "${c.ascent?.toSpeech()} meters",
     ),
     AudioFeedbackMetric.disabled(
       "Descent",
-      (c) => "${c.descent} meters",
+      (c) => "${c.descent?.toSpeech()} meters",
     ),
   ];
 }
