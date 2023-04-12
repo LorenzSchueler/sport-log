@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:collection/collection.dart';
 import 'package:flutter/cupertino.dart';
@@ -24,11 +25,28 @@ class HeartRateUtils extends ChangeNotifier {
   int? get hr => _hr;
   int? _battery;
   int? get battery => _battery;
+  List<int> _rrs = [];
+  //https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5624990/
+  int? _hrv;
+  int? get hrv => _hrv;
+  void _setHrv() {
+    if (_rrs.length < 2) {
+      _hrv = null;
+      return;
+    }
+    var sumOfSquares = 0;
+    for (var i = 0; i < _rrs.length - 1; i++) {
+      sumOfSquares += pow(_rrs[i] - _rrs[i + 1], 2) as int;
+    }
+
+    _hrv = sqrt(sumOfSquares / (_rrs.length - 1)).round();
+  }
 
   bool _disposed = false;
 
   bool get canStartStream => deviceId != null;
 
+  bool get isWaiting => isActive && _hr == null;
   bool get isActive => _heartRateSubscription != null;
   bool get isNotActive => _heartRateSubscription == null;
 
@@ -75,13 +93,18 @@ class HeartRateUtils extends ChangeNotifier {
   }
 
   Future<bool> startHeartRateStream(
-    void Function(PolarHeartRateEvent)? onHeartRateEvent,
-  ) async {
+    void Function(PolarHeartRateEvent)? onHeartRateEvent, {
+    bool hrv = false,
+  }) async {
     if (deviceId == null || _heartRateSubscription != null) {
       return false;
     }
     _heartRateSubscription = _polar.heartRateStream.listen((event) {
       _hr = event.data.hr;
+      if (hrv) {
+        _rrs.addAll(event.data.rrsMs);
+        _setHrv();
+      }
       onHeartRateEvent?.call(event);
       notifyListeners();
     });
@@ -104,6 +127,8 @@ class HeartRateUtils extends ChangeNotifier {
     }
     deviceId = null;
     _hr = null;
+    _rrs = [];
+    _hrv = null;
     _battery = null;
     if (!_disposed) {
       notifyListeners();
