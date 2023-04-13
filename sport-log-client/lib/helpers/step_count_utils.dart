@@ -27,8 +27,7 @@ class StepCountUtils {
         return false;
       }
     }
-    final stepCountStream = Pedometer.stepCountStream;
-    _stepCountSubscription = stepCountStream.listen((stepCount) {
+    _stepCountSubscription = Pedometer.stepCountStream.listen((stepCount) {
       onStepCountUpdate(stepCount);
       _lastStepCount = stepCount;
     });

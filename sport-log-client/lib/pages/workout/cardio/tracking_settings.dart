@@ -14,6 +14,12 @@ class TrackingSettings extends ChangeNotifier {
 
   TrackingSettings._();
 
+  @override
+  void dispose() {
+    _heartRateUtils.dispose();
+    super.dispose();
+  }
+
   Movement _movement = Movement.defaultMovement!;
   Movement get movement => _movement;
   set movement(Movement movement) {
@@ -45,6 +51,7 @@ class TrackingSettings extends ChangeNotifier {
   AudioFeedbackConfig? _audioFeedback;
   AudioFeedbackConfig? get audioFeedback => _audioFeedback;
   set audioFeedback(AudioFeedbackConfig? audioFeedback) {
+    _audioFeedback?.dispose();
     _audioFeedback = audioFeedback;
     _audioFeedback?.addListener(notifyListeners);
     notifyListeners();

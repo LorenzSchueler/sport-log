@@ -76,6 +76,12 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
   int? _heartRate;
   int? _cadence;
 
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
   late final _rateLimiter =
       RateLimiter(_touchCallback, const Duration(milliseconds: 200));
 

@@ -38,6 +38,12 @@ class _RouteDetailsPageState extends State<RouteDetailsPage>
   final NullablePointer<CircleAnnotation> _touchLocationMarker =
       NullablePointer.nullPointer();
 
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
   Future<void> _onMapCreated(MapController mapController) async {
     _mapController = mapController;
     await _setBoundsAndLine();

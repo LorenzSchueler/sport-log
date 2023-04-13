@@ -47,6 +47,14 @@ class AudioFeedbackConfig extends ChangeNotifier {
 
   AudioFeedbackConfig._();
 
+  @override
+  void dispose() {
+    for (final metric in metrics) {
+      metric.dispose();
+    }
+    super.dispose();
+  }
+
   int _interval = 1000;
   int get interval => _interval;
   set interval(int interval) {
