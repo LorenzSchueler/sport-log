@@ -44,7 +44,8 @@ class TrackingUtils extends ChangeNotifier {
             : null,
         _audioFeedbackConfig = trackingSettings.audioFeedback,
         _heartRateUtils = trackingSettings.heartRateUtils.deviceId != null
-            ? trackingSettings.heartRateUtils
+            ? (HeartRateUtils() // trackingSettings.heartRateUtils is disposed
+              ..deviceId = trackingSettings.heartRateUtils.deviceId)
             : null;
 
   static const maxSpeed = 250; // km/ h
@@ -222,37 +223,35 @@ class TrackingUtils extends ChangeNotifier {
   }
 
   void _onHeartRateUpdate(PolarHeartRateEvent event) {
+    final rrsMs = event.data.rrsMs;
+    final heartRate = _cardioSessionDescription.cardioSession.heartRate!;
     if (isTracking) {
-      if (_cardioSessionDescription.cardioSession.heartRate!.isEmpty &&
-          event.data.rrsMs.isNotEmpty) {
-        _cardioSessionDescription.cardioSession.heartRate!.add(currentDuration);
-      } else {
-        for (final rr in event.data.rrsMs) {
-          _cardioSessionDescription.cardioSession.heartRate!.add(
-            currentDuration +
-                Duration(milliseconds: -event.data.rrsMs.sum + rr),
-          );
+      for (final rrMs in rrsMs) {
+        final duration =
+            currentDuration + Duration(milliseconds: -rrsMs.sum + rrMs);
+        if (!duration.isNegative) {
+          heartRate.add(duration);
         }
       }
     }
-    _heartRateInfo = "rr: ${event.data.rrsMs} ms\nhr: ${event.data.hr} bpm";
+    _heartRateInfo = "rr: $rrsMs ms\nhr: ${event.data.hr} bpm";
   }
 
   void _onStepCountUpdate(StepCount stepCount) {
-    if (isTracking) {
-      if (_cardioSessionDescription.cardioSession.cadence!.isEmpty) {
-        _cardioSessionDescription.cardioSession.cadence!.add(currentDuration);
-      } else {
-        /// interpolate steps since last stepCount update
-        final newSteps = stepCount.steps - _stepUtils.lastStepCount.steps;
-        final timeDiff = stepCount.timeStamp
-            .difference(_stepUtils.lastStepCount.timeStamp)
-            .inMilliseconds;
-        final avgTimeDiff = (timeDiff / newSteps).floor();
-        for (var ms = 0; ms < timeDiff; ms += avgTimeDiff) {
-          _cardioSessionDescription.cardioSession.cadence!.add(
-            currentDuration + Duration(milliseconds: -timeDiff + ms),
-          );
+    final cadence = _cardioSessionDescription.cardioSession.cadence!;
+    final lastStepCount = _stepUtils.lastStepCount;
+    if (isTracking && lastStepCount != null) {
+      /// interpolate steps since last stepCount update
+      final newSteps = stepCount.steps - lastStepCount.steps;
+      final timeDiff = stepCount.timeStamp
+          .difference(lastStepCount.timeStamp)
+          .inMilliseconds;
+      final avgTimeDiff = (timeDiff / newSteps).floor();
+      for (var ms = 0; ms < timeDiff; ms += avgTimeDiff) {
+        final duration =
+            currentDuration + Duration(milliseconds: -timeDiff + ms);
+        if (!duration.isNegative) {
+          cadence.add(duration);
         }
       }
     }

@@ -6,7 +6,7 @@ import 'package:sport_log/widgets/dialogs/dialogs.dart';
 
 class StepCountUtils {
   StreamSubscription<StepCount>? _stepCountSubscription;
-  late StepCount _lastStepCount;
+  StepCount? _lastStepCount;
 
   void dispose() {
     stopStepCountStream();
@@ -42,5 +42,5 @@ class StepCountUtils {
 
   bool get enabled => _stepCountSubscription != null;
 
-  StepCount get lastStepCount => _lastStepCount;
+  StepCount? get lastStepCount => _lastStepCount;
 }
