@@ -23,97 +23,76 @@ class TimerPage extends StatelessWidget {
         create: (_) => TimerState(),
         builder: (context, timerState, _) => DefaultTabController(
           length: 3,
-          child: Builder(
-            builder: (context) {
-              final tabController = DefaultTabController.of(context);
-              tabController.addListener(() {
-                if (!tabController.indexIsChanging) {
-                  switch (tabController.index) {
-                    case 0:
-                      timerState.timerType = TimerType.timer;
-                      break;
-                    case 1:
-                      timerState.timerType = TimerType.interval;
-                      break;
-                    default:
-                      timerState.timerType = TimerType.stopwatch;
-                      break;
-                  }
-                }
-              });
-
-              return Scaffold(
-                resizeToAvoidBottomInset: false,
-                appBar: AppBar(
-                  title: const Text("Timer"),
-                  bottom: DeactivatableTabBar(
-                    disabled: timerState.isRunning,
-                    child: TabBar(
-                      indicatorColor: Theme.of(context).colorScheme.primary,
-                      tabs: const [
-                        Tab(
-                          text: "Timer",
-                          icon: Icon(AppIcons.timeInterval),
-                        ),
-                        Tab(
-                          text: "Interval",
-                          icon: Icon(AppIcons.repeat),
-                        ),
-                        Tab(
-                          text: "Stopwatch",
-                          icon: Icon(AppIcons.stopwatch),
-                        )
-                      ],
+          child: Scaffold(
+            resizeToAvoidBottomInset: false,
+            appBar: AppBar(
+              title: const Text("Timer"),
+              bottom: DeactivatableTabBar(
+                disabled: timerState.isRunning,
+                child: TabBar(
+                  indicatorColor: Theme.of(context).colorScheme.primary,
+                  tabs: const [
+                    Tab(
+                      text: "Timer",
+                      icon: Icon(AppIcons.timeInterval),
                     ),
-                  ),
+                    Tab(
+                      text: "Interval",
+                      icon: Icon(AppIcons.repeat),
+                    ),
+                    Tab(
+                      text: "Stopwatch",
+                      icon: Icon(AppIcons.stopwatch),
+                    )
+                  ],
                 ),
-                body: Container(
-                  padding: Defaults.edgeInsets.normal,
-                  child: TabBarView(
-                    physics: const NeverScrollableScrollPhysics(),
+              ),
+            ),
+            body: Container(
+              padding: Defaults.edgeInsets.normal,
+              child: TabBarView(
+                physics: const NeverScrollableScrollPhysics(),
+                children: [
+                  Column(
                     children: [
-                      Column(
-                        children: [
-                          _timeFormField("Time", timerState),
-                          Defaults.sizedBox.vertical.huge,
-                          _startStopButton(context, timerState),
-                          const SizedBox(height: 100),
-                          timeText(timerState),
-                        ],
-                      ),
-                      Column(
-                        children: [
-                          _timeFormField("Round Time", timerState),
-                          _restTimeFormField(timerState),
-                          _roundsFormField(timerState),
-                          Defaults.sizedBox.vertical.huge,
-                          _startStopButton(context, timerState),
-                          const SizedBox(height: 80),
-                          FittedBox(
-                            child: Text(
-                              "Round ${timerState.currentRound ?? '0'}",
-                              softWrap: false,
-                              style: const TextStyle(fontSize: 80),
-                            ),
-                          ),
-                          timeText(timerState),
-                        ],
-                      ),
-                      Column(
-                        children: [
-                          _timeFormField("Timecap", timerState),
-                          Defaults.sizedBox.vertical.huge,
-                          _startStopButton(context, timerState),
-                          const SizedBox(height: 100),
-                          timeText(timerState),
-                        ],
-                      ),
+                      _timeFormField("Time", timerState),
+                      Defaults.sizedBox.vertical.huge,
+                      _startStopButton(context, timerState),
+                      const SizedBox(height: 100),
+                      timeText(timerState),
                     ],
                   ),
-                ),
-                drawer: const MainDrawer(selectedRoute: Routes.timer),
-              );
-            },
+                  Column(
+                    children: [
+                      _timeFormField("Round Time", timerState),
+                      _restTimeFormField(timerState),
+                      _roundsFormField(timerState),
+                      Defaults.sizedBox.vertical.huge,
+                      _startStopButton(context, timerState),
+                      const SizedBox(height: 80),
+                      FittedBox(
+                        child: Text(
+                          "Round ${timerState.currentRound ?? '0'}",
+                          softWrap: false,
+                          style: const TextStyle(fontSize: 80),
+                        ),
+                      ),
+                      timeText(timerState),
+                    ],
+                  ),
+                  Column(
+                    children: [
+                      _timeFormField("Timecap", timerState),
+                      Defaults.sizedBox.vertical.huge,
+                      _startStopButton(context, timerState),
+                      const SizedBox(height: 100),
+                      timeText(timerState),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            drawer: const MainDrawer(selectedRoute: Routes.timer),
           ),
         ),
       ),
@@ -173,7 +152,9 @@ class TimerPage extends StatelessWidget {
           )
         : ElevatedButton(
             onPressed: () => timerState.time.inSeconds > 0
-                ? timerState.start()
+                ? timerState.start(
+                    TimerType.values[DefaultTabController.of(context).index],
+                  )
                 : showMessageDialog(
                     context: context,
                     text: "The time must be greater than 0.",

@@ -16,7 +16,6 @@ class TimerState extends ChangeNotifier {
   Duration _time = Duration.zero;
   Duration? _restTime;
   int _rounds = 3;
-  TimerType _timerType = TimerType.timer;
   TimerUtils? _timerUtils;
 
   bool get isRunning => _timerUtils != null;
@@ -46,19 +45,12 @@ class TimerState extends ChangeNotifier {
     }
   }
 
-  set timerType(TimerType timerType) {
-    if (isNotRunning) {
-      _timerType = timerType;
-      notifyListeners();
-    }
-  }
-
   Duration? get displayTime => _timerUtils?.displayTime;
   int? get currentRound => _timerUtils?.currentRound;
 
-  void start() {
+  void start(TimerType timerType) {
     _timerUtils = TimerUtils.startTimer(
-      timerType: _timerType,
+      timerType: timerType,
       time: _time,
       restTime: _restTime,
       rounds: _rounds,
