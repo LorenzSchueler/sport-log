@@ -152,7 +152,7 @@ extension TrackExtension on List<Position> {
         for (var i = index; i < track2.length; i++) {
           if (point._fastDistanceTo(track2[i]) < maxDistance) {
             index = i;
-            break outer;
+            continue outer;
           }
         }
         return false;

@@ -101,22 +101,14 @@ class CardioSessionTable extends TableAccessor<CardioSession> {
   Future<List<CardioSession>> getByMovementWithTrackOrderDatetime({
     Movement? movement,
   }) async {
-    final records = await AppDatabase.database!.rawQuery(
-      '''
-      SELECT
-        ${table.allColumns}
-      FROM ${Tables.cardioSession}
-      WHERE ${TableAccessor.combineFilter([
-            notDeleted,
-            movementIdFilter(movement),
-            withTrack
-          ])}
-      ORDER BY ${TableAccessor.orderByDatetimeOfTable(Tables.cardioSession)}
-    ''',
+    final records = await database.query(
+      tableName,
+      where: TableAccessor.combineFilter(
+        [notDeleted, movementIdFilter(movement), withTrack],
+      ),
+      orderBy: orderByDatetime,
     );
-    return records
-        .map((record) => serde.fromDbRecord(record, prefix: table.prefix))
-        .toList();
+    return records.map(serde.fromDbRecord).toList();
   }
 }
 
