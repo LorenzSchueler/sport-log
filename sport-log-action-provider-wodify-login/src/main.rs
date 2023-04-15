@@ -338,11 +338,11 @@ async fn wodify_login(
     if let Ok(duration) = (exec_action_event.datetime - Duration::days(1) - Utc::now()).to_std() {
         time::sleep(duration).await;
     }
-    info!("ready at {}", Utc::now());
+    info!("ready");
 
     for _ in 0..3 {
         driver.refresh().await.map_err(Error::WebDriver)?;
-        info!("reload done at {}", Utc::now());
+        info!("reload done");
 
         let table = driver
             .find(By::ClassName("TableRecords"))
@@ -406,11 +406,7 @@ async fn wodify_login(
                     .map_err(Error::WebDriver)?;
                 icon.scroll_into_view().await.map_err(Error::WebDriver)?;
                 icon.click().await.map_err(Error::WebDriver)?;
-                info!(
-                    "reservation for {} at {}",
-                    exec_action_event.datetime,
-                    Utc::now()
-                );
+                info!("reservation for {} done", exec_action_event.datetime);
 
                 if mode == Mode::Interactive {
                     time::sleep(StdDuration::from_secs(3)).await;
