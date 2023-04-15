@@ -46,7 +46,8 @@ class HeartRatePage extends StatelessWidget {
                     ),
                   ),
                   if (!heartRateUtils.isSearching &&
-                      !heartRateUtils.isActive &&
+                      !heartRateUtils.isConnecting &&
+                      !heartRateUtils.isConnected &&
                       heartRateUtils.devices.isNotEmpty) ...[
                     Defaults.sizedBox.vertical.normal,
                     const Text("Heart Rate Monitors"),
@@ -71,15 +72,14 @@ class HeartRatePage extends StatelessWidget {
                         ),
                       ),
                     ),
-                  ],
-                  if (!heartRateUtils.isActive &&
-                      heartRateUtils.canStartStream) ...[
-                    Defaults.sizedBox.vertical.normal,
-                    ElevatedButton(
-                      onPressed: () =>
-                          heartRateUtils.startHeartRateStream(null, hrv: true),
-                      child: const Text("Connect"),
-                    ),
+                    if (heartRateUtils.canConnect) ...[
+                      Defaults.sizedBox.vertical.normal,
+                      ElevatedButton(
+                        onPressed: () => heartRateUtils
+                            .startHeartRateStream(null, hrv: true),
+                        child: const Text("Connect"),
+                      ),
+                    ],
                   ],
                   Expanded(
                     child: Column(

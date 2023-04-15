@@ -18,7 +18,7 @@ class HeartRateUtils extends ChangeNotifier {
   Map<String, String> get devices => _devices;
   String? deviceId;
 
-  StreamSubscription<PolarHeartRateEvent>? _heartRateSubscription;
+  StreamSubscription<PolarStreamingData<PolarHrSample>>? _heartRateSubscription;
   StreamSubscription<PolarBatteryLevelEvent>? _batterySubscription;
 
   int? _hr;
@@ -44,11 +44,12 @@ class HeartRateUtils extends ChangeNotifier {
 
   bool _disposed = false;
 
-  bool get canStartStream => deviceId != null;
-
-  bool get isWaiting => isActive && _hr == null;
-  bool get isActive => _heartRateSubscription != null;
-  bool get isNotActive => _heartRateSubscription == null;
+  bool get canConnect => deviceId != null;
+  bool _isConnecting = false;
+  bool get isConnecting => _isConnecting;
+  bool get isConnected => _heartRateSubscription != null;
+  bool get isNotConnected => !isConnected;
+  bool get isWaiting => (isConnecting || isConnected) && _hr == null;
 
   @override
   void dispose() {
@@ -58,6 +59,10 @@ class HeartRateUtils extends ChangeNotifier {
   }
 
   Future<void> searchDevices() async {
+    if (_isSearching) {
+      return;
+    }
+
     _isSearching = true;
     notifyListeners();
 
@@ -71,6 +76,7 @@ class HeartRateUtils extends ChangeNotifier {
       }
     }
 
+    await _polar.requestPermissions();
     _devices = {
       await for (final d in _polar.searchForDevice().timeout(
             _searchDuration,
@@ -79,7 +85,7 @@ class HeartRateUtils extends ChangeNotifier {
         d.name: d.deviceId
     };
 
-    deviceId = devices.values.firstOrNull;
+    deviceId = devices.values.firstOrNull; // auto select first one
     _isSearching = false;
     if (!_disposed) {
       notifyListeners();
@@ -93,27 +99,52 @@ class HeartRateUtils extends ChangeNotifier {
   }
 
   Future<bool> startHeartRateStream(
-    void Function(PolarHeartRateEvent)? onHeartRateEvent, {
+    void Function(List<int>)? onHeartRateEvent, {
     bool hrv = false,
   }) async {
-    if (deviceId == null || _heartRateSubscription != null) {
+    if (!canConnect || isConnecting || isConnected) {
       return false;
     }
-    _heartRateSubscription = _polar.heartRateStream.listen((event) {
-      _hr = event.data.hr;
+
+    _isConnecting = true;
+    notifyListeners();
+
+    await _polar.connectToDevice(deviceId!);
+    await _polar.sdkFeatureReady.firstWhere(
+      (e) => e.identifier == deviceId && e.feature == PolarSdkFeature.hr,
+    );
+
+    _heartRateSubscription = _polar.startHrStreaming(deviceId!).listen((e) {
+      final samples = e.samples;
+      if (samples.isEmpty) {
+        return;
+      }
+      _hr = samples.last.hr;
+      final rrs = <int>[];
+      for (final sample in samples) {
+        rrs.addAll(sample.rrsMs);
+      }
       if (hrv) {
-        _rrs.addAll(event.data.rrsMs);
+        _rrs.addAll(rrs);
         _setHrv();
       }
-      onHeartRateEvent?.call(event);
-      notifyListeners();
+
+      onHeartRateEvent?.call(rrs);
+      if (!_disposed) {
+        notifyListeners();
+      }
     });
-    _batterySubscription = _polar.batteryLevelStream.listen((event) {
+    _batterySubscription = _polar.batteryLevel.listen((event) {
       _battery = event.level;
-      notifyListeners();
+      if (!_disposed) {
+        notifyListeners();
+      }
     });
-    await _polar.connectToDevice(deviceId!);
-    notifyListeners();
+
+    _isConnecting = false;
+    if (!_disposed) {
+      notifyListeners();
+    }
     return true;
   }
 

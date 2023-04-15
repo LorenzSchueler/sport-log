@@ -6,7 +6,6 @@ import 'package:flutter_tts/flutter_tts.dart';
 import 'package:location/location.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart'
     hide Position, Settings;
-import 'package:polar/polar.dart';
 import 'package:sport_log/app.dart';
 import 'package:sport_log/data_provider/data_providers/cardio_data_provider.dart';
 import 'package:sport_log/helpers/extensions/location_data_extension.dart';
@@ -87,7 +86,7 @@ class TrackingUtils extends ChangeNotifier {
   LatLng? get lastLatLng => _locationUtils.lastLatLng;
   final StepCountUtils _stepUtils = StepCountUtils();
   final HeartRateUtils? _heartRateUtils;
-  bool get waitingOnHR => _heartRateUtils?.isNotActive ?? false;
+  bool get waitingOnHR => _heartRateUtils?.isNotConnected ?? false;
 
   MapController? _mapController;
   ElevationMapController? _elevationMapController;
@@ -220,19 +219,18 @@ class TrackingUtils extends ChangeNotifier {
     notifyListeners();
   }
 
-  void _onHeartRateUpdate(PolarHeartRateEvent event) {
-    final rrsMs = event.data.rrsMs;
+  void _onHeartRateUpdate(List<int> rrs) {
     final heartRate = _cardioSessionDescription.cardioSession.heartRate!;
     if (isTracking) {
-      for (final rrMs in rrsMs) {
-        final duration =
-            currentDuration + Duration(milliseconds: -rrsMs.sum + rrMs);
+      var duration = currentDuration - Duration(milliseconds: rrs.sum);
+      for (final rr in rrs) {
+        duration += Duration(milliseconds: rr);
         if (!duration.isNegative) {
           heartRate.add(duration);
         }
       }
     }
-    _heartRateInfo = "rr: $rrsMs ms\nhr: ${event.data.hr} bpm";
+    _heartRateInfo = "rr: $rrs ms";
   }
 
   void _onStepUpdate() {
