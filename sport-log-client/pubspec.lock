@@ -795,10 +795,11 @@ packages:
   pedometer:
     dependency: "direct main"
     description:
-      name: pedometer
-      sha256: "16d7a3df91b9ad72304cf47924dfe9c1abd50304fbf23245edbc89d8429957c1"
-      url: "https://pub.dev"
-    source: hosted
+      path: "packages/pedometer"
+      ref: fa6072adb257648c3e45f4d10a71fe8d5f8b784b
+      resolved-ref: fa6072adb257648c3e45f4d10a71fe8d5f8b784b
+      url: "https://github.com/LorenzSchueler/flutter-plugins"
+    source: git
     version: "3.0.0"
   permission_handler:
     dependency: "direct main"

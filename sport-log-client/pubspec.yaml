@@ -61,7 +61,11 @@ dependencies:
   mapbox_search: ^3.0.1+2
   package_info_plus: ^3.0.1
   path_provider: ^2.0.10
-  pedometer: ^3.0.0
+  pedometer: #^3.0.0
+    git:
+      url: https://github.com/LorenzSchueler/flutter-plugins
+      path: packages/pedometer
+      ref: fa6072adb257648c3e45f4d10a71fe8d5f8b784b
   permission_handler: ^10.0.0
   polar: ^4.0.0
   provider: ^6.0.2 # state management

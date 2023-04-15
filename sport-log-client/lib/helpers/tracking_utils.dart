@@ -6,11 +6,9 @@ import 'package:flutter_tts/flutter_tts.dart';
 import 'package:location/location.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart'
     hide Position, Settings;
-import 'package:pedometer/pedometer.dart';
 import 'package:polar/polar.dart';
 import 'package:sport_log/app.dart';
 import 'package:sport_log/data_provider/data_providers/cardio_data_provider.dart';
-import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/extensions/location_data_extension.dart';
 import 'package:sport_log/helpers/heart_rate_utils.dart';
 import 'package:sport_log/helpers/lat_lng.dart';
@@ -134,7 +132,7 @@ class TrackingUtils extends ChangeNotifier {
       (_) => _autoSaveCardioSession(),
     );
     await _locationUtils.startLocationStream(_onLocationUpdate);
-    await _stepUtils.startStepCountStream(_onStepCountUpdate);
+    await _stepUtils.startStepStream(_onStepUpdate);
     await _heartRateUtils?.startHeartRateStream(_onHeartRateUpdate);
   }
 
@@ -237,26 +235,11 @@ class TrackingUtils extends ChangeNotifier {
     _heartRateInfo = "rr: $rrsMs ms\nhr: ${event.data.hr} bpm";
   }
 
-  void _onStepCountUpdate(StepCount stepCount) {
-    final cadence = _cardioSessionDescription.cardioSession.cadence!;
-    final lastStepCount = _stepUtils.lastStepCount;
-    if (isTracking && lastStepCount != null) {
-      /// interpolate steps since last stepCount update
-      final newSteps = stepCount.steps - lastStepCount.steps;
-      final timeDiff = stepCount.timeStamp
-          .difference(lastStepCount.timeStamp)
-          .inMilliseconds;
-      final avgTimeDiff = (timeDiff / newSteps).floor();
-      for (var ms = 0; ms < timeDiff; ms += avgTimeDiff) {
-        final duration =
-            currentDuration + Duration(milliseconds: -timeDiff + ms);
-        if (!duration.isNegative) {
-          cadence.add(duration);
-        }
-      }
+  void _onStepUpdate() {
+    if (isTracking) {
+      _cardioSessionDescription.cardioSession.cadence!.add(currentDuration);
     }
-    _stepInfo =
-        "step count: ${stepCount.steps}\ntime: ${stepCount.timeStamp.formatHms}";
+    _stepInfo = "last step: $currentDuration";
   }
 
   Future<void> _onLocationUpdate(LocationData location) async {
