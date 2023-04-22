@@ -34,12 +34,12 @@ pub async fn create_user(
     Json(user): Json<Unverified<User>>,
 ) -> HandlerResult<StatusCode> {
     if !config.user_self_registration {
-        return Err(HandlerError {
-            status: StatusCode::FORBIDDEN,
-            message: Some(ErrorMessage::Other {
+        return Err(HandlerError::from((
+            StatusCode::FORBIDDEN,
+            ErrorMessage::Other {
                 error: "user self registration is disabled".to_owned(),
-            }),
-        });
+            },
+        )));
     }
 
     let mut user = user.verify_unchecked()?;

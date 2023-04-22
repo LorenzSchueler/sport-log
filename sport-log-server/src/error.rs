@@ -2,11 +2,15 @@ use std::convert::Infallible;
 
 use axum::{
     extract::rejection::{TypedHeaderRejection, TypedHeaderRejectionReason},
-    http::StatusCode,
+    http::{HeaderValue, StatusCode},
     response::{IntoResponse, Response},
     Json,
 };
 use diesel::result::{DatabaseErrorKind, Error as DieselError};
+use hyper::{
+    header::{AUTHORIZATION, WWW_AUTHENTICATE},
+    HeaderMap,
+};
 use r2d2::Error as R2D2Error;
 use serde::{ser::SerializeStruct, Deserialize, Serialize};
 use tracing::info;
@@ -22,8 +26,9 @@ pub enum ErrorMessage {
 
 #[derive(Debug)]
 pub struct HandlerError {
-    pub status: StatusCode,
-    pub message: Option<ErrorMessage>,
+    status: StatusCode,
+    message: Option<ErrorMessage>,
+    headers: Option<HeaderMap>,
 }
 
 impl Serialize for HandlerError {
@@ -45,6 +50,17 @@ impl From<StatusCode> for HandlerError {
         HandlerError {
             status,
             message: None,
+            headers: None,
+        }
+    }
+}
+
+impl From<(StatusCode, ErrorMessage)> for HandlerError {
+    fn from((status, message): (StatusCode, ErrorMessage)) -> Self {
+        HandlerError {
+            status,
+            message: Some(message),
+            headers: None,
         }
     }
 }
@@ -57,18 +73,29 @@ impl From<TypedHeaderRejection> for HandlerError {
                 message: Some(ErrorMessage::Other {
                     error: format!("header {} missing", rejection.name()),
                 }),
+                headers: if rejection.name() == AUTHORIZATION {
+                    Some(
+                        [(WWW_AUTHENTICATE, HeaderValue::from_static("Basic"))]
+                            .into_iter()
+                            .collect(),
+                    )
+                } else {
+                    None
+                },
             },
             TypedHeaderRejectionReason::Error(error) => HandlerError {
                 status: StatusCode::BAD_REQUEST,
                 message: Some(ErrorMessage::Other {
                     error: format!("header {}: {}", rejection.name(), error),
                 }),
+                headers: None,
             },
             _ => HandlerError {
                 status: StatusCode::BAD_REQUEST,
                 message: Some(ErrorMessage::Other {
                     error: format!("header {} invalid", rejection.name()),
                 }),
+                headers: None,
             },
         }
     }
@@ -81,6 +108,7 @@ impl From<R2D2Error> for HandlerError {
             message: Some(ErrorMessage::Other {
                 error: error.to_string(),
             }),
+            headers: None,
         }
     }
 }
@@ -88,10 +116,7 @@ impl From<R2D2Error> for HandlerError {
 impl From<DieselError> for HandlerError {
     fn from(error: DieselError) -> Self {
         match error {
-            DieselError::NotFound => HandlerError {
-                status: StatusCode::NOT_FOUND,
-                message: None,
-            },
+            DieselError::NotFound => HandlerError::from(StatusCode::NOT_FOUND),
             DieselError::DatabaseError(db_error, db_error_info) => match db_error {
                 DatabaseErrorKind::UniqueViolation => HandlerError {
                     status: StatusCode::CONFLICT,
@@ -122,6 +147,7 @@ impl From<DieselError> for HandlerError {
                             ErrorMessage::UniqueViolation { table, columns }
                         }
                     }),
+                    headers: None,
                 },
                 DatabaseErrorKind::ForeignKeyViolation => HandlerError {
                     status: StatusCode::CONFLICT,
@@ -144,18 +170,17 @@ impl From<DieselError> for HandlerError {
 
                         Some(ErrorMessage::ForeignKeyViolation { table, column })
                     },
+                    headers: None,
                 },
                 _ => HandlerError {
                     status: StatusCode::INTERNAL_SERVER_ERROR,
                     message: Some(ErrorMessage::Other {
                         error: db_error_info.message().to_owned(),
                     }),
+                    headers: None,
                 },
             },
-            _ => HandlerError {
-                status: StatusCode::INTERNAL_SERVER_ERROR,
-                message: None,
-            },
+            _ => HandlerError::from(StatusCode::INTERNAL_SERVER_ERROR),
         }
     }
 }
@@ -171,6 +196,10 @@ impl IntoResponse for HandlerError {
         if let Some(message) = &self.message {
             info!("{:?}", message);
         }
-        (self.status, Json(self)).into_response()
+        if let Some(header) = &self.headers {
+            (self.status, header.to_owned(), Json(self)).into_response()
+        } else {
+            (self.status, Json(self)).into_response()
+        }
     }
 }

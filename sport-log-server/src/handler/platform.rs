@@ -38,10 +38,7 @@ pub async fn ap_create_platform(
     Json(platform): Json<Unverified<Platform>>,
 ) -> HandlerResult<StatusCode> {
     if !config.ap_self_registration {
-        return Err(HandlerError {
-            status: StatusCode::FORBIDDEN,
-            message: None,
-        });
+        return Err(HandlerError::from(StatusCode::FORBIDDEN));
     }
 
     let platform = platform.verify_unchecked()?;
@@ -72,10 +69,7 @@ pub async fn ap_get_platforms(
     mut db: DbConn,
 ) -> HandlerResult<Json<Vec<Platform>>> {
     if !config.ap_self_registration {
-        return Err(HandlerError {
-            status: StatusCode::FORBIDDEN,
-            message: None,
-        });
+        return Err(HandlerError::from(StatusCode::FORBIDDEN));
     }
 
     match id {
@@ -131,23 +125,15 @@ pub async fn create_platform_credentials(
 ) -> HandlerResult<StatusCode> {
     match platform_credentials {
         UnverifiedSingleOrVec::Single(platform_credential) => {
-            let platform_credential =
-                platform_credential
-                    .verify_user_without_db(auth)
-                    .map_err(|status| HandlerError {
-                        status,
-                        message: None,
-                    })?;
+            let platform_credential = platform_credential
+                .verify_user_without_db(auth)
+                .map_err(HandlerError::from)?;
             PlatformCredentialDb::create(&platform_credential, &mut db)
         }
         UnverifiedSingleOrVec::Vec(platform_credentials) => {
-            let platform_credentials =
-                platform_credentials
-                    .verify_user_without_db(auth)
-                    .map_err(|status| HandlerError {
-                        status,
-                        message: None,
-                    })?;
+            let platform_credentials = platform_credentials
+                .verify_user_without_db(auth)
+                .map_err(HandlerError::from)?;
             PlatformCredentialDb::create_multiple(&platform_credentials, &mut db)
         }
     }

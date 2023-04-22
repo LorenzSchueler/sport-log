@@ -18,11 +18,8 @@ use tracing::{debug, trace, warn, Span};
 
 use crate::{error::HandlerError, handler::*, state::AppState};
 
-async fn handler_404() -> HandlerError {
-    HandlerError {
-        status: StatusCode::NOT_FOUND,
-        message: None,
-    }
+async fn handler_not_found() -> HandlerError {
+    HandlerError::from(StatusCode::NOT_FOUND)
 }
 
 async fn get_version() -> Json<Version> {
@@ -211,7 +208,7 @@ pub fn get_router(state: AppState) -> Router {
                 .merge(ap_router)
                 .merge(user_router),
         )
-        .fallback(handler_404)
+        .fallback(handler_not_found)
         .layer(
             ServiceBuilder::new()
                 .layer(trace_layer)

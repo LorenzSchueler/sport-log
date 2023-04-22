@@ -43,12 +43,12 @@ pub async fn ap_create_action_provider(
     Json(action_provider): Json<Unverified<ActionProvider>>,
 ) -> HandlerResult<StatusCode> {
     if !config.ap_self_registration {
-        return Err(HandlerError {
-            status: StatusCode::FORBIDDEN,
-            message: Some(ErrorMessage::Other {
+        return Err(HandlerError::from((
+            StatusCode::FORBIDDEN,
+            ErrorMessage::Other {
                 error: "action provider self registration is disabled".to_owned(),
-            }),
-        });
+            },
+        )));
     }
 
     let mut action_provider = action_provider.verify_unchecked()?;
@@ -327,11 +327,7 @@ pub async fn ap_disable_action_events(
     Json(ids): Json<UnverifiedIds<ActionEventId>>,
 ) -> HandlerResult<StatusCode> {
     ActionEventDb::disable_multiple(
-        ids.verify_ap(auth, &mut db)
-            .map_err(|status| HandlerError {
-                status,
-                message: None,
-            })?,
+        ids.verify_ap(auth, &mut db).map_err(HandlerError::from)?,
         &mut db,
     )
     .map(|_| StatusCode::OK)
@@ -370,13 +366,13 @@ pub async fn ap_get_executable_action_events(
         }
         (None, None) => ExecutableActionEventDb::get_by_action_provider(*auth, &mut db),
         _ => {
-            return Err(HandlerError {
-                status: StatusCode::BAD_REQUEST,
-                message: Some(ErrorMessage::Other {
-                    error: "'start' and 'end' must be either specified both or neither of them"
+            return Err(HandlerError::from((
+                StatusCode::BAD_REQUEST,
+                ErrorMessage::Other {
+                    error: "'start' and 'end' must be specified either both or not at all"
                         .to_owned(),
-                }),
-            })
+                },
+            )))
         }
     }
     .map(Json)

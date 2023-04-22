@@ -6,7 +6,7 @@ use crate::{auth::AuthAdmin, db::*, error::HandlerResult, state::DbConn};
 
 #[derive(Debug, Deserialize)]
 pub struct LastChange {
-    pub last_change: DateTime<Utc>,
+    last_change: DateTime<Utc>,
 }
 
 pub async fn adm_do_garbage_collection(

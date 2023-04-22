@@ -11,7 +11,7 @@ use crate::{auth::AuthUser, db::AccountDataDb, error::HandlerResult, state::DbCo
 #[derive(Debug, Deserialize)]
 pub struct LastSync {
     #[serde(default)]
-    pub last_sync: Option<DateTime<Utc>>,
+    last_sync: Option<DateTime<Utc>>,
 }
 
 pub async fn get_account_data(
