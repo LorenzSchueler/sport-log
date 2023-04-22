@@ -128,7 +128,7 @@ extension ApiResultFromRequest<T> on ApiResult<T> {
     } on TypeError {
       return Failure(ApiError(ApiErrorType.badJson, null));
     } catch (e) {
-      ApiLogging.logger.e("Unhandled error", e);
+      _ApiLogging.logger.e("Unhandled error", e);
       return Failure(ApiError(ApiErrorType.unknownRequestError, null));
     }
   }
@@ -151,7 +151,7 @@ extension ApiResultFromRequest<T> on ApiResult<T> {
       });
 }
 
-abstract class Api<T extends JsonSerializable> with ApiLogging, ApiHelpers {
+abstract class Api<T extends JsonSerializable> with _ApiLogging {
   static final accountData = AccountDataApi();
   static final user = UserApi();
   static final actions = ActionApi();
@@ -172,9 +172,9 @@ abstract class Api<T extends JsonSerializable> with ApiLogging, ApiHelpers {
   static final wods = WodApi();
 
   static Future<ApiResult<ServerVersion>> getServerVersion() {
-    const route = "/version";
+    final uri = Uri.parse("${Settings.instance.serverUrl}/version");
     return ApiResultFromRequest.fromRequestWithValue<ServerVersion>(
-      (client) => client.get(UriFromRoute.fromRoute(route)),
+      (client) => client.get(uri),
       (dynamic json) => ServerVersion.fromJson(json as Map<String, dynamic>),
     );
   }
@@ -185,19 +185,39 @@ abstract class Api<T extends JsonSerializable> with ApiLogging, ApiHelpers {
   /// everything after version, e. g. '/user'
   String get _route;
 
-  String get _path => "/v${Config.apiVersion}$_route";
+  Uri get _uri =>
+      Uri.parse("${Settings.instance.serverUrl}/v${Config.apiVersion}$_route");
   Map<String, dynamic> _toJson(T object) => object.toJson();
 
   Future<ApiResult<T>> getSingle(Int64 id) async {
-    return _getRequest(
-      '$_path?id=$id',
+    final uri = Uri.parse("$_uri?id=$id");
+    return ApiResultFromRequest.fromRequestWithValue<T>(
+      (client) async {
+        final headers = _ApiHeaders._basicAuth;
+        _logRequest('GET', uri, headers);
+        final response = await client.get(
+          uri,
+          headers: headers,
+        );
+        _logResponse(response);
+        return response;
+      },
       (dynamic json) => _fromJson(json as Map<String, dynamic>),
     );
   }
 
   Future<ApiResult<List<T>>> getMultiple() async {
-    return _getRequest(
-      _path,
+    return ApiResultFromRequest.fromRequestWithValue<List<T>>(
+      (client) async {
+        final headers = _ApiHeaders._basicAuth;
+        _logRequest('GET', _uri, headers);
+        final response = await client.get(
+          _uri,
+          headers: headers,
+        );
+        _logResponse(response);
+        return response;
+      },
       (dynamic json) => (json as List<dynamic>)
           .map((dynamic json) => _fromJson(json as Map<String, dynamic>))
           .toList(),
@@ -208,9 +228,9 @@ abstract class Api<T extends JsonSerializable> with ApiLogging, ApiHelpers {
     return ApiResultFromRequest.fromRequest((client) async {
       final body = _toJson(object);
       final headers = _ApiHeaders._basicAuthContentTypeJson;
-      _logRequest('POST', _path, headers, body);
+      _logRequest('POST', _uri, headers, body);
       final response = await client.post(
-        UriFromRoute.fromRoute(_path),
+        _uri,
         headers: headers,
         body: jsonEncode(body),
       );
@@ -226,9 +246,9 @@ abstract class Api<T extends JsonSerializable> with ApiLogging, ApiHelpers {
     return ApiResultFromRequest.fromRequest((client) async {
       final body = objects.map(_toJson).toList();
       final headers = _ApiHeaders._basicAuthContentTypeJson;
-      _logRequest('POST', _path, headers, body);
+      _logRequest('POST', _uri, headers, body);
       final response = await client.post(
-        UriFromRoute.fromRoute(_path),
+        _uri,
         headers: headers,
         body: jsonEncode(body),
       );
@@ -241,9 +261,9 @@ abstract class Api<T extends JsonSerializable> with ApiLogging, ApiHelpers {
     return ApiResultFromRequest.fromRequest((client) async {
       final body = _toJson(object);
       final headers = _ApiHeaders._basicAuthContentTypeJson;
-      _logRequest('PUT', _path, headers, body);
+      _logRequest('PUT', _uri, headers, body);
       final response = await client.put(
-        UriFromRoute.fromRoute(_path),
+        _uri,
         headers: headers,
         body: jsonEncode(body),
       );
@@ -259,9 +279,9 @@ abstract class Api<T extends JsonSerializable> with ApiLogging, ApiHelpers {
     return ApiResultFromRequest.fromRequest((client) async {
       final body = objects.map(_toJson).toList();
       final headers = _ApiHeaders._basicAuthContentTypeJson;
-      _logRequest('PUT', _path, headers, body);
+      _logRequest('PUT', _uri, headers, body);
       final response = await client.put(
-        UriFromRoute.fromRoute(_path),
+        _uri,
         headers: headers,
         body: jsonEncode(body),
       );
@@ -277,12 +297,12 @@ class _ApiHeaders {
     String password,
   ) =>
       {
-        'authorization':
+        HttpHeaders.authorizationHeader:
             'Basic ${base64Encode(utf8.encode('$username:$password'))}'
       };
 
   static const Map<String, String> _contentTypeJson = {
-    'Content-Type': 'application/json; charset=UTF-8',
+    HttpHeaders.contentTypeHeader: 'application/json; charset=UTF-8',
   };
 
   static Map<String, String> get _basicAuth => _basicAuthFromParts(
@@ -296,7 +316,7 @@ class _ApiHeaders {
       };
 }
 
-mixin ApiLogging {
+mixin _ApiLogging {
   static final logger = Logger('API');
 
   String _prettyJson(dynamic json, {int indent = 2}) {
@@ -306,7 +326,7 @@ mixin ApiLogging {
 
   void _logRequest(
     String httpMethod,
-    String route,
+    Uri route,
     Map<String, String> headers, [
     dynamic json,
   ]) {
@@ -334,32 +354,6 @@ mixin ApiLogging {
     logger.log(
       successful ? l.Level.debug : l.Level.error,
       'response: ${response.statusCode}$headerStr$bodyStr',
-    );
-  }
-}
-
-extension UriFromRoute on Uri {
-  static Uri fromRoute(String route) =>
-      Uri.parse(Settings.instance.serverUrl + route);
-}
-
-mixin ApiHelpers on ApiLogging {
-  Future<ApiResult<T>> _getRequest<T>(
-    String route,
-    T Function(dynamic) fromJson,
-  ) async {
-    return ApiResultFromRequest.fromRequestWithValue<T>(
-      (client) async {
-        final headers = _ApiHeaders._basicAuth;
-        _logRequest('GET', route, headers);
-        final response = await client.get(
-          UriFromRoute.fromRoute(route),
-          headers: headers,
-        );
-        _logResponse(response);
-        return response;
-      },
-      fromJson,
     );
   }
 }

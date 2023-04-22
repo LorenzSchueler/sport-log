@@ -1,9 +1,19 @@
 part of '../api.dart';
 
-class AccountDataApi with ApiLogging, ApiHelpers {
+class AccountDataApi with _ApiLogging {
   Future<ApiResult<AccountData>> get(DateTime? lastSync) async {
-    return _getRequest(
-      _path(lastSync),
+    final uri = _uri(lastSync);
+    return ApiResultFromRequest.fromRequestWithValue(
+      (client) async {
+        final headers = _ApiHeaders._basicAuth;
+        _logRequest('GET', uri, headers);
+        final response = await client.get(
+          uri,
+          headers: headers,
+        );
+        _logResponse(response);
+        return response;
+      },
       (dynamic json) => AccountData.fromJson(json as Map<String, dynamic>),
     );
   }
@@ -12,6 +22,7 @@ class AccountDataApi with ApiLogging, ApiHelpers {
       ? '/account_data'
       : '/account_data?last_sync=${dateTime.toUtc().toIso8601String()}';
 
-  String _path(DateTime? dateTime) =>
-      "/v${Config.apiVersion}${_route(dateTime)}";
+  Uri _uri(DateTime? dateTime) => Uri.parse(
+        "${Settings.instance.serverUrl}/v${Config.apiVersion}${_route(dateTime)}",
+      );
 }

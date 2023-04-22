@@ -1,17 +1,18 @@
 part of '../api.dart';
 
-class UserApi with ApiLogging, ApiHelpers {
+class UserApi with _ApiLogging {
   final String _route = '/user';
 
-  String get _path => "/v${Config.apiVersion}$_route";
+  Uri get _uri =>
+      Uri.parse("${Settings.instance.serverUrl}/v${Config.apiVersion}$_route");
 
   Future<ApiResult<User>> getSingle(String username, String password) {
     return ApiResultFromRequest.fromRequestWithValue<User>(
       (client) async {
         final headers = _ApiHeaders._basicAuthFromParts(username, password);
-        _logRequest('GET', _path, headers);
+        _logRequest('GET', _uri, headers);
         final response = await client.get(
-          UriFromRoute.fromRoute(_path),
+          _uri,
           headers: headers,
         );
         _logResponse(response);
@@ -26,9 +27,9 @@ class UserApi with ApiLogging, ApiHelpers {
     return ApiResultFromRequest.fromRequest((client) async {
       final body = user.toJson();
       const headers = _ApiHeaders._contentTypeJson;
-      _logRequest('POST', _path, headers, body);
+      _logRequest('POST', _uri, headers, body);
       final response = await client.post(
-        UriFromRoute.fromRoute(_path),
+        _uri,
         headers: headers,
         body: jsonEncode(body),
       );
@@ -41,9 +42,9 @@ class UserApi with ApiLogging, ApiHelpers {
     return ApiResultFromRequest.fromRequest((client) async {
       final body = user.toJson();
       final headers = _ApiHeaders._basicAuthContentTypeJson;
-      _logRequest('PUT', _path, headers, body);
+      _logRequest('PUT', _uri, headers, body);
       final response = await client.put(
-        UriFromRoute.fromRoute(_path),
+        _uri,
         headers: headers,
         body: jsonEncode(body),
       );
@@ -55,9 +56,9 @@ class UserApi with ApiLogging, ApiHelpers {
   Future<ApiResult<void>> deleteSingle() async {
     return ApiResultFromRequest.fromRequest((client) async {
       final headers = _ApiHeaders._basicAuthContentTypeJson;
-      _logRequest('DELETE', _path, headers);
+      _logRequest('DELETE', _uri, headers);
       final response = await client.delete(
-        UriFromRoute.fromRoute(_path),
+        _uri,
         headers: headers,
       );
       _logResponse(response);
