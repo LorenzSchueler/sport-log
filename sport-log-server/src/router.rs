@@ -1,7 +1,7 @@
 use std::{iter, time::Duration};
 
 use axum::{
-    body::{Body, Bytes},
+    body::{Body, BoxBody, Bytes},
     extract::DefaultBodyLimit,
     http::{header::AUTHORIZATION, Request, StatusCode},
     response::Response,
@@ -11,7 +11,9 @@ use axum::{
 use sport_log_types::{uri::*, Version};
 use tower::ServiceBuilder;
 use tower_http::{
-    classify::ServerErrorsFailureClass, sensitive_headers::SetSensitiveRequestHeadersLayer,
+    classify::ServerErrorsFailureClass,
+    compression::{CompressionBody, CompressionLayer},
+    sensitive_headers::SetSensitiveRequestHeadersLayer,
     trace::TraceLayer,
 };
 use tracing::{debug, trace, warn, Span};
@@ -168,9 +170,13 @@ pub fn get_router(state: AppState) -> Router {
                 .on_request(|request: &Request<Body>, _span: &Span| {
                     debug!("request\n{:#?}", request.headers());
                 })
-                .on_response(|response: &Response, _latency: Duration, _span: &Span| {
-                    debug!("response {}\n{:#?}", response.status(), response.headers());
-                })
+                .on_response(
+                    |response: &Response<CompressionBody<BoxBody>>,
+                     _latency: Duration,
+                     _span: &Span| {
+                        debug!("response {}\n{:#?}", response.status(), response.headers());
+                    },
+                )
                 .on_body_chunk(|chunk: &Bytes, _latency: Duration, _span: &Span| {
                     trace!("response body\n{:?}", chunk);
                 })
@@ -212,7 +218,9 @@ pub fn get_router(state: AppState) -> Router {
         .layer(
             ServiceBuilder::new()
                 .layer(trace_layer)
-                .layer(DefaultBodyLimit::max(5 * 1024 * 1024)),
+                .layer(DefaultBodyLimit::max(5 * 1024 * 1024))
+                .layer(CompressionLayer::new()),
+            //.layer(RequestDecompressionLayer::new()),
         )
         .with_state(state)
 }
