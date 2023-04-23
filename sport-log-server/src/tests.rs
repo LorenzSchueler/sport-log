@@ -1,9 +1,11 @@
+use std::io::Write;
+
 use axum::{
     body::{Body, HttpBody},
     headers::HeaderName,
     http::{
-        header::{AUTHORIZATION, CONTENT_TYPE},
-        Request, StatusCode,
+        header::{ACCEPT_ENCODING, AUTHORIZATION, CONTENT_TYPE},
+        HeaderValue, Request, StatusCode,
     },
     response::Response,
     Router,
@@ -11,7 +13,8 @@ use axum::{
 use base64::{engine::general_purpose::STANDARD, Engine};
 use chrono::{DateTime, Duration, Utc};
 use diesel::r2d2::{ConnectionManager, CustomizeConnection, Pool};
-use hyper::body;
+use flate2::write::GzDecoder;
+use hyper::{body, header::CONTENT_ENCODING};
 use mime::APPLICATION_JSON;
 use rand::Rng;
 use sport_log_types::{
@@ -767,6 +770,46 @@ async fn own_get() {
     .await;
 
     assert_eq!(response.status(), StatusCode::OK);
+}
+
+#[tokio::test]
+async fn own_get_gzip() {
+    let (mut router, db_pool, _) = init().await;
+
+    DiaryDb::create(&TEST_DIARY, &mut db_pool.get().unwrap()).unwrap();
+
+    // check that get works for same user
+    let header = auth_header(&TEST_USER.username, &TEST_USER.password);
+    let response = request(
+        &mut router,
+        Request::get(route_max_version(
+            "",
+            DIARY,
+            &[("id", &TEST_DIARY.id.0.to_string())],
+        ))
+        .header(header.0, header.1)
+        .header(ACCEPT_ENCODING, "gzip")
+        .body(Body::empty())
+        .unwrap(),
+    )
+    .await;
+
+    assert_eq!(response.status(), StatusCode::OK);
+    assert!(response.headers().contains_key(CONTENT_ENCODING));
+    assert_eq!(
+        response.headers().get(CONTENT_ENCODING),
+        Some(&HeaderValue::from_static("gzip"))
+    );
+
+    let bytes = body::to_bytes(response.into_body()).await.unwrap().to_vec();
+    let mut decoded = Vec::new();
+    let mut decoder = GzDecoder::new(decoded);
+    decoder.write_all(&bytes[..]).unwrap();
+    decoded = decoder.finish().unwrap();
+    let data = String::from_utf8(decoded).unwrap();
+    let diary: Vec<Diary> = serde_json::from_str(&data).unwrap();
+    assert_eq!(diary.len(), 1);
+    assert_eq!(diary[0].id, TEST_DIARY.id);
 }
 
 #[tokio::test]

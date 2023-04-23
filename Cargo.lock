@@ -1724,6 +1724,7 @@ dependencies = [
  "chrono",
  "diesel",
  "diesel_migrations",
+ "flate2",
  "hyper",
  "lazy_static",
  "mime",
