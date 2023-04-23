@@ -69,15 +69,15 @@ class _CountWeightInputState extends State<CountWeightInput> {
     _submit();
   }
 
-  void _setDistanceUnit(dynamic unit) {
-    if (unit != null && unit is DistanceUnit) {
+  void _setDistanceUnit(DistanceUnit? unit) {
+    if (unit != null) {
       setState(() => _distanceUnit = unit);
       _submit();
     }
   }
 
-  void _setUnit(dynamic unit) {
-    if (unit != null && unit is String && unit != _weightUnit) {
+  void _setUnit(String? unit) {
+    if (unit != null && unit != _weightUnit) {
       setState(() {
         _weightUnit = unit;
         _weight = _weightUnit == "lb" ? _weight! * _lbToKg : _weight! / _lbToKg;

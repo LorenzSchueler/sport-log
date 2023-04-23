@@ -43,9 +43,7 @@ class ErrorMessage extends JsonSerializable {
       case "unique_violation":
         return ErrorMessage.uniqueViolation(
           body["table"] as String,
-          (body["columns"] as List<dynamic>)
-              .map((dynamic c) => c as String)
-              .toList(),
+          (body["columns"] as List<dynamic>).cast<String>(),
         );
       case "other":
         return ErrorMessage.other(body["error"] as String);

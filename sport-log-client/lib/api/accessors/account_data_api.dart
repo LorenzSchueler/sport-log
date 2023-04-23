@@ -8,7 +8,7 @@ class AccountDataApi {
   Future<ApiResult<AccountData>> get(DateTime? lastSync) =>
       (Request("get", _uri(lastSync))..headers.addAll(ApiHeaders.basicAuth))
           .toApiResultWithValue(
-        (dynamic json) => AccountData.fromJson(json as Map<String, dynamic>),
+        (Object json) => AccountData.fromJson(json as Map<String, dynamic>),
       );
 
   String _route(DateTime? dateTime) => dateTime == null

@@ -26,7 +26,7 @@ import 'package:sport_log/settings.dart';
 
 final _logger = Logger('API');
 
-String _prettyJson(dynamic json, {int indent = 2}) {
+String _prettyJson(Object json, {int indent = 2}) {
   final spaces = ' ' * indent;
   return JsonEncoder.withIndent(spaces).convert(json);
 }
@@ -36,7 +36,7 @@ void _logRequest(Request request) {
       ? "\n${request.headers.entries.map((e) => '${e.key}: ${e.value}').join('\n')}"
       : "";
   final jsonStr = Config.instance.outputRequestJson && request.body.isNotEmpty
-      ? "\n\n${_prettyJson(jsonDecode(request.body))}"
+      ? "\n\n${_prettyJson(jsonDecode(request.body) as Object)}"
       : "";
   _logger.d("request: ${request.method} ${request.url}$headersStr$jsonStr");
 }
@@ -98,9 +98,8 @@ extension _ToApiResult on StreamedResponse {
       ? HandlerError.fromJson(json as Map<String, dynamic>).message
       : null;
 
-  Future<ApiResult<T?>> _mapToApiResult<T>(
-    T Function(dynamic)? fromJson,
-  ) async {
+  // ignore: long-method
+  Future<ApiResult<T?>> _mapToApiResult<T>(T Function(Object)? fromJson) async {
     // steam can be read only once
     final rawBody = utf8.decode(await stream.toBytes());
     final json = rawBody.isEmpty ? null : jsonDecode(rawBody) as Object;
@@ -108,12 +107,17 @@ extension _ToApiResult on StreamedResponse {
 
     switch (statusCode) {
       case 200:
-        return Success(fromJson?.call(json));
+        return fromJson != null
+            ? json != null
+                ? Success(fromJson(json))
+                // expected non empty body
+                : Failure(ApiError(ApiErrorType.badJson, statusCode))
+            : Success(null);
       case 204:
         return fromJson == null
             ? Success(null)
-            // value needed but nothing returned
-            : Failure(ApiError(ApiErrorType.unknownServerError, statusCode));
+            // expected non empty body and status 200
+            : Failure(ApiError(ApiErrorType.badJson, statusCode));
       case 400:
         return Failure(
           ApiError(ApiErrorType.badRequest, statusCode, _errorMessage(json)),
@@ -156,7 +160,7 @@ extension _ToApiResult on StreamedResponse {
   Future<ApiResult<void>> toApiResult() => _mapToApiResult(null);
 
   Future<ApiResult<T>> toApiResultWithValue<T>(
-    T Function(dynamic) fromJson,
+    T Function(Object) fromJson,
   ) async {
     final result = await _mapToApiResult(fromJson);
     return result.isSuccess
@@ -190,7 +194,7 @@ extension RequestExtension on Request {
         return response.toApiResult();
       });
 
-  Future<ApiResult<T>> toApiResultWithValue<T>(T Function(dynamic) fromJson) =>
+  Future<ApiResult<T>> toApiResultWithValue<T>(T Function(Object) fromJson) =>
       _handleError(() async {
         _logRequest(this);
         final response = await _client.send(this);

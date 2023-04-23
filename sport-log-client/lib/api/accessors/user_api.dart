@@ -14,7 +14,7 @@ class UserApi {
       (Request("get", _uri)
             ..headers.addAll(ApiHeaders.basicAuthFromParts(username, password)))
           .toApiResultWithValue(
-        (dynamic json) =>
+        (Object json) =>
             User.fromJson(json as Map<String, dynamic>)..password = password,
       );
 
