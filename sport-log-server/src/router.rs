@@ -220,7 +220,7 @@ pub fn get_router(state: AppState) -> Router {
                 .layer(trace_layer)
                 .layer(DefaultBodyLimit::max(5 * 1024 * 1024))
                 .layer(CompressionLayer::new()),
-            //.layer(RequestDecompressionLayer::new()),
+            //.layer(RequestDecompressionLayer::new()) // TODO
         )
         .with_state(state)
 }

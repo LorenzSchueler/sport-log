@@ -58,7 +58,7 @@ where
         if let Ok(id) = UserDb::auth(username, password, &mut db) {
             return Ok(Self(id));
         }
-        let user_id = parse_id_header(parts, UserId).map_err(HandlerError::from)?;
+        let user_id = parse_id_header(parts, UserId)?;
         if AdminDb::auth(username, password, admin_password).is_ok() {
             return Ok(Self(user_id));
         }
@@ -115,7 +115,7 @@ where
         if let Ok(id) = UserDb::auth(username, password, &mut db) {
             return Ok(Self(id));
         }
-        let user_id = parse_id_header(parts, UserId).map_err(HandlerError::from)?;
+        let user_id = parse_id_header(parts, UserId)?;
         if let Ok(auth) = ActionProviderDb::auth_as_user(username, password, user_id, &mut db) {
             match auth {
                 AuthApForUser::Allowed(_) => return Ok(Self(user_id)),
@@ -177,7 +177,7 @@ where
         if let Ok(id) = ActionProviderDb::auth(username, password, &mut db) {
             return Ok(Self(id));
         }
-        let ap_id = parse_id_header(parts, ActionProviderId).map_err(HandlerError::from)?;
+        let ap_id = parse_id_header(parts, ActionProviderId)?;
         if AdminDb::auth(username, password, admin_password).is_ok() {
             return Ok(Self(ap_id));
         }

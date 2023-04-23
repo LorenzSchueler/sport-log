@@ -73,15 +73,11 @@ impl From<TypedHeaderRejection> for HandlerError {
                 message: Some(ErrorMessage::Other {
                     error: format!("header {} missing", rejection.name()),
                 }),
-                headers: if rejection.name() == AUTHORIZATION {
-                    Some(
-                        [(WWW_AUTHENTICATE, HeaderValue::from_static("Basic"))]
-                            .into_iter()
-                            .collect(),
-                    )
-                } else {
-                    None
-                },
+                headers: (rejection.name() == AUTHORIZATION).then(|| {
+                    [(WWW_AUTHENTICATE, HeaderValue::from_static("Basic"))]
+                        .into_iter()
+                        .collect()
+                }),
             },
             TypedHeaderRejectionReason::Error(error) => HandlerError {
                 status: StatusCode::BAD_REQUEST,
@@ -130,17 +126,13 @@ impl From<DieselError> for HandlerError {
                                 .and_then(|c| {
                                     // {tablename}__{column1__column2...}__key
                                     let key = "__key";
-                                    if c.ends_with(key) && c.len() > key.len() {
-                                        Some(
-                                            c[..c.len() - 5]
-                                                .split("__")
-                                                .skip(1)
-                                                .map(ToOwned::to_owned)
-                                                .collect(),
-                                        )
-                                    } else {
-                                        None
-                                    }
+                                    (c.ends_with(key) && c.len() > key.len()).then(|| {
+                                        c[..c.len() - 5]
+                                            .split("__")
+                                            .skip(1)
+                                            .map(ToOwned::to_owned)
+                                            .collect()
+                                    })
                                 })
                                 .unwrap_or_default();
 
@@ -158,12 +150,8 @@ impl From<DieselError> for HandlerError {
                             .and_then(|c| {
                                 // {tablename}_{column}_fkey
                                 let fkey = "_fkey";
-                                if c.ends_with(fkey) && c.len() > table.len() + 1 + fkey.len() {
-                                    let column = &c[table.len() + 1..c.len() - fkey.len()];
-                                    Some(column)
-                                } else {
-                                    None
-                                }
+                                (c.ends_with(fkey) && c.len() > table.len() + 1 + fkey.len())
+                                    .then(|| &c[table.len() + 1..c.len() - fkey.len()])
                             })
                             .unwrap_or("<unknown>")
                             .to_owned();

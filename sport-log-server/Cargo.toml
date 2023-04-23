@@ -13,7 +13,7 @@ axum = { version = "0.6", features = [ "headers", "macros" ] }
 r2d2 = { version = "0.8" }
 hyper = "0.14"
 tower = { version = "0.4", features = [ "util" ] }
-tower-http = {version = "0.4", features = [ "trace", "sensitive-headers", "compression-gzip" ] } # "decompression-gzip"
+tower-http = {version = "0.4", features = [ "trace", "sensitive-headers", "compression-full", "decompression-full"] }
 diesel = { version = "2", features = ["postgres", "r2d2", "chrono"] }
 diesel_migrations = "2"
 argon2 = { version = "0.5" }
