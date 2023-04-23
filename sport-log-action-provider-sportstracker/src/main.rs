@@ -1,7 +1,6 @@
 use std::{env, fs, process};
 
 use chrono::{DateTime, Duration, NaiveDateTime, Utc};
-use err_derive::Error as StdError;
 use lazy_static::lazy_static;
 use rand::Rng;
 use reqwest::{Client, Error as ReqwestError, StatusCode};
@@ -12,7 +11,8 @@ use sport_log_types::{
     ActionEventId, CardioSession, CardioSessionId, CardioType, ExecutableActionEvent, Movement,
     Position, ID_HEADER,
 };
-use tokio::task::JoinError;
+use thiserror::Error;
+use tokio::task::{JoinError, JoinHandle};
 use tracing::{debug, error, info, warn};
 use tracing_subscriber::EnvFilter;
 
@@ -21,26 +21,23 @@ const NAME: &str = "sportstracker-fetch";
 const DESCRIPTION: &str = "Sportstracker Fetch can fetch the latests workouts recorded with sportstracker and save them in your cardio sessions.";
 const PLATFORM_NAME: &str = "sportstracker";
 
-#[derive(Debug, StdError)]
+#[derive(Debug, Error)]
 enum Error {
-    #[error(display = "{}", _0)]
-    Reqwest(ReqwestError),
-    #[error(display = "{}", _0)]
-    Join(JoinError),
+    #[error("{0}")]
+    Reqwest(#[from] ReqwestError),
+    #[error("{0}")]
+    Join(#[from] JoinError),
 }
 
-#[derive(Debug, StdError)]
+#[derive(Debug, Error)]
 enum UserError {
-    #[error(display = "can not log in: no credentials provided")]
+    #[error("can not log in: no credentials provided")]
     NoCredential(ActionEventId),
-    #[error(display = "can not log in: login failed")]
+    #[error("can not log in: login failed")]
     LoginFailed(ActionEventId),
-    #[error(
-        display = "failed to create cardio session: unknown activity id {}",
-        _0
-    )]
+    #[error("failed to create cardio session: unknown activity id {0}")]
     UnknownActivityId(u32, ActionEventId),
-    #[error(display = "failed to create cardio session: unknown movement {}", _0)]
+    #[error("failed to create cardio session: unknown movement {0}")]
     UnknownMovement(&'static str, ActionEventId),
 }
 
@@ -228,12 +225,11 @@ async fn fetch() -> Result<(), Error> {
         Duration::hours(0),
         Duration::hours(1) + Duration::minutes(1),
     )
-    .await
-    .map_err(Error::Reqwest)?;
+    .await?;
 
     debug!("got {} executable action events", exec_action_events.len());
 
-    let mut tasks = vec![];
+    let mut tasks: Vec<JoinHandle<Result<Result<ActionEventId, UserError>, Error>>> = vec![];
     for exec_action_event in exec_action_events {
         let client = client.clone();
 
@@ -328,7 +324,7 @@ async fn fetch() -> Result<(), Error> {
 
     let mut delete_action_event_ids = vec![];
     for task in tasks {
-        match task.await.map_err(Error::Join)?.map_err(Error::Reqwest)? {
+        match task.await?? {
             Ok(action_event_id) => delete_action_event_ids.push(action_event_id),
             Err(error) => {
                 info!("{error}");
@@ -351,8 +347,7 @@ async fn fetch() -> Result<(), Error> {
             &CONFIG.password,
             &delete_action_event_ids,
         )
-        .await
-        .map_err(Error::Reqwest)?;
+        .await?;
     }
 
     Ok(())
@@ -393,14 +388,9 @@ fn to_cardio_session(
         CardioType::Freetime
     };
 
-    let avg_cadence = if workout_stats.step_count > 0 {
-        Some(
-            (f64::from(workout_stats.step_count) / (f64::from(workout_stats.total_time) / 60.))
-                as i32,
-        )
-    } else {
-        None
-    };
+    let avg_cadence = (workout_stats.step_count > 0).then(|| {
+        (f64::from(workout_stats.step_count) / (f64::from(workout_stats.total_time) / 60.)) as i32
+    });
 
     let track = workout_track
         .locations

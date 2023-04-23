@@ -7,7 +7,6 @@ use std::{
 };
 
 use chrono::{Duration, Local, Utc};
-use err_derive::Error as StdError;
 use lazy_static::lazy_static;
 use reqwest::{Client, Error as ReqwestError};
 use serde::Deserialize;
@@ -15,6 +14,7 @@ use sport_log_ap_utils::{disable_events, get_events, setup as setup_db};
 use sport_log_types::{ActionEventId, ExecutableActionEvent};
 use sysinfo::{ProcessExt, System, SystemExt};
 use thirtyfour::{error::WebDriverError, prelude::*, WebDriver};
+use thiserror::Error;
 use tokio::{process::Command, task::JoinError, time};
 use tracing::{debug, error, info, warn};
 use tracing_subscriber::EnvFilter;
@@ -28,27 +28,27 @@ const PLATFORM_NAME: &str = "wodify";
 const GECKODRIVER: &str = "geckodriver";
 const WEBDRIVER_ADDRESS: &str = "http://localhost:4444/";
 
-#[derive(Debug, StdError)]
+#[derive(Debug, Error)]
 enum Error {
-    #[error(display = "{}", _0)]
-    Reqwest(ReqwestError),
-    #[error(display = "{}", _0)]
-    Io(IoError),
-    #[error(display = "{}", _0)]
-    WebDriver(WebDriverError),
-    #[error(display = "{}", _0)]
-    Join(JoinError),
+    #[error("{0}")]
+    Reqwest(#[from] ReqwestError),
+    #[error("{0}")]
+    Io(#[from] IoError),
+    #[error("{0}")]
+    WebDriver(#[from] WebDriverError),
+    #[error("{0}")]
+    Join(#[from] JoinError),
 }
 
 type Result<T> = StdResult<T, Error>;
 
-#[derive(Debug, StdError)]
+#[derive(Debug, Error)]
 enum UserError {
-    #[error(display = "can not log in: no credentials provided")]
+    #[error("can not log in: no credentials provided")]
     NoCredential(ActionEventId),
-    #[error(display = "can not log in: login failed")]
+    #[error("can not log in: login failed")]
     LoginFailed(ActionEventId),
-    #[error(display = "the class could not be found within the timeout")]
+    #[error("the class could not be found within the timeout")]
     ClassNotFound(ActionEventId),
 }
 
@@ -189,8 +189,7 @@ async fn login(mode: Mode) -> Result<()> {
         Duration::hours(0),
         Duration::days(1) + Duration::minutes(2),
     )
-    .await
-    .map_err(Error::Reqwest)?;
+    .await?;
 
     debug!("got {} executable action events", exec_action_events.len());
 
@@ -202,16 +201,13 @@ async fn login(mode: Mode) -> Result<()> {
         p.kill();
     }
 
-    let mut webdriver = Command::new(GECKODRIVER)
-        .stdout(Stdio::null())
-        .spawn()
-        .map_err(Error::Io)?;
+    let mut webdriver = Command::new(GECKODRIVER).stdout(Stdio::null()).spawn()?;
 
     time::sleep(StdDuration::from_secs(1)).await; // make sure geckodriver is available
 
     let mut caps = DesiredCapabilities::firefox();
     if mode == Mode::Headless {
-        caps.set_headless().map_err(Error::WebDriver)?;
+        caps.set_headless()?;
     }
 
     let mut tasks = vec![];
@@ -226,14 +222,12 @@ async fn login(mode: Mode) -> Result<()> {
                 return Ok(Err(UserError::NoCredential(exec_action_event.action_event_id)));
             };
 
-            let driver = WebDriver::new(WEBDRIVER_ADDRESS, caps)
-                .await
-                .map_err(Error::WebDriver)?;
+            let driver = WebDriver::new(WEBDRIVER_ADDRESS, caps).await?;
 
             let result = wodify_login(&driver, username, password, &exec_action_event, mode).await;
 
             debug!("closing browser");
-            driver.quit().await.map_err(Error::WebDriver)?;
+            driver.quit().await?;
 
             result
         }));
@@ -241,7 +235,7 @@ async fn login(mode: Mode) -> Result<()> {
 
     let mut disable_action_event_ids = vec![];
     for task in tasks {
-        match task.await.map_err(Error::Join)?? {
+        match task.await?? {
             Ok(action_event_id) => disable_action_event_ids.push(action_event_id),
             Err(error) => {
                 info!("{error}");
@@ -264,12 +258,11 @@ async fn login(mode: Mode) -> Result<()> {
             &CONFIG.password,
             &disable_action_event_ids,
         )
-        .await
-        .map_err(Error::Reqwest)?;
+        .await?;
     }
 
     debug!("terminating webdriver");
-    webdriver.kill().await.map_err(Error::Io)?;
+    webdriver.kill().await?;
 
     Ok(())
 }
@@ -288,38 +281,26 @@ async fn wodify_login(
         .to_string();
     let date = exec_action_event.datetime.format("%m/%d/%Y").to_string();
 
-    driver
-        .delete_all_cookies()
-        .await
-        .map_err(Error::WebDriver)?;
-    driver
-        .goto("https://app.wodify.com")
-        .await
-        .map_err(Error::WebDriver)?;
+    driver.delete_all_cookies().await?;
+    driver.goto("https://app.wodify.com").await?;
 
     time::sleep(StdDuration::from_secs(3)).await;
 
     driver
         .find(By::Id("Input_UserName"))
-        .await
-        .map_err(Error::WebDriver)?
+        .await?
         .send_keys(username)
-        .await
-        .map_err(Error::WebDriver)?;
+        .await?;
     driver
         .find(By::Id("Input_Password"))
-        .await
-        .map_err(Error::WebDriver)?
+        .await?
         .send_keys(password)
-        .await
-        .map_err(Error::WebDriver)?;
+        .await?;
     driver
         .find(By::ClassName("signin-btn"))
-        .await
-        .map_err(Error::WebDriver)?
+        .await?
         .click()
-        .await
-        .map_err(Error::WebDriver)?;
+        .await?;
 
     time::sleep(StdDuration::from_secs(5)).await;
 
@@ -332,8 +313,7 @@ async fn wodify_login(
 
     driver
         .goto("https://app.wodify.com/Schedule/CalendarListViewEntry.aspx")
-        .await
-        .map_err(Error::WebDriver)?;
+        .await?;
 
     if let Ok(duration) = (exec_action_event.datetime - Duration::days(1) - Utc::now()).to_std() {
         time::sleep(duration).await;
@@ -341,21 +321,16 @@ async fn wodify_login(
     info!("ready");
 
     for _ in 0..3 {
-        driver.refresh().await.map_err(Error::WebDriver)?;
+        driver.refresh().await?;
         info!("reload done");
 
         let table = driver
             .find(By::ClassName("TableRecords"))
-            .await
-            .map_err(Error::WebDriver)?
+            .await?
             .find(By::Tag("tbody"))
-            .await
-            .map_err(Error::WebDriver)?;
+            .await?;
 
-        let rows = table
-            .find_all(By::Tag("tr"))
-            .await
-            .map_err(Error::WebDriver)?;
+        let rows = table.find_all(By::Tag("tr")).await?;
 
         let mut start_row_number = rows.len();
         for (i, row) in rows.iter().enumerate() {
@@ -363,12 +338,7 @@ async fn wodify_login(
                 .find(By::XPath("./td[1]/span[contains(@class, \"h3\")]"))
                 .await
             {
-                if day
-                    .inner_html()
-                    .await
-                    .map_err(Error::WebDriver)?
-                    .contains(&date)
-                {
+                if day.inner_html().await?.contains(&date) {
                     start_row_number = i + 1;
                     break;
                 }
@@ -390,22 +360,17 @@ async fn wodify_login(
         for row in &rows[start_row_number..end_row_number] {
             let row_matches = row
                 .find(By::XPath("./td[1]/div/span"))
-                .await
-                .map_err(Error::WebDriver)?
+                .await?
                 .attr("title")
-                .await
-                .map_err(Error::WebDriver)?
+                .await?
                 .map_or(false, |title| {
                     title.contains(&exec_action_event.action_name) && title.contains(&time)
                 });
 
             if row_matches {
-                let icon = row
-                    .find(By::XPath("./td[3]/div"))
-                    .await
-                    .map_err(Error::WebDriver)?;
-                icon.scroll_into_view().await.map_err(Error::WebDriver)?;
-                icon.click().await.map_err(Error::WebDriver)?;
+                let icon = row.find(By::XPath("./td[3]/div")).await?;
+                icon.scroll_into_view().await?;
+                icon.click().await?;
                 info!("reservation for {} done", exec_action_event.datetime);
 
                 if mode == Mode::Interactive {

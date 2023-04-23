@@ -483,20 +483,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "err-derive"
-version = "0.3.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c34a887c8df3ed90498c1c437ce21f211c8e27672921a8ffa293cb8d6d4caa9e"
-dependencies = [
- "proc-macro-error",
- "proc-macro2",
- "quote",
- "rustversion",
- "syn 1.0.109",
- "synstructure",
-]
-
-[[package]]
 name = "fantoccini"
 version = "0.20.0-rc.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1579,13 +1565,13 @@ name = "sport-log-action-provider-sportstracker"
 version = "0.1.0"
 dependencies = [
  "chrono",
- "err-derive",
  "lazy_static",
  "rand",
  "reqwest",
  "serde",
  "sport-log-ap-utils",
  "sport-log-types",
+ "thiserror",
  "tokio",
  "toml 0.7.3",
  "tracing",
@@ -1597,7 +1583,6 @@ name = "sport-log-action-provider-wodify-login"
 version = "0.1.0"
 dependencies = [
  "chrono",
- "err-derive",
  "lazy_static",
  "reqwest",
  "serde",
@@ -1605,6 +1590,7 @@ dependencies = [
  "sport-log-types",
  "sysinfo",
  "thirtyfour",
+ "thiserror",
  "tokio",
  "toml 0.7.3",
  "tracing",
@@ -1616,7 +1602,6 @@ name = "sport-log-action-provider-wodify-wod"
 version = "0.1.0"
 dependencies = [
  "chrono",
- "err-derive",
  "lazy_static",
  "rand",
  "reqwest",
@@ -1624,6 +1609,7 @@ dependencies = [
  "sport-log-ap-utils",
  "sport-log-types",
  "thirtyfour",
+ "thiserror",
  "tokio",
  "toml 0.7.3",
  "tracing",
@@ -1764,18 +1750,6 @@ name = "sync_wrapper"
 version = "0.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2047c6ded9c721764247e62cd3b03c09ffc529b2ba5b10ec482ae507a4a70160"
-
-[[package]]
-name = "synstructure"
-version = "0.12.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f36bdaa60a83aca3921b5259d5400cbf5e90fc51931376a9bd4a0eb79aa7210f"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 1.0.109",
- "unicode-xid",
-]
 
 [[package]]
 name = "sysinfo"

@@ -4,7 +4,6 @@ use std::{
 };
 
 use chrono::{Duration, Local, Utc};
-use err_derive::Error as StdError;
 use lazy_static::lazy_static;
 use rand::Rng;
 use reqwest::{Client, Error as ReqwestError, StatusCode};
@@ -15,6 +14,7 @@ use sport_log_types::{
     ActionEventId, ExecutableActionEvent, Wod, WodId, ID_HEADER,
 };
 use thirtyfour::{error::WebDriverError, prelude::*, WebDriver};
+use thiserror::Error;
 use tokio::{process::Command, time};
 use tracing::{debug, error, info, warn};
 use tracing_subscriber::EnvFilter;
@@ -25,19 +25,19 @@ const DESCRIPTION: &str =
     "Wodify Wod can fetch the Workout of the Day and save it in your wods. The action names correspond to the class type the wod should be fetched for.";
 const PLATFORM_NAME: &str = "wodify";
 
-#[derive(Debug, StdError)]
+#[derive(Debug, Error)]
 enum Error {
-    #[error(display = "{}", _0)]
-    Reqwest(ReqwestError),
-    #[error(display = "{}", _0)]
-    Io(IoError),
-    #[error(display = "{}", _0)]
-    WebDriver(WebDriverError),
-    #[error(display = "ExecutableActionEvent doesn't contain credentials")]
+    #[error("{0}")]
+    Reqwest(#[from] ReqwestError),
+    #[error("{0}")]
+    Io(#[from] IoError),
+    #[error("{0}")]
+    WebDriver(#[from] WebDriverError),
+    #[error("ExecutableActionEvent doesn't contain credentials")]
     NoCredential(ActionEventId),
-    #[error(display = "login failed")]
+    #[error("login failed")]
     LoginFailed(ActionEventId),
-    #[error(display = "the wod could not be found")]
+    #[error("the wod could not be found")]
     WodNotFound(ActionEventId),
 }
 
@@ -169,8 +169,7 @@ async fn get_wod(mode: Mode) -> Result<()> {
         Duration::hours(0),
         Duration::days(1) + Duration::minutes(1),
     )
-    .await
-    .map_err(Error::Reqwest)?;
+    .await?;
 
     info!("got {} executable action events", exec_action_events.len());
 
@@ -178,7 +177,7 @@ async fn get_wod(mode: Mode) -> Result<()> {
         return Ok(());
     }
 
-    let mut webdriver = Command::new("../geckodriver").spawn().map_err(Error::Io)?;
+    let mut webdriver = Command::new("../geckodriver").spawn()?;
 
     let mut caps = DesiredCapabilities::firefox();
     if mode == Mode::Headless {
@@ -200,9 +199,7 @@ async fn get_wod(mode: Mode) -> Result<()> {
                 return Err(Error::NoCredential(exec_action_event.action_event_id))
             };
 
-            let driver = WebDriver::new("http://localhost:4444/", caps)
-                .await
-                .map_err(Error::WebDriver)?;
+            let driver = WebDriver::new("http://localhost:4444/", caps).await?;
 
             let result = try_get_wod(
                 &driver,
@@ -215,7 +212,7 @@ async fn get_wod(mode: Mode) -> Result<()> {
             .await;
 
             info!("closing browser");
-            driver.quit().await.map_err(Error::WebDriver)?;
+            driver.quit().await?;
 
             result
         }));
@@ -250,8 +247,7 @@ async fn get_wod(mode: Mode) -> Result<()> {
             &CONFIG.password,
             &delete_action_event_ids,
         )
-        .await
-        .map_err(Error::Reqwest)?;
+        .await?;
     }
 
     info!("terminating webdriver");
@@ -268,38 +264,28 @@ async fn try_get_wod(
     exec_action_event: &ExecutableActionEvent,
     mode: Mode,
 ) -> Result<ActionEventId> {
-    driver
-        .delete_all_cookies()
-        .await
-        .map_err(Error::WebDriver)?;
+    driver.delete_all_cookies().await?;
     driver
         .goto("https://app.wodify.com/WOD/WODEntry.aspx")
-        .await
-        .map_err(Error::WebDriver)?;
+        .await?;
 
     time::sleep(StdDuration::from_secs(3)).await;
 
     driver
         .find(By::Id("Input_UserName"))
-        .await
-        .map_err(Error::WebDriver)?
+        .await?
         .send_keys(username)
-        .await
-        .map_err(Error::WebDriver)?;
+        .await?;
     driver
         .find(By::Id("Input_Password"))
-        .await
-        .map_err(Error::WebDriver)?
+        .await?
         .send_keys(password)
-        .await
-        .map_err(Error::WebDriver)?;
+        .await?;
     driver
         .find(By::ClassName("signin-btn"))
-        .await
-        .map_err(Error::WebDriver)?
+        .await?
         .click()
-        .await
-        .map_err(Error::WebDriver)?;
+        .await?;
     time::sleep(StdDuration::from_secs(2)).await;
 
     if driver
@@ -330,18 +316,15 @@ async fn try_get_wod(
     {
         let elements = wod
             .find_all(By::ClassName("component_show_wrapper"))
-            .await
-            .map_err(Error::WebDriver)?;
+            .await?;
 
         let mut description = String::new();
         for element in elements {
             let name = element
                 .find(By::ClassName("component_name"))
-                .await
-                .map_err(Error::WebDriver)?
+                .await?
                 .inner_html()
-                .await
-                .map_err(Error::WebDriver)?
+                .await?
                 .replace("<br>", "\n")
                 .replace("&nbsp;", " ");
             description += name.as_str();
@@ -349,11 +332,9 @@ async fn try_get_wod(
 
             let content = element
                 .find(By::ClassName("component_wrapper"))
-                .await
-                .map_err(Error::WebDriver)?
+                .await?
                 .inner_html()
-                .await
-                .map_err(Error::WebDriver)?
+                .await?
                 .replace("<br>", "\n")
                 .replace("&nbsp;", " ");
             description += content.as_str();
@@ -374,8 +355,7 @@ async fn try_get_wod(
             .header(ID_HEADER, exec_action_event.user_id.0)
             .json(&wod)
             .send()
-            .await
-            .map_err(Error::Reqwest)?;
+            .await?;
         match response.status() {
             StatusCode::CONFLICT => {
                 let today = Local::now().date_naive().format("%Y-%m-%d").to_string();
@@ -388,11 +368,9 @@ async fn try_get_wod(
                     .basic_auth(NAME, Some(&CONFIG.password))
                     .header(ID_HEADER, exec_action_event.user_id.0)
                     .send()
-                    .await
-                    .map_err(Error::Reqwest)?
+                    .await?
                     .json()
-                    .await
-                    .map_err(Error::Reqwest)?;
+                    .await?;
                 let mut wod = wods
                     .into_iter()
                     .next()
@@ -408,14 +386,13 @@ async fn try_get_wod(
                     .header(ID_HEADER, exec_action_event.user_id.0)
                     .json(&wod)
                     .send()
-                    .await
-                    .map_err(Error::Reqwest)?;
+                    .await?;
             }
             StatusCode::OK => {
                 info!("new wod created");
             }
             _ => {
-                response.error_for_status().map_err(Error::Reqwest)?; // this will always fail and return the error
+                response.error_for_status()?; // this will always fail and return the error
             }
         }
 
