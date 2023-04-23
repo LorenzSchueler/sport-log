@@ -8,23 +8,52 @@ import 'package:http/io_client.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:logger/logger.dart' as l;
 import 'package:result_type/result_type.dart';
+import 'package:sport_log/api/accessors/account_data_api.dart';
+import 'package:sport_log/api/accessors/action_api.dart';
+import 'package:sport_log/api/accessors/cardio_api.dart';
+import 'package:sport_log/api/accessors/diary_api.dart';
+import 'package:sport_log/api/accessors/metcon_api.dart';
+import 'package:sport_log/api/accessors/movement_api.dart';
+import 'package:sport_log/api/accessors/platform_api.dart';
+import 'package:sport_log/api/accessors/strength_api.dart';
+import 'package:sport_log/api/accessors/user_api.dart';
+import 'package:sport_log/api/accessors/wod_api.dart';
 import 'package:sport_log/config.dart';
 import 'package:sport_log/helpers/logger.dart';
-import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/error_message.dart';
 import 'package:sport_log/models/server_version/server_version.dart';
 import 'package:sport_log/settings.dart';
 
-part 'accessors/account_data_api.dart';
-part 'accessors/action_api.dart';
-part 'accessors/cardio_api.dart';
-part 'accessors/diary_api.dart';
-part 'accessors/metcon_api.dart';
-part 'accessors/movement_api.dart';
-part 'accessors/platform_api.dart';
-part 'accessors/strength_api.dart';
-part 'accessors/user_api.dart';
-part 'accessors/wod_api.dart';
+final _logger = Logger('API');
+
+String _prettyJson(dynamic json, {int indent = 2}) {
+  final spaces = ' ' * indent;
+  return JsonEncoder.withIndent(spaces).convert(json);
+}
+
+void _logRequest(Request request) {
+  final headersStr = Config.instance.outputRequestHeaders
+      ? "\n${request.headers.entries.map((e) => '${e.key}: ${e.value}').join('\n')}"
+      : "";
+  final jsonStr = Config.instance.outputRequestJson && request.body.isNotEmpty
+      ? "\n\n${_prettyJson(jsonDecode(request.body))}"
+      : "";
+  _logger.d("request: ${request.method} ${request.url}$headersStr$jsonStr");
+}
+
+void _logResponse(StreamedResponse response, Object? json) {
+  final successful = response.statusCode >= 200 && response.statusCode < 300;
+  final headerStr = Config.instance.outputResponseHeaders
+      ? "\n${response.headers.entries.map((e) => "${e.key}: ${e.value}").join("\n")}"
+      : "";
+  final jsonStr = Config.instance.outputResponseJson && json != null
+      ? "\n\n${_prettyJson(json)}"
+      : "";
+  _logger.log(
+    successful ? l.Level.debug : l.Level.error,
+    "response: ${response.statusCode}$headerStr$jsonStr",
+  );
+}
 
 enum ApiErrorType {
   // http error
@@ -64,94 +93,112 @@ class ApiError {
 
 typedef ApiResult<T> = Result<T, ApiError>;
 
-extension _ToApiResult on Response {
-  ErrorMessage? get _message => HandlerError.fromJson(
-        jsonDecode(utf8.decode(bodyBytes)) as Map<String, dynamic>,
-      ).message;
+extension _ToApiResult on StreamedResponse {
+  ErrorMessage? _errorMessage(Object? json) => json != null
+      ? HandlerError.fromJson(json as Map<String, dynamic>).message
+      : null;
 
-  ApiResult<T?> _mapToApiResult<T>(T Function()? fromJson) {
+  Future<ApiResult<T?>> _mapToApiResult<T>(
+    T Function(dynamic)? fromJson,
+  ) async {
+    // steam can be read only once
+    final rawBody = utf8.decode(await stream.toBytes());
+    final json = rawBody.isEmpty ? null : jsonDecode(rawBody) as Object;
+    _logResponse(this, json);
+
     switch (statusCode) {
       case 200:
-        return Success(fromJson?.call());
+        return Success(fromJson?.call(json));
       case 204:
         return fromJson == null
             ? Success(null)
-            : Failure(
-                ApiError(ApiErrorType.unknownServerError, statusCode),
-              ); // value needed but nothing returned
+            // value needed but nothing returned
+            : Failure(ApiError(ApiErrorType.unknownServerError, statusCode));
       case 400:
-        return Failure(ApiError(ApiErrorType.badRequest, statusCode, _message));
+        return Failure(
+          ApiError(ApiErrorType.badRequest, statusCode, _errorMessage(json)),
+        );
       case 401:
         return Failure(
-          ApiError(ApiErrorType.unauthorized, statusCode, _message),
+          ApiError(ApiErrorType.unauthorized, statusCode, _errorMessage(json)),
         );
       case 403:
-        return Failure(ApiError(ApiErrorType.forbidden, statusCode, _message));
+        return Failure(
+          ApiError(ApiErrorType.forbidden, statusCode, _errorMessage(json)),
+        );
       case 404:
-        return Failure(ApiError(ApiErrorType.notFound, statusCode, _message));
+        return Failure(
+          ApiError(ApiErrorType.notFound, statusCode, _errorMessage(json)),
+        );
       case 409:
-        return Failure(ApiError(ApiErrorType.conflict, statusCode, _message));
+        return Failure(
+          ApiError(ApiErrorType.conflict, statusCode, _errorMessage(json)),
+        );
       case 500:
         return Failure(
-          ApiError(ApiErrorType.internalServerError, statusCode, _message),
+          ApiError(
+            ApiErrorType.internalServerError,
+            statusCode,
+            _errorMessage(json),
+          ),
         );
       default:
         return Failure(
-          ApiError(ApiErrorType.unknownServerError, statusCode, _message),
+          ApiError(
+            ApiErrorType.unknownServerError,
+            statusCode,
+            _errorMessage(json),
+          ),
         );
     }
   }
 
-  ApiResult<void> toApiResult() => _mapToApiResult(null);
+  Future<ApiResult<void>> toApiResult() => _mapToApiResult(null);
 
-  ApiResult<T> toApiResultWithValue<T>(T Function(dynamic) fromJson) {
-    final result = _mapToApiResult(
-      () => fromJson(jsonDecode(utf8.decode(bodyBytes))),
-    );
+  Future<ApiResult<T>> toApiResultWithValue<T>(
+    T Function(dynamic) fromJson,
+  ) async {
+    final result = await _mapToApiResult(fromJson);
     return result.isSuccess
         ? Success(result.success as T)
         : Failure(result.failure);
   }
 }
 
-extension ApiResultFromRequest<T> on ApiResult<T> {
+extension RequestExtension on Request {
   static final _ioClient = HttpClient()..connectionTimeout = Config.httpTimeout;
   static final _client = IOClient(_ioClient);
 
   static Future<ApiResult<T>> _handleError<T>(
-    Future<ApiResult<T>> Function() request,
+    Future<ApiResult<T>> Function() fn,
   ) async {
     try {
-      return await request();
+      return await fn();
     } on SocketException {
       return Failure(ApiError(ApiErrorType.serverUnreachable, null));
     } on TypeError {
       return Failure(ApiError(ApiErrorType.badJson, null));
     } catch (e) {
-      _ApiLogging.logger.e("Unhandled error", e);
+      _logger.e("Unhandled error", e);
       return Failure(ApiError(ApiErrorType.unknownRequestError, null));
     }
   }
 
-  static Future<ApiResult<void>> fromRequest(
-    Future<Response> Function(Client client) request,
-  ) =>
-      _handleError(() async {
-        final response = await request(_client);
+  Future<ApiResult<void>> toApiResult() => _handleError(() async {
+        _logRequest(this);
+        final response = await _client.send(this);
         return response.toApiResult();
       });
 
-  static Future<ApiResult<T>> fromRequestWithValue<T>(
-    Future<Response> Function(Client client) request,
-    T Function(dynamic) fromJson,
-  ) =>
+  Future<ApiResult<T>> toApiResultWithValue<T>(T Function(dynamic) fromJson) =>
       _handleError(() async {
-        final response = await request(_client);
+        _logRequest(this);
+        final response = await _client.send(this);
         return response.toApiResultWithValue(fromJson);
       });
 }
 
-abstract class Api<T extends JsonSerializable> with _ApiLogging {
+abstract class Api<T extends JsonSerializable> {
   static final accountData = AccountDataApi();
   static final user = UserApi();
   static final actions = ActionApi();
@@ -173,187 +220,87 @@ abstract class Api<T extends JsonSerializable> with _ApiLogging {
 
   static Future<ApiResult<ServerVersion>> getServerVersion() {
     final uri = Uri.parse("${Settings.instance.serverUrl}/version");
-    return ApiResultFromRequest.fromRequestWithValue<ServerVersion>(
-      (client) => client.get(uri),
-      (dynamic json) => ServerVersion.fromJson(json as Map<String, dynamic>),
+    return Request("get", uri).toApiResultWithValue(
+      (json) => ServerVersion.fromJson(json as Map<String, dynamic>),
     );
   }
 
-  // things needed to be overridden
-  T _fromJson(Map<String, dynamic> json);
+  T fromJson(Map<String, dynamic> json);
 
   /// everything after version, e. g. '/user'
-  String get _route;
+  String get route;
 
   Uri get _uri =>
-      Uri.parse("${Settings.instance.serverUrl}/v${Config.apiVersion}$_route");
+      Uri.parse("${Settings.instance.serverUrl}/v${Config.apiVersion}$route");
   Map<String, dynamic> _toJson(T object) => object.toJson();
 
-  Future<ApiResult<T>> getSingle(Int64 id) async {
-    final uri = Uri.parse("$_uri?id=$id");
-    return ApiResultFromRequest.fromRequestWithValue<T>(
-      (client) async {
-        final headers = _ApiHeaders._basicAuth;
-        _logRequest('GET', uri, headers);
-        final response = await client.get(
-          uri,
-          headers: headers,
-        );
-        _logResponse(response);
-        return response;
-      },
-      (dynamic json) => _fromJson(json as Map<String, dynamic>),
-    );
-  }
-
-  Future<ApiResult<List<T>>> getMultiple() async {
-    return ApiResultFromRequest.fromRequestWithValue<List<T>>(
-      (client) async {
-        final headers = _ApiHeaders._basicAuth;
-        _logRequest('GET', _uri, headers);
-        final response = await client.get(
-          _uri,
-          headers: headers,
-        );
-        _logResponse(response);
-        return response;
-      },
-      (dynamic json) => (json as List<dynamic>)
-          .map((dynamic json) => _fromJson(json as Map<String, dynamic>))
-          .toList(),
-    );
-  }
-
-  Future<ApiResult<void>> postSingle(T object) async {
-    return ApiResultFromRequest.fromRequest((client) async {
-      final body = _toJson(object);
-      final headers = _ApiHeaders._basicAuthContentTypeJson;
-      _logRequest('POST', _uri, headers, body);
-      final response = await client.post(
-        _uri,
-        headers: headers,
-        body: jsonEncode(body),
+  Future<ApiResult<T>> getSingle(Int64 id) =>
+      (Request("get", Uri.parse("$_uri?id=$id"))
+            ..headers.addAll(ApiHeaders.basicAuth))
+          .toApiResultWithValue(
+        (json) => fromJson(json as Map<String, dynamic>),
       );
-      _logResponse(response);
-      return response;
-    });
-  }
+
+  Future<ApiResult<List<T>>> getMultiple() =>
+      (Request("get", _uri)..headers.addAll(ApiHeaders.basicAuth))
+          .toApiResultWithValue(
+        (json) => ((json as List<dynamic>).cast<Map<String, dynamic>>())
+            .map(fromJson)
+            .toList(),
+      );
+
+  Future<ApiResult<void>> postSingle(T object) => (Request("post", _uri)
+        ..headers.addAll(ApiHeaders.basicAuthContentTypeJson)
+        ..body = jsonEncode(_toJson(object)))
+      .toApiResult();
 
   Future<ApiResult<void>> postMultiple(List<T> objects) async {
     if (objects.isEmpty) {
       return Success(null);
     }
-    return ApiResultFromRequest.fromRequest((client) async {
-      final body = objects.map(_toJson).toList();
-      final headers = _ApiHeaders._basicAuthContentTypeJson;
-      _logRequest('POST', _uri, headers, body);
-      final response = await client.post(
-        _uri,
-        headers: headers,
-        body: jsonEncode(body),
-      );
-      _logResponse(response);
-      return response;
-    });
+    return (Request("post", _uri)
+          ..headers.addAll(ApiHeaders.basicAuthContentTypeJson)
+          ..body = jsonEncode(objects.map(_toJson).toList()))
+        .toApiResult();
   }
 
-  Future<ApiResult<void>> putSingle(T object) async {
-    return ApiResultFromRequest.fromRequest((client) async {
-      final body = _toJson(object);
-      final headers = _ApiHeaders._basicAuthContentTypeJson;
-      _logRequest('PUT', _uri, headers, body);
-      final response = await client.put(
-        _uri,
-        headers: headers,
-        body: jsonEncode(body),
-      );
-      _logResponse(response);
-      return response;
-    });
-  }
+  Future<ApiResult<void>> putSingle(T object) => (Request("put", _uri)
+        ..headers.addAll(ApiHeaders.basicAuthContentTypeJson)
+        ..body = jsonEncode(_toJson(object)))
+      .toApiResult();
 
   Future<ApiResult<void>> putMultiple(List<T> objects) async {
     if (objects.isEmpty) {
       return Success(null);
     }
-    return ApiResultFromRequest.fromRequest((client) async {
-      final body = objects.map(_toJson).toList();
-      final headers = _ApiHeaders._basicAuthContentTypeJson;
-      _logRequest('PUT', _uri, headers, body);
-      final response = await client.put(
-        _uri,
-        headers: headers,
-        body: jsonEncode(body),
-      );
-      _logResponse(response);
-      return response;
-    });
+    return (Request("put", _uri)
+          ..headers.addAll(ApiHeaders.basicAuthContentTypeJson)
+          ..body = jsonEncode(objects.map(_toJson).toList()))
+        .toApiResult();
   }
 }
 
-class _ApiHeaders {
-  static Map<String, String> _basicAuthFromParts(
+class ApiHeaders {
+  static Map<String, String> basicAuthFromParts(
     String username,
     String password,
   ) =>
       {
         HttpHeaders.authorizationHeader:
-            'Basic ${base64Encode(utf8.encode('$username:$password'))}'
+            "Basic ${base64Encode(utf8.encode('$username:$password'))}"
       };
 
-  static const Map<String, String> _contentTypeJson = {
+  static const Map<String, String> contentTypeJson = {
     HttpHeaders.contentTypeHeader: 'application/json; charset=UTF-8',
   };
 
-  static Map<String, String> get _basicAuth => _basicAuthFromParts(
+  static Map<String, String> get basicAuth => basicAuthFromParts(
         Settings.instance.username!,
         Settings.instance.password!,
       );
 
-  static Map<String, String> get _basicAuthContentTypeJson => {
-        ..._basicAuth,
-        ..._contentTypeJson,
+  static Map<String, String> get basicAuthContentTypeJson => {
+        ...basicAuth,
+        ...contentTypeJson,
       };
-}
-
-mixin _ApiLogging {
-  static final logger = Logger('API');
-
-  String _prettyJson(dynamic json, {int indent = 2}) {
-    final spaces = ' ' * indent;
-    return JsonEncoder.withIndent(spaces).convert(json);
-  }
-
-  void _logRequest(
-    String httpMethod,
-    Uri route,
-    Map<String, String> headers, [
-    dynamic json,
-  ]) {
-    final headersStr = Config.instance.outputRequestHeaders
-        ? "\n${headers.entries.map((e) => '${e.key}: ${e.value}').join('\n')}"
-        : "";
-    final jsonStr = json != null && Config.instance.outputRequestJson
-        ? "\n\n${_prettyJson(json)}"
-        : "";
-    logger.d(
-      "request: $httpMethod ${Settings.instance.serverUrl}$route$headersStr$jsonStr",
-    );
-  }
-
-  void _logResponse(Response response) {
-    final successful = response.statusCode >= 200 && response.statusCode < 300;
-    final headerStr = Config.instance.outputResponseHeaders
-        ? "\n${response.headers.entries.map((e) => "${e.key}: ${e.value}").join("\n")}"
-        : "";
-    final body = utf8.decode(response.bodyBytes);
-    final bodyStr =
-        body.isNotEmpty && (!successful || Config.instance.outputResponseJson)
-            ? '\n\n${_prettyJson(jsonDecode(body))}'
-            : "";
-    logger.log(
-      successful ? l.Level.debug : l.Level.error,
-      'response: ${response.statusCode}$headerStr$bodyStr',
-    );
-  }
 }

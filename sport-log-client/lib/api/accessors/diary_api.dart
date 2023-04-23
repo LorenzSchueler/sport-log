@@ -1,9 +1,10 @@
-part of '../api.dart';
+import 'package:sport_log/api/api.dart';
+import 'package:sport_log/models/diary/diary.dart';
 
 class DiaryApi extends Api<Diary> {
   @override
-  Diary _fromJson(Map<String, dynamic> json) => Diary.fromJson(json);
+  Diary fromJson(Map<String, dynamic> json) => Diary.fromJson(json);
 
   @override
-  String get _route => '/diary';
+  final route = '/diary';
 }

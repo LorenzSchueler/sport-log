@@ -1,9 +1,10 @@
-part of '../api.dart';
+import 'package:sport_log/api/api.dart';
+import 'package:sport_log/models/movement/movement.dart';
 
 class MovementApi extends Api<Movement> {
   @override
-  Movement _fromJson(Map<String, dynamic> json) => Movement.fromJson(json);
+  Movement fromJson(Map<String, dynamic> json) => Movement.fromJson(json);
 
   @override
-  String get _route => '/movement';
+  final route = '/movement';
 }

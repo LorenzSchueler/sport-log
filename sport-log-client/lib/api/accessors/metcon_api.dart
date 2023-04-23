@@ -1,27 +1,28 @@
-part of '../api.dart';
+import 'package:sport_log/api/api.dart';
+import 'package:sport_log/models/metcon/all.dart';
 
 class MetconSessionApi extends Api<MetconSession> {
   @override
-  MetconSession _fromJson(Map<String, dynamic> json) =>
+  MetconSession fromJson(Map<String, dynamic> json) =>
       MetconSession.fromJson(json);
 
   @override
-  String get _route => '/metcon_session';
+  final route = '/metcon_session';
 }
 
 class MetconApi extends Api<Metcon> {
   @override
-  Metcon _fromJson(Map<String, dynamic> json) => Metcon.fromJson(json);
+  Metcon fromJson(Map<String, dynamic> json) => Metcon.fromJson(json);
 
   @override
-  String get _route => '/metcon';
+  final route = '/metcon';
 }
 
 class MetconMovementApi extends Api<MetconMovement> {
   @override
-  MetconMovement _fromJson(Map<String, dynamic> json) =>
+  MetconMovement fromJson(Map<String, dynamic> json) =>
       MetconMovement.fromJson(json);
 
   @override
-  String get _route => '/metcon_movement';
+  final route = '/metcon_movement';
 }

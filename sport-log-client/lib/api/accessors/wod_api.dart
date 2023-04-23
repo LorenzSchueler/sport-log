@@ -1,9 +1,10 @@
-part of '../api.dart';
+import 'package:sport_log/api/api.dart';
+import 'package:sport_log/models/wod/wod.dart';
 
 class WodApi extends Api<Wod> {
   @override
-  Wod _fromJson(Map<String, dynamic> json) => Wod.fromJson(json);
+  Wod fromJson(Map<String, dynamic> json) => Wod.fromJson(json);
 
   @override
-  String get _route => '/wod';
+  final route = '/wod';
 }

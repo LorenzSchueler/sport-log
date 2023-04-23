@@ -1,22 +1,15 @@
-part of '../api.dart';
+import 'package:http/http.dart';
+import 'package:sport_log/api/api.dart';
+import 'package:sport_log/config.dart';
+import 'package:sport_log/models/account_data/account_data.dart';
+import 'package:sport_log/settings.dart';
 
-class AccountDataApi with _ApiLogging {
-  Future<ApiResult<AccountData>> get(DateTime? lastSync) async {
-    final uri = _uri(lastSync);
-    return ApiResultFromRequest.fromRequestWithValue(
-      (client) async {
-        final headers = _ApiHeaders._basicAuth;
-        _logRequest('GET', uri, headers);
-        final response = await client.get(
-          uri,
-          headers: headers,
-        );
-        _logResponse(response);
-        return response;
-      },
-      (dynamic json) => AccountData.fromJson(json as Map<String, dynamic>),
-    );
-  }
+class AccountDataApi {
+  Future<ApiResult<AccountData>> get(DateTime? lastSync) =>
+      (Request("get", _uri(lastSync))..headers.addAll(ApiHeaders.basicAuth))
+          .toApiResultWithValue(
+        (dynamic json) => AccountData.fromJson(json as Map<String, dynamic>),
+      );
 
   String _route(DateTime? dateTime) => dateTime == null
       ? '/account_data'

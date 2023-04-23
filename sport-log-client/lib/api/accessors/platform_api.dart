@@ -1,18 +1,19 @@
-part of '../api.dart';
+import 'package:sport_log/api/api.dart';
+import 'package:sport_log/models/platform/all.dart';
 
 class PlatformApi extends Api<Platform> {
   @override
-  Platform _fromJson(Map<String, dynamic> json) => Platform.fromJson(json);
+  Platform fromJson(Map<String, dynamic> json) => Platform.fromJson(json);
 
   @override
-  String get _route => '/platform';
+  final route = '/platform';
 }
 
 class PlatformCredentialApi extends Api<PlatformCredential> {
   @override
-  PlatformCredential _fromJson(Map<String, dynamic> json) =>
+  PlatformCredential fromJson(Map<String, dynamic> json) =>
       PlatformCredential.fromJson(json);
 
   @override
-  String get _route => '/platform_credential';
+  final route = '/platform_credential';
 }

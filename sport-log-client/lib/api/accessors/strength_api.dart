@@ -1,19 +1,19 @@
-part of '../api.dart';
+import 'package:sport_log/api/api.dart';
+import 'package:sport_log/models/strength/all.dart';
 
 class StrengthSessionApi extends Api<StrengthSession> {
   @override
-  StrengthSession _fromJson(Map<String, dynamic> json) =>
+  StrengthSession fromJson(Map<String, dynamic> json) =>
       StrengthSession.fromJson(json);
 
   @override
-  String get _route => '/strength_session';
+  final route = '/strength_session';
 }
 
 class StrengthSetApi extends Api<StrengthSet> {
   @override
-  StrengthSet _fromJson(Map<String, dynamic> json) =>
-      StrengthSet.fromJson(json);
+  StrengthSet fromJson(Map<String, dynamic> json) => StrengthSet.fromJson(json);
 
   @override
-  String get _route => '/strength_set';
+  final route = '/strength_set';
 }
