@@ -1,13 +1,9 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mapbox_search/mapbox_search.dart';
-import 'package:sport_log/config.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/bool_toggle.dart';
-import 'package:sport_log/helpers/lat_lng.dart';
-import 'package:sport_log/helpers/map_controller.dart';
+import 'package:sport_log/helpers/map_search_utils.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
@@ -15,70 +11,13 @@ import 'package:sport_log/widgets/main_drawer.dart';
 import 'package:sport_log/widgets/map_widgets/mapbox_map_wrapper.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
 import 'package:sport_log/widgets/provider_consumer.dart';
-import 'package:sport_log/widgets/snackbar.dart';
 
-class MapPage extends StatefulWidget {
-  const MapPage({super.key});
-
-  @override
-  State<MapPage> createState() => _MapPageState();
-}
-
-class _MapPageState extends State<MapPage> {
-  MapController? _mapController;
-  final _searchBar = FocusNode();
-  final _placesSearch =
-      PlacesSearch(apiKey: Config.instance.accessToken, limit: 10);
-
-  String? _search;
-  List<MapBoxPlace> _searchResults = [];
-
-  Future<void> _searchPlaces(String name) async {
-    setState(() => _search = name);
-    List<MapBoxPlace>? places;
-    try {
-      places = await _placesSearch.getPlaces(_search!);
-    } on SocketException {
-      showNoInternetToast(context);
-    }
-    if (mounted) {
-      setState(() => _searchResults = places ?? []);
-    }
-  }
-
-  void _toggleSearch() {
-    setState(() {
-      _search = _search == null ? "" : null;
-      if (_search == null) {
-        _searchResults = [];
-      }
-    });
-    if (_search != null) {
-      _searchBar.requestFocus();
-    }
-  }
-
-  Future<void> _goToSearchItem(int index) async {
-    FocusManager.instance.primaryFocus?.unfocus();
-    final item = _searchResults[index];
-    setState(() => _searchResults = []);
-
-    final coords = item.center!;
-    await _mapController?.animateCenter(LatLng(lat: coords[1], lng: coords[0]));
-
-    final bbox = item.bbox;
-    if (bbox != null) {
-      await _mapController?.setBoundsX(
-        [LatLng(lat: bbox[1], lng: bbox[0]), LatLng(lat: bbox[3], lng: bbox[2])]
-            .latLngBounds!,
-        padded: false,
-      );
-    } else {
-      await _mapController?.setZoom(16);
-    }
-  }
+class MapPage extends StatelessWidget {
+  MapPage({super.key});
 
   static const _searchBackgroundColor = Color.fromARGB(150, 255, 255, 255);
+
+  final _searchBar = FocusNode();
 
   Future<void> _onDrawerChanged(bool open) async {
     if (open) {
@@ -107,64 +46,71 @@ class _MapPageState extends State<MapPage> {
     return NeverPop(
       child: ProviderConsumer(
         create: (_) => BoolToggle.on(),
-        builder: (context, showOverlays, _) => Scaffold(
-          extendBodyBehindAppBar: true,
-          appBar: showOverlays.isOn
-              ? AppBar(
-                  title: _search == null
-                      ? null
-                      : TextFormField(
-                          focusNode: _searchBar,
-                          onChanged: _searchPlaces,
-                          onTap: () => _searchPlaces(_search ?? ""),
-                          decoration: Theme.of(context).textFormFieldDecoration,
-                          style: Theme.of(context)
-                              .textTheme
-                              .titleLarge!
-                              .copyWith(color: Colors.black),
+        builder: (context, showOverlays, _) => ProviderConsumer(
+          create: (_) => MapSearchUtils(),
+          builder: (context, searchUtils, _) => Scaffold(
+            extendBodyBehindAppBar: true,
+            appBar: showOverlays.isOn
+                ? AppBar(
+                    title: searchUtils.search == null
+                        ? null
+                        : TextFormField(
+                            focusNode: _searchBar,
+                            onChanged: searchUtils.searchPlaces,
+                            onTap: () => searchUtils
+                                .searchPlaces(searchUtils.search ?? ""),
+                            decoration:
+                                Theme.of(context).textFormFieldDecoration,
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleLarge!
+                                .copyWith(color: Colors.black),
+                          ),
+                    actions: [
+                      IconButton(
+                        onPressed: () => searchUtils.toggleSearch(_searchBar),
+                        icon: Icon(
+                          searchUtils.search != null
+                              ? AppIcons.close
+                              : AppIcons.search,
                         ),
-                  actions: [
-                    IconButton(
-                      onPressed: _toggleSearch,
-                      icon: Icon(
-                        _search != null ? AppIcons.close : AppIcons.search,
+                      ),
+                    ],
+                    foregroundColor: Theme.of(context).colorScheme.background,
+                    backgroundColor: _searchBackgroundColor,
+                    elevation: 0,
+                  )
+                : null,
+            drawer: const MainDrawer(selectedRoute: Routes.map),
+            onDrawerChanged: _onDrawerChanged,
+            body: Stack(
+              alignment: Alignment.center,
+              children: [
+                MapboxMapWrapper(
+                  showFullscreenButton: false,
+                  showMapStylesButton: true,
+                  showSelectRouteButton: true,
+                  showSetNorthButton: true,
+                  showCurrentLocationButton: true,
+                  showCenterLocationButton: true,
+                  showOverlays: showOverlays.isOn,
+                  buttonTopOffset: 100,
+                  onMapCreated: searchUtils.setMapController,
+                  onTap: (_) => showOverlays.toggle(),
+                ),
+                if (showOverlays.isOn && searchUtils.searchResults.isNotEmpty)
+                  SafeArea(
+                    child: Align(
+                      alignment: Alignment.topCenter,
+                      child: MapSearchResults(
+                        searchResults: searchUtils.searchResults,
+                        backgroundColor: _searchBackgroundColor,
+                        onItemTap: searchUtils.goToSearchItem,
                       ),
                     ),
-                  ],
-                  foregroundColor: Theme.of(context).colorScheme.background,
-                  backgroundColor: _searchBackgroundColor,
-                  elevation: 0,
-                )
-              : null,
-          drawer: const MainDrawer(selectedRoute: Routes.map),
-          onDrawerChanged: _onDrawerChanged,
-          body: Stack(
-            alignment: Alignment.center,
-            children: [
-              MapboxMapWrapper(
-                showFullscreenButton: false,
-                showMapStylesButton: true,
-                showSelectRouteButton: true,
-                showSetNorthButton: true,
-                showCurrentLocationButton: true,
-                showCenterLocationButton: true,
-                showOverlays: showOverlays.isOn,
-                buttonTopOffset: 100,
-                onMapCreated: (controller) => _mapController = controller,
-                onTap: (_) => showOverlays.toggle(),
-              ),
-              if (showOverlays.isOn && _searchResults.isNotEmpty)
-                SafeArea(
-                  child: Align(
-                    alignment: Alignment.topCenter,
-                    child: MapSearchResults(
-                      searchResults: _searchResults,
-                      backgroundColor: _searchBackgroundColor,
-                      onItemTap: _goToSearchItem,
-                    ),
                   ),
-                ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -200,7 +146,7 @@ class MapSearchResults extends StatelessWidget {
             itemBuilder: (context, index) => GestureDetector(
               onTap: () => onItemTap(index),
               child: Text(
-                searchResults[index].toString(),
+                searchResults[index].placeName ?? "unknown",
                 style: Theme.of(context)
                     .textTheme
                     .titleMedium!

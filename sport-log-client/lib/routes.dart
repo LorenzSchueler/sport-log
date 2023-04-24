@@ -117,8 +117,7 @@ abstract class Routes {
     Routes.registration: (_) =>
         _checkNotUserId(() => const LoginPage(loginType: LoginType.register)),
     Routes.timer: (_) => _checkUserId(() => const TimerPage()),
-    Routes.map: (context) =>
-        _checkUserIdAndroidIos(context, () => const MapPage()),
+    Routes.map: (context) => _checkUserIdAndroidIos(context, MapPage.new),
     Routes.offlineMaps: (context) =>
         _checkUserIdAndroidIos(context, () => const OfflineMapsPage()),
     Routes.heartRate: (context) =>
