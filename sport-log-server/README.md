@@ -148,6 +148,19 @@ postgres=# \password sport_admin
 
 refer to [synchronization](../SYNCHRONIZATION.md)
 
+## Reset User Password
+
+```sh
+# install argon2 and pwgen
+sudo apt install argon2 pwgen
+# generate password hash - be careful not to add a newline at the end of the password
+argon2 $(pwgen 16 1) -id -e
+# log in to postgres
+psql -h localhost -U sport_admin -d sport_log
+# set new password
+sport_log=> update "user" set password = '<password hash>' where username = '<username>';
+```
+
 ## REST API Example
 
 ```sh
