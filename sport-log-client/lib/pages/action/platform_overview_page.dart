@@ -39,7 +39,7 @@ class PlatformOverviewPage extends StatelessWidget {
                       textAlign: TextAlign.center,
                     ),
                   )
-                : Container(
+                : Padding(
                     padding: Defaults.edgeInsets.normal,
                     child: ListView.separated(
                       itemBuilder: (_, index) => PlatformCard(

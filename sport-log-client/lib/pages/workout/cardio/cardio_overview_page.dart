@@ -105,7 +105,7 @@ class CardioSessionsPage extends StatelessWidget {
               SyncRefreshIndicator(
                 child: dataProvider.entities.isEmpty
                     ? SessionsPageTab.cardio.noEntriesText
-                    : Container(
+                    : Padding(
                         padding: Defaults.edgeInsets.normal,
                         child: Column(
                           children: [

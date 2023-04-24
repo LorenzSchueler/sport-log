@@ -48,7 +48,7 @@ class TimerPage extends StatelessWidget {
                 ),
               ),
             ),
-            body: Container(
+            body: Padding(
               padding: Defaults.edgeInsets.normal,
               child: TabBarView(
                 physics: const NeverScrollableScrollPhysics(),

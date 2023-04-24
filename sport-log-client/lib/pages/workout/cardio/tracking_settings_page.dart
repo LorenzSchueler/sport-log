@@ -18,7 +18,7 @@ class CardioTrackingSettingsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("Tracking Settings")),
-      body: Container(
+      body: Padding(
         padding: Defaults.edgeInsets.normal,
         child: ProviderConsumer<TrackingSettings>(
           create: (_) => TrackingSettings(),

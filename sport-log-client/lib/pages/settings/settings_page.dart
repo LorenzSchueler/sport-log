@@ -177,7 +177,7 @@ class SettingsPage extends StatelessWidget {
     return NeverPop(
       child: Scaffold(
         appBar: AppBar(title: const Text("Settings")),
-        body: Container(
+        body: Padding(
           padding: Defaults.edgeInsets.normal,
           child: Consumer<Settings>(
             builder: (context, settings, _) => ListView(

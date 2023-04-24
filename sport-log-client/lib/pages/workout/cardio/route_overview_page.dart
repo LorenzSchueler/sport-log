@@ -70,7 +70,7 @@ class RoutePage extends StatelessWidget {
                       textAlign: TextAlign.center,
                     ),
                   )
-                : Container(
+                : Padding(
                     padding: Defaults.edgeInsets.normal,
                     child: ListView.separated(
                       itemBuilder: (_, index) => RouteCard(

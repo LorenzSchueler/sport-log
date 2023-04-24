@@ -74,7 +74,7 @@ class DiaryPage extends StatelessWidget {
               SyncRefreshIndicator(
                 child: dataProvider.entities.isEmpty
                     ? SessionsPageTab.diary.noEntriesText
-                    : Container(
+                    : Padding(
                         padding: Defaults.edgeInsets.normal,
                         child: Column(
                           children: [

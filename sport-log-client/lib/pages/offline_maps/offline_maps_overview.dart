@@ -126,7 +126,7 @@ class _OfflineMapsPageState extends State<OfflineMapsPage> {
                   ],
                 ),
                 Expanded(
-                  child: Container(
+                  child: Padding(
                     padding: Defaults.edgeInsets.normal,
                     child: Column(
                       children: [

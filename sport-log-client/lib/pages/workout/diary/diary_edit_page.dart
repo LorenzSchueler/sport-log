@@ -74,7 +74,7 @@ class _DiaryEditPageState extends State<DiaryEditPage> {
             ),
           ],
         ),
-        body: Container(
+        body: Padding(
           padding: Defaults.edgeInsets.normal,
           child: Form(
             key: _formKey,

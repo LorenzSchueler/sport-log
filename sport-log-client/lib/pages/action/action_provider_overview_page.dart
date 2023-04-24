@@ -77,7 +77,7 @@ class _ActionProviderOverviewPageState
       body: _actionProviderDescription == null
           ? const CircularProgressIndicator()
           : SyncRefreshIndicator(
-              child: Container(
+              child: Padding(
                 padding: Defaults.edgeInsets.normal,
                 child: ListView(
                   children: [

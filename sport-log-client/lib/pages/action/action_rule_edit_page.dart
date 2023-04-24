@@ -79,7 +79,7 @@ class _ActionRuleEditPageState extends State<ActionRuleEditPage> {
             ),
           ],
         ),
-        body: Container(
+        body: Padding(
           padding: Defaults.edgeInsets.normal,
           child: ListView(
             children: [

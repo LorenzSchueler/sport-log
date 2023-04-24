@@ -116,7 +116,7 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
             ),
           ],
         ),
-        body: Container(
+        body: Padding(
           padding: Defaults.edgeInsets.normal,
           child: Column(
             children: [

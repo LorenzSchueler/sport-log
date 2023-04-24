@@ -170,7 +170,7 @@ class CardioValueUnitDescriptionTable extends StatelessWidget {
         //ValueUnitDescription.calories(
         //cardioSessionDescription.cardioSession.calories,
         //),
-        //Container(),
+        //Padding(),
         //],
         //),
       ],

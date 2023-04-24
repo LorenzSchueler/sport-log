@@ -61,8 +61,8 @@ class Sync extends ChangeNotifier {
         serverVersion = serverVersionResult.success;
         if (!serverVersion!.compatibleWithClientApiVersion()) {
           final context = App.globalContext;
-          // must be unawaited so that callback finished even if dialog context dropped
           if (context.mounted) {
+            // must be unawaited so that callback finished even if dialog context dropped
             unawaited(
               showMessageDialog(
                 context: context,
@@ -126,7 +126,6 @@ class Sync extends ChangeNotifier {
     Movement.defaultMovement ??= await MovementDataProvider().getById(Int64(1));
     MetconDescription.defaultMetconDescription ??=
         await MetconDescriptionDataProvider().getById(Int64(1));
-    return;
   }
 
   void stopSync() {

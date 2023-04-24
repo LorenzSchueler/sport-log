@@ -79,7 +79,7 @@ class _ActionEventEditPageState extends State<ActionEventEditPage> {
             ),
           ],
         ),
-        body: Container(
+        body: Padding(
           padding: Defaults.edgeInsets.normal,
           child: ListView(
             children: [

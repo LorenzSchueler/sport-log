@@ -99,7 +99,7 @@ class StrengthSessionsPage extends StatelessWidget {
               SyncRefreshIndicator(
                 child: dataProvider.entities.isEmpty
                     ? SessionsPageTab.strength.noEntriesText
-                    : Container(
+                    : Padding(
                         padding: Defaults.edgeInsets.normal,
                         child: Column(
                           children: [

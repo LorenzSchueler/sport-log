@@ -18,7 +18,7 @@ class HeartRatePage extends StatelessWidget {
       child: Scaffold(
         appBar: AppBar(title: const Text("Heart Rate")),
         drawer: const MainDrawer(selectedRoute: Routes.heartRate),
-        body: Container(
+        body: Padding(
           padding: Defaults.edgeInsets.normal,
           child: Center(
             child: ProviderConsumer<HeartRateUtils>(
