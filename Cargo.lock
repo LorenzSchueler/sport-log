@@ -1685,14 +1685,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "sport-log-api-tester"
-version = "0.1.0"
-dependencies = [
- "reqwest",
- "serde_json",
-]
-
-[[package]]
 name = "sport-log-password-hasher"
 version = "0.1.0"
 dependencies = [
