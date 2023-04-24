@@ -38,55 +38,47 @@ class _NewCredentialsDialogState extends State<NewCredentialsDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return Dialog(
+    return AlertDialog(
       clipBehavior: Clip.antiAlias,
-      child: Padding(
-        padding: Defaults.edgeInsets.normal,
+      title: const Text("Update Credentials"),
+      content: Form(
+        key: _formKey,
         child: Column(
           mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              "Looks like you changed your credentials on another device.\nPlease update them below!",
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
+            const Text("Looks like you changed your credentials."),
             Defaults.sizedBox.vertical.big,
-            Form(
-              key: _formKey,
-              child: Column(
-                children: [
-                  _usernameInput(context),
-                  Defaults.sizedBox.vertical.normal,
-                  _passwordInput(context),
-                  Defaults.sizedBox.vertical.normal,
-                  Row(
-                    children: [
-                      ElevatedButton(
-                        onPressed: Navigator.of(context).pop,
-                        child: const Text("Ignore"),
-                      ),
-                      const Spacer(),
-                      if (_loginPending)
-                        Container(
-                          margin: const EdgeInsets.only(right: 20),
-                          child: const CircularProgressIndicator(),
-                        ),
-                      _submitButton(context),
-                    ],
-                  )
-                ],
-              ),
+            _usernameInput(),
+            Defaults.sizedBox.vertical.normal,
+            _passwordInput(),
+            Defaults.sizedBox.vertical.normal,
+            Row(
+              children: [
+                ElevatedButton(
+                  onPressed: Navigator.of(context).pop,
+                  child: const Text("Ignore"),
+                ),
+                const Spacer(),
+                if (_loginPending)
+                  Container(
+                    margin: const EdgeInsets.only(right: 20),
+                    child: const CircularProgressIndicator(),
+                  ),
+                _submitButton(),
+              ],
             ),
-            Defaults.sizedBox.vertical.big,
-            if (_errorMessage != null) Text(_errorMessage!)
+            if (_errorMessage != null) ...[
+              Defaults.sizedBox.vertical.big,
+              Text(_errorMessage!)
+            ]
           ],
         ),
       ),
     );
   }
 
-  Widget _usernameInput(
-    BuildContext context,
-  ) {
+  Widget _usernameInput() {
     return TextFormField(
       onChanged: (username) {
         final validated = Validator.validateUsername(username);
@@ -109,9 +101,7 @@ class _NewCredentialsDialogState extends State<NewCredentialsDialog> {
     );
   }
 
-  Widget _passwordInput(
-    BuildContext context,
-  ) {
+  Widget _passwordInput() {
     return TextFormField(
       onChanged: (password) {
         final validated = Validator.validatePassword(password);
@@ -134,20 +124,18 @@ class _NewCredentialsDialogState extends State<NewCredentialsDialog> {
     );
   }
 
-  Widget _submitButton(
-    BuildContext context,
-  ) {
+  Widget _submitButton() {
     return ElevatedButton(
       onPressed: (!_loginPending &&
               _formKey.currentContext != null &&
               _formKey.currentState!.validate())
-          ? () => _submit(context)
+          ? _submit
           : null,
       child: const Text("Update"),
     );
   }
 
-  Future<void> _submit(BuildContext context) async {
+  Future<void> _submit() async {
     setState(() => _loginPending = true);
     final result = await Account.login(
       context.read<Settings>().serverUrl,
