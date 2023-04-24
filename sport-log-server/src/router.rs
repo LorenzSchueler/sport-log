@@ -193,18 +193,6 @@ pub fn get_router(state: AppState) -> Router {
                 ),
         );
 
-    //.layer(
-    //ServiceBuilder::new()
-    //.layer(
-    //CorsLayer::new()
-    //.allow_credentials(true)
-    //.allow_headers(Any)
-    //.allow_methods(Any)
-    //.allow_origin(Any)
-    //.max_age(Duration::from_secs(864000)),
-    //),
-    //);
-
     Router::new()
         .route(VERSION, get(get_version))
         .nest(
@@ -220,7 +208,6 @@ pub fn get_router(state: AppState) -> Router {
                 .layer(trace_layer)
                 .layer(DefaultBodyLimit::max(5 * 1024 * 1024))
                 .layer(CompressionLayer::new()),
-            //.layer(RequestDecompressionLayer::new()) // TODO
         )
         .with_state(state)
 }
