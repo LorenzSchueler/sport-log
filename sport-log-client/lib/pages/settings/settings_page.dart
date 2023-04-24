@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:sport_log/app.dart';
 import 'package:sport_log/data_provider/sync.dart';
 import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/defaults.dart';
@@ -141,8 +142,9 @@ class SettingsPage extends StatelessWidget {
     );
     if (approved) {
       await Account.logout();
+      final context = App.globalContext; // other context is no longer mounted
       if (context.mounted) {
-        await Navigator.of(context).newBase(Routes.landing);
+        await Navigator.of(App.globalContext).newBase(Routes.landing);
       }
     }
   }
@@ -155,6 +157,7 @@ class SettingsPage extends StatelessWidget {
     );
     if (approved) {
       final result = await Account.delete();
+      final context = App.globalContext; // other context is no longer mounted
       if (context.mounted) {
         if (result.isFailure) {
           await showMessageDialog(
@@ -173,9 +176,7 @@ class SettingsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return NeverPop(
       child: Scaffold(
-        appBar: AppBar(
-          title: const Text("Settings"),
-        ),
+        appBar: AppBar(title: const Text("Settings")),
         body: Container(
           padding: Defaults.edgeInsets.normal,
           child: Consumer<Settings>(

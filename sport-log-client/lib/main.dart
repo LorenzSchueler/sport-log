@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:provider/provider.dart';
 import 'package:sport_log/app.dart';
 import 'package:sport_log/config.dart';
 import 'package:sport_log/data_provider/sync.dart';
@@ -77,13 +76,7 @@ class InitAppWrapperState extends State<InitAppWrapper> {
   @override
   Widget build(BuildContext context) {
     return _progress == null
-        ? MultiProvider(
-            providers: [
-              ChangeNotifierProvider<Sync>.value(value: Sync.instance),
-              ChangeNotifierProvider<Settings>.value(value: Settings.instance),
-            ],
-            child: const App(),
-          )
+        ? const App()
         : MaterialApp(
             debugShowCheckedModeBanner: false,
             theme: AppTheme.lightTheme,
