@@ -9,9 +9,9 @@
 
 ## Setup
 
-1. install postgresql: 
+1. install postgresql, argon2 and pwgen: 
     ```bash
-    apt install libpq-dev postgresql-client-common postgresql
+    apt install libpq-dev postgresql-client-common postgresql argon2 pwgen
     ```
 1. create db user: 
     ```bash
@@ -33,8 +33,11 @@
     ```bash
     cp sport-log-server.toml.template sport-log-server.toml
     ```
-1. generate admin password with [sport-log-password-hasher](../sport-log-password-hasher)
-1. edit *sport-log-server.toml* and set new admin password
+1. hash admin password
+    ```bash
+    argon2 $(pwgen 16 1) -id -e
+    ```
+1. edit *sport-log-server.toml* and set new admin password hash
 1. (optional) enable password auth for Unix Domain Socket connections (for psql): 
     *   add entry 
         ```text
@@ -151,8 +154,6 @@ refer to [synchronization](../SYNCHRONIZATION.md)
 ## Reset User Password
 
 ```sh
-# install argon2 and pwgen
-sudo apt install argon2 pwgen
 # generate password hash - be careful not to add a newline at the end of the password
 argon2 $(pwgen 16 1) -id -e
 # log in to postgres

@@ -1685,14 +1685,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "sport-log-password-hasher"
-version = "0.1.0"
-dependencies = [
- "argon2",
- "rand_core",
-]
-
-[[package]]
 name = "sport-log-scheduler"
 version = "0.1.0"
 dependencies = [

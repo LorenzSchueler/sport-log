@@ -35,7 +35,6 @@ The server and action providers as well as helper tools and libraries are struct
 - [**sport-log-types-derive**](sport-log-types-derive) macros for types
 - [**sport-log-server**](sport-log-server) central server backend
 - [**sport-log-scheduler**](sport-log-scheduler) responsible for creating action events from action rules and deleting old action events
-- [**sport-log-password-hasher**](sport-log-password-hasher) hash passwords and verify hashes and passwords that can be stored in the server backend
 - [**sport-log-ap-utils**](sport-log-ap-utils) helper functions for rust action providers
 - [**sport-log-action-provider-sportstracker**](sport-log-action-provider-sportstracker) fetches new cardio sessions from sportstracker
 - [**sport-log-action-provider-wodify-login**](sport-log-action-provider-wodify-login) reserves spots in crossfit classes
