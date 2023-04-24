@@ -147,3 +147,57 @@ postgres=# \password sport_admin
 ## Client Server Synchronization
 
 refer to [synchronization](../SYNCHRONIZATION.md)
+
+## REST API Example
+
+```sh
+# get supported api versions
+curl 'http://localhost:8001/version' | jq
+# get movement with id 1
+curl -u user:passwd 'http://localhost:8001/v0.3/movement?id=1' | jq
+# get all movements
+curl -u user:passwd 'http://localhost:8001/v0.3/movement' | jq
+# create new movement
+curl -u user:passwd -X POST 'http://localhost:8001/v0.3/movement' \
+    -H 'Accept: application/json' \
+    -H 'Content-Type: application/json' \
+    -d '
+    {
+        "id":"1000",
+        "user_id":"1",
+        "name":"MyNewMovement",
+        "description":null,
+        "movement_dimension":"Distance",
+        "cardio":true,
+        "deleted":false
+    }'
+# change movement
+curl -u user:passwd -X PUT 'http://localhost:8001/v0.3/movement' \
+    -H 'Accept: application/json' \
+    -H 'Content-Type: application/json' \
+    -d '
+    {
+        "id":"1000",
+        "user_id":"1",
+        "name":"MyMovement",
+        "description":null,
+        "movement_dimension":"Distance",
+        "cardio":true,
+        "deleted":false
+    }'
+# (soft) delete movement (set deleted to true)
+curl -u user:passwd -X PUT 'http://localhost:8001/v0.3/movement' \
+    -H 'Accept: application/json' \
+    -H 'Content-Type: application/json' \
+    -d '
+    {
+        "id":"1000",
+        "user_id":"1",
+        "name":"MyMovement",
+        "description":null,
+        "movement_dimension":"Distance",
+        "cardio":true,
+        "deleted":true
+    }'
+
+```
