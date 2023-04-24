@@ -49,43 +49,36 @@ class _LoginPageState extends State<LoginPage> {
       appBar: AppBar(
         title: Text(widget.loginType.isRegister ? "Register" : "Login"),
       ),
-      body: Container(
+      body: Padding(
         padding: Defaults.edgeInsets.normal,
-        child: Center(
-          child: Form(
-            key: _formKey,
-            child: ListView(
-              shrinkWrap: true,
-              children: [
-                _serverUrlInput(context),
+        child: Form(
+          key: _formKey,
+          child: ListView(
+            shrinkWrap: true,
+            children: [
+              _serverUrlInput(),
+              Defaults.sizedBox.vertical.normal,
+              _usernameInput(),
+              Defaults.sizedBox.vertical.normal,
+              _passwordInput(),
+              Defaults.sizedBox.vertical.normal,
+              if (widget.loginType.isRegister) ...[
+                _passwordInput2(),
                 Defaults.sizedBox.vertical.normal,
-                _usernameInput(context),
+                _emailInput(),
                 Defaults.sizedBox.vertical.normal,
-                _passwordInput(context),
-                Defaults.sizedBox.vertical.normal,
-                if (widget.loginType.isRegister) ...[
-                  _passwordInput2(context),
-                  Defaults.sizedBox.vertical.normal,
-                  _emailInput(context),
-                  Defaults.sizedBox.vertical.normal,
-                ],
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    _loginPending
-                        ? const CircularProgressIndicator()
-                        : _submitButton(context),
-                  ],
-                )
               ],
-            ),
+              _loginPending
+                  ? const Align(child: CircularProgressIndicator())
+                  : _submitButton(),
+            ],
           ),
         ),
       ),
     );
   }
 
-  Widget _serverUrlInput(BuildContext context) {
+  Widget _serverUrlInput() {
     return TextFormField(
       // use new initialValue if url changed
       key: ValueKey(_serverUrl),
@@ -118,7 +111,7 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _usernameInput(BuildContext context) {
+  Widget _usernameInput() {
     return TextFormField(
       onChanged: (username) {
         final validated = Validator.validateUsername(username);
@@ -140,7 +133,7 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _passwordInput(BuildContext context) {
+  Widget _passwordInput() {
     return TextFormField(
       onChanged: (password) {
         final validated = Validator.validatePassword(password);
@@ -165,7 +158,7 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _passwordInput2(BuildContext context) {
+  Widget _passwordInput2() {
     return TextFormField(
       decoration: Theme.of(context).textFormFieldDecoration.copyWith(
             icon: const Icon(AppIcons.key),
@@ -183,7 +176,7 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _emailInput(BuildContext context) {
+  Widget _emailInput() {
     return TextFormField(
       onChanged: (email) {
         final validated = Validator.validateEmail(email);
@@ -206,18 +199,18 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _submitButton(BuildContext context) {
+  Widget _submitButton() {
     return ElevatedButton(
       onPressed: (!_loginPending &&
               _formKey.currentContext != null &&
               _formKey.currentState!.validate())
-          ? () => _submit(context)
+          ? _submit
           : null,
       child: Text(widget.loginType.isRegister ? "Register" : "Login"),
     );
   }
 
-  Future<void> _submit(BuildContext context) async {
+  Future<void> _submit() async {
     setState(() => _loginPending = true);
     final result = widget.loginType.isRegister
         ? await Account.register(_serverUrl, _user)
