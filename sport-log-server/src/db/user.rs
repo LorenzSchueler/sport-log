@@ -1,4 +1,7 @@
-use argon2::password_hash::{PasswordHash, PasswordHasher, PasswordVerifier, SaltString};
+use argon2::{
+    password_hash::{PasswordHash, PasswordHasher, SaltString},
+    Argon2, PasswordVerifier,
+};
 use axum::http::StatusCode;
 use chrono::{DateTime, Utc};
 use diesel::{prelude::*, result::Error};
@@ -18,7 +21,7 @@ impl UserDb {
         db: &mut PgConnection,
     ) -> QueryResult<usize> {
         let salt = SaltString::generate(&mut OsRng);
-        user.password = build_hasher()?
+        user.password = Argon2::default()
             .hash_password(user.password.as_bytes(), &salt)
             .map_err(|_| Error::RollbackTransaction)? // this should not happen but prevents panic
             .to_string();
@@ -32,7 +35,7 @@ impl UserDb {
     ) -> QueryResult<usize> {
         for user in &mut *users {
             let salt = SaltString::generate(&mut OsRng);
-            user.password = build_hasher()?
+            user.password = Argon2::default()
                 .hash_password(user.password.as_bytes(), &salt)
                 .map_err(|_| Error::RollbackTransaction)? // this should not happen but prevents panic
                 .to_string();
@@ -49,7 +52,7 @@ impl UserDb {
         db: &mut PgConnection,
     ) -> QueryResult<usize> {
         let salt = SaltString::generate(&mut OsRng);
-        user.password = build_hasher()?
+        user.password = Argon2::default()
             .hash_password(user.password.as_bytes(), &salt)
             .map_err(|_| Error::RollbackTransaction)? // this should not happen but prevents panic
             .to_string();
@@ -88,7 +91,7 @@ impl UserDb {
 
         let password_hash = PasswordHash::new(password_hash.as_str())
             .expect("invalid password hash stored in database");
-        if build_hasher()?
+        if Argon2::default()
             .verify_password(password.as_bytes(), &password_hash)
             .is_ok()
         {

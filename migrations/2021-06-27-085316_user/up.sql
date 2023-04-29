@@ -1,7 +1,7 @@
 create table "user" (
     id bigint primary key,
     username varchar(80) not null check (length(username) >= 2),
-    password char(96) not null,
+    password varchar(120) not null,
     email varchar(80) not null check (length(email) >= 5),
     last_change timestamptz not null default now()
 );

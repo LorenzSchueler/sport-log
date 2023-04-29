@@ -3,7 +3,7 @@ create type weekday as enum('monday', 'tuesday', 'wednesday', 'thursday', 'frida
 create table action_provider (
     id bigint primary key,
     name varchar(80) not null check (length(name) >= 2),
-    password char(96) not null,
+    password varchar(120) not null,
     platform_id bigint not null references platform on delete cascade,
     description text,
     last_change timestamptz not null default now(),

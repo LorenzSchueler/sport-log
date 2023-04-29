@@ -62,7 +62,7 @@ diesel::table! {
     action_provider (id) {
         id -> Int8,
         name -> Varchar,
-        password -> Bpchar,
+        password -> Varchar,
         platform_id -> Int8,
         description -> Nullable<Text>,
         last_change -> Timestamptz,
@@ -464,7 +464,7 @@ diesel::table! {
     user (id) {
         id -> Int8,
         username -> Varchar,
-        password -> Bpchar,
+        password -> Varchar,
         email -> Varchar,
         last_change -> Timestamptz,
     }
