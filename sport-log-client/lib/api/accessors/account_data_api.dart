@@ -1,8 +1,6 @@
 import 'package:http/http.dart';
 import 'package:sport_log/api/api.dart';
-import 'package:sport_log/config.dart';
 import 'package:sport_log/models/account_data/account_data.dart';
-import 'package:sport_log/settings.dart';
 
 class AccountDataApi {
   factory AccountDataApi() => _instance;
@@ -15,9 +13,7 @@ class AccountDataApi {
       ? '/account_data'
       : '/account_data?last_sync=${dateTime.toUtc().toIso8601String()}';
 
-  Uri _uri(DateTime? dateTime) => Uri.parse(
-        "${Settings.instance.serverUrl}/v${Config.apiVersion}${_route(dateTime)}",
-      );
+  Uri _uri(DateTime? dateTime) => Api.uriFromRoute(_route(dateTime));
 
   Future<ApiResult<AccountData>> get(DateTime? lastSync) =>
       (Request("get", _uri(lastSync))..headers.addAll(ApiHeaders.basicAuth))

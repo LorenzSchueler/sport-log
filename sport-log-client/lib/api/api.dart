@@ -187,8 +187,9 @@ abstract class Api<T extends JsonSerializable> {
   /// everything after version, e. g. '/user'
   String get route;
 
-  Uri get _uri =>
+  static Uri uriFromRoute(String route) =>
       Uri.parse("${Settings.instance.serverUrl}/v${Config.apiVersion}$route");
+  Uri get _uri => uriFromRoute(route);
   Map<String, dynamic> _toJson(T object) => object.toJson();
 
   Future<ApiResult<T>> getSingle(Int64 id) =>
