@@ -75,7 +75,10 @@ enum ApiErrorType {
 }
 
 class ApiError {
-  ApiError(this.errorType, this.errorCode, [this.message]);
+  ApiError(this.errorType, this.errorCode, [Object? jsonMessage])
+      : message = jsonMessage != null
+            ? HandlerError.fromJson(jsonMessage as Map<String, dynamic>).message
+            : null;
 
   final ApiErrorType errorType;
   final int? errorCode;
@@ -94,12 +97,7 @@ class ApiError {
 typedef ApiResult<T> = Result<T, ApiError>;
 
 extension _ToApiResult on StreamedResponse {
-  ErrorMessage? _errorMessage(Object? json) => json != null
-      ? HandlerError.fromJson(json as Map<String, dynamic>).message
-      : null;
-
-  // ignore: long-method
-  Future<ApiResult<T?>> _mapToApiResult<T>(T Function(Object)? fromJson) async {
+  Future<ApiResult<T?>> toApiResult<T>(T Function(Object)? fromJson) async {
     // steam can be read only once
     final rawBody = utf8.decode(await stream.toBytes());
     final json = rawBody.isEmpty ? null : jsonDecode(rawBody) as Object;
@@ -120,52 +118,33 @@ extension _ToApiResult on StreamedResponse {
             : Failure(ApiError(ApiErrorType.badJson, statusCode));
       case 400:
         return Failure(
-          ApiError(ApiErrorType.badRequest, statusCode, _errorMessage(json)),
+          ApiError(ApiErrorType.badRequest, statusCode, json),
         );
       case 401:
         return Failure(
-          ApiError(ApiErrorType.unauthorized, statusCode, _errorMessage(json)),
+          ApiError(ApiErrorType.unauthorized, statusCode, json),
         );
       case 403:
         return Failure(
-          ApiError(ApiErrorType.forbidden, statusCode, _errorMessage(json)),
+          ApiError(ApiErrorType.forbidden, statusCode, json),
         );
       case 404:
         return Failure(
-          ApiError(ApiErrorType.notFound, statusCode, _errorMessage(json)),
+          ApiError(ApiErrorType.notFound, statusCode, json),
         );
       case 409:
         return Failure(
-          ApiError(ApiErrorType.conflict, statusCode, _errorMessage(json)),
+          ApiError(ApiErrorType.conflict, statusCode, json),
         );
       case 500:
         return Failure(
-          ApiError(
-            ApiErrorType.internalServerError,
-            statusCode,
-            _errorMessage(json),
-          ),
+          ApiError(ApiErrorType.internalServerError, statusCode, json),
         );
       default:
         return Failure(
-          ApiError(
-            ApiErrorType.unknownServerError,
-            statusCode,
-            _errorMessage(json),
-          ),
+          ApiError(ApiErrorType.unknownServerError, statusCode, json),
         );
     }
-  }
-
-  Future<ApiResult<void>> toApiResult() => _mapToApiResult(null);
-
-  Future<ApiResult<T>> toApiResultWithValue<T>(
-    T Function(Object) fromJson,
-  ) async {
-    final result = await _mapToApiResult(fromJson);
-    return result.isSuccess
-        ? Success(result.success as T)
-        : Failure(result.failure);
   }
 }
 
@@ -191,14 +170,17 @@ extension RequestExtension on Request {
   Future<ApiResult<void>> toApiResult() => _handleError(() async {
         _logRequest(this);
         final response = await _client.send(this);
-        return response.toApiResult();
+        return response.toApiResult(null);
       });
 
   Future<ApiResult<T>> toApiResultWithValue<T>(T Function(Object) fromJson) =>
       _handleError(() async {
         _logRequest(this);
         final response = await _client.send(this);
-        return response.toApiResultWithValue(fromJson);
+        final result = await response.toApiResult(fromJson);
+        return result.isSuccess
+            ? Success(result.success as T)
+            : Failure(result.failure);
       });
 }
 
