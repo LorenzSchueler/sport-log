@@ -49,6 +49,12 @@
         sudo service postgresql reload
         ```
 
+## Run server
+
+```bash
+cargo run --release
+```
+
 ## Connect to database with psql
 
 ```bash
@@ -61,24 +67,23 @@ psql -h localhost -U sport_admin -d sport_log
 pg_dump --dbname=postgres://sport_admin:<password>@localhost/sport_log --data-only --inserts > sport-log_$(date +%Y-%m-%d).dump.sql
 ```
 
-## Run server in debug mode
-
-```bash
-cargo run
-```
-
-## Update DB Schema
-
-```bash
-cd ../sport-log-types && diesel database reset --locked-schema && cd ../sport-log-server
-```
-
 ## Change database password
 
 ```bash
 sudo -u postgres psql
 postgres=# \password sport_admin
 ```
+
+## Update DB Schema
+
+```bash
+# update database by hand and only update schema.rs
+diesel print-schema > sport-log-types/src/schema.rs
+# OR
+# recreate database with new schema
+cd ../sport-log-types && diesel database reset --locked-schema && cd ../sport-log-server
+```
+
 
 ## SystemD Setup for deployment
 ### Setup 
