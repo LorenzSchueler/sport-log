@@ -17,6 +17,7 @@ use flate2::write::GzDecoder;
 use hyper::{body, header::CONTENT_ENCODING};
 use mime::APPLICATION_JSON;
 use rand::Rng;
+use serde::de::DeserializeOwned;
 use sport_log_types::{
     uri::{
         route_max_version, ACCOUNT_DATA, ADM_PLATFORM, AP_ACTION_PROVIDER, AP_PLATFORM, DIARY, USER,
@@ -149,6 +150,7 @@ fn auth_as_headers(username: &str, id: i64, password: &str) -> [(HeaderName, Str
 }
 
 fn assert_json(response: &Response) {
+    assert!(response.headers().contains_key(CONTENT_TYPE));
     assert_eq!(
         response.headers().get(CONTENT_TYPE).unwrap(),
         APPLICATION_JSON.as_ref(),
@@ -160,6 +162,22 @@ where
     B: HttpBody + Send + 'static,
 {
     router.ready().await.unwrap().call(request).await.unwrap()
+}
+
+async fn parse_body<T: DeserializeOwned>(response: Response) -> T {
+    let bytes = body::to_bytes(response.into_body()).await.unwrap();
+    let data = std::str::from_utf8(&bytes).unwrap();
+    serde_json::from_str(data).unwrap()
+}
+
+async fn parse_gzip_body<T: DeserializeOwned>(response: Response) -> T {
+    let bytes = body::to_bytes(response.into_body()).await.unwrap();
+    let mut decoded = Vec::new();
+    let mut decoder = GzDecoder::new(decoded);
+    decoder.write_all(&bytes).unwrap();
+    decoded = decoder.finish().unwrap();
+    let data = std::str::from_utf8(&decoded).unwrap();
+    serde_json::from_str(data).unwrap()
 }
 
 /// Use a get request to make sure that the authentication succeeds.
@@ -704,6 +722,10 @@ async fn own_get() {
     .await;
 
     assert_eq!(response.status(), StatusCode::OK);
+    assert_json(&response);
+    let diary: Vec<Diary> = parse_body(response).await;
+    assert_eq!(diary.len(), 1);
+    assert_eq!(diary[0].id, TEST_DIARY.id);
 }
 
 #[tokio::test]
@@ -729,19 +751,13 @@ async fn own_get_gzip() {
     .await;
 
     assert_eq!(response.status(), StatusCode::OK);
+    assert_json(&response);
     assert!(response.headers().contains_key(CONTENT_ENCODING));
     assert_eq!(
         response.headers().get(CONTENT_ENCODING),
         Some(&HeaderValue::from_static("gzip"))
     );
-
-    let bytes = body::to_bytes(response.into_body()).await.unwrap().to_vec();
-    let mut decoded = Vec::new();
-    let mut decoder = GzDecoder::new(decoded);
-    decoder.write_all(&bytes[..]).unwrap();
-    decoded = decoder.finish().unwrap();
-    let data = String::from_utf8(decoded).unwrap();
-    let diary: Vec<Diary> = serde_json::from_str(&data).unwrap();
+    let diary: Vec<Diary> = parse_gzip_body(response).await;
     assert_eq!(diary.len(), 1);
     assert_eq!(diary[0].id, TEST_DIARY.id);
 }
@@ -866,9 +882,7 @@ async fn get_account_data() {
         .await;
 
         let status = response.status();
-        let data = String::from_utf8(body::to_bytes(response.into_body()).await.unwrap().to_vec())
-            .unwrap();
-        let account_data = serde_json::from_str(&data).unwrap();
+        let account_data = parse_body(response).await;
         (status, account_data)
     }
 
