@@ -4,6 +4,12 @@ import 'package:sport_log/database/table_accessor.dart';
 import 'package:sport_log/models/all.dart';
 
 class MovementTable extends TableAccessor<Movement> {
+  factory MovementTable() => _instance;
+
+  MovementTable._();
+
+  static final _instance = MovementTable._();
+
   @override
   DbSerializer<Movement> get serde => DbMovementSerializer();
 
@@ -55,12 +61,18 @@ class MovementTable extends TableAccessor<Movement> {
 }
 
 class MovementDescriptionTable {
+  factory MovementDescriptionTable() => _instance;
+
+  MovementDescriptionTable._();
+
+  static final _instance = MovementDescriptionTable._();
+
   Future<List<MovementDescription>> getNonDeleted() async {
     const hasReference = 'has_reference';
     final records = await AppDatabase.database!.rawQuery(
       '''
       SELECT
-        ${AppDatabase.movements.table.allColumns},
+        ${MovementTable().table.allColumns},
         (
           EXISTS (
             SELECT * FROM ${Tables.metconMovement}
@@ -93,8 +105,9 @@ class MovementDescriptionTable {
     return records
         .map(
           (r) => MovementDescription(
-            movement: AppDatabase.movements.serde
-                .fromDbRecord(r, prefix: AppDatabase.movements.table.prefix),
+            movement: MovementTable()
+                .serde
+                .fromDbRecord(r, prefix: MovementTable().table.prefix),
             hasReference: r[hasReference]! as int == 1,
           ),
         )
@@ -109,7 +122,7 @@ class MovementDescriptionTable {
     final records = await AppDatabase.database!.rawQuery(
       '''
       SELECT
-        ${AppDatabase.movements.table.allColumns},
+        ${MovementTable().table.allColumns},
         (
           EXISTS (
             SELECT * FROM ${Tables.metconMovement}
@@ -144,8 +157,9 @@ class MovementDescriptionTable {
     return records
         .map(
           (r) => MovementDescription(
-            movement: AppDatabase.movements.serde
-                .fromDbRecord(r, prefix: AppDatabase.movements.table.prefix),
+            movement: MovementTable()
+                .serde
+                .fromDbRecord(r, prefix: MovementTable().table.prefix),
             hasReference: r[hasReference]! as int == 1,
           ),
         )

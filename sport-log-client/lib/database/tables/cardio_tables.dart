@@ -6,6 +6,12 @@ import 'package:sport_log/models/cardio/all.dart';
 import 'package:sport_log/models/movement/movement.dart';
 
 class RouteTable extends TableAccessor<Route> {
+  factory RouteTable() => _instance;
+
+  RouteTable._();
+
+  static final _instance = RouteTable._();
+
   @override
   DbSerializer<Route> get serde => DbRouteSerializer();
 
@@ -47,6 +53,12 @@ class RouteTable extends TableAccessor<Route> {
 }
 
 class CardioSessionTable extends TableAccessor<CardioSession> {
+  factory CardioSessionTable() => _instance;
+
+  CardioSessionTable._();
+
+  static final _instance = CardioSessionTable._();
+
   @override
   DbSerializer<CardioSession> get serde => DbCardioSessionSerializer();
 
@@ -113,10 +125,15 @@ class CardioSessionTable extends TableAccessor<CardioSession> {
 }
 
 class CardioSessionDescriptionTable {
-  static CardioSessionTable get _cardioSessionTable =>
-      AppDatabase.cardioSessions;
-  static RouteTable get _routeTable => AppDatabase.routes;
-  static MovementTable get _movementTable => AppDatabase.movements;
+  factory CardioSessionDescriptionTable() => _instance;
+
+  CardioSessionDescriptionTable._();
+
+  static final _instance = CardioSessionDescriptionTable._();
+
+  static final CardioSessionTable _cardioSessionTable = CardioSessionTable();
+  static final RouteTable _routeTable = RouteTable();
+  static final MovementTable _movementTable = MovementTable();
 
   Future<List<CardioSessionDescription>> getByTimerangeAndMovementAndComment({
     DateTime? from,

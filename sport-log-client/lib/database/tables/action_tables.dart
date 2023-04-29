@@ -4,6 +4,12 @@ import 'package:sport_log/models/action/all.dart';
 import 'package:sport_log/models/platform/platform.dart';
 
 class ActionTable extends TableAccessor<Action> {
+  factory ActionTable() => _instance;
+
+  ActionTable._();
+
+  static final _instance = ActionTable._();
+
   @override
   DbSerializer<Action> get serde => DbActionSerializer();
 
@@ -45,6 +51,12 @@ class ActionTable extends TableAccessor<Action> {
 }
 
 class ActionEventTable extends TableAccessor<ActionEvent> {
+  factory ActionEventTable() => _instance;
+
+  ActionEventTable._();
+
+  static final _instance = ActionEventTable._();
+
   @override
   DbSerializer<ActionEvent> get serde => DbActionEventSerializer();
 
@@ -89,6 +101,12 @@ class ActionEventTable extends TableAccessor<ActionEvent> {
 }
 
 class ActionRuleTable extends TableAccessor<ActionRule> {
+  factory ActionRuleTable() => _instance;
+
+  ActionRuleTable._();
+
+  static final _instance = ActionRuleTable._();
+
   @override
   DbSerializer<ActionRule> get serde => DbActionRuleSerializer();
 
@@ -134,6 +152,12 @@ class ActionRuleTable extends TableAccessor<ActionRule> {
 }
 
 class ActionProviderTable extends TableAccessor<ActionProvider> {
+  factory ActionProviderTable() => _instance;
+
+  ActionProviderTable._();
+
+  static final _instance = ActionProviderTable._();
+
   @override
   DbSerializer<ActionProvider> get serde => DbActionProviderSerializer();
 

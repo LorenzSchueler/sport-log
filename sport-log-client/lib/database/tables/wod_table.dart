@@ -3,6 +3,12 @@ import 'package:sport_log/database/table_accessor.dart';
 import 'package:sport_log/models/wod/wod.dart';
 
 class WodTable extends TableAccessor<Wod> {
+  factory WodTable() => _instance;
+
+  WodTable._();
+
+  static final _instance = WodTable._();
+
   @override
   DbSerializer<Wod> get serde => DbWodSerializer();
 

@@ -2,7 +2,7 @@ import 'package:sport_log/api/accessors/movement_api.dart';
 import 'package:sport_log/api/api.dart';
 import 'package:sport_log/data_provider/data_provider.dart';
 import 'package:sport_log/database/database.dart';
-import 'package:sport_log/database/tables/all.dart';
+import 'package:sport_log/database/tables/movement_table.dart';
 import 'package:sport_log/helpers/extensions/sort_extension.dart';
 import 'package:sport_log/models/account_data/account_data.dart';
 import 'package:sport_log/models/movement/all.dart';
@@ -18,7 +18,7 @@ class MovementDataProvider extends EntityDataProvider<Movement> {
   final Api<Movement> api = MovementApi();
 
   @override
-  final MovementTable db = AppDatabase.movements;
+  final MovementTable table = MovementTable();
 
   @override
   List<Movement> getFromAccountData(AccountData accountData) =>
@@ -29,7 +29,7 @@ class MovementDataProvider extends EntityDataProvider<Movement> {
     bool cardioOnly = false,
     bool distanceOnly = false,
   }) async {
-    return (await db.getByCardioAndDistance(
+    return (await table.getByCardioAndDistance(
       cardioOnly: cardioOnly,
       distanceOnly: distanceOnly,
     ))

@@ -6,16 +6,13 @@ import 'package:sport_log/database/tables/movement_table.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/strength/strength_records.dart';
 
-class StrengthSessionAndMovement {
-  StrengthSessionAndMovement({
-    required this.session,
-    required this.movement,
-  });
-  StrengthSession session;
-  Movement movement;
-}
-
 class StrengthSessionTable extends TableAccessor<StrengthSession> {
+  factory StrengthSessionTable() => _instance;
+
+  StrengthSessionTable._();
+
+  static final _instance = StrengthSessionTable._();
+
   @override
   DbSerializer<StrengthSession> get serde => DbStrengthSessionSerializer();
 
@@ -55,6 +52,12 @@ class StrengthSessionTable extends TableAccessor<StrengthSession> {
 }
 
 class StrengthSetTable extends TableAccessor<StrengthSet> {
+  factory StrengthSetTable() => _instance;
+
+  StrengthSetTable._();
+
+  static final _instance = StrengthSetTable._();
+
   @override
   DbSerializer<StrengthSet> get serde => DbStrengthSetSerializer();
 
@@ -125,11 +128,16 @@ class StrengthSetTable extends TableAccessor<StrengthSet> {
 }
 
 class StrengthSessionDescriptionTable {
-  static StrengthSessionTable get _strengthSessionTable =>
-      AppDatabase.strengthSessions;
+  factory StrengthSessionDescriptionTable() => _instance;
 
-  static MovementTable get _movementTable => AppDatabase.movements;
-  static StrengthSetTable get _strengthSetTable => AppDatabase.strengthSets;
+  StrengthSessionDescriptionTable._();
+
+  static final _instance = StrengthSessionDescriptionTable._();
+
+  static final StrengthSessionTable _strengthSessionTable =
+      StrengthSessionTable();
+  static final MovementTable _movementTable = MovementTable();
+  static final StrengthSetTable _strengthSetTable = StrengthSetTable();
 
   Future<StrengthSessionDescription?> getById(Int64 idValue) async {
     final records = await AppDatabase.database!.rawQuery(

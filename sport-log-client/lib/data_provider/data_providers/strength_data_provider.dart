@@ -4,7 +4,6 @@ import 'package:sport_log/api/api.dart';
 import 'package:sport_log/data_provider/data_provider.dart';
 import 'package:sport_log/data_provider/data_providers/movement_data_provider.dart';
 import 'package:sport_log/database/database.dart';
-import 'package:sport_log/database/table_accessor.dart';
 import 'package:sport_log/database/tables/strength_tables.dart';
 import 'package:sport_log/helpers/diff_algorithm.dart';
 import 'package:sport_log/models/account_data/account_data.dart';
@@ -23,7 +22,7 @@ class StrengthSessionDataProvider extends EntityDataProvider<StrengthSession> {
   final Api<StrengthSession> api = StrengthSessionApi();
 
   @override
-  final TableAccessor<StrengthSession> db = AppDatabase.strengthSessions;
+  final StrengthSessionTable table = StrengthSessionTable();
 
   @override
   List<StrengthSession> getFromAccountData(AccountData accountData) =>
@@ -41,7 +40,7 @@ class StrengthSetDataProvider extends EntityDataProvider<StrengthSet> {
   final Api<StrengthSet> api = StrengthSetApi();
 
   @override
-  final StrengthSetTable db = AppDatabase.strengthSets;
+  final StrengthSetTable table = StrengthSetTable();
 
   @override
   List<StrengthSet> getFromAccountData(AccountData accountData) =>
@@ -50,9 +49,9 @@ class StrengthSetDataProvider extends EntityDataProvider<StrengthSet> {
   Future<List<StrengthSet>> getByStrengthSession(
     StrengthSession strengthSession,
   ) =>
-      db.getByStrengthSession(strengthSession);
+      table.getByStrengthSession(strengthSession);
 
-  Future<StrengthRecords> getStrengthRecords() => db.getStrengthRecords();
+  Future<StrengthRecords> getStrengthRecords() => table.getStrengthRecords();
 }
 
 class StrengthSessionDescriptionDataProvider

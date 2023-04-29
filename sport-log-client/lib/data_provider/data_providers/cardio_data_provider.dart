@@ -20,13 +20,13 @@ class RouteDataProvider extends EntityDataProvider<Route> {
   final Api<Route> api = RouteApi();
 
   @override
-  final RouteTable db = AppDatabase.routes;
+  final RouteTable table = RouteTable();
 
   @override
   List<Route> getFromAccountData(AccountData accountData) => accountData.routes;
 
   Future<List<Route>> getByName(String? name) async {
-    return (await db.getNonDeleted())
+    return (await table.getNonDeleted())
         .fuzzySort(query: name, toString: (m) => m.name);
   }
 }
@@ -42,7 +42,7 @@ class CardioSessionDataProvider extends EntityDataProvider<CardioSession> {
   final Api<CardioSession> api = CardioSessionApi();
 
   @override
-  final CardioSessionTable db = AppDatabase.cardioSessions;
+  final CardioSessionTable table = CardioSessionTable();
 
   @override
   List<CardioSession> getFromAccountData(AccountData accountData) =>
@@ -51,7 +51,7 @@ class CardioSessionDataProvider extends EntityDataProvider<CardioSession> {
   Future<List<CardioSession>> getSimilarCardioSessions(
     CardioSessionDescription cardioSessionDescription,
   ) async {
-    final all = await db.getByMovementWithTrackOrderDatetime(
+    final all = await table.getByMovementWithTrackOrderDatetime(
       movement: cardioSessionDescription.movement,
     );
     return all

@@ -5,6 +5,12 @@ import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/metcon/metcon_records.dart';
 
 class MetconTable extends TableAccessor<Metcon> {
+  factory MetconTable() => _instance;
+
+  MetconTable._();
+
+  static final _instance = MetconTable._();
+
   @override
   DbSerializer<Metcon> get serde => DbMetconSerializer();
 
@@ -45,6 +51,12 @@ class MetconTable extends TableAccessor<Metcon> {
 }
 
 class MetconMovementTable extends TableAccessor<MetconMovement> {
+  factory MetconMovementTable() => _instance;
+
+  MetconMovementTable._();
+
+  static final _instance = MetconMovementTable._();
+
   @override
   DbSerializer<MetconMovement> get serde => DbMetconMovementSerializer();
 
@@ -102,6 +114,12 @@ class MetconMovementTable extends TableAccessor<MetconMovement> {
 }
 
 class MetconSessionTable extends TableAccessor<MetconSession> {
+  factory MetconSessionTable() => _instance;
+
+  MetconSessionTable._();
+
+  static final _instance = MetconSessionTable._();
+
   @override
   DbSerializer<MetconSession> get serde => DbMetconSessionSerializer();
 

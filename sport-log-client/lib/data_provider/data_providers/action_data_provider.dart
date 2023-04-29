@@ -19,14 +19,14 @@ class ActionProviderDataProvider extends EntityDataProvider<ActionProvider> {
   final Api<ActionProvider> api = ActionProviderApi();
 
   @override
-  final ActionProviderTable db = AppDatabase.actionProviders;
+  final ActionProviderTable table = ActionProviderTable();
 
   @override
   List<ActionProvider> getFromAccountData(AccountData accountData) =>
       accountData.actionProviders;
 
   Future<List<ActionProvider>> getByPlatform(Platform platform) =>
-      db.getByPlatform(platform);
+      table.getByPlatform(platform);
 }
 
 class ActionDataProvider extends EntityDataProvider<Action> {
@@ -40,14 +40,14 @@ class ActionDataProvider extends EntityDataProvider<Action> {
   final Api<Action> api = ActionApi();
 
   @override
-  final ActionTable db = AppDatabase.actions;
+  final ActionTable table = ActionTable();
 
   @override
   List<Action> getFromAccountData(AccountData accountData) =>
       accountData.actions;
 
   Future<List<Action>> getByActionProvider(ActionProvider actionProvider) =>
-      db.getByActionProvider(actionProvider);
+      table.getByActionProvider(actionProvider);
 }
 
 class ActionRuleDataProvider extends EntityDataProvider<ActionRule> {
@@ -61,14 +61,14 @@ class ActionRuleDataProvider extends EntityDataProvider<ActionRule> {
   final Api<ActionRule> api = ActionRuleApi();
 
   @override
-  final ActionRuleTable db = AppDatabase.actionRules;
+  final ActionRuleTable table = ActionRuleTable();
 
   @override
   List<ActionRule> getFromAccountData(AccountData accountData) =>
       accountData.actionRules;
 
   Future<List<ActionRule>> getByActionProvider(ActionProvider actionProvider) =>
-      db.getByActionProvider(actionProvider);
+      table.getByActionProvider(actionProvider);
 }
 
 class ActionEventDataProvider extends EntityDataProvider<ActionEvent> {
@@ -82,7 +82,7 @@ class ActionEventDataProvider extends EntityDataProvider<ActionEvent> {
   final Api<ActionEvent> api = ActionEventApi();
 
   @override
-  final ActionEventTable db = AppDatabase.actionEvents;
+  final ActionEventTable table = ActionEventTable();
 
   @override
   List<ActionEvent> getFromAccountData(AccountData accountData) =>
@@ -91,7 +91,7 @@ class ActionEventDataProvider extends EntityDataProvider<ActionEvent> {
   Future<List<ActionEvent>> getByActionProvider(
     ActionProvider actionProvider,
   ) =>
-      db.getByActionProvider(actionProvider);
+      table.getByActionProvider(actionProvider);
 }
 
 class ActionProviderDescriptionDataProvider

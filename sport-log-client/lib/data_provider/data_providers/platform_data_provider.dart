@@ -4,7 +4,7 @@ import 'package:sport_log/data_provider/data_provider.dart';
 import 'package:sport_log/data_provider/data_providers/action_data_provider.dart';
 import 'package:sport_log/database/database.dart';
 import 'package:sport_log/database/table_accessor.dart';
-import 'package:sport_log/database/tables/all.dart';
+import 'package:sport_log/database/tables/platform_tables.dart';
 import 'package:sport_log/models/account_data/account_data.dart';
 import 'package:sport_log/models/platform/all.dart';
 import 'package:sport_log/models/platform/platform_description.dart';
@@ -20,7 +20,7 @@ class PlatformDataProvider extends EntityDataProvider<Platform> {
   final Api<Platform> api = PlatformApi();
 
   @override
-  final TableAccessor<Platform> db = AppDatabase.platforms;
+  final TableAccessor<Platform> table = PlatformTable();
 
   @override
   List<Platform> getFromAccountData(AccountData accountData) =>
@@ -39,14 +39,14 @@ class PlatformCredentialDataProvider
   final Api<PlatformCredential> api = PlatformCredentialApi();
 
   @override
-  final PlatformCredentialTable db = AppDatabase.platformCredentials;
+  final PlatformCredentialTable table = PlatformCredentialTable();
 
   @override
   List<PlatformCredential> getFromAccountData(AccountData accountData) =>
       accountData.platformCredentials;
 
   Future<PlatformCredential?> getByPlatform(Platform platform) =>
-      db.getByPlatform(platform);
+      table.getByPlatform(platform);
 }
 
 class PlatformDescriptionDataProvider

@@ -3,6 +3,12 @@ import 'package:sport_log/database/table_accessor.dart';
 import 'package:sport_log/models/platform/all.dart';
 
 class PlatformTable extends TableAccessor<Platform> {
+  factory PlatformTable() => _instance;
+
+  PlatformTable._();
+
+  static final _instance = PlatformTable._();
+
   @override
   DbSerializer<Platform> get serde => DbPlatformSerializer();
 
@@ -25,6 +31,12 @@ class PlatformTable extends TableAccessor<Platform> {
 }
 
 class PlatformCredentialTable extends TableAccessor<PlatformCredential> {
+  factory PlatformCredentialTable() => _instance;
+
+  PlatformCredentialTable._();
+
+  static final _instance = PlatformCredentialTable._();
+
   @override
   DbSerializer<PlatformCredential> get serde =>
       DbPlatformCredentialSerializer();

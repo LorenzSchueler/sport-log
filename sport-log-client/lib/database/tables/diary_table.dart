@@ -3,6 +3,12 @@ import 'package:sport_log/database/table_accessor.dart';
 import 'package:sport_log/models/diary/all.dart';
 
 class DiaryTable extends TableAccessor<Diary> {
+  factory DiaryTable() => _instance;
+
+  DiaryTable._();
+
+  static final _instance = DiaryTable._();
+
   @override
   DbSerializer<Diary> get serde => DbDiarySerializer();
 

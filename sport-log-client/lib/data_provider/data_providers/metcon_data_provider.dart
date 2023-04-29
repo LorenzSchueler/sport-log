@@ -21,14 +21,14 @@ class MetconDataProvider extends EntityDataProvider<Metcon> {
   final Api<Metcon> api = MetconApi();
 
   @override
-  final MetconTable db = AppDatabase.metcons;
+  final MetconTable table = MetconTable();
 
   @override
   List<Metcon> getFromAccountData(AccountData accountData) =>
       accountData.metcons;
 
   Future<List<Metcon>> getByName(String? name) async {
-    return (await db.getNonDeleted())
+    return (await table.getNonDeleted())
         .fuzzySort(query: name, toString: (m) => m.name);
   }
 }
@@ -44,14 +44,14 @@ class MetconMovementDataProvider extends EntityDataProvider<MetconMovement> {
   final Api<MetconMovement> api = MetconMovementApi();
 
   @override
-  final MetconMovementTable db = AppDatabase.metconMovements;
+  final MetconMovementTable table = MetconMovementTable();
 
   @override
   List<MetconMovement> getFromAccountData(AccountData accountData) =>
       accountData.metconMovements;
 
   Future<List<MetconMovement>> getByMetcon(Metcon metcon) =>
-      db.getByMetcon(metcon);
+      table.getByMetcon(metcon);
 }
 
 class MetconSessionDataProvider extends EntityDataProvider<MetconSession> {
@@ -65,13 +65,13 @@ class MetconSessionDataProvider extends EntityDataProvider<MetconSession> {
   final Api<MetconSession> api = MetconSessionApi();
 
   @override
-  final MetconSessionTable db = AppDatabase.metconSessions;
+  final MetconSessionTable table = MetconSessionTable();
 
   @override
   List<MetconSession> getFromAccountData(AccountData accountData) =>
       accountData.metconSessions;
 
-  Future<bool> existsByMetcon(Metcon metcon) => db.existsByMetcon(metcon);
+  Future<bool> existsByMetcon(Metcon metcon) => table.existsByMetcon(metcon);
 
   Future<List<MetconSession>> getByTimerangeAndMetconAndComment({
     required DateTime? from,
@@ -79,14 +79,14 @@ class MetconSessionDataProvider extends EntityDataProvider<MetconSession> {
     required Metcon? metcon,
     required String? comment,
   }) =>
-      db.getByTimerangeAndMetconAndComment(
+      table.getByTimerangeAndMetconAndComment(
         from: from,
         until: until,
         metcon: metcon,
         comment: comment,
       );
 
-  Future<MetconRecords> getMetconRecords() => db.getMetconRecords();
+  Future<MetconRecords> getMetconRecords() => table.getMetconRecords();
 }
 
 class MetconDescriptionDataProvider extends DataProvider<MetconDescription> {

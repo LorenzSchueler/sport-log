@@ -1,7 +1,14 @@
 import 'package:result_type/result_type.dart';
 import 'package:sport_log/config.dart';
 import 'package:sport_log/database/table_accessor.dart';
-import 'package:sport_log/database/tables/all.dart';
+import 'package:sport_log/database/tables/action_tables.dart';
+import 'package:sport_log/database/tables/cardio_tables.dart';
+import 'package:sport_log/database/tables/diary_table.dart';
+import 'package:sport_log/database/tables/metcon_tables.dart';
+import 'package:sport_log/database/tables/movement_table.dart';
+import 'package:sport_log/database/tables/platform_tables.dart';
+import 'package:sport_log/database/tables/strength_tables.dart';
+import 'package:sport_log/database/tables/wod_table.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -111,7 +118,7 @@ class AppDatabase {
         version: 1,
         onConfigure: (db) => db.execute('PRAGMA foreign_keys = ON;'),
         onCreate: (db, version) async {
-          for (final tableAccessor in tablesAccessors) {
+          for (final tableAccessor in _tablesAccessors) {
             _logger.d("Creating table: ${tableAccessor.tableName}");
             for (final statement in tableAccessor.table.setupSql) {
               if (Config.instance.outputDbStatement) {
@@ -137,40 +144,23 @@ class AppDatabase {
     await open();
   }
 
-  static final diaries = DiaryTable();
-  static final wods = WodTable();
-  static final movements = MovementTable();
-  static final metcons = MetconTable();
-  static final metconMovements = MetconMovementTable();
-  static final metconSessions = MetconSessionTable();
-  static final routes = RouteTable();
-  static final cardioSessions = CardioSessionTable();
-  static final strengthSessions = StrengthSessionTable();
-  static final strengthSets = StrengthSetTable();
-  static final platforms = PlatformTable();
-  static final platformCredentials = PlatformCredentialTable();
-  static final actionProviders = ActionProviderTable();
-  static final actions = ActionTable();
-  static final actionRules = ActionRuleTable();
-  static final actionEvents = ActionEventTable();
-
-  static List<TableAccessor> get tablesAccessors => [
-        diaries,
-        wods,
-        movements,
-        metcons,
-        metconMovements,
-        metconSessions,
-        routes,
-        cardioSessions,
-        strengthSessions,
-        strengthSets,
-        platforms,
-        platformCredentials,
-        actionProviders,
-        actions,
-        actionRules,
-        actionEvents,
+  static List<TableAccessor> get _tablesAccessors => [
+        DiaryTable(),
+        WodTable(),
+        MovementTable(),
+        MetconTable(),
+        MetconMovementTable(),
+        MetconSessionTable(),
+        RouteTable(),
+        CardioSessionTable(),
+        StrengthSessionTable(),
+        StrengthSetTable(),
+        PlatformTable(),
+        PlatformCredentialTable(),
+        ActionProviderTable(),
+        ActionTable(),
+        ActionRuleTable(),
+        ActionEventTable(),
       ];
 
   static final cardioSessionDescriptions = CardioSessionDescriptionTable();
