@@ -1,3 +1,4 @@
+import 'package:sport_log/api/accessors/action_api.dart';
 import 'package:sport_log/api/api.dart';
 import 'package:sport_log/data_provider/data_provider.dart';
 import 'package:sport_log/database/database.dart';
@@ -15,7 +16,7 @@ class ActionProviderDataProvider extends EntityDataProvider<ActionProvider> {
   static final _instance = ActionProviderDataProvider._();
 
   @override
-  final Api<ActionProvider> api = Api.actionProviders;
+  final Api<ActionProvider> api = ActionProviderApi();
 
   @override
   final ActionProviderTable db = AppDatabase.actionProviders;
@@ -36,7 +37,7 @@ class ActionDataProvider extends EntityDataProvider<Action> {
   static final _instance = ActionDataProvider._();
 
   @override
-  final Api<Action> api = Api.actions;
+  final Api<Action> api = ActionApi();
 
   @override
   final ActionTable db = AppDatabase.actions;
@@ -57,7 +58,7 @@ class ActionRuleDataProvider extends EntityDataProvider<ActionRule> {
   static final _instance = ActionRuleDataProvider._();
 
   @override
-  final Api<ActionRule> api = Api.actionRules;
+  final Api<ActionRule> api = ActionRuleApi();
 
   @override
   final ActionRuleTable db = AppDatabase.actionRules;
@@ -78,7 +79,7 @@ class ActionEventDataProvider extends EntityDataProvider<ActionEvent> {
   static final _instance = ActionEventDataProvider._();
 
   @override
-  final Api<ActionEvent> api = Api.actionEvents;
+  final Api<ActionEvent> api = ActionEventApi();
 
   @override
   final ActionEventTable db = AppDatabase.actionEvents;

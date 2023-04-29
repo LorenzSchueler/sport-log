@@ -1,4 +1,5 @@
 import 'package:fixnum/fixnum.dart';
+import 'package:sport_log/api/accessors/strength_api.dart';
 import 'package:sport_log/api/api.dart';
 import 'package:sport_log/data_provider/data_provider.dart';
 import 'package:sport_log/data_provider/data_providers/movement_data_provider.dart';
@@ -19,7 +20,7 @@ class StrengthSessionDataProvider extends EntityDataProvider<StrengthSession> {
   static final _instance = StrengthSessionDataProvider._();
 
   @override
-  final Api<StrengthSession> api = Api.strengthSessions;
+  final Api<StrengthSession> api = StrengthSessionApi();
 
   @override
   final TableAccessor<StrengthSession> db = AppDatabase.strengthSessions;
@@ -37,7 +38,7 @@ class StrengthSetDataProvider extends EntityDataProvider<StrengthSet> {
   static final _instance = StrengthSetDataProvider._();
 
   @override
-  final Api<StrengthSet> api = Api.strengthSets;
+  final Api<StrengthSet> api = StrengthSetApi();
 
   @override
   final StrengthSetTable db = AppDatabase.strengthSets;

@@ -1,3 +1,4 @@
+import 'package:sport_log/api/accessors/platform_api.dart';
 import 'package:sport_log/api/api.dart';
 import 'package:sport_log/data_provider/data_provider.dart';
 import 'package:sport_log/data_provider/data_providers/action_data_provider.dart';
@@ -16,7 +17,7 @@ class PlatformDataProvider extends EntityDataProvider<Platform> {
   static final _instance = PlatformDataProvider._();
 
   @override
-  final Api<Platform> api = Api.platforms;
+  final Api<Platform> api = PlatformApi();
 
   @override
   final TableAccessor<Platform> db = AppDatabase.platforms;
@@ -35,7 +36,7 @@ class PlatformCredentialDataProvider
   static final _instance = PlatformCredentialDataProvider._();
 
   @override
-  final Api<PlatformCredential> api = Api.platformCredentials;
+  final Api<PlatformCredential> api = PlatformCredentialApi();
 
   @override
   final PlatformCredentialTable db = AppDatabase.platformCredentials;

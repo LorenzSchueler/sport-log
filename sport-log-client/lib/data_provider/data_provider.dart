@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:fixnum/fixnum.dart';
 import 'package:flutter/foundation.dart' show ChangeNotifier, VoidCallback;
 import 'package:result_type/result_type.dart';
+import 'package:sport_log/api/accessors/account_data_api.dart';
 import 'package:sport_log/api/api.dart';
 import 'package:sport_log/app.dart';
 import 'package:sport_log/data_provider/data_providers/action_data_provider.dart';
@@ -294,7 +295,7 @@ abstract class EntityDataProvider<T extends AtomicEntity>
 
   static Future<bool> downSync({required VoidCallback? onNoInternet}) async {
     final accountDataResult =
-        await Api.accountData.get(Settings.instance.lastSync);
+        await AccountDataApi().get(Settings.instance.lastSync);
     if (accountDataResult.isFailure) {
       await DataProvider._handleApiError(
         accountDataResult.failure,

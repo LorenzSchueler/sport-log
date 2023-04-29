@@ -1,3 +1,4 @@
+import 'package:sport_log/api/accessors/diary_api.dart';
 import 'package:sport_log/api/api.dart';
 import 'package:sport_log/data_provider/data_provider.dart';
 import 'package:sport_log/database/database.dart';
@@ -13,7 +14,7 @@ class DiaryDataProvider extends EntityDataProvider<Diary> {
   static final _instance = DiaryDataProvider._();
 
   @override
-  final Api<Diary> api = Api.diaries;
+  final Api<Diary> api = DiaryApi();
 
   @override
   final DiaryTable db = AppDatabase.diaries;

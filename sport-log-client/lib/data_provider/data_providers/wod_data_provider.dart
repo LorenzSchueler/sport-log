@@ -1,3 +1,4 @@
+import 'package:sport_log/api/accessors/wod_api.dart';
 import 'package:sport_log/api/api.dart';
 import 'package:sport_log/data_provider/data_provider.dart';
 import 'package:sport_log/database/database.dart';
@@ -13,7 +14,7 @@ class WodDataProvider extends EntityDataProvider<Wod> {
   static final _instance = WodDataProvider._();
 
   @override
-  final Api<Wod> api = Api.wods;
+  final Api<Wod> api = WodApi();
 
   @override
   final TableAccessor<Wod> db = AppDatabase.wods;

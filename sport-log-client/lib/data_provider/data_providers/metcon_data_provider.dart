@@ -1,4 +1,5 @@
 import 'package:fixnum/fixnum.dart';
+import 'package:sport_log/api/accessors/metcon_api.dart';
 import 'package:sport_log/api/api.dart';
 import 'package:sport_log/data_provider/data_provider.dart';
 import 'package:sport_log/data_provider/data_providers/movement_data_provider.dart';
@@ -17,7 +18,7 @@ class MetconDataProvider extends EntityDataProvider<Metcon> {
   static final _instance = MetconDataProvider._();
 
   @override
-  final Api<Metcon> api = Api.metcons;
+  final Api<Metcon> api = MetconApi();
 
   @override
   final MetconTable db = AppDatabase.metcons;
@@ -40,7 +41,7 @@ class MetconMovementDataProvider extends EntityDataProvider<MetconMovement> {
   static final _instance = MetconMovementDataProvider._();
 
   @override
-  final Api<MetconMovement> api = Api.metconMovements;
+  final Api<MetconMovement> api = MetconMovementApi();
 
   @override
   final MetconMovementTable db = AppDatabase.metconMovements;
@@ -61,7 +62,7 @@ class MetconSessionDataProvider extends EntityDataProvider<MetconSession> {
   static final _instance = MetconSessionDataProvider._();
 
   @override
-  final Api<MetconSession> api = Api.metconSessions;
+  final Api<MetconSession> api = MetconSessionApi();
 
   @override
   final MetconSessionTable db = AppDatabase.metconSessions;

@@ -1,7 +1,10 @@
 import 'package:faker/faker.dart';
 import 'package:fixnum/fixnum.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sport_log/api/api.dart';
+import 'package:sport_log/api/accessors/action_api.dart';
+import 'package:sport_log/api/accessors/diary_api.dart';
+import 'package:sport_log/api/accessors/strength_api.dart';
+import 'package:sport_log/api/accessors/user_api.dart';
 import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/main.dart';
 import 'package:sport_log/models/all.dart';
@@ -10,25 +13,25 @@ import 'package:sport_log/settings.dart';
 void testUser(User user, User updatedUser) {
   group('User', () {
     test('create', () async {
-      assert((await Api.user.postSingle(user)).isSuccess);
+      assert((await UserApi().postSingle(user)).isSuccess);
     });
     test('get', () async {
       assert(
-        (await Api.user.getSingle(user.username, user.password)).isSuccess,
+        (await UserApi().getSingle(user.username, user.password)).isSuccess,
       );
     });
     test('update', () async {
-      assert((await Api.user.putSingle(updatedUser)).isSuccess);
+      assert((await UserApi().putSingle(updatedUser)).isSuccess);
     });
     test('delete', () async {
-      assert((await Api.user.deleteSingle()).isSuccess);
+      assert((await UserApi().deleteSingle()).isSuccess);
     });
   });
 }
 
 void testAction() {
   test('get action providers', () async {
-    assert((await Api.actionProviders.getMultiple()).isSuccess);
+    assert((await ActionProviderApi().getMultiple()).isSuccess);
   });
 }
 
@@ -44,21 +47,21 @@ void testDiary(User sampleUser) {
     );
 
     test('create', () async {
-      assert((await Api.diaries.postSingle(diary)).isSuccess);
+      assert((await DiaryApi().postSingle(diary)).isSuccess);
     });
     test('get', () async {
-      assert((await Api.diaries.getSingle(diary.id)).isSuccess);
+      assert((await DiaryApi().getSingle(diary.id)).isSuccess);
     });
     test('get multiple', () async {
-      assert((await Api.diaries.getMultiple()).isSuccess);
+      assert((await DiaryApi().getMultiple()).isSuccess);
     });
     test('update', () async {
       assert(
-        (await Api.diaries.putSingle(diary..date = DateTime.now())).isSuccess,
+        (await DiaryApi().putSingle(diary..date = DateTime.now())).isSuccess,
       );
     });
     test('set deleted', () async {
-      assert((await Api.diaries.putSingle(diary..deleted = true)).isSuccess);
+      assert((await DiaryApi().putSingle(diary..deleted = true)).isSuccess);
     });
   });
 }
@@ -77,27 +80,27 @@ void testStrengthSession(User sampleUser) {
 
     test('create', () async {
       assert(
-        (await Api.strengthSessions.postSingle(strengthSession)).isSuccess,
+        (await StrengthSessionApi().postSingle(strengthSession)).isSuccess,
       );
     });
     test('get', () async {
       assert(
-        (await Api.strengthSessions.getSingle(strengthSession.id)).isSuccess,
+        (await StrengthSessionApi().getSingle(strengthSession.id)).isSuccess,
       );
     });
     test('get multiple', () async {
-      assert((await Api.strengthSessions.getMultiple()).isSuccess);
+      assert((await StrengthSessionApi().getMultiple()).isSuccess);
     });
     test('update', () async {
       assert(
-        (await Api.strengthSessions
+        (await StrengthSessionApi()
                 .putSingle(strengthSession..comments = 'comments'))
             .isSuccess,
       );
     });
     test('set deleted', () async {
       assert(
-        (await Api.strengthSessions.putSingle(strengthSession..deleted = true))
+        (await StrengthSessionApi().putSingle(strengthSession..deleted = true))
             .isSuccess,
       );
     });
@@ -118,23 +121,23 @@ void testActionRule(User sampleUser) {
     );
 
     test('create', () async {
-      assert((await Api.actionRules.postSingle(actionRule)).isSuccess);
+      assert((await ActionRuleApi().postSingle(actionRule)).isSuccess);
     });
     test('get', () async {
-      assert((await Api.actionRules.getSingle(actionRule.id)).isSuccess);
+      assert((await ActionRuleApi().getSingle(actionRule.id)).isSuccess);
     });
     test('get multiple', () async {
-      assert((await Api.actionRules.getMultiple()).isSuccess);
+      assert((await ActionRuleApi().getMultiple()).isSuccess);
     });
     test('update', () async {
       assert(
-        (await Api.actionRules.putSingle(actionRule..time = DateTime.now()))
+        (await ActionRuleApi().putSingle(actionRule..time = DateTime.now()))
             .isSuccess,
       );
     });
     test('set deleted', () async {
       assert(
-        (await Api.actionRules.putSingle(actionRule..deleted = true)).isSuccess,
+        (await ActionRuleApi().putSingle(actionRule..deleted = true)).isSuccess,
       );
     });
   });
@@ -153,12 +156,12 @@ Future<void> main() async {
     );
 
     setUpAll(() async {
-      assert((await Api.user.postSingle(sampleUser)).isSuccess);
+      assert((await UserApi().postSingle(sampleUser)).isSuccess);
       await Settings.instance.setUser(sampleUser);
     });
 
     tearDownAll(() async {
-      assert((await Api.user.deleteSingle()).isSuccess);
+      assert((await UserApi().deleteSingle()).isSuccess);
     });
 
     testAction();

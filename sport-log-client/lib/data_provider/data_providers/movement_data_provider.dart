@@ -1,3 +1,4 @@
+import 'package:sport_log/api/accessors/movement_api.dart';
 import 'package:sport_log/api/api.dart';
 import 'package:sport_log/data_provider/data_provider.dart';
 import 'package:sport_log/database/database.dart';
@@ -14,7 +15,7 @@ class MovementDataProvider extends EntityDataProvider<Movement> {
   static final _instance = MovementDataProvider._();
 
   @override
-  final Api<Movement> api = Api.movements;
+  final Api<Movement> api = MovementApi();
 
   @override
   final MovementTable db = AppDatabase.movements;

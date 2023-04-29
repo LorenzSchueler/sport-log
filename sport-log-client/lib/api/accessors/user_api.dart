@@ -7,6 +7,12 @@ import 'package:sport_log/models/user/user.dart';
 import 'package:sport_log/settings.dart';
 
 class UserApi {
+  factory UserApi() => _instance;
+
+  UserApi._();
+
+  static final _instance = UserApi._();
+
   final _uri =
       Uri.parse("${Settings.instance.serverUrl}/v${Config.apiVersion}/user");
 

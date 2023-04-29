@@ -8,16 +8,6 @@ import 'package:http/io_client.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:logger/logger.dart' as l;
 import 'package:result_type/result_type.dart';
-import 'package:sport_log/api/accessors/account_data_api.dart';
-import 'package:sport_log/api/accessors/action_api.dart';
-import 'package:sport_log/api/accessors/cardio_api.dart';
-import 'package:sport_log/api/accessors/diary_api.dart';
-import 'package:sport_log/api/accessors/metcon_api.dart';
-import 'package:sport_log/api/accessors/movement_api.dart';
-import 'package:sport_log/api/accessors/platform_api.dart';
-import 'package:sport_log/api/accessors/strength_api.dart';
-import 'package:sport_log/api/accessors/user_api.dart';
-import 'package:sport_log/api/accessors/wod_api.dart';
 import 'package:sport_log/config.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/error_message.dart';
@@ -185,25 +175,6 @@ extension RequestExtension on Request {
 }
 
 abstract class Api<T extends JsonSerializable> {
-  static final accountData = AccountDataApi();
-  static final user = UserApi();
-  static final actions = ActionApi();
-  static final actionProviders = ActionProviderApi();
-  static final actionRules = ActionRuleApi();
-  static final actionEvents = ActionEventApi();
-  static final cardioSessions = CardioSessionApi();
-  static final routes = RouteApi();
-  static final diaries = DiaryApi();
-  static final metcons = MetconApi();
-  static final metconSessions = MetconSessionApi();
-  static final metconMovements = MetconMovementApi();
-  static final movements = MovementApi();
-  static final platforms = PlatformApi();
-  static final platformCredentials = PlatformCredentialApi();
-  static final strengthSessions = StrengthSessionApi();
-  static final strengthSets = StrengthSetApi();
-  static final wods = WodApi();
-
   static Future<ApiResult<ServerVersion>> getServerVersion() {
     final uri = Uri.parse("${Settings.instance.serverUrl}/version");
     return Request("get", uri).toApiResultWithValue(

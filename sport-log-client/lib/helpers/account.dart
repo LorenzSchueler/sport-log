@@ -1,4 +1,5 @@
 import 'package:result_type/result_type.dart';
+import 'package:sport_log/api/accessors/user_api.dart';
 import 'package:sport_log/api/api.dart';
 import 'package:sport_log/data_provider/sync.dart';
 import 'package:sport_log/database/database.dart';
@@ -33,7 +34,7 @@ class Account {
 
   static Future<ApiResult<void>> register(String serverUrl, User user) async {
     await Settings.instance.setServerUrl(serverUrl);
-    final result = await Api.user.postSingle(user);
+    final result = await UserApi().postSingle(user);
     if (result.isSuccess) {
       await Settings.instance.setUser(user);
       await Settings.instance.setAccountCreated(true);
@@ -55,7 +56,7 @@ class Account {
     String password,
   ) async {
     await Settings.instance.setServerUrl(serverUrl);
-    final result = await Api.user.getSingle(username, password);
+    final result = await UserApi().getSingle(username, password);
     if (result.isSuccess) {
       final user = result.success;
       await Settings.instance.setUser(user);
@@ -91,7 +92,7 @@ class Account {
     if (email != null) {
       user.email = email;
     }
-    final result = await Api.user.putSingle(user);
+    final result = await UserApi().putSingle(user);
     if (result.isSuccess) {
       await Settings.instance.setUser(user);
       return Success(user);
@@ -123,7 +124,7 @@ class Account {
 
   static Future<ApiResult<void>> delete() async {
     Sync.instance.stopSync();
-    final result = await Api.user.deleteSingle();
+    final result = await UserApi().deleteSingle();
     if (result.isSuccess) {
       await Settings.instance.setUser(null);
       await Settings.instance.setAccountCreated(false);
@@ -144,7 +145,7 @@ class Account {
 
   static Future<ApiResult<void>> newInitSync() async {
     // check if current user is able to login
-    final result = await Api.user
+    final result = await UserApi()
         .getSingle(Settings.instance.username!, Settings.instance.password!);
     if (result.isFailure) {
       return Failure(result.failure);

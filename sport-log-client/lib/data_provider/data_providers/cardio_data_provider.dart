@@ -1,3 +1,4 @@
+import 'package:sport_log/api/accessors/cardio_api.dart';
 import 'package:sport_log/api/api.dart';
 import 'package:sport_log/data_provider/data_provider.dart';
 import 'package:sport_log/data_provider/data_providers/movement_data_provider.dart';
@@ -16,7 +17,7 @@ class RouteDataProvider extends EntityDataProvider<Route> {
   static final _instance = RouteDataProvider._();
 
   @override
-  final Api<Route> api = Api.routes;
+  final Api<Route> api = RouteApi();
 
   @override
   final RouteTable db = AppDatabase.routes;
@@ -38,7 +39,7 @@ class CardioSessionDataProvider extends EntityDataProvider<CardioSession> {
   static final _instance = CardioSessionDataProvider._();
 
   @override
-  final Api<CardioSession> api = Api.cardioSessions;
+  final Api<CardioSession> api = CardioSessionApi();
 
   @override
   final CardioSessionTable db = AppDatabase.cardioSessions;
