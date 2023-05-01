@@ -1,3 +1,4 @@
+import 'package:result_type/result_type.dart';
 import 'package:sport_log/api/api.dart';
 import 'package:sport_log/models/platform/all.dart';
 
@@ -13,6 +14,20 @@ class PlatformApi extends Api<Platform> {
 
   @override
   final route = '/platform';
+
+  @override
+  Future<ApiResult<void>> postSingle(Platform object) async => Success(null);
+
+  @override
+  Future<ApiResult<void>> postMultiple(List<Platform> objects) async =>
+      Success(null);
+
+  @override
+  Future<ApiResult<void>> putSingle(Platform object) async => Success(null);
+
+  @override
+  Future<ApiResult<void>> putMultiple(List<Platform> objects) async =>
+      Success(null);
 }
 
 class PlatformCredentialApi extends Api<PlatformCredential> {
