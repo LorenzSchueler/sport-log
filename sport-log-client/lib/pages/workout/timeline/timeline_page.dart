@@ -50,7 +50,7 @@ class TimelinePage extends StatelessWidget {
                     onChanged: (comment) => dataProvider.search = comment,
                     decoration: Theme.of(context).textFormFieldDecoration,
                   )
-                : const Text("Timeline"),
+                : Text(dataProvider.selected?.name ?? "Timeline"),
             actions: [
               IconButton(
                 onPressed: () {
