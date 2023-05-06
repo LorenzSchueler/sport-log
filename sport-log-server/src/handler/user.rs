@@ -5,7 +5,7 @@ use crate::{
     auth::{AuthAdmin, AuthUser},
     config::Config,
     db::*,
-    handler::{ErrorMessage, HandlerError, HandlerResult, UnverifiedSingleOrVec},
+    handler::{check_password, ErrorMessage, HandlerError, HandlerResult, UnverifiedSingleOrVec},
     state::DbConn,
 };
 
@@ -17,10 +17,14 @@ pub async fn adm_create_users(
     match users {
         UnverifiedSingleOrVec::Single(user) => {
             let mut user = user.verify_adm(auth)?;
+            check_password(&user.password)?;
             UserDb::create(&mut user, &mut db)
         }
         UnverifiedSingleOrVec::Vec(users) => {
             let mut users = users.verify_adm(auth)?;
+            for user in &users {
+                check_password(&user.password)?;
+            }
             UserDb::create_multiple(&mut users, &mut db)
         }
     }
@@ -43,6 +47,7 @@ pub async fn create_user(
     }
 
     let mut user = user.verify_unchecked()?;
+    check_password(&user.password)?;
     UserDb::create(&mut user, &mut db)
         .map(|_| StatusCode::OK)
         .map_err(Into::into)
@@ -60,6 +65,7 @@ pub async fn update_user(
     Json(user): Json<Unverified<User>>,
 ) -> HandlerResult<StatusCode> {
     let mut user = user.verify_user(auth, &mut db)?;
+    check_password(&user.password)?;
     UserDb::update(&mut user, &mut db)
         .map(|_| StatusCode::OK)
         .map_err(Into::into)

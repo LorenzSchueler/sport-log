@@ -1,3 +1,4 @@
+use axum::http::StatusCode;
 use chrono::{DateTime, Utc};
 use serde::Deserialize;
 
@@ -53,4 +54,21 @@ pub struct TimeSpanOption {
 
 fn none<T>() -> Option<T> {
     None
+}
+
+fn check_password(password: &str) -> HandlerResult<()> {
+    if password.len() >= 8
+        && password.chars().any(|c| c.is_lowercase())
+        && password.chars().any(|c| c.is_uppercase())
+        && password.chars().any(|c| c.is_numeric())
+    {
+        Ok(())
+    } else {
+        Err(HandlerError::from((
+            StatusCode::BAD_REQUEST,
+            ErrorMessage::Other {
+                error: "The password must contain at least one lower case and one upper case character as well as one number and must be at least 8 characters long.".to_owned(),
+            },
+        )))
+    }
 }

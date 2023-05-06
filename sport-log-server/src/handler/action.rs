@@ -13,7 +13,8 @@ use crate::{
     config::Config,
     db::*,
     handler::{
-        ErrorMessage, HandlerError, HandlerResult, IdOption, TimeSpanOption, UnverifiedSingleOrVec,
+        check_password, ErrorMessage, HandlerError, HandlerResult, IdOption, TimeSpanOption,
+        UnverifiedSingleOrVec,
     },
     state::DbConn,
 };
@@ -26,10 +27,14 @@ pub async fn adm_create_action_providers(
     match action_providers {
         UnverifiedSingleOrVec::Single(action_provider) => {
             let mut action_provider = action_provider.verify_adm(auth)?;
+            check_password(&action_provider.password)?;
             ActionProviderDb::create(&mut action_provider, &mut db)
         }
         UnverifiedSingleOrVec::Vec(action_providers) => {
             let mut action_providers = action_providers.verify_adm(auth)?;
+            for action_provider in &action_providers {
+                check_password(&action_provider.password)?;
+            }
             ActionProviderDb::create_multiple(&mut action_providers, &mut db)
         }
     }
@@ -52,6 +57,7 @@ pub async fn ap_create_action_provider(
     }
 
     let mut action_provider = action_provider.verify_unchecked()?;
+    check_password(&action_provider.password)?;
     ActionProviderDb::create(&mut action_provider, &mut db)
         .map(|_| StatusCode::OK)
         .map_err(Into::into)
