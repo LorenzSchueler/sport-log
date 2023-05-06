@@ -40,13 +40,13 @@ lazy_static! {
     static ref TEST_USER: User = User {
         id: UserId(123_456_789),
         username: String::from("test-user-username-123456789"),
-        password: String::from("test-user-password-123456789"),
+        password: String::from("test-user-Password-123456789"),
         email: String::from("test-user-email-123456789"),
     };
     static ref TEST_USER2: User = User {
         id: UserId(213_456_789),
         username: String::from("test-user2-username-213456789"),
-        password: String::from("test-user2-password-213456789"),
+        password: String::from("test-user2-Password-213456789"),
         email: String::from("test-user2-email-213456789"),
     };
     static ref TEST_PLATFORM: Platform = Platform {
@@ -58,7 +58,7 @@ lazy_static! {
     static ref TEST_AP: ActionProvider = ActionProvider {
         id: ActionProviderId(123_456_789),
         name: String::from("test-ap-name-123456789"),
-        password: String::from("test-ap-password-123456789"),
+        password: String::from("test-ap-Password-123456789"),
         platform_id: TEST_PLATFORM.id,
         description: None,
         deleted: false,
@@ -925,7 +925,7 @@ async fn user_self_registration() {
     let user = User {
         id: user_id,
         username: format!("user{}", user_id.0),
-        password: "password".to_owned(),
+        password: "Password1".to_owned(),
         email: format!("email{}", user_id.0),
     };
 
@@ -990,7 +990,7 @@ async fn ap_self_registration() {
     let action_provider = ActionProvider {
         id: ap_id,
         name: format!("ap{}", ap_id.0),
-        password: "password".to_owned(),
+        password: "Password1".to_owned(),
         platform_id: TEST_PLATFORM.id,
         description: None,
         deleted: false,
