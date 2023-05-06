@@ -92,8 +92,66 @@ jobs:
            cargo check --manifest-path sport-log-types-derive/Cargo.toml &&
            cargo check --tests
 
-    #- name: Run tests
-    #  run: cargo test --verbose
+  test:
+    name: test
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_DB: sport_log        
+          POSTGRES_PASSWORD: test-passwd
+          POSTGRES_USER: sport_admin
+        ports:
+          - 5432:5432
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+    - name: checkout
+      uses: actions/checkout@v3
+    - name: install rust
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+        override: true
+    - name: load cache
+      uses: Swatinem/rust-cache@v1
+    - name: install postgresql
+      run: |
+        sudo apt-get update -y
+        sudo apt-get install libpq-dev postgresql-client-common postgresql
+    - name: install diesel_cli
+      run: cargo install diesel_cli --no-default-features --features postgres
+    - name: create .env file
+      working-directory: sport-log-types
+      run: echo 'DATABASE_URL=postgres://sport_admin:test-passwd@localhost/sport_log' > .env
+    - name: setup database
+      working-directory: sport-log-types
+      run: |
+        cp src/schema.rs src/schema.rs.copy
+        diesel database setup
+        mv src/schema.rs.copy src/schema.rs
+      # diesel database setup --locked-schema TODO
+    - name: create sport-log-server.toml file
+      working-directory: sport-log-server
+      run: |
+        echo 'admin_password = "$argon2id$v=19$m=4096,t=3,p=1$jfQMFwbuWJW6kYF3K6Opxg$8zmHSEMYeXuxhxl7HNv8/zsgSx/LWm6Iy1EciOBJdQM" # = "admin-passwd"
+        user_self_registration = true
+        ap_self_registration = true
+        database_url = "postgres://sport_admin:test-passwd@localhost/sport_log"
+        release_address = "0.0.0.0:8000"
+        debug_address = "0.0.0.0:8001"
+        ' > sport-log-server.toml
+    - name: cargo test
+      uses: actions-rs/cargo@v1
+      with:
+        command: test
 
   deps:
     name: unused deps
