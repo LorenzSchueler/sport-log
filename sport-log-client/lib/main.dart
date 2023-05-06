@@ -13,7 +13,6 @@ import 'package:sport_log/pages/login/welcome_screen.dart';
 import 'package:sport_log/settings.dart';
 import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/dialogs/new_credentials_dialog.dart';
-import 'package:sqflite/sqflite.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 Stream<double> initialize() async* {

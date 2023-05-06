@@ -11,6 +11,23 @@ bool validate(bool val, String message) {
   return true;
 }
 
+extension Case on String {
+  bool isUpperCase() {
+    final ascii = codeUnitAt(0);
+    return ascii >= 65 && ascii <= 90;
+  }
+
+  bool isLowerCase() {
+    final ascii = codeUnitAt(0);
+    return ascii >= 97 && ascii <= 122;
+  }
+
+  bool isDigit() {
+    final ascii = codeUnitAt(0);
+    return ascii >= 48 && ascii <= 57;
+  }
+}
+
 class Validator {
   Validator._();
 
@@ -40,6 +57,13 @@ class Validator {
     // ignore: prefer-conditional-expressions
     if (password == null || password.isEmpty) {
       return "Password must not be empty.";
+    } else if (password.length < 8) {
+      return "Password must be at least 8 characters long.";
+    } else if (!(password.runes
+            .any((c) => String.fromCharCode(c).isLowerCase()) &&
+        password.runes.any((c) => String.fromCharCode(c).isUpperCase()) &&
+        password.runes.any((c) => String.fromCharCode(c).isDigit()))) {
+      return "Password must contain at least one lower case and one upper case character and one number.";
     } else {
       return null;
     }
