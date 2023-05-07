@@ -78,12 +78,11 @@ postgres=# \password sport_admin
 
 ```bash
 # update database by hand and only update schema.rs
-diesel print-schema > sport-log-types/src/schema.rs
+cd sport-log-types && diesel print-schema > src/schema.rs
 # OR
-# recreate database with new schema
-cd ../sport-log-types && diesel database reset --locked-schema && cd ../sport-log-server
+# recreate database
+cd sport-log-types && diesel database reset --locked-schema
 ```
-
 
 ## SystemD Setup for deployment
 ### Setup 

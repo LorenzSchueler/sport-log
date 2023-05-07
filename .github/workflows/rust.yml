@@ -89,8 +89,7 @@ jobs:
            cargo check --manifest-path sport-log-scheduler/Cargo.toml &&
            cargo check --manifest-path sport-log-server/Cargo.toml &&
            cargo check --manifest-path sport-log-types/Cargo.toml &&
-           cargo check --manifest-path sport-log-types-derive/Cargo.toml &&
-           cargo check --tests
+           cargo check --manifest-path sport-log-types-derive/Cargo.toml
 
   test:
     name: test
@@ -134,9 +133,8 @@ jobs:
     - name: setup database
       working-directory: sport-log-types
       run: |
-        cp src/schema.rs src/schema.rs.copy
         diesel database setup
-        mv src/schema.rs.copy src/schema.rs
+        patch src/schema.rs src/schema.patch
       # diesel database setup --locked-schema TODO
     - name: create sport-log-server.toml file
       working-directory: sport-log-server
