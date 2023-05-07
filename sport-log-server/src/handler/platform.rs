@@ -9,7 +9,7 @@ use crate::{
     auth::{AuthAdmin, AuthUser},
     config::Config,
     db::*,
-    handler::{HandlerError, HandlerResult, IdOption, UnverifiedSingleOrVec},
+    handler::{ErrorMessage, HandlerError, HandlerResult, IdOption, UnverifiedSingleOrVec},
     state::DbConn,
 };
 
@@ -38,7 +38,12 @@ pub async fn ap_create_platform(
     Json(platform): Json<Unverified<Platform>>,
 ) -> HandlerResult<StatusCode> {
     if !config.ap_self_registration {
-        return Err(HandlerError::from(StatusCode::FORBIDDEN));
+        return Err(HandlerError::from((
+            StatusCode::FORBIDDEN,
+            ErrorMessage::Other {
+                error: "action provider self registration is disabled".to_owned(),
+            },
+        )));
     }
 
     let platform = platform.verify_unchecked()?;
@@ -69,7 +74,12 @@ pub async fn ap_get_platforms(
     mut db: DbConn,
 ) -> HandlerResult<Json<Vec<Platform>>> {
     if !config.ap_self_registration {
-        return Err(HandlerError::from(StatusCode::FORBIDDEN));
+        return Err(HandlerError::from((
+            StatusCode::FORBIDDEN,
+            ErrorMessage::Other {
+                error: "action provider self registration is disabled".to_owned(),
+            },
+        )));
     }
 
     match id {
