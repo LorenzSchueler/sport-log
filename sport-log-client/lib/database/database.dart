@@ -57,7 +57,7 @@ class DbError {
   String toString() {
     switch (dbErrorCode) {
       case DbErrorCode.uniqueViolation:
-        return "An entry table $table with the same values for ${columns!.join(', ')} already exists.";
+        return "An entry in table $table with the same values for ${columns!.join(', ')} already exists.";
       case DbErrorCode.unknown:
         return databaseException != null
             ? "Unknown database error: $databaseException"

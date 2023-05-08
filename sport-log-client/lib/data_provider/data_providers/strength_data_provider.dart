@@ -7,6 +7,7 @@ import 'package:sport_log/database/database.dart';
 import 'package:sport_log/database/tables/strength_tables.dart';
 import 'package:sport_log/helpers/diff_algorithm.dart';
 import 'package:sport_log/models/account_data/account_data.dart';
+import 'package:sport_log/models/clone_extensions.dart';
 import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/models/strength/all.dart';
 import 'package:sport_log/models/strength/strength_records.dart';
@@ -114,6 +115,18 @@ class StrengthSessionDescriptionDataProvider
     if (result.isFailure) {
       return result;
     }
+    // avoid conflicts with existing sets with same setNumber
+    result = await _strengthSetDataProvider.updateMultiple(
+      diffing.toUpdate.clone().map((s) {
+        s.setNumber += 1000;
+        return s;
+      }).toList(),
+      notify: false,
+    );
+    if (result.isFailure) {
+      return result;
+    }
+    // set correct setNumber
     result = await _strengthSetDataProvider.updateMultiple(
       diffing.toUpdate,
       notify: false,

@@ -8,6 +8,7 @@ import 'package:sport_log/database/tables/metcon_tables.dart';
 import 'package:sport_log/helpers/diff_algorithm.dart';
 import 'package:sport_log/helpers/extensions/sort_extension.dart';
 import 'package:sport_log/models/all.dart';
+import 'package:sport_log/models/clone_extensions.dart';
 import 'package:sport_log/models/metcon/metcon_records.dart';
 
 class MetconDataProvider extends EntityDataProvider<Metcon> {
@@ -147,6 +148,18 @@ class MetconDescriptionDataProvider extends DataProvider<MetconDescription> {
     if (result.isFailure) {
       return result;
     }
+    // avoid conflicts with existing metconMovements with same movementNumber
+    result = await _metconMovementDataProvider.updateMultiple(
+      diffing.toUpdate.clone().map((m) {
+        m.movementNumber += 1000;
+        return m;
+      }).toList(),
+      notify: false,
+    );
+    if (result.isFailure) {
+      return result;
+    }
+    // set correct movementNumber
     result = await _metconMovementDataProvider.updateMultiple(
       diffing.toUpdate,
       notify: false,
