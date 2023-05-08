@@ -62,7 +62,8 @@ class _CardioEditPageState extends State<CardioEditPage> {
       } else {
         await showMessageDialog(
           context: context,
-          text: 'Creating Cardio Session failed:\n${result.failure}',
+          text:
+              "${widget.isNew ? 'Creating' : 'Updating'} Cardio Session failed:\n${result.failure}",
         );
       }
     }
@@ -125,9 +126,7 @@ class _CardioEditPageState extends State<CardioEditPage> {
     return DiscardWarningOnPop(
       child: Scaffold(
         appBar: AppBar(
-          title: Text(
-            widget.isNew ? "Create Cardio Session" : "Edit Cardio Session",
-          ),
+          title: Text("${widget.isNew ? 'Create' : 'Edit'} Cardio Session"),
           actions: [
             IconButton(
               onPressed: _deleteCardioSession,

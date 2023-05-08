@@ -57,7 +57,8 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
       } else {
         await showMessageDialog(
           context: context,
-          text: 'Creating Strength Session failed:\n${result.failure}',
+          text:
+              "${widget.isNew ? 'Creating' : 'Updating'} Strength Session failed:\n${result.failure}",
         );
       }
     }
@@ -100,9 +101,7 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
     return DiscardWarningOnPop(
       child: Scaffold(
         appBar: AppBar(
-          title: Text(
-            widget.isNew ? "Create Strength Session" : "Edit Strength Session",
-          ),
+          title: Text("${widget.isNew ? 'Create' : 'Edit'} Strength Session"),
           actions: [
             IconButton(
               onPressed: _deleteStrengthSession,

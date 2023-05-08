@@ -57,7 +57,8 @@ class _MetconSessionEditPageState extends State<MetconSessionEditPage> {
       } else {
         await showMessageDialog(
           context: context,
-          text: 'Creating Metcon Session failed:\n${result.failure}',
+          text:
+              "${widget.isNew ? 'Creating' : 'Updating'} Metcon Session failed:\n${result.failure}",
         );
       }
     }
@@ -83,9 +84,7 @@ class _MetconSessionEditPageState extends State<MetconSessionEditPage> {
     return DiscardWarningOnPop(
       child: Scaffold(
         appBar: AppBar(
-          title: Text(
-            widget.isNew ? "Create Metcon Session" : "Edit Metcon Session",
-          ),
+          title: Text("${widget.isNew ? 'Create' : 'Edit'} Metcon Session"),
           actions: [
             IconButton(
               onPressed: _deleteMetconSession,

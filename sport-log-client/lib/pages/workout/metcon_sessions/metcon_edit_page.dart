@@ -22,6 +22,7 @@ class MetconEditPage extends StatefulWidget {
   });
 
   final MetconDescription? metconDescription;
+  bool get isNew => metconDescription == null;
 
   @override
   State<StatefulWidget> createState() => _MetconEditPageState();
@@ -38,18 +39,16 @@ class _MetconEditPageState extends State<MetconEditPage> {
     if (_metconDescription.metcon.description == "") {
       setState(() => _metconDescription.metcon.description = null);
     }
-    final result = widget.metconDescription != null
-        ? await _dataProvider.updateSingle(_metconDescription)
-        : await _dataProvider.createSingle(_metconDescription);
+    final result = widget.isNew
+        ? await _dataProvider.createSingle(_metconDescription)
+        : await _dataProvider.updateSingle(_metconDescription);
     if (result.isSuccess) {
       MetconDescription.defaultMetconDescription ??= _metconDescription;
       if (mounted) {
         Navigator.pop(
           context,
           ReturnObject(
-            action: widget.metconDescription != null
-                ? ReturnAction.updated
-                : ReturnAction.created,
+            action: widget.isNew ? ReturnAction.created : ReturnAction.updated,
             payload: _metconDescription,
           ), // needed for return to details page
         );
@@ -57,13 +56,14 @@ class _MetconEditPageState extends State<MetconEditPage> {
     } else if (mounted) {
       await showMessageDialog(
         context: context,
-        text: 'Creating Metcon failed:\n${result.failure}',
+        text:
+            "${widget.isNew ? 'Creating' : 'Updating'} Metcon failed:\n${result.failure}",
       );
     }
   }
 
   Future<void> _deleteMetcon() async {
-    if (widget.metconDescription != null) {
+    if (!widget.isNew) {
       await _dataProvider.deleteSingle(_metconDescription);
     }
     if (mounted) {
@@ -79,9 +79,7 @@ class _MetconEditPageState extends State<MetconEditPage> {
     return DiscardWarningOnPop(
       child: Scaffold(
         appBar: AppBar(
-          title: Text(
-            widget.metconDescription != null ? "Edit Metcon" : "New Metcon",
-          ),
+          title: Text("${widget.isNew ? 'Create' : 'Edit'} Metcon"),
           actions: [
             if (!_metconDescription.hasReference &&
                 _metconDescription.metcon.userId != null)

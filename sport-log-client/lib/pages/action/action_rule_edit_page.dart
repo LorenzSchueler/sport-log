@@ -21,6 +21,7 @@ class ActionRuleEditPage extends StatefulWidget {
 
   final ActionProviderDescription actionProviderDescription;
   final ActionRule? actionRule;
+  bool get isNew => actionRule == null;
 
   @override
   State<ActionRuleEditPage> createState() => _ActionRuleEditPageState();
@@ -34,23 +35,24 @@ class _ActionRuleEditPageState extends State<ActionRuleEditPage> {
       );
 
   Future<void> _saveActionRule() async {
-    final result = widget.actionRule != null
-        ? await _dataProvider.updateSingle(_actionRule)
-        : await _dataProvider.createSingle(_actionRule);
+    final result = widget.isNew
+        ? await _dataProvider.createSingle(_actionRule)
+        : await _dataProvider.updateSingle(_actionRule);
     if (mounted) {
       if (result.isSuccess) {
         Navigator.pop(context);
       } else {
         await showMessageDialog(
           context: context,
-          text: 'Creating Action Rule failed:\n${result.failure}',
+          text:
+              "${widget.isNew ? 'Creating' : 'Updating'} Action Rule failed:\n${result.failure}",
         );
       }
     }
   }
 
   Future<void> _deleteActionRule() async {
-    if (widget.actionRule != null) {
+    if (!widget.isNew) {
       await _dataProvider.deleteSingle(_actionRule);
     }
     if (mounted) {
@@ -63,11 +65,7 @@ class _ActionRuleEditPageState extends State<ActionRuleEditPage> {
     return DiscardWarningOnPop(
       child: Scaffold(
         appBar: AppBar(
-          title: Text(
-            widget.actionRule != null
-                ? "Edit Action Rule"
-                : "Create Action Rule",
-          ),
+          title: Text("${widget.isNew ? 'Create' : 'Edit'} Action Rule"),
           actions: [
             IconButton(
               onPressed: _deleteActionRule,

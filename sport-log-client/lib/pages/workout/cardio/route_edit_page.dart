@@ -25,6 +25,7 @@ class RouteEditPage extends StatefulWidget {
   const RouteEditPage({required this.route, super.key});
 
   final Route? route;
+  bool get isNew => route == null;
 
   @override
   State<RouteEditPage> createState() => _RouteEditPageState();
@@ -51,31 +52,30 @@ class _RouteEditPageState extends State<RouteEditPage> {
 
   Future<void> _saveRoute() async {
     _logger.i("saving route");
-    final result = widget.route != null
-        ? await _dataProvider.updateSingle(_route)
-        : await _dataProvider.createSingle(_route);
+    final result = widget.isNew
+        ? await _dataProvider.createSingle(_route)
+        : await _dataProvider.updateSingle(_route);
     if (mounted) {
       if (result.isSuccess) {
         Navigator.pop(
           context,
           ReturnObject(
-            action: widget.route == null
-                ? ReturnAction.created
-                : ReturnAction.updated,
+            action: widget.isNew ? ReturnAction.created : ReturnAction.updated,
             payload: _route,
           ), // needed for route details page
         );
       } else {
         await showMessageDialog(
           context: context,
-          text: 'Creating Route Entry failed:\n${result.failure}',
+          text:
+              "${widget.isNew ? 'Creating' : 'Updating'} Route Entry failed:\n${result.failure}",
         );
       }
     }
   }
 
   Future<void> _deleteRoute() async {
-    if (widget.route != null) {
+    if (!widget.isNew) {
       await _dataProvider.deleteSingle(_route);
     }
     if (mounted) {
@@ -208,7 +208,7 @@ class _RouteEditPageState extends State<RouteEditPage> {
     return DiscardWarningOnPop(
       child: Scaffold(
         appBar: AppBar(
-          title: Text(widget.route != null ? "Edit Route" : "Create Route"),
+          title: Text("${widget.isNew ? 'Create' : 'Edit'} Route"),
           actions: [
             IconButton(
               onPressed: _deleteRoute,

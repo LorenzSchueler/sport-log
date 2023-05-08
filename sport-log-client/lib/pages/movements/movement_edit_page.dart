@@ -21,6 +21,7 @@ class MovementEditPage extends StatefulWidget {
 
   final MovementDescription? movementDescription;
   final String? name;
+  bool get isNew => movementDescription == null;
 
   @override
   State<StatefulWidget> createState() => _MovementEditPageState();
@@ -44,9 +45,9 @@ class _MovementEditPageState extends State<MovementEditPage> {
   }
 
   Future<void> _saveMovement() async {
-    final result = widget.movementDescription != null
-        ? await _dataProvider.updateSingle(_movementDescription.movement)
-        : await _dataProvider.createSingle(_movementDescription.movement);
+    final result = widget.isNew
+        ? await _dataProvider.createSingle(_movementDescription.movement)
+        : await _dataProvider.updateSingle(_movementDescription.movement);
     if (result.isSuccess) {
       Movement.defaultMovement ??= _movementDescription.movement;
       if (mounted) {
@@ -55,13 +56,14 @@ class _MovementEditPageState extends State<MovementEditPage> {
     } else if (mounted) {
       await showMessageDialog(
         context: context,
-        text: 'Creating Movement failed:\n${result.failure}',
+        text:
+            "${widget.isNew ? 'Creating' : 'Updating'} Movement failed:\n${result.failure}",
       );
     }
   }
 
   void _deleteMovement() {
-    if (widget.movementDescription != null) {
+    if (!widget.isNew) {
       assert(_movementDescription.movement.userId != null);
       _dataProvider.deleteSingle(_movementDescription.movement);
     }
@@ -73,14 +75,9 @@ class _MovementEditPageState extends State<MovementEditPage> {
     return DiscardWarningOnPop(
       child: Scaffold(
         appBar: AppBar(
-          title: Text(
-            widget.movementDescription != null
-                ? "Edit Movement"
-                : "New Movement",
-          ),
+          title: Text("${widget.isNew ? 'Create' : 'Edit'} Movement"),
           actions: [
-            if (widget.movementDescription != null &&
-                !widget.movementDescription!.hasReference)
+            if (!widget.isNew && !widget.movementDescription!.hasReference)
               IconButton(
                 onPressed: _deleteMovement,
                 icon: const Icon(AppIcons.delete),

@@ -21,6 +21,7 @@ class ActionEventEditPage extends StatefulWidget {
 
   final ActionProviderDescription actionProviderDescription;
   final ActionEvent? actionEvent;
+  bool get isNew => actionEvent == null;
 
   @override
   State<ActionEventEditPage> createState() => _ActionEventEditPageState();
@@ -34,23 +35,24 @@ class _ActionEventEditPageState extends State<ActionEventEditPage> {
       );
 
   Future<void> _saveActionEvent() async {
-    final result = widget.actionEvent != null
-        ? await _dataProvider.updateSingle(_actionEvent)
-        : await _dataProvider.createSingle(_actionEvent);
+    final result = widget.isNew
+        ? await _dataProvider.createSingle(_actionEvent)
+        : await _dataProvider.updateSingle(_actionEvent);
     if (mounted) {
       if (result.isSuccess) {
         Navigator.pop(context);
       } else {
         await showMessageDialog(
           context: context,
-          text: 'Creating Action Event failed:\n${result.failure}',
+          text:
+              "${widget.isNew ? 'Creating' : 'Updating'} Action Event failed:\n${result.failure}",
         );
       }
     }
   }
 
   Future<void> _deleteActionEvent() async {
-    if (widget.actionEvent != null) {
+    if (!widget.isNew) {
       await _dataProvider.deleteSingle(_actionEvent);
     }
     if (mounted) {
@@ -63,11 +65,7 @@ class _ActionEventEditPageState extends State<ActionEventEditPage> {
     return DiscardWarningOnPop(
       child: Scaffold(
         appBar: AppBar(
-          title: Text(
-            widget.actionEvent != null
-                ? "Edit Action Event"
-                : "Create Action Event",
-          ),
+          title: Text("${widget.isNew ? 'Create' : 'Edit'} Action Event"),
           actions: [
             IconButton(
               onPressed: _deleteActionEvent,

@@ -15,6 +15,7 @@ class DiaryEditPage extends StatefulWidget {
   const DiaryEditPage({this.diary, super.key});
 
   final Diary? diary;
+  bool get isNew => diary == null;
 
   @override
   State<DiaryEditPage> createState() => _DiaryEditPageState();
@@ -27,23 +28,24 @@ class _DiaryEditPageState extends State<DiaryEditPage> {
   late final Diary _diary = widget.diary?.clone() ?? Diary.defaultValue();
 
   Future<void> _saveDiary() async {
-    final result = widget.diary != null
-        ? await _dataProvider.updateSingle(_diary)
-        : await _dataProvider.createSingle(_diary);
+    final result = widget.isNew
+        ? await _dataProvider.createSingle(_diary)
+        : await _dataProvider.updateSingle(_diary);
     if (mounted) {
       if (result.isSuccess) {
         Navigator.pop(context);
       } else {
         await showMessageDialog(
           context: context,
-          text: 'Creating Diary Entry failed:\n${result.failure}',
+          text:
+              "${widget.isNew ? 'Creating' : 'Updating'} Diary Entry failed:\n${result.failure}",
         );
       }
     }
   }
 
   Future<void> _deleteDiary() async {
-    if (widget.diary != null) {
+    if (!widget.isNew) {
       await _dataProvider.deleteSingle(_diary);
     }
     if (mounted) {
@@ -56,9 +58,7 @@ class _DiaryEditPageState extends State<DiaryEditPage> {
     return DiscardWarningOnPop(
       child: Scaffold(
         appBar: AppBar(
-          title: Text(
-            widget.diary != null ? "Edit Diary Entry" : "Create Diary Entry",
-          ),
+          title: Text("${widget.isNew ? 'Create' : 'Edit'} Diary Entry"),
           actions: [
             IconButton(
               onPressed: _deleteDiary,

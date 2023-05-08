@@ -135,6 +135,7 @@ class PlatformCard extends StatelessWidget {
 class PlatformCredentialDialog extends StatefulWidget {
   const PlatformCredentialDialog(this.platformDescription, {super.key});
   final PlatformDescription platformDescription;
+  bool get isNew => platformDescription.platformCredential == null;
 
   @override
   State<PlatformCredentialDialog> createState() =>
@@ -217,23 +218,20 @@ class _PlatformCredentialDialogState extends State<PlatformCredentialDialog> {
   Widget get _updateButton {
     return ElevatedButton(
       onPressed: _update,
-      child: Text(
-        widget.platformDescription.platformCredential == null
-            ? "Create"
-            : "Update",
-      ),
+      child: Text(widget.isNew ? "Create" : "Edit"),
     );
   }
 
   Future<void> _update() async {
-    final result = widget.platformDescription.platformCredential == null
+    final result = widget.isNew
         ? await _dataProvider.createSingle(platformDescription)
         : await _dataProvider.updateSingle(platformDescription);
     if (mounted) {
       if (result.isFailure) {
         await showMessageDialog(
           context: context,
-          text: 'Creating Credentials failed:\n${result.failure}',
+          text:
+              "${widget.isNew ? 'Creating' : 'Updating'} Credentials failed:\n${result.failure}",
         );
       } else {
         Navigator.pop(context);
@@ -244,16 +242,12 @@ class _PlatformCredentialDialogState extends State<PlatformCredentialDialog> {
   Widget get _deleteButton {
     return ElevatedButton(
       onPressed: _delete,
-      child: Text(
-        widget.platformDescription.platformCredential == null
-            ? "Back"
-            : "Delete",
-      ),
+      child: Text(widget.isNew ? "Back" : "Delete"),
     );
   }
 
   Future<void> _delete() async {
-    if (widget.platformDescription.platformCredential == null) {
+    if (widget.isNew) {
       Navigator.pop(context);
     } else {
       final result = await _dataProvider.deleteSingle(platformDescription);
@@ -261,7 +255,7 @@ class _PlatformCredentialDialogState extends State<PlatformCredentialDialog> {
         if (result.isFailure) {
           await showMessageDialog(
             context: context,
-            text: 'Deleting Credentials failed:\n${result.failure}',
+            text: "Deleting Credentials failed:\n${result.failure}",
           );
         } else {
           Navigator.pop(context);
