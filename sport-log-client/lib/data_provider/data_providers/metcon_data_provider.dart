@@ -5,10 +5,9 @@ import 'package:sport_log/data_provider/data_provider.dart';
 import 'package:sport_log/data_provider/data_providers/movement_data_provider.dart';
 import 'package:sport_log/database/database.dart';
 import 'package:sport_log/database/tables/metcon_tables.dart';
-import 'package:sport_log/helpers/diff_algorithm.dart';
 import 'package:sport_log/helpers/extensions/sort_extension.dart';
+import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/models/all.dart';
-import 'package:sport_log/models/clone_extensions.dart';
 import 'package:sport_log/models/metcon/metcon_records.dart';
 
 class MetconDataProvider extends EntityDataProvider<Metcon> {
@@ -130,44 +129,31 @@ class MetconDescriptionDataProvider extends DataProvider<MetconDescription> {
     object.sanitize();
     assert(object.isValid());
 
-    final oldMMovements =
-        await _metconMovementDataProvider.getByMetcon(object.metcon);
-    final newMMovements = [...object.moves.map((m) => m.metconMovement)];
-
-    final diffing = diff(oldMMovements, newMMovements);
-
     var result =
         await _metconDataProvider.updateSingle(object.metcon, notify: false);
     if (result.isFailure) {
       return result;
     }
+
+    // Updating metconMovements does not work because one movement can end up having the same movementNumber (and metconId) and an existing movement.
+    // Temporarily setting the movementNumber to a higher value and updating it afterwards also does not work
+    // because the same problem will occur on the server side when the changes are synchronized.
+    // Since this is not an EntityDataProvider this method is not used for updates coming from the server.
+    final oldMMovements =
+        await _metconMovementDataProvider.getByMetcon(object.metcon);
+    final newMMovements = object.moves
+        .map(
+          (m) => m.metconMovement..id = randomId(),
+        )
+        .toList();
     result = await _metconMovementDataProvider.deleteMultiple(
-      diffing.toDelete,
+      oldMMovements,
       notify: false,
     );
     if (result.isFailure) {
       return result;
     }
-    // avoid conflicts with existing metconMovements with same movementNumber
-    result = await _metconMovementDataProvider.updateMultiple(
-      diffing.toUpdate.clone().map((m) {
-        m.movementNumber += 1000;
-        return m;
-      }).toList(),
-      notify: false,
-    );
-    if (result.isFailure) {
-      return result;
-    }
-    // set correct movementNumber
-    result = await _metconMovementDataProvider.updateMultiple(
-      diffing.toUpdate,
-      notify: false,
-    );
-    if (result.isFailure) {
-      return result;
-    }
-    return _metconMovementDataProvider.createMultiple(diffing.toCreate);
+    return _metconMovementDataProvider.createMultiple(newMMovements);
   }
 
   @override

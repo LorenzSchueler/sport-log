@@ -5,9 +5,8 @@ import 'package:sport_log/data_provider/data_provider.dart';
 import 'package:sport_log/data_provider/data_providers/movement_data_provider.dart';
 import 'package:sport_log/database/database.dart';
 import 'package:sport_log/database/tables/strength_tables.dart';
-import 'package:sport_log/helpers/diff_algorithm.dart';
+import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/models/account_data/account_data.dart';
-import 'package:sport_log/models/clone_extensions.dart';
 import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/models/strength/all.dart';
 import 'package:sport_log/models/strength/strength_records.dart';
@@ -96,11 +95,6 @@ class StrengthSessionDescriptionDataProvider
     object.sanitize();
     assert(object.isValid());
 
-    final oldSets =
-        await _strengthSetDataProvider.getByStrengthSession(object.session);
-    final newSets = [...object.sets];
-    final diffing = diff(oldSets, newSets);
-
     var result = await _strengthSessionDataProvider.updateSingle(
       object.session,
       notify: false,
@@ -108,33 +102,26 @@ class StrengthSessionDescriptionDataProvider
     if (result.isFailure) {
       return result;
     }
+
+    // Updating sets does not work because one set can end up having the same setNumber (and strengthSessionId) and an existing set.
+    // Temporarily setting the setNumber to a higher value and updating it afterwards also does not work
+    // because the same problem will occur on the server side when the changes are synchronized.
+    // Since this is not an EntityDataProvider this method is not used for updates coming from the server.
+    final oldSets =
+        await _strengthSetDataProvider.getByStrengthSession(object.session);
+    final newSets = object.sets
+        .map(
+          (s) => s..id = randomId(),
+        )
+        .toList();
     result = await _strengthSetDataProvider.deleteMultiple(
-      diffing.toDelete,
+      oldSets,
       notify: false,
     );
     if (result.isFailure) {
       return result;
     }
-    // avoid conflicts with existing sets with same setNumber
-    result = await _strengthSetDataProvider.updateMultiple(
-      diffing.toUpdate.clone().map((s) {
-        s.setNumber += 1000;
-        return s;
-      }).toList(),
-      notify: false,
-    );
-    if (result.isFailure) {
-      return result;
-    }
-    // set correct setNumber
-    result = await _strengthSetDataProvider.updateMultiple(
-      diffing.toUpdate,
-      notify: false,
-    );
-    if (result.isFailure) {
-      return result;
-    }
-    return _strengthSetDataProvider.createMultiple(diffing.toCreate);
+    return _strengthSetDataProvider.createMultiple(newSets);
   }
 
   @override
