@@ -70,20 +70,17 @@ class StrengthSessionStats extends JsonSerializable {
   Map<String, dynamic> toJson() => _$StrengthSessionStatsToJson(this);
 
   String toDisplayName(MovementDimension dimension) {
-    switch (dimension) {
-      case MovementDimension.reps:
-        return [
+    return switch (dimension) {
+      MovementDimension.reps => [
           if (maxEorm != null) '1RM: ${formatWeight(maxEorm!)}',
           if (sumVolume != null) 'Vol: ${formatWeight(sumVolume!)}',
           if (maxWeight != null) 'Max Weight: ${formatWeight(maxWeight!)}',
           'Avg Reps: ${avgCount.toStringAsFixed(1)}',
-        ].join(' • ');
-      case MovementDimension.time:
-        return 'Best time: ${Duration(milliseconds: minCount).formatMsMill}';
-      case MovementDimension.distance:
-        return 'Best distance: $maxCount m';
-      case MovementDimension.energy:
-        return 'Total energy: $sumCount cal';
-    }
+        ].join(' • '),
+      MovementDimension.time =>
+        'Best time: ${Duration(milliseconds: minCount).formatMsMill}',
+      MovementDimension.distance => 'Best distance: $maxCount m',
+      MovementDimension.energy => 'Total energy: $sumCount cal',
+    };
   }
 }

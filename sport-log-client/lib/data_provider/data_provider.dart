@@ -51,9 +51,8 @@ abstract class DataProvider<T> extends ChangeNotifier {
         unawaited(showNewCredentialsDialog());
         return null;
       // create something that references non existing object
-      case ApiErrorType.forbidden:
       // primary foreign or unique key violation
-      case ApiErrorType.conflict:
+      case ApiErrorType.forbidden || ApiErrorType.conflict:
         final conflictResolution = await showConflictDialog(
           context: App.globalContext,
           title: "An error occurred.",

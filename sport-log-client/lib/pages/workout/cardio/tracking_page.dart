@@ -154,9 +154,8 @@ class _TrackingPageButtons extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    switch (trackingMode) {
-      case TrackingMode.tracking:
-        return Row(
+    return switch (trackingMode) {
+      TrackingMode.tracking => Row(
           children: [
             Expanded(
               child: ElevatedButton(
@@ -169,9 +168,8 @@ class _TrackingPageButtons extends StatelessWidget {
               ),
             ),
           ],
-        );
-      case TrackingMode.paused:
-        return Row(
+        ),
+      TrackingMode.paused => Row(
           children: [
             Expanded(
               child: ElevatedButton(
@@ -195,9 +193,8 @@ class _TrackingPageButtons extends StatelessWidget {
               ),
             ),
           ],
-        );
-      case TrackingMode.notStarted:
-        return Row(
+        ),
+      TrackingMode.notStarted => Row(
           children: [
             Expanded(
               child: ElevatedButton(
@@ -227,7 +224,7 @@ class _TrackingPageButtons extends StatelessWidget {
               ),
             ),
           ],
-        );
-    }
+        ),
+    };
   }
 }

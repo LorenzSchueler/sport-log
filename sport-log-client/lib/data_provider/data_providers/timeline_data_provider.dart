@@ -98,7 +98,7 @@ class TimelineDataProvider extends DataProvider<TimelineUnion> {
         ..addAll(metconSessionsDescription.map(TimelineUnion.metconSession))
         ..addAll(cardioSessionsDescription.map(TimelineUnion.cardioSession))
         ..addAll(diaries.map(TimelineUnion.diary))
-        ..sort((a, b) => b.compareTo(a));
+        ..sort((a, b) => b.datetime.compareTo(a.datetime));
 
   Future<TimelineRecords> getRecords() async => TimelineRecords(
         await _strengthDataProvider.getStrengthRecords(),

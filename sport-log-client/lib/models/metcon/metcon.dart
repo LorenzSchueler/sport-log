@@ -81,16 +81,16 @@ class Metcon extends AtomicEntity {
       );
 
   bool validateMetconType() {
-    switch (metconType) {
-      case MetconType.amrap:
-        return validate(rounds == null, 'Metcon: amrap: rounds != null') &&
-            validate(timecap != null, 'Metcon: amrap: timecap == null');
-      case MetconType.emom:
-        return validate(rounds != null, 'Metcon: emom: rounds == null') &&
-            validate(timecap != null, 'Metcon: emom: timecap == null');
-      case MetconType.forTime:
-        return validate(rounds != null, 'Metcon: forTime: rounds == null');
-    }
+    return switch (metconType) {
+      MetconType.amrap =>
+        validate(rounds == null, 'Metcon: amrap: rounds != null') &&
+            validate(timecap != null, 'Metcon: amrap: timecap == null'),
+      MetconType.emom =>
+        validate(rounds != null, 'Metcon: emom: rounds == null') &&
+            validate(timecap != null, 'Metcon: emom: timecap == null'),
+      MetconType.forTime =>
+        validate(rounds != null, 'Metcon: forTime: rounds == null'),
+    };
   }
 
   @override

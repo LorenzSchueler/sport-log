@@ -80,33 +80,23 @@ class Column {
   bool getIsPrimaryKey() => _isPrimaryKey;
 
   static String _typeToString(DbType type) {
-    switch (type) {
-      case DbType.integer:
-        return 'integer';
-      case DbType.text:
-        return 'text';
-      case DbType.real:
-        return 'real';
-      case DbType.blob:
-        return 'blob';
-      case DbType.bool:
-        return 'integer';
-    }
+    return switch (type) {
+      DbType.integer => "integer",
+      DbType.text => "text",
+      DbType.real => "real",
+      DbType.blob => "blob",
+      DbType.bool => "integer",
+    };
   }
 
   static String _onActionToString(OnAction action) {
-    switch (action) {
-      case OnAction.setNull:
-        return 'set null';
-      case OnAction.setDefault:
-        return 'set default';
-      case OnAction.cascade:
-        return 'cascade';
-      case OnAction.restrict:
-        return 'restrict';
-      case OnAction.noAction:
-        return 'no action';
-    }
+    return switch (action) {
+      OnAction.setNull => "set null",
+      OnAction.setDefault => "set default",
+      OnAction.cascade => "cascade",
+      OnAction.restrict => "restrict",
+      OnAction.noAction => "no action",
+    };
   }
 
   String get _referenceString {

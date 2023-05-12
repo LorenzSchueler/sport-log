@@ -38,7 +38,6 @@ Stream<double> initialize() async* {
 }
 
 void main() {
-  WidgetsFlutterBinding.ensureInitialized();
   GlobalErrorHandler.run(
     () => runApp(const InitAppWrapper()),
   );

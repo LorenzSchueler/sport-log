@@ -2,7 +2,7 @@ import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/metcon/metcon_records.dart';
 import 'package:sport_log/models/strength/strength_records.dart';
 
-class TimelineUnion extends Comparable<TimelineUnion> {
+class TimelineUnion {
   TimelineUnion.strengthSession(
     StrengthSessionDescription this._strengthSessionDescription,
   )   : _metconSessionDescription = null,
@@ -58,11 +58,6 @@ class TimelineUnion extends Comparable<TimelineUnion> {
     } else {
       return diaryFunction(_diary!);
     }
-  }
-
-  @override
-  int compareTo(TimelineUnion other) {
-    return datetime.compareTo(other.datetime);
   }
 }
 

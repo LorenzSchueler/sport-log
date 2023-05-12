@@ -137,7 +137,6 @@ class _MetconSessionEditPageState extends State<MetconSessionEditPage> {
                               _metconSessionDescription.metconSession.rounds =
                                   0;
                               _metconSessionDescription.metconSession.reps = 0;
-                              break;
                             case MetconType.emom:
                               _metconSessionDescription.metconSession.time =
                                   null;
@@ -145,7 +144,6 @@ class _MetconSessionEditPageState extends State<MetconSessionEditPage> {
                                   null;
                               _metconSessionDescription.metconSession.reps =
                                   null;
-                              break;
                             case MetconType.forTime:
                               _metconSessionDescription.metconSession.time =
                                   Duration.zero;
@@ -154,7 +152,6 @@ class _MetconSessionEditPageState extends State<MetconSessionEditPage> {
                               _metconSessionDescription.metconSession.reps =
                                   null;
                               _finished = true;
-                              break;
                           }
                         });
                       }

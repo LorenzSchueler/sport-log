@@ -76,56 +76,47 @@ class DateTimeChart extends StatelessWidget {
         )
         .toList()
       ..sort((v1, v2) => v1.datetime.compareTo(v2.datetime));
-    switch (dateFilterState.runtimeType) {
-      case DayFilter:
-        return DayChart(
+
+    return switch (dateFilterState.runtimeType) {
+      DayFilter => DayChart(
           chartValues: chartValues,
           yFromZero: yFromZero,
           isTime: false,
-        );
-      case WeekFilter:
-        return WeekChart(
-          chartValues: chartValues,
-          yFromZero: yFromZero,
-          isTime: false,
-          startDateTime: dateFilterState.start!,
-        );
-      case MonthFilter:
-        return MonthChart(
+        ),
+      WeekFilter => WeekChart(
           chartValues: chartValues,
           yFromZero: yFromZero,
           isTime: false,
           startDateTime: dateFilterState.start!,
-        );
-      case YearFilter:
-        return YearChart(
+        ),
+      MonthFilter => MonthChart(
           chartValues: chartValues,
           yFromZero: yFromZero,
           isTime: false,
           startDateTime: dateFilterState.start!,
-        );
-      default:
-        return AllChart(
+        ),
+      YearFilter => YearChart(
           chartValues: chartValues,
           yFromZero: yFromZero,
           isTime: false,
-        );
-    }
+          startDateTime: dateFilterState.start!,
+        ),
+      _ => AllChart(
+          chartValues: chartValues,
+          yFromZero: yFromZero,
+          isTime: false,
+        ),
+    };
   }
 
   DateTime _groupFunction(DateTime dateTime) {
-    switch (dateFilterState.runtimeType) {
-      case DayFilter:
-        return dateTime;
-      case WeekFilter:
-        return dateTime.beginningOfDay();
-      case MonthFilter:
-        return dateTime.beginningOfDay();
-      case YearFilter:
-        return dateTime.beginningOfMonth().add(const Duration(days: 15));
-      default:
-        return dateTime.beginningOfMonth().add(const Duration(days: 15));
-    }
+    return switch (dateFilterState.runtimeType) {
+      DayFilter => dateTime,
+      WeekFilter => dateTime.beginningOfDay(),
+      MonthFilter => dateTime.beginningOfDay(),
+      YearFilter => dateTime.beginningOfMonth().add(const Duration(days: 15)),
+      _ => dateTime.beginningOfMonth().add(const Duration(days: 15)),
+    };
   }
 }
 

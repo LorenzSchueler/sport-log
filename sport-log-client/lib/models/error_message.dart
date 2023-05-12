@@ -70,16 +70,15 @@ class ErrorMessage extends JsonSerializable {
 
   @override
   String toString() {
-    switch (type) {
-      case ErrorMessageType.primaryKeyViolation:
-        return "primary key violation in table $table";
-      case ErrorMessageType.foreignKeyViolation:
-        return "foreign key violation in table $table in column $column";
-      case ErrorMessageType.uniqueViolation:
-        return "unique violation in table $table in columns $columns";
-      case ErrorMessageType.other:
-        return "$error";
-    }
+    return switch (type) {
+      ErrorMessageType.primaryKeyViolation =>
+        "primary key violation in table $table",
+      ErrorMessageType.foreignKeyViolation =>
+        "foreign key violation in table $table in column $column",
+      ErrorMessageType.uniqueViolation =>
+        "unique violation in table $table in columns $columns",
+      ErrorMessageType.other => "$error",
+    };
   }
 }
 

@@ -19,34 +19,32 @@ extension MetconRecordsExtension on MetconRecords {
     if (metconRecord == null) {
       return false;
     }
-    switch (metconSessionDescription.metconDescription.metcon.metconType) {
-      case MetconType.amrap:
-        return isRecord(
+    return switch (
+        metconSessionDescription.metconDescription.metcon.metconType) {
+      MetconType.amrap => isRecord(
           metconSessionDescription.metconSession.rounds
               ?.mulNullable(MetconRecord.multiplier)
               ?.addNullable(metconSessionDescription.metconSession.reps),
           metconRecord.rounds
               ?.mulNullable(MetconRecord.multiplier)
               ?.addNullable(metconRecord.reps),
-        );
-      case MetconType.forTime:
-        return metconRecord.time != null
-            ? isRecord(
-                metconSessionDescription.metconSession.time?.inMilliseconds,
-                metconRecord.time?.inMilliseconds,
-                minRecord: true,
-              )
-            : isRecord(
-                metconSessionDescription.metconSession.rounds
-                    ?.mulNullable(MetconRecord.multiplier)
-                    ?.addNullable(metconSessionDescription.metconSession.reps),
-                metconRecord.rounds
-                    ?.mulNullable(MetconRecord.multiplier)
-                    ?.addNullable(metconRecord.reps),
-              );
-      case MetconType.emom:
-        return false;
-    }
+        ),
+      MetconType.forTime => metconRecord.time != null
+          ? isRecord(
+              metconSessionDescription.metconSession.time?.inMilliseconds,
+              metconRecord.time?.inMilliseconds,
+              minRecord: true,
+            )
+          : isRecord(
+              metconSessionDescription.metconSession.rounds
+                  ?.mulNullable(MetconRecord.multiplier)
+                  ?.addNullable(metconSessionDescription.metconSession.reps),
+              metconRecord.rounds
+                  ?.mulNullable(MetconRecord.multiplier)
+                  ?.addNullable(metconRecord.reps),
+            ),
+      MetconType.emom => false,
+    };
   }
 }
 

@@ -257,17 +257,13 @@ class StrengthRecordsCard extends StatelessWidget {
       switch (movement.dimension) {
         case MovementDimension.reps:
           countText = "${strengthRecord!.maxCount} reps";
-          break;
         case MovementDimension.time:
           countText =
               Duration(milliseconds: strengthRecord!.maxCount).formatMsMill;
-          break;
         case MovementDimension.distance:
           countText = '${strengthRecord!.maxCount} m';
-          break;
         case MovementDimension.energy:
           countText = '${strengthRecord!.maxCount} cal';
-          break;
       }
     }
 
@@ -336,36 +332,31 @@ class StrengthRecordMarkers extends StatelessWidget {
     return Row(
       children: strengthRecordTypes
           .map(
-            (recordType) {
-              switch (recordType) {
-                case StrengthRecordType.maxWeight:
-                  return [
-                    const Icon(
-                      AppIcons.medal,
-                      color: Colors.orange,
-                      size: 20,
-                    ),
-                    Defaults.sizedBox.horizontal.normal,
-                  ];
-                case StrengthRecordType.maxCount:
-                  return [
-                    const Icon(
-                      AppIcons.medal,
-                      color: Colors.yellow,
-                      size: 20,
-                    ),
-                    Defaults.sizedBox.horizontal.normal,
-                  ];
-                case StrengthRecordType.maxEorm:
-                  return [
-                    const Icon(
-                      AppIcons.medal,
-                      color: Colors.grey,
-                      size: 20,
-                    ),
-                    Defaults.sizedBox.horizontal.normal,
-                  ];
-              }
+            (recordType) => switch (recordType) {
+              StrengthRecordType.maxWeight => [
+                  const Icon(
+                    AppIcons.medal,
+                    color: Colors.orange,
+                    size: 20,
+                  ),
+                  Defaults.sizedBox.horizontal.normal,
+                ],
+              StrengthRecordType.maxCount => [
+                  const Icon(
+                    AppIcons.medal,
+                    color: Colors.yellow,
+                    size: 20,
+                  ),
+                  Defaults.sizedBox.horizontal.normal,
+                ],
+              StrengthRecordType.maxEorm => [
+                  const Icon(
+                    AppIcons.medal,
+                    color: Colors.grey,
+                    size: 20,
+                  ),
+                  Defaults.sizedBox.horizontal.normal,
+                ],
             },
           )
           .toList()

@@ -42,48 +42,40 @@ class MetconSessionDescription extends CompoundEntity {
 
   @override
   bool isValidBeforeSanitation() {
-    bool metconMetconDescriptionChecks;
-    switch (metconDescription.metcon.metconType) {
-      case MetconType.amrap:
-        metconMetconDescriptionChecks = validate(
-              metconSession.time == null,
-              'MetconSessionDescription: time != null although amrap',
-            ) &&
-            validate(
-              metconSession.rounds != null,
-              'MetconSessionDescription: rounds != null although amrap',
-            ) &&
-            validate(
-              metconSession.reps != null,
-              'MetconSessionDescription: reps != null although amrap',
-            );
-        break;
-      case MetconType.emom:
-        metconMetconDescriptionChecks = validate(
-              metconSession.time == null,
-              'MetconSessionDescription: time != null although amrap',
-            ) &&
-            validate(
-              metconSession.rounds == null,
-              'MetconSessionDescription: rounds != null although amrap',
-            ) &&
-            validate(
-              metconSession.reps == null,
-              'MetconSessionDescription: reps != null although amrap',
-            );
-        break;
-      case MetconType.forTime:
-        metconMetconDescriptionChecks = validate(
-          metconSession.time == null ||
-              metconSession.rounds == null && metconSession.reps == null,
-          'MetconSessionDescription: for "for time" either time or rounds and reps must be null',
-        );
-        break;
-    }
     return metconSession.isValidBeforeSanitation() &&
         metconDescription.isValidBeforeSanitation() &&
         metconSession.metconId == metconDescription.metcon.id &&
-        metconMetconDescriptionChecks;
+        switch (metconDescription.metcon.metconType) {
+          MetconType.amrap => validate(
+                metconSession.time == null,
+                'MetconSessionDescription: time != null although amrap',
+              ) &&
+              validate(
+                metconSession.rounds != null,
+                'MetconSessionDescription: rounds != null although amrap',
+              ) &&
+              validate(
+                metconSession.reps != null,
+                'MetconSessionDescription: reps != null although amrap',
+              ),
+          MetconType.emom => validate(
+                metconSession.time == null,
+                'MetconSessionDescription: time != null although amrap',
+              ) &&
+              validate(
+                metconSession.rounds == null,
+                'MetconSessionDescription: rounds != null although amrap',
+              ) &&
+              validate(
+                metconSession.reps == null,
+                'MetconSessionDescription: reps != null although amrap',
+              ),
+          MetconType.forTime => validate(
+              metconSession.time == null ||
+                  metconSession.rounds == null && metconSession.reps == null,
+              'MetconSessionDescription: for "for time" either time or rounds and reps must be null',
+            ),
+        };
   }
 
   @override

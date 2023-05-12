@@ -93,48 +93,26 @@ extension _ToApiResult on StreamedResponse {
     final json = rawBody.isEmpty ? null : jsonDecode(rawBody) as Object;
     _logResponse(this, json);
 
-    switch (statusCode) {
-      case 200:
-        return fromJson != null
-            ? json != null
-                ? Success(fromJson(json))
-                // expected non empty body
-                : Failure(ApiError(ApiErrorType.badJson, statusCode))
-            : Success(null);
-      case 204:
-        return fromJson == null
-            ? Success(null)
-            // expected non empty body and status 200
-            : Failure(ApiError(ApiErrorType.badJson, statusCode));
-      case 400:
-        return Failure(
-          ApiError(ApiErrorType.badRequest, statusCode, json),
-        );
-      case 401:
-        return Failure(
-          ApiError(ApiErrorType.unauthorized, statusCode, json),
-        );
-      case 403:
-        return Failure(
-          ApiError(ApiErrorType.forbidden, statusCode, json),
-        );
-      case 404:
-        return Failure(
-          ApiError(ApiErrorType.notFound, statusCode, json),
-        );
-      case 409:
-        return Failure(
-          ApiError(ApiErrorType.conflict, statusCode, json),
-        );
-      case 500:
-        return Failure(
-          ApiError(ApiErrorType.internalServerError, statusCode, json),
-        );
-      default:
-        return Failure(
-          ApiError(ApiErrorType.unknownServerError, statusCode, json),
-        );
-    }
+    return switch (statusCode) {
+      200 => fromJson != null
+          ? json != null
+              ? Success(fromJson(json))
+              // expected non empty body
+              : Failure(ApiError(ApiErrorType.badJson, statusCode))
+          : Success(null),
+      204 => fromJson == null
+          ? Success(null)
+          // expected non empty body and status 200
+          : Failure(ApiError(ApiErrorType.badJson, statusCode)),
+      400 => Failure(ApiError(ApiErrorType.badRequest, statusCode, json)),
+      401 => Failure(ApiError(ApiErrorType.unauthorized, statusCode, json)),
+      403 => Failure(ApiError(ApiErrorType.forbidden, statusCode, json)),
+      404 => Failure(ApiError(ApiErrorType.notFound, statusCode, json)),
+      409 => Failure(ApiError(ApiErrorType.conflict, statusCode, json)),
+      500 =>
+        Failure(ApiError(ApiErrorType.internalServerError, statusCode, json)),
+      _ => Failure(ApiError(ApiErrorType.unknownServerError, statusCode, json)),
+    };
   }
 }
 
@@ -202,7 +180,8 @@ abstract class Api<T extends JsonSerializable> {
   Future<ApiResult<List<T>>> getMultiple() =>
       (Request("get", _uri)..headers.addAll(ApiHeaders.basicAuth))
           .toApiResultWithValue(
-        (json) => ((json as List<dynamic>).cast<Map<String, dynamic>>())
+        (json) => (json as List<dynamic>)
+            .cast<Map<String, dynamic>>()
             .map(fromJson)
             .toList(),
       );

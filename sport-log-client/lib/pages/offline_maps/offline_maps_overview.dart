@@ -133,9 +133,9 @@ class _OfflineMapsPageState extends State<OfflineMapsPage> {
                         mapDownloadUtils.progress == null
                             ? ElevatedButton(
                                 onPressed: () => _downloadMap(mapDownloadUtils),
-                                child: Row(
+                                child: const Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
-                                  children: const [
+                                  children: [
                                     Icon(AppIcons.download),
                                     Text("Download")
                                   ],

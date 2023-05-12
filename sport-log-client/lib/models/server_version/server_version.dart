@@ -40,7 +40,7 @@ class ServerVersion extends JsonSerializable {
   }
 }
 
-class Version extends Comparable<Version> {
+class Version implements Comparable<Version> {
   Version(this.major, this.minor, [this.patch]);
 
   factory Version.fromString(String version) {

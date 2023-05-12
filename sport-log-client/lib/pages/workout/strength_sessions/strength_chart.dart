@@ -25,26 +25,17 @@ enum _SeriesType {
   final bool yFromZero;
 
   double? value(StrengthSessionStats stats) {
-    switch (this) {
-      case _SeriesType.maxWeight:
-        return stats.maxWeight;
-      case _SeriesType.avgWeight:
-        return stats.avgWeight;
-      case _SeriesType.maxDistance:
-        return stats.maxCount.toDouble();
-      case _SeriesType.minTime:
-        return stats.minCount.toDouble();
-      case _SeriesType.sumCalories:
-        return stats.sumCount.toDouble();
-      case _SeriesType.maxEorm:
-        return stats.maxEorm;
-      case _SeriesType.maxReps:
-        return stats.maxCount.toDouble();
-      case _SeriesType.avgReps:
-        return stats.avgCount;
-      case _SeriesType.sumVolume:
-        return stats.sumVolume;
-    }
+    return switch (this) {
+      _SeriesType.maxWeight => stats.maxWeight,
+      _SeriesType.avgWeight => stats.avgWeight,
+      _SeriesType.maxDistance => stats.maxCount.toDouble(),
+      _SeriesType.minTime => stats.minCount.toDouble(),
+      _SeriesType.sumCalories => stats.sumCount.toDouble(),
+      _SeriesType.maxEorm => stats.maxEorm,
+      _SeriesType.maxReps => stats.maxCount.toDouble(),
+      _SeriesType.avgReps => stats.avgCount,
+      _SeriesType.sumVolume => stats.sumVolume,
+    };
   }
 }
 
@@ -79,35 +70,32 @@ class _StrengthChartState extends State<StrengthChart> {
       widget.strengthSessionDescriptions.map((d) => d.stats).toList();
 
   List<_SeriesType> _getAvailableSeries() {
-    switch (widget.strengthSessionDescriptions.first.movement.dimension) {
-      case MovementDimension.reps:
-        return [
+    return switch (
+        widget.strengthSessionDescriptions.first.movement.dimension) {
+      MovementDimension.reps => [
           _SeriesType.maxEorm,
           _SeriesType.maxWeight,
           _SeriesType.avgWeight,
           _SeriesType.maxReps,
           _SeriesType.avgReps,
           _SeriesType.sumVolume,
-        ];
-      case MovementDimension.energy:
-        return [
+        ],
+      MovementDimension.energy => [
           _SeriesType.sumCalories,
           _SeriesType.maxWeight,
           _SeriesType.avgWeight,
-        ];
-      case MovementDimension.distance:
-        return [
+        ],
+      MovementDimension.distance => [
           _SeriesType.maxDistance,
           _SeriesType.maxWeight,
           _SeriesType.avgWeight,
-        ];
-      case MovementDimension.time:
-        return [
+        ],
+      MovementDimension.time => [
           _SeriesType.minTime,
           _SeriesType.maxWeight,
           _SeriesType.avgWeight,
-        ];
-    }
+        ],
+    };
   }
 
   @override

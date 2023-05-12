@@ -34,12 +34,9 @@ class MetconSession extends AtomicEntity {
       case MetconType.amrap:
         rounds = 0;
         reps = 0;
-        break;
       case MetconType.emom:
-        break;
       case MetconType.forTime:
         time = Duration.zero;
-        break;
     }
     return MetconSession(
       id: randomId(),

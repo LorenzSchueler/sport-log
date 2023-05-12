@@ -55,14 +55,13 @@ class DbError {
 
   @override
   String toString() {
-    switch (dbErrorCode) {
-      case DbErrorCode.uniqueViolation:
-        return "An entry in table $table with the same values for ${columns!.join(', ')} already exists.";
-      case DbErrorCode.unknown:
-        return databaseException != null
-            ? "Unknown database error: $databaseException"
-            : "Unknown database error";
-    }
+    return switch (dbErrorCode) {
+      DbErrorCode.uniqueViolation =>
+        "An entry in table $table with the same values for ${columns!.join(', ')} already exists.",
+      DbErrorCode.unknown => databaseException != null
+          ? "Unknown database error: $databaseException"
+          : "Unknown database error",
+    };
   }
 }
 

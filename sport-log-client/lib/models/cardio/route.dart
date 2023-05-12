@@ -15,7 +15,7 @@ import 'package:sport_log/settings.dart';
 part 'route.g.dart';
 
 @JsonSerializable()
-class Route extends AtomicEntity with Comparable<Route> {
+class Route extends AtomicEntity {
   Route({
     required this.id,
     required this.userId,
@@ -127,11 +127,6 @@ class Route extends AtomicEntity with Comparable<Route> {
     if (markedPositions != null && markedPositions!.isEmpty) {
       markedPositions = null;
     }
-  }
-
-  @override
-  int compareTo(Route other) {
-    return name.compareTo(other.name);
   }
 }
 

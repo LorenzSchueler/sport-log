@@ -194,38 +194,32 @@ class _MetconEditPageState extends State<MetconEditPage> {
         case MetconType.amrap:
           _metconDescription.metcon.rounds = null;
           _metconDescription.metcon.timecap ??= Metcon.timecapDefaultValue;
-          break;
         case MetconType.emom:
           _metconDescription.metcon.rounds ??= Metcon.roundsDefaultValue;
           _metconDescription.metcon.timecap ??= Metcon.timecapDefaultValue;
-          break;
         case MetconType.forTime:
           _metconDescription.metcon.rounds ??= Metcon.roundsDefaultValue;
-          // timecap can be either null or non null
-          break;
+        // timecap can be either null or non null
       }
     });
   }
 
   Widget _additionalFieldsInput() {
-    switch (_metconDescription.metcon.metconType) {
-      case MetconType.amrap:
-        return _timecapInput(caption: "Time", allowCancel: false);
-      case MetconType.emom:
-        return Column(
+    return switch (_metconDescription.metcon.metconType) {
+      MetconType.amrap => _timecapInput(caption: "Time", allowCancel: false),
+      MetconType.emom => Column(
           children: [
             _roundsInput(),
             _timecapInput(caption: "Total Time", allowCancel: false),
           ],
-        );
-      case MetconType.forTime:
-        return Column(
+        ),
+      MetconType.forTime => Column(
           children: [
             _roundsInput(),
             _timecapInput(caption: "Timecap", allowCancel: true),
           ],
-        );
-    }
+        ),
+    };
   }
 
   Widget _roundsInput() {
