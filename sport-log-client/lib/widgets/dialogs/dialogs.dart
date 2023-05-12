@@ -24,7 +24,7 @@ class _Dialog<T> extends StatelessWidget {
   Widget build(BuildContext context) {
     return AlertDialog(
       title: title == null ? null : Text(title!),
-      content: Text(text),
+      content: SingleChildScrollView(child: Text(text)),
       actions: options
           .map(
             (o) => TextButton(
