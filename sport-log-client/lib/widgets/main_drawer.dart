@@ -26,6 +26,20 @@ class MainDrawer extends StatelessWidget {
           builder: (context, settings, _) {
             return Column(
               children: [
+                const DrawerHeader(
+                  child: Column(
+                    children: [
+                      Icon(
+                        AppIcons.plan,
+                        size: 100,
+                      ),
+                      Text(
+                        "Sport Log",
+                        style: TextStyle(fontSize: 30),
+                      ),
+                    ],
+                  ),
+                ),
                 Expanded(
                   child: ListView(
                     children: [
