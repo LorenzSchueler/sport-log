@@ -33,11 +33,8 @@ class PlatformOverviewPage extends StatelessWidget {
           appBar: AppBar(title: const Text("Server Actions")),
           body: SyncRefreshIndicator(
             child: dataProvider.entities.isEmpty
-                ? const Center(
-                    child: Text(
-                      "looks like there are no platforms 😔",
-                      textAlign: TextAlign.center,
-                    ),
+                ? const RefreshableNoEntriesText(
+                    text: "Looks like there are no registered platforms 😔",
                   )
                 : Padding(
                     padding: Defaults.edgeInsets.normal,

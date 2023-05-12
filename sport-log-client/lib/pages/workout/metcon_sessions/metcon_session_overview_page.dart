@@ -103,7 +103,9 @@ class MetconSessionsPage extends StatelessWidget {
             children: [
               SyncRefreshIndicator(
                 child: dataProvider.entities.isEmpty
-                    ? SessionsPageTab.metcon.noEntriesText
+                    ? RefreshableNoEntriesText(
+                        text: SessionsPageTab.metcon.noEntriesText,
+                      )
                     : Padding(
                         padding: Defaults.edgeInsets.normal,
                         child: dataProvider.selected != null &&

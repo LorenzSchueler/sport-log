@@ -61,11 +61,9 @@ class MetconsPage extends StatelessWidget {
           ),
           body: SyncRefreshIndicator(
             child: dataProvider.entities.isEmpty
-                ? const Center(
-                    child: Text(
-                      "looks like there are no metcons there yet 😔 \npress ＋ to create a new one",
-                      textAlign: TextAlign.center,
-                    ),
+                ? const RefreshableNoEntriesText(
+                    text:
+                        "Looks like there are no metcons there yet 😔\nPress ＋ to create a new one",
                   )
                 : Padding(
                     padding: Defaults.edgeInsets.normal,

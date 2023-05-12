@@ -22,3 +22,20 @@ class SyncRefreshIndicator extends StatelessWidget {
     );
   }
 }
+
+class RefreshableNoEntriesText extends StatelessWidget {
+  const RefreshableNoEntriesText({required this.text, super.key});
+
+  final String text;
+  @override
+  Widget build(BuildContext context) {
+    return CustomScrollView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      slivers: [
+        SliverFillRemaining(
+          child: Center(child: Text(text, textAlign: TextAlign.center)),
+        ),
+      ],
+    );
+  }
+}

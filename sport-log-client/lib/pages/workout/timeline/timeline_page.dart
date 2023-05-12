@@ -96,7 +96,9 @@ class TimelinePage extends StatelessWidget {
             children: [
               SyncRefreshIndicator(
                 child: dataProvider.entities.isEmpty
-                    ? SessionsPageTab.timeline.noEntriesWithoutAddText
+                    ? RefreshableNoEntriesText(
+                        text: SessionsPageTab.timeline.noEntriesWithoutAddText,
+                      )
                     : Padding(
                         padding: Defaults.edgeInsets.normal,
                         child: ListView.separated(

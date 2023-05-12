@@ -31,19 +31,11 @@ enum SessionsPageTab {
   final String label;
   final String entryName;
 
-  Widget get noEntriesText => Center(
-        child: Text(
-          "looks like there are no $entryName there yet 😔 \nselect a different time range above ↑\nor press ＋ to create a new one",
-          textAlign: TextAlign.center,
-        ),
-      );
+  String get noEntriesText =>
+      "Looks like there are no $entryName there yet 😔 \nSelect a different time range above ↑\nor press ＋ to create a new one";
 
-  Widget get noEntriesWithoutAddText => Center(
-        child: Text(
-          "looks like there are no $entryName there yet 😔 \nselect a different time range above ↑",
-          textAlign: TextAlign.center,
-        ),
-      );
+  String get noEntriesWithoutAddText =>
+      "Looks like there are no $entryName there yet 😔 \nSelect a different time range above ↑";
 
   static BottomNavigationBar bottomNavigationBar({
     required BuildContext context,
