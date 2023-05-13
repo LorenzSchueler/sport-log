@@ -7,6 +7,8 @@ import 'package:sport_log/helpers/extensions/formatting.dart';
 import 'package:sport_log/helpers/page_return.dart';
 import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/models/strength/all.dart';
+import 'package:sport_log/models/strength/strength_records.dart';
+import 'package:sport_log/pages/workout/strength_sessions/strength_record_card.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/input_fields/edit_tile.dart';
@@ -29,6 +31,22 @@ class StrengthSessionDetailsPageState
   final _dataProvider = StrengthSessionDescriptionDataProvider();
   late StrengthSessionDescription _strengthSessionDescription =
       widget.strengthSessionDescription.clone();
+  StrengthRecords strengthRecords = {};
+
+  @override
+  void initState() {
+    _loadRecords();
+    super.initState();
+  }
+
+  Future<void> _loadRecords() async {
+    final records = await _dataProvider.getStrengthRecords();
+    if (mounted) {
+      setState(() {
+        strengthRecords = records;
+      });
+    }
+  }
 
   Future<void> _deleteStrengthSession() async {
     await _dataProvider.deleteSingle(_strengthSessionDescription);
@@ -50,6 +68,7 @@ class StrengthSessionDetailsPageState
         setState(() {
           _strengthSessionDescription = returnObj.payload;
         });
+        await _loadRecords();
       }
     }
   }
@@ -132,22 +151,41 @@ class StrengthSessionDetailsPageState
               padding: Defaults.edgeInsets.normal,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: _strengthSessionDescription.sets
-                    .mapIndexed(
-                      (index, set) => EditTile(
-                        leading: null,
-                        caption: "Set ${index + 1}",
-                        child: Text(
-                          set.toDisplayName(
-                            _strengthSessionDescription.movement.dimension,
-                            withEorm: true,
+                children: _strengthSessionDescription.sets.mapIndexed(
+                  (index, set) {
+                    final recordTypes = strengthRecords.getRecordTypes(
+                      set,
+                      _strengthSessionDescription.movement,
+                    );
+                    return EditTile(
+                      leading: null,
+                      caption: "Set ${index + 1}",
+                      child: Row(
+                        children: [
+                          Text(
+                            set.toDisplayName(
+                              _strengthSessionDescription.movement.dimension,
+                              withEorm: true,
+                            ),
                           ),
-                        ),
+                          if (recordTypes.isNotEmpty) ...[
+                            Defaults.sizedBox.horizontal.normal,
+                            StrengthRecordMarkers(
+                              strengthRecordTypes: recordTypes,
+                            ),
+                          ],
+                        ],
                       ),
-                    )
-                    .toList(),
+                    );
+                  },
+                ).toList(),
               ),
             ),
+          ),
+          Defaults.sizedBox.vertical.small,
+          StrengthRecordsCard(
+            strengthRecords: strengthRecords,
+            movement: _strengthSessionDescription.movement,
           ),
         ],
       ),

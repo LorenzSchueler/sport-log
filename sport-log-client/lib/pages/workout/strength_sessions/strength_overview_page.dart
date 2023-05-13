@@ -1,4 +1,3 @@
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_log/data_provider/data_providers/strength_data_provider.dart';
 import 'package:sport_log/data_provider/overview_data_provider.dart';
@@ -11,6 +10,7 @@ import 'package:sport_log/pages/workout/date_filter/date_filter.dart';
 import 'package:sport_log/pages/workout/overview_card.dart';
 import 'package:sport_log/pages/workout/session_tab_utils.dart';
 import 'package:sport_log/pages/workout/strength_sessions/strength_chart.dart';
+import 'package:sport_log/pages/workout/strength_sessions/strength_record_card.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
@@ -206,132 +206,6 @@ class StrengthSessionCard extends StatelessWidget {
         Routes.strengthDetails,
         arguments: strengthSessionDescription,
       ),
-    );
-  }
-}
-
-class StrengthRecordsCard extends StatelessWidget {
-  StrengthRecordsCard({
-    required this.movement,
-    required StrengthRecords strengthRecords,
-    super.key,
-  }) : strengthRecord = strengthRecords[movement.id];
-
-  final Movement movement;
-  final StrengthRecord? strengthRecord;
-
-  @override
-  Widget build(BuildContext context) {
-    String? countText;
-    if (strengthRecord != null) {
-      switch (movement.dimension) {
-        case MovementDimension.reps:
-          countText = "${strengthRecord!.maxCount} reps";
-        case MovementDimension.time:
-          countText =
-              Duration(milliseconds: strengthRecord!.maxCount).formatMsMill;
-        case MovementDimension.distance:
-          countText = '${strengthRecord!.maxCount} m';
-        case MovementDimension.energy:
-          countText = '${strengthRecord!.maxCount} cal';
-      }
-    }
-
-    return strengthRecord == null
-        ? Container()
-        : Card(
-            margin: EdgeInsets.zero,
-            child: Padding(
-              padding: Defaults.edgeInsets.normal,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  if (strengthRecord!.maxWeight != null) ...[
-                    const Icon(
-                      AppIcons.medal,
-                      color: Colors.orange,
-                      size: 20,
-                    ),
-                    Defaults.sizedBox.horizontal.small,
-                    Text(
-                      "${strengthRecord!.maxWeight!.round()} kg",
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    Defaults.sizedBox.horizontal.normal,
-                  ],
-                  const Icon(
-                    AppIcons.medal,
-                    color: Colors.yellow,
-                    size: 20,
-                  ),
-                  Defaults.sizedBox.horizontal.small,
-                  Text(
-                    countText!,
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                  if (strengthRecord!.maxEorm != null) ...[
-                    Defaults.sizedBox.horizontal.normal,
-                    const Icon(
-                      AppIcons.medal,
-                      color: Colors.grey,
-                      size: 20,
-                    ),
-                    Defaults.sizedBox.horizontal.small,
-                    Text(
-                      "${strengthRecord!.maxEorm!.round()} kg",
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                  ],
-                ],
-              ),
-            ),
-          );
-  }
-}
-
-class StrengthRecordMarkers extends StatelessWidget {
-  const StrengthRecordMarkers({
-    required this.strengthRecordTypes,
-    super.key,
-  });
-
-  final List<StrengthRecordType> strengthRecordTypes;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: strengthRecordTypes
-          .map(
-            (recordType) => switch (recordType) {
-              StrengthRecordType.maxWeight => [
-                  const Icon(
-                    AppIcons.medal,
-                    color: Colors.orange,
-                    size: 20,
-                  ),
-                  Defaults.sizedBox.horizontal.normal,
-                ],
-              StrengthRecordType.maxCount => [
-                  const Icon(
-                    AppIcons.medal,
-                    color: Colors.yellow,
-                    size: 20,
-                  ),
-                  Defaults.sizedBox.horizontal.normal,
-                ],
-              StrengthRecordType.maxEorm => [
-                  const Icon(
-                    AppIcons.medal,
-                    color: Colors.grey,
-                    size: 20,
-                  ),
-                  Defaults.sizedBox.horizontal.normal,
-                ],
-            },
-          )
-          .toList()
-          .flattened
-          .toList(),
     );
   }
 }
