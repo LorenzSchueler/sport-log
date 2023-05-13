@@ -3,12 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:sport_log/data_provider/data_providers/diary_data_provider.dart';
 import 'package:sport_log/data_provider/overview_data_provider.dart';
 import 'package:sport_log/defaults.dart';
-import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/models/diary/diary.dart';
 import 'package:sport_log/pages/workout/charts/datetime_chart.dart';
-import 'package:sport_log/pages/workout/comments_box.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_state.dart';
+import 'package:sport_log/pages/workout/overview_card.dart';
 import 'package:sport_log/pages/workout/session_tab_utils.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/theme.dart';
@@ -145,44 +144,22 @@ class DiaryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return OverviewCard(
+      datetime: diary.date,
+      left: const [],
+      right: [
+        if (diary.bodyweight != null)
+          ValueUnitDescription(
+            value: diary.bodyweight?.toStringAsFixed(1),
+            unit: "kg Bodyweight",
+            description: null,
+          ),
+      ],
+      comments: diary.comments,
       onTap: () {
         Navigator.pushNamed(context, Routes.diaryEdit, arguments: diary);
       },
-      child: Card(
-        margin: EdgeInsets.zero,
-        child: Padding(
-          padding: Defaults.edgeInsets.normal,
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(
-                width: 150,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(diary.date.toHumanDay()),
-                    if (diary.bodyweight != null) ...[
-                      Defaults.sizedBox.vertical.normal,
-                      ValueUnitDescription(
-                        value: diary.bodyweight?.toStringAsFixed(1),
-                        unit: "kg Bodyweight",
-                        description: null,
-                      ),
-                    ]
-                  ],
-                ),
-              ),
-              if (diary.comments != null) ...[
-                Defaults.sizedBox.horizontal.normal,
-                Expanded(
-                  child: CommentsBox(comments: diary.comments!),
-                ),
-              ]
-            ],
-          ),
-        ),
-      ),
+      dateOnly: true,
     );
   }
 }

@@ -7,8 +7,8 @@ import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/models/strength/all.dart';
 import 'package:sport_log/models/strength/strength_records.dart';
-import 'package:sport_log/pages/workout/comments_box.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter.dart';
+import 'package:sport_log/pages/workout/overview_card.dart';
 import 'package:sport_log/pages/workout/session_tab_utils.dart';
 import 'package:sport_log/pages/workout/strength_sessions/strength_chart.dart';
 import 'package:sport_log/routes.dart';
@@ -171,72 +171,40 @@ class StrengthSessionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return OverviewCard(
+      datetime: strengthSessionDescription.session.datetime,
+      left: [
+        Text(
+          strengthSessionDescription.movement.name,
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
+        if (strengthRecordTypes.isNotEmpty) ...[
+          Defaults.sizedBox.vertical.normal,
+          StrengthRecordMarkers(
+            strengthRecordTypes: strengthRecordTypes,
+          ),
+        ],
+        if (strengthSessionDescription.session.interval != null) ...[
+          Defaults.sizedBox.vertical.normal,
+          Text(
+            "Interval: ${strengthSessionDescription.session.interval!.formatTimeShort}",
+          ),
+        ],
+      ],
+      right: strengthSessionDescription.sets
+          .map(
+            (set) => Text(
+              set.toDisplayName(
+                strengthSessionDescription.movement.dimension,
+              ),
+            ),
+          )
+          .toList(),
+      comments: strengthSessionDescription.session.comments,
       onTap: () => Navigator.pushNamed(
         context,
         Routes.strengthDetails,
         arguments: strengthSessionDescription,
-      ),
-      child: Card(
-        margin: EdgeInsets.zero,
-        child: Padding(
-          padding: Defaults.edgeInsets.normal,
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      strengthSessionDescription.session.datetime
-                          .toHumanDateTime(),
-                    ),
-                    Defaults.sizedBox.vertical.normal,
-                    Text(
-                      strengthSessionDescription.movement.name,
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    if (strengthRecordTypes.isNotEmpty) ...[
-                      Defaults.sizedBox.vertical.normal,
-                      StrengthRecordMarkers(
-                        strengthRecordTypes: strengthRecordTypes,
-                      ),
-                    ],
-                    if (strengthSessionDescription.session.interval !=
-                        null) ...[
-                      Defaults.sizedBox.vertical.normal,
-                      Text(
-                        "Interval: ${strengthSessionDescription.session.interval!.formatTimeShort}",
-                      ),
-                    ],
-                    if (strengthSessionDescription.session.comments !=
-                        null) ...[
-                      Defaults.sizedBox.vertical.normal,
-                      CommentsBox(
-                        comments: strengthSessionDescription.session.comments!,
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: strengthSessionDescription.sets
-                      .map(
-                        (set) => Text(
-                          set.toDisplayName(
-                            strengthSessionDescription.movement.dimension,
-                          ),
-                        ),
-                      )
-                      .toList(),
-                ),
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }

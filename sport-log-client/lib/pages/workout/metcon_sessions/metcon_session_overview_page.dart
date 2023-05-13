@@ -2,14 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:sport_log/data_provider/data_providers/metcon_data_provider.dart';
 import 'package:sport_log/data_provider/overview_data_provider.dart';
 import 'package:sport_log/defaults.dart';
-import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/extensions/navigator_extension.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/metcon/metcon_records.dart';
-import 'package:sport_log/pages/workout/comments_box.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter.dart';
 import 'package:sport_log/pages/workout/metcon_sessions/metcon_description_card.dart';
 import 'package:sport_log/pages/workout/metcon_sessions/metcon_session_results_card.dart';
+import 'package:sport_log/pages/workout/overview_card.dart';
 import 'package:sport_log/pages/workout/session_tab_utils.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/theme.dart';
@@ -184,7 +183,37 @@ class MetconSessionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return OverviewCard(
+      datetime: metconSessionDescription.metconSession.datetime,
+      left: [
+        Text(
+          metconSessionDescription.metconDescription.metcon.name,
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
+        if (metconRecord) ...[
+          Defaults.sizedBox.vertical.normal,
+          const Icon(
+            AppIcons.medal,
+            color: Colors.orange,
+            size: 20,
+          ),
+        ],
+      ],
+      right: [
+        Text(metconSessionDescription.longResultDescription),
+        Defaults.sizedBox.vertical.normal,
+        Row(
+          children: [
+            const Text("Rx "),
+            Icon(
+              metconSessionDescription.metconSession.rx
+                  ? AppIcons.check
+                  : AppIcons.close,
+            ),
+          ],
+        ),
+      ],
+      comments: metconSessionDescription.metconSession.comments,
       onTap: () {
         Navigator.pushNamed(
           context,
@@ -192,71 +221,6 @@ class MetconSessionCard extends StatelessWidget {
           arguments: metconSessionDescription,
         );
       },
-      child: Card(
-        margin: EdgeInsets.zero,
-        child: Padding(
-          padding: Defaults.edgeInsets.normal,
-          child: Column(
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          metconSessionDescription.metconSession.datetime
-                              .toHumanDateTime(),
-                        ),
-                        Defaults.sizedBox.vertical.normal,
-                        Text(
-                          metconSessionDescription
-                              .metconDescription.metcon.name,
-                          style: Theme.of(context).textTheme.titleMedium,
-                        ),
-                        if (metconRecord) ...[
-                          Defaults.sizedBox.vertical.normal,
-                          const Icon(
-                            AppIcons.medal,
-                            color: Colors.orange,
-                            size: 20,
-                          ),
-                        ],
-                      ],
-                    ),
-                  ),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(metconSessionDescription.longResultDescription),
-                        Defaults.sizedBox.vertical.normal,
-                        Row(
-                          children: [
-                            const Text("Rx "),
-                            Icon(
-                              metconSessionDescription.metconSession.rx
-                                  ? AppIcons.check
-                                  : AppIcons.close,
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              if (metconSessionDescription.metconSession.comments != null) ...[
-                const Divider(),
-                CommentsBox(
-                  comments: metconSessionDescription.metconSession.comments!,
-                ),
-              ],
-            ],
-          ),
-        ),
-      ),
     );
   }
 }

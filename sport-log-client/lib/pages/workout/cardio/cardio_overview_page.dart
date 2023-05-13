@@ -254,6 +254,7 @@ class CardioSessionCard extends StatelessWidget {
             Padding(
               padding: Defaults.edgeInsets.normal,
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
