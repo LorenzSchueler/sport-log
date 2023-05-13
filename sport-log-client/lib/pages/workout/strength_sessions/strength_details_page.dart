@@ -92,44 +92,12 @@ class StrengthSessionDetailsPageState
       body: ListView(
         padding: Defaults.edgeInsets.normal,
         children: [
-          Card(
-            margin: EdgeInsets.zero,
-            child: Padding(
-              padding: Defaults.edgeInsets.normal,
-              child: Column(
-                children: [
-                  EditTile(
-                    leading: null,
-                    caption: "Date",
-                    child: Text(
-                      _strengthSessionDescription.session.datetime
-                          .toHumanDateTime(),
-                    ),
-                  ),
-                  EditTile(
-                    leading: null,
-                    caption: "Sets",
-                    child: Text(
-                      '${_strengthSessionDescription.sets.length} sets',
-                    ),
-                  ),
-                  if (widget.strengthSessionDescription.session.interval !=
-                      null)
-                    EditTile(
-                      leading: null,
-                      caption: "Interval",
-                      child: Text(
-                        _strengthSessionDescription
-                            .session.interval!.formatTimeShort,
-                      ),
-                    ),
-                  ..._bestValuesInfo(_strengthSessionDescription),
-                ],
-              ),
-            ),
+          _StrengthStatsCard(
+            strengthSessionDescription: _strengthSessionDescription,
+            strengthRecords: strengthRecords,
           ),
           if (_strengthSessionDescription.session.comments != null) ...[
-            Defaults.sizedBox.vertical.small,
+            Defaults.sizedBox.vertical.normal,
             Card(
               margin: EdgeInsets.zero,
               child: Padding(
@@ -144,50 +112,64 @@ class StrengthSessionDetailsPageState
               ),
             ),
           ],
-          Defaults.sizedBox.vertical.small,
-          Card(
-            margin: EdgeInsets.zero,
-            child: Padding(
-              padding: Defaults.edgeInsets.normal,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: _strengthSessionDescription.sets.mapIndexed(
-                  (index, set) {
-                    final recordTypes = strengthRecords.getRecordTypes(
-                      set,
-                      _strengthSessionDescription.movement,
-                    );
-                    return EditTile(
-                      leading: null,
-                      caption: "Set ${index + 1}",
-                      child: Row(
-                        children: [
-                          Text(
-                            set.toDisplayName(
-                              _strengthSessionDescription.movement.dimension,
-                              withEorm: true,
-                            ),
-                          ),
-                          if (recordTypes.isNotEmpty) ...[
-                            Defaults.sizedBox.horizontal.normal,
-                            StrengthRecordMarkers(
-                              strengthRecordTypes: recordTypes,
-                            ),
-                          ],
-                        ],
-                      ),
-                    );
-                  },
-                ).toList(),
-              ),
-            ),
+          Defaults.sizedBox.vertical.normal,
+          _StrengthSetsCard(
+            strengthSessionDescription: _strengthSessionDescription,
+            strengthRecords: strengthRecords,
           ),
-          Defaults.sizedBox.vertical.small,
+          Defaults.sizedBox.vertical.normal,
           StrengthRecordsCard(
             strengthRecords: strengthRecords,
             movement: _strengthSessionDescription.movement,
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _StrengthStatsCard extends StatelessWidget {
+  const _StrengthStatsCard({
+    required this.strengthSessionDescription,
+    required this.strengthRecords,
+  });
+
+  final StrengthSessionDescription strengthSessionDescription;
+  final StrengthRecords strengthRecords;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: EdgeInsets.zero,
+      child: Padding(
+        padding: Defaults.edgeInsets.normal,
+        child: Column(
+          children: [
+            EditTile(
+              leading: null,
+              caption: "Date",
+              child: Text(
+                strengthSessionDescription.session.datetime.toHumanDateTime(),
+              ),
+            ),
+            EditTile(
+              leading: null,
+              caption: "Sets",
+              child: Text(
+                '${strengthSessionDescription.sets.length} sets',
+              ),
+            ),
+            if (strengthSessionDescription.session.interval != null)
+              EditTile(
+                leading: null,
+                caption: "Interval",
+                child: Text(
+                  strengthSessionDescription.session.interval!.formatTimeShort,
+                ),
+              ),
+            ..._bestValuesInfo(strengthSessionDescription),
+          ],
+        ),
       ),
     );
   }
@@ -250,5 +232,56 @@ class StrengthSessionDetailsPageState
           ),
         ];
     }
+  }
+}
+
+class _StrengthSetsCard extends StatelessWidget {
+  const _StrengthSetsCard({
+    required this.strengthSessionDescription,
+    required this.strengthRecords,
+  });
+
+  final StrengthSessionDescription strengthSessionDescription;
+  final StrengthRecords strengthRecords;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: EdgeInsets.zero,
+      child: Padding(
+        padding: Defaults.edgeInsets.normal,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: strengthSessionDescription.sets.mapIndexed(
+            (index, set) {
+              final recordTypes = strengthRecords.getRecordTypes(
+                set,
+                strengthSessionDescription.movement,
+              );
+              return EditTile(
+                leading: null,
+                caption: "Set ${index + 1}",
+                child: Row(
+                  children: [
+                    Text(
+                      set.toDisplayName(
+                        strengthSessionDescription.movement.dimension,
+                        withEorm: true,
+                      ),
+                    ),
+                    if (recordTypes.isNotEmpty) ...[
+                      Defaults.sizedBox.horizontal.normal,
+                      StrengthRecordMarkers(
+                        strengthRecordTypes: recordTypes,
+                      ),
+                    ],
+                  ],
+                ),
+              );
+            },
+          ).toList(),
+        ),
+      ),
+    );
   }
 }
