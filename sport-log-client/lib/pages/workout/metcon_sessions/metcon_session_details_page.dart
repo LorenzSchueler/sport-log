@@ -72,6 +72,7 @@ class _MetconSessionDetailsPageState extends State<MetconSessionDetailsPage> {
         setState(() {
           _metconSessionDescription = returnObj.payload;
         });
+        await _loadOtherSessions();
       }
     }
   }
