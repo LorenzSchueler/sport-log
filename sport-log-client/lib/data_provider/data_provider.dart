@@ -50,9 +50,8 @@ abstract class DataProvider<T> extends ChangeNotifier {
         _logger.w('Tried sync but access unauthorized.', error);
         unawaited(showNewCredentialsDialog());
         return null;
-      // create something that references non existing object
       // primary foreign or unique key violation
-      case ApiErrorType.forbidden || ApiErrorType.conflict:
+      case ApiErrorType.conflict:
         final conflictResolution = await showConflictDialog(
           context: App.globalContext,
           title: "An error occurred.",
