@@ -177,12 +177,11 @@ class _StrengthStatsCard extends StatelessWidget {
   // ignore: long-method
   List<Widget> _bestValuesInfo(StrengthSessionDescription session) {
     final stats = session.stats;
-    switch (session.movement.dimension) {
-      case MovementDimension.reps:
-        final maxEorm = stats.maxEorm;
-        final maxWeight = stats.maxWeight;
-        final sumVolume = stats.sumVolume;
-        return [
+    final maxEorm = stats.maxEorm;
+    final maxWeight = stats.maxWeight;
+    final sumVolume = stats.sumVolume;
+    return switch (session.movement.dimension) {
+      MovementDimension.reps => [
           if (maxEorm != null)
             EditTile(
               leading: null,
@@ -206,32 +205,29 @@ class _StrengthStatsCard extends StatelessWidget {
             caption: 'Avg Reps',
             child: Text(stats.avgCount.toStringAsFixed(1)),
           )
-        ];
-      case MovementDimension.time:
-        return [
+        ],
+      MovementDimension.time => [
           EditTile(
             leading: null,
             caption: 'Best Time',
             child: Text(Duration(milliseconds: stats.minCount).formatMsMill),
           ),
-        ];
-      case MovementDimension.distance:
-        return [
+        ],
+      MovementDimension.distance => [
           EditTile(
             leading: null,
             caption: 'Best Distance',
             child: Text("${stats.maxCount} m"),
           ),
-        ];
-      case MovementDimension.energy:
-        return [
+        ],
+      MovementDimension.energy => [
           EditTile(
             leading: null,
             caption: 'Total Energy',
             child: Text('${stats.sumCount} cal'),
           ),
-        ];
-    }
+        ],
+    };
   }
 }
 

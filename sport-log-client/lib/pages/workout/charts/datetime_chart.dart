@@ -24,18 +24,13 @@ enum AggregatorType {
 
   /// list must not be empty
   double compute(Iterable<double> list) {
-    switch (this) {
-      case AggregatorType.min:
-        return list.minOrNull ?? 0;
-      case AggregatorType.max:
-        return list.maxOrNull ?? 0;
-      case AggregatorType.sum:
-        return list.sum;
-      case AggregatorType.avg:
-        return list.average;
-      case AggregatorType.none:
-        return list.first;
-    }
+    return switch (this) {
+      AggregatorType.min => list.minOrNull ?? 0,
+      AggregatorType.max => list.maxOrNull ?? 0,
+      AggregatorType.sum => list.sum,
+      AggregatorType.avg => list.average,
+      AggregatorType.none => list.first,
+    };
   }
 }
 

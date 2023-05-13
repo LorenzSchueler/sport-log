@@ -32,24 +32,20 @@ class ErrorMessage extends JsonSerializable {
   factory ErrorMessage.fromJson(Map<String, dynamic> json) {
     final type = json.keys.first;
     final body = json[type] as Map<String, dynamic>;
-    switch (type) {
-      case "primary_key_violation":
-        return ErrorMessage.primaryKeyViolation(body["table"] as String);
-      case "foreign_key_violation":
-        return ErrorMessage.foreignKeyViolation(
+    return switch (type) {
+      "primary_key_violation" =>
+        ErrorMessage.primaryKeyViolation(body["table"] as String),
+      "foreign_key_violation" => ErrorMessage.foreignKeyViolation(
           body["table"] as String,
           body["column"] as String,
-        );
-      case "unique_violation":
-        return ErrorMessage.uniqueViolation(
+        ),
+      "unique_violation" => ErrorMessage.uniqueViolation(
           body["table"] as String,
           (body["columns"] as List<dynamic>).cast<String>(),
-        );
-      case "other":
-        return ErrorMessage.other(body["error"] as String);
-      default:
-        throw TypeError();
-    }
+        ),
+      "other" => ErrorMessage.other(body["error"] as String?),
+      _ => ErrorMessage.other(null),
+    };
   }
 
   final ErrorMessageType type;

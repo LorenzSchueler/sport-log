@@ -35,6 +35,7 @@ class MetconSession extends AtomicEntity {
         rounds = 0;
         reps = 0;
       case MetconType.emom:
+        break;
       case MetconType.forTime:
         time = Duration.zero;
     }
