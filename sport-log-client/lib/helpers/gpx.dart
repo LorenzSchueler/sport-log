@@ -3,20 +3,17 @@ import 'dart:io';
 import 'package:collection/collection.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:gpx/gpx.dart';
+import 'package:result_type/result_type.dart';
 import 'package:sport_log/helpers/lat_lng.dart';
-import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/write_to_file.dart';
 import 'package:sport_log/models/cardio/position.dart';
 
-final _logger = Logger("Gpx");
-
-List<Position>? gpxToTrack(String gpxString) {
+Result<List<Position>, String> gpxToTrack(String gpxString) {
   final Gpx gpx;
   try {
     gpx = GpxReader().fromString(gpxString);
   } on StateError {
-    _logger.i("parsing gpx failed");
-    return null;
+    return Failure("Parsing file failed. This file is not valid GPX.");
   }
   final points =
       gpx.trks.map((t) => t.trksegs).flattened.map((t) => t.trkpts).flattened;
@@ -44,7 +41,7 @@ List<Position>? gpxToTrack(String gpxString) {
       ),
     );
   }
-  return track;
+  return Success(track);
 }
 
 String trackToGpx(List<Position> track, {DateTime? startTime}) {
@@ -67,28 +64,26 @@ String trackToGpx(List<Position> track, {DateTime? startTime}) {
 Future<String?> saveTrackAsGpx(
   List<Position> track, {
   DateTime? startTime,
-}) async {
-  final gpxString = trackToGpx(track, startTime: startTime);
-  final path = await writeToFile(
-    content: gpxString,
+}) {
+  return writeToFile(
+    content: trackToGpx(track, startTime: startTime),
     filename: "track",
     fileExtension: "gpx",
   );
-
-  if (path != null) {
-    _logger.i("track exported to $path");
-  }
-
-  return path;
 }
 
-Future<List<Position>?> loadTrackFromGpxFile() async {
+Future<Result<List<Position>, String>?> loadTrackFromGpxFile() async {
   await FilePicker.platform.clearTemporaryFiles();
   final result = await FilePicker.platform.pickFiles();
   if (result == null) {
     return null;
   }
   final file = File(result.files.single.path!);
-  final gpxString = await file.readAsString();
+  final String gpxString;
+  try {
+    gpxString = await file.readAsString();
+  } catch (e) {
+    return Failure(e.toString());
+  }
   return gpxToTrack(gpxString);
 }

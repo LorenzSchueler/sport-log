@@ -126,17 +126,17 @@ class _RouteUploadPageState extends State<RouteUploadPage> {
 
   Future<void> _loadFile() async {
     final track = await loadTrackFromGpxFile();
-    if (mounted) {
-      if (track == null) {
+    if (mounted && track != null) {
+      if (track.isFailure) {
         await showMessageDialog(
           context: context,
           title: "An Error occurred",
-          text: "Parsing file failed.",
+          text: track.failure,
         );
       } else {
         setState(() {
           _route
-            ..track = track
+            ..track = track.success
             ..setDistance()
             ..setAscentDescent();
         });
