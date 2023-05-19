@@ -77,39 +77,41 @@ class DiaryPage extends StatelessWidget {
                       )
                     : Padding(
                         padding: Defaults.edgeInsets.normal,
-                        child: Column(
-                          children: [
+                        child: CustomScrollView(
+                          slivers: [
                             if (dataProvider.dateFilter is! DayFilter &&
                                 dataProvider.entities
-                                    .any((d) => d.bodyweight != null)) ...[
-                              DateTimeChart(
-                                chartValues: dataProvider.entities
-                                    .map((s) {
-                                      final value = s.bodyweight;
-                                      return value == null
-                                          ? null
-                                          : DateTimeChartValue(
-                                              datetime: s.date,
-                                              value: value,
-                                            );
-                                    })
-                                    .whereNotNull()
-                                    .toList(),
-                                dateFilterState: dataProvider.dateFilter,
-                                yFromZero: false,
-                                aggregatorType: AggregatorType.avg,
+                                    .any((d) => d.bodyweight != null))
+                              SliverList.list(
+                                children: [
+                                  Defaults.sizedBox.vertical.normal,
+                                  DateTimeChart(
+                                    chartValues: dataProvider.entities
+                                        .map((s) {
+                                          final value = s.bodyweight;
+                                          return value == null
+                                              ? null
+                                              : DateTimeChartValue(
+                                                  datetime: s.date,
+                                                  value: value,
+                                                );
+                                        })
+                                        .whereNotNull()
+                                        .toList(),
+                                    dateFilterState: dataProvider.dateFilter,
+                                    yFromZero: false,
+                                    aggregatorType: AggregatorType.avg,
+                                  ),
+                                  Defaults.sizedBox.vertical.normal,
+                                ],
                               ),
-                              Defaults.sizedBox.vertical.normal,
-                            ],
-                            Expanded(
-                              child: ListView.separated(
-                                itemBuilder: (_, index) => DiaryCard(
-                                  diary: dataProvider.entities[index],
-                                ),
-                                separatorBuilder: (_, __) =>
-                                    Defaults.sizedBox.vertical.normal,
-                                itemCount: dataProvider.entities.length,
+                            SliverList.separated(
+                              itemBuilder: (_, index) => DiaryCard(
+                                diary: dataProvider.entities[index],
                               ),
+                              separatorBuilder: (_, __) =>
+                                  Defaults.sizedBox.vertical.normal,
+                              itemCount: dataProvider.entities.length,
                             ),
                           ],
                         ),

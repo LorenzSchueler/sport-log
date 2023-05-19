@@ -103,33 +103,34 @@ class StrengthSessionsPage extends StatelessWidget {
                       )
                     : Padding(
                         padding: Defaults.edgeInsets.normal,
-                        child: Column(
-                          children: [
-                            if (dataProvider.isSelected) ...[
-                              StrengthChart(
-                                strengthSessionDescriptions:
-                                    dataProvider.entities,
-                                dateFilterState: dataProvider.dateFilter,
+                        child: CustomScrollView(
+                          slivers: [
+                            if (dataProvider.isSelected)
+                              SliverList.list(
+                                children: [
+                                  StrengthChart(
+                                    strengthSessionDescriptions:
+                                        dataProvider.entities,
+                                    dateFilterState: dataProvider.dateFilter,
+                                  ),
+                                  Defaults.sizedBox.vertical.normal,
+                                  StrengthRecordsCard(
+                                    strengthRecords: dataProvider.records ?? {},
+                                    movement: dataProvider.selected!,
+                                  ),
+                                  Defaults.sizedBox.vertical.normal,
+                                ],
                               ),
-                              Defaults.sizedBox.vertical.normal,
-                              StrengthRecordsCard(
+                            SliverList.separated(
+                              itemBuilder: (context, index) =>
+                                  StrengthSessionCard(
+                                strengthSessionDescription:
+                                    dataProvider.entities[index],
                                 strengthRecords: dataProvider.records ?? {},
-                                movement: dataProvider.selected!,
                               ),
-                              Defaults.sizedBox.vertical.normal,
-                            ],
-                            Expanded(
-                              child: ListView.separated(
-                                itemBuilder: (context, index) =>
-                                    StrengthSessionCard(
-                                  strengthSessionDescription:
-                                      dataProvider.entities[index],
-                                  strengthRecords: dataProvider.records ?? {},
-                                ),
-                                separatorBuilder: (_, __) =>
-                                    Defaults.sizedBox.vertical.normal,
-                                itemCount: dataProvider.entities.length,
-                              ),
+                              separatorBuilder: (_, __) =>
+                                  Defaults.sizedBox.vertical.normal,
+                              itemCount: dataProvider.entities.length,
                             ),
                           ],
                         ),

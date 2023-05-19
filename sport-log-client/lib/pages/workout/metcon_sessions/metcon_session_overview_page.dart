@@ -107,44 +107,38 @@ class MetconSessionsPage extends StatelessWidget {
                       )
                     : Padding(
                         padding: Defaults.edgeInsets.normal,
-                        child: dataProvider.selected != null &&
-                                dataProvider.entities.isNotEmpty
-                            ? ListView.separated(
-                                itemBuilder: (_, index) {
-                                  if (index == 0) {
-                                    return MetconDescriptionCard(
-                                      metconDescription: dataProvider
-                                          .entities.first.metconDescription,
-                                    );
-                                  } else if (index == 1) {
-                                    return MetconSessionResultsCard(
-                                      metconSessionDescription: null,
-                                      metconSessionDescriptions:
-                                          dataProvider.entities,
-                                      metconRecords: dataProvider.records ?? {},
-                                    );
-                                  } else {
-                                    return MetconSessionCard(
-                                      metconSessionDescription:
-                                          dataProvider.entities[index - 2],
-                                      metconRecords: dataProvider.records ?? {},
-                                    );
-                                  }
-                                },
-                                separatorBuilder: (_, __) =>
-                                    Defaults.sizedBox.vertical.normal,
-                                itemCount: dataProvider.entities.length + 2,
-                              )
-                            : ListView.separated(
-                                itemBuilder: (_, index) => MetconSessionCard(
-                                  metconSessionDescription:
-                                      dataProvider.entities[index],
-                                  metconRecords: dataProvider.records ?? {},
-                                ),
-                                separatorBuilder: (_, __) =>
-                                    Defaults.sizedBox.vertical.normal,
-                                itemCount: dataProvider.entities.length,
+                        child: CustomScrollView(
+                          slivers: [
+                            if (dataProvider.selected != null &&
+                                dataProvider.entities.isNotEmpty)
+                              SliverList.list(
+                                children: [
+                                  MetconDescriptionCard(
+                                    metconDescription: dataProvider
+                                        .entities.first.metconDescription,
+                                  ),
+                                  Defaults.sizedBox.vertical.normal,
+                                  MetconSessionResultsCard(
+                                    metconSessionDescription: null,
+                                    metconSessionDescriptions:
+                                        dataProvider.entities,
+                                    metconRecords: dataProvider.records ?? {},
+                                  ),
+                                  Defaults.sizedBox.vertical.normal,
+                                ],
                               ),
+                            SliverList.separated(
+                              itemBuilder: (_, index) => MetconSessionCard(
+                                metconSessionDescription:
+                                    dataProvider.entities[index],
+                                metconRecords: dataProvider.records ?? {},
+                              ),
+                              separatorBuilder: (_, __) =>
+                                  Defaults.sizedBox.vertical.normal,
+                              itemCount: dataProvider.entities.length,
+                            ),
+                          ],
+                        ),
                       ),
               ),
               if (dataProvider.isLoading)

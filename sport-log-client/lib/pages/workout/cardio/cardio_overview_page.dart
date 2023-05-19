@@ -1,8 +1,10 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_log/data_provider/data_providers/cardio_data_provider.dart';
 import 'package:sport_log/data_provider/overview_data_provider.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
+import 'package:sport_log/helpers/extensions/iterable_extension.dart';
 import 'package:sport_log/helpers/extensions/navigator_extension.dart';
 import 'package:sport_log/helpers/map_controller.dart';
 import 'package:sport_log/models/all.dart';
@@ -109,31 +111,31 @@ class CardioSessionsPage extends StatelessWidget {
                       )
                     : Padding(
                         padding: Defaults.edgeInsets.normal,
-                        child: Column(
-                          children: [
-                            if (dataProvider.isSelected) ...[
-                              CardioChart(
-                                cardioSessions: dataProvider.entities
-                                    .map((e) => e.cardioSession)
-                                    .toList(),
-                                dateFilterState: dataProvider.dateFilter,
-                              ),
-                              Defaults.sizedBox.vertical.normal,
-                            ],
-                            Expanded(
-                              child: ListView.separated(
-                                itemBuilder: (_, index) => CardioSessionCard(
-                                  cardioSessionDescription:
-                                      dataProvider.entities[index],
-                                  key: ValueKey(
-                                    dataProvider
-                                        .entities[index].cardioSession.id,
+                        child: CustomScrollView(
+                          slivers: [
+                            SliverList.list(
+                              children: [
+                                if (dataProvider.isSelected)
+                                  CardioChart(
+                                    cardioSessions: dataProvider.entities
+                                        .map((e) => e.cardioSession)
+                                        .toList(),
+                                    dateFilterState: dataProvider.dateFilter,
                                   ),
+                                Defaults.sizedBox.vertical.normal,
+                              ],
+                            ),
+                            SliverList.separated(
+                              itemBuilder: (_, index) => CardioSessionCard(
+                                cardioSessionDescription:
+                                    dataProvider.entities[index],
+                                key: ValueKey(
+                                  dataProvider.entities[index].cardioSession.id,
                                 ),
-                                separatorBuilder: (_, __) =>
-                                    Defaults.sizedBox.vertical.normal,
-                                itemCount: dataProvider.entities.length,
                               ),
+                              separatorBuilder: (_, __) =>
+                                  Defaults.sizedBox.vertical.normal,
+                              itemCount: dataProvider.entities.length,
                             ),
                           ],
                         ),
