@@ -29,7 +29,7 @@ environment:
 dependencies:
   audioplayers: ^4.0.1
   collection: ^1.16.0
-  device_info_plus: ^8.0.0
+  device_info_plus: ^9.0.0
   file_picker: ^5.0.0
   fixnum: ^1.0.0 # used for ids (in web ints go only up to 2^53-1)
   fl_chart: ^0.62.0
@@ -56,7 +56,7 @@ dependencies:
   mapbox_api: ^1.0.0
   mapbox_maps_flutter: ^0.4.3
   mapbox_search: ^3.0.1+2
-  package_info_plus: ^3.0.1
+  package_info_plus: ^4.0.0
   path_provider: ^2.0.10
   pedometer: #^3.0.0
     # callback for every step
@@ -82,6 +82,7 @@ dependency_overrides:
       url: https://github.com/Lyokone/flutterlocation
       path: packages/location_android
       ref: 9000a61402aaa437df447e9c5b0544cce2adcc0c
+  win32: ^4.0.0
 
 dev_dependencies:
   build_runner: ^2.1.0 # json
