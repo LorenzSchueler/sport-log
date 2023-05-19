@@ -77,7 +77,11 @@ jobs:
       working-directory: sport-log-client
       run: |
         cp sport-log-client.yaml.template sport-log-client.yaml
-        flutter build apk --release --flavor production
+        flutter build apk --release \
+            --flavor production \
+            --target-platform android-arm64 \
+            --split-per-abi \
+            --dart-define GIT_REF=$(git show-ref --head --hash=7 HEAD)
       env:
         SDK_REGISTRY_TOKEN: ${{ secrets.SDK_REGISTRY_TOKEN }}
 

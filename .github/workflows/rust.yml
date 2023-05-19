@@ -163,5 +163,6 @@ jobs:
       with:
         crate: cargo-machete
         version: latest
+        use-tool-cache: true
     - name: cargo machete
       run: cargo machete
