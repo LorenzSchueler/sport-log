@@ -122,6 +122,10 @@ class CardioSessionsPage extends StatelessWidget {
                                         .toList(),
                                     dateFilterState: dataProvider.dateFilter,
                                   ),
+                                CardioStatsCard(
+                                  cardioSessionDescriptions:
+                                      dataProvider.entities,
+                                ),
                                 Defaults.sizedBox.vertical.normal,
                               ],
                             ),
@@ -284,6 +288,78 @@ class CardioSessionCard extends StatelessWidget {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class CardioStatsCard extends StatelessWidget {
+  CardioStatsCard({
+    required List<CardioSessionDescription> cardioSessionDescriptions,
+    super.key,
+  }) : groupedSessions = groupBy(cardioSessionDescriptions, (c) => c.movement)
+            .entries
+            .toList();
+
+  final List<MapEntry<Movement, List<CardioSessionDescription>>>
+      groupedSessions;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: EdgeInsets.zero,
+      child: Padding(
+        padding: Defaults.edgeInsets.normal,
+        child: ListView.separated(
+          shrinkWrap: true,
+          itemBuilder: (context, index) {
+            final group = groupedSessions[index];
+            final movement = group.key.name;
+            final number = group.value.length;
+            final distance = group.value
+                .map((s) => s.cardioSession.distance)
+                .whereNotNull()
+                .sum;
+            final time =
+                group.value.map((s) => s.cardioSession.time).whereNotNull().sum;
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  movement,
+                  style: const TextStyle(fontSize: 20),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: ValueUnitDescription.timeSmall(time),
+                      ),
+                    ),
+                    Expanded(
+                      child: Align(
+                        child: ValueUnitDescription.distanceSmall(distance),
+                      ),
+                    ),
+                    Expanded(
+                      child: Align(
+                        alignment: Alignment.centerRight,
+                        child: Text(
+                          "$number times",
+                          style: const TextStyle(fontSize: 20),
+                        ),
+                      ),
+                    ),
+                  ],
+                )
+              ],
+            );
+          },
+          separatorBuilder: (_, __) => const Divider(),
+          itemCount: groupedSessions.length,
         ),
       ),
     );
