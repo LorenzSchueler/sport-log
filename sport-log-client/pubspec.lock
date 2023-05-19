@@ -875,10 +875,11 @@ packages:
   polar:
     dependency: "direct main"
     description:
-      name: polar
-      sha256: c96289f6060b56c5f07feb90f74d5cf58b84515fb67f601fbc8cdb0e6b3ed8ea
-      url: "https://pub.dev"
-    source: hosted
+      path: "."
+      ref: HEAD
+      resolved-ref: dfb9da5ef304ed581051ce8c21d1e8c105f5bcb7
+      url: "https://github.com/LorenzSchueler/polar"
+    source: git
     version: "5.2.0"
   pool:
     dependency: transitive

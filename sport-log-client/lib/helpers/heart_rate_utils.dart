@@ -69,6 +69,16 @@ class HeartRateUtils extends ChangeNotifier {
 
     await stopHeartRateStream();
 
+    while (!await _polar.requestPermissions()) {
+      final systemSettings = await showSystemSettingsDialog(
+        text:
+            "Bluetooth permission is required to connect to heart rate monitors.",
+      );
+      if (systemSettings.isIgnore) {
+        return;
+      }
+    }
+
     outer:
     while (true) {
       await _bluetooth.turnOn();
@@ -86,7 +96,6 @@ class HeartRateUtils extends ChangeNotifier {
       }
     }
 
-    await _polar.requestPermissions();
     _devices = {
       await for (final d in _polar.searchForDevice().timeout(
             _searchDuration,
