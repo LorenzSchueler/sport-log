@@ -25,13 +25,6 @@
     <!-- pedometer -->
     <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
 
-    <!-- gpx export/ error log -->
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <!-- gpx export/ error log -->
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <!-- gpx export/ error log -->
-    <uses-permission android:name="android.permission.ACCESS_MEDIA_LOCATION" />
-
     <queries>
         <intent>
             <action android:name="android.intent.action.VIEW" />
