@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:sport_log/app.dart';
 
 class _DialogOption<T> {
-  _DialogOption({required this.name, required this.value});
+  _DialogOption({required this.name, required this.value, this.color});
 
   final String name;
   final T value;
+  final Color? color;
 }
 
 class _Dialog<T> extends StatelessWidget {
@@ -29,7 +30,10 @@ class _Dialog<T> extends StatelessWidget {
           .map(
             (o) => TextButton(
               onPressed: () => Navigator.pop(context, o.value),
-              child: Text(o.name),
+              child: Text(
+                o.name,
+                style: TextStyle(color: o.color),
+              ),
             ),
           )
           .toList(),
@@ -78,7 +82,7 @@ enum SystemSettings {
 Future<SystemSettings> showSystemSettingsDialog({required String text}) async {
   final systemSettings = await showDialog<SystemSettings>(
     context: App.globalContext,
-    builder: (context) => _Dialog(
+    builder: (_) => _Dialog(
       title: null,
       text: text,
       options: [
@@ -97,7 +101,7 @@ Future<bool> showApproveDialog({
 }) async {
   final approved = await showDialog<bool>(
     context: context,
-    builder: (context) => _Dialog(
+    builder: (_) => _Dialog(
       title: title,
       text: text,
       options: [
@@ -109,12 +113,54 @@ Future<bool> showApproveDialog({
   return approved ?? false;
 }
 
-Future<bool> showDiscardWarningDialog(BuildContext context) =>
-    showApproveDialog(
-      context: context,
+Future<bool> showDiscardWarningDialog(BuildContext context) async {
+  final discard = await showDialog<bool>(
+    context: context,
+    builder: (_) => _Dialog(
       title: 'Discard changes',
       text: 'Changes will be lost.',
-    );
+      options: [
+        _DialogOption(
+          name: "Cancel",
+          value: false,
+          color: Theme.of(context).colorScheme.errorContainer,
+        ),
+        _DialogOption(
+          name: "Discard Changes",
+          value: true,
+          color: Theme.of(context).colorScheme.error,
+        ),
+      ],
+    ),
+  );
+  return discard ?? false;
+}
+
+Future<bool> showDeleteWarningDialog(
+  BuildContext context,
+  String entityName,
+) async {
+  final delete = await showDialog<bool>(
+    context: context,
+    builder: (_) => _Dialog(
+      title: 'Delete $entityName?',
+      text: 'This $entityName will be permanently deleted.',
+      options: [
+        _DialogOption(
+          name: "Cancel",
+          value: false,
+          color: Theme.of(context).colorScheme.errorContainer,
+        ),
+        _DialogOption(
+          name: "Delete",
+          value: true,
+          color: Theme.of(context).colorScheme.error,
+        ),
+      ],
+    ),
+  );
+  return delete ?? false;
+}
 
 Future<void> showMessageDialog({
   required BuildContext context,
