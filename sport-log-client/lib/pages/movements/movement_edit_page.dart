@@ -62,12 +62,19 @@ class _MovementEditPageState extends State<MovementEditPage> {
     }
   }
 
-  void _deleteMovement() {
+  Future<void> _deleteMovement() async {
+    final delete = await showDeleteWarningDialog(context, "Movement");
+    if (!delete) {
+      return;
+    }
     if (!widget.isNew) {
       assert(_movementDescription.movement.userId != null);
-      _dataProvider.deleteSingle(_movementDescription.movement);
+      assert(!_movementDescription.hasReference);
+      await _dataProvider.deleteSingle(_movementDescription.movement);
     }
-    Navigator.pop(context);
+    if (mounted) {
+      Navigator.pop(context);
+    }
   }
 
   @override
@@ -77,7 +84,7 @@ class _MovementEditPageState extends State<MovementEditPage> {
         appBar: AppBar(
           title: Text("${widget.isNew ? 'Create' : 'Edit'} Movement"),
           actions: [
-            if (!widget.isNew && !widget.movementDescription!.hasReference)
+            if (!_movementDescription.hasReference)
               IconButton(
                 onPressed: _deleteMovement,
                 icon: const Icon(AppIcons.delete),

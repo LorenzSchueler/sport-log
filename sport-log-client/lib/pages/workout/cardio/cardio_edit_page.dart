@@ -70,6 +70,10 @@ class _CardioEditPageState extends State<CardioEditPage> {
   }
 
   Future<void> _deleteCardioSession() async {
+    final delete = await showDeleteWarningDialog(context, "Cardio Session");
+    if (!delete) {
+      return;
+    }
     if (!widget.isNew) {
       await _dataProvider.deleteSingle(_cardioSessionDescription);
     }
@@ -128,15 +132,15 @@ class _CardioEditPageState extends State<CardioEditPage> {
         appBar: AppBar(
           title: Text("${widget.isNew ? 'Create' : 'Edit'} Cardio Session"),
           actions: [
-            IconButton(
-              onPressed: _deleteCardioSession,
-              icon: const Icon(AppIcons.delete),
-            ),
             if (_cardioSessionDescription.cardioSession.time != null)
               IconButton(
                 onPressed: _showCutPage,
                 icon: const Icon(AppIcons.cut),
               ),
+            IconButton(
+              onPressed: _deleteCardioSession,
+              icon: const Icon(AppIcons.delete),
+            ),
             IconButton(
               onPressed: _formKey.currentContext != null &&
                       _formKey.currentState!.validate() &&

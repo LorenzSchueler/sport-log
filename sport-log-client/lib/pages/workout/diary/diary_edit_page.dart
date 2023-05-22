@@ -45,6 +45,10 @@ class _DiaryEditPageState extends State<DiaryEditPage> {
   }
 
   Future<void> _deleteDiary() async {
+    final delete = await showDeleteWarningDialog(context, "Diary Entry");
+    if (!delete) {
+      return;
+    }
     if (!widget.isNew) {
       await _dataProvider.deleteSingle(_diary);
     }

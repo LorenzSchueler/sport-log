@@ -65,6 +65,10 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
   }
 
   Future<void> _deleteStrengthSession() async {
+    final delete = await showDeleteWarningDialog(context, "Strength Session");
+    if (!delete) {
+      return;
+    }
     if (!widget.isNew) {
       await _dataProvider.deleteSingle(_strengthSessionDescription);
     }

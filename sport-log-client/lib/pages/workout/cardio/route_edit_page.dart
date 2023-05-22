@@ -75,6 +75,10 @@ class _RouteEditPageState extends State<RouteEditPage> {
   }
 
   Future<void> _deleteRoute() async {
+    final delete = await showDeleteWarningDialog(context, "Route");
+    if (!delete) {
+      return;
+    }
     if (!widget.isNew) {
       await _dataProvider.deleteSingle(_route);
     }

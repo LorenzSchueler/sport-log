@@ -1,6 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart' hide Route;
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
+import 'package:sport_log/data_provider/data_providers/cardio_data_provider.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/bool_toggle.dart';
 import 'package:sport_log/helpers/gpx.dart';
@@ -27,6 +28,8 @@ class RouteDetailsPage extends StatefulWidget {
 
 class _RouteDetailsPageState extends State<RouteDetailsPage>
     with SingleTickerProviderStateMixin {
+  final _dataProvider = RouteDataProvider();
+
   late Route _route = widget.route.clone();
 
   MapController? _mapController;
@@ -67,6 +70,23 @@ class _RouteDetailsPageState extends State<RouteDetailsPage>
     }
   }
 
+  Future<void> _deleteRoute() async {
+    final delete = await showDeleteWarningDialog(context, "Route");
+    if (!delete) {
+      return;
+    }
+    await _dataProvider.deleteSingle(_route);
+    if (mounted) {
+      Navigator.pop(
+        context,
+        ReturnObject(
+          action: ReturnAction.deleted,
+          payload: _route,
+        ), // needed for route details page
+      );
+    }
+  }
+
   Future<void> _pushEditPage() async {
     final returnObj = await Navigator.pushNamed(
       context,
@@ -96,6 +116,10 @@ class _RouteDetailsPageState extends State<RouteDetailsPage>
               onPressed: _exportFile,
               icon: const Icon(AppIcons.download),
             ),
+          IconButton(
+            onPressed: _deleteRoute,
+            icon: const Icon(AppIcons.delete),
+          ),
           IconButton(
             onPressed: _pushEditPage,
             icon: const Icon(AppIcons.edit),

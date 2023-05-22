@@ -52,6 +52,10 @@ class _ActionEventEditPageState extends State<ActionEventEditPage> {
   }
 
   Future<void> _deleteActionEvent() async {
+    final delete = await showDeleteWarningDialog(context, "Action Event");
+    if (!delete) {
+      return;
+    }
     if (!widget.isNew) {
       await _dataProvider.deleteSingle(_actionEvent);
     }

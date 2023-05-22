@@ -11,6 +11,7 @@ import 'package:sport_log/models/strength/strength_records.dart';
 import 'package:sport_log/pages/workout/strength_sessions/strength_record_card.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/app_icons.dart';
+import 'package:sport_log/widgets/dialogs/dialogs.dart';
 import 'package:sport_log/widgets/input_fields/edit_tile.dart';
 
 class StrengthSessionDetailsPage extends StatefulWidget {
@@ -49,6 +50,10 @@ class StrengthSessionDetailsPageState
   }
 
   Future<void> _deleteStrengthSession() async {
+    final delete = await showDeleteWarningDialog(context, "Strength Session");
+    if (!delete) {
+      return;
+    }
     await _dataProvider.deleteSingle(_strengthSessionDescription);
     if (mounted) {
       Navigator.pop(context);

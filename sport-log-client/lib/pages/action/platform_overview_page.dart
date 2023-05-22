@@ -244,20 +244,15 @@ class _PlatformCredentialDialogState extends State<PlatformCredentialDialog> {
   }
 
   Future<void> _delete() async {
-    if (widget.isNew) {
+    final delete = await showDeleteWarningDialog(context, "Credentials");
+    if (!delete) {
+      return;
+    }
+    if (!widget.isNew) {
+      await _dataProvider.deleteSingle(platformDescription);
+    }
+    if (mounted) {
       Navigator.pop(context);
-    } else {
-      final result = await _dataProvider.deleteSingle(platformDescription);
-      if (mounted) {
-        if (result.isFailure) {
-          await showMessageDialog(
-            context: context,
-            text: "Deleting Credentials failed:\n${result.failure}",
-          );
-        } else {
-          Navigator.pop(context);
-        }
-      }
     }
   }
 }

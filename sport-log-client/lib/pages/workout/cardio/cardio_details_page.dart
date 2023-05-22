@@ -50,7 +50,8 @@ class CardioDetailsPage extends StatefulWidget {
 
 class _CardioDetailsPageState extends State<CardioDetailsPage>
     with SingleTickerProviderStateMixin {
-  final _dataProvider = CardioSessionDataProvider();
+  final _dataProvider = CardioSessionDescriptionDataProvider();
+  final _sessionDataProvider = CardioSessionDataProvider();
 
   late CardioSessionDescription _cardioSessionDescription =
       widget.cardioSessionDescription.clone();
@@ -114,6 +115,17 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
     );
   }
 
+  Future<void> _deleteCardioSession() async {
+    final delete = await showDeleteWarningDialog(context, "Cardio Session");
+    if (!delete) {
+      return;
+    }
+    await _dataProvider.deleteSingle(_cardioSessionDescription);
+    if (mounted) {
+      Navigator.pop(context);
+    }
+  }
+
   Future<void> _pushEditPage() async {
     final returnObj = await Navigator.pushNamed(
       context,
@@ -134,8 +146,8 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
   }
 
   Future<void> _findSimilarSessions() async {
-    final similarSessions =
-        await _dataProvider.getSimilarCardioSessions(_cardioSessionDescription);
+    final similarSessions = await _sessionDataProvider
+        .getSimilarCardioSessions(_cardioSessionDescription);
     setState(() {
       _similarSessions = similarSessions;
     });
@@ -176,6 +188,10 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
               onPressed: _exportFile,
               icon: const Icon(AppIcons.download),
             ),
+          IconButton(
+            onPressed: _deleteCardioSession,
+            icon: const Icon(AppIcons.delete),
+          ),
           IconButton(
             onPressed: _pushEditPage,
             icon: const Icon(AppIcons.edit),

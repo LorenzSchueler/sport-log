@@ -63,7 +63,13 @@ class _MetconEditPageState extends State<MetconEditPage> {
   }
 
   Future<void> _deleteMetcon() async {
+    final delete = await showDeleteWarningDialog(context, "Metcon");
+    if (!delete) {
+      return;
+    }
     if (!widget.isNew) {
+      assert(_metconDescription.metcon.userId != null);
+      assert(!_metconDescription.hasReference);
       await _dataProvider.deleteSingle(_metconDescription);
     }
     if (mounted) {

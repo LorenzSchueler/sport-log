@@ -6,6 +6,7 @@ import 'package:sport_log/models/all.dart';
 import 'package:sport_log/pages/workout/metcon_sessions/metcon_description_card.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/app_icons.dart';
+import 'package:sport_log/widgets/dialogs/dialogs.dart';
 
 class MetconDetailsPage extends StatefulWidget {
   const MetconDetailsPage({
@@ -24,7 +25,13 @@ class _MetconDetailsPageState extends State<MetconDetailsPage> {
   late MetconDescription _metconDescription = widget.metconDescription.clone();
 
   Future<void> _deleteMetcon() async {
-    await _dataProvider.deleteSingle(widget.metconDescription);
+    final delete = await showDeleteWarningDialog(context, "Metcon");
+    if (!delete) {
+      return;
+    }
+    assert(_metconDescription.metcon.userId != null);
+    assert(!_metconDescription.hasReference);
+    await _dataProvider.deleteSingle(_metconDescription);
     if (mounted) {
       Navigator.pop(context);
     }
@@ -61,12 +68,12 @@ class _MetconDetailsPageState extends State<MetconDetailsPage> {
             icon: const Icon(AppIcons.add),
           ),
           if (!_metconDescription.hasReference &&
-              widget.metconDescription.metcon.userId != null)
+              _metconDescription.metcon.userId != null)
             IconButton(
               onPressed: _deleteMetcon,
               icon: const Icon(AppIcons.delete),
             ),
-          if (widget.metconDescription.metcon.userId != null)
+          if (_metconDescription.metcon.userId != null)
             IconButton(
               onPressed: _pushEditPage,
               icon: const Icon(AppIcons.edit),

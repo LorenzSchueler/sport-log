@@ -8,6 +8,7 @@ import 'package:sport_log/pages/workout/metcon_sessions/metcon_description_card.
 import 'package:sport_log/pages/workout/metcon_sessions/metcon_session_results_card.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/app_icons.dart';
+import 'package:sport_log/widgets/dialogs/dialogs.dart';
 
 class MetconSessionDetailsPage extends StatefulWidget {
   const MetconSessionDetailsPage({
@@ -53,6 +54,10 @@ class _MetconSessionDetailsPageState extends State<MetconSessionDetailsPage> {
   }
 
   Future<void> _deleteMetconSession() async {
+    final delete = await showDeleteWarningDialog(context, "Metcon Session");
+    if (!delete) {
+      return;
+    }
     await _dataProvider.deleteSingle(widget.metconSessionDescription);
     if (mounted) {
       Navigator.pop(context);

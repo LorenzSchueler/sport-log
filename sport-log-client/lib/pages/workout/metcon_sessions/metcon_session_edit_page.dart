@@ -65,6 +65,10 @@ class _MetconSessionEditPageState extends State<MetconSessionEditPage> {
   }
 
   Future<void> _deleteMetconSession() async {
+    final delete = await showDeleteWarningDialog(context, "Metcon Session");
+    if (!delete) {
+      return;
+    }
     if (!widget.isNew) {
       await _dataProvider.deleteSingle(_metconSessionDescription);
     }

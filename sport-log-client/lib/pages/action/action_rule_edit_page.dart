@@ -52,6 +52,10 @@ class _ActionRuleEditPageState extends State<ActionRuleEditPage> {
   }
 
   Future<void> _deleteActionRule() async {
+    final delete = await showDeleteWarningDialog(context, "Action Rule");
+    if (!delete) {
+      return;
+    }
     if (!widget.isNew) {
       await _dataProvider.deleteSingle(_actionRule);
     }
