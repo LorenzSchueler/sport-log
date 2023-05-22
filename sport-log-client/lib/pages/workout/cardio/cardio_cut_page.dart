@@ -48,10 +48,8 @@ class _CardioCutPageState extends State<CardioCutPage> {
     if (mounted) {
       Navigator.pop(
         context,
-        ReturnObject(
-          action: ReturnAction.updated,
-          payload: _cardioSessionDescription,
-        ), // needed for cardio edit page
+        // needed for cardio edit page
+        ReturnObject.updated(_cardioSessionDescription),
       );
     }
   }

@@ -49,10 +49,8 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
       if (result.isSuccess) {
         Navigator.pop(
           context,
-          ReturnObject(
-            action: widget.isNew ? ReturnAction.created : ReturnAction.updated,
-            payload: _strengthSessionDescription,
-          ), // needed for return to details page
+          // needed for return to details page
+          ReturnObject.isNew(widget.isNew, _strengthSessionDescription),
         );
       } else {
         await showMessageDialog(
@@ -74,7 +72,11 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
           await _dataProvider.deleteSingle(_strengthSessionDescription);
       if (mounted) {
         if (result.isSuccess) {
-          Navigator.pop(context);
+          Navigator.pop(
+            context,
+            // needed for return to details page
+            ReturnObject.deleted(_strengthSessionDescription),
+          );
         } else {
           await showMessageDialog(
             context: context,
@@ -83,7 +85,11 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
         }
       }
     } else if (mounted) {
-      Navigator.pop(context);
+      Navigator.pop(
+        context,
+        // needed for return to details page
+        ReturnObject.deleted(_strengthSessionDescription),
+      );
     }
   }
 

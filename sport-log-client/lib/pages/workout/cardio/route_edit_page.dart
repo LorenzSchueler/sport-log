@@ -59,10 +59,8 @@ class _RouteEditPageState extends State<RouteEditPage> {
       if (result.isSuccess) {
         Navigator.pop(
           context,
-          ReturnObject(
-            action: widget.isNew ? ReturnAction.created : ReturnAction.updated,
-            payload: _route,
-          ), // needed for route details page
+          // needed for route details page
+          ReturnObject.isNew(widget.isNew, _route),
         );
       } else {
         await showMessageDialog(
@@ -85,10 +83,8 @@ class _RouteEditPageState extends State<RouteEditPage> {
         if (result.isSuccess) {
           Navigator.pop(
             context,
-            ReturnObject(
-              action: ReturnAction.deleted,
-              payload: _route,
-            ), // needed for route details page
+            // needed for route details page
+            ReturnObject.deleted(_route),
           );
         } else {
           await showMessageDialog(
@@ -101,10 +97,8 @@ class _RouteEditPageState extends State<RouteEditPage> {
     if (mounted) {
       Navigator.pop(
         context,
-        ReturnObject(
-          action: ReturnAction.deleted,
-          payload: _route,
-        ), // needed for route details page
+        // needed for route details page
+        ReturnObject.deleted(_route),
       );
     }
   }

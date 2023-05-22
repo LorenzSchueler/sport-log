@@ -54,10 +54,8 @@ class _CardioEditPageState extends State<CardioEditPage> {
       if (result.isSuccess) {
         Navigator.pop(
           context,
-          ReturnObject(
-            action: widget.isNew ? ReturnAction.created : ReturnAction.updated,
-            payload: _cardioSessionDescription,
-          ), // needed for cardio details page
+          // needed for cardio details page
+          ReturnObject.isNew(widget.isNew, _cardioSessionDescription),
         );
       } else {
         await showMessageDialog(
@@ -81,10 +79,8 @@ class _CardioEditPageState extends State<CardioEditPage> {
         if (result.isSuccess) {
           Navigator.pop(
             context,
-            ReturnObject(
-              action: ReturnAction.deleted,
-              payload: _cardioSessionDescription,
-            ), // needed for cardio details page
+            // needed for cardio details page
+            ReturnObject.deleted(_cardioSessionDescription),
           );
         } else {
           await showMessageDialog(
@@ -96,10 +92,8 @@ class _CardioEditPageState extends State<CardioEditPage> {
     } else if (mounted) {
       Navigator.pop(
         context,
-        ReturnObject(
-          action: ReturnAction.deleted,
-          payload: _cardioSessionDescription,
-        ), // needed for cardio details page
+        // needed for cardio details page
+        ReturnObject.deleted(_cardioSessionDescription),
       );
     }
   }
@@ -112,10 +106,12 @@ class _CardioEditPageState extends State<CardioEditPage> {
         arguments: _cardioSessionDescription,
       );
       if (returnObj is ReturnObject<CardioSessionDescription> && mounted) {
-        setState(() {
-          _cardioSessionDescription = returnObj.payload;
-        });
-        await _setBoundsAndLines();
+        if (returnObj.action == ReturnAction.updated) {
+          setState(() {
+            _cardioSessionDescription = returnObj.payload;
+          });
+          await _setBoundsAndLines();
+        }
       }
     }
   }

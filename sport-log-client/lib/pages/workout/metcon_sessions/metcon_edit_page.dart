@@ -47,10 +47,8 @@ class _MetconEditPageState extends State<MetconEditPage> {
       if (mounted) {
         Navigator.pop(
           context,
-          ReturnObject(
-            action: widget.isNew ? ReturnAction.created : ReturnAction.updated,
-            payload: _metconDescription,
-          ), // needed for return to details page
+          // needed for return to details page
+          ReturnObject.isNew(widget.isNew, _metconDescription),
         );
       }
     } else if (mounted) {
@@ -75,10 +73,8 @@ class _MetconEditPageState extends State<MetconEditPage> {
         if (result.isSuccess) {
           Navigator.pop(
             context,
-            ReturnObject(
-              action: ReturnAction.deleted,
-              payload: _metconDescription,
-            ),
+            // needed for return to details page
+            ReturnObject.deleted(_metconDescription),
           );
         } else {
           await showMessageDialog(
@@ -90,7 +86,8 @@ class _MetconEditPageState extends State<MetconEditPage> {
     } else if (mounted) {
       Navigator.pop(
         context,
-        ReturnObject(action: ReturnAction.deleted, payload: _metconDescription),
+        // needed for return to details page
+        ReturnObject.deleted(_metconDescription),
       );
     }
   }
