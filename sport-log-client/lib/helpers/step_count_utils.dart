@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:pedometer/pedometer.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:sport_log/widgets/dialogs/dialogs.dart';
+import 'package:sport_log/helpers/request_permission.dart';
 
 class StepCountUtils {
   StreamSubscription<void>? _stepCountSubscription;
@@ -17,14 +17,8 @@ class StepCountUtils {
     if (_stepCountSubscription != null) {
       return false;
     }
-    while (!await Permission.activityRecognition.request().isGranted) {
-      final systemSettings = await showSystemSettingsDialog(
-        text:
-            "In order to record your cadence 'Activity Recognition' must be allowed.",
-      );
-      if (systemSettings.isIgnore) {
-        return false;
-      }
+    if (!await PermissionRequest.request(Permission.activityRecognition)) {
+      return false;
     }
     _stepCountSubscription = Pedometer.stepStream.listen((_) => onStep());
 

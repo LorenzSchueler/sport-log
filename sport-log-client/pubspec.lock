@@ -181,10 +181,10 @@ packages:
     dependency: transitive
     description:
       name: built_value
-      sha256: "2f17434bd5d52a26762043d6b43bb53b3acd029b4d9071a329f46d67ef297e6d"
+      sha256: "7dd62d9faf105c434f3d829bbe9c4be02ec67f5ed94832222116122df67c5452"
       url: "https://pub.dev"
     source: hosted
-    version: "8.5.0"
+    version: "8.6.0"
   characters:
     dependency: transitive
     description:
@@ -370,10 +370,10 @@ packages:
     dependency: "direct main"
     description:
       name: flutter_blue_plus
-      sha256: "50626b905b9fdd73157988ffbdb84e404a3d87a6e79e785ef7c8f6e0073e5993"
+      sha256: a977e90b7f9dcece90a95a287f8843e3b9028a61199c41bc279832c096d31d43
       url: "https://pub.dev"
     source: hosted
-    version: "1.5.0"
+    version: "1.5.2"
   flutter_lints:
     dependency: "direct dev"
     description:
@@ -441,10 +441,10 @@ packages:
     dependency: transitive
     description:
       name: glob
-      sha256: "4515b5b6ddb505ebdd242a5f2cc5d22d3d6a80013789debfbda7777f47ea308c"
+      sha256: "0e7014b3b7d4dac1ca4d6114f82bf1782ee86745b9b42a92c9289c23d8a0ab63"
       url: "https://pub.dev"
     source: hosted
-    version: "2.1.1"
+    version: "2.1.2"
   gpx:
     dependency: "direct main"
     description:
@@ -569,10 +569,10 @@ packages:
     dependency: "direct main"
     description:
       name: latlong2
-      sha256: "408993a0e3f46e79ce1f129e4cb0386eef6d48dfa6394939ecacfbd7049154ec"
+      sha256: "18712164760cee655bc790122b0fd8f3d5b3c36da2cb7bf94b68a197fbb0811b"
       url: "https://pub.dev"
     source: hosted
-    version: "0.8.1"
+    version: "0.9.0"
   lints:
     dependency: transitive
     description:
@@ -875,11 +875,10 @@ packages:
   polar:
     dependency: "direct main"
     description:
-      path: "."
-      ref: HEAD
-      resolved-ref: dfb9da5ef304ed581051ce8c21d1e8c105f5bcb7
-      url: "https://github.com/LorenzSchueler/polar"
-    source: git
+      name: polar
+      sha256: c96289f6060b56c5f07feb90f74d5cf58b84515fb67f601fbc8cdb0e6b3ed8ea
+      url: "https://pub.dev"
+    source: hosted
     version: "5.2.0"
   pool:
     dependency: transitive

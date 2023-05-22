@@ -2,9 +2,12 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:collection/collection.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:polar/polar.dart';
+import 'package:sport_log/helpers/request_permission.dart';
 import 'package:sport_log/widgets/dialogs/dialogs.dart';
 
 class HeartRateUtils extends ChangeNotifier {
@@ -59,6 +62,42 @@ class HeartRateUtils extends ChangeNotifier {
     super.dispose();
   }
 
+  Future<bool> requestPermissions() async {
+    // polar can request permissions but does not provide the permission status
+
+    final sdkInt = (await DeviceInfoPlugin().androidInfo).version.sdkInt;
+    assert(sdkInt >= 23);
+    if (sdkInt < 31) {
+      // If we are on an Android version before S
+      return PermissionRequest.request(Permission.location);
+    } else {
+      // If we are on Android S+
+      if (!await PermissionRequest.request(Permission.bluetoothScan)) {
+        return false;
+      }
+      return PermissionRequest.request(Permission.bluetoothConnect);
+    }
+  }
+
+  Future<bool> enableBluetooth() async {
+    while (true) {
+      await _bluetooth.turnOn();
+      for (var i = 0; i < 100; i++) {
+        // ignore: inference_failure_on_instance_creation
+        await Future.delayed(const Duration(milliseconds: 100));
+        if (await _bluetooth.isOn) {
+          return true;
+        }
+      }
+      final systemSettings =
+          await showSystemSettingsDialog(text: "Please enable bluetooth.");
+      if (systemSettings.isIgnore) {
+        return false;
+      }
+    }
+  }
+
+  // ignore: long-method
   Future<void> searchDevices() async {
     if (_isSearching) {
       return;
@@ -69,31 +108,9 @@ class HeartRateUtils extends ChangeNotifier {
 
     await stopHeartRateStream();
 
-    while (!await _polar.requestPermissions()) {
-      final systemSettings = await showSystemSettingsDialog(
-        text:
-            "Bluetooth permission is required to connect to heart rate monitors.",
-      );
-      if (systemSettings.isIgnore) {
-        return;
-      }
-    }
-
-    outer:
-    while (true) {
-      await _bluetooth.turnOn();
-      for (var i = 0; i < 100; i++) {
-        // ignore: inference_failure_on_instance_creation
-        await Future.delayed(const Duration(milliseconds: 100));
-        if (await _bluetooth.isOn) {
-          break outer;
-        }
-      }
-      final systemSettings =
-          await showSystemSettingsDialog(text: "Please enable bluetooth.");
-      if (systemSettings.isIgnore) {
-        return;
-      }
+    await requestPermissions();
+    if (!await enableBluetooth()) {
+      return;
     }
 
     _devices = {

@@ -2,10 +2,11 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:location/location.dart';
-import 'package:permission_handler/permission_handler.dart'
-    as permission_handler;
+import 'package:permission_handler/permission_handler.dart';
+import 'package:sport_log/app.dart';
 import 'package:sport_log/helpers/extensions/location_data_extension.dart';
 import 'package:sport_log/helpers/lat_lng.dart';
+import 'package:sport_log/helpers/request_permission.dart';
 import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/dialogs/dialogs.dart';
 
@@ -33,41 +34,21 @@ class LocationUtils extends ChangeNotifier {
       return false;
     }
 
-    // make sure "Allow When In Use" or "Request Every Time" is granted first
-    // Request Every Time treated as Allow When In Use
-    while (![
-      PermissionStatus.authorizedWhenInUse,
-      PermissionStatus.authorizedAlways
-    ].contains(await requestPermission())) {
-      final systemSettings = await showSystemSettingsDialog(
-        text:
-            "In order to track your location, the permission for location must be set to 'Allow When In Use'.",
-      );
-      if (systemSettings.isIgnore) {
-        return false;
+    if (!await PermissionRequest.request(Permission.locationWhenInUse)) {
+      return false;
+    }
+    if (!await Permission.locationAlways.isGranted) {
+      final context = App.globalContext;
+      if (context.mounted) {
+        await showMessageDialog(
+          context: context,
+          text: "Location must be always allowed.",
+        );
       }
     }
-
-    // now that "Allow While In Use" is granted we can request "Allow Always"
-    if (!await permission_handler.Permission.locationAlways.isGranted) {
-      final systemSettings = await showSystemSettingsDialog(
-        text:
-            "In order to track your location in the background, the permission for location must be set to 'Allow Always'.",
-      );
-      if (systemSettings.isIgnore) {
-        return false;
-      }
-    }
-    while (!await permission_handler.Permission.locationAlways
-        .request()
-        .isGranted) {
-      final systemSettings = await showSystemSettingsDialog(
-        text:
-            "In order to track your location in the background, the permission for location must be set to 'Allow Always'.",
-      );
-      if (systemSettings.isIgnore) {
-        return false;
-      }
+    // opens settings only once
+    if (!await PermissionRequest.request(Permission.locationAlways)) {
+      return false;
     }
 
     await setLocationSettings(useGooglePlayServices: false);
