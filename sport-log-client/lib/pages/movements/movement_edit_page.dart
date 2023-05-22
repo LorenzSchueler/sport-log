@@ -70,9 +70,19 @@ class _MovementEditPageState extends State<MovementEditPage> {
     if (!widget.isNew) {
       assert(_movementDescription.movement.userId != null);
       assert(!_movementDescription.hasReference);
-      await _dataProvider.deleteSingle(_movementDescription.movement);
-    }
-    if (mounted) {
+      final result =
+          await _dataProvider.deleteSingle(_movementDescription.movement);
+      if (mounted) {
+        if (result.isSuccess) {
+          Navigator.pop(context);
+        } else {
+          await showMessageDialog(
+            context: context,
+            text: "Deleting Movement failed:\n${result.failure}",
+          );
+        }
+      }
+    } else if (mounted) {
       Navigator.pop(context);
     }
   }

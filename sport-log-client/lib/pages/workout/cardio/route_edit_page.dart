@@ -80,7 +80,23 @@ class _RouteEditPageState extends State<RouteEditPage> {
       return;
     }
     if (!widget.isNew) {
-      await _dataProvider.deleteSingle(_route);
+      final result = await _dataProvider.deleteSingle(_route);
+      if (mounted) {
+        if (result.isSuccess) {
+          Navigator.pop(
+            context,
+            ReturnObject(
+              action: ReturnAction.deleted,
+              payload: _route,
+            ), // needed for route details page
+          );
+        } else {
+          await showMessageDialog(
+            context: context,
+            text: "Deleting Route failed:\n${result.failure}",
+          );
+        }
+      }
     }
     if (mounted) {
       Navigator.pop(

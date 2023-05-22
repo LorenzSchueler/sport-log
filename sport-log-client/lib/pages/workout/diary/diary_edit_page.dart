@@ -50,9 +50,18 @@ class _DiaryEditPageState extends State<DiaryEditPage> {
       return;
     }
     if (!widget.isNew) {
-      await _dataProvider.deleteSingle(_diary);
-    }
-    if (mounted) {
+      final result = await _dataProvider.deleteSingle(_diary);
+      if (mounted) {
+        if (result.isSuccess) {
+          Navigator.pop(context);
+        } else {
+          await showMessageDialog(
+            context: context,
+            text: "Deleting Diary Entry failed:\n${result.failure}",
+          );
+        }
+      }
+    } else if (mounted) {
       Navigator.pop(context);
     }
   }

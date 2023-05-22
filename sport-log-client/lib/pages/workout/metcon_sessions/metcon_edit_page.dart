@@ -70,9 +70,24 @@ class _MetconEditPageState extends State<MetconEditPage> {
     if (!widget.isNew) {
       assert(_metconDescription.metcon.userId != null);
       assert(!_metconDescription.hasReference);
-      await _dataProvider.deleteSingle(_metconDescription);
-    }
-    if (mounted) {
+      final result = await _dataProvider.deleteSingle(_metconDescription);
+      if (mounted) {
+        if (result.isSuccess) {
+          Navigator.pop(
+            context,
+            ReturnObject(
+              action: ReturnAction.deleted,
+              payload: _metconDescription,
+            ),
+          );
+        } else {
+          await showMessageDialog(
+            context: context,
+            text: "Deleting Metcon failed:\n${result.failure}",
+          );
+        }
+      }
+    } else if (mounted) {
       Navigator.pop(
         context,
         ReturnObject(action: ReturnAction.deleted, payload: _metconDescription),

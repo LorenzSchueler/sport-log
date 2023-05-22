@@ -31,9 +31,16 @@ class _MetconDetailsPageState extends State<MetconDetailsPage> {
     }
     assert(_metconDescription.metcon.userId != null);
     assert(!_metconDescription.hasReference);
-    await _dataProvider.deleteSingle(_metconDescription);
+    final result = await _dataProvider.deleteSingle(_metconDescription);
     if (mounted) {
-      Navigator.pop(context);
+      if (result.isSuccess) {
+        Navigator.pop(context);
+      } else {
+        await showMessageDialog(
+          context: context,
+          text: "Deleting Metcon failed:\n${result.failure}",
+        );
+      }
     }
   }
 

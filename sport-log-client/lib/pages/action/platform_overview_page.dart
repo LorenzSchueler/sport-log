@@ -249,9 +249,18 @@ class _PlatformCredentialDialogState extends State<PlatformCredentialDialog> {
       return;
     }
     if (!widget.isNew) {
-      await _dataProvider.deleteSingle(platformDescription);
-    }
-    if (mounted) {
+      final result = await _dataProvider.deleteSingle(platformDescription);
+      if (mounted) {
+        if (result.isSuccess) {
+          Navigator.pop(context);
+        } else {
+          await showMessageDialog(
+            context: context,
+            text: "Deleting Credentials failed:\n${result.failure}",
+          );
+        }
+      }
+    } else if (mounted) {
       Navigator.pop(context);
     }
   }

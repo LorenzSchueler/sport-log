@@ -75,9 +75,25 @@ class _CardioEditPageState extends State<CardioEditPage> {
       return;
     }
     if (!widget.isNew) {
-      await _dataProvider.deleteSingle(_cardioSessionDescription);
-    }
-    if (mounted) {
+      final result =
+          await _dataProvider.deleteSingle(_cardioSessionDescription);
+      if (mounted) {
+        if (result.isSuccess) {
+          Navigator.pop(
+            context,
+            ReturnObject(
+              action: ReturnAction.deleted,
+              payload: _cardioSessionDescription,
+            ), // needed for cardio details page
+          );
+        } else {
+          await showMessageDialog(
+            context: context,
+            text: "Deleting Cardio Session failed:\n${result.failure}",
+          );
+        }
+      }
+    } else if (mounted) {
       Navigator.pop(
         context,
         ReturnObject(

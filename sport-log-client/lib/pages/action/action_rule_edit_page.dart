@@ -57,9 +57,18 @@ class _ActionRuleEditPageState extends State<ActionRuleEditPage> {
       return;
     }
     if (!widget.isNew) {
-      await _dataProvider.deleteSingle(_actionRule);
-    }
-    if (mounted) {
+      final result = await _dataProvider.deleteSingle(_actionRule);
+      if (mounted) {
+        if (result.isSuccess) {
+          Navigator.pop(context);
+        } else {
+          await showMessageDialog(
+            context: context,
+            text: "Deleting Action Rule failed:\n${result.failure}",
+          );
+        }
+      }
+    } else if (mounted) {
       Navigator.pop(context);
     }
   }

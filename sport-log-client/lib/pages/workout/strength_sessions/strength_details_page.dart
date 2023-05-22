@@ -54,9 +54,17 @@ class StrengthSessionDetailsPageState
     if (!delete) {
       return;
     }
-    await _dataProvider.deleteSingle(_strengthSessionDescription);
+    final result =
+        await _dataProvider.deleteSingle(_strengthSessionDescription);
     if (mounted) {
-      Navigator.pop(context);
+      if (result.isSuccess) {
+        Navigator.pop(context);
+      } else {
+        await showMessageDialog(
+          context: context,
+          text: "Deleting Strength Session failed:\n${result.failure}",
+        );
+      }
     }
   }
 

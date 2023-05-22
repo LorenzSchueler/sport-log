@@ -58,9 +58,17 @@ class _MetconSessionDetailsPageState extends State<MetconSessionDetailsPage> {
     if (!delete) {
       return;
     }
-    await _dataProvider.deleteSingle(widget.metconSessionDescription);
+    final result =
+        await _dataProvider.deleteSingle(widget.metconSessionDescription);
     if (mounted) {
-      Navigator.pop(context);
+      if (result.isSuccess) {
+        Navigator.pop(context);
+      } else {
+        await showMessageDialog(
+          context: context,
+          text: "Deleting Metcon Session failed:\n${result.failure}",
+        );
+      }
     }
   }
 

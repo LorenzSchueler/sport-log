@@ -70,9 +70,19 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
       return;
     }
     if (!widget.isNew) {
-      await _dataProvider.deleteSingle(_strengthSessionDescription);
-    }
-    if (mounted) {
+      final result =
+          await _dataProvider.deleteSingle(_strengthSessionDescription);
+      if (mounted) {
+        if (result.isSuccess) {
+          Navigator.pop(context);
+        } else {
+          await showMessageDialog(
+            context: context,
+            text: "Deleting Strength Session failed:\n${result.failure}",
+          );
+        }
+      }
+    } else if (mounted) {
       Navigator.pop(context);
     }
   }

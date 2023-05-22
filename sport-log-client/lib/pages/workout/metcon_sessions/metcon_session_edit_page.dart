@@ -70,9 +70,25 @@ class _MetconSessionEditPageState extends State<MetconSessionEditPage> {
       return;
     }
     if (!widget.isNew) {
-      await _dataProvider.deleteSingle(_metconSessionDescription);
-    }
-    if (mounted) {
+      final result =
+          await _dataProvider.deleteSingle(_metconSessionDescription);
+      if (mounted) {
+        if (result.isSuccess) {
+          Navigator.pop(
+            context,
+            ReturnObject(
+              action: ReturnAction.deleted,
+              payload: _metconSessionDescription,
+            ), // needed for return to details page
+          );
+        } else {
+          await showMessageDialog(
+            context: context,
+            text: "Deleting Metcon Session failed:\n${result.failure}",
+          );
+        }
+      }
+    } else if (mounted) {
       Navigator.pop(
         context,
         ReturnObject(

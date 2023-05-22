@@ -75,15 +75,16 @@ class _RouteDetailsPageState extends State<RouteDetailsPage>
     if (!delete) {
       return;
     }
-    await _dataProvider.deleteSingle(_route);
+    final result = await _dataProvider.deleteSingle(_route);
     if (mounted) {
-      Navigator.pop(
-        context,
-        ReturnObject(
-          action: ReturnAction.deleted,
-          payload: _route,
-        ), // needed for route details page
-      );
+      if (result.isSuccess) {
+        Navigator.pop(context);
+      } else {
+        await showMessageDialog(
+          context: context,
+          text: "Deleting Route failed:\n${result.failure}",
+        );
+      }
     }
   }
 
