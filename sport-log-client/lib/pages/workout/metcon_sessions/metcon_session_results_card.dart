@@ -35,9 +35,18 @@ class MetconSessionResultsCard extends StatelessWidget {
             if (metconSessionDescription != null)
               EditTile(
                 leading: null,
+                caption: "Date",
+                child: Text(
+                  metconSessionDescription!.metconSession.datetime
+                      .toHumanDate(),
+                ),
+              ),
+            if (metconSessionDescription != null)
+              EditTile(
+                leading: null,
                 caption: "Score",
                 child: Text(
-                  "${metconSessionDescription!.shortResultDescription} (${metconSessionDescription!.metconSession.datetime.toHumanDate()})",
+                  "${metconSessionDescription!.shortResultDescription} ${metconSessionDescription!.metconSession.rx ? "Rx" : "Scaled"}",
                 ),
               ),
             if (metconSessionDescription?.metconSession.comments != null)
@@ -48,26 +57,37 @@ class MetconSessionResultsCard extends StatelessWidget {
               ),
             EditTile(
               leading: null,
-              caption: "Previous Scores",
+              caption: "All Scores",
               unboundedHeight: true,
-              child: Column(
+              child: Table(
+                defaultColumnWidth: const IntrinsicColumnWidth(),
                 children: [
-                  for (final metconSessionDescription
-                      in metconSessionDescriptions)
-                    Row(
+                  for (final msd in metconSessionDescriptions)
+                    TableRow(
                       children: [
-                        Text(
-                          "${metconSessionDescription.shortResultDescription} (${metconSessionDescription.metconSession.datetime.toHumanDate()})",
+                        Padding(
+                          padding: const EdgeInsets.only(right: 10),
+                          child: Text(msd.shortResultDescription),
                         ),
-                        if (metconRecords
-                            .isMetconRecord(metconSessionDescription)) ...[
-                          Defaults.sizedBox.horizontal.normal,
-                          const Icon(
-                            AppIcons.medal,
-                            color: Colors.orange,
-                            size: 20,
-                          ),
-                        ],
+                        msd.metconSession.rx
+                            ? Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Text("Rx"),
+                                  Defaults.sizedBox.horizontal.normal,
+                                  if (metconRecords.isMetconRecord(msd))
+                                    const Icon(
+                                      AppIcons.medal,
+                                      color: Colors.orange,
+                                      size: 20,
+                                    )
+                                ],
+                              )
+                            : const Text("Scaled"),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 10),
+                          child: Text(msd.metconSession.datetime.toHumanDate()),
+                        )
                       ],
                     )
                 ],

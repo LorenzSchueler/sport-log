@@ -196,16 +196,7 @@ class MetconSessionCard extends StatelessWidget {
       right: [
         Text(metconSessionDescription.longResultDescription),
         Defaults.sizedBox.vertical.normal,
-        Row(
-          children: [
-            const Text("Rx "),
-            Icon(
-              metconSessionDescription.metconSession.rx
-                  ? AppIcons.check
-                  : AppIcons.close,
-            ),
-          ],
-        ),
+        Text(metconSessionDescription.metconSession.rx ? "Rx" : "Scaled"),
       ],
       comments: metconSessionDescription.metconSession.comments,
       onTap: () {
