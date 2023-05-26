@@ -106,7 +106,6 @@ class EditTile extends StatelessWidget {
 
   Widget _captionChildColumn(BuildContext context) {
     return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (caption != null) CaptionTile(caption: caption!),

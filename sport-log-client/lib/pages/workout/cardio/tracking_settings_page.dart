@@ -150,8 +150,8 @@ class CardioTrackingSettingsPage extends StatelessWidget {
                         return Row(
                           children: [
                             SizedBox(
-                              height: 32,
-                              width: 34,
+                              height: 29,
+                              width: 34, // remove left padding
                               child: Switch(
                                 value: metric.isEnabled,
                                 onChanged: (enabled) =>

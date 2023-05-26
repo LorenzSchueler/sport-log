@@ -201,8 +201,8 @@ class _MetconSessionEditPageState extends State<MetconSessionEditPage> {
                       const Text("finished"),
                       Defaults.sizedBox.horizontal.normal,
                       SizedBox(
-                        height: 20,
-                        width: 34,
+                        height: 29,
+                        width: 34, // remove left padding
                         child: Switch(
                           value: _finished,
                           onChanged: (finished) {
@@ -307,8 +307,8 @@ class _MetconSessionEditPageState extends State<MetconSessionEditPage> {
                   caption: "Rx",
                   leading: AppIcons.checkBox,
                   child: SizedBox(
-                    height: 20,
-                    width: 34,
+                    height: 29, // make it fit into EditTile
+                    width: 34, // remove left padding
                     child: Switch(
                       value: _metconSessionDescription.metconSession.rx,
                       onChanged: (rx) {
@@ -317,7 +317,6 @@ class _MetconSessionEditPageState extends State<MetconSessionEditPage> {
                           _metconSessionDescription.metconSession.rx = rx;
                         });
                       },
-                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     ),
                   ),
                 ),
