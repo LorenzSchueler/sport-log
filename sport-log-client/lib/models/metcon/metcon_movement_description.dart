@@ -51,7 +51,7 @@ class MetconMovementDescription extends CompoundEntity {
     movement.sanitize();
   }
 
-  String get movementText {
+  String get countUnitWeight {
     final count = movement.dimension == MovementDimension.time
         ? Duration(milliseconds: metconMovement.count).formatTimeShort
         : "${metconMovement.count}";
@@ -70,6 +70,6 @@ class MetconMovementDescription extends CompoundEntity {
         ? " @ ${formatWeight(metconMovement.maleWeight!, metconMovement.femaleWeight)}"
         : "";
 
-    return "${movement.name}: $count $unit $weight";
+    return "$count $unit $weight";
   }
 }

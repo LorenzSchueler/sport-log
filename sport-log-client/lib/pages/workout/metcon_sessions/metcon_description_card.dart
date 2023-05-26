@@ -31,11 +31,19 @@ class MetconDescriptionCard extends StatelessWidget {
               leading: null,
               caption: "Movements",
               unboundedHeight: true,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              child: Table(
+                defaultColumnWidth: const IntrinsicColumnWidth(),
                 children: [
                   for (var metconMovementDescription in metconDescription.moves)
-                    Text(metconMovementDescription.movementText),
+                    TableRow(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(right: 10),
+                          child: Text(metconMovementDescription.movement.name),
+                        ),
+                        Text(metconMovementDescription.countUnitWeight),
+                      ],
+                    )
                 ],
               ),
             ),
