@@ -172,7 +172,6 @@ class ActionRulesCard extends StatelessWidget {
                   Routes.actionRuleEdit,
                   arguments: [actionProviderDescription, actionRule],
                 ),
-                behavior: HitTestBehavior.opaque,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -192,17 +191,19 @@ class ActionRulesCard extends StatelessWidget {
                           "${actionRule.weekday.name} at ${actionRule.time.formatHm}",
                         ),
                         const Spacer(),
-                        Checkbox(
-                          value: actionRule.enabled,
-                          onChanged: (value) {
-                            if (value != null) {
-                              actionRule.enabled = value;
-                              _dataProvider.updateSingle(actionRule);
-                            }
-                          },
-                          visualDensity: VisualDensity.compact,
-                          materialTapTargetSize:
-                              MaterialTapTargetSize.shrinkWrap,
+                        // make as big is add icon
+                        SizedBox(
+                          height: 24,
+                          width: 24,
+                          child: Checkbox(
+                            value: actionRule.enabled,
+                            onChanged: (value) {
+                              if (value != null) {
+                                actionRule.enabled = value;
+                                _dataProvider.updateSingle(actionRule);
+                              }
+                            },
+                          ),
                         )
                       ],
                     ),
@@ -263,7 +264,6 @@ class ActionEventsCard extends StatelessWidget {
                   Routes.actionEventEdit,
                   arguments: [actionProviderDescription, actionEvent],
                 ),
-                behavior: HitTestBehavior.opaque,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -283,18 +283,20 @@ class ActionEventsCard extends StatelessWidget {
                           actionEvent.datetime.toHumanDateTime(),
                         ),
                         const Spacer(),
-                        Checkbox(
-                          value: actionEvent.enabled,
-                          onChanged: (value) {
-                            if (value != null) {
-                              actionEvent.enabled = value;
-                              _dataProvider.updateSingle(actionEvent);
-                            }
-                          },
-                          visualDensity: VisualDensity.compact,
-                          materialTapTargetSize:
-                              MaterialTapTargetSize.shrinkWrap,
-                        )
+                        // make as big is add icon
+                        SizedBox(
+                          height: 24,
+                          width: 24,
+                          child: Checkbox(
+                            value: actionEvent.enabled,
+                            onChanged: (value) {
+                              if (value != null) {
+                                actionEvent.enabled = value;
+                                _dataProvider.updateSingle(actionEvent);
+                              }
+                            },
+                          ),
+                        ),
                       ],
                     ),
                     if (actionEvent.arguments != null)
