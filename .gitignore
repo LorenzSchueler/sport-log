@@ -5,6 +5,7 @@
 /sport-log-action-provider-map-matching/map-matching
 /sport-log-action-provider-sportstracker/sport-log-action-provider-sportstracker.toml
 /sport-log-action-provider-wodify-login/sport-log-action-provider-wodify-login.toml
+/sport-log-action-provider-wodify-wod/sport-log-action-provider-wodify-wod.toml
 /sport-log-scheduler/sport-log-scheduler.toml
 /sport-log-server/sport-log-server.toml
 /sport-log-client/sport-log-client.yaml
@@ -17,5 +18,3 @@ flatpak-repo
 geckodriver
 rust_checks.sh
 upgrade.sh
-
-# git update-index --assume-unchanged sport-log-client.sport-log-client.yaml
