@@ -44,8 +44,10 @@ class OverviewCard extends StatelessWidget {
                               ? datetime.toHumanDay()
                               : datetime.toHumanDateTime(),
                         ),
-                        Defaults.sizedBox.vertical.normal,
-                        ...left
+                        if (left.isNotEmpty) ...[
+                          Defaults.sizedBox.vertical.normal,
+                          ...left
+                        ]
                       ],
                     ),
                   ),
