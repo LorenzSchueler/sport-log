@@ -4,8 +4,6 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart' hide Route;
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:location/location.dart';
-import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart'
-    hide Position, Settings;
 import 'package:sport_log/app.dart';
 import 'package:sport_log/data_provider/data_providers/cardio_data_provider.dart';
 import 'package:sport_log/helpers/extensions/location_data_extension.dart';
@@ -13,8 +11,8 @@ import 'package:sport_log/helpers/heart_rate_utils.dart';
 import 'package:sport_log/helpers/lat_lng.dart';
 import 'package:sport_log/helpers/location_utils.dart';
 import 'package:sport_log/helpers/map_controller.dart';
-import 'package:sport_log/helpers/pointer.dart';
 import 'package:sport_log/helpers/step_count_utils.dart';
+import 'package:sport_log/helpers/tracking_ui_utils.dart';
 import 'package:sport_log/models/cardio/all.dart';
 import 'package:sport_log/pages/workout/cardio/audio_feedback_config.dart';
 import 'package:sport_log/pages/workout/cardio/tracking_settings.dart';
@@ -45,7 +43,7 @@ class TrackingUtils extends ChangeNotifier {
               ..deviceId = trackingSettings.heartRateUtils.deviceId)
             : null;
 
-  static const maxSpeed = 250; // km/ h
+  static const _maxSpeed = 250; // km/ h
   static const currentDurationOffset = Duration(minutes: 1);
   static const _minAlarmInterval = Duration(minutes: 1);
 
@@ -66,12 +64,6 @@ class TrackingUtils extends ChangeNotifier {
       ? _lastStopDuration + DateTime.now().difference(_lastResumeTime)
       : _lastStopDuration;
 
-  bool _centerLocation = true;
-  void setCenterLocation(bool centerLocation) {
-    _centerLocation = centerLocation;
-    centerCurrentLocation();
-  }
-
   String _locationInfo = "no data";
   String get locationInfo => _locationInfo;
   String _stepInfo = "no data";
@@ -82,29 +74,25 @@ class TrackingUtils extends ChangeNotifier {
   Timer? _refreshTimer;
   Timer? _autosaveTimer;
 
+  final TrackingUiUtils _trackingUiUtils = TrackingUiUtils();
+  void setCenterLocation(bool centerLocation) =>
+      _trackingUiUtils.setCenterLocation(centerLocation, lastLatLng);
+
   final LocationUtils _locationUtils = LocationUtils();
   LatLng? get lastLatLng => _locationUtils.lastLatLng;
+
   final StepCountUtils _stepUtils = StepCountUtils();
+
   final HeartRateUtils? _heartRateUtils;
   bool get waitingOnHR => _heartRateUtils?.isNotConnected ?? false;
 
-  MapController? _mapController;
   ElevationMapController? _elevationMapController;
-
-  final NullablePointer<PolylineAnnotation> _line =
-      NullablePointer.nullPointer();
-  final NullablePointer<List<CircleAnnotation>> _currentLocationMarker =
-      NullablePointer.nullPointer();
 
   final int? _routeAlarmDistance;
   DateTime? _lastAlarm;
-  final tts = FlutterTts()
+  final _tts = FlutterTts()
     ..setVoice({"name": "en-US-language", "locale": "en-US"})
     ..awaitSpeakCompletion(true);
-  //var voices = ((await tts.getVoices) as List).cast<Map>().where((m) {
-  //var d = m.cast<String, String>();
-  //return d["locale"] == "en-US";
-  //}).toList();
 
   final AudioFeedbackConfig? _audioFeedbackConfig;
 
@@ -119,11 +107,10 @@ class TrackingUtils extends ChangeNotifier {
   }
 
   Future<void> onMapCreated(MapController mapController) async {
-    _mapController = mapController;
-    if (_cardioSessionDescription.route?.track != null) {
-      await _mapController
-          ?.addRouteLine(_cardioSessionDescription.route!.track!);
-    }
+    await _trackingUiUtils.onMapCreated(
+      mapController,
+      cardioSessionDescription.route,
+    );
     _refreshTimer =
         Timer.periodic(const Duration(seconds: 1), (_) => _refresh());
     _autosaveTimer = Timer.periodic(
@@ -197,6 +184,7 @@ class TrackingUtils extends ChangeNotifier {
   }
 
   Future<void> deleteIfSaved(BuildContext context) async {
+    // do not call showDeleteWarningDialog because DiscardDialog already shown
     if (_isSaved) {
       final result =
           await _dataProvider.deleteSingle(_cardioSessionDescription);
@@ -249,7 +237,7 @@ class TrackingUtils extends ChangeNotifier {
       final hour = (currentDuration - lastPosition.time).inMilliseconds /
           (1000 * 60 * 60);
       final speed = km / hour;
-      if (speed > maxSpeed) {
+      if (speed > _maxSpeed) {
         return;
       }
     }
@@ -276,17 +264,10 @@ class TrackingUtils extends ChangeNotifier {
 
     if (isTracking) {
       _cardioSessionDescription.cardioSession.track!.add(position);
-      await _mapController?.updateTrackLine(
-        _line,
-        _cardioSessionDescription.cardioSession.track,
-      );
+      await _trackingUiUtils
+          .onTrackUpdate(_cardioSessionDescription.cardioSession.track);
     }
-
-    await centerCurrentLocation();
-    await _mapController?.updateCurrentLocationMarker(
-      _currentLocationMarker,
-      position.latLng,
-    );
+    await _trackingUiUtils.onLocationUpdate(position.latLng);
 
     await _routeAlarm(position);
     await _audioFeedback();
@@ -302,7 +283,7 @@ class TrackingUtils extends ChangeNotifier {
           .round();
       if (distance > _routeAlarmDistance!) {
         _lastAlarm = DateTime.now();
-        await tts.speak("You are off route by $distance meters.");
+        await _tts.speak("You are off route by $distance meters.");
       }
     }
   }
@@ -315,21 +296,14 @@ class TrackingUtils extends ChangeNotifier {
       final prevLap = track[track.length - 2].distance ~/ config.interval;
       final currLap = track.last.distance ~/ config.interval;
       if (prevLap < currLap) {
-        await tts.speak("The current metrics are:");
+        await _tts.speak("The current metrics are:");
         for (final metric in config.metrics) {
           final text = metric.text(session);
           if (text != null) {
-            await tts.speak(text);
+            await _tts.speak(text);
           }
         }
       }
-    }
-  }
-
-  Future<void> centerCurrentLocation() async {
-    final latLng = lastLatLng;
-    if (_centerLocation && latLng != null) {
-      await _mapController?.animateCenter(latLng);
     }
   }
 }
