@@ -158,11 +158,15 @@ jobs:
     steps:
     - name: checkout
       uses: actions/checkout@v3
+    - name: load cache
+      uses: Swatinem/rust-cache@v1
     - name: install cargo-machete
-      uses: actions-rs/install@v0.1
-      with:
-        crate: cargo-machete
-        version: latest
-        use-tool-cache: true
+      run: cargo install cargo-machete
+      # actions-rs/install fails to load cached binary
+      # uses: actions-rs/install@v0.1
+      # with:
+        # crate: cargo-machete
+        # version: latest
+        # use-tool-cache: true
     - name: cargo machete
       run: cargo machete
