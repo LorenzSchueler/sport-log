@@ -1,16 +1,16 @@
-131c131
+135c135
 <         track -> Nullable<Array<Nullable<Position>>>,
 ---
 >         track -> Nullable<Array<Position>>,
-133c133
+137c137
 <         cadence -> Nullable<Array<Nullable<Int4>>>,
 ---
 >         cadence -> Nullable<Array<Int4>>,
-135c135
+139c139
 <         heart_rate -> Nullable<Array<Nullable<Int4>>>,
 ---
 >         heart_rate -> Nullable<Array<Int4>>,
-330,331c330,331
+342,343c342,343
 <         track -> Nullable<Array<Nullable<Position>>>,
 <         marked_positions -> Nullable<Array<Nullable<Position>>>,
 ---

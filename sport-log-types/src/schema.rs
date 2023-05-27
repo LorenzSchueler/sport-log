@@ -31,6 +31,7 @@ diesel::table! {
 
     action (id) {
         id -> Int8,
+        #[max_length = 80]
         name -> Varchar,
         action_provider_id -> Int8,
         description -> Nullable<Text>,
@@ -61,7 +62,9 @@ diesel::table! {
 
     action_provider (id) {
         id -> Int8,
+        #[max_length = 80]
         name -> Varchar,
+        #[max_length = 120]
         password -> Varchar,
         platform_id -> Int8,
         description -> Nullable<Text>,
@@ -95,6 +98,7 @@ diesel::table! {
         id -> Int8,
         user_id -> Int8,
         training_plan_id -> Int8,
+        #[max_length = 80]
         name -> Varchar,
         description -> Nullable<Text>,
         movement_id -> Int8,
@@ -169,6 +173,7 @@ diesel::table! {
 
     group (id) {
         id -> Int8,
+        #[max_length = 80]
         name -> Varchar,
         last_change -> Timestamptz,
         deleted -> Bool,
@@ -194,6 +199,7 @@ diesel::table! {
     metcon (id) {
         id -> Int8,
         user_id -> Nullable<Int8>,
+        #[max_length = 80]
         name -> Varchar,
         metcon_type -> MetconType,
         rounds -> Nullable<Int4>,
@@ -259,6 +265,7 @@ diesel::table! {
     movement (id) {
         id -> Int8,
         user_id -> Nullable<Int8>,
+        #[max_length = 80]
         name -> Varchar,
         description -> Nullable<Text>,
         movement_dimension -> MovementDimension,
@@ -285,6 +292,7 @@ diesel::table! {
 
     muscle_group (id) {
         id -> Int8,
+        #[max_length = 80]
         name -> Varchar,
         description -> Nullable<Text>,
     }
@@ -295,6 +303,7 @@ diesel::table! {
 
     platform (id) {
         id -> Int8,
+        #[max_length = 80]
         name -> Varchar,
         credential -> Bool,
         last_change -> Timestamptz,
@@ -309,7 +318,9 @@ diesel::table! {
         id -> Int8,
         user_id -> Int8,
         platform_id -> Int8,
+        #[max_length = 80]
         username -> Varchar,
+        #[max_length = 80]
         password -> Varchar,
         last_change -> Timestamptz,
         deleted -> Bool,
@@ -323,6 +334,7 @@ diesel::table! {
     route (id) {
         id -> Int8,
         user_id -> Int8,
+        #[max_length = 80]
         name -> Varchar,
         distance -> Int4,
         ascent -> Nullable<Int4>,
@@ -389,6 +401,7 @@ diesel::table! {
         id -> Int8,
         user_id -> Int8,
         training_plan_id -> Int8,
+        #[max_length = 80]
         name -> Varchar,
         description -> Nullable<Text>,
         movement_id -> Int8,
@@ -449,6 +462,7 @@ diesel::table! {
     training_plan (id) {
         id -> Int8,
         user_id -> Int8,
+        #[max_length = 80]
         name -> Varchar,
         description -> Nullable<Text>,
         date -> Nullable<Date>,
@@ -463,8 +477,11 @@ diesel::table! {
 
     user (id) {
         id -> Int8,
+        #[max_length = 80]
         username -> Varchar,
+        #[max_length = 120]
         password -> Varchar,
+        #[max_length = 80]
         email -> Varchar,
         last_change -> Timestamptz,
     }
