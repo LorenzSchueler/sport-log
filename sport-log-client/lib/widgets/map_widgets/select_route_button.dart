@@ -19,8 +19,8 @@ class SelectRouteButton extends StatefulWidget {
 }
 
 class _SelectRouteButtonState extends State<SelectRouteButton> {
-  Route? selectedRoute;
-  final NullablePointer<PolylineAnnotation> line =
+  Route? _selectedRoute;
+  final NullablePointer<PolylineAnnotation> _line =
       NullablePointer.nullPointer();
 
   @override
@@ -35,17 +35,17 @@ class _SelectRouteButtonState extends State<SelectRouteButton> {
   Future<void> selectRoute() async {
     final route = await showRoutePicker(
       context: context,
-      selectedRoute: selectedRoute,
+      selectedRoute: _selectedRoute,
     );
     if (route == null) {
       return;
-    } else if (route.id == selectedRoute?.id) {
-      selectedRoute = null;
+    } else if (route.id == _selectedRoute?.id) {
+      _selectedRoute = null;
     } else {
-      selectedRoute = route;
+      _selectedRoute = route;
     }
-    await widget.mapController.updateRouteLine(line, selectedRoute?.track);
+    await widget.mapController.updateRouteLine(_line, _selectedRoute?.track);
     await widget.mapController
-        .setBoundsFromTracks(selectedRoute?.track, null, padded: true);
+        .setBoundsFromTracks(_selectedRoute?.track, null, padded: true);
   }
 }
