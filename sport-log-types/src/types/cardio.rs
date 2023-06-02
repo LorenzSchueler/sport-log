@@ -1,7 +1,7 @@
 use chrono::{DateTime, Utc};
 #[cfg(feature = "db")]
 use diesel::{
-    backend::RawValue,
+    backend::Backend,
     deserialize::{self, FromSql},
     pg::Pg,
     serialize::{self, Output, ToSql, WriteTuple},
@@ -79,7 +79,7 @@ impl ToSql<crate::schema::sql_types::Position, Pg> for Position {
 
 #[cfg(feature = "db")]
 impl FromSql<crate::schema::sql_types::Position, Pg> for Position {
-    fn from_sql(bytes: RawValue<'_, Pg>) -> deserialize::Result<Self> {
+    fn from_sql(bytes: <Pg as Backend>::RawValue<'_>) -> deserialize::Result<Self> {
         let (longitude, latitude, elevation, distance, time) =
             FromSql::<Record<(Double, Double, Double, Double, Integer)>, Pg>::from_sql(bytes)?;
         Ok(Position {
