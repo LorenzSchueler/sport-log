@@ -8,7 +8,6 @@ import 'package:sport_log/app.dart';
 import 'package:sport_log/data_provider/data_providers/cardio_data_provider.dart';
 import 'package:sport_log/helpers/extensions/location_data_extension.dart';
 import 'package:sport_log/helpers/heart_rate_utils.dart';
-import 'package:sport_log/helpers/lat_lng.dart';
 import 'package:sport_log/helpers/location_utils.dart';
 import 'package:sport_log/helpers/map_controller.dart';
 import 'package:sport_log/helpers/step_count_utils.dart';
@@ -75,11 +74,11 @@ class TrackingUtils extends ChangeNotifier {
   Timer? _autosaveTimer;
 
   final TrackingUiUtils _trackingUiUtils = TrackingUiUtils();
-  void setCenterLocation(bool centerLocation) =>
-      _trackingUiUtils.setCenterLocation(centerLocation, lastLatLng);
+  void setCenterLocation(bool centerLocation) => _trackingUiUtils
+      .setCenterLocation(centerLocation, _locationUtils.lastLatLng);
 
   final LocationUtils _locationUtils = LocationUtils();
-  LatLng? get lastLatLng => _locationUtils.lastLatLng;
+  bool get waitingOnGps => !_locationUtils.hasGps;
 
   final StepCountUtils _stepUtils = StepCountUtils();
 
@@ -267,7 +266,7 @@ class TrackingUtils extends ChangeNotifier {
       await _trackingUiUtils
           .onTrackUpdate(_cardioSessionDescription.cardioSession.track);
     }
-    await _trackingUiUtils.onLocationUpdate(position.latLng);
+    await _trackingUiUtils.onLocationUpdate(location);
 
     await _routeAlarm(position);
     await _audioFeedback();

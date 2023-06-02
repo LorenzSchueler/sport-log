@@ -1,4 +1,6 @@
+import 'package:location/location.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' hide Position;
+import 'package:sport_log/helpers/extensions/location_data_extension.dart';
 import 'package:sport_log/helpers/lat_lng.dart';
 import 'package:sport_log/helpers/map_controller.dart';
 import 'package:sport_log/helpers/pointer.dart';
@@ -33,11 +35,12 @@ class TrackingUiUtils {
     await _mapController?.updateTrackLine(_line, track);
   }
 
-  Future<void> onLocationUpdate(LatLng latLng) async {
-    await centerCurrentLocation(latLng);
+  Future<void> onLocationUpdate(LocationData location) async {
+    await centerCurrentLocation(location.latLng);
     await _mapController?.updateCurrentLocationMarker(
       _currentLocationMarker,
-      latLng,
+      location.latLng,
+      location.isGps,
     );
   }
 

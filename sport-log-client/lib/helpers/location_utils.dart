@@ -12,7 +12,7 @@ import 'package:sport_log/widgets/dialogs/dialogs.dart';
 
 class LocationUtils extends ChangeNotifier {
   StreamSubscription<LocationData>? _locationSubscription;
-  LatLng? _lastLatLng;
+  LocationData? _lastLocation;
 
   bool _disposed = false;
 
@@ -70,7 +70,7 @@ class LocationUtils extends ChangeNotifier {
       description: "test",
       onTapBringToFront: true,
     );
-    _lastLatLng = locationData.latLng;
+    _lastLocation = locationData;
     onLocationUpdate(locationData);
     notifyListeners();
   }
@@ -78,13 +78,16 @@ class LocationUtils extends ChangeNotifier {
   Future<void> stopLocationStream() async {
     await _locationSubscription?.cancel();
     _locationSubscription = null;
-    _lastLatLng = null;
+    _lastLocation = null;
     if (!_disposed) {
       notifyListeners();
     }
   }
 
-  LatLng? get lastLatLng => _lastLatLng;
+  LocationData? get lastLocation => _lastLocation;
+  LatLng? get lastLatLng => _lastLocation?.latLng;
+  bool get hasGps =>
+      (_lastLocation?.isGps ?? false) && _lastLocation?.latLng != null;
 
   bool get enabled => _locationSubscription != null;
 }

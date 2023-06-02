@@ -9,6 +9,10 @@ import 'package:sport_log/helpers/pointer.dart';
 import 'package:sport_log/models/cardio/position.dart';
 import 'package:synchronized/synchronized.dart';
 
+const double _markerRadius = 8;
+const double _gpsMarkerRadius = 20;
+const double _noGpsMarkerRadius = 50;
+
 class MapController {
   MapController._(
     this.__controller,
@@ -243,18 +247,19 @@ class MapController {
 
   Future<List<CircleAnnotation>?> addCurrentLocationMarker(
     LatLng latLng,
+    bool isGps,
   ) async {
     final color = _colorToInt(const Color.fromARGB(0xFF, 0, 0x60, 0xA0));
     return (await _circleManager?.createMulti([
       CircleAnnotationOptions(
         geometry: latLng.toJsonPoint(),
-        circleRadius: 8,
+        circleRadius: _markerRadius,
         circleColor: color,
         circleOpacity: 0.5,
       ),
       CircleAnnotationOptions(
         geometry: latLng.toJsonPoint(),
-        circleRadius: 20,
+        circleRadius: isGps ? _gpsMarkerRadius : _noGpsMarkerRadius,
         circleColor: color,
         circleOpacity: 0.3,
       ),
@@ -265,14 +270,17 @@ class MapController {
   Future<void> updateCurrentLocationMarker(
     NullablePointer<List<CircleAnnotation>> circles,
     LatLng? latLng,
+    bool isGps,
   ) async {
     await _lock.synchronized(() async {
       if (circles.isNull && latLng != null) {
-        circles.object = await addCurrentLocationMarker(latLng);
+        circles.object = await addCurrentLocationMarker(latLng, isGps);
       } else if (circles.isNotNull && latLng != null) {
         circles.object = circles.object!
             .map((c) => c..geometry = latLng.toJsonPoint())
             .toList();
+        circles.object![1].circleRadius =
+            isGps ? _gpsMarkerRadius : _noGpsMarkerRadius;
         for (final circle in circles.object!) {
           await _circleManager?.update(circle);
         }
@@ -289,7 +297,7 @@ class MapController {
       await _circleManager?.create(
         CircleAnnotationOptions(
           geometry: latLng.toJsonPoint(),
-          circleRadius: 8,
+          circleRadius: _markerRadius,
           circleColor: _colorToInt(color),
           circleOpacity: 0.5,
         ),

@@ -117,7 +117,7 @@ class CardioTrackingPage extends StatelessWidget {
                             onPause: trackingUtils.pause,
                             onResume: trackingUtils.resume,
                             onSave: () => _saveDialog(context, trackingUtils),
-                            waitingOnHPS: trackingUtils.lastLatLng == null,
+                            waitingOnGPS: trackingUtils.waitingOnGps,
                             waitingOnHR: trackingUtils.waitingOnHR,
                           ),
                         ],
@@ -140,7 +140,7 @@ class _TrackingPageButtons extends StatelessWidget {
     required this.onPause,
     required this.onResume,
     required this.onSave,
-    required this.waitingOnHPS,
+    required this.waitingOnGPS,
     required this.waitingOnHR,
   });
 
@@ -149,7 +149,7 @@ class _TrackingPageButtons extends StatelessWidget {
   final VoidCallback onPause;
   final VoidCallback onResume;
   final VoidCallback onSave;
-  final bool waitingOnHPS;
+  final bool waitingOnGPS;
   final bool waitingOnHR;
 
   @override
@@ -202,9 +202,9 @@ class _TrackingPageButtons extends StatelessWidget {
                   backgroundColor: Theme.of(context).colorScheme.errorContainer,
                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 ),
-                onPressed: waitingOnHPS || waitingOnHR ? null : onStart,
+                onPressed: waitingOnGPS || waitingOnHR ? null : onStart,
                 child: Text(
-                  waitingOnHPS
+                  waitingOnGPS
                       ? "Waiting on GPS"
                       : waitingOnHR
                           ? "Waiting on HR Monitor"

@@ -27,6 +27,7 @@ class CurrentLocationButton extends StatelessWidget {
       await mapController.updateCurrentLocationMarker(
         _currentLocationMarker,
         null,
+        false,
       );
     } else {
       await locationUtils.startLocationStream(_onLocationUpdate);
@@ -40,6 +41,7 @@ class CurrentLocationButton extends StatelessWidget {
     await mapController.updateCurrentLocationMarker(
       _currentLocationMarker,
       location.latLng,
+      location.isGps,
     );
   }
 
