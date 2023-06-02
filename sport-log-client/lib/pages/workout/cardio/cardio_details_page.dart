@@ -92,8 +92,6 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
   static const _heartRateColor = Colors.red;
   static const _cadenceColor = Colors.green;
 
-  static const _currentDurationOffset = Duration(minutes: 1);
-
   Future<void> _onMapCreated(MapController mapController) async {
     _mapController = mapController;
     await _setBoundsAndLines();
@@ -387,52 +385,34 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
     );
   }
 
-  DurationChartLine _speedLine() => DurationChartLine.fromUngroupedChartValues(
-        ungroupedChartValues: _cardioSessionDescription.cardioSession.track
-                ?.groupListsBy(
-                  (p) => Duration(minutes: p.time.inMinutes),
-                )
-                .entries
-                .map((entry) {
-              final km =
-                  (entry.value.last.distance - entry.value.first.distance) /
-                      1000;
-              final hour = (entry.value.last.time - entry.value.first.time)
-                      .inMilliseconds /
+  DurationChartLine _speedLine() => DurationChartLine.fromValues<Position>(
+        values: _cardioSessionDescription.cardioSession.track,
+        getDuration: (position) => position.time,
+        getGroupValue: (positions) {
+          final km =
+              (positions.last.distance - positions.first.distance) / 1000;
+          final hour =
+              (positions.last.time - positions.first.time).inMilliseconds /
                   (1000 * 60 * 60);
-              return DurationChartValue(
-                duration: entry.key,
-                value: km / hour,
-              );
-            }).toList() ??
-            []
-          ..sort(
-            (v1, v2) => v1.duration.compareTo(v2.duration),
-          ),
+          return km / hour;
+        },
         lineColor: _speedColor,
       );
 
-  DurationChartLine _elevationLine() =>
-      DurationChartLine.fromUngroupedChartValues(
-        ungroupedChartValues: _cardioSessionDescription.cardioSession.track
-                ?.map(
-                  (t) => DurationChartValue(
-                    duration: t.time,
-                    value: t.elevation,
-                  ),
-                )
-                .toList() ??
-            [],
+  DurationChartLine _elevationLine() => DurationChartLine.fromValues<Position>(
+        values: _cardioSessionDescription.cardioSession.track,
+        getDuration: (position) => position.time,
+        getGroupValue: (positions) => positions.map((p) => p.elevation).average,
         lineColor: _elevationColor,
       );
 
   DurationChartLine _heartRateLine() => DurationChartLine.fromDurationList(
-        durations: _cardioSessionDescription.cardioSession.heartRate ?? [],
+        durations: _cardioSessionDescription.cardioSession.heartRate,
         lineColor: _heartRateColor,
       );
 
   DurationChartLine _cadenceLine() => DurationChartLine.fromDurationList(
-        durations: _cardioSessionDescription.cardioSession.cadence ?? [],
+        durations: _cardioSessionDescription.cardioSession.cadence,
         lineColor: _cadenceColor,
       );
 
@@ -460,6 +440,17 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
       final session = _cardioSessionDescription.cardioSession;
       final track = session.track;
 
+      final totalDuration = [
+        track?.lastOrNull?.time,
+        session.heartRate?.lastOrNull,
+        session.cadence?.lastOrNull
+      ].whereNotNull().maxOrNull;
+      if (totalDuration == null) {
+        // this should not happen because if there is no data the chart is also not shown
+        return;
+      }
+      final interval = DurationChartLine.intervalMinutes(totalDuration);
+
       final Position? pos;
       if (track != null) {
         final index = binarySearchLargestLE(
@@ -475,16 +466,19 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
       setState(() {
         _time = touchDuration;
         _speed = session
-            .currentSpeed(touchDuration - _currentDurationOffset, touchDuration)
+            .currentSpeed(
+              touchDuration,
+              touchDuration + interval,
+            )
             ?.roundToPrecision(1);
         _elevation = pos?.elevation.round();
         _heartRate = session.currentHeartRate(
-          touchDuration - _currentDurationOffset,
           touchDuration,
+          touchDuration + interval,
         );
         _cadence = session.currentCadence(
-          touchDuration - _currentDurationOffset,
           touchDuration,
+          touchDuration + interval,
         );
       });
       await _mapController?.updateTrackMarker(_touchMarker, pos?.latLng);
