@@ -21,7 +21,10 @@ class MapPage extends StatelessWidget {
 
   Future<void> _onDrawerChanged(bool open) async {
     if (open) {
-      await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+      await SystemChrome.setEnabledSystemUIMode(
+        SystemUiMode.manual,
+        overlays: SystemUiOverlay.values,
+      );
       await SystemChrome.setPreferredOrientations(
         [DeviceOrientation.portraitUp],
       );
