@@ -2,7 +2,11 @@ import 'package:collection/collection.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
-import 'package:sport_log/pages/workout/charts/all.dart';
+import 'package:sport_log/pages/workout/charts/datetime_charts/all_chart.dart';
+import 'package:sport_log/pages/workout/charts/datetime_charts/day_chart.dart';
+import 'package:sport_log/pages/workout/charts/datetime_charts/month_chart.dart';
+import 'package:sport_log/pages/workout/charts/datetime_charts/week_chart.dart';
+import 'package:sport_log/pages/workout/charts/datetime_charts/year_chart.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_state.dart';
 
 class DateTimeChartValue {
