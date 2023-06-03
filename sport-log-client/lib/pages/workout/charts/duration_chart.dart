@@ -117,8 +117,7 @@ class DurationChart extends StatefulWidget {
         maxX = chartLines
             .map(
               (chartLine) =>
-                  ((chartLine.chartValues.lastOrNull?.duration.inMinutes ?? 0) +
-                      1) *
+                  (chartLine.chartValues.lastOrNull?.duration.inMinutes ?? 0) *
                   60 *
                   1000,
             )
