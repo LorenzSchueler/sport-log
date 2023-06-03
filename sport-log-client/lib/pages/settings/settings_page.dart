@@ -310,22 +310,19 @@ class SettingsPage extends StatelessWidget {
                   Consumer<Sync>(
                     builder: (context, sync, _) => EditTile(
                       leading: AppIcons.sync,
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: ElevatedButton(
-                              style: ButtonStyle(
-                                backgroundColor: MaterialStateProperty.all(
-                                  Theme.of(context).colorScheme.errorContainer,
-                                ),
-                              ),
-                              onPressed: sync.isSyncing
-                                  ? null
-                                  : () => _initSync(context),
-                              child: const Text('Init Sync'),
+                      child: Container(
+                        constraints:
+                            const BoxConstraints(minWidth: double.infinity),
+                        child: ElevatedButton(
+                          style: ButtonStyle(
+                            backgroundColor: MaterialStateProperty.all(
+                              Theme.of(context).colorScheme.errorContainer,
                             ),
                           ),
-                        ],
+                          onPressed:
+                              sync.isSyncing ? null : () => _initSync(context),
+                          child: const Text('Init Sync'),
+                        ),
                       ),
                     ),
                   ),
@@ -435,8 +432,15 @@ class SettingsPage extends StatelessWidget {
                 const CaptionTile(caption: "About"),
                 EditTile(
                   leading: AppIcons.questionMark,
-                  child: const Text('About'),
-                  onTap: () => Navigator.pushNamed(context, Routes.about),
+                  child: ConstrainedBox(
+                    constraints:
+                        const BoxConstraints(minWidth: double.infinity),
+                    child: OutlinedButton(
+                      child: const Text('About'),
+                      onPressed: () =>
+                          Navigator.pushNamed(context, Routes.about),
+                    ),
+                  ),
                 ),
               ],
             ),

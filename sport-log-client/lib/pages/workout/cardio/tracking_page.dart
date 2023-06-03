@@ -155,19 +155,16 @@ class _TrackingPageButtons extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return switch (trackingMode) {
-      TrackingMode.tracking => Row(
-          children: [
-            Expanded(
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(context).colorScheme.error,
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                ),
-                onPressed: onPause,
-                child: const Text("Pause"),
-              ),
+      TrackingMode.tracking => ConstrainedBox(
+          constraints: const BoxConstraints(minWidth: double.infinity),
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Theme.of(context).colorScheme.error,
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
             ),
-          ],
+            onPressed: onPause,
+            child: const Text("Pause"),
+          ),
         ),
       TrackingMode.paused => Row(
           children: [
