@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sport_log/widgets/custom_icons.dart';
 
-class AppIcons {
-  AppIcons._();
+abstract final class AppIcons {
   // This Class has 3 purposes:
   // - combine Icons and CustomIcons in one class
   // - give Icons more intuitive names

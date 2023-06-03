@@ -19,9 +19,7 @@ import 'package:sport_log/settings.dart';
 //     syncEnabled
 //       syncInterval
 //       lastSync
-class Account {
-  Account._();
-
+abstract final class Account {
   static Future<void> noAccount() async {
     await Settings.instance.setUserId(randomId());
     // keep username, password and email as is

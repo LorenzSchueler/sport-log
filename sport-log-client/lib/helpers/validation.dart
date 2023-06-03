@@ -28,9 +28,7 @@ extension Case on String {
   }
 }
 
-class Validator {
-  Validator._();
-
+abstract final class Validator {
   static String? validateUrl(String? url) {
     if (url == null || url.isEmpty) {
       return "URL must not be empty.";
