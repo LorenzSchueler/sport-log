@@ -28,6 +28,9 @@ pub fn route_max_version(address: &str, route: &str, query: &[(&str, &str)]) -> 
 
 // user URIs
 
+pub const APP_INFO: &str = "/app/info";
+pub const APP_DOWNLOAD: &str = "/app/download";
+
 pub const ACCOUNT_DATA: &str = "/account_data";
 
 pub const USER: &str = "/user";

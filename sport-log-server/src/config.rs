@@ -1,4 +1,4 @@
-use std::net::SocketAddr;
+use std::{net::SocketAddr, path::PathBuf};
 
 use serde::{Deserialize, Serialize};
 
@@ -17,4 +17,5 @@ pub struct Config {
     pub database_url: String,
     pub release_address: SocketAddr,
     pub debug_address: SocketAddr,
+    pub app_dir: Option<PathBuf>,
 }

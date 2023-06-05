@@ -74,6 +74,8 @@ pub fn get_router(state: AppState) -> Router {
         );
 
     let user_router = Router::new()
+        .route(APP_INFO, get(get_app_info))
+        .route(APP_DOWNLOAD, get(download_app))
         .route(ACCOUNT_DATA, get(get_account_data))
         .route(
             USER,

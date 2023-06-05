@@ -4,3 +4,4 @@ ap_self_registration = true
 database_url = "postgres://sport_admin:<password>@localhost/sport_log"
 release_address = "0.0.0.0:8000"
 debug_address = "0.0.0.0:8001"
+app_dir = "/path/to/app" # comment out to disable app download

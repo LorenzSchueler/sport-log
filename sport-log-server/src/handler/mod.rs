@@ -8,6 +8,7 @@ pub use crate::error::*;
 mod account;
 mod action;
 //mod activity;
+mod app;
 mod cardio;
 mod diary_wod;
 mod garbage_collection;
@@ -20,6 +21,7 @@ mod user;
 
 pub use account::*;
 pub use action::*;
+pub use app::*;
 //pub use activity::*;
 pub use cardio::*;
 pub use diary_wod::*;
