@@ -233,7 +233,7 @@ class SettingsPage extends StatelessWidget {
                         _setServerUrl(context, serverUrl),
                   ),
                 ],
-                if (settings.syncEnabled)
+                if (settings.syncEnabled) ...[
                   EditTile(
                     leading: AppIcons.timeInterval,
                     caption: "Synchronization Interval (min)",
@@ -249,6 +249,13 @@ class SettingsPage extends StatelessWidget {
                       },
                     ),
                   ),
+                  EditTile.Switch(
+                    leading: AppIcons.systemUpdate,
+                    caption: "Check for Updates",
+                    value: settings.checkForUpdates,
+                    onChanged: settings.setCheckForUpdates,
+                  ),
+                ],
                 Defaults.sizedBox.vertical.small,
                 const Divider(),
                 if (settings.accountCreated) ...[

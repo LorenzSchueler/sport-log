@@ -99,4 +99,5 @@ abstract final class AppIcons {
   static const IconData chart = Icons.timeline_rounded;
   static const IconData compare = Icons.compare_rounded;
   static const IconData notification = Icons.notifications_active_rounded;
+  static const IconData systemUpdate = Icons.system_update_rounded;
 }

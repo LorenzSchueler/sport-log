@@ -93,8 +93,8 @@ class Sync extends ChangeNotifier {
 
     if (Settings.instance.checkForUpdates && !_checkedUpdates) {
       await update(onNoInternet);
+      _checkedUpdates = true;
     }
-    _checkedUpdates = true;
 
     var syncSuccessful =
         await EntityDataProvider.downSync(onNoInternet: onNoInternet);
