@@ -76,7 +76,9 @@ pub async fn get_app_info(
     let ref_log = read_to_string(app_dir.join("ref.log"))
         .await
         .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
-    let mut refs = ref_log.split("\n");
+    let mut refs = ref_log
+        .split("\n")
+        .filter(|current_ref| current_ref.len() == 7);
     let found_ref = refs.find(|current_ref| current_ref == &git_ref).is_some();
 
     if found_ref {
