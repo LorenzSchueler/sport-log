@@ -7,8 +7,10 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:sport_log/app.dart';
 import 'package:sport_log/config.dart';
 import 'package:sport_log/data_provider/data_provider.dart';
+import 'package:sport_log/data_provider/data_providers/app_data_provider.dart';
 import 'package:sport_log/data_provider/data_providers/metcon_data_provider.dart';
 import 'package:sport_log/data_provider/data_providers/movement_data_provider.dart';
+import 'package:sport_log/data_provider/data_providers/server_version_data_provider.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/request_permission.dart';
 import 'package:sport_log/models/metcon/metcon_description.dart';
@@ -60,8 +62,8 @@ class Sync extends ChangeNotifier {
     notifyListeners();
 
     if (_serverVersion == null) {
-      final serverVersionResult =
-          await DataProvider.getServerVersion(onNoInternet: onNoInternet);
+      final serverVersionResult = await ServerVersionDataProvider()
+          .getServerVersion(onNoInternet: onNoInternet);
       if (serverVersionResult.isSuccess) {
         _serverVersion = serverVersionResult.success;
         if (!_serverVersion!.compatibleWithClientApiVersion()) {
@@ -115,7 +117,7 @@ class Sync extends ChangeNotifier {
 
   Future<void> update(VoidCallback? onNoInternet) async {
     final updateInfoResult =
-        await DataProvider.getUpdateInfo(onNoInternet: onNoInternet);
+        await AppDataProvider().getUpdateInfo(onNoInternet: onNoInternet);
     // ignore failure
     if (updateInfoResult.isFailure) {
       return;
@@ -129,10 +131,12 @@ class Sync extends ChangeNotifier {
     if (!context.mounted) {
       return;
     }
-    await showUpdateDialog(context);
-    // ask if update now
+    final update = await showUpdateDialog(context);
+    if (!update) {
+      return;
+    }
     final updateDownloadResult =
-        await DataProvider.downloadUpdate(onNoInternet: onNoInternet);
+        await AppDataProvider().downloadUpdate(onNoInternet: onNoInternet);
     if (updateDownloadResult.isFailure) {
       return;
     }

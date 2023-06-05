@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:fixnum/fixnum.dart';
 import 'package:flutter/foundation.dart' show ChangeNotifier, VoidCallback;
-import 'package:result_type/result_type.dart';
 import 'package:sport_log/api/accessors/account_data_api.dart';
 import 'package:sport_log/api/api.dart';
 import 'package:sport_log/app.dart';
@@ -18,10 +17,8 @@ import 'package:sport_log/database/database.dart';
 import 'package:sport_log/database/table_accessor.dart';
 import 'package:sport_log/helpers/account.dart';
 import 'package:sport_log/helpers/logger.dart';
-import 'package:sport_log/helpers/write_to_file.dart';
 import 'package:sport_log/models/account_data/account_data.dart';
 import 'package:sport_log/models/entity_interfaces.dart';
-import 'package:sport_log/models/server_version/server_version.dart';
 import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/dialogs/dialogs.dart';
 import 'package:sport_log/widgets/dialogs/new_credentials_dialog.dart';
@@ -37,7 +34,7 @@ abstract class DataProvider<T> extends ChangeNotifier {
 
   Future<List<T>> getNonDeleted();
 
-  static Future<ConflictResolution?> _handleApiError(
+  static Future<ConflictResolution?> handleApiError(
     ApiError error,
     VoidCallback? onNoInternet,
   ) async {
@@ -80,60 +77,6 @@ abstract class DataProvider<T> extends ChangeNotifier {
       title: "An error occurred.",
       text: error.toString(),
     );
-  }
-
-  static Future<Result<ServerVersion, void>> getServerVersion({
-    VoidCallback? onNoInternet,
-  }) async {
-    final result = await Api.getServerVersion();
-
-    if (result.isFailure) {
-      await DataProvider._handleApiError(
-        result.failure,
-        onNoInternet,
-      );
-      return Failure(null);
-    } else {
-      return result;
-    }
-  }
-
-  static Future<Result<UpdateInfo, void>> getUpdateInfo({
-    VoidCallback? onNoInternet,
-  }) async {
-    final result = await Api.getUpdateInfo();
-
-    if (result.isFailure) {
-      await DataProvider._handleApiError(
-        result.failure,
-        onNoInternet,
-      );
-      return Failure(null);
-    } else {
-      return result;
-    }
-  }
-
-  static Future<Result<String?, void>> downloadUpdate({
-    VoidCallback? onNoInternet,
-  }) async {
-    final result = await Api.downloadUpdate();
-
-    if (result.isFailure) {
-      await DataProvider._handleApiError(
-        result.failure,
-        onNoInternet,
-      );
-      return Failure(null);
-    } else {
-      final bytes = result.success;
-      final filename = await writeBytesToFile(
-        content: bytes,
-        filename: "app",
-        fileExtension: "apk",
-      );
-      return Success(filename);
-    }
   }
 }
 
@@ -257,7 +200,7 @@ abstract class EntityDataProvider<T extends AtomicEntity>
     final result = await fnMultiple(records);
     if (result.isFailure) {
       final conflictResolution =
-          await DataProvider._handleApiError(result.failure, onNoInternet);
+          await DataProvider.handleApiError(result.failure, onNoInternet);
       return conflictResolution != null
           ? await _resolveConflict(conflictResolution, fnSingle, records)
           : false;
@@ -335,7 +278,7 @@ abstract class EntityDataProvider<T extends AtomicEntity>
     final accountDataResult =
         await AccountDataApi().get(Settings.instance.lastSync);
     if (accountDataResult.isFailure) {
-      await DataProvider._handleApiError(
+      await DataProvider.handleApiError(
         accountDataResult.failure,
         onNoInternet,
       );

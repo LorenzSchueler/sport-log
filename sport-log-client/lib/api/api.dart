@@ -8,12 +8,10 @@ import 'package:http/http.dart';
 import 'package:http/io_client.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:logger/logger.dart' as l;
-import 'package:package_info_plus/package_info_plus.dart';
 import 'package:result_type/result_type.dart';
 import 'package:sport_log/config.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/error_message.dart';
-import 'package:sport_log/models/server_version/server_version.dart';
 import 'package:sport_log/settings.dart';
 
 final _logger = Logger('API');
@@ -176,33 +174,6 @@ extension RequestExtension on Request {
 }
 
 abstract class Api<T extends JsonSerializable> {
-  static Future<ApiResult<ServerVersion>> getServerVersion() {
-    final uri = Uri.parse("${Settings.instance.serverUrl}/version");
-    return Request("get", uri).toApiResultWithValue(
-      (json) => ServerVersion.fromJson(json as Map<String, dynamic>),
-    );
-  }
-
-  static Future<ApiResult<UpdateInfo>> getUpdateInfo() {
-    final uri = uriFromRoute("/app/info?git_ref=${Config.gitRef}");
-    final request = Request("get", uri)..headers.addAll(ApiHeaders.basicAuth);
-    return request.toApiResultWithValue(
-      (json) => UpdateInfo.fromJson(json as Map<String, dynamic>),
-    );
-  }
-
-  static Future<ApiResult<Uint8List>> downloadUpdate() async {
-    const format = "apk";
-    const build = Config.debugMode ? "debug" : "release";
-    final packageName = (await PackageInfo.fromPlatform()).packageName;
-    final flavor = packageName.endsWith(".dev") ? "development" : "production";
-    final uri = uriFromRoute(
-      "/app/download?format=$format&build=$build&flavor=$flavor",
-    );
-    final request = Request("get", uri)..headers.addAll(ApiHeaders.basicAuth);
-    return request.toBytes();
-  }
-
   T fromJson(Map<String, dynamic> json);
 
   /// everything after version, e. g. '/user'
