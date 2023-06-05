@@ -30,6 +30,7 @@ class Settings extends ChangeNotifier {
   static const String _serverUrl = "serverUrl";
   static const String _syncInterval = "syncInterval";
   static const String _lastSync = "lastSync";
+  static const String _checkForUpdates = "checkForUpdates";
   static const String _units = "units";
   static const String _weightIncrement = "weightIncrement";
   static const String _durationIncrement = "durationIncrement";
@@ -50,6 +51,7 @@ class Settings extends ChangeNotifier {
     await _setDefaults(override: override);
   }
 
+  // ignore: long-method
   Future<void> _setDefaults({bool override = false}) async {
     // do not use _put to avoid calling notifyListeners repeatedly.
     if (!_contains(_accountCreated) || override) {
@@ -66,6 +68,9 @@ class Settings extends ChangeNotifier {
     }
     if (!_contains(_lastSync) || override) {
       await _storage!.put(_lastSync, null);
+    }
+    if (!_contains(_checkForUpdates) || override) {
+      await _storage!.put(_checkForUpdates, true);
     }
     if (!_contains(_units) || override) {
       await _storage!.put(_units, "metric");
@@ -155,6 +160,11 @@ class Settings extends ChangeNotifier {
   DateTime? get lastSync => _getDateTimeOptional(_lastSync);
 
   Future<void> setLastSync(DateTime? lastSync) => _put(_lastSync, lastSync);
+
+  bool get checkForUpdates => _getBool(_checkForUpdates);
+
+  Future<void> setCheckForUpdates(bool checkForUpdates) =>
+      _put(_checkForUpdates, checkForUpdates);
 
   Units get units => Units.fromString(_getString(_units));
 

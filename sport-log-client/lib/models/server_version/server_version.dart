@@ -64,3 +64,13 @@ class Version implements Comparable<Version> {
     return major != other.major ? major - other.major : minor - other.minor;
   }
 }
+
+@JsonSerializable()
+class UpdateInfo {
+  UpdateInfo({required this.newVersion});
+
+  factory UpdateInfo.fromJson(Map<String, dynamic> json) =>
+      _$UpdateInfoFromJson(json);
+
+  bool newVersion;
+}

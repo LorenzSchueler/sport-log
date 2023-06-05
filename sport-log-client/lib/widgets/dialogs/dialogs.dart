@@ -162,6 +162,22 @@ Future<bool> showDeleteWarningDialog(
   return delete ?? false;
 }
 
+Future<bool> showUpdateDialog(BuildContext context) async {
+  final update = await showDialog<bool>(
+    context: context,
+    builder: (_) => _Dialog(
+      title: 'Install Update?',
+      text:
+          'An update for Sport-Log is available. Do you want to download and install it now?',
+      options: [
+        _DialogOption(name: "No", value: false),
+        _DialogOption(name: "Yes", value: true),
+      ],
+    ),
+  );
+  return update ?? false;
+}
+
 Future<void> showMessageDialog({
   required BuildContext context,
   String? title,

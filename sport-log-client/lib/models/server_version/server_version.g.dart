@@ -18,3 +18,12 @@ Map<String, dynamic> _$ServerVersionStringToJson(
       'min': instance.min,
       'max': instance.max,
     };
+
+UpdateInfo _$UpdateInfoFromJson(Map<String, dynamic> json) => UpdateInfo(
+      newVersion: json['new_version'] as bool,
+    );
+
+Map<String, dynamic> _$UpdateInfoToJson(UpdateInfo instance) =>
+    <String, dynamic>{
+      'new_version': instance.newVersion,
+    };

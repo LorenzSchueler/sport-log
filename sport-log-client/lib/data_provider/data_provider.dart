@@ -18,6 +18,7 @@ import 'package:sport_log/database/database.dart';
 import 'package:sport_log/database/table_accessor.dart';
 import 'package:sport_log/helpers/account.dart';
 import 'package:sport_log/helpers/logger.dart';
+import 'package:sport_log/helpers/write_to_file.dart';
 import 'package:sport_log/models/account_data/account_data.dart';
 import 'package:sport_log/models/entity_interfaces.dart';
 import 'package:sport_log/models/server_version/server_version.dart';
@@ -94,6 +95,44 @@ abstract class DataProvider<T> extends ChangeNotifier {
       return Failure(null);
     } else {
       return result;
+    }
+  }
+
+  static Future<Result<UpdateInfo, void>> getUpdateInfo({
+    VoidCallback? onNoInternet,
+  }) async {
+    final result = await Api.getUpdateInfo();
+
+    if (result.isFailure) {
+      await DataProvider._handleApiError(
+        result.failure,
+        onNoInternet,
+      );
+      return Failure(null);
+    } else {
+      return result;
+    }
+  }
+
+  static Future<Result<String?, void>> downloadUpdate({
+    VoidCallback? onNoInternet,
+  }) async {
+    final result = await Api.downloadUpdate();
+
+    if (result.isFailure) {
+      await DataProvider._handleApiError(
+        result.failure,
+        onNoInternet,
+      );
+      return Failure(null);
+    } else {
+      final bytes = result.success;
+      final filename = await writeBytesToFile(
+        content: bytes,
+        filename: "app",
+        fileExtension: "apk",
+      );
+      return Success(filename);
     }
   }
 }

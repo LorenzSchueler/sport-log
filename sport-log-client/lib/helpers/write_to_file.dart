@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:path_provider/path_provider.dart';
 import 'package:sport_log/config.dart';
@@ -14,7 +15,7 @@ final _logger = Logger("WriteToFile");
 Future<String?> writeToFile({
   required String content,
   required String filename,
-  String fileExtension = "",
+  required String fileExtension,
   bool append = false,
 }) async {
   final dir = Config.isAndroid
@@ -35,6 +36,31 @@ Future<String?> writeToFile({
       content,
       flush: true,
       mode: append ? FileMode.writeOnlyAppend : FileMode.writeOnly,
+    );
+  } on FileSystemException catch (e) {
+    _logger.w(e);
+    return null;
+  }
+  return file.path;
+}
+
+/// Writes content to file `filename` in cache directory.
+///
+/// If the file already exists it will be overwritten.
+///
+/// If successful it returns the path to the file.
+Future<String?> writeBytesToFile({
+  required Uint8List content,
+  required String filename,
+  required String fileExtension,
+}) async {
+  final dir = await getTemporaryDirectory();
+  final file = File("${dir.path}/$filename.$fileExtension");
+  try {
+    await file.writeAsBytes(
+      content,
+      flush: true,
+      mode: FileMode.writeOnly,
     );
   } on FileSystemException catch (e) {
     _logger.w(e);

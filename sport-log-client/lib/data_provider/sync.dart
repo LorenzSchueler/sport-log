@@ -2,12 +2,15 @@ import 'dart:async';
 
 import 'package:fixnum/fixnum.dart';
 import 'package:flutter/foundation.dart' show ChangeNotifier, VoidCallback;
+import 'package:open_file/open_file.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:sport_log/app.dart';
 import 'package:sport_log/config.dart';
 import 'package:sport_log/data_provider/data_provider.dart';
 import 'package:sport_log/data_provider/data_providers/metcon_data_provider.dart';
 import 'package:sport_log/data_provider/data_providers/movement_data_provider.dart';
 import 'package:sport_log/helpers/logger.dart';
+import 'package:sport_log/helpers/request_permission.dart';
 import 'package:sport_log/models/metcon/metcon_description.dart';
 import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/models/server_version/server_version.dart';
@@ -26,7 +29,9 @@ class Sync extends ChangeNotifier {
   bool _isSyncing;
   bool get isSyncing => _isSyncing;
 
-  ServerVersion? serverVersion;
+  ServerVersion? _serverVersion;
+
+  bool _checkedUpdates = false;
 
   Future<void> init() async {
     if (Config.instance.deleteDatabase) {
@@ -54,12 +59,12 @@ class Sync extends ChangeNotifier {
     _isSyncing = true;
     notifyListeners();
 
-    if (serverVersion == null) {
+    if (_serverVersion == null) {
       final serverVersionResult =
           await DataProvider.getServerVersion(onNoInternet: onNoInternet);
       if (serverVersionResult.isSuccess) {
-        serverVersion = serverVersionResult.success;
-        if (!serverVersion!.compatibleWithClientApiVersion()) {
+        _serverVersion = serverVersionResult.success;
+        if (!_serverVersion!.compatibleWithClientApiVersion()) {
           final context = App.globalContext;
           if (context.mounted) {
             // must be unawaited so that callback finished even if dialog context dropped
@@ -67,7 +72,7 @@ class Sync extends ChangeNotifier {
               showMessageDialog(
                 context: context,
                 text:
-                    "Client api version ${Config.apiVersion} is not compatible with server api versions: $serverVersion\n"
+                    "Client api version ${Config.apiVersion} is not compatible with server api versions: $_serverVersion\n"
                     "Server synchronization is no longer possible. Please update the app.",
               ),
             );
@@ -86,6 +91,11 @@ class Sync extends ChangeNotifier {
       }
     }
 
+    if (Settings.instance.checkForUpdates && !_checkedUpdates) {
+      await update(onNoInternet);
+    }
+    _checkedUpdates = true;
+
     var syncSuccessful =
         await EntityDataProvider.downSync(onNoInternet: onNoInternet);
     if (syncSuccessful) {
@@ -101,6 +111,40 @@ class Sync extends ChangeNotifier {
     notifyListeners();
 
     return syncSuccessful;
+  }
+
+  Future<void> update(VoidCallback? onNoInternet) async {
+    final updateInfoResult =
+        await DataProvider.getUpdateInfo(onNoInternet: onNoInternet);
+    // ignore failure
+    if (updateInfoResult.isFailure) {
+      return;
+    }
+    final updateInfo = updateInfoResult.success;
+    if (!updateInfo.newVersion) {
+      return;
+    }
+    final context = App.globalContext;
+    // ignore: use_build_context_synchronously
+    if (!context.mounted) {
+      return;
+    }
+    await showUpdateDialog(context);
+    // ask if update now
+    final updateDownloadResult =
+        await DataProvider.downloadUpdate(onNoInternet: onNoInternet);
+    if (updateDownloadResult.isFailure) {
+      return;
+    }
+    final filename = updateDownloadResult.success;
+    if (filename == null) {
+      return;
+    }
+    if (!await PermissionRequest.request(Permission.manageExternalStorage) ||
+        !await PermissionRequest.request(Permission.requestInstallPackages)) {
+      return;
+    }
+    await OpenFile.open(filename);
   }
 
   Future<void> startSync() async {
@@ -130,7 +174,7 @@ class Sync extends ChangeNotifier {
 
   void stopSync() {
     _logger.d('Stopping synchronization.');
-    serverVersion = null;
+    _serverVersion = null;
     _syncTimer?.cancel();
     _syncTimer = null;
   }

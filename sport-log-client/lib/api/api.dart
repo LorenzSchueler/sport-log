@@ -1,12 +1,14 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:fixnum/fixnum.dart';
 import 'package:http/http.dart';
 import 'package:http/io_client.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:logger/logger.dart' as l;
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:result_type/result_type.dart';
 import 'package:sport_log/config.dart';
 import 'package:sport_log/helpers/logger.dart';
@@ -79,7 +81,7 @@ class ApiError {
   String toString() {
     final description = errorType.description;
     final errorCodeStr = errorCode != null ? " (status $errorCode)" : "";
-    final messageStr = message != null ? "\n$message" : "";
+    final messageStr = message != null ? "\nReason: $message" : "";
     return "$description$errorCodeStr$messageStr";
   }
 }
@@ -112,6 +114,21 @@ extension _ToApiResult on StreamedResponse {
       500 =>
         Failure(ApiError(ApiErrorType.internalServerError, statusCode, json)),
       _ => Failure(ApiError(ApiErrorType.unknownServerError, statusCode, json)),
+    };
+  }
+
+  Future<ApiResult<Uint8List>> toBytes() async {
+    final rawBody = await stream.toBytes();
+    return switch (statusCode) {
+      200 => Success(rawBody),
+      204 => Failure(ApiError(ApiErrorType.badJson, statusCode)),
+      400 => Failure(ApiError(ApiErrorType.badRequest, statusCode)),
+      401 => Failure(ApiError(ApiErrorType.unauthorized, statusCode)),
+      403 => Failure(ApiError(ApiErrorType.forbidden, statusCode)),
+      404 => Failure(ApiError(ApiErrorType.notFound, statusCode)),
+      409 => Failure(ApiError(ApiErrorType.conflict, statusCode)),
+      500 => Failure(ApiError(ApiErrorType.internalServerError, statusCode)),
+      _ => Failure(ApiError(ApiErrorType.unknownServerError, statusCode)),
     };
   }
 }
@@ -150,6 +167,12 @@ extension RequestExtension on Request {
             ? Success(result.success as T)
             : Failure(result.failure);
       });
+
+  Future<ApiResult<Uint8List>> toBytes() => _handleError(() async {
+        _logRequest(this);
+        final response = await _client.send(this);
+        return response.toBytes();
+      });
 }
 
 abstract class Api<T extends JsonSerializable> {
@@ -158,6 +181,26 @@ abstract class Api<T extends JsonSerializable> {
     return Request("get", uri).toApiResultWithValue(
       (json) => ServerVersion.fromJson(json as Map<String, dynamic>),
     );
+  }
+
+  static Future<ApiResult<UpdateInfo>> getUpdateInfo() {
+    final uri = uriFromRoute("/app/info?git_ref=${Config.gitRef}");
+    final request = Request("get", uri)..headers.addAll(ApiHeaders.basicAuth);
+    return request.toApiResultWithValue(
+      (json) => UpdateInfo.fromJson(json as Map<String, dynamic>),
+    );
+  }
+
+  static Future<ApiResult<Uint8List>> downloadUpdate() async {
+    const format = "apk";
+    const build = Config.debugMode ? "debug" : "release";
+    final packageName = (await PackageInfo.fromPlatform()).packageName;
+    final flavor = packageName.endsWith(".dev") ? "development" : "production";
+    final uri = uriFromRoute(
+      "/app/download?format=$format&build=$build&flavor=$flavor",
+    );
+    final request = Request("get", uri)..headers.addAll(ApiHeaders.basicAuth);
+    return request.toBytes();
   }
 
   T fromJson(Map<String, dynamic> json);
