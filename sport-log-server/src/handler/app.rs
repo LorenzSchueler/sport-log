@@ -76,21 +76,24 @@ pub async fn get_app_info(
     let ref_log = read_to_string(app_dir.join("ref.log"))
         .await
         .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
-    let ref_index = ref_log
-        .split("\n")
-        .enumerate()
-        .find(|(_, current_ref)| current_ref == &git_ref)
-        .map(|(index, _)| index);
+    let mut refs = ref_log.split("\n");
+    let found_ref = refs.find(|current_ref| current_ref == &git_ref).is_some();
 
-    match ref_index {
-        Some(0) => Ok(Json(AppInfo { new_version: false })),
-        Some(_) => Ok(Json(AppInfo { new_version: true })),
-        None => Err(HandlerError::from((
+    if found_ref {
+        if refs.next().is_none() {
+            // ref is last one
+            Ok(Json(AppInfo { new_version: false }))
+        } else {
+            // there are newer refs
+            Ok(Json(AppInfo { new_version: true }))
+        }
+    } else {
+        Err(HandlerError::from((
             StatusCode::BAD_REQUEST,
             ErrorMessage::Other {
                 error: "the git ref was not found in the ref log".to_owned(),
             },
-        ))),
+        )))
     }
 }
 
