@@ -28,32 +28,31 @@ class RoutePlanningUtils {
     List<Position> track,
     List<Position> markedPositions,
   ) {
-    var searchFrom = 0;
+    var searchStart = 0;
     var deleteBetween = false;
     for (final markedPos in markedPositions) {
-      var (distance, index) = markedPos.minDistanceTo(track.slice(searchFrom));
+      var (distance, index) = markedPos.minDistanceTo(track.slice(searchStart));
       if (index == null) {
         // no nearest point found - keep track as is
         break;
       }
-      index += searchFrom;
+      index += searchStart;
       if (distance < 20) {
         if (deleteBetween) {
-          track.removeRange(searchFrom, index);
-          index = index - searchFrom;
-          searchFrom = index + 1;
+          track.removeRange(searchStart, index);
+          searchStart += 1;
           deleteBetween = false;
         } else {
-          searchFrom = index + 1;
+          searchStart = index + 1;
         }
       } else {
-        track.insert(searchFrom, markedPos);
-        searchFrom += 1;
+        track.insert(searchStart, markedPos);
+        searchStart += 1;
         deleteBetween = true;
       }
     }
     if (deleteBetween) {
-      track.removeRange(searchFrom, track.length);
+      track.removeRange(searchStart, track.length);
     }
 
     return track;
