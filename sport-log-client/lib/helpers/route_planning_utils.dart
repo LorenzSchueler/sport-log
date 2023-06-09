@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:collection/collection.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:mapbox_api/mapbox_api.dart';
 import 'package:result_type/result_type.dart';
@@ -21,6 +22,42 @@ enum RoutePlanningError {
 
 class RoutePlanningUtils {
   static final _logger = Logger("RoutePlanningUtils");
+
+  // Remove parts that are too far from the marked points and replace them with straight line.
+  static List<Position> _adjustTrack(
+    List<Position> track,
+    List<Position> markedPositions,
+  ) {
+    var searchFrom = 0;
+    var deleteBetween = false;
+    for (final markedPos in markedPositions) {
+      var (distance, index) = markedPos.minDistanceTo(track.slice(searchFrom));
+      if (index == null) {
+        // no nearest point found - keep track as is
+        break;
+      }
+      index += searchFrom;
+      if (distance < 20) {
+        if (deleteBetween) {
+          track.removeRange(searchFrom, index);
+          index = index - searchFrom;
+          searchFrom = index + 1;
+          deleteBetween = false;
+        } else {
+          searchFrom = index + 1;
+        }
+      } else {
+        track.insert(searchFrom, markedPos);
+        searchFrom += 1;
+        deleteBetween = true;
+      }
+    }
+    if (deleteBetween) {
+      track.removeRange(searchFrom, track.length);
+    }
+
+    return track;
+  }
 
   static Future<Result<List<Position>, RoutePlanningError>> matchLocations(
     List<Position> markedPositions,
@@ -58,7 +95,8 @@ class RoutePlanningUtils {
           ),
         );
       }
-      return Success(track);
+      final adjustedTrack = _adjustTrack(track, markedPositions);
+      return Success(adjustedTrack);
     } else {
       _logger.i("mapbox api error ${response.error.runtimeType}");
       return Failure(RoutePlanningError.unknown);
