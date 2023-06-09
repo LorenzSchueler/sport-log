@@ -42,15 +42,18 @@ class LatLng {
     return R * sqrt(x * x + y * y);
   } // in m
 
-  double minDistanceTo(List<LatLng> track) {
+  /// Return the minimum distance in meter and the index of the closest point.
+  (double, int?) minDistanceTo(List<LatLng> track) {
     var minDistance = double.infinity;
-    for (final latLng in track) {
-      final distance = _fastDistanceTo(latLng);
+    int? index;
+    for (var i = 0; i < track.length; i++) {
+      final distance = _fastDistanceTo(track[i]);
       if (distance < minDistance) {
         minDistance = distance;
+        index = i;
       }
     }
-    return minDistance;
+    return (minDistance, index);
   }
 }
 

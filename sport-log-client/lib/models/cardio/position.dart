@@ -89,7 +89,7 @@ class Position {
 
   double distanceTo(Position other) => latLng.distanceTo(other.latLng);
 
-  double minDistanceTo(List<Position> track) =>
+  (double, int?) minDistanceTo(List<Position> track) =>
       latLng.minDistanceTo(track.latLngs);
 }
 

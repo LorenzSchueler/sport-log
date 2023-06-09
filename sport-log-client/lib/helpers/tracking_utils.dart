@@ -278,12 +278,11 @@ class TrackingUtils extends ChangeNotifier {
         _routeAlarmDistance != null &&
         (_lastAlarm?.isBefore(DateTime.now().subtract(_minAlarmInterval)) ??
             true)) {
-      final distance = position
-          .minDistanceTo(cardioSessionDescription.route!.track!)
-          .round();
-      if (distance > _routeAlarmDistance!) {
+      final (distance, index) =
+          position.minDistanceTo(cardioSessionDescription.route!.track!);
+      if (distance > _routeAlarmDistance! && index != null) {
         _lastAlarm = DateTime.now();
-        await _tts.speak("You are off route by $distance meters.");
+        await _tts.speak("You are off route by ${distance.round()} meters.");
       }
     }
   }
