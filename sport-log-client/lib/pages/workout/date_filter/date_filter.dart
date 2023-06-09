@@ -50,7 +50,7 @@ class _DateFilterState extends State<DateFilter> {
         children: [
           if (_dateFilterState is! AllFilter)
             RepeatIconButton(
-              icon: const Icon(AppIcons.arrowBackOpen),
+              icon: const Icon(AppIcons.arrowLeft),
               onClick: () => setDateFilterState(_dateFilterState.earlier),
               color: appBarColor,
             ),
@@ -81,7 +81,7 @@ class _DateFilterState extends State<DateFilter> {
           ),
           if (_dateFilterState is! AllFilter)
             RepeatIconButton(
-              icon: const Icon(AppIcons.arrowForwardOpen),
+              icon: const Icon(AppIcons.arrowRight),
               onClick: _dateFilterState.goingForwardPossible
                   ? () => setDateFilterState(_dateFilterState.later)
                   : null,

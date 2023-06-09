@@ -55,10 +55,11 @@ abstract final class AppIcons {
   static const IconData invertColors = Icons.invert_colors_rounded;
 
   // arrows
-  static const IconData arrowBack = Icons.arrow_back_rounded;
-  static const IconData arrowBackOpen = Icons.arrow_back_ios_rounded;
-  static const IconData arrowForwardOpen = Icons.arrow_forward_ios_rounded;
+  static const IconData arrowLeft = Icons.arrow_back_ios_rounded;
+  static const IconData arrowRight = Icons.arrow_forward_ios_rounded;
   static const IconData arrowDropDown = Icons.arrow_drop_down_rounded;
+  static const IconData arrowUp = Icons.keyboard_arrow_up_rounded;
+  static const IconData arrowDown = Icons.keyboard_arrow_down_rounded;
   static const IconData trendingUp = Icons.trending_up_rounded;
   static const IconData trendingDown = Icons.trending_down_rounded;
 

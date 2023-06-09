@@ -43,6 +43,8 @@ class _RouteEditPageState extends State<RouteEditPage> {
   List<CircleAnnotation> _circles = [];
   List<PointAnnotation> _labels = [];
 
+  SnapMode _snapMode = SnapMode.snapIfClose;
+
   bool _isSearching = false;
 
   MapController? _mapController;
@@ -113,13 +115,12 @@ class _RouteEditPageState extends State<RouteEditPage> {
       final track = await _lock.synchronized(
         () => RoutePlanningUtils.matchLocations(
           _route.markedPositions!,
+          _snapMode,
           _elevationMapController?.getElevation,
         ),
       );
       if (mounted) {
         setState(() => _isSearching = false);
-      }
-      if (mounted) {
         if (track.isFailure) {
           showSimpleToast(context, track.failure.message);
         } else {
@@ -132,7 +133,7 @@ class _RouteEditPageState extends State<RouteEditPage> {
           await _mapController?.updateRouteLine(_line, _route.track);
         }
       }
-    } else {
+    } else if (mounted) {
       await _mapController?.updateRouteLine(_line, null);
     }
   }
@@ -246,50 +247,73 @@ class _RouteEditPageState extends State<RouteEditPage> {
             )
           ],
         ),
-        body: Column(
-          children: [
-            Expanded(
-              child: Stack(
-                children: [
-                  MapboxMapWrapper(
-                    showFullscreenButton: false,
-                    showMapStylesButton: true,
-                    showSelectRouteButton: false,
-                    showSetNorthButton: true,
-                    showCurrentLocationButton: false,
-                    showCenterLocationButton: false,
-                    onMapCreated: _onMapCreated,
-                    onLongTap: _extendLine,
-                  ),
-                  if (_isSearching)
-                    const Align(
-                      alignment: Alignment.topCenter,
-                      child: Padding(
-                        padding: EdgeInsets.only(top: 10),
-                        child: CircularProgressIndicator(color: Colors.black45),
-                      ),
-                    ),
-                ],
-              ),
-            ),
-            ElevationMap(onMapCreated: _onElevationMapCreated),
-            Padding(
-              padding: Defaults.edgeInsets.normal,
-              child: ProviderConsumer(
-                create: (_) => BoolToggle.off(),
-                builder: (context, listExpanded, _) => Column(
+        body: ProviderConsumer(
+          create: (_) => BoolToggle.off(),
+          builder: (context, listExpanded, _) => Column(
+            children: [
+              Expanded(
+                child: Stack(
                   children: [
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
+                    MapboxMapWrapper(
+                      showFullscreenButton: false,
+                      showMapStylesButton: true,
+                      showSelectRouteButton: false,
+                      showSetNorthButton: true,
+                      showCurrentLocationButton: false,
+                      showCenterLocationButton: false,
+                      scaleAtTop: true,
+                      onMapCreated: _onMapCreated,
+                      onLongTap: _extendLine,
+                    ),
+                    if (_isSearching)
+                      const Align(
+                        alignment: Alignment.topCenter,
+                        child: Padding(
+                          padding: EdgeInsets.only(top: 10),
+                          child:
+                              CircularProgressIndicator(color: Colors.black45),
+                        ),
+                      ),
+                    Align(
+                      alignment: Alignment.bottomCenter,
+                      child: IconButton(
                         onPressed: listExpanded.toggle,
-                        child:
-                            Text(listExpanded.isOn ? "hide List" : "show List"),
+                        iconSize: 50,
+                        icon: Icon(
+                          listExpanded.isOn
+                              ? AppIcons.arrowDown
+                              : AppIcons.arrowUp,
+                          color: Colors.black,
+                        ),
                       ),
                     ),
-                    if (listExpanded.isOn)
+                  ],
+                ),
+              ),
+              ElevationMap(onMapCreated: _onElevationMapCreated),
+              if (listExpanded.isOn)
+                Padding(
+                  padding: Defaults.edgeInsets.normal,
+                  child: Column(
+                    children: [
+                      SegmentedButton(
+                        segments: SnapMode.values
+                            .map(
+                              (snapMode) => ButtonSegment(
+                                value: snapMode,
+                                label: Text(snapMode.name),
+                              ),
+                            )
+                            .toList(),
+                        selected: {_snapMode},
+                        showSelectedIcon: false,
+                        onSelectionChanged: (selected) {
+                          setState(() => _snapMode = selected.first);
+                          _updateLine();
+                        },
+                      ),
                       ConstrainedBox(
-                        constraints: const BoxConstraints(maxHeight: 300),
+                        constraints: const BoxConstraints(maxHeight: 250),
                         child: ReorderableListView.builder(
                           itemBuilder: (context, index) => ListTile(
                             key: ValueKey(index),
@@ -309,29 +333,31 @@ class _RouteEditPageState extends State<RouteEditPage> {
                           shrinkWrap: true,
                         ),
                       ),
-                    const Divider(),
-                    Defaults.sizedBox.vertical.normal,
-                    RouteValueUnitDescriptionTable(route: _route),
-                    Defaults.sizedBox.vertical.normal,
-                    Form(
-                      key: _formKey,
-                      child: TextFormField(
-                        onTap: () => listExpanded.setState(false),
-                        onChanged: (name) => setState(() => _route.name = name),
-                        initialValue: _route.name,
-                        validator: Validator.validateStringNotEmpty,
-                        autovalidateMode: AutovalidateMode.onUserInteraction,
-                        decoration:
-                            Theme.of(context).textFormFieldDecoration.copyWith(
-                                  labelText: "Name",
-                                ),
+                      const Divider(),
+                      Defaults.sizedBox.vertical.normal,
+                      RouteValueUnitDescriptionTable(route: _route),
+                      Defaults.sizedBox.vertical.normal,
+                      Form(
+                        key: _formKey,
+                        child: TextFormField(
+                          onTap: () => listExpanded.setState(false),
+                          onChanged: (name) =>
+                              setState(() => _route.name = name),
+                          initialValue: _route.name,
+                          validator: Validator.validateStringNotEmpty,
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
+                          decoration: Theme.of(context)
+                              .textFormFieldDecoration
+                              .copyWith(
+                                labelText: "Name",
+                              ),
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            )
-          ],
+            ],
+          ),
         ),
       ),
     );

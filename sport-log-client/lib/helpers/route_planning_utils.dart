@@ -8,6 +8,19 @@ import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/lat_lng.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/cardio/position.dart';
+import 'package:sport_log/models/clone_extensions.dart';
+
+enum SnapMode {
+  alwaysSnap,
+  snapIfClose,
+  neverSnap;
+
+  String get name => switch (this) {
+        SnapMode.alwaysSnap => "Always Snap",
+        SnapMode.snapIfClose => "Snap If Close",
+        SnapMode.neverSnap => "Never Snap",
+      };
+}
 
 enum RoutePlanningError {
   noInternet,
@@ -21,6 +34,8 @@ enum RoutePlanningError {
 }
 
 class RoutePlanningUtils {
+  static const int _maxDistance = 20;
+
   static final _logger = Logger("RoutePlanningUtils");
 
   // Remove parts that are too far from the marked points and replace them with straight line.
@@ -37,7 +52,7 @@ class RoutePlanningUtils {
         break;
       }
       index += searchStart;
-      if (distance < 20) {
+      if (distance < _maxDistance) {
         if (deleteBetween) {
           track.removeRange(searchStart, index);
           searchStart += 1;
@@ -60,8 +75,13 @@ class RoutePlanningUtils {
 
   static Future<Result<List<Position>, RoutePlanningError>> matchLocations(
     List<Position> markedPositions,
+    SnapMode snapMode,
     Future<double?> Function(LatLng)? getElevation,
   ) async {
+    if (snapMode == SnapMode.neverSnap) {
+      return Success(markedPositions.clone());
+    }
+
     DirectionsApiResponse response;
     try {
       response = await Defaults.mapboxApi.directions.request(
@@ -94,8 +114,13 @@ class RoutePlanningUtils {
           ),
         );
       }
-      final adjustedTrack = _adjustTrack(track, markedPositions);
-      return Success(adjustedTrack);
+      if (snapMode == SnapMode.snapIfClose) {
+        final adjustedTrack = _adjustTrack(track, markedPositions);
+        return Success(adjustedTrack);
+      } else {
+        // snapMode == SnapMode.alwaysSnap
+        return Success(track);
+      }
     } else {
       _logger.i("mapbox api error ${response.error.runtimeType}");
       return Failure(RoutePlanningError.unknown);
