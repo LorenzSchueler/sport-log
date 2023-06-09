@@ -20,6 +20,7 @@ import 'package:sport_log/widgets/map_widgets/static_mapbox_map.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
 import 'package:sport_log/widgets/provider_consumer.dart';
 import 'package:sport_log/widgets/snackbar.dart';
+import 'package:synchronized/synchronized.dart';
 
 class RouteEditPage extends StatefulWidget {
   const RouteEditPage({required this.route, super.key});
@@ -35,6 +36,7 @@ class _RouteEditPageState extends State<RouteEditPage> {
   final _logger = Logger('RouteEditPage');
   final _formKey = GlobalKey<FormState>();
   final _dataProvider = RouteDataProvider();
+  final _lock = Lock();
 
   final NullablePointer<PolylineAnnotation> _line =
       NullablePointer.nullPointer();
@@ -105,12 +107,18 @@ class _RouteEditPageState extends State<RouteEditPage> {
 
   Future<void> _updateLine() async {
     if (_route.markedPositions!.length >= 2) {
-      setState(() => _isSearching = true);
-      final track = await RoutePlanningUtils.matchLocations(
-        _route.markedPositions!,
-        _elevationMapController?.getElevation,
+      if (mounted) {
+        setState(() => _isSearching = true);
+      }
+      final track = await _lock.synchronized(
+        () => RoutePlanningUtils.matchLocations(
+          _route.markedPositions!,
+          _elevationMapController?.getElevation,
+        ),
       );
-      setState(() => _isSearching = false);
+      if (mounted) {
+        setState(() => _isSearching = false);
+      }
       if (mounted) {
         if (track.isFailure) {
           showSimpleToast(context, track.failure.message);
@@ -258,7 +266,7 @@ class _RouteEditPageState extends State<RouteEditPage> {
                       alignment: Alignment.topCenter,
                       child: Padding(
                         padding: EdgeInsets.only(top: 10),
-                        child: CircularProgressIndicator(color: Colors.grey),
+                        child: CircularProgressIndicator(color: Colors.black45),
                       ),
                     ),
                 ],
