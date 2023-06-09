@@ -73,13 +73,53 @@ class RoutePlanningUtils {
     return track;
   }
 
+  static List<Position> _setDistances(List<Position> track) {
+    if (track.isNotEmpty) {
+      track[0].distance = 0;
+    }
+    for (var i = 1; i < track.length; i++) {
+      track[i].distance = track[i - 1].distance +
+          track[i - 1].latLng.distanceTo(track[i].latLng);
+    }
+    return track;
+  }
+
+  static Future<List<Position>> _responseToTrack(
+    DirectionsApiResponse response,
+    Future<double?> Function(LatLng)? getElevation,
+  ) async {
+    final navRoute = response.routes![0];
+    final track = <Position>[];
+    final latLngs = PolylinePoints()
+        .decodePolyline(navRoute.geometry as String)
+        .map((p) => LatLng(lat: p.latitude, lng: p.longitude))
+        .toList();
+    for (final latLng in latLngs) {
+      final elevation = await getElevation?.call(latLng);
+      track.add(
+        Position(
+          latitude: latLng.lat,
+          longitude: latLng.lng,
+          elevation: elevation ?? track.last.elevation,
+          distance: track.isEmpty
+              ? 0
+              : track.last.distance + track.last.latLng.distanceTo(latLng),
+          time: Duration.zero,
+        ),
+      );
+    }
+    return track;
+  }
+
   static Future<Result<List<Position>, RoutePlanningError>> matchLocations(
     List<Position> markedPositions,
     SnapMode snapMode,
     Future<double?> Function(LatLng)? getElevation,
   ) async {
     if (snapMode == SnapMode.neverSnap) {
-      return Success(markedPositions.clone());
+      var track = markedPositions.clone();
+      track = _setDistances(track);
+      return Success(track);
     }
 
     DirectionsApiResponse response;
@@ -94,28 +134,10 @@ class RoutePlanningUtils {
       return Failure(RoutePlanningError.noInternet);
     }
     if (response.routes != null && response.routes!.isNotEmpty) {
-      final navRoute = response.routes![0];
-      final track = <Position>[];
-      final latLngs = PolylinePoints()
-          .decodePolyline(navRoute.geometry as String)
-          .map((p) => LatLng(lat: p.latitude, lng: p.longitude))
-          .toList();
-      for (final latLng in latLngs) {
-        final elevation = await getElevation?.call(latLng);
-        track.add(
-          Position(
-            latitude: latLng.lat,
-            longitude: latLng.lng,
-            elevation: elevation ?? track.last.elevation,
-            distance: track.isEmpty
-                ? 0
-                : track.last.distance + track.last.latLng.distanceTo(latLng),
-            time: Duration.zero,
-          ),
-        );
-      }
+      final track = await _responseToTrack(response, getElevation);
       if (snapMode == SnapMode.snapIfClose) {
-        final adjustedTrack = _adjustTrack(track, markedPositions);
+        var adjustedTrack = _adjustTrack(track, markedPositions);
+        adjustedTrack = _setDistances(track);
         return Success(adjustedTrack);
       } else {
         // snapMode == SnapMode.alwaysSnap
