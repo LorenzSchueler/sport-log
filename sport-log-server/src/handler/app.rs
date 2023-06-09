@@ -1,17 +1,13 @@
 use axum::{
-    body::{self, Full},
     extract::{Query, State},
     http::StatusCode,
-    response::{IntoResponse, Response},
+    response::IntoResponse,
     Json,
 };
-use hyper::header::{CONTENT_DISPOSITION, CONTENT_TYPE};
-use mime::APPLICATION_OCTET_STREAM;
+use axum_extra::body::AsyncReadBody;
+use hyper::{header::CONTENT_DISPOSITION, http::HeaderValue};
 use serde::{Deserialize, Serialize};
-use tokio::{
-    fs::{read_to_string, File},
-    io::AsyncReadExt,
-};
+use tokio::fs::{read_to_string, File};
 
 use crate::{
     auth::AuthUser,
@@ -132,20 +128,15 @@ pub async fn download_app(
         AppFormat::APK => format!("app-{flavor}-{build}.apk"),
     };
     let path = app_dir.join(&filename);
-    let mut file = File::open(path)
+    let file = File::open(path)
         .await
-        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
-    let mut content = Vec::new();
-    file.read_to_end(&mut content)
-        .await
+        .map(AsyncReadBody::new)
         .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
-    Ok(Response::builder()
-        .header(CONTENT_TYPE, APPLICATION_OCTET_STREAM.as_ref())
-        .header(
-            CONTENT_DISPOSITION,
-            format!(r#"Content-Disposition: attachment; filename="{filename}""#),
-        )
-        .body(body::boxed(Full::from(content)))
-        .unwrap())
+    let headers = [(
+        CONTENT_DISPOSITION,
+        HeaderValue::from_str(&format!(r#"attachment; filename="{filename}""#)).unwrap(),
+    )];
+
+    Ok((headers, file))
 }
