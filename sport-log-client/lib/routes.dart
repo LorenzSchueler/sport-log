@@ -9,6 +9,7 @@ import 'package:sport_log/pages/action/platform_overview_page.dart';
 import 'package:sport_log/pages/heart_rate/heart_rate_page.dart';
 import 'package:sport_log/pages/login/landing_page.dart';
 import 'package:sport_log/pages/login/login_page.dart';
+import 'package:sport_log/pages/login/update_page.dart';
 import 'package:sport_log/pages/map/map_page.dart';
 import 'package:sport_log/pages/movements/movement_edit_page.dart';
 import 'package:sport_log/pages/movements/movement_overview_page.dart';
@@ -46,6 +47,7 @@ abstract class Routes {
   static const landing = '/landing';
   static const login = '/login';
   static const registration = '/register';
+  static const update = '/update';
   static const timer = "/timer";
   static const map = "/map";
   static const offlineMaps = "/offline_maps";
@@ -116,6 +118,7 @@ abstract class Routes {
         _checkNotUserId(() => const LoginPage(loginType: LoginType.login)),
     Routes.registration: (_) =>
         _checkNotUserId(() => const LoginPage(loginType: LoginType.register)),
+    Routes.update: (_) => const UpdatePage(),
     Routes.timer: (_) => _checkUserId(() => const TimerPage()),
     Routes.map: (context) => _checkUserIdAndroidIos(context, MapPage.new),
     Routes.offlineMaps: (context) =>

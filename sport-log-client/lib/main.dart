@@ -82,22 +82,20 @@ class InitAppWrapperState extends State<InitAppWrapper> {
             themeMode: ThemeMode.dark,
             navigatorKey: navigatorKey,
             home: WelcomeScreen(
-              content: Center(
-                child: Column(
-                  children: [
-                    LinearProgressIndicator(value: _progress),
-                    if (_error != null) ...[
-                      Defaults.sizedBox.vertical.normal,
-                      Text(
-                        _error.toString(),
-                        style: Theme.of(context)
-                            .textTheme
-                            .bodyLarge
-                            ?.copyWith(color: Colors.red),
-                      ),
-                    ],
+              content: Column(
+                children: [
+                  LinearProgressIndicator(value: _progress),
+                  if (_error != null) ...[
+                    Defaults.sizedBox.vertical.normal,
+                    Text(
+                      _error.toString(),
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyLarge
+                          ?.copyWith(color: Colors.red),
+                    ),
                   ],
-                ),
+                ],
               ),
             ),
             builder: ignoreSystemTextScaleFactor,

@@ -116,6 +116,7 @@ extension _ToApiResult on StreamedResponse {
   }
 
   Future<ApiResult<Uint8List>> toBytes() async {
+    _logResponse(this, null);
     final rawBody = await stream.toBytes();
     return switch (statusCode) {
       200 => Success(rawBody),

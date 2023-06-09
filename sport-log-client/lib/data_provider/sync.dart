@@ -1,9 +1,7 @@
 import 'dart:async';
 
 import 'package:fixnum/fixnum.dart';
-import 'package:flutter/foundation.dart' show ChangeNotifier, VoidCallback;
-import 'package:open_file/open_file.dart';
-import 'package:permission_handler/permission_handler.dart';
+import 'package:flutter/widgets.dart';
 import 'package:sport_log/app.dart';
 import 'package:sport_log/config.dart';
 import 'package:sport_log/data_provider/data_provider.dart';
@@ -12,10 +10,10 @@ import 'package:sport_log/data_provider/data_providers/metcon_data_provider.dart
 import 'package:sport_log/data_provider/data_providers/movement_data_provider.dart';
 import 'package:sport_log/data_provider/data_providers/server_version_data_provider.dart';
 import 'package:sport_log/helpers/logger.dart';
-import 'package:sport_log/helpers/request_permission.dart';
 import 'package:sport_log/models/metcon/metcon_description.dart';
 import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/models/server_version/server_version.dart';
+import 'package:sport_log/routes.dart';
 import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/dialogs/dialogs.dart';
 
@@ -126,7 +124,7 @@ class Sync extends ChangeNotifier {
     if (!updateInfo.newVersion) {
       return;
     }
-    final context = App.globalContext;
+    var context = App.globalContext;
     // ignore: use_build_context_synchronously
     if (!context.mounted) {
       return;
@@ -135,20 +133,12 @@ class Sync extends ChangeNotifier {
     if (!update) {
       return;
     }
-    final updateDownloadResult =
-        await AppDataProvider().downloadUpdate(onNoInternet: onNoInternet);
-    if (updateDownloadResult.isFailure) {
+    context = App.globalContext;
+    // ignore: use_build_context_synchronously
+    if (!context.mounted) {
       return;
     }
-    final filename = updateDownloadResult.success;
-    if (filename == null) {
-      return;
-    }
-    if (!await PermissionRequest.request(Permission.manageExternalStorage) ||
-        !await PermissionRequest.request(Permission.requestInstallPackages)) {
-      return;
-    }
-    await OpenFile.open(filename);
+    await Navigator.of(context).pushNamed(Routes.update);
   }
 
   Future<void> startSync() async {
