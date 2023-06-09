@@ -208,6 +208,7 @@ class TrackingUtils extends ChangeNotifier {
 
   void _onHeartRateUpdate(List<int> rrs) {
     final heartRate = _cardioSessionDescription.cardioSession.heartRate!;
+
     if (isTracking) {
       var duration = currentDuration - Duration(milliseconds: rrs.sum);
       for (final rr in rrs) {
@@ -228,11 +229,12 @@ class TrackingUtils extends ChangeNotifier {
   }
 
   Future<void> _onLocationUpdate(LocationData location) async {
+    final track = _cardioSessionDescription.cardioSession.track!;
+
     // filter GPS jumps in tracking mode
-    if (isTracking &&
-        _cardioSessionDescription.cardioSession.track!.isNotEmpty) {
-      final lastPosition = _cardioSessionDescription.cardioSession.track!.last;
-      final km = lastPosition.distanceTo(location.latLng) / 1000;
+    if (isTracking && track.isNotEmpty) {
+      final lastPosition = track.last;
+      final km = lastPosition.latLng.distanceTo(location.latLng) / 1000;
       final hour = (currentDuration - lastPosition.time).inMilliseconds /
           (1000 * 60 * 60);
       final speed = km / hour;
@@ -248,10 +250,9 @@ class TrackingUtils extends ChangeNotifier {
       latitude: location.latitude!,
       longitude: location.longitude!,
       elevation: elevation ?? location.altitude!,
-      distance: _cardioSessionDescription.cardioSession.track!.isEmpty
+      distance: track.isEmpty
           ? 0
-          : _cardioSessionDescription.cardioSession.track!.last
-              .addDistanceTo(location.latLng),
+          : track.last.distance + track.last.latLng.distanceTo(location.latLng),
       time: currentDuration,
     );
 
@@ -259,10 +260,10 @@ class TrackingUtils extends ChangeNotifier {
         "satellites: ${location.satellites}\n"
         "elevation GPS: ${location.altitude?.round()} m\n"
         "elevation Mbx: ${elevation?.round()} m\n"
-        "points:      ${_cardioSessionDescription.cardioSession.track!.length}";
+        "points:      ${track.length}";
 
     if (isTracking) {
-      _cardioSessionDescription.cardioSession.track!.add(position);
+      track.add(position);
       await _trackingUiUtils
           .onTrackUpdate(_cardioSessionDescription.cardioSession.track);
     }

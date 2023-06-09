@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:collection/collection.dart';
+import 'package:latlong2/latlong.dart' as lat_long;
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 
 class LatLng {
@@ -23,9 +24,86 @@ class LatLng {
 
   @override
   String toString() => "lat: $lat, lng: $lng";
+
+  double distanceTo(LatLng other) =>
+      const lat_long.Distance(roundResult: false).distance(
+        lat_long.LatLng(lat, lng),
+        lat_long.LatLng(other.lat, other.lng),
+      ); // in m
+
+  // optimized haversine for small angles between points
+  double _fastDistanceTo(LatLng other) {
+    double rad(double degree) => degree / 180 * pi;
+
+    const R = 6371000; // radius of the earth in m
+    final x =
+        (rad(lng) - rad(other.lng)) * cos(0.5 * (rad(lat) + rad(other.lat)));
+    final y = rad(lat) - rad(other.lat);
+    return R * sqrt(x * x + y * y);
+  } // in m
+
+  double minDistanceTo(List<LatLng> track) {
+    var minDistance = double.infinity;
+    for (final latLng in track) {
+      final distance = _fastDistanceTo(latLng);
+      if (distance < minDistance) {
+        minDistance = distance;
+      }
+    }
+    return minDistance;
+  }
 }
 
-extension LatLngsExtension on Iterable<LatLng> {
+extension LatLngListExtension on List<LatLng> {
+  /// Check that every point of each track is within `maxDistance` of any point of the other track
+  /// that comes after (or is the same as) the matching point of the previous point of this track.
+  /// That is, if point 3 of track 2 is the first point that is within `maxDistance` of point 1 of track 1,
+  /// then we only check the points starting from point 3 in track 2 to find a point that is within `maxDistance` to point 2 of track 1.
+  ///
+  /// Because we do not care about the average or minimal distance and only want to make sure
+  /// that every point of one track is within `maxDistance` of any point of the other track,
+  /// we can avoid the quadratic complexity of
+  /// [Dynamic Time Warping](https://en.wikipedia.org/wiki/Dynamic_time_warping) or
+  /// [Fréchet distance](https://en.wikipedia.org/wiki/Fr%C3%A9chet_distance) and implement it in linear time.
+  /// Although we have a nested loop over the points of both tracks, the time is linear
+  /// because we skip all already consumed elements of the inner track (except the last one)
+  /// and stop once we find a point within `maxDistance`.
+  /// The next time around we start at this position.
+  /// This way every track in only traversed once.
+  static bool _checkMaxDistance(
+    int maxDistance,
+    List<LatLng> track1,
+    List<LatLng> track2,
+  ) {
+    bool check(List<LatLng> track1, List<LatLng> track2) {
+      var index = 0;
+      outer:
+      for (final point in track1) {
+        for (var i = index; i < track2.length; i++) {
+          if (point._fastDistanceTo(track2[i]) < maxDistance) {
+            index = i;
+            continue outer;
+          }
+        }
+        return false;
+      }
+      return true;
+    }
+
+    return check(track1, track2) && check(track2, track1);
+  }
+
+  bool similarTo(List<LatLng> other) {
+    const maxDistance = 50;
+    return isNotEmpty &&
+        other.isNotEmpty &&
+        first._fastDistanceTo(other.first) < maxDistance && // start
+        last._fastDistanceTo(other.last) < maxDistance && // end
+        _checkMaxDistance(maxDistance, this, other);
+  }
+}
+
+extension LatLngIterExtension on Iterable<LatLng> {
   LatLngBounds? get latLngBounds {
     if (isEmpty) {
       return null;

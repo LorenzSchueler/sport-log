@@ -51,7 +51,9 @@ class RoutePlanningUtils {
             latitude: latLng.lat,
             longitude: latLng.lng,
             elevation: elevation ?? track.last.elevation,
-            distance: track.isEmpty ? 0 : track.last.addDistanceTo(latLng),
+            distance: track.isEmpty
+                ? 0
+                : track.last.distance + track.last.latLng.distanceTo(latLng),
             time: Duration.zero,
           ),
         );

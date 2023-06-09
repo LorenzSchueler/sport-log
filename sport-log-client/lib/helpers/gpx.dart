@@ -34,7 +34,8 @@ Result<List<Position>, String> gpxToTrack(String gpxString) {
         elevation: point.ele ?? 0.0,
         distance: track.isEmpty
             ? 0
-            : track.last.addDistanceTo(LatLng(lat: lat, lng: lng)),
+            : track.last.distance +
+                track.last.latLng.distanceTo(LatLng(lat: lat, lng: lng)),
         time: startTime == null || point.time == null
             ? Duration.zero
             : point.time!.difference(startTime),
