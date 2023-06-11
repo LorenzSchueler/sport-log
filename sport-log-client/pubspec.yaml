@@ -87,17 +87,17 @@ dependency_overrides:
 
 dev_dependencies:
   build_runner: ^2.1.0 # json
-    # flutter pub run build_runner build --delete-conflicting-outputs
+    # dart run build_runner build --delete-conflicting-outputs
   dart_code_metrics: ^5.0.1
-    # flutter pub run dart_code_metrics:metrics analyze lib
-    # flutter pub run dart_code_metrics:metrics check-unused-files lib
-    # flutter pub run dart_code_metrics:metrics check-unused-code lib
+    # dart run dart_code_metrics:metrics analyze lib
+    # dart run dart_code_metrics:metrics check-unused-files lib
+    # dart run dart_code_metrics:metrics check-unused-code lib
   faker: ^2.0.0
   flutter_lints: ^2.0.1
   flutter_test:
     sdk: flutter
   icons_launcher: ^2.0.1 
-    # flutter pub run icons_launcher:create
+    # dart run icons_launcher:create
   json_serializable: ^6.3.0 # json
 
 icons_launcher:

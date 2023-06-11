@@ -9,6 +9,7 @@ import 'package:sport_log/helpers/map_controller.dart';
 import 'package:sport_log/helpers/page_return.dart';
 import 'package:sport_log/helpers/pointer.dart';
 import 'package:sport_log/models/cardio/route.dart';
+import 'package:sport_log/pages/workout/cardio/no_track.dart';
 import 'package:sport_log/pages/workout/cardio/route_value_unit_description_table.dart';
 import 'package:sport_log/pages/workout/charts/distance_chart.dart';
 import 'package:sport_log/routes.dart';
@@ -144,19 +145,7 @@ class _RouteDetailsPageState extends State<RouteDetailsPage>
                       scaleAtTop: fullscreen.isOff,
                       onMapCreated: _onMapCreated,
                     )
-                  : Center(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            AppIcons.route,
-                            color: Theme.of(context).colorScheme.onSurface,
-                          ),
-                          Defaults.sizedBox.horizontal.normal,
-                          const Text("no track available"),
-                        ],
-                      ),
-                    ),
+                  : const NoTrackPlaceholder(),
             ),
             if (fullscreen.isOff)
               TabBar(
@@ -183,19 +172,7 @@ class _RouteDetailsPageState extends State<RouteDetailsPage>
                         touchCallback: _touchCallback,
                       ),
                     )
-                  : Center(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            AppIcons.route,
-                            color: Theme.of(context).colorScheme.onSurface,
-                          ),
-                          Defaults.sizedBox.horizontal.normal,
-                          const Text("no track available"),
-                        ],
-                      ),
-                    ),
+                  : const Center(child: NoTrackPlaceholder()),
           ],
         ),
       ),

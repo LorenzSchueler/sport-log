@@ -9,6 +9,7 @@ import 'package:sport_log/helpers/extensions/navigator_extension.dart';
 import 'package:sport_log/helpers/map_controller.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/pages/workout/cardio/cardio_chart.dart';
+import 'package:sport_log/pages/workout/cardio/no_track.dart';
 import 'package:sport_log/pages/workout/comments_box.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter.dart';
 import 'package:sport_log/pages/workout/session_tab_utils.dart';
@@ -246,17 +247,7 @@ class CardioSessionCard extends StatelessWidget {
                       onTap: (_) => showDetails(context),
                     ),
                   )
-                : Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        AppIcons.route,
-                        color: Theme.of(context).colorScheme.onSurface,
-                      ),
-                      Defaults.sizedBox.horizontal.normal,
-                      const Text("no track available"),
-                    ],
-                  ),
+                : const NoTrackPlaceholder(),
             Padding(
               padding: Defaults.edgeInsets.normal,
               child: Column(

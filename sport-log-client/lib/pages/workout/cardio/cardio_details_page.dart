@@ -18,6 +18,7 @@ import 'package:sport_log/models/cardio/cardio_session.dart';
 import 'package:sport_log/models/cardio/cardio_session_description.dart';
 import 'package:sport_log/models/cardio/position.dart';
 import 'package:sport_log/pages/workout/cardio/cardio_value_unit_description_table.dart';
+import 'package:sport_log/pages/workout/cardio/no_track.dart';
 import 'package:sport_log/pages/workout/charts/duration_chart.dart';
 import 'package:sport_log/pages/workout/comments_box.dart';
 import 'package:sport_log/routes.dart';
@@ -224,19 +225,7 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
                       onFullscreenToggle: fullscreen.setState,
                       onMapCreated: _onMapCreated,
                     )
-                  : Center(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            AppIcons.route,
-                            color: Theme.of(context).colorScheme.onSurface,
-                          ),
-                          Defaults.sizedBox.horizontal.normal,
-                          const Text("no track available"),
-                        ],
-                      ),
-                    ),
+                  : const NoTrackPlaceholder(),
             ),
             if (fullscreen.isOff)
               TabBar(
@@ -331,19 +320,7 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
                           ),
                         ],
                       )
-                    : Center(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              AppIcons.route,
-                              color: Theme.of(context).colorScheme.onSurface,
-                            ),
-                            Defaults.sizedBox.horizontal.normal,
-                            const Text("no track available"),
-                          ],
-                        ),
-                      ),
+                    : const NoTrackPlaceholder(),
               ),
             if (fullscreen.isOff && _tabController.index == 2)
               ConstrainedBox(

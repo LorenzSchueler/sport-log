@@ -53,10 +53,7 @@ class Route extends AtomicEntity {
   @override
   bool deleted;
 
-  void setDistance() {
-    distance =
-        track == null || track!.isEmpty ? 0 : track!.last.distance.round();
-  }
+  void setDistance() => distance = track?.lastOrNull?.distance.round() ?? 0;
 
   void setAscentDescent() {
     if (track == null || track!.isEmpty) {

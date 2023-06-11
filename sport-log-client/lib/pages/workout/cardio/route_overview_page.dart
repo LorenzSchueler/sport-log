@@ -5,6 +5,7 @@ import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/navigator_extension.dart';
 import 'package:sport_log/helpers/map_controller.dart';
 import 'package:sport_log/models/cardio/all.dart';
+import 'package:sport_log/pages/workout/cardio/no_track.dart';
 import 'package:sport_log/pages/workout/session_tab_utils.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/theme.dart';
@@ -152,16 +153,7 @@ class RouteCard extends StatelessWidget {
                       onTap: (_) => showDetails(context),
                     ),
                   )
-                : Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        AppIcons.route,
-                        color: Theme.of(context).colorScheme.onSurface,
-                      ),
-                      const Text(" no track available"),
-                    ],
-                  ),
+                : const Center(child: NoTrackPlaceholder()),
             Padding(
               padding: Defaults.edgeInsets.normal,
               child: Row(
