@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/account.dart';
+import 'package:sport_log/helpers/bool_toggle.dart';
 import 'package:sport_log/helpers/extensions/navigator_extension.dart';
 import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/helpers/validation.dart';
@@ -11,6 +12,7 @@ import 'package:sport_log/settings.dart';
 import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/dialogs.dart';
+import 'package:sport_log/widgets/provider_consumer.dart';
 
 enum LoginType {
   login,
@@ -134,27 +136,36 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget _passwordInput() {
-    return TextFormField(
-      onChanged: (password) {
-        final validated = Validator.validatePassword(password);
-        if (validated == null) {
-          setState(() => _user.password = password);
-        }
-      },
-      decoration: Theme.of(context).textFormFieldDecoration.copyWith(
-            icon: const Icon(AppIcons.key),
-            labelText: "Password",
-          ),
-      validator: Validator.validatePassword,
-      autovalidateMode: AutovalidateMode.onUserInteraction,
-      enabled: !_loginPending,
-      style: _loginPending
-          ? TextStyle(color: Theme.of(context).disabledColor)
-          : null,
-      textInputAction: widget.loginType.isLogin
-          ? TextInputAction.done
-          : TextInputAction.next,
-      obscureText: true,
+    return ProviderConsumer(
+      create: (_) => BoolToggle.on(),
+      builder: (context, obscure, _) => TextFormField(
+        onChanged: (password) {
+          final validated = Validator.validatePassword(password);
+          if (validated == null) {
+            setState(() => _user.password = password);
+          }
+        },
+        decoration: Theme.of(context).textFormFieldDecoration.copyWith(
+              icon: const Icon(AppIcons.key),
+              labelText: "Password",
+              suffixIcon: IconButton(
+                icon: obscure.isOn
+                    ? const Icon(AppIcons.visibility)
+                    : const Icon(AppIcons.visibilityOff),
+                onPressed: obscure.toggle,
+              ),
+            ),
+        validator: Validator.validatePassword,
+        autovalidateMode: AutovalidateMode.onUserInteraction,
+        enabled: !_loginPending,
+        style: _loginPending
+            ? TextStyle(color: Theme.of(context).disabledColor)
+            : null,
+        textInputAction: widget.loginType.isLogin
+            ? TextInputAction.done
+            : TextInputAction.next,
+        obscureText: obscure.isOn,
+      ),
     );
   }
 

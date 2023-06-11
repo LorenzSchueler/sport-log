@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:sport_log/data_provider/data_providers/platform_data_provider.dart';
 import 'package:sport_log/data_provider/overview_data_provider.dart';
 import 'package:sport_log/defaults.dart';
+import 'package:sport_log/helpers/bool_toggle.dart';
 import 'package:sport_log/models/platform/platform_credential.dart';
 import 'package:sport_log/models/platform/platform_description.dart';
 import 'package:sport_log/routes.dart';
@@ -156,66 +157,62 @@ class _PlatformCredentialDialogState extends State<PlatformCredentialDialog> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            _usernameInput,
-            _passwordInput,
+            TextFormField(
+              onChanged: (username) => setState(() {
+                platformDescription.platformCredential!.username = username;
+              }),
+              initialValue: platformDescription.platformCredential!.username,
+              decoration: Theme.of(context).textFormFieldDecoration.copyWith(
+                    icon: const Icon(AppIcons.account),
+                    labelText: "Username",
+                  ),
+              autovalidateMode: AutovalidateMode.onUserInteraction,
+              textInputAction: TextInputAction.next,
+              keyboardType: TextInputType.emailAddress,
+            ),
+            ProviderConsumer(
+              create: (_) => BoolToggle.on(),
+              builder: (context, obscure, _) => TextFormField(
+                onChanged: (password) => setState(() {
+                  platformDescription.platformCredential!.password = password;
+                }),
+                initialValue: platformDescription.platformCredential!.password,
+                decoration: Theme.of(context).textFormFieldDecoration.copyWith(
+                      icon: const Icon(AppIcons.key),
+                      labelText: "Password",
+                      suffixIcon: IconButton(
+                        icon: obscure.isOn
+                            ? const Icon(AppIcons.visibility)
+                            : const Icon(AppIcons.visibilityOff),
+                        onPressed: obscure.toggle,
+                      ),
+                    ),
+                autovalidateMode: AutovalidateMode.onUserInteraction,
+                textInputAction: TextInputAction.done,
+                obscureText: obscure.isOn,
+              ),
+            ),
             Defaults.sizedBox.vertical.normal,
             Padding(
               // 24 icon + 15 padding
               padding: const EdgeInsets.only(left: 24 + 15),
               child: Row(
                 children: [
-                  _updateButton,
+                  ElevatedButton(
+                    onPressed: _update,
+                    child: Text(widget.isNew ? "Create" : "Edit"),
+                  ),
                   const Spacer(),
-                  _deleteButton,
+                  ElevatedButton(
+                    onPressed: _delete,
+                    child: Text(widget.isNew ? "Back" : "Delete"),
+                  ),
                 ],
               ),
             ),
           ],
         ),
       ),
-    );
-  }
-
-  Widget get _usernameInput {
-    return TextFormField(
-      onChanged: (username) {
-        setState(
-          () => platformDescription.platformCredential!.username = username,
-        );
-      },
-      initialValue: platformDescription.platformCredential!.username,
-      decoration: Theme.of(context).textFormFieldDecoration.copyWith(
-            icon: const Icon(AppIcons.account),
-            labelText: "Username",
-          ),
-      autovalidateMode: AutovalidateMode.onUserInteraction,
-      textInputAction: TextInputAction.next,
-      keyboardType: TextInputType.emailAddress,
-    );
-  }
-
-  Widget get _passwordInput {
-    return TextFormField(
-      onChanged: (password) {
-        setState(
-          () => platformDescription.platformCredential!.password = password,
-        );
-      },
-      initialValue: platformDescription.platformCredential!.password,
-      decoration: Theme.of(context).textFormFieldDecoration.copyWith(
-            icon: const Icon(AppIcons.key),
-            labelText: "Password",
-          ),
-      autovalidateMode: AutovalidateMode.onUserInteraction,
-      textInputAction: TextInputAction.done,
-      obscureText: true,
-    );
-  }
-
-  Widget get _updateButton {
-    return ElevatedButton(
-      onPressed: _update,
-      child: Text(widget.isNew ? "Create" : "Edit"),
     );
   }
 
@@ -234,13 +231,6 @@ class _PlatformCredentialDialogState extends State<PlatformCredentialDialog> {
         Navigator.pop(context);
       }
     }
-  }
-
-  Widget get _deleteButton {
-    return ElevatedButton(
-      onPressed: _delete,
-      child: Text(widget.isNew ? "Back" : "Delete"),
-    );
   }
 
   Future<void> _delete() async {

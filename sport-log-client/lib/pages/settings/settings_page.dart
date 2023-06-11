@@ -276,29 +276,27 @@ class SettingsPage extends StatelessWidget {
                   ),
                   ProviderConsumer(
                     create: (_) => BoolToggle.on(),
-                    builder: (context, obscure, _) {
-                      return TextFormField(
-                        // use new initialValue if password changed
-                        key: ValueKey(settings.password),
-                        decoration:
-                            Theme.of(context).textFormFieldDecoration.copyWith(
-                                  icon: const Icon(AppIcons.key),
-                                  labelText: "Password",
-                                  suffixIcon: IconButton(
-                                    icon: obscure.isOn
-                                        ? const Icon(AppIcons.visibility)
-                                        : const Icon(AppIcons.visibilityOff),
-                                    onPressed: obscure.toggle,
-                                  ),
+                    builder: (context, obscure, _) => TextFormField(
+                      // use new initialValue if password changed
+                      key: ValueKey(settings.password),
+                      decoration:
+                          Theme.of(context).textFormFieldDecoration.copyWith(
+                                icon: const Icon(AppIcons.key),
+                                labelText: "Password",
+                                suffixIcon: IconButton(
+                                  icon: obscure.isOn
+                                      ? const Icon(AppIcons.visibility)
+                                      : const Icon(AppIcons.visibilityOff),
+                                  onPressed: obscure.toggle,
                                 ),
-                        obscureText: obscure.isOn,
-                        initialValue: settings.password,
-                        validator: Validator.validatePassword,
-                        autovalidateMode: AutovalidateMode.onUserInteraction,
-                        onFieldSubmitted: (password) =>
-                            _setPassword(context, password),
-                      );
-                    },
+                              ),
+                      obscureText: obscure.isOn,
+                      initialValue: settings.password,
+                      validator: Validator.validatePassword,
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      onFieldSubmitted: (password) =>
+                          _setPassword(context, password),
+                    ),
                   ),
                   TextFormField(
                     // use new initialValue if email changed

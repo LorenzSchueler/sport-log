@@ -3,11 +3,13 @@ import 'package:provider/provider.dart';
 import 'package:sport_log/app.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/account.dart';
+import 'package:sport_log/helpers/bool_toggle.dart';
 import 'package:sport_log/helpers/validation.dart';
 import 'package:sport_log/models/user/user.dart';
 import 'package:sport_log/settings.dart';
 import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
+import 'package:sport_log/widgets/provider_consumer.dart';
 
 Future<void> showNewCredentialsDialog() async {
   if (!NewCredentialsDialog.isShown) {
@@ -102,25 +104,34 @@ class _NewCredentialsDialogState extends State<NewCredentialsDialog> {
   }
 
   Widget _passwordInput() {
-    return TextFormField(
-      onChanged: (password) {
-        final validated = Validator.validatePassword(password);
-        if (validated == null) {
-          setState(() => _password = password);
-        }
-      },
-      decoration: Theme.of(context).textFormFieldDecoration.copyWith(
-            icon: const Icon(AppIcons.key),
-            labelText: "Password",
-          ),
-      validator: Validator.validatePassword,
-      autovalidateMode: AutovalidateMode.onUserInteraction,
-      enabled: !_loginPending,
-      style: _loginPending
-          ? TextStyle(color: Theme.of(context).disabledColor)
-          : null,
-      textInputAction: TextInputAction.done,
-      obscureText: true,
+    return ProviderConsumer(
+      create: (_) => BoolToggle.on(),
+      builder: (context, obscure, _) => TextFormField(
+        onChanged: (password) {
+          final validated = Validator.validatePassword(password);
+          if (validated == null) {
+            setState(() => _password = password);
+          }
+        },
+        decoration: Theme.of(context).textFormFieldDecoration.copyWith(
+              icon: const Icon(AppIcons.key),
+              labelText: "Password",
+              suffixIcon: IconButton(
+                icon: obscure.isOn
+                    ? const Icon(AppIcons.visibility)
+                    : const Icon(AppIcons.visibilityOff),
+                onPressed: obscure.toggle,
+              ),
+            ),
+        validator: Validator.validatePassword,
+        autovalidateMode: AutovalidateMode.onUserInteraction,
+        enabled: !_loginPending,
+        style: _loginPending
+            ? TextStyle(color: Theme.of(context).disabledColor)
+            : null,
+        textInputAction: TextInputAction.done,
+        obscureText: obscure.isOn,
+      ),
     );
   }
 
