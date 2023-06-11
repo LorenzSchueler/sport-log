@@ -80,7 +80,7 @@ class _DiaryEditPageState extends State<DiaryEditPage> {
             IconButton(
               onPressed: _formKey.currentContext != null &&
                       _formKey.currentState!.validate() &&
-                      _diary.isValid()
+                      _diary.isValidBeforeSanitation()
                   ? _saveDiary
                   : null,
               icon: const Icon(AppIcons.save),

@@ -102,7 +102,7 @@ class _MovementEditPageState extends State<MovementEditPage> {
             IconButton(
               onPressed: _formKey.currentContext != null &&
                       _formKey.currentState!.validate() &&
-                      _movementDescription.isValid()
+                      _movementDescription.isValidBeforeSanitation()
                   ? _saveMovement
                   : null,
               icon: const Icon(AppIcons.save),

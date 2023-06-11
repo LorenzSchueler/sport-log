@@ -156,7 +156,7 @@ class _CardioEditPageState extends State<CardioEditPage> {
             IconButton(
               onPressed: _formKey.currentContext != null &&
                       _formKey.currentState!.validate() &&
-                      _cardioSessionDescription.isValid()
+                      _cardioSessionDescription.isValidBeforeSanitation()
                   ? _saveCardioSession
                   : null,
               icon: const Icon(AppIcons.save),

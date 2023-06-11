@@ -85,7 +85,9 @@ class _ActionRuleEditPageState extends State<ActionRuleEditPage> {
               icon: const Icon(AppIcons.delete),
             ),
             IconButton(
-              onPressed: _actionRule.isValid() ? _saveActionRule : null,
+              onPressed: _actionRule.isValidBeforeSanitation()
+                  ? _saveActionRule
+                  : null,
               icon: const Icon(AppIcons.save),
             ),
           ],

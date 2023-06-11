@@ -85,7 +85,9 @@ class _ActionEventEditPageState extends State<ActionEventEditPage> {
               icon: const Icon(AppIcons.delete),
             ),
             IconButton(
-              onPressed: _actionEvent.isValid() ? _saveActionEvent : null,
+              onPressed: _actionEvent.isValidBeforeSanitation()
+                  ? _saveActionEvent
+                  : null,
               icon: const Icon(AppIcons.save),
             ),
           ],

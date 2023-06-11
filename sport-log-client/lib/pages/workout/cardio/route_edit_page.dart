@@ -240,7 +240,7 @@ class _RouteEditPageState extends State<RouteEditPage> {
             IconButton(
               onPressed: _formKey.currentContext != null &&
                       _formKey.currentState!.validate() &&
-                      _route.isValid()
+                      _route.isValidBeforeSanitation()
                   ? _saveRoute
                   : null,
               icon: const Icon(AppIcons.save),
@@ -248,8 +248,8 @@ class _RouteEditPageState extends State<RouteEditPage> {
           ],
         ),
         body: ProviderConsumer(
-          create: (_) => BoolToggle.off(),
-          builder: (context, listExpanded, _) => Column(
+          create: (_) => BoolToggle.on(),
+          builder: (context, fullscreen, _) => Column(
             children: [
               Expanded(
                 child: Stack(
@@ -277,12 +277,12 @@ class _RouteEditPageState extends State<RouteEditPage> {
                     Align(
                       alignment: Alignment.bottomCenter,
                       child: IconButton(
-                        onPressed: listExpanded.toggle,
+                        onPressed: fullscreen.toggle,
                         iconSize: 50,
                         icon: Icon(
-                          listExpanded.isOn
-                              ? AppIcons.arrowDown
-                              : AppIcons.arrowUp,
+                          fullscreen.isOn
+                              ? AppIcons.arrowUp
+                              : AppIcons.arrowDown,
                           color: Colors.black,
                         ),
                       ),
@@ -291,7 +291,7 @@ class _RouteEditPageState extends State<RouteEditPage> {
                 ),
               ),
               ElevationMap(onMapCreated: _onElevationMapCreated),
-              if (listExpanded.isOn)
+              if (fullscreen.isOff)
                 Padding(
                   padding: Defaults.edgeInsets.normal,
                   child: Column(
@@ -340,7 +340,6 @@ class _RouteEditPageState extends State<RouteEditPage> {
                       Form(
                         key: _formKey,
                         child: TextFormField(
-                          onTap: () => listExpanded.setState(false),
                           onChanged: (name) =>
                               setState(() => _route.name = name),
                           initialValue: _route.name,

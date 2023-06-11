@@ -128,7 +128,7 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
               icon: const Icon(AppIcons.delete),
             ),
             IconButton(
-              onPressed: _strengthSessionDescription.isValid()
+              onPressed: _strengthSessionDescription.isValidBeforeSanitation()
                   ? _saveStrengthSession
                   : null,
               icon: const Icon(AppIcons.save),

@@ -108,7 +108,7 @@ class _MetconEditPageState extends State<MetconEditPage> {
             IconButton(
               onPressed: _formKey.currentContext != null &&
                       _formKey.currentState!.validate() &&
-                      _metconDescription.isValid()
+                      _metconDescription.isValidBeforeSanitation()
                   ? _saveMetcon
                   : null,
               icon: const Icon(AppIcons.save),
