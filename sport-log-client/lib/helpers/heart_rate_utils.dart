@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:collection/collection.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:polar/polar.dart';
@@ -150,26 +151,33 @@ class HeartRateUtils extends ChangeNotifier {
       (e) => e.identifier == deviceId && e.feature == PolarSdkFeature.hr,
     );
 
-    _heartRateSubscription = _polar.startHrStreaming(deviceId!).listen((e) {
-      final samples = e.samples;
-      if (samples.isEmpty) {
-        return;
-      }
-      _hr = samples.last.hr;
-      final rrs = <int>[];
-      for (final sample in samples) {
-        rrs.addAll(sample.rrsMs);
-      }
-      if (hrv) {
-        _rrs.addAll(rrs);
-        _setHrv();
-      }
+    _heartRateSubscription = _polar.startHrStreaming(deviceId!).listen(
+      (e) {
+        final samples = e.samples;
+        if (samples.isEmpty) {
+          return;
+        }
+        _hr = samples.last.hr;
+        final rrs = <int>[];
+        for (final sample in samples) {
+          rrs.addAll(sample.rrsMs);
+        }
+        if (hrv) {
+          _rrs.addAll(rrs);
+          _setHrv();
+        }
 
-      onHeartRateEvent?.call(rrs);
-      if (!_disposed) {
-        notifyListeners();
-      }
-    });
+        onHeartRateEvent?.call(rrs);
+        if (!_disposed) {
+          notifyListeners();
+        }
+      },
+      onError: (Object error) {
+        if (error is PlatformException) {
+          stopHeartRateStream();
+        }
+      },
+    );
     _batterySubscription = _polar.batteryLevel.listen((event) {
       _battery = event.level;
       if (!_disposed) {
