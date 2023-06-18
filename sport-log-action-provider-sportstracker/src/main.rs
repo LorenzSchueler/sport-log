@@ -258,7 +258,7 @@ async fn fetch() -> Result<(), Error> {
             let workout_keys = get_workout_keys(&client, &token).await?;
 
             let movements: Vec<Movement> = client
-                .get(route_max_version(&CONFIG.server_url, MOVEMENT, &[]))
+                .get(route_max_version(&CONFIG.server_url, MOVEMENT, None))
                 .basic_auth(NAME, Some(&CONFIG.password))
                 .header(ID_HEADER, exec_action_event.user_id.0)
                 .send()
@@ -290,7 +290,7 @@ async fn fetch() -> Result<(), Error> {
                 };
 
                 let response = client
-                    .post(route_max_version(&CONFIG.server_url, CARDIO_SESSION, &[]))
+                    .post(route_max_version(&CONFIG.server_url, CARDIO_SESSION, None))
                     .basic_auth(NAME, Some(&CONFIG.password))
                     .header(ID_HEADER, exec_action_event.user_id.0)
                     .json(&cardio_session)

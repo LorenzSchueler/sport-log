@@ -350,7 +350,7 @@ async fn try_get_wod(
         };
 
         let response = client
-            .post(route_max_version(&CONFIG.base_url, WOD, &[]))
+            .post(route_max_version(&CONFIG.base_url, WOD, None))
             .basic_auth(NAME, Some(&CONFIG.password))
             .header(ID_HEADER, exec_action_event.user_id.0)
             .json(&wod)
@@ -363,7 +363,7 @@ async fn try_get_wod(
                     .get(route_max_version(
                         &CONFIG.base_url,
                         WOD,
-                        &[("start", &today), ("end", &today)],
+                        Some(&[("start", &today), ("end", &today)]),
                     ))
                     .basic_auth(NAME, Some(&CONFIG.password))
                     .header(ID_HEADER, exec_action_event.user_id.0)
@@ -381,7 +381,7 @@ async fn try_get_wod(
                     wod.description = Some(description);
                 }
                 client
-                    .put(route_max_version(&CONFIG.base_url, WOD, &[]))
+                    .put(route_max_version(&CONFIG.base_url, WOD, None))
                     .basic_auth(NAME, Some(&CONFIG.password))
                     .header(ID_HEADER, exec_action_event.user_id.0)
                     .json(&wod)

@@ -8,21 +8,17 @@ pub const VERSION_0_3: &str = "0.3";
 pub const MIN_VERSION: &str = VERSION_0_3;
 pub const MAX_VERSION: &str = VERSION_0_3;
 
-fn format_query(query: &[(&str, &str)]) -> String {
-    let mut string: String = query
-        .iter()
-        .flat_map(|(key, value)| [key, "=", value, "&"])
-        .collect();
-    string.pop();
-    string
-}
+pub fn route_max_version(address: &str, route: &str, query: Option<&[(&str, &str)]>) -> String {
+    if let (Some(query), Some(false)) = (query, query.map(|q| q.is_empty())) {
+        let mut query_string: String = query
+            .iter()
+            .flat_map(|(key, value)| [key, "=", value, "&"])
+            .collect();
+        query_string.pop();
 
-pub fn route_max_version(address: &str, route: &str, query: &[(&str, &str)]) -> String {
-    if query.is_empty() {
-        format!("{address}/v{MAX_VERSION}{route}")
-    } else {
-        let query_string = format_query(query);
         format!("{address}/v{MAX_VERSION}{route}?{query_string}")
+    } else {
+        format!("{address}/v{MAX_VERSION}{route}")
     }
 }
 

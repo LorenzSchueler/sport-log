@@ -109,7 +109,7 @@ fn create_action_events(client: &Client, config: &Config) -> Result<(), ReqwestE
         .get(route_max_version(
             &config.server_url,
             ADM_CREATABLE_ACTION_RULE,
-            &[],
+            None,
         ))
         .basic_auth(ADMIN_USERNAME, Some(&config.admin_password))
         .send()?
@@ -143,7 +143,11 @@ fn create_action_events(client: &Client, config: &Config) -> Result<(), ReqwestE
     debug!("{:#?}", action_events);
 
     client
-        .post(route_max_version(&config.server_url, ADM_ACTION_EVENT, &[]))
+        .post(route_max_version(
+            &config.server_url,
+            ADM_ACTION_EVENT,
+            None,
+        ))
         .basic_auth(ADMIN_USERNAME, Some(&config.admin_password))
         .json(&action_events)
         .send()?
@@ -195,7 +199,7 @@ fn delete_action_events(client: &Client, config: &Config) -> Result<(), ReqwestE
         .get(route_max_version(
             &config.server_url,
             ADM_DELETABLE_ACTION_EVENT,
-            &[],
+            None,
         ))
         .basic_auth(ADMIN_USERNAME, Some(&config.admin_password))
         .send()?
@@ -222,7 +226,11 @@ fn delete_action_events(client: &Client, config: &Config) -> Result<(), ReqwestE
     debug!("{:#?}", action_event_ids);
 
     client
-        .delete(route_max_version(&config.server_url, ADM_ACTION_EVENT, &[]))
+        .delete(route_max_version(
+            &config.server_url,
+            ADM_ACTION_EVENT,
+            None,
+        ))
         .basic_auth(ADMIN_USERNAME, Some(&config.admin_password))
         .json(&action_event_ids)
         .send()?
@@ -244,11 +252,11 @@ fn garbage_collection(client: &Client, config: &Config) -> Result<(), ReqwestErr
             .delete(route_max_version(
                 &config.server_url,
                 ADM_GARBAGE_COLLECTION,
-                &[(
+                Some(&[(
                     "last_change",
                     &(Utc::now() - Duration::days(config.garbage_collection_min_days as i64))
                         .to_string(),
-                )],
+                )]),
             ))
             .basic_auth(ADMIN_USERNAME, Some(&config.admin_password))
             .send()?

@@ -332,7 +332,7 @@ async fn admin_auth() {
     let (mut router, _, _) = init().await;
     auth(
         &mut router,
-        &route_max_version("", ADM_PLATFORM, &[]),
+        &route_max_version("", ADM_PLATFORM, None),
         ADMIN_USERNAME,
         ADMIN_PASSWORD_PLAINTEXT,
     )
@@ -344,7 +344,7 @@ async fn admin_auth_wrong_credentials() {
     let (mut router, _, _) = init().await;
     auth_wrong_credentials(
         &mut router,
-        &route_max_version("", ADM_PLATFORM, &[]),
+        &route_max_version("", ADM_PLATFORM, None),
         ADMIN_USERNAME,
     )
     .await;
@@ -353,7 +353,7 @@ async fn admin_auth_wrong_credentials() {
 #[tokio::test]
 async fn admin_auth_without_credentials() {
     let (mut router, _, _) = init().await;
-    auth_without_credentials(&mut router, &route_max_version("", ADM_PLATFORM, &[])).await;
+    auth_without_credentials(&mut router, &route_max_version("", ADM_PLATFORM, None)).await;
 }
 
 #[tokio::test]
@@ -361,7 +361,7 @@ async fn ap_auth() {
     let (mut router, _, _) = init().await;
     auth(
         &mut router,
-        &route_max_version("", AP_ACTION_PROVIDER, &[]),
+        &route_max_version("", AP_ACTION_PROVIDER, None),
         &TEST_AP.name,
         &TEST_AP.password,
     )
@@ -373,7 +373,7 @@ async fn ap_auth_wrong_credentials() {
     let (mut router, _, _) = init().await;
     auth_wrong_credentials(
         &mut router,
-        &route_max_version("", AP_ACTION_PROVIDER, &[]),
+        &route_max_version("", AP_ACTION_PROVIDER, None),
         &TEST_AP.name,
     )
     .await;
@@ -382,7 +382,11 @@ async fn ap_auth_wrong_credentials() {
 #[tokio::test]
 async fn ap_auth_without_credentials() {
     let (mut router, _, _) = init().await;
-    auth_without_credentials(&mut router, &route_max_version("", AP_ACTION_PROVIDER, &[])).await;
+    auth_without_credentials(
+        &mut router,
+        &route_max_version("", AP_ACTION_PROVIDER, None),
+    )
+    .await;
 }
 
 #[tokio::test]
@@ -390,7 +394,7 @@ async fn admin_as_ap_auth() {
     let (mut router, _, _) = init().await;
     auth_as(
         &mut router,
-        &route_max_version("", AP_ACTION_PROVIDER, &[]),
+        &route_max_version("", AP_ACTION_PROVIDER, None),
         ADMIN_USERNAME,
         TEST_AP.id.0,
         ADMIN_PASSWORD_PLAINTEXT,
@@ -403,7 +407,7 @@ async fn admin_as_ap_auth_wrong_credentials() {
     let (mut router, _, _) = init().await;
     auth_as_wrong_credentials(
         &mut router,
-        &route_max_version("", AP_ACTION_PROVIDER, &[]),
+        &route_max_version("", AP_ACTION_PROVIDER, None),
         ADMIN_USERNAME,
         TEST_AP.id.0,
     )
@@ -415,7 +419,7 @@ async fn admin_as_ap_auth_without_credentials() {
     let (mut router, _, _) = init().await;
     auth_as_without_credentials(
         &mut router,
-        &route_max_version("", AP_ACTION_PROVIDER, &[]),
+        &route_max_version("", AP_ACTION_PROVIDER, None),
         TEST_AP.id.0,
     )
     .await;
@@ -426,7 +430,7 @@ async fn user_auth() {
     let (mut router, _, _) = init().await;
     auth(
         &mut router,
-        &route_max_version("", USER, &[]),
+        &route_max_version("", USER, None),
         &TEST_USER.username,
         &TEST_USER.password,
     )
@@ -438,7 +442,7 @@ async fn user_auth_wrong_credentials() {
     let (mut router, _, _) = init().await;
     auth_wrong_credentials(
         &mut router,
-        &route_max_version("", USER, &[]),
+        &route_max_version("", USER, None),
         &TEST_USER.username,
     )
     .await;
@@ -447,7 +451,7 @@ async fn user_auth_wrong_credentials() {
 #[tokio::test]
 async fn user_auth_without_credentials() {
     let (mut router, _, _) = init().await;
-    auth_without_credentials(&mut router, &route_max_version("", USER, &[])).await;
+    auth_without_credentials(&mut router, &route_max_version("", USER, None)).await;
 }
 
 #[tokio::test]
@@ -455,7 +459,7 @@ async fn admin_as_user_auth() {
     let (mut router, _, _) = init().await;
     auth_as(
         &mut router,
-        &route_max_version("", USER, &[]),
+        &route_max_version("", USER, None),
         ADMIN_USERNAME,
         TEST_USER.id.0,
         ADMIN_PASSWORD_PLAINTEXT,
@@ -468,7 +472,7 @@ async fn admin_as_user_auth_wrong_credentials() {
     let (mut router, _, _) = init().await;
     auth_as_wrong_credentials(
         &mut router,
-        &route_max_version("", USER, &[]),
+        &route_max_version("", USER, None),
         ADMIN_USERNAME,
         TEST_USER.id.0,
     )
@@ -480,7 +484,7 @@ async fn admin_as_user_auth_without_credentials() {
     let (mut router, _, _) = init().await;
     auth_as_without_credentials(
         &mut router,
-        &route_max_version("", USER, &[]),
+        &route_max_version("", USER, None),
         TEST_USER.id.0,
     )
     .await;
@@ -491,7 +495,7 @@ async fn user_ap_auth() {
     let (mut router, _, _) = init().await;
     auth(
         &mut router,
-        &route_max_version("", DIARY, &[]),
+        &route_max_version("", DIARY, None),
         &TEST_USER.username,
         &TEST_USER.password,
     )
@@ -503,7 +507,7 @@ async fn user_ap_auth_wrong_credentials() {
     let (mut router, _, _) = init().await;
     auth_wrong_credentials(
         &mut router,
-        &route_max_version("", DIARY, &[]),
+        &route_max_version("", DIARY, None),
         &TEST_USER.username,
     )
     .await;
@@ -512,7 +516,7 @@ async fn user_ap_auth_wrong_credentials() {
 #[tokio::test]
 async fn user_ap_auth_without_credentials() {
     let (mut router, _, _) = init().await;
-    auth_without_credentials(&mut router, &route_max_version("", DIARY, &[])).await;
+    auth_without_credentials(&mut router, &route_max_version("", DIARY, None)).await;
 }
 
 #[tokio::test]
@@ -533,7 +537,7 @@ async fn ap_as_user_ap_auth() {
 
     auth_as(
         &mut router,
-        &route_max_version("", DIARY, &[]),
+        &route_max_version("", DIARY, None),
         &TEST_AP.name,
         TEST_USER.id.0,
         &TEST_AP.password,
@@ -572,7 +576,7 @@ async fn ap_as_user_ap_auth_no_event() {
     //  check that ap has no access
     auth_as_not_allowed(
         &mut router,
-        &route_max_version("", DIARY, &[]),
+        &route_max_version("", DIARY, None),
         &TEST_AP.name,
         TEST_USER.id.0,
         &TEST_AP.password,
@@ -598,7 +602,7 @@ async fn ap_as_user_ap_auth_wrong_credentials() {
 
     auth_as_wrong_credentials(
         &mut router,
-        &route_max_version("", DIARY, &[]),
+        &route_max_version("", DIARY, None),
         &TEST_AP.name,
         TEST_USER.id.0,
     )
@@ -623,7 +627,7 @@ async fn ap_as_user_ap_auth_without_credentials() {
 
     auth_as_without_credentials(
         &mut router,
-        &route_max_version("", DIARY, &[]),
+        &route_max_version("", DIARY, None),
         TEST_USER.id.0,
     )
     .await;
@@ -635,7 +639,7 @@ async fn admin_as_user_ap_auth() {
 
     auth_as(
         &mut router,
-        &route_max_version("", DIARY, &[]),
+        &route_max_version("", DIARY, None),
         ADMIN_USERNAME,
         TEST_USER.id.0,
         ADMIN_PASSWORD_PLAINTEXT,
@@ -649,7 +653,7 @@ async fn admin_as_user_ap_auth_wrong_credentials() {
 
     auth_as_wrong_credentials(
         &mut router,
-        &route_max_version("", DIARY, &[]),
+        &route_max_version("", DIARY, None),
         ADMIN_USERNAME,
         TEST_USER.id.0,
     )
@@ -662,7 +666,7 @@ async fn admin_as_user_ap_auth_without_credentials() {
 
     auth_as_without_credentials(
         &mut router,
-        &route_max_version("", DIARY, &[]),
+        &route_max_version("", DIARY, None),
         TEST_USER.id.0,
     )
     .await;
@@ -676,7 +680,7 @@ async fn own_create() {
     let header = auth_header(&TEST_USER.username, &TEST_USER.password);
     let response = request(
         &mut router,
-        Request::post(route_max_version("", DIARY, &[]))
+        Request::post(route_max_version("", DIARY, None))
             .header(header.0, header.1)
             .header(CONTENT_TYPE, APPLICATION_JSON.as_ref())
             .body(serde_json::to_string(&TEST_DIARY as &Diary).unwrap().into())
@@ -695,7 +699,7 @@ async fn foreign_create() {
     let header = auth_header(&TEST_USER2.username, &TEST_USER2.password);
     let response = request(
         &mut router,
-        Request::post(route_max_version("", DIARY, &[]))
+        Request::post(route_max_version("", DIARY, None))
             .header(header.0, header.1)
             .header(CONTENT_TYPE, APPLICATION_JSON.as_ref())
             .body(serde_json::to_string(&TEST_DIARY as &Diary).unwrap().into())
@@ -719,7 +723,7 @@ async fn own_get() {
         Request::get(route_max_version(
             "",
             DIARY,
-            &[("id", &TEST_DIARY.id.0.to_string())],
+            Some(&[("id", &TEST_DIARY.id.0.to_string())]),
         ))
         .header(header.0, header.1)
         .body(Body::empty())
@@ -747,7 +751,7 @@ async fn own_get_gzip() {
         Request::get(route_max_version(
             "",
             DIARY,
-            &[("id", &TEST_DIARY.id.0.to_string())],
+            Some(&[("id", &TEST_DIARY.id.0.to_string())]),
         ))
         .header(header.0, header.1)
         .header(ACCEPT_ENCODING, "gzip")
@@ -778,7 +782,7 @@ async fn own_get_non_existing() {
         Request::get(route_max_version(
             "",
             DIARY,
-            &[("id", &TEST_DIARY.id.0.to_string())],
+            Some(&[("id", &TEST_DIARY.id.0.to_string())]),
         ))
         .header(header.0, header.1)
         .body(Body::empty())
@@ -802,7 +806,7 @@ async fn foreign_get() {
         Request::get(route_max_version(
             "",
             DIARY,
-            &[("id", &TEST_DIARY.id.0.to_string())],
+            Some(&[("id", &TEST_DIARY.id.0.to_string())]),
         ))
         .header(header.0, header.1)
         .body(Body::empty())
@@ -823,7 +827,7 @@ async fn own_update() {
     let header = auth_header(&TEST_USER.username, &TEST_USER.password);
     let response = request(
         &mut router,
-        Request::put(&route_max_version("", DIARY, &[]))
+        Request::put(&route_max_version("", DIARY, None))
             .header(header.0, header.1)
             .header(CONTENT_TYPE, APPLICATION_JSON.as_ref())
             .body(serde_json::to_string(&TEST_DIARY as &Diary).unwrap().into())
@@ -841,7 +845,7 @@ async fn own_update_non_existing() {
     let header = auth_header(&TEST_USER.username, &TEST_USER.password);
     let response = request(
         &mut router,
-        Request::put(&route_max_version("", DIARY, &[]))
+        Request::put(&route_max_version("", DIARY, None))
             .header(header.0, header.1)
             .header(CONTENT_TYPE, APPLICATION_JSON.as_ref())
             .body(serde_json::to_string(&TEST_DIARY as &Diary).unwrap().into())
@@ -862,7 +866,7 @@ async fn foreign_update() {
     let header = auth_header(&TEST_USER2.username, &TEST_USER2.password);
     let response = request(
         &mut router,
-        Request::put(&route_max_version("", DIARY, &[]))
+        Request::put(&route_max_version("", DIARY, None))
             .header(header.0, header.1)
             .header(CONTENT_TYPE, APPLICATION_JSON.as_ref())
             .body(serde_json::to_string(&TEST_DIARY as &Diary).unwrap().into())
@@ -875,12 +879,18 @@ async fn foreign_update() {
 
 #[tokio::test]
 async fn get_account_data() {
-    async fn inner(router: &mut Router, now: &DateTime<Utc>) -> (StatusCode, AccountData) {
+    async fn inner(
+        router: &mut Router,
+        datetime: Option<&DateTime<Utc>>,
+    ) -> (StatusCode, AccountData) {
         let header = auth_header(&TEST_USER.username, &TEST_USER.password);
-        let now = &now.to_rfc3339().replace("+00:00", "Z");
+        let datetime = datetime.map(|datetime| datetime.to_rfc3339().replace("+00:00", "Z"));
+        let datetime = datetime.as_ref();
+        let query = datetime.map(|datetime| [("last_sync", datetime.as_str())]);
+        let query = query.as_ref().map(|x| x.as_slice());
         let response = request(
             router,
-            Request::get(route_max_version("", ACCOUNT_DATA, &[("last_sync", now)]))
+            Request::get(route_max_version("", ACCOUNT_DATA, query))
                 .header(header.0, header.1)
                 .body(Body::empty())
                 .unwrap(),
@@ -894,29 +904,46 @@ async fn get_account_data() {
 
     let (mut router, db_pool, _) = init().await;
 
-    let now = Utc::now();
-    let (status, account_data) = inner(&mut router, &now).await;
+    // get all - check empty
+    let (status, account_data) = inner(&mut router, None).await;
 
     assert_eq!(status, StatusCode::OK);
     assert!(account_data.diaries.is_empty());
 
-    let now = Utc::now() - Duration::seconds(10); // TODO
+    // get updates - check no new data
+    let now = Utc::now();
+    let (status, account_data) = inner(&mut router, Some(&now)).await;
+
+    assert_eq!(status, StatusCode::OK);
+    assert!(account_data.diaries.is_empty());
+
+    // get updates - check new diary
+    let now = Utc::now() - Duration::seconds(1); // TODO
     DiaryDb::create(&TEST_DIARY, &mut db_pool.get().unwrap()).unwrap();
-    let (status, account_data) = inner(&mut router, &now).await;
+    let (status, account_data) = inner(&mut router, Some(&now)).await;
 
     assert_eq!(status, StatusCode::OK);
     assert_eq!(account_data.diaries.len(), 1);
     assert_eq!(account_data.diaries[0].id, TEST_DIARY.id);
 
+    // get updates - check no new data
     let now = Utc::now();
-    let (status, account_data) = inner(&mut router, &now).await;
+    let (status, account_data) = inner(&mut router, Some(&now)).await;
 
     assert_eq!(status, StatusCode::OK);
     assert!(account_data.diaries.is_empty());
 
-    let now = Utc::now() - Duration::seconds(10); // TODO
+    // get updates - check updated diary
+    let now = Utc::now() - Duration::seconds(1); // TODO
     DiaryDb::update(&TEST_DIARY, &mut db_pool.get().unwrap()).unwrap();
-    let (status, account_data) = inner(&mut router, &now).await;
+    let (status, account_data) = inner(&mut router, Some(&now)).await;
+
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(account_data.diaries.len(), 1);
+    assert_eq!(account_data.diaries[0].id, TEST_DIARY.id);
+
+    // get all - check diary
+    let (status, account_data) = inner(&mut router, None).await;
 
     assert_eq!(status, StatusCode::OK);
     assert_eq!(account_data.diaries.len(), 1);
@@ -937,7 +964,7 @@ async fn user_self_registration() {
 
     let response = request(
         &mut router,
-        Request::post(&route_max_version("", USER, &[]))
+        Request::post(&route_max_version("", USER, None))
             .header(CONTENT_TYPE, APPLICATION_JSON.as_ref())
             .body(serde_json::to_string(&user).unwrap().into())
             .unwrap(),
@@ -965,7 +992,7 @@ async fn ap_self_registration() {
 
     let response = request(
         &mut router,
-        Request::post(&route_max_version("", AP_PLATFORM, &[]))
+        Request::post(&route_max_version("", AP_PLATFORM, None))
             .header(CONTENT_TYPE, APPLICATION_JSON.as_ref())
             .body(serde_json::to_string(&platform).unwrap().into())
             .unwrap(),
@@ -980,7 +1007,7 @@ async fn ap_self_registration() {
 
     let response = request(
         &mut router,
-        Request::get(&route_max_version("", AP_PLATFORM, &[]))
+        Request::get(&route_max_version("", AP_PLATFORM, None))
             .body(Body::empty())
             .unwrap(),
     )
@@ -1004,7 +1031,7 @@ async fn ap_self_registration() {
 
     let response = request(
         &mut router,
-        Request::post(&route_max_version("", AP_ACTION_PROVIDER, &[]))
+        Request::post(&route_max_version("", AP_ACTION_PROVIDER, None))
             .header(CONTENT_TYPE, APPLICATION_JSON.as_ref())
             .body(serde_json::to_string(&action_provider).unwrap().into())
             .unwrap(),

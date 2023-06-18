@@ -37,7 +37,7 @@ pub async fn setup(
     };
 
     let response = client
-        .post(route_max_version(base_url, AP_PLATFORM, &[]))
+        .post(route_max_version(base_url, AP_PLATFORM, None))
         .json(&platform)
         .send()
         .await?;
@@ -50,7 +50,7 @@ pub async fn setup(
         StatusCode::CONFLICT => {
             info!("platform already exists");
             let platforms: Vec<Platform> = client
-                .get(route_max_version(base_url, AP_PLATFORM, &[]))
+                .get(route_max_version(base_url, AP_PLATFORM, None))
                 .send()
                 .await?
                 .json()
@@ -81,7 +81,7 @@ pub async fn setup(
     };
 
     let response = client
-        .post(route_max_version(base_url, AP_ACTION_PROVIDER, &[]))
+        .post(route_max_version(base_url, AP_ACTION_PROVIDER, None))
         .basic_auth(name, Some(&password))
         .json(&action_provider)
         .send()
@@ -95,7 +95,7 @@ pub async fn setup(
         StatusCode::CONFLICT => {
             info!("action provider already exists");
             let action_provider: ActionProvider = client
-                .get(route_max_version(base_url, AP_ACTION_PROVIDER, &[]))
+                .get(route_max_version(base_url, AP_ACTION_PROVIDER, None))
                 .basic_auth(name, Some(&password))
                 .send()
                 .await?
@@ -127,7 +127,7 @@ pub async fn setup(
         .collect();
 
     match client
-        .post(route_max_version(base_url, AP_ACTION, &[]))
+        .post(route_max_version(base_url, AP_ACTION, None))
         .basic_auth(name, Some(&password))
         .json(&actions)
         .send()
@@ -157,7 +157,7 @@ pub async fn get_events(
         .get(route_max_version(
             base_url,
             AP_EXECUTABLE_ACTION_EVENT,
-            &[("start", &datetime_start), ("end", &datetime_end)],
+            Some(&[("start", &datetime_start), ("end", &datetime_end)]),
         ))
         .basic_auth(name, Some(&password))
         .send()
@@ -175,7 +175,7 @@ pub async fn disable_events(
     action_event_ids: &[ActionEventId],
 ) -> Result<(), Error> {
     client
-        .delete(route_max_version(base_url, AP_ACTION_EVENT, &[]))
+        .delete(route_max_version(base_url, AP_ACTION_EVENT, None))
         .basic_auth(name, Some(&password))
         .json(action_event_ids)
         .send()
