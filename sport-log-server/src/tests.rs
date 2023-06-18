@@ -106,6 +106,12 @@ fn get_test_db_pool(config: &Config) -> DbPool {
 }
 
 async fn init() -> (Router, DbPool, &'static Config) {
+    // Every test case calls [`init`] to get the router (and if needed also the db pool and the config).
+    // Therefore all test will have their own db pools.
+    // For each pool there is only a single database connection that uses a test transaction (which is never committed).
+    // By restricting the number of connections to a single one per db pool,
+    // the connection that can be retrieved from the pool in order to run setup code
+    // is guaranteed to be the same one that will be later used by the axum handlers.
     // Make sure to drop any reference to DbConn before invoking router,
     // because otherwise handlers will time out trying to retrieve a connection from the pool.
 

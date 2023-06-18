@@ -1,3 +1,6 @@
+use argon2::Argon2;
+#[cfg(test)]
+use argon2::{Algorithm, Params, Version};
 use axum::http::StatusCode;
 use chrono::{DateTime, Utc};
 use diesel::{PgConnection, QueryResult};
@@ -31,6 +34,25 @@ pub use training_plan::*;
 pub use user::*;
 
 use crate::auth::*;
+
+pub fn build_hasher() -> Argon2<'static> {
+    #[cfg(not(test))]
+    return Argon2::default();
+
+    // speed up hashing for tests
+    #[cfg(test)]
+    return Argon2::new(
+        Algorithm::Argon2id,
+        Version::V0x13,
+        Params::new(
+            Params::MIN_M_COST,
+            Params::MIN_P_COST,
+            Params::MIN_P_COST,
+            None,
+        )
+        .unwrap_or_default(),
+    );
+}
 
 /// Wrapper around incoming json data for which the access permissions for the [`AuthUserOrAP`], [`AuthAP`] or [`AuthAdmin`] have not been checked.
 ///
