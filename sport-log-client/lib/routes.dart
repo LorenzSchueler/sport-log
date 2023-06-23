@@ -22,6 +22,7 @@ import 'package:sport_log/pages/workout/cardio/cardio_cut_page.dart';
 import 'package:sport_log/pages/workout/cardio/cardio_details_page.dart';
 import 'package:sport_log/pages/workout/cardio/cardio_edit_page.dart';
 import 'package:sport_log/pages/workout/cardio/cardio_overview_page.dart';
+import 'package:sport_log/pages/workout/cardio/cardio_update_elevation_page.dart';
 import 'package:sport_log/pages/workout/cardio/route_details_page.dart';
 import 'package:sport_log/pages/workout/cardio/route_edit_page.dart';
 import 'package:sport_log/pages/workout/cardio/route_overview_page.dart';
@@ -85,6 +86,7 @@ abstract class Routes {
   static const String cardioOverview = '/cardio/overview';
   static const String cardioDetails = '/cardio/details';
   static const String cardioEdit = '/cardio/edit';
+  static const String cardioUpdateElevation = '/cardio/update_elevation';
   static const String cardioCut = '/cardio/cut';
   static const String trackingSettings = '/cardio/tracking_settings';
   static const String tracking = '/cardio/tracking';
@@ -272,6 +274,14 @@ abstract class Routes {
                   cardioSessionDescription: cardioSessionDescription,
                   isNew: isNew,
                 );
+        }),
+    Routes.cardioUpdateElevation: (context) => _checkUserId(() {
+          final cardioSessionDescription = ModalRoute.of(context)!
+              .settings
+              .arguments! as CardioSessionDescription;
+          return CardioUpdateElevationPage(
+            cardioSessionDescription: cardioSessionDescription,
+          );
         }),
     Routes.cardioCut: (context) => _checkUserId(() {
           final cardioSessionDescription = ModalRoute.of(context)!

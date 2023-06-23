@@ -44,16 +44,6 @@ class _CardioCutPageState extends State<CardioCutPage> {
   final NullablePointer<CircleAnnotation> _cutEndMarker =
       NullablePointer.nullPointer();
 
-  void _returnToEditPage() {
-    if (mounted) {
-      Navigator.pop(
-        context,
-        // needed for cardio edit page
-        ReturnObject.updated(_cardioSessionDescription),
-      );
-    }
-  }
-
   Future<void> _onMapCreated(MapController mapController) async {
     _mapController = mapController;
     await _setBoundsAndLines();
@@ -98,7 +88,13 @@ class _CardioCutPageState extends State<CardioCutPage> {
       if (approved) {
         _cardioSessionDescription.cardioSession
             .cut(_cutStartDuration, _cutEndDuration);
-        _returnToEditPage();
+        if (mounted) {
+          Navigator.pop(
+            context,
+            // needed for cardio edit page
+            ReturnObject.updated(_cardioSessionDescription),
+          );
+        }
       }
     }
   }
@@ -122,84 +118,89 @@ class _CardioCutPageState extends State<CardioCutPage> {
                   onMapCreated: _onMapCreated,
                 ),
               ),
-            Defaults.sizedBox.vertical.normal,
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                EditTile(
-                  leading: null,
-                  caption: "Start",
-                  shrinkWidth: true,
-                  onTap: () async {
-                    final duration = await showScrollableDurationPicker(
-                      context: context,
-                      initialDuration: _cutStartDuration,
-                    );
-                    if (mounted && duration != null) {
-                      if (duration > _cutEndDuration) {
-                        await showMessageDialog(
-                          context: context,
-                          text: "Start time can not be after End time.",
-                        );
-                      } else {
-                        setState(() => _cutStartDuration = duration);
-                        await _updateCutLocationMarker();
-                      }
-                    }
-                  },
-                  child: Text(_cutStartDuration.formatHms),
-                ),
-                EditTile(
-                  leading: null,
-                  caption: "End",
-                  shrinkWidth: true,
-                  onTap: () async {
-                    final duration = await showScrollableDurationPicker(
-                      context: context,
-                      initialDuration: _cutEndDuration,
-                    );
-                    if (mounted && duration != null) {
-                      if (duration < _cutStartDuration) {
-                        await showMessageDialog(
-                          context: context,
-                          text: "End time can not be before Start time.",
-                        );
-                      } else {
-                        setState(() => _cutEndDuration = duration);
-                        await _updateCutLocationMarker();
-                      }
-                    }
-                  },
-                  child: Text(_cutEndDuration.formatHms),
-                ),
-              ],
-            ),
-            Defaults.sizedBox.vertical.normal,
-            ElevatedButton(
-              onPressed: _cutCardioSession,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Theme.of(context).colorScheme.error,
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+            Padding(
+              padding: Defaults.edgeInsets.normal,
+              child: Column(
                 children: [
-                  const Icon(AppIcons.cut),
-                  Defaults.sizedBox.horizontal.normal,
-                  const Text("Cut"),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      EditTile(
+                        leading: null,
+                        caption: "Start",
+                        shrinkWidth: true,
+                        onTap: () async {
+                          final duration = await showScrollableDurationPicker(
+                            context: context,
+                            initialDuration: _cutStartDuration,
+                          );
+                          if (mounted && duration != null) {
+                            if (duration > _cutEndDuration) {
+                              await showMessageDialog(
+                                context: context,
+                                text: "Start time can not be after End time.",
+                              );
+                            } else {
+                              setState(() => _cutStartDuration = duration);
+                              await _updateCutLocationMarker();
+                            }
+                          }
+                        },
+                        child: Text(_cutStartDuration.formatHms),
+                      ),
+                      EditTile(
+                        leading: null,
+                        caption: "End",
+                        shrinkWidth: true,
+                        onTap: () async {
+                          final duration = await showScrollableDurationPicker(
+                            context: context,
+                            initialDuration: _cutEndDuration,
+                          );
+                          if (mounted && duration != null) {
+                            if (duration < _cutStartDuration) {
+                              await showMessageDialog(
+                                context: context,
+                                text: "End time can not be before Start time.",
+                              );
+                            } else {
+                              setState(() => _cutEndDuration = duration);
+                              await _updateCutLocationMarker();
+                            }
+                          }
+                        },
+                        child: Text(_cutEndDuration.formatHms),
+                      ),
+                    ],
+                  ),
+                  ElevatedButton(
+                    onPressed: _cutCardioSession,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Theme.of(context).colorScheme.error,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(AppIcons.cut),
+                        Defaults.sizedBox.horizontal.normal,
+                        const Text("Cut"),
+                      ],
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(AppIcons.close),
+                        Defaults.sizedBox.horizontal.normal,
+                        const Text("Cancel"),
+                      ],
+                    ),
+                  ),
                 ],
               ),
-            ),
-            ElevatedButton(
-              onPressed: _returnToEditPage,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(AppIcons.close),
-                  Defaults.sizedBox.horizontal.normal,
-                  const Text("Cancel"),
-                ],
-              ),
-            ),
+            )
           ],
         ),
       ),
