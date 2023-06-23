@@ -4,7 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:location/location.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:sport_log/app.dart';
-import 'package:sport_log/helpers/extensions/location_data_extension.dart';
+import 'package:sport_log/helpers/gps_position.dart';
 import 'package:sport_log/helpers/lat_lng.dart';
 import 'package:sport_log/helpers/request_permission.dart';
 import 'package:sport_log/settings.dart';
@@ -12,7 +12,7 @@ import 'package:sport_log/widgets/dialogs/dialogs.dart';
 
 class LocationUtils extends ChangeNotifier {
   StreamSubscription<LocationData>? _locationSubscription;
-  LocationData? _lastLocation;
+  GpsPosition? _lastLocation;
 
   bool _disposed = false;
 
@@ -28,7 +28,7 @@ class LocationUtils extends ChangeNotifier {
   }
 
   Future<bool> startLocationStream(
-    void Function(LocationData) onLocationUpdate,
+    void Function(GpsPosition) onLocationUpdate,
   ) async {
     if (_locationSubscription != null) {
       return false;
@@ -52,26 +52,30 @@ class LocationUtils extends ChangeNotifier {
     }
 
     await setLocationSettings(useGooglePlayServices: false);
-    _locationSubscription = onLocationChanged(inBackground: true).listen(
-      (locationData) => _onLocationUpdate(locationData, onLocationUpdate),
-    );
+    _locationSubscription =
+        onLocationChanged(inBackground: true).listen((locationData) {
+      _onLocationUpdate(
+        GpsPosition.fromLocationData(locationData),
+        onLocationUpdate,
+      );
+    });
     notifyListeners();
     return true;
   }
 
   Future<void> _onLocationUpdate(
-    LocationData locationData,
-    void Function(LocationData) onLocationUpdate,
+    GpsPosition position,
+    void Function(GpsPosition) onLocationUpdate,
   ) async {
     await updateBackgroundNotification(
       title: "Sport Log Tracking",
       subtitle:
-          "(${locationData.latitude?.toStringAsFixed(5)}, ${locationData.longitude?.toStringAsFixed(5)}) ~ ${locationData.accuracy?.round()} m [${locationData.satellites} satellites]",
+          "(${position.latitude.toStringAsFixed(5)}, ${position.longitude.toStringAsFixed(5)}) ~ ${position.accuracy.round()} m [${position.satellites} satellites]",
       description: "test",
       onTapBringToFront: true,
     );
-    _lastLocation = locationData;
-    onLocationUpdate(locationData);
+    _lastLocation = position;
+    onLocationUpdate(position);
     notifyListeners();
   }
 
@@ -84,7 +88,7 @@ class LocationUtils extends ChangeNotifier {
     }
   }
 
-  LocationData? get lastLocation => _lastLocation;
+  GpsPosition? get lastLocation => _lastLocation;
   LatLng? get lastLatLng => _lastLocation?.latLng;
   bool get hasGps =>
       (_lastLocation?.isGps ?? false) && _lastLocation?.latLng != null;

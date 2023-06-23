@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:location/location.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
-import 'package:sport_log/helpers/extensions/location_data_extension.dart';
+import 'package:sport_log/helpers/gps_position.dart';
 import 'package:sport_log/helpers/location_utils.dart';
 import 'package:sport_log/helpers/map_controller.dart';
 import 'package:sport_log/helpers/pointer.dart';
@@ -56,7 +55,7 @@ class _CurrentLocationButtonState extends State<CurrentLocationButton> {
     }
   }
 
-  Future<void> _onLocationUpdate(LocationData location) async {
+  Future<void> _onLocationUpdate(GpsPosition location) async {
     if (_centerLocation) {
       await widget.mapController.animateCenter(location.latLng);
     }

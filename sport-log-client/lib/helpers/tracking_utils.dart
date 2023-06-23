@@ -3,10 +3,9 @@ import 'dart:async';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart' hide Route;
 import 'package:flutter_tts/flutter_tts.dart';
-import 'package:location/location.dart';
 import 'package:sport_log/app.dart';
 import 'package:sport_log/data_provider/data_providers/cardio_data_provider.dart';
-import 'package:sport_log/helpers/extensions/location_data_extension.dart';
+import 'package:sport_log/helpers/gps_position.dart';
 import 'package:sport_log/helpers/heart_rate_utils.dart';
 import 'package:sport_log/helpers/location_utils.dart';
 import 'package:sport_log/helpers/map_controller.dart';
@@ -228,7 +227,7 @@ class TrackingUtils extends ChangeNotifier {
     _stepInfo = "last step: $currentDuration";
   }
 
-  Future<void> _onLocationUpdate(LocationData location) async {
+  Future<void> _onLocationUpdate(GpsPosition location) async {
     final track = _cardioSessionDescription.cardioSession.track!;
 
     // filter GPS jumps in tracking mode
@@ -247,18 +246,18 @@ class TrackingUtils extends ChangeNotifier {
         await _elevationMapController?.getElevation(location.latLng);
 
     final position = Position(
-      latitude: location.latitude!,
-      longitude: location.longitude!,
-      elevation: elevation ?? location.altitude!,
+      latitude: location.latitude,
+      longitude: location.longitude,
+      elevation: elevation ?? location.elevation,
       distance: track.isEmpty
           ? 0
           : track.last.distance + track.last.latLng.distanceTo(location.latLng),
       time: currentDuration,
     );
 
-    _locationInfo = "accuracy: ${location.accuracy?.round()} m\n"
+    _locationInfo = "accuracy: ${location.accuracy.round()} m\n"
         "satellites: ${location.satellites}\n"
-        "elevation GPS: ${location.altitude?.round()} m\n"
+        "elevation GPS: ${location.elevation.round()} m\n"
         "elevation Mbx: ${elevation?.round()} m\n"
         "points:      ${track.length}";
 
