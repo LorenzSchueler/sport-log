@@ -37,39 +37,40 @@ class _CardioUpdateElevationPageState extends State<CardioUpdateElevationPage> {
       text:
           "The old elevation data will be permanently lost. The new elevations is taken from the map. This requires internet or offline maps.",
     );
-    if (approved) {
-      final track = _cardioSessionDescription.cardioSession.track;
-      if (track != null) {
-        for (var i = 0; i < track.length; i++) {
-          final pos = track[i];
-          final elevation =
-              await _elevationMapController?.getElevation(pos.latLng);
-          if (elevation != null) {
-            pos.elevation = elevation;
-          } else {
-            if (mounted) {
-              await showMessageDialog(
-                context: context,
-                text: "Failed to fetch elevation data.",
-              );
-            }
-            return;
+    if (!approved) {
+      return;
+    }
+    final track = _cardioSessionDescription.cardioSession.track;
+    if (track != null) {
+      for (var i = 0; i < track.length; i++) {
+        final pos = track[i];
+        final elevation =
+            await _elevationMapController?.getElevation(pos.latLng);
+        if (elevation != null) {
+          pos.elevation = elevation;
+        } else {
+          if (mounted) {
+            await showMessageDialog(
+              context: context,
+              text: "Failed to fetch elevation data.",
+            );
           }
-          setState(() {
-            _progress = i / track.length;
-          });
+          return;
         }
+        setState(() {
+          _progress = i / track.length;
+        });
       }
-      setState(() {
-        _cardioSessionDescription.cardioSession.setAscentDescent();
-      });
-      if (mounted) {
-        Navigator.pop(
-          context,
-          // needed for cardio edit page
-          ReturnObject.updated(_cardioSessionDescription),
-        );
-      }
+    }
+    setState(() {
+      _cardioSessionDescription.cardioSession.setAscentDescent();
+    });
+    if (mounted) {
+      Navigator.pop(
+        context,
+        // needed for cardio edit page
+        ReturnObject.updated(_cardioSessionDescription),
+      );
     }
   }
 
