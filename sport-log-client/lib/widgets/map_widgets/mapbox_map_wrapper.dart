@@ -131,22 +131,10 @@ class _MapboxMapWrapperState extends State<MapboxMapWrapper> {
               await Settings.instance.setLastMapPosition(lastMapPosition);
             }
           },
-          onTapListener: (coord) async {
-            final latLng = await _mapController?.screenCoordToLatLng(coord);
-            if (latLng != null) {
-              // TODO fix until upstream is fixed
-              final latLng = LatLng(lat: coord.x, lng: coord.y);
-              widget.onTap?.call(latLng);
-            }
-          },
-          onLongTapListener: (coord) async {
-            final latLng = await _mapController?.screenCoordToLatLng(coord);
-            if (latLng != null) {
-              // TODO fix until upstream is fixed
-              final latLng = LatLng(lat: coord.x, lng: coord.y);
-              widget.onLongTap?.call(latLng);
-            }
-          },
+          onTapListener: (_, point) =>
+              widget.onTap?.call(LatLng.fromMap(point)),
+          onLongTapListener: (_, point) =>
+              widget.onLongTap?.call(LatLng.fromMap(point)),
         ),
         if (_mapController != null && widget.showOverlays)
           Positioned(

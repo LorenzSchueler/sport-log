@@ -96,7 +96,7 @@ class MapController {
   Future<void> _animatePitchBy(double pitch) async =>
       _controller?.pitchBy(pitch, null);
 
-  Future<LatLng?> screenCoordToLatLng(
+  Future<LatLng?> _screenCoordToLatLng(
     ScreenCoordinate screenCoordinate,
   ) async {
     final latLngMap = await _controller?.coordinateForPixel(screenCoordinate);
@@ -127,7 +127,7 @@ class MapController {
     await _controller?.setCamera(CameraOptions(center: center.toJsonPoint()));
 
     final screenCorner =
-        await screenCoordToLatLng(ScreenCoordinate(x: 0, y: 0));
+        await _screenCoordToLatLng(ScreenCoordinate(x: 0, y: 0));
     if (screenCorner == null) {
       return;
     }

@@ -54,7 +54,9 @@ dependencies:
       ref: 9000a61402aaa437df447e9c5b0544cce2adcc0c
   logger: ^1.0.0
   mapbox_api: ^1.0.0
-  mapbox_maps_flutter: ^0.4.3
+  mapbox_maps_flutter: #^0.4.3
+    git:
+      url: https://github.com/LorenzSchueler/mapbox-maps-flutter
   mapbox_search: ^3.0.1+2
   open_file: ^3.3.1
   package_info_plus: ^4.0.0

@@ -6,7 +6,7 @@ import 'package:sport_log/helpers/lat_lng.dart';
 import 'package:sport_log/helpers/map_controller.dart';
 import 'package:sport_log/settings.dart';
 
-class StaticMapboxMap extends StatefulWidget {
+class StaticMapboxMap extends StatelessWidget {
   const StaticMapboxMap({
     this.onMapCreated,
     this.onTap,
@@ -18,19 +18,11 @@ class StaticMapboxMap extends StatefulWidget {
   final void Function(LatLng)? onTap;
   final void Function(LatLng)? onLongTap;
 
-  @override
-  State<StaticMapboxMap> createState() => _StaticMapboxMapState();
-}
-
-class _StaticMapboxMapState extends State<StaticMapboxMap> {
-  MapController? _mapController;
-
   Future<void> _onMapCreated(MapController mapController) async {
-    _mapController = mapController;
     await mapController.disableAllGestures();
     await mapController.setScaleBarSettings();
     await mapController.hideAttribution();
-    widget.onMapCreated?.call(mapController);
+    onMapCreated?.call(mapController);
   }
 
   @override
@@ -46,22 +38,8 @@ class _StaticMapboxMapState extends State<StaticMapboxMap> {
           await _onMapCreated(controller);
         }
       },
-      onTapListener: (coord) async {
-        final latLng = await _mapController?.screenCoordToLatLng(coord);
-        if (latLng != null) {
-          // TODO fix until upstream is fixed
-          final latLng = LatLng(lat: coord.x, lng: coord.y);
-          widget.onTap?.call(latLng);
-        }
-      },
-      onLongTapListener: (coord) async {
-        final latLng = await _mapController?.screenCoordToLatLng(coord);
-        if (latLng != null) {
-          // TODO fix until upstream is fixed
-          final latLng = LatLng(lat: coord.x, lng: coord.y);
-          widget.onLongTap?.call(latLng);
-        }
-      },
+      onTapListener: (_, point) => onTap?.call(LatLng.fromMap(point)),
+      onLongTapListener: (_, point) => onLongTap?.call(LatLng.fromMap(point)),
     );
   }
 }
