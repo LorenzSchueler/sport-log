@@ -5,7 +5,6 @@ import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/bool_toggle.dart';
 import 'package:sport_log/helpers/map_search_utils.dart';
 import 'package:sport_log/routes.dart';
-import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
 import 'package:sport_log/widgets/map_widgets/mapbox_map_wrapper.dart';
@@ -62,8 +61,6 @@ class MapPage extends StatelessWidget {
                             onChanged: searchUtils.searchPlaces,
                             onTap: () => searchUtils
                                 .searchPlaces(searchUtils.search ?? ""),
-                            decoration:
-                                Theme.of(context).textFormFieldDecoration,
                             style: Theme.of(context)
                                 .textTheme
                                 .titleLarge!

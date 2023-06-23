@@ -135,9 +135,9 @@ class _DurationInputState extends State<DurationInput> {
                 }
               },
               decoration: const InputDecoration(
+                contentPadding: EdgeInsets.zero,
                 isCollapsed: true,
                 isDense: true,
-                border: InputBorder.none,
               ),
             ),
             onFocusChange: (focus) {

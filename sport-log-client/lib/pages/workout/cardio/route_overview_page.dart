@@ -8,7 +8,6 @@ import 'package:sport_log/models/cardio/all.dart';
 import 'package:sport_log/pages/workout/cardio/no_track.dart';
 import 'package:sport_log/pages/workout/session_tab_utils.dart';
 import 'package:sport_log/routes.dart';
-import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/expandable_fab.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
@@ -41,7 +40,6 @@ class RoutePage extends StatelessWidget {
                 ? TextFormField(
                     focusNode: _searchBar,
                     onChanged: (name) => dataProvider.search = name,
-                    decoration: Theme.of(context).textFormFieldDecoration,
                   )
                 : const Text("Routes"),
             actions: [

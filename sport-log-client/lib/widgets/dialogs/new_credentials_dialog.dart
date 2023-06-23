@@ -7,7 +7,6 @@ import 'package:sport_log/helpers/bool_toggle.dart';
 import 'package:sport_log/helpers/validation.dart';
 import 'package:sport_log/models/user/user.dart';
 import 'package:sport_log/settings.dart';
-import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/provider_consumer.dart';
 
@@ -88,10 +87,10 @@ class _NewCredentialsDialogState extends State<NewCredentialsDialog> {
           setState(() => _username = username);
         }
       },
-      decoration: Theme.of(context).textFormFieldDecoration.copyWith(
-            icon: const Icon(AppIcons.account),
-            labelText: "Username",
-          ),
+      decoration: const InputDecoration(
+        icon: Icon(AppIcons.account),
+        labelText: "Username",
+      ),
       validator: Validator.validateUsername,
       autovalidateMode: AutovalidateMode.onUserInteraction,
       enabled: !_loginPending,
@@ -113,16 +112,16 @@ class _NewCredentialsDialogState extends State<NewCredentialsDialog> {
             setState(() => _password = password);
           }
         },
-        decoration: Theme.of(context).textFormFieldDecoration.copyWith(
-              icon: const Icon(AppIcons.key),
-              labelText: "Password",
-              suffixIcon: IconButton(
-                icon: obscure.isOn
-                    ? const Icon(AppIcons.visibility)
-                    : const Icon(AppIcons.visibilityOff),
-                onPressed: obscure.toggle,
-              ),
-            ),
+        decoration: InputDecoration(
+          icon: const Icon(AppIcons.key),
+          labelText: "Password",
+          suffixIcon: IconButton(
+            icon: obscure.isOn
+                ? const Icon(AppIcons.visibility)
+                : const Icon(AppIcons.visibilityOff),
+            onPressed: obscure.toggle,
+          ),
+        ),
         validator: Validator.validatePassword,
         autovalidateMode: AutovalidateMode.onUserInteraction,
         enabled: !_loginPending,

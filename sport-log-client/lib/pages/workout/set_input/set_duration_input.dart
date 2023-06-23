@@ -320,7 +320,6 @@ class _PaddedIntInputState extends State<_PaddedIntInput> {
             keyboardType: TextInputType.number,
             textAlign: TextAlign.right,
             decoration: InputDecoration(
-              border: InputBorder.none,
               hintText: widget.placeholder
                   .toString()
                   .padLeft(widget.numberOfDigits, '0'),

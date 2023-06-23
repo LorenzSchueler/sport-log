@@ -9,7 +9,6 @@ import 'package:sport_log/helpers/validation.dart';
 import 'package:sport_log/models/user/user.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/settings.dart';
-import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/dialogs.dart';
 import 'package:sport_log/widgets/provider_consumer.dart';
@@ -91,18 +90,18 @@ class _LoginPageState extends State<LoginPage> {
           setState(() => _serverUrl = serverUrl);
         }
       },
-      decoration: Theme.of(context).textFormFieldDecoration.copyWith(
-            icon: const Icon(AppIcons.cloudUpload),
-            labelText: "Server URL",
-            suffixIcon: IconButton(
-              onPressed: () {
-                setState(() {
-                  _serverUrl = context.read<Settings>().getDefaultServerUrl();
-                });
-              },
-              icon: const Icon(AppIcons.restore),
-            ),
-          ),
+      decoration: InputDecoration(
+        icon: const Icon(AppIcons.cloudUpload),
+        labelText: "Server URL",
+        suffixIcon: IconButton(
+          onPressed: () {
+            setState(() {
+              _serverUrl = context.read<Settings>().getDefaultServerUrl();
+            });
+          },
+          icon: const Icon(AppIcons.restore),
+        ),
+      ),
       validator: Validator.validateUrl,
       autovalidateMode: AutovalidateMode.onUserInteraction,
       enabled: !_loginPending,
@@ -121,10 +120,10 @@ class _LoginPageState extends State<LoginPage> {
           setState(() => _user.username = username);
         }
       },
-      decoration: Theme.of(context).textFormFieldDecoration.copyWith(
-            icon: const Icon(AppIcons.account),
-            labelText: "Username",
-          ),
+      decoration: const InputDecoration(
+        icon: Icon(AppIcons.account),
+        labelText: "Username",
+      ),
       validator: Validator.validateUsername,
       autovalidateMode: AutovalidateMode.onUserInteraction,
       enabled: !_loginPending,
@@ -145,16 +144,16 @@ class _LoginPageState extends State<LoginPage> {
             setState(() => _user.password = password);
           }
         },
-        decoration: Theme.of(context).textFormFieldDecoration.copyWith(
-              icon: const Icon(AppIcons.key),
-              labelText: "Password",
-              suffixIcon: IconButton(
-                icon: obscure.isOn
-                    ? const Icon(AppIcons.visibility)
-                    : const Icon(AppIcons.visibilityOff),
-                onPressed: obscure.toggle,
-              ),
-            ),
+        decoration: InputDecoration(
+          icon: const Icon(AppIcons.key),
+          labelText: "Password",
+          suffixIcon: IconButton(
+            icon: obscure.isOn
+                ? const Icon(AppIcons.visibility)
+                : const Icon(AppIcons.visibilityOff),
+            onPressed: obscure.toggle,
+          ),
+        ),
         validator: Validator.validatePassword,
         autovalidateMode: AutovalidateMode.onUserInteraction,
         enabled: !_loginPending,
@@ -171,10 +170,10 @@ class _LoginPageState extends State<LoginPage> {
 
   Widget _passwordInput2() {
     return TextFormField(
-      decoration: Theme.of(context).textFormFieldDecoration.copyWith(
-            icon: const Icon(AppIcons.key),
-            labelText: "Repeat password",
-          ),
+      decoration: const InputDecoration(
+        icon: Icon(AppIcons.key),
+        labelText: "Repeat password",
+      ),
       validator: (password2) =>
           Validator.validatePassword2(_user.password, password2),
       autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -195,10 +194,10 @@ class _LoginPageState extends State<LoginPage> {
           setState(() => _user.email = email);
         }
       },
-      decoration: Theme.of(context).textFormFieldDecoration.copyWith(
-            icon: const Icon(AppIcons.email),
-            labelText: "Email",
-          ),
+      decoration: const InputDecoration(
+        icon: Icon(AppIcons.email),
+        labelText: "Email",
+      ),
       validator: Validator.validateEmail,
       autovalidateMode: AutovalidateMode.onUserInteraction,
       enabled: !_loginPending,

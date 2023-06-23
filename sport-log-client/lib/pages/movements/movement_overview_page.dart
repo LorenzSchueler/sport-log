@@ -4,7 +4,6 @@ import 'package:sport_log/data_provider/overview_data_provider.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/models/movement/all.dart';
 import 'package:sport_log/routes.dart';
-import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/dialogs.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
@@ -36,7 +35,6 @@ class MovementsPage extends StatelessWidget {
                 ? TextFormField(
                     focusNode: _searchBar,
                     onChanged: (name) => dataProvider.search = name,
-                    decoration: Theme.of(context).textFormFieldDecoration,
                   )
                 : const Text("Movements"),
             actions: [

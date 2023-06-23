@@ -6,7 +6,6 @@ import 'package:sport_log/helpers/bool_toggle.dart';
 import 'package:sport_log/models/platform/platform_credential.dart';
 import 'package:sport_log/models/platform/platform_description.dart';
 import 'package:sport_log/routes.dart';
-import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/dialogs.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
@@ -162,10 +161,10 @@ class _PlatformCredentialDialogState extends State<PlatformCredentialDialog> {
                 platformDescription.platformCredential!.username = username;
               }),
               initialValue: platformDescription.platformCredential!.username,
-              decoration: Theme.of(context).textFormFieldDecoration.copyWith(
-                    icon: const Icon(AppIcons.account),
-                    labelText: "Username",
-                  ),
+              decoration: const InputDecoration(
+                icon: Icon(AppIcons.account),
+                labelText: "Username",
+              ),
               autovalidateMode: AutovalidateMode.onUserInteraction,
               textInputAction: TextInputAction.next,
               keyboardType: TextInputType.emailAddress,
@@ -177,16 +176,16 @@ class _PlatformCredentialDialogState extends State<PlatformCredentialDialog> {
                   platformDescription.platformCredential!.password = password;
                 }),
                 initialValue: platformDescription.platformCredential!.password,
-                decoration: Theme.of(context).textFormFieldDecoration.copyWith(
-                      icon: const Icon(AppIcons.key),
-                      labelText: "Password",
-                      suffixIcon: IconButton(
-                        icon: obscure.isOn
-                            ? const Icon(AppIcons.visibility)
-                            : const Icon(AppIcons.visibilityOff),
-                        onPressed: obscure.toggle,
-                      ),
-                    ),
+                decoration: InputDecoration(
+                  icon: const Icon(AppIcons.key),
+                  labelText: "Password",
+                  suffixIcon: IconButton(
+                    icon: obscure.isOn
+                        ? const Icon(AppIcons.visibility)
+                        : const Icon(AppIcons.visibilityOff),
+                    onPressed: obscure.toggle,
+                  ),
+                ),
                 autovalidateMode: AutovalidateMode.onUserInteraction,
                 textInputAction: TextInputAction.done,
                 obscureText: obscure.isOn,

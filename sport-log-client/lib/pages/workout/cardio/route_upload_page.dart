@@ -9,7 +9,6 @@ import 'package:sport_log/helpers/pointer.dart';
 import 'package:sport_log/helpers/validation.dart';
 import 'package:sport_log/models/cardio/route.dart';
 import 'package:sport_log/pages/workout/cardio/route_value_unit_description_table.dart';
-import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/dialogs.dart';
 import 'package:sport_log/widgets/map_widgets/mapbox_map_wrapper.dart';
@@ -109,10 +108,9 @@ class _RouteUploadPageState extends State<RouteUploadPage> {
                       initialValue: _route.name,
                       validator: Validator.validateStringNotEmpty,
                       autovalidateMode: AutovalidateMode.onUserInteraction,
-                      decoration:
-                          Theme.of(context).textFormFieldDecoration.copyWith(
-                                labelText: "Name",
-                              ),
+                      decoration: const InputDecoration(
+                        labelText: "Name",
+                      ),
                     ),
                   ),
                 ],

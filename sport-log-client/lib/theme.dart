@@ -133,6 +133,12 @@ class AppTheme {
           return null;
         }),
       ),
+      // input decoration for InputDecorator, TextField, and TextFormField
+      inputDecorationTheme: const InputDecorationTheme(
+        contentPadding: EdgeInsets.symmetric(vertical: 5),
+        border: InputBorder.none,
+        iconColor: EditTile.iconCaptionColor,
+      ),
       textTheme: const TextTheme(
         //headline1    96.0  light
         //Extremely large text.
@@ -221,13 +227,5 @@ class AppTheme {
         _shadeValue(color.red, factor),
         _shadeValue(color.green, factor),
         _shadeValue(color.blue, factor),
-      );
-}
-
-extension ThemeDataExtension on ThemeData {
-  InputDecoration get textFormFieldDecoration => const InputDecoration(
-        contentPadding: EdgeInsets.symmetric(vertical: 5),
-        border: InputBorder.none,
-        iconColor: EditTile.iconCaptionColor,
       );
 }

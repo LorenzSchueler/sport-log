@@ -11,7 +11,6 @@ import 'package:sport_log/pages/workout/metcon_sessions/metcon_session_results_c
 import 'package:sport_log/pages/workout/overview_card.dart';
 import 'package:sport_log/pages/workout/session_tab_utils.dart';
 import 'package:sport_log/routes.dart';
-import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
 import 'package:sport_log/widgets/picker/picker.dart';
@@ -49,7 +48,6 @@ class MetconSessionsPage extends StatelessWidget {
                 ? TextFormField(
                     focusNode: _searchBar,
                     onChanged: (comment) => dataProvider.search = comment,
-                    decoration: Theme.of(context).textFormFieldDecoration,
                   )
                 : Text(dataProvider.selected?.name ?? "Metcon Sessions"),
             actions: [

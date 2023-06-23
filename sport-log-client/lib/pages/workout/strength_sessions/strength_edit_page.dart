@@ -8,7 +8,6 @@ import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/helpers/page_return.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/pages/workout/set_input/new_set_input.dart';
-import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/dialogs.dart';
 import 'package:sport_log/widgets/input_fields/duration_input.dart';
@@ -274,16 +273,16 @@ class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
         setState(() => _strengthSessionDescription.session.comments = text);
       },
       initialValue: _strengthSessionDescription.session.comments,
-      decoration: Theme.of(context).textFormFieldDecoration.copyWith(
-            labelText: 'Comment',
-            icon: const Icon(AppIcons.edit),
-            suffixIcon: IconButton(
-              onPressed: () => setState(
-                () => _strengthSessionDescription.session.comments = null,
-              ),
-              icon: const Icon(AppIcons.close),
-            ),
+      decoration: InputDecoration(
+        labelText: 'Comment',
+        icon: const Icon(AppIcons.edit),
+        suffixIcon: IconButton(
+          onPressed: () => setState(
+            () => _strengthSessionDescription.session.comments = null,
           ),
+          icon: const Icon(AppIcons.close),
+        ),
+      ),
     );
   }
 

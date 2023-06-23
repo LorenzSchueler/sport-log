@@ -9,7 +9,6 @@ import 'package:sport_log/helpers/bool_toggle.dart';
 import 'package:sport_log/helpers/extensions/navigator_extension.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/settings.dart';
-import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/dialogs.dart';
 import 'package:sport_log/widgets/input_fields/duration_input.dart';
@@ -217,15 +216,14 @@ class SettingsPage extends StatelessWidget {
                   TextFormField(
                     // use new initialValue if url changed
                     key: ValueKey(settings.serverUrl),
-                    decoration:
-                        Theme.of(context).textFormFieldDecoration.copyWith(
-                              icon: const Icon(AppIcons.cloudUpload),
-                              labelText: "Server URL",
-                              suffixIcon: IconButton(
-                                onPressed: settings.setDefaultServerUrl,
-                                icon: const Icon(AppIcons.restore),
-                              ),
-                            ),
+                    decoration: InputDecoration(
+                      icon: const Icon(AppIcons.cloudUpload),
+                      labelText: "Server URL",
+                      suffixIcon: IconButton(
+                        onPressed: settings.setDefaultServerUrl,
+                        icon: const Icon(AppIcons.restore),
+                      ),
+                    ),
                     initialValue: settings.serverUrl,
                     validator: Validator.validateUrl,
                     autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -263,11 +261,10 @@ class SettingsPage extends StatelessWidget {
                   TextFormField(
                     // use new initialValue if username changed
                     key: ValueKey(settings.username),
-                    decoration:
-                        Theme.of(context).textFormFieldDecoration.copyWith(
-                              icon: const Icon(AppIcons.account),
-                              labelText: "Username",
-                            ),
+                    decoration: const InputDecoration(
+                      icon: Icon(AppIcons.account),
+                      labelText: "Username",
+                    ),
                     initialValue: settings.username,
                     validator: Validator.validateUsername,
                     autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -279,17 +276,16 @@ class SettingsPage extends StatelessWidget {
                     builder: (context, obscure, _) => TextFormField(
                       // use new initialValue if password changed
                       key: ValueKey(settings.password),
-                      decoration:
-                          Theme.of(context).textFormFieldDecoration.copyWith(
-                                icon: const Icon(AppIcons.key),
-                                labelText: "Password",
-                                suffixIcon: IconButton(
-                                  icon: obscure.isOn
-                                      ? const Icon(AppIcons.visibility)
-                                      : const Icon(AppIcons.visibilityOff),
-                                  onPressed: obscure.toggle,
-                                ),
-                              ),
+                      decoration: InputDecoration(
+                        icon: const Icon(AppIcons.key),
+                        labelText: "Password",
+                        suffixIcon: IconButton(
+                          icon: obscure.isOn
+                              ? const Icon(AppIcons.visibility)
+                              : const Icon(AppIcons.visibilityOff),
+                          onPressed: obscure.toggle,
+                        ),
+                      ),
                       obscureText: obscure.isOn,
                       initialValue: settings.password,
                       validator: Validator.validatePassword,
@@ -301,11 +297,10 @@ class SettingsPage extends StatelessWidget {
                   TextFormField(
                     // use new initialValue if email changed
                     key: ValueKey(settings.email),
-                    decoration:
-                        Theme.of(context).textFormFieldDecoration.copyWith(
-                              icon: const Icon(AppIcons.email),
-                              labelText: "Email",
-                            ),
+                    decoration: const InputDecoration(
+                      icon: Icon(AppIcons.email),
+                      labelText: "Email",
+                    ),
                     initialValue: settings.email,
                     validator: Validator.validateEmail,
                     autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -397,11 +392,10 @@ class SettingsPage extends StatelessWidget {
                 //leading: AppIcons.sync,
                 //),
                 TextFormField(
-                  decoration:
-                      Theme.of(context).textFormFieldDecoration.copyWith(
-                            icon: const Icon(AppIcons.dumbbell),
-                            labelText: "Weight Increment",
-                          ),
+                  decoration: const InputDecoration(
+                    icon: Icon(AppIcons.dumbbell),
+                    labelText: "Weight Increment",
+                  ),
                   keyboardType: TextInputType.number,
                   initialValue: settings.weightIncrement.toString(),
                   validator: Validator.validateDoubleGtZero,

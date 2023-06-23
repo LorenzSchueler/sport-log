@@ -81,9 +81,9 @@ class _IntInputState extends State<IntInput> {
                 } // ignore error for now and report it on unfocus
               },
               decoration: const InputDecoration(
+                contentPadding: EdgeInsets.zero,
                 isCollapsed: true,
                 isDense: true,
-                border: InputBorder.none,
               ),
             ),
             onFocusChange: (focus) {

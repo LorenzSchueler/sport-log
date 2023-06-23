@@ -9,7 +9,6 @@ import 'package:sport_log/helpers/tracking_utils.dart';
 import 'package:sport_log/pages/workout/cardio/cardio_value_unit_description_table.dart';
 import 'package:sport_log/pages/workout/cardio/tracking_settings.dart';
 import 'package:sport_log/settings.dart';
-import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/map_widgets/mapbox_map_wrapper.dart';
 import 'package:sport_log/widgets/map_widgets/static_mapbox_map.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
@@ -33,9 +32,9 @@ class CardioTrackingPage extends StatelessWidget {
               trackingUtils.cardioSessionDescription.cardioSession.comments,
           onChanged: (comments) => trackingUtils
               .cardioSessionDescription.cardioSession.comments = comments,
-          decoration: Theme.of(context).textFormFieldDecoration.copyWith(
-                labelText: "Comments",
-              ),
+          decoration: const InputDecoration(
+            labelText: "Comments",
+          ),
           keyboardType: TextInputType.multiline,
           minLines: 1,
           maxLines: 5,

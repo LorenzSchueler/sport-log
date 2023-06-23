@@ -6,7 +6,6 @@ import 'package:sport_log/helpers/extensions/navigator_extension.dart';
 import 'package:sport_log/models/metcon/all.dart';
 import 'package:sport_log/pages/workout/session_tab_utils.dart';
 import 'package:sport_log/routes.dart';
-import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
@@ -37,7 +36,6 @@ class MetconsPage extends StatelessWidget {
                 ? TextFormField(
                     focusNode: _searchBar,
                     onChanged: (name) => dataProvider.search = name,
-                    decoration: Theme.of(context).textFormFieldDecoration,
                   )
                 : const Text("Metcons"),
             actions: [

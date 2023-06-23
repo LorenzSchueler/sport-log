@@ -3,7 +3,6 @@ import 'package:sport_log/data_provider/data_providers/movement_data_provider.da
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/validation.dart';
 import 'package:sport_log/models/movement/all.dart';
-import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/dialogs.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
@@ -145,18 +144,16 @@ class _MovementEditPageState extends State<MovementEditPage> {
                               () => _movementDescription.movement.description =
                                   description,
                             ),
-                            decoration: Theme.of(context)
-                                .textFormFieldDecoration
-                                .copyWith(
-                                  labelText: "Description",
-                                  suffixIcon: IconButton(
-                                    icon: const Icon(AppIcons.close),
-                                    onPressed: () => setState(
-                                      () => _movementDescription
-                                          .movement.description = null,
-                                    ),
-                                  ),
+                            decoration: InputDecoration(
+                              labelText: "Description",
+                              suffixIcon: IconButton(
+                                icon: const Icon(AppIcons.close),
+                                onPressed: () => setState(
+                                  () => _movementDescription
+                                      .movement.description = null,
                                 ),
+                              ),
+                            ),
                           ),
                         ),
                       ],
@@ -184,9 +181,9 @@ class _MovementEditPageState extends State<MovementEditPage> {
       style: Theme.of(context).textTheme.titleLarge,
       textInputAction: TextInputAction.next,
       keyboardType: TextInputType.text,
-      decoration: Theme.of(context).textFormFieldDecoration.copyWith(
-            labelText: "Name",
-          ),
+      decoration: const InputDecoration(
+        labelText: "Name",
+      ),
     );
   }
 

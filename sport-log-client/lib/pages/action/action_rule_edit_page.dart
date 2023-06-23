@@ -4,7 +4,6 @@ import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/models/action/action_provider_description.dart';
 import 'package:sport_log/models/action/action_rule.dart';
-import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/dialogs.dart';
 import 'package:sport_log/widgets/input_fields/edit_tile.dart';
@@ -148,10 +147,10 @@ class _ActionRuleEditPageState extends State<ActionRuleEditPage> {
                 },
               ),
               TextFormField(
-                decoration: Theme.of(context).textFormFieldDecoration.copyWith(
-                      icon: const Icon(AppIcons.comment),
-                      labelText: "Arguments",
-                    ),
+                decoration: const InputDecoration(
+                  icon: Icon(AppIcons.comment),
+                  labelText: "Arguments",
+                ),
                 initialValue: _actionRule.arguments,
                 onChanged: (arguments) => setState(() {
                   _actionRule.arguments = arguments.isEmpty ? null : arguments;

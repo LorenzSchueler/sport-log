@@ -6,7 +6,6 @@ import 'package:sport_log/helpers/validation.dart';
 import 'package:sport_log/models/metcon/all.dart';
 import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/pages/workout/set_input/new_set_input.dart';
-import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/dialogs.dart';
 import 'package:sport_log/widgets/input_fields/duration_input.dart';
@@ -147,9 +146,9 @@ class _MetconEditPageState extends State<MetconEditPage> {
       style: Theme.of(context).textTheme.titleLarge,
       textInputAction: TextInputAction.next,
       keyboardType: TextInputType.text,
-      decoration: Theme.of(context).textFormFieldDecoration.copyWith(
-            labelText: "Name",
-          ),
+      decoration: const InputDecoration(
+        labelText: "Name",
+      ),
     );
   }
 
@@ -175,15 +174,15 @@ class _MetconEditPageState extends State<MetconEditPage> {
               onChanged: (description) => setState(
                 () => _metconDescription.metcon.description = description,
               ),
-              decoration: Theme.of(context).textFormFieldDecoration.copyWith(
-                    labelText: "Description",
-                    suffixIcon: IconButton(
-                      icon: const Icon(AppIcons.close),
-                      onPressed: () => setState(
-                        () => _metconDescription.metcon.description = null,
-                      ),
-                    ),
+              decoration: InputDecoration(
+                labelText: "Description",
+                suffixIcon: IconButton(
+                  icon: const Icon(AppIcons.close),
+                  onPressed: () => setState(
+                    () => _metconDescription.metcon.description = null,
                   ),
+                ),
+              ),
             ),
           );
   }

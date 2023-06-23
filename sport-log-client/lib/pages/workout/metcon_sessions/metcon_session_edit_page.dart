@@ -6,7 +6,6 @@ import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/page_return.dart';
 import 'package:sport_log/models/all.dart';
-import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/dialogs.dart';
 import 'package:sport_log/widgets/input_fields/duration_input.dart';
@@ -321,11 +320,10 @@ class _MetconSessionEditPageState extends State<MetconSessionEditPage> {
                   ),
                 ),
                 TextFormField(
-                  decoration:
-                      Theme.of(context).textFormFieldDecoration.copyWith(
-                            icon: const Icon(AppIcons.comment),
-                            labelText: "Comments",
-                          ),
+                  decoration: const InputDecoration(
+                    icon: Icon(AppIcons.comment),
+                    labelText: "Comments",
+                  ),
                   initialValue:
                       _metconSessionDescription.metconSession.comments,
                   keyboardType: TextInputType.multiline,

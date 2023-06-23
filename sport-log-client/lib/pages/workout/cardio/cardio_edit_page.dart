@@ -9,7 +9,6 @@ import 'package:sport_log/helpers/pointer.dart';
 import 'package:sport_log/helpers/validation.dart';
 import 'package:sport_log/models/cardio/cardio_session_description.dart';
 import 'package:sport_log/routes.dart';
-import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/dialogs.dart';
 import 'package:sport_log/widgets/input_fields/edit_tile.dart';
@@ -349,11 +348,10 @@ class _CardioEditPageState extends State<CardioEditPage> {
                               (double.parse(distance) * 1000).round();
                         }
                       }),
-                      decoration:
-                          Theme.of(context).textFormFieldDecoration.copyWith(
-                                icon: const Icon(AppIcons.ruler),
-                                labelText: "Distance (km)",
-                              ),
+                      decoration: const InputDecoration(
+                        icon: Icon(AppIcons.ruler),
+                        labelText: "Distance (km)",
+                      ),
                     ),
                     TextFormField(
                       controller: _ascentController,
@@ -372,11 +370,10 @@ class _CardioEditPageState extends State<CardioEditPage> {
                               int.parse(ascent);
                         }
                       }),
-                      decoration:
-                          Theme.of(context).textFormFieldDecoration.copyWith(
-                                icon: const Icon(AppIcons.trendingUp),
-                                labelText: "Ascent (m)",
-                              ),
+                      decoration: const InputDecoration(
+                        icon: Icon(AppIcons.trendingUp),
+                        labelText: "Ascent (m)",
+                      ),
                     ),
                     TextFormField(
                       controller: _descentController,
@@ -395,11 +392,10 @@ class _CardioEditPageState extends State<CardioEditPage> {
                               int.parse(descent);
                         }
                       }),
-                      decoration:
-                          Theme.of(context).textFormFieldDecoration.copyWith(
-                                icon: const Icon(AppIcons.trendingDown),
-                                labelText: "Descent (m)",
-                              ),
+                      decoration: const InputDecoration(
+                        icon: Icon(AppIcons.trendingDown),
+                        labelText: "Descent (m)",
+                      ),
                     ),
                     EditTile.optionalActionChip(
                       leading: AppIcons.timeInterval,
@@ -450,11 +446,10 @@ class _CardioEditPageState extends State<CardioEditPage> {
                               int.parse(calories);
                         }
                       }),
-                      decoration:
-                          Theme.of(context).textFormFieldDecoration.copyWith(
-                                icon: const Icon(AppIcons.food),
-                                labelText: "Calories",
-                              ),
+                      decoration: const InputDecoration(
+                        icon: Icon(AppIcons.food),
+                        labelText: "Calories",
+                      ),
                     ),
                     TextFormField(
                       controller: _avgCadenceController,
@@ -476,11 +471,10 @@ class _CardioEditPageState extends State<CardioEditPage> {
                               int.parse(avgCadence);
                         }
                       }),
-                      decoration:
-                          Theme.of(context).textFormFieldDecoration.copyWith(
-                                icon: const Icon(AppIcons.gauge),
-                                labelText: "Cadence",
-                              ),
+                      decoration: const InputDecoration(
+                        icon: Icon(AppIcons.gauge),
+                        labelText: "Cadence",
+                      ),
                     ),
                     TextFormField(
                       controller: _avgHeartRateController,
@@ -502,11 +496,10 @@ class _CardioEditPageState extends State<CardioEditPage> {
                               int.parse(avgHeartRate);
                         }
                       }),
-                      decoration:
-                          Theme.of(context).textFormFieldDecoration.copyWith(
-                                icon: const Icon(AppIcons.heartbeat),
-                                labelText: "Heart Rate",
-                              ),
+                      decoration: const InputDecoration(
+                        icon: Icon(AppIcons.heartbeat),
+                        labelText: "Heart Rate",
+                      ),
                     ),
                     TextFormField(
                       onChanged: (comments) => setState(() {
@@ -515,11 +508,10 @@ class _CardioEditPageState extends State<CardioEditPage> {
                       }),
                       initialValue:
                           _cardioSessionDescription.cardioSession.comments,
-                      decoration:
-                          Theme.of(context).textFormFieldDecoration.copyWith(
-                                icon: const Icon(AppIcons.comment),
-                                labelText: "Comments",
-                              ),
+                      decoration: const InputDecoration(
+                        icon: Icon(AppIcons.comment),
+                        labelText: "Comments",
+                      ),
                       keyboardType: TextInputType.multiline,
                       minLines: 1,
                       maxLines: 5,

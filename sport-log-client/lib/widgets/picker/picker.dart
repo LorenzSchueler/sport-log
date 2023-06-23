@@ -14,7 +14,6 @@ import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/models/timeline_union.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_state.dart';
 import 'package:sport_log/routes.dart';
-import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 
 class Picker<T> extends StatelessWidget {
@@ -137,19 +136,19 @@ class _PickerWithSearchState<T> extends State<PickerWithSearch<T>> {
         autofocus: true,
         initialValue: _search,
         onChanged: _update,
-        decoration: Theme.of(context).textFormFieldDecoration.copyWith(
-              labelText: 'Search',
-              prefixIcon: const Icon(AppIcons.search),
-              suffixIcon: _search.isNotEmpty && widget.editRoute != null
-                  ? IconButton(
-                      onPressed: () => Navigator.pushNamed(
-                        context,
-                        widget.editRoute!,
-                      ),
-                      icon: const Icon(AppIcons.add),
-                    )
-                  : null,
-            ),
+        decoration: InputDecoration(
+          labelText: 'Search',
+          prefixIcon: const Icon(AppIcons.search),
+          suffixIcon: _search.isNotEmpty && widget.editRoute != null
+              ? IconButton(
+                  onPressed: () => Navigator.pushNamed(
+                    context,
+                    widget.editRoute!,
+                  ),
+                  icon: const Icon(AppIcons.add),
+                )
+              : null,
+        ),
       ),
     );
   }
