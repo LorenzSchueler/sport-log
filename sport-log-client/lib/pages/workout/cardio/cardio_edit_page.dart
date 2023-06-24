@@ -319,13 +319,28 @@ class _CardioEditPageState extends State<CardioEditPage> {
                           selectedRoute: _cardioSessionDescription.route,
                           context: context,
                         );
-                        if (mounted && route != null) {
-                          setState(() {
-                            _cardioSessionDescription.cardioSession.routeId =
-                                route.id;
-                            _cardioSessionDescription.route = route;
-                          });
+                        if (route == null) {
+                          return;
                         }
+                        if (mounted) {
+                          if (route.id == _cardioSessionDescription.route?.id) {
+                            setState(() {
+                              _cardioSessionDescription.cardioSession.routeId =
+                                  null;
+                              _cardioSessionDescription.route = null;
+                            });
+                          } else {
+                            setState(() {
+                              _cardioSessionDescription.cardioSession.routeId =
+                                  route.id;
+                              _cardioSessionDescription.route = route;
+                            });
+                          }
+                        }
+                        await _mapController?.updateRouteLine(
+                          _routeLine,
+                          _cardioSessionDescription.route?.track,
+                        );
                       },
                     ),
                     TextFormField(
