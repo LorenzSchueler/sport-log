@@ -192,12 +192,12 @@ class CardioSessionCard extends StatelessWidget {
       cardioSessionDescription.route?.track,
       padded: true,
     );
+    if (cardioSessionDescription.route?.track != null) {
+      await mapController.addRouteLine(cardioSessionDescription.route!.track!);
+    }
     if (cardioSessionDescription.cardioSession.track != null) {
       await mapController
           .addTrackLine(cardioSessionDescription.cardioSession.track!);
-    }
-    if (cardioSessionDescription.route?.track != null) {
-      await mapController.addRouteLine(cardioSessionDescription.route!.track!);
     }
   }
 

@@ -104,13 +104,13 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
       _cardioSessionDescription.route?.track,
       padded: true,
     );
-    await _mapController?.updateTrackLine(
-      _trackLine,
-      _cardioSessionDescription.cardioSession.track,
-    );
     await _mapController?.updateRouteLine(
       _routeLine,
       _cardioSessionDescription.route?.track,
+    );
+    await _mapController?.updateTrackLine(
+      _trackLine,
+      _cardioSessionDescription.cardioSession.track,
     );
   }
 
