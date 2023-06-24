@@ -138,6 +138,11 @@ class _RouteUploadPageState extends State<RouteUploadPage> {
             ..setDistance()
             ..setAscentDescent();
         });
+        await _mapController?.setBoundsFromTracks(
+          _route.track,
+          _route.markedPositions,
+          padded: true,
+        );
         await _mapController?.updateRouteLine(_line, _route.track);
       }
     }
