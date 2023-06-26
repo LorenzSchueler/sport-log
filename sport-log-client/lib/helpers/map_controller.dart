@@ -383,7 +383,11 @@ class MapController {
     );
   }
 
-  Future<void> disableHillshade(String layerId) => _removeLayer(layerId);
+  Future<void> disableHillshade(String layerId) async {
+    await _removeLayer(layerId);
+    // this make removeLayer work more reliably but still the hillshade is sometimes not removed
+    await setZoom((await zoom)!); // TODO remove if removeLayer works reliably
+  }
 
   Future<bool?> hillshadeEnabled(String layerId) => _layerExists(layerId);
 
