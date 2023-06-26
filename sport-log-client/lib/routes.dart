@@ -114,12 +114,16 @@ abstract class Routes {
     return Settings.instance.userId == null ? builder() : TimelinePage();
   }
 
+  static Widget _checkNoAccount(Widget Function() builder) {
+    return Settings.instance.accountCreated ? TimelinePage() : builder();
+  }
+
   static final Map<String, Widget Function(BuildContext)> _routeList = {
     Routes.landing: (_) => _checkNotUserId(() => const LandingPage()),
     Routes.login: (_) =>
-        _checkNotUserId(() => const LoginPage(loginType: LoginType.login)),
+        _checkNoAccount(() => const LoginPage(loginType: LoginType.login)),
     Routes.registration: (_) =>
-        _checkNotUserId(() => const LoginPage(loginType: LoginType.register)),
+        _checkNoAccount(() => const LoginPage(loginType: LoginType.register)),
     Routes.update: (_) => const UpdatePage(),
     Routes.timer: (_) => _checkUserId(() => const TimerPage()),
     Routes.map: (context) => _checkUserIdAndroidIos(context, MapPage.new),
