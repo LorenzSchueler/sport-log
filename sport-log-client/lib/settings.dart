@@ -42,6 +42,8 @@ class Settings extends ChangeNotifier {
   static const String _lastGpsLatLng = "lastGpsLatLng";
   static const String _developer = "developer";
 
+  static const Duration _defaultSyncInterval = Duration(minutes: 5);
+
   Future<void> init({bool override = false}) async {
     Hive
       ..registerAdapter(DurationAdapter())
@@ -64,7 +66,7 @@ class Settings extends ChangeNotifier {
       await setDefaultServerUrl();
     }
     if (!_contains(_syncInterval) || override) {
-      await _storage!.put(_syncInterval, const Duration(minutes: 5));
+      await _storage!.put(_syncInterval, _defaultSyncInterval);
     }
     if (!_contains(_lastSync) || override) {
       await _storage!.put(_lastSync, null);
@@ -156,6 +158,9 @@ class Settings extends ChangeNotifier {
 
   Future<void> setSyncInterval(Duration interval) =>
       _put(_syncInterval, interval);
+
+  Future<void> setDefaultSyncInterval() =>
+      _put(_syncInterval, _defaultSyncInterval);
 
   DateTime? get lastSync => _getDateTimeOptional(_lastSync);
 

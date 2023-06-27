@@ -38,7 +38,10 @@ abstract final class Account {
       await Settings.instance.setAccountCreated(true);
       // serverUrl already set
       await Settings.instance.setSyncEnabled(true);
-      // keep syncInterval as is
+      await Settings.instance.setDefaultSyncInterval();
+
+      // set userId of all data in db to id of new user
+      await AppDatabase.setUserId(user.id);
 
       await Sync.instance.startSync();
       return Success(null);
@@ -61,7 +64,10 @@ abstract final class Account {
       await Settings.instance.setAccountCreated(true);
       // serverUrl already set
       await Settings.instance.setSyncEnabled(true);
-      // keep syncInterval as is
+      await Settings.instance.setDefaultSyncInterval();
+
+      // set userId of all data in db to id of logged in user
+      await AppDatabase.setUserId(user.id);
 
       await Sync.instance.startSync();
       return Success(user);
@@ -107,17 +113,17 @@ abstract final class Account {
 
   static Future<void> logout() async {
     Sync.instance.stopSync();
-    await Settings.instance.setUser(null);
+    // keep userId as is
+    await Settings.instance.setUsername(null);
+    await Settings.instance.setPassword(null);
+    await Settings.instance.setEmail(null);
     await Settings.instance.setAccountCreated(false);
     // keep serverUrl as is
     await Settings.instance.setSyncEnabled(false);
     // keep syncInterval as is
     await Settings.instance.setLastSync(null);
+    // keep db data
 
-    Movement.defaultMovement = null;
-    MetconDescription.defaultMetconDescription = null;
-
-    await AppDatabase.reset();
   }
 
   static Future<ApiResult<void>> delete() async {
