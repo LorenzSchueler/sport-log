@@ -1,3 +1,4 @@
+import 'package:fixnum/fixnum.dart';
 import 'package:result_type/result_type.dart';
 import 'package:sport_log/config.dart';
 import 'package:sport_log/database/table_accessor.dart';
@@ -117,14 +118,8 @@ class AppDatabase {
         version: 1,
         onConfigure: (db) => db.execute('PRAGMA foreign_keys = ON;'),
         onCreate: (db, version) async {
-          for (final tableAccessor in _tablesAccessors) {
-            _logger.d("Creating table: ${tableAccessor.tableName}");
-            for (final statement in tableAccessor.table.setupSql) {
-              if (Config.instance.outputDbStatement) {
-                _logger.d(statement);
-              }
-              await db.execute(statement);
-            }
+          for (final table in _tables) {
+            await table.setup();
           }
         },
         //onUpgrade: null,
@@ -143,7 +138,13 @@ class AppDatabase {
     await open();
   }
 
-  static List<TableAccessor> get _tablesAccessors => [
+  static Future<void> setUserId(Int64 userId) async {
+    for (final table in _tables) {
+      await table.setAllUserId(userId);
+    }
+  }
+
+  static List<TableAccessor> get _tables => [
         DiaryTable(),
         WodTable(),
         MovementTable(),

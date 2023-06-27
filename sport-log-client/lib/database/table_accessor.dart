@@ -1,9 +1,11 @@
 import 'package:collection/collection.dart';
 import 'package:fixnum/fixnum.dart';
+import 'package:sport_log/config.dart';
 import 'package:sport_log/database/database.dart';
 import 'package:sport_log/database/table.dart';
 import 'package:sport_log/database/table_accessor.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
+import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -12,6 +14,8 @@ export 'db_interfaces.dart';
 bool Function(List<int> l1, List<int> l2) eq = const ListEquality<int>().equals;
 
 abstract class TableAccessor<T extends AtomicEntity> {
+  final _logger = Logger('Table');
+
   DbSerializer<T> get serde;
   Table get table;
 
@@ -108,6 +112,16 @@ abstract class TableAccessor<T extends AtomicEntity> {
   static String orderByNameOfTable(String tableName) =>
       "$tableName.${Columns.name} collate nocase";
   String get orderByName => orderByNameOfTable(tableName);
+
+  Future<void> setup() async {
+    _logger.d("Creating table: $tableName");
+    for (final statement in table.setupSql) {
+      if (Config.instance.outputDbStatement) {
+        _logger.d(statement);
+      }
+      await database.execute(statement);
+    }
+  }
 
   Future<bool> hardDeleteSingle(Int64 id) async {
     final changes = await database.delete(
@@ -286,6 +300,16 @@ abstract class TableAccessor<T extends AtomicEntity> {
       synchronized,
       where: '${Columns.syncStatus} = ${SyncStatus.created.index}',
     );
+  }
+
+  Future<void> setAllUserId(Int64 userId) async {
+    if (table.columns.map((column) => column.name).contains(Columns.userId)) {
+      _logger.d("Setting userId for all rows in table: $tableName");
+      await database.update(tableName, {
+        Columns.userId: userId.toInt(),
+        Columns.syncStatus: SyncStatus.updated.index
+      });
+    }
   }
 
   Future<DbResult> upsertMultiple(
