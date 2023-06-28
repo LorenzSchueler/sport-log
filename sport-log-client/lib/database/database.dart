@@ -119,7 +119,13 @@ class AppDatabase {
         onConfigure: (db) => db.execute('PRAGMA foreign_keys = ON;'),
         onCreate: (db, version) async {
           for (final table in _tables) {
-            await table.setup();
+            _logger.d("Creating table: ${table.tableName}");
+            for (final statement in table.table.setupSql) {
+              if (Config.instance.outputDbStatement) {
+                _logger.d(statement);
+              }
+              await db.execute(statement);
+            }
           }
         },
         //onUpgrade: null,
