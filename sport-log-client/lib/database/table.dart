@@ -162,7 +162,7 @@ class Table {
 
   List<String> get setupSql {
     final primaryKey =
-        columns.where((c) => c.getIsPrimaryKey()).map((c) => c.name).toList();
+        columns.where((c) => c.getIsPrimaryKey()).map((c) => c.name);
     final primaryKeyStr =
         primaryKey.isEmpty ? '' : 'primary key(${primaryKey.join(', ')})';
     final tableSetup = '''

@@ -51,7 +51,7 @@ class MovementDescriptionDataProvider
 
   static MovementDescriptionDataProvider? _instance;
 
-  final _movementDescriptionDb = AppDatabase.movementDescriptions;
+  final _movementDescriptionDb = MovementDescriptionTable();
 
   final _dataProvider = MovementDataProvider();
 

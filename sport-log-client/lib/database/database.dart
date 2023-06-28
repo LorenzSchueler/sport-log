@@ -162,8 +162,4 @@ class AppDatabase {
         ActionRuleTable(),
         ActionEventTable(),
       ];
-
-  static final cardioSessionDescriptions = CardioSessionDescriptionTable();
-  static final strengthSessionDescriptions = StrengthSessionDescriptionTable();
-  static final movementDescriptions = MovementDescriptionTable();
 }

@@ -72,7 +72,7 @@ class StrengthSessionDescriptionDataProvider
 
   static StrengthSessionDescriptionDataProvider? _instance;
 
-  final _strengthSessionDescriptionDb = AppDatabase.strengthSessionDescriptions;
+  final _strengthSessionDescriptionDb = StrengthSessionDescriptionTable();
 
   final _strengthSessionDataProvider = StrengthSessionDataProvider();
   final _strengthSetDataProvider = StrengthSetDataProvider();

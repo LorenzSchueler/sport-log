@@ -62,6 +62,7 @@ abstract final class Account {
       await Settings.instance.setDefaultSyncInterval();
 
       // set userId of all data in db to id of new user
+      // because the id is not changed, registering in as a different user on the same server will fail
       await AppDatabase.setUserId(user.id);
 
       await Sync.instance.startSync();
@@ -99,6 +100,7 @@ abstract final class Account {
       await Settings.instance.setDefaultSyncInterval();
 
       // set userId of all data in db to id of logged in user
+      // because the id is not changed, logging in as a different user on the same server will fail
       await AppDatabase.setUserId(user.id);
 
       await Sync.instance.startSync();

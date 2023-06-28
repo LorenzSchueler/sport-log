@@ -76,7 +76,7 @@ class CardioSessionDescriptionDataProvider
 
   static CardioSessionDescriptionDataProvider? _instance;
 
-  final _cardioSessionDescriptionDb = AppDatabase.cardioSessionDescriptions;
+  final _cardioSessionDescriptionDb = CardioSessionDescriptionTable();
 
   final _cardioDataProvider = CardioSessionDataProvider();
   final _routeDataProvider = RouteDataProvider();
