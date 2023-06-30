@@ -49,7 +49,7 @@ class _MetconSessionEditPageState extends State<MetconSessionEditPage> {
         Navigator.pop(
           context,
           // needed for return to details page
-          ReturnObject.isNew(widget.isNew, _metconDescriptionDataProvider),
+          ReturnObject.isNew(widget.isNew, _metconSessionDescription),
         );
       } else {
         await showMessageDialog(
