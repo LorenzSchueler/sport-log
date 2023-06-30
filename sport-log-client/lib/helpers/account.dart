@@ -83,11 +83,10 @@ abstract final class Account {
   ) async {
     _logger.i("login");
 
-    // scenario: initial app start, after noAccount, logout or delete
+    // scenario: initial app start, when password changed, after noAccount, logout or delete
     // the user may exist
     // there may be data in the db
-    // the user has not created an account
-    assert(!Settings.instance.accountCreated);
+    // the user may have created an account
 
     await Settings.instance.setServerUrl(serverUrl);
     final result = await UserApi().getSingle(username, password);

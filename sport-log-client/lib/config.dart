@@ -131,7 +131,7 @@ class Config extends JsonSerializable {
   static bool isLinux = Platform.isLinux;
   static bool isWindows = Platform.isWindows;
 
-  static bool get isTest => Platform.environment.containsKey('FLUTTER_TEST');
+  static bool isTest = Platform.environment.containsKey('FLUTTER_TEST');
 
   static const bool releaseMode = kReleaseMode;
   static const bool profileMode = kProfileMode;
