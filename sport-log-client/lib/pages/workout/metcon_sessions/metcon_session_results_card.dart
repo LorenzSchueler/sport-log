@@ -53,6 +53,7 @@ class MetconSessionResultsCard extends StatelessWidget {
               EditTile(
                 leading: null,
                 caption: "Comments",
+                unboundedHeight: true,
                 child: Text(metconSessionDescription!.metconSession.comments!),
               ),
             EditTile(

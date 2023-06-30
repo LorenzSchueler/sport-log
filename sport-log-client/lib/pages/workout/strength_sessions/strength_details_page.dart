@@ -118,6 +118,7 @@ class StrengthSessionDetailsPageState
                 child: EditTile(
                   leading: null,
                   caption: 'Comments',
+                  unboundedHeight: true,
                   child: Text(
                     _strengthSessionDescription.session.comments!,
                   ),
