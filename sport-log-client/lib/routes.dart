@@ -298,7 +298,9 @@ abstract class Routes {
         }),
     Routes.trackingSettings: (context) => _checkUserIdAndroidIos(
           context,
-          () => const CardioTrackingSettingsPage(),
+          () => Movement.defaultMovement == null
+              ? const MovementEditPage(movementDescription: null)
+              : const CardioTrackingSettingsPage(),
         ),
     Routes.tracking: (context) => _checkUserIdAndroidIos(context, () {
           final trackingSettings =
