@@ -16,8 +16,8 @@ import 'package:sport_log/widgets/picker/datetime_picker.dart';
 import 'package:sport_log/widgets/picker/picker.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
 
-class StrengthSessionEditPage extends StatefulWidget {
-  const StrengthSessionEditPage({
+class StrengthEditPage extends StatefulWidget {
+  const StrengthEditPage({
     required this.strengthSessionDescription,
     required this.isNew,
     super.key,
@@ -27,11 +27,10 @@ class StrengthSessionEditPage extends StatefulWidget {
   final bool isNew;
 
   @override
-  State<StrengthSessionEditPage> createState() =>
-      _StrengthSessionEditPageState();
+  State<StrengthEditPage> createState() => _StrengthEditPageState();
 }
 
-class _StrengthSessionEditPageState extends State<StrengthSessionEditPage> {
+class _StrengthEditPageState extends State<StrengthEditPage> {
   final _dataProvider = StrengthSessionDescriptionDataProvider();
 
   late final StrengthSessionDescription _strengthSessionDescription =

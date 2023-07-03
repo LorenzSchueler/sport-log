@@ -18,8 +18,8 @@ import 'package:sport_log/widgets/pop_scopes.dart';
 import 'package:sport_log/widgets/provider_consumer.dart';
 import 'package:sport_log/widgets/sync_refresh_indicator.dart';
 
-class MetconSessionsPage extends StatelessWidget {
-  MetconSessionsPage({super.key});
+class MetconSessionOverviewPage extends StatelessWidget {
+  MetconSessionOverviewPage({super.key});
 
   final _searchBar = FocusNode();
 

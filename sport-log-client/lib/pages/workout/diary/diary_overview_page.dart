@@ -17,8 +17,8 @@ import 'package:sport_log/widgets/provider_consumer.dart';
 import 'package:sport_log/widgets/sync_refresh_indicator.dart';
 import 'package:sport_log/widgets/value_unit_description.dart';
 
-class DiaryPage extends StatelessWidget {
-  DiaryPage({super.key});
+class DiaryOverviewPage extends StatelessWidget {
+  DiaryOverviewPage({super.key});
 
   final _searchBar = FocusNode();
 

@@ -24,8 +24,8 @@ import 'package:sport_log/widgets/provider_consumer.dart';
 import 'package:sport_log/widgets/sync_refresh_indicator.dart';
 import 'package:sport_log/widgets/value_unit_description.dart';
 
-class CardioSessionsPage extends StatelessWidget {
-  CardioSessionsPage({super.key});
+class CardioOverviewPage extends StatelessWidget {
+  CardioOverviewPage({super.key});
 
   final _searchBar = FocusNode();
 
