@@ -22,6 +22,9 @@ import 'package:sport_log/pages/workout/cardio/cardio_edit_page.dart';
 import 'package:sport_log/pages/workout/cardio/cardio_overview_page.dart';
 import 'package:sport_log/pages/workout/cardio/route_edit_page.dart';
 import 'package:sport_log/pages/workout/cardio/route_overview_page.dart';
+import 'package:sport_log/pages/workout/cardio/route_upload_page.dart';
+import 'package:sport_log/pages/workout/cardio/tracking_page.dart';
+import 'package:sport_log/pages/workout/cardio/tracking_settings_page.dart';
 import 'package:sport_log/pages/workout/diary/diary_edit_page.dart';
 import 'package:sport_log/pages/workout/diary/diary_overview_page.dart';
 import 'package:sport_log/pages/workout/metcon_sessions/metcon_edit_page.dart';
@@ -41,18 +44,21 @@ const username = "uq";
 const password = "123456aBC";
 const mapPumpDuration = Duration(seconds: 5);
 
-Finder input(String name) => find.ancestor(
-      of: find.text(name),
+Finder input(String text) => find.ancestor(
+      of: find.text(text),
       matching: find.byType(TextFormField),
     );
 final serverUrlInput = input("Server URL");
 final usernameInput = input("Username");
 final passwordInput = input("Password");
 
-final loginButton = find.ancestor(
-  of: find.text("Login"),
-  matching: find.byType(ElevatedButton),
-);
+Finder button(String text) => find.ancestor(
+      of: find.text(text),
+      matching: find.byType(ElevatedButton),
+    );
+final loginButton = button("Login");
+final okButton = button("OK");
+final cancelButton = button("Cancel");
 
 final aboutButton = find.ancestor(
   of: find.text("About", skipOffstage: false),
@@ -65,7 +71,9 @@ Finder fab(IconData icon) => find.ancestor(
     );
 final addFab = fab(AppIcons.add);
 final editFab = fab(AppIcons.notes);
+final stopwatchFab = fab(AppIcons.stopwatch);
 final routeFab = fab(AppIcons.route);
+final uploadFab = fab(AppIcons.upload);
 
 final backButton = find.byType(BackButton);
 
@@ -84,8 +92,8 @@ final discardChanges = find.ancestor(
   matching: find.byType(TextButton),
 );
 
-Finder navItem(String name) => find.ancestor(
-      of: find.text(name),
+Finder navItem(String text) => find.ancestor(
+      of: find.text(text),
       matching: find.byWidgetPredicate(
         (widget) => widget.runtimeType.toString() == "_BottomNavigationTile",
       ),
@@ -95,8 +103,8 @@ final metconNavItem = navItem("Metcon");
 final cardioNavItem = navItem("Cardio");
 final diaryNavItem = navItem("Diary");
 
-Finder drawerItem(String name) => find.ancestor(
-      of: find.text(name),
+Finder drawerItem(String text) => find.ancestor(
+      of: find.text(text),
       matching: find.byType(ListTile),
     );
 final movementDrawerItem = drawerItem("Movements");
@@ -116,19 +124,25 @@ void printAncestors(Finder finder) {
 }
 
 Future<void> backDiscardChanges(WidgetTester tester) async {
-  expect(backButton, findsOneWidget);
-  await tester.tap(backButton);
-  await tester.pumpAndSettle();
-  expect(discardChanges, findsOneWidget);
-  await tester.tap(discardChanges);
-  await tester.pumpAndSettle();
+  await tap(tester, backButton);
+  await tap(tester, discardChanges);
 }
 
 Future<void> openDrawer(WidgetTester tester) async {
-  expect(menuButton, findsOneWidget);
-  await tester.tap(menuButton);
-  await tester.pumpAndSettle();
+  await tap(tester, menuButton);
   expect(find.byType(MainDrawer), findsOneWidget);
+}
+
+Future<void> tap(WidgetTester tester, Finder finder) async {
+  expect(finder, findsOneWidget);
+  await tester.tap(finder);
+  await tester.pumpAndSettle();
+}
+
+Future<void> enterText(WidgetTester tester, Finder finder, String text) async {
+  expect(finder, findsOneWidget);
+  await tester.enterText(finder, text);
+  await tester.pumpAndSettle();
 }
 
 Future<void> screenshot(String filename) async {
@@ -167,56 +181,42 @@ void main() {
     await screenshot("landing");
 
     // go to login
-    expect(loginButton, findsOneWidget);
-    await tester.tap(loginButton);
-    await tester.pumpAndSettle();
+    await tap(tester, loginButton);
     expect(find.byType(LoginPage), findsOneWidget);
     await screenshot("login");
 
     // login and go to timeline
-    expect(serverUrlInput, findsOneWidget);
-    await tester.enterText(serverUrlInput, serverUrl);
-    expect(usernameInput, findsOneWidget);
-    await tester.enterText(usernameInput, username);
-    expect(passwordInput, findsOneWidget);
-    await tester.enterText(passwordInput, password);
-    expect(loginButton, findsOneWidget);
-    await tester.pumpAndSettle();
-    await tester.tap(loginButton);
-    await tester.pumpAndSettle();
+    await enterText(tester, serverUrlInput, serverUrl);
+    await enterText(tester, usernameInput, username);
+    await enterText(tester, passwordInput, password);
+    await tap(tester, loginButton);
     expect(find.byType(TimelinePage), findsOneWidget);
+    await tester.pumpAndSettle(mapPumpDuration); // wait for map to render
     await screenshot("timeline");
 
     // go to strength overview
     expect(strengthNavItem, findsOneWidget);
-    await tester.tap(strengthNavItem);
-    await tester.pumpAndSettle();
+    await tap(tester, strengthNavItem);
     expect(find.byType(StrengthOverviewPage), findsOneWidget);
     await screenshot("strength_session_overview");
 
     // go to strength details TODO
 
     // go to strength edit
-    expect(addFab, findsOneWidget);
-    await tester.tap(addFab);
-    await tester.pumpAndSettle();
+    await tap(tester, addFab);
     expect(find.byType(StrengthEditPage), findsOneWidget);
     await screenshot("strength_session_edit");
     await backDiscardChanges(tester);
 
     // go to metcon session overview
-    expect(metconNavItem, findsOneWidget);
-    await tester.tap(metconNavItem);
-    await tester.pumpAndSettle();
+    await tap(tester, metconNavItem);
     expect(find.byType(MetconSessionOverviewPage), findsOneWidget);
     await screenshot("metcon_session_overview");
 
     // go to metcon session details TODO
 
     // go to metcon session edit
-    expect(addFab, findsOneWidget);
-    await tester.tap(addFab);
-    await tester.pumpAndSettle();
+    await tap(tester, addFab);
     expect(find.byType(MetconSessionEditPage), findsOneWidget);
     await screenshot("metcon_session_edit");
     await backDiscardChanges(tester);
@@ -226,80 +226,83 @@ void main() {
       of: find.byIcon(AppIcons.notes),
       matching: find.byType(IconButton),
     );
-    expect(metconButton, findsOneWidget);
-    await tester.tap(metconButton);
-    await tester.pumpAndSettle();
+    await tap(tester, metconButton);
     expect(find.byType(MetconOverviewPage), findsOneWidget);
     await screenshot("metcon_overview");
 
     // go to metcon details TODO
 
     // go to metcon edit
-    expect(addFab, findsOneWidget);
-    await tester.tap(addFab);
-    await tester.pumpAndSettle();
+    await tap(tester, addFab);
     expect(find.byType(MetconEditPage), findsOneWidget);
     await screenshot("metcon_edit");
     await backDiscardChanges(tester);
 
     // go to cardio overview
-    expect(cardioNavItem, findsOneWidget);
-    await tester.tap(cardioNavItem);
-    await tester.pumpAndSettle(mapPumpDuration);
+    await tap(tester, cardioNavItem);
     expect(find.byType(CardioOverviewPage), findsOneWidget);
+    await tester.pumpAndSettle(mapPumpDuration); // wait for map to render
     await screenshot("cardio_session_overview");
 
     // go to cardio details TODO
 
     // go to cardio edit
-    expect(addFab, findsOneWidget);
-    await tester.tap(addFab);
-    await tester.pumpAndSettle();
-    expect(editFab, findsOneWidget);
-    await tester.tap(editFab);
-    await tester.pumpAndSettle();
+    await tap(tester, addFab);
+    await tap(tester, editFab);
     expect(find.byType(CardioEditPage), findsOneWidget);
+    await tester.pumpAndSettle(mapPumpDuration); // wait for map to render
     await screenshot("cardio_session_edit");
     await backDiscardChanges(tester);
 
     // go to cardio update elevation TODO
     // go to cardio cut TODO
-    // go to tracking settings TODO
-    // go to tracking TODO
+
+    // go to tracking settings
+    await tap(tester, addFab);
+    await tap(tester, stopwatchFab);
+    expect(find.byType(CardioTrackingSettingsPage), findsOneWidget);
+    await tester.pumpAndSettle(mapPumpDuration); // wait for map to render
+    await screenshot("tracking_settings");
+
+    // go to tracking
+    await tap(tester, okButton);
+    expect(find.byType(CardioTrackingPage), findsOneWidget);
+    await tester.pumpAndSettle(mapPumpDuration); // wait for map to render
+    await screenshot("tracking");
+    await tap(tester, cancelButton); // back to cardio overview
+    await tap(tester, backButton); // back to cardio overview
 
     // go to route overview
-    expect(routeButton, findsOneWidget);
-    await tester.tap(routeButton);
-    await tester.pumpAndSettle(mapPumpDuration);
+    await tap(tester, routeButton);
     expect(find.byType(RouteOverviewPage), findsOneWidget);
+    await tester.pumpAndSettle(mapPumpDuration); // wait for map to render
     await screenshot("route_overview");
 
     // go to route details TODO
 
     // go to route edit
-    expect(addFab, findsOneWidget);
-    await tester.tap(addFab);
-    await tester.pumpAndSettle();
-    expect(routeFab, findsOneWidget);
-    await tester.tap(routeFab);
-    await tester.pumpAndSettle(mapPumpDuration);
+    await tap(tester, addFab);
+    await tap(tester, routeFab);
     expect(find.byType(RouteEditPage), findsOneWidget);
+    await tester.pumpAndSettle(mapPumpDuration); // wait for map to render
     await screenshot("route_edit");
     await backDiscardChanges(tester);
 
     // go to route upload TODO
+    await tap(tester, addFab);
+    await tap(tester, uploadFab);
+    expect(find.byType(RouteUploadPage), findsOneWidget);
+    await tester.pumpAndSettle(mapPumpDuration); // wait for map to render
+    await screenshot("route_upload");
+    await backDiscardChanges(tester);
 
     // go to diary overview
-    expect(diaryNavItem, findsOneWidget);
-    await tester.tap(diaryNavItem);
-    await tester.pumpAndSettle();
+    await tap(tester, diaryNavItem);
     expect(find.byType(DiaryOverviewPage), findsOneWidget);
     await screenshot("diary_overview");
 
     // go to diary session edit
-    expect(addFab, findsOneWidget);
-    await tester.tap(addFab);
-    await tester.pumpAndSettle();
+    await tap(tester, addFab);
     await screenshot("diary_edit");
     expect(find.byType(DiaryEditPage), findsOneWidget);
     await backDiscardChanges(tester);
@@ -310,57 +313,45 @@ void main() {
     await screenshot("drawer");
 
     // go to movement overview
-    expect(movementDrawerItem, findsOneWidget);
-    await tester.tap(movementDrawerItem);
-    await tester.pumpAndSettle();
+    await tap(tester, movementDrawerItem);
     expect(find.byType(MovementOverviewPage), findsOneWidget);
     await screenshot("movement_overview");
 
     // go to movement edit
-    expect(addFab, findsOneWidget);
-    await tester.tap(addFab);
-    await tester.pumpAndSettle();
+    await tap(tester, addFab);
     await screenshot("movement_edit");
     expect(find.byType(MovementEditPage), findsOneWidget);
     await backDiscardChanges(tester);
 
     // go to timer
     await openDrawer(tester);
-    expect(timerDrawerItem, findsOneWidget);
-    await tester.tap(timerDrawerItem);
-    await tester.pumpAndSettle();
+    await tap(tester, timerDrawerItem);
     expect(find.byType(TimerPage), findsOneWidget);
     await screenshot("timer");
 
     // go to map
     await openDrawer(tester);
-    expect(mapDrawerItem, findsOneWidget);
-    await tester.tap(mapDrawerItem);
-    await tester.pumpAndSettle(mapPumpDuration);
+    await tap(tester, mapDrawerItem);
     expect(find.byType(MapPage), findsOneWidget);
+    await tester.pumpAndSettle(mapPumpDuration); // wait for map to render
     await screenshot("map");
 
     // go to offline maps
     await openDrawer(tester);
-    expect(offlineMapsDrawerItem, findsOneWidget);
-    await tester.tap(offlineMapsDrawerItem);
-    await tester.pumpAndSettle(mapPumpDuration);
+    await tap(tester, offlineMapsDrawerItem);
     expect(find.byType(OfflineMapsPage), findsOneWidget);
+    await tester.pumpAndSettle(mapPumpDuration); // wait for map to render
     await screenshot("offline_maps");
 
     // go to heart rate
     await openDrawer(tester);
-    expect(heartRateDrawerItem, findsOneWidget);
-    await tester.tap(heartRateDrawerItem);
-    await tester.pumpAndSettle();
+    await tap(tester, heartRateDrawerItem);
     expect(find.byType(HeartRatePage), findsOneWidget);
     await screenshot("heart_rate");
 
     // go to platform_overview
     await openDrawer(tester);
-    expect(serverActionsDrawerItem, findsOneWidget);
-    await tester.tap(serverActionsDrawerItem);
-    await tester.pumpAndSettle();
+    await tap(tester, serverActionsDrawerItem);
     expect(find.byType(PlatformOverviewPage), findsOneWidget);
     await screenshot("platform_overview");
 
@@ -370,9 +361,7 @@ void main() {
 
     // go to settings
     await openDrawer(tester);
-    expect(settingsDrawerItem, findsOneWidget);
-    await tester.tap(settingsDrawerItem);
-    await tester.pumpAndSettle();
+    await tap(tester, settingsDrawerItem);
     expect(find.byType(SettingsPage), findsOneWidget);
     await screenshot("settings");
 
@@ -380,8 +369,7 @@ void main() {
     expect(aboutButton, findsOneWidget);
     await tester.ensureVisible(aboutButton);
     await tester.pumpAndSettle();
-    await tester.tap(aboutButton);
-    await tester.pumpAndSettle();
+    await tap(tester, aboutButton);
     expect(find.byType(AboutPage), findsOneWidget);
     await screenshot("about");
   });
