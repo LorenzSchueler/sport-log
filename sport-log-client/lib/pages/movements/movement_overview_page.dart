@@ -11,8 +11,8 @@ import 'package:sport_log/widgets/pop_scopes.dart';
 import 'package:sport_log/widgets/provider_consumer.dart';
 import 'package:sport_log/widgets/sync_refresh_indicator.dart';
 
-class MovementsPage extends StatelessWidget {
-  MovementsPage({super.key});
+class MovementOverviewPage extends StatelessWidget {
+  MovementOverviewPage({super.key});
 
   final _searchBar = FocusNode();
 

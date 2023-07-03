@@ -158,7 +158,7 @@ abstract class Routes {
           );
         }),
     // movement
-    Routes.movementOverview: (_) => _checkUserId(MovementsPage.new),
+    Routes.movementOverview: (_) => _checkUserId(MovementOverviewPage.new),
     Routes.movementEdit: (context) => _checkUserId(() {
           final arg = ModalRoute.of(context)?.settings.arguments;
           if (arg is MovementDescription) {
