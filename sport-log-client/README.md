@@ -38,7 +38,7 @@
 
 ### Run on Android Emulator
 
-* server address `10.0.2.2:8000` will be used which will be mapped to localhost
+* server address `10.0.2.2` is mapped to localhost
 * to copy the database to your computer, use
 ```bash
 adb root  # restart adb daemon as root
