@@ -22,12 +22,13 @@ class DurationChartLine {
   factory DurationChartLine._fromNonNormalizedDurationChartLine(
     List<DurationChartValue> chartValues,
     Color lineColor,
+    bool absolute,
   ) {
     if (chartValues.isEmpty) {
       return DurationChartLine._([], lineColor);
     }
     final maxValue = chartValues.map((e) => e.value).max;
-    final minValue = chartValues.map((e) => e.value).min;
+    final minValue = absolute ? 0 : chartValues.map((e) => e.value).min;
     final diff = maxValue - minValue;
     for (final chartValue in chartValues) {
       if (diff > 0) {
@@ -44,42 +45,59 @@ class DurationChartLine {
   factory DurationChartLine.fromDurationList({
     required List<Duration>? durations,
     required Color lineColor,
+    required bool absolute,
   }) {
     return DurationChartLine.fromValues(
       values: durations,
       getDuration: (d) => d,
       getGroupValue: (durations) => durations.length.toDouble(),
+      getLastGroupValue: (durations, interval) =>
+          durations.length.toDouble() *
+          (interval.inMilliseconds /
+              (durations.last.inMilliseconds % interval.inMilliseconds)),
       lineColor: lineColor,
+      absolute: absolute,
     );
   }
 
+  // ignore: long-parameter-list
   static DurationChartLine fromValues<T>({
     required List<T>? values,
     required Duration Function(T) getDuration,
     required double Function(List<T>) getGroupValue,
+    double Function(List<T>, Duration interval)? getLastGroupValue,
     required Color lineColor,
+    required bool absolute,
   }) {
     if (values == null || values.isEmpty) {
       return DurationChartLine._([], lineColor);
     }
     final totalDuration = getDuration(values.last);
     final interval = intervalMinutes(totalDuration);
-    final chartValues = values
+    final groupedValues = values
         .groupListsBy(
           (el) => _groupFunction(getDuration(el), interval.inMinutes),
         )
-        .entries
+        .entries;
+    final chartValues = groupedValues
         .map(
           (entry) => DurationChartValue(
             duration: entry.key,
             value: getGroupValue(entry.value),
           ),
         )
-        .toList()
-      ..sort((v1, v2) => v1.duration.compareTo(v2.duration));
+        .toList();
+    if (getLastGroupValue != null) {
+      chartValues.last = DurationChartValue(
+        duration: groupedValues.last.key,
+        value: getLastGroupValue(groupedValues.last.value, interval),
+      );
+    }
+    chartValues.sort((v1, v2) => v1.duration.compareTo(v2.duration));
     return DurationChartLine._fromNonNormalizedDurationChartLine(
       chartValues,
       lineColor,
+      absolute,
     );
   }
 
@@ -96,7 +114,6 @@ class DurationChartLine {
 class DurationChart extends StatefulWidget {
   DurationChart({
     required this.chartLines,
-    required this.yFromZero,
     this.touchCallback,
     this.height = 200,
     this.labelColor = Colors.white,
@@ -125,7 +142,6 @@ class DurationChart extends StatefulWidget {
             .toDouble();
 
   final List<DurationChartLine> chartLines;
-  final bool yFromZero;
   final void Function(Duration? x)? touchCallback;
   final double height;
   final Color labelColor;

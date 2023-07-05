@@ -313,7 +313,6 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
                                 _cadenceLine(),
                                 _heartRateLine()
                               ],
-                              yFromZero: true,
                               touchCallback: _rateLimiter.execute,
                             ),
                           ),
@@ -373,6 +372,7 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
           return km / hour;
         },
         lineColor: _speedColor,
+        absolute: true,
       );
 
   DurationChartLine _elevationLine() => DurationChartLine.fromValues<Position>(
@@ -380,16 +380,19 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
         getDuration: (position) => position.time,
         getGroupValue: (positions) => positions.map((p) => p.elevation).average,
         lineColor: _elevationColor,
+        absolute: false,
       );
 
   DurationChartLine _heartRateLine() => DurationChartLine.fromDurationList(
         durations: _cardioSessionDescription.cardioSession.heartRate,
         lineColor: _heartRateColor,
+        absolute: true,
       );
 
   DurationChartLine _cadenceLine() => DurationChartLine.fromDurationList(
         durations: _cardioSessionDescription.cardioSession.cadence,
         lineColor: _cadenceColor,
+        absolute: true,
       );
 
   Future<void> _exportFile() async {
