@@ -33,6 +33,9 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
 
+  late final TextEditingController _serverUrlInputController =
+      TextEditingController(text: _serverUrl);
+
   String _serverUrl = Settings.instance.serverUrl;
 
   final _user = User(
@@ -81,9 +84,7 @@ class _LoginPageState extends State<LoginPage> {
 
   Widget _serverUrlInput() {
     return TextFormField(
-      // use new initialValue if url changed
-      key: ValueKey(_serverUrl),
-      initialValue: _serverUrl,
+      controller: _serverUrlInputController,
       onChanged: (serverUrl) {
         final validated = Validator.validateUrl(serverUrl);
         if (validated == null) {
@@ -97,6 +98,7 @@ class _LoginPageState extends State<LoginPage> {
           onPressed: () {
             setState(() {
               _serverUrl = context.read<Settings>().getDefaultServerUrl();
+              _serverUrlInputController.text = _serverUrl;
             });
           },
           icon: const Icon(AppIcons.restore),
