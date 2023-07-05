@@ -239,9 +239,8 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
               ),
             // TabBarView needs bounded height so different heights for tabs does not work
             if (fullscreen.isOff && _tabController.index == 0)
-              Container(
+              Padding(
                 padding: Defaults.edgeInsets.normal,
-                color: Theme.of(context).colorScheme.background,
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [

@@ -34,19 +34,11 @@ class _RouteDetailsPageState extends State<RouteDetailsPage>
   late Route _route = widget.route.clone();
 
   MapController? _mapController;
-  late final TabController _tabController =
-      TabController(length: 2, vsync: this)..addListener(() => setState(() {}));
 
   final NullablePointer<PolylineAnnotation> _routeLine =
       NullablePointer.nullPointer();
   final NullablePointer<CircleAnnotation> _touchLocationMarker =
       NullablePointer.nullPointer();
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
 
   Future<void> _onMapCreated(MapController mapController) async {
     _mapController = mapController;
@@ -147,32 +139,20 @@ class _RouteDetailsPageState extends State<RouteDetailsPage>
                     )
                   : const NoTrackPlaceholder(),
             ),
-            if (fullscreen.isOff)
-              TabBar(
-                controller: _tabController,
-                indicatorColor: Theme.of(context).colorScheme.primary,
-                tabs: const [
-                  Tab(text: "Stats", icon: Icon(AppIcons.numberedList)),
-                  Tab(text: "Chart", icon: Icon(AppIcons.chart)),
-                ],
-              ),
-            if (fullscreen.isOff && _tabController.index == 0)
-              Container(
+            if (fullscreen.isOff) ...[
+              Padding(
                 padding: Defaults.edgeInsets.normal,
-                color: Theme.of(context).colorScheme.background,
                 child: RouteValueUnitDescriptionTable(route: _route),
               ),
-            if (fullscreen.isOff && _tabController.index == 1)
-              _route.track != null
-                  ? Container(
-                      color: const Color.fromARGB(150, 0, 0, 0),
-                      child: DistanceChart(
-                        chartLines: [_elevationLine()],
-                        yFromZero: false,
-                        touchCallback: _touchCallback,
-                      ),
-                    )
-                  : const Center(child: NoTrackPlaceholder()),
+              if (_route.track != null) ...[
+                const Divider(),
+                DistanceChart(
+                  chartLines: [_elevationLine()],
+                  yFromZero: false,
+                  touchCallback: _touchCallback,
+                )
+              ]
+            ]
           ],
         ),
       ),
