@@ -312,7 +312,7 @@ class _RouteEditPageState extends State<RouteEditPage> {
                         },
                       ),
                       ConstrainedBox(
-                        constraints: const BoxConstraints(maxHeight: 250),
+                        constraints: const BoxConstraints(maxHeight: 200),
                         child: ReorderableListView.builder(
                           itemBuilder: (context, index) => ListTile(
                             key: ValueKey(index),
@@ -326,6 +326,8 @@ class _RouteEditPageState extends State<RouteEditPage> {
                             ),
                             trailing: const Icon(AppIcons.dragHandle),
                             dense: true,
+                            visualDensity: VisualDensity.compact,
+                            contentPadding: const EdgeInsets.only(right: 10),
                           ),
                           itemCount: _route.markedPositions!.length,
                           onReorder: _switchPoints,
@@ -333,9 +335,8 @@ class _RouteEditPageState extends State<RouteEditPage> {
                         ),
                       ),
                       const Divider(),
-                      Defaults.sizedBox.vertical.normal,
                       RouteValueUnitDescriptionTable(route: _route),
-                      Defaults.sizedBox.vertical.normal,
+                      const Divider(),
                       Form(
                         key: _formKey,
                         child: TextFormField(
