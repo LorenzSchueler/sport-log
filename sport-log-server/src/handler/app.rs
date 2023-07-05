@@ -18,7 +18,7 @@ use crate::{
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "lowercase")]
 enum AppFormat {
-    APK,
+    Apk,
 }
 
 #[derive(Debug, Deserialize)]
@@ -73,9 +73,9 @@ pub async fn get_app_info(
         .await
         .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
     let mut refs = ref_log
-        .split("\n")
+        .split('\n')
         .filter(|current_ref| current_ref.len() == 7);
-    let found_ref = refs.find(|current_ref| current_ref == &git_ref).is_some();
+    let found_ref = refs.any(|current_ref| current_ref == &git_ref);
 
     if found_ref {
         if refs.next().is_none() {
@@ -125,7 +125,7 @@ pub async fn download_app(
         _ => "production",
     };
     let filename = match format {
-        AppFormat::APK => format!("app-{flavor}-{build}.apk"),
+        AppFormat::Apk => format!("app-{flavor}-{build}.apk"),
     };
     let path = app_dir.join(&filename);
     let file = File::open(path)

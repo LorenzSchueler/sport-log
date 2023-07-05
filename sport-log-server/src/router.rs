@@ -32,7 +32,7 @@ async fn get_version() -> Json<Version> {
 }
 
 pub fn get_router(state: AppState) -> Router {
-    let admin_route = Router::new()
+    let admin_router = Router::new()
         .route(ADM_GARBAGE_COLLECTION, delete(adm_do_garbage_collection))
         .route(
             ADM_PLATFORM,
@@ -200,7 +200,7 @@ pub fn get_router(state: AppState) -> Router {
         .nest(
             &format!("/v{MAX_VERSION}"),
             Router::new()
-                .merge(admin_route)
+                .merge(admin_router)
                 .merge(ap_router)
                 .merge(user_router),
         )

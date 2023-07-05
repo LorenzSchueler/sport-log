@@ -53,12 +53,12 @@ where
 
         let mut db = db_pool.get()?;
 
-        let admin_password = &config.admin_password;
-
         if let Ok(id) = UserDb::auth(username, password, &mut db) {
             return Ok(Self(id));
         }
+
         let user_id = parse_id_header(parts, UserId)?;
+        let admin_password = &config.admin_password;
         if AdminDb::auth(username, password, admin_password).is_ok() {
             return Ok(Self(user_id));
         }
@@ -110,11 +110,10 @@ where
 
         let mut db = db_pool.get()?;
 
-        let admin_password = &config.admin_password;
-
         if let Ok(id) = UserDb::auth(username, password, &mut db) {
             return Ok(Self(id));
         }
+
         let user_id = parse_id_header(parts, UserId)?;
         if let Ok(auth) = ActionProviderDb::auth_as_user(username, password, user_id, &mut db) {
             match auth {
@@ -122,6 +121,8 @@ where
                 AuthApForUser::Forbidden => return Err(StatusCode::FORBIDDEN.into()),
             }
         }
+
+        let admin_password = &config.admin_password;
         if AdminDb::auth(username, password, admin_password).is_ok() {
             return Ok(Self(user_id));
         }
@@ -172,12 +173,12 @@ where
 
         let mut db = db_pool.get()?;
 
-        let admin_password = &config.admin_password;
-
         if let Ok(id) = ActionProviderDb::auth(username, password, &mut db) {
             return Ok(Self(id));
         }
+
         let ap_id = parse_id_header(parts, ActionProviderId)?;
+        let admin_password = &config.admin_password;
         if AdminDb::auth(username, password, admin_password).is_ok() {
             return Ok(Self(ap_id));
         }
