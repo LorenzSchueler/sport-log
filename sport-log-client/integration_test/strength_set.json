@@ -1,0 +1,210 @@
+[
+    {
+        "id": "-7869130253005014794",
+        "strength_session_id": "5066976457247511571",
+        "set_number": 3,
+        "count": 3,
+        "weight": 90,
+        "deleted": false
+    },
+    {
+        "id": "-7662147613745620071",
+        "strength_session_id": "-2840653213028353960",
+        "set_number": 1,
+        "count": 10,
+        "weight": 80,
+        "deleted": false
+    },
+    {
+        "id": "-5719446028444589560",
+        "strength_session_id": "-6697475083954892948",
+        "set_number": 2,
+        "count": 2,
+        "weight": 180,
+        "deleted": false
+    },
+    {
+        "id": "-4248357511461166437",
+        "strength_session_id": "-6697475083954892948",
+        "set_number": 3,
+        "count": 2,
+        "weight": 180,
+        "deleted": false
+    },
+    {
+        "id": "-4240110129575879914",
+        "strength_session_id": "-2840653213028353960",
+        "set_number": 5,
+        "count": 10,
+        "weight": 80,
+        "deleted": false
+    },
+    {
+        "id": "-3670269617489522172",
+        "strength_session_id": "-6697475083954892948",
+        "set_number": 5,
+        "count": 2,
+        "weight": 180,
+        "deleted": false
+    },
+    {
+        "id": "-3324799974919245458",
+        "strength_session_id": "-166695097748467778",
+        "set_number": 1,
+        "count": 5,
+        "weight": 125,
+        "deleted": false
+    },
+    {
+        "id": "-3046724195179661783",
+        "strength_session_id": "5066976457247511571",
+        "set_number": 2,
+        "count": 3,
+        "weight": 85,
+        "deleted": false
+    },
+    {
+        "id": "-1634219373362278260",
+        "strength_session_id": "5066976457247511571",
+        "set_number": 7,
+        "count": 1,
+        "weight": 105,
+        "deleted": false
+    },
+    {
+        "id": "-1565754934322996260",
+        "strength_session_id": "5066976457247511571",
+        "set_number": 0,
+        "count": 5,
+        "weight": 80,
+        "deleted": false
+    },
+    {
+        "id": "-773218072577979626",
+        "strength_session_id": "-2840653213028353960",
+        "set_number": 4,
+        "count": 10,
+        "weight": 80,
+        "deleted": false
+    },
+    {
+        "id": "-476853327563623743",
+        "strength_session_id": "-6697475083954892948",
+        "set_number": 0,
+        "count": 2,
+        "weight": 180,
+        "deleted": false
+    },
+    {
+        "id": "-352084593314889779",
+        "strength_session_id": "5066976457247511571",
+        "set_number": 4,
+        "count": 2,
+        "weight": 95,
+        "deleted": false
+    },
+    {
+        "id": "476992654691936489",
+        "strength_session_id": "-2840653213028353960",
+        "set_number": 0,
+        "count": 10,
+        "weight": 80,
+        "deleted": false
+    },
+    {
+        "id": "741424625328583855",
+        "strength_session_id": "-166695097748467778",
+        "set_number": 3,
+        "count": 4,
+        "weight": 125,
+        "deleted": false
+    },
+    {
+        "id": "2230529535249343685",
+        "strength_session_id": "5066976457247511571",
+        "set_number": 5,
+        "count": 1,
+        "weight": 100,
+        "deleted": false
+    },
+    {
+        "id": "3554096988528157617",
+        "strength_session_id": "-2840653213028353960",
+        "set_number": 2,
+        "count": 10,
+        "weight": 80,
+        "deleted": false
+    },
+    {
+        "id": "4004597732310487570",
+        "strength_session_id": "-166695097748467778",
+        "set_number": 2,
+        "count": 5,
+        "weight": 125,
+        "deleted": false
+    },
+    {
+        "id": "4626463213566596934",
+        "strength_session_id": "-6697475083954892948",
+        "set_number": 6,
+        "count": 2,
+        "weight": 180,
+        "deleted": false
+    },
+    {
+        "id": "5122007311431786366",
+        "strength_session_id": "-166695097748467778",
+        "set_number": 0,
+        "count": 5,
+        "weight": 125,
+        "deleted": false
+    },
+    {
+        "id": "5631447907676623719",
+        "strength_session_id": "5066976457247511571",
+        "set_number": 1,
+        "count": 5,
+        "weight": 80,
+        "deleted": false
+    },
+    {
+        "id": "7181367538157886730",
+        "strength_session_id": "-6697475083954892948",
+        "set_number": 4,
+        "count": 2,
+        "weight": 180,
+        "deleted": false
+    },
+    {
+        "id": "8019042588641687845",
+        "strength_session_id": "-2840653213028353960",
+        "set_number": 3,
+        "count": 10,
+        "weight": 80,
+        "deleted": false
+    },
+    {
+        "id": "8549861699204504574",
+        "strength_session_id": "-166695097748467778",
+        "set_number": 4,
+        "count": 4,
+        "weight": 120,
+        "deleted": false
+    },
+    {
+        "id": "8692938331162764966",
+        "strength_session_id": "-6697475083954892948",
+        "set_number": 1,
+        "count": 2,
+        "weight": 180,
+        "deleted": false
+    },
+    {
+        "id": "8829935324417741940",
+        "strength_session_id": "5066976457247511571",
+        "set_number": 6,
+        "count": 1,
+        "weight": 102.5,
+        "deleted": false
+    }
+]
