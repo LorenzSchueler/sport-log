@@ -9,6 +9,18 @@
 ![](https://img.shields.io/github/license/LorenzSchueler/sport-log)
 ![](https://img.shields.io/github/contributors/LorenzSchueler/sport-log)
 
+<table>
+  <tr>
+    <td><img src="sport-log-client/screenshots/timeline.png"></td>
+    <td><img src="sport-log-client/screenshots/strength_details.png"></td>
+    <td><img src="sport-log-client/screenshots/tracking.png"></td>
+    <td><img src="sport-log-client/screenshots/route_details.png"></td>
+    <td><img src="sport-log-client/screenshots/action_provider_overview.png"></td>
+  </tr>
+</table>
+
+[All Screenshots](sport-log-client/SCREENSHOTS.md)
+
 Sport Log is a sports tracking app written in Flutter together with a server backend written in Rust.
 Additionally, there are action providers which are intended to do scheduled repetitive actions like map matching, fetching and inserting data from other sources, exporting data or providing automated reservations for other platforms.
 The client and action providers communicate with the server via a REST API.
