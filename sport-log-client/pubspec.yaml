@@ -80,10 +80,6 @@ dependencies:
   yaml: ^3.1.0
 
 dependency_overrides:
-  flutter_test:
-    sdk: flutter
-  integration_test:
-    sdk: flutter
   location_android: 
     git:
       url: https://github.com/Lyokone/flutterlocation
@@ -104,6 +100,8 @@ dev_dependencies:
     sdk: flutter
   icons_launcher: ^2.0.1 
     # dart run icons_launcher:create
+  integration_test:
+    sdk: flutter
   json_serializable: ^6.3.0 # json
 
 icons_launcher:

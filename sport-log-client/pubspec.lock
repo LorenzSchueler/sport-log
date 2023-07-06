@@ -536,7 +536,7 @@ packages:
     source: hosted
     version: "4.0.17"
   integration_test:
-    dependency: "direct overridden"
+    dependency: "direct dev"
     description: flutter
     source: sdk
     version: "0.0.0"
