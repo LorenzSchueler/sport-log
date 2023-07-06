@@ -31,7 +31,7 @@ class UserApi {
         ..headers.addAll(ApiHeaders.basicAuthContentTypeJson))
       .toApiResult();
 
-  Future<ApiResult<void>> deleteSingle() => (Request("delete", _uri)
-        ..headers.addAll(ApiHeaders.basicAuthContentTypeJson))
-      .toApiResult();
+  Future<ApiResult<void>> deleteSingle() =>
+      (Request("delete", _uri)..headers.addAll(ApiHeaders.basicAuth))
+          .toApiResult();
 }

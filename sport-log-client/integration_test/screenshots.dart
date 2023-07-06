@@ -7,6 +7,9 @@ import 'package:integration_test/integration_test.dart';
 import 'package:sport_log/config.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/main.dart';
+import 'package:sport_log/pages/action/action_event_edit_page.dart';
+import 'package:sport_log/pages/action/action_provider_overview_page.dart';
+import 'package:sport_log/pages/action/action_rule_edit_page.dart';
 import 'package:sport_log/pages/action/platform_overview_page.dart';
 import 'package:sport_log/pages/heart_rate/heart_rate_page.dart';
 import 'package:sport_log/pages/login/landing_page.dart';
@@ -18,8 +21,12 @@ import 'package:sport_log/pages/offline_maps/offline_maps_overview.dart';
 import 'package:sport_log/pages/settings/about_page.dart';
 import 'package:sport_log/pages/settings/settings_page.dart';
 import 'package:sport_log/pages/timer/timer_page.dart';
+import 'package:sport_log/pages/workout/cardio/cardio_cut_page.dart';
+import 'package:sport_log/pages/workout/cardio/cardio_details_page.dart';
 import 'package:sport_log/pages/workout/cardio/cardio_edit_page.dart';
 import 'package:sport_log/pages/workout/cardio/cardio_overview_page.dart';
+import 'package:sport_log/pages/workout/cardio/cardio_update_elevation_page.dart';
+import 'package:sport_log/pages/workout/cardio/route_details_page.dart';
 import 'package:sport_log/pages/workout/cardio/route_edit_page.dart';
 import 'package:sport_log/pages/workout/cardio/route_overview_page.dart';
 import 'package:sport_log/pages/workout/cardio/route_upload_page.dart';
@@ -27,10 +34,13 @@ import 'package:sport_log/pages/workout/cardio/tracking_page.dart';
 import 'package:sport_log/pages/workout/cardio/tracking_settings_page.dart';
 import 'package:sport_log/pages/workout/diary/diary_edit_page.dart';
 import 'package:sport_log/pages/workout/diary/diary_overview_page.dart';
+import 'package:sport_log/pages/workout/metcon_sessions/metcon_details_page.dart';
 import 'package:sport_log/pages/workout/metcon_sessions/metcon_edit_page.dart';
 import 'package:sport_log/pages/workout/metcon_sessions/metcon_overview_page.dart';
+import 'package:sport_log/pages/workout/metcon_sessions/metcon_session_details_page.dart';
 import 'package:sport_log/pages/workout/metcon_sessions/metcon_session_edit_page.dart';
 import 'package:sport_log/pages/workout/metcon_sessions/metcon_session_overview_page.dart';
+import 'package:sport_log/pages/workout/strength_sessions/strength_details_page.dart';
 import 'package:sport_log/pages/workout/strength_sessions/strength_edit_page.dart';
 import 'package:sport_log/pages/workout/strength_sessions/strength_overview_page.dart';
 import 'package:sport_log/pages/workout/timeline/timeline_page.dart';
@@ -40,9 +50,9 @@ import 'package:sport_log/widgets/main_drawer.dart';
 final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
 const serverUrl = "http://10.0.2.2:8001";
-const username = "uq";
-const password = "123456aBC";
-const mapPumpDuration = Duration(seconds: 5);
+const username = "ScreenshotUser";
+const password = "ScreenshotPassword0";
+const mapPumpDuration = Duration(seconds: 10);
 
 Finder input(String text) => find.ancestor(
       of: find.text(text),
@@ -70,22 +80,21 @@ Finder fab(IconData icon) => find.ancestor(
       matching: find.byType(FloatingActionButton),
     );
 final addFab = fab(AppIcons.add);
-final editFab = fab(AppIcons.notes);
 final stopwatchFab = fab(AppIcons.stopwatch);
 final routeFab = fab(AppIcons.route);
 final uploadFab = fab(AppIcons.upload);
 
 final backButton = find.byType(BackButton);
 
-final menuButton = find.ancestor(
-  of: find.byIcon(Icons.menu),
-  matching: find.byType(IconButton),
-);
-
-final routeButton = find.ancestor(
-  of: find.byIcon(AppIcons.route),
-  matching: find.byType(IconButton),
-);
+Finder iconButton(IconData icon) => find.ancestor(
+      of: find.byIcon(icon),
+      matching: find.byType(IconButton),
+    );
+final menuButton = iconButton(Icons.menu);
+final routeButton = iconButton(AppIcons.route);
+final editButton = iconButton(AppIcons.edit);
+final cutButton = iconButton(AppIcons.cut);
+final elevationButton = iconButton(AppIcons.trendingUp);
 
 final discardChanges = find.ancestor(
   of: find.text("Discard Changes"),
@@ -176,7 +185,7 @@ void main() {
     }
 
     // landing
-    await tester.pumpAndSettle(const Duration(seconds: 5));
+    await tester.pumpAndSettle(const Duration(seconds: 10));
     expect(find.byType(LandingPage), findsOneWidget);
     await screenshot("landing");
 
@@ -198,28 +207,39 @@ void main() {
     expect(strengthNavItem, findsOneWidget);
     await tap(tester, strengthNavItem);
     expect(find.byType(StrengthOverviewPage), findsOneWidget);
-    await screenshot("strength_session_overview");
+    await screenshot("strength_overview");
 
-    // go to strength details TODO
+    // go to strength details
+    await tap(tester, find.byType(StrengthSessionCard).first);
+    expect(find.byType(StrengthSessionDetailsPage), findsOneWidget);
+    await screenshot("strength_details");
 
     // go to strength edit
-    await tap(tester, addFab);
+    await tap(tester, editButton);
     expect(find.byType(StrengthEditPage), findsOneWidget);
-    await screenshot("strength_session_edit");
-    await backDiscardChanges(tester);
+    await screenshot("strength_edit");
+    await backDiscardChanges(tester); // back to details
+    await tap(tester, backButton); // back to overview
 
     // go to metcon session overview
     await tap(tester, metconNavItem);
     expect(find.byType(MetconSessionOverviewPage), findsOneWidget);
     await screenshot("metcon_session_overview");
 
-    // go to metcon session details TODO
+    // go to metcon session details
+    await tap(tester, find.byType(MetconSessionCard).first);
+    expect(find.byType(MetconSessionDetailsPage), findsOneWidget);
+    await tester.pumpAndSettle(
+      const Duration(seconds: 1),
+    ); // wait for other sessions to load
+    await screenshot("metcon_session_details");
 
     // go to metcon session edit
-    await tap(tester, addFab);
+    await tap(tester, editButton);
     expect(find.byType(MetconSessionEditPage), findsOneWidget);
     await screenshot("metcon_session_edit");
-    await backDiscardChanges(tester);
+    await backDiscardChanges(tester); // back to details
+    await tap(tester, backButton); // back to overview
 
     // go to metcon overview
     final metconButton = find.ancestor(
@@ -228,9 +248,14 @@ void main() {
     );
     await tap(tester, metconButton);
     expect(find.byType(MetconOverviewPage), findsOneWidget);
+    await tester
+        .pumpAndSettle(const Duration(seconds: 1)); // wait for data to load
     await screenshot("metcon_overview");
 
-    // go to metcon details TODO
+    await tap(tester, find.byType(MetconCard).first);
+    expect(find.byType(MetconDetailsPage), findsOneWidget);
+    await screenshot("metcon_details");
+    await tap(tester, backButton);
 
     // go to metcon edit
     await tap(tester, addFab);
@@ -242,20 +267,36 @@ void main() {
     await tap(tester, cardioNavItem);
     expect(find.byType(CardioOverviewPage), findsOneWidget);
     await tester.pumpAndSettle(mapPumpDuration); // wait for map to render
-    await screenshot("cardio_session_overview");
+    await screenshot("cardio_overview");
 
-    // go to cardio details TODO
+    // go to cardio details
+    await tap(tester, find.textContaining(" at ").first);
+    // await tap(tester, find.byType(CardioSessionCard).first); // tap not registered
+    expect(find.byType(CardioDetailsPage), findsOneWidget);
+    await tester.pumpAndSettle(mapPumpDuration); // wait for map to render
+    await screenshot("cardio_details");
 
     // go to cardio edit
-    await tap(tester, addFab);
-    await tap(tester, editFab);
+    await tap(tester, editButton);
     expect(find.byType(CardioEditPage), findsOneWidget);
     await tester.pumpAndSettle(mapPumpDuration); // wait for map to render
-    await screenshot("cardio_session_edit");
-    await backDiscardChanges(tester);
+    await screenshot("cardio_edit");
 
-    // go to cardio update elevation TODO
-    // go to cardio cut TODO
+    // go to cardio cut
+    await tap(tester, cutButton);
+    expect(find.byType(CardioCutPage), findsOneWidget);
+    await tester.pumpAndSettle(mapPumpDuration); // wait for map to render
+    await screenshot("cardio_cut");
+    await backDiscardChanges(tester); // back to edit
+
+    // go to cardio update elevation
+    await tap(tester, elevationButton);
+    expect(find.byType(CardioUpdateElevationPage), findsOneWidget);
+    await tester.pumpAndSettle(mapPumpDuration); // wait for map to render
+    await screenshot("cardio_update_elevation");
+    await backDiscardChanges(tester); // back to edit
+    await backDiscardChanges(tester); // back to details
+    await tap(tester, backButton); // back to overview
 
     // go to tracking settings
     await tap(tester, addFab);
@@ -278,7 +319,13 @@ void main() {
     await tester.pumpAndSettle(mapPumpDuration); // wait for map to render
     await screenshot("route_overview");
 
-    // go to route details TODO
+    // go to route details
+    await tap(tester, find.textContaining("km", findRichText: true).first);
+    // await tap(tester, find.byType(RouteCard).first); // tap not registered
+    expect(find.byType(RouteDetailsPage), findsOneWidget);
+    await tester.pumpAndSettle(mapPumpDuration); // wait for map to render
+    await screenshot("route_details");
+    await tap(tester, backButton); // back to route overview
 
     // go to route edit
     await tap(tester, addFab);
@@ -288,7 +335,7 @@ void main() {
     await screenshot("route_edit");
     await backDiscardChanges(tester);
 
-    // go to route upload TODO
+    // go to route upload
     await tap(tester, addFab);
     await tap(tester, uploadFab);
     expect(find.byType(RouteUploadPage), findsOneWidget);
@@ -355,9 +402,25 @@ void main() {
     expect(find.byType(PlatformOverviewPage), findsOneWidget);
     await screenshot("platform_overview");
 
-    // go to action provider overview TODO
-    // go to action rule overview TODO
-    // go to action event overview TODO
+    // go to action provider overview
+    await tap(tester, find.text("wodify-login"));
+    expect(find.byType(ActionProviderOverviewPage), findsOneWidget);
+    await tester
+        .pumpAndSettle(const Duration(seconds: 1)); // wait for data to load
+    await screenshot("action_provider_overview");
+
+    // go to action rule overview
+    await tap(tester, find.byType(ActionRulesCard).first);
+    expect(find.byType(ActionRuleEditPage), findsOneWidget);
+    await screenshot("action_rule_edit");
+    await backDiscardChanges(tester); // back to ap overview
+
+    // go to action event overview
+    await tap(tester, find.byType(ActionEventsCard).first);
+    expect(find.byType(ActionEventEditPage), findsOneWidget);
+    await screenshot("action_event_edit");
+    await backDiscardChanges(tester); // back to ap overview
+    await tap(tester, backButton); // back to platform overview
 
     // go to settings
     await openDrawer(tester);
