@@ -12,7 +12,6 @@ import 'package:sport_log/helpers/gpx.dart';
 import 'package:sport_log/helpers/map_controller.dart';
 import 'package:sport_log/helpers/page_return.dart';
 import 'package:sport_log/helpers/pointer.dart';
-import 'package:sport_log/helpers/rate_limiter.dart';
 import 'package:sport_log/helpers/search.dart';
 import 'package:sport_log/models/cardio/cardio_session.dart';
 import 'package:sport_log/models/cardio/cardio_session_description.dart';
@@ -124,8 +123,8 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
     super.dispose();
   }
 
-  late final _rateLimiter =
-      RateLimiter(_touchCallback, const Duration(milliseconds: 200));
+  //late final _rateLimiter =
+  //RateLimiter(_touchCallback, const Duration(milliseconds: 200));
 
   static const _timeColor = Colors.white;
   static const _speedColor = Colors.blue;
@@ -357,7 +356,7 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
                                 _cadenceLine,
                                 _heartRateLine
                               ],
-                              touchCallback: _rateLimiter.execute,
+                              touchCallback: _touchCallback,
                             ),
                           ),
                         ],
@@ -419,11 +418,6 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
 
   // ignore: long-method
   Future<void> _touchCallback(Duration? touchDuration) async {
-    // needed because RateLimiter calls callback later
-    if (!mounted) {
-      return;
-    }
-
     if (touchDuration != null) {
       final session = _cardioSessionDescription.cardioSession;
       final track = session.track;
@@ -452,6 +446,9 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
         pos = null;
       }
 
+      if (!mounted) {
+        return;
+      }
       setState(() {
         _time = touchDuration;
         _speed = _speedLine.chartValues
