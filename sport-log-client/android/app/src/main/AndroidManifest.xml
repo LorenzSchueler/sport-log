@@ -36,7 +36,7 @@
             <data android:scheme="https" />
         </intent>
     </queries>
-    <application android:label="sport_log_client" android:name="${applicationName}"
+    <application android:label="Sport Log" android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity android:name=".MainActivity" android:exported="true"
             android:launchMode="singleTop" android:theme="@style/LaunchTheme"
