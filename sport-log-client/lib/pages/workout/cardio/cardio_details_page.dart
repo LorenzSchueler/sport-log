@@ -60,7 +60,7 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
   DurationChartLine _getSpeedLine() => DurationChartLine.fromValues<Position>(
         values: _cardioSessionDescription.cardioSession.track,
         getDuration: (position) => position.time,
-        getGroupValue: (positions) {
+        getGroupValue: (positions, _) {
           final km =
               (positions.last.distance - positions.first.distance) / 1000;
           final hour =
@@ -77,7 +77,8 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
       DurationChartLine.fromValues<Position>(
         values: _cardioSessionDescription.cardioSession.track,
         getDuration: (position) => position.time,
-        getGroupValue: (positions) => positions.map((p) => p.elevation).average,
+        getGroupValue: (positions, _) =>
+            positions.map((p) => p.elevation).average,
         lineColor: _elevationColor,
         absolute: false,
       );
@@ -122,9 +123,6 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
     _tabController.dispose();
     super.dispose();
   }
-
-  //late final _rateLimiter =
-  //RateLimiter(_touchCallback, const Duration(milliseconds: 200));
 
   static const _timeColor = Colors.white;
   static const _speedColor = Colors.blue;

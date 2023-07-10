@@ -55,11 +55,13 @@ class DurationChartLine {
     return DurationChartLine.fromValues(
       values: durations,
       getDuration: (d) => d,
-      getGroupValue: (durations) => durations.length.toDouble(),
+      getGroupValue: (durations, interval) =>
+          durations.length.toDouble() / (interval.inMilliseconds / 60 / 1000),
       getLastGroupValue: (durations, interval) =>
           durations.length.toDouble() *
           (interval.inMilliseconds /
-              (durations.last.inMilliseconds % interval.inMilliseconds)),
+              (durations.last.inMilliseconds % interval.inMilliseconds)) /
+          (interval.inMilliseconds / 60 / 1000),
       lineColor: lineColor,
       absolute: absolute,
     );
@@ -69,7 +71,7 @@ class DurationChartLine {
   static DurationChartLine fromValues<T>({
     required List<T>? values,
     required Duration Function(T) getDuration,
-    required double Function(List<T>) getGroupValue,
+    required double Function(List<T>, Duration interval) getGroupValue,
     double Function(List<T>, Duration interval)? getLastGroupValue,
     required Color lineColor,
     required bool absolute,
@@ -78,13 +80,14 @@ class DurationChartLine {
       return DurationChartLine._([], lineColor);
     }
     final totalDuration = getDuration(values.last);
+    final interval = intervalMinutes(totalDuration);
     final groupedValues = values
         .groupListsBy(
           (el) => groupFunction(getDuration(el), totalDuration),
         )
         .entries;
     final chartValues = groupedValues.map((entry) {
-      final value = getGroupValue(entry.value);
+      final value = getGroupValue(entry.value, interval);
       return DurationChartValue(
         duration: entry.key,
         value: value,
@@ -92,7 +95,6 @@ class DurationChartLine {
       );
     }).toList();
     if (getLastGroupValue != null) {
-      final interval = intervalMinutes(totalDuration);
       final value = getLastGroupValue(groupedValues.last.value, interval);
       chartValues.last = DurationChartValue(
         duration: groupedValues.last.key,
