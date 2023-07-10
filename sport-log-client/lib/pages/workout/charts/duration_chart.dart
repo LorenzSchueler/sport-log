@@ -7,13 +7,18 @@ import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/pages/workout/charts/grid_line_drawer.dart';
 
 class DurationChartValue {
-  DurationChartValue({required this.duration, required this.value});
+  DurationChartValue({
+    required this.duration,
+    required this.value,
+    required this.rawValue,
+  });
 
   Duration duration;
   double value;
+  double rawValue;
 
   @override
-  String toString() => "$duration: $value";
+  String toString() => "$duration: $value ($rawValue)";
 }
 
 class DurationChartLine {
@@ -73,24 +78,26 @@ class DurationChartLine {
       return DurationChartLine._([], lineColor);
     }
     final totalDuration = getDuration(values.last);
-    final interval = intervalMinutes(totalDuration);
     final groupedValues = values
         .groupListsBy(
-          (el) => _groupFunction(getDuration(el), interval.inMinutes),
+          (el) => groupFunction(getDuration(el), totalDuration),
         )
         .entries;
-    final chartValues = groupedValues
-        .map(
-          (entry) => DurationChartValue(
-            duration: entry.key,
-            value: getGroupValue(entry.value),
-          ),
-        )
-        .toList();
+    final chartValues = groupedValues.map((entry) {
+      final value = getGroupValue(entry.value);
+      return DurationChartValue(
+        duration: entry.key,
+        value: value,
+        rawValue: value,
+      );
+    }).toList();
     if (getLastGroupValue != null) {
+      final interval = intervalMinutes(totalDuration);
+      final value = getLastGroupValue(groupedValues.last.value, interval);
       chartValues.last = DurationChartValue(
         duration: groupedValues.last.key,
-        value: getLastGroupValue(groupedValues.last.value, interval),
+        value: value,
+        rawValue: value,
       );
     }
     chartValues.sort((v1, v2) => v1.duration.compareTo(v2.duration));
@@ -104,8 +111,10 @@ class DurationChartLine {
   final List<DurationChartValue> chartValues;
   final Color lineColor;
 
-  static Duration _groupFunction(Duration duration, int intervalMin) =>
-      Duration(minutes: duration.inMinutes ~/ intervalMin * intervalMin);
+  static Duration groupFunction(Duration duration, Duration totalDuration) {
+    final intervalMin = intervalMinutes(totalDuration).inMinutes;
+    return Duration(minutes: duration.inMinutes ~/ intervalMin * intervalMin);
+  }
 
   static Duration intervalMinutes(Duration totalDuration) =>
       Duration(minutes: totalDuration.inHours + 1);

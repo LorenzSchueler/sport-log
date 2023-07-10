@@ -57,6 +57,46 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
   late CardioSessionDescription _cardioSessionDescription =
       widget.cardioSessionDescription.clone();
 
+  late DurationChartLine _speedLine = _getSpeedLine();
+  DurationChartLine _getSpeedLine() => DurationChartLine.fromValues<Position>(
+        values: _cardioSessionDescription.cardioSession.track,
+        getDuration: (position) => position.time,
+        getGroupValue: (positions) {
+          final km =
+              (positions.last.distance - positions.first.distance) / 1000;
+          final hour =
+              (positions.last.time - positions.first.time).inMilliseconds /
+                  (1000 * 60 * 60);
+          return km / hour;
+        },
+        lineColor: _speedColor,
+        absolute: true,
+      );
+
+  late DurationChartLine _elevationLine = _getElevationLine();
+  DurationChartLine _getElevationLine() =>
+      DurationChartLine.fromValues<Position>(
+        values: _cardioSessionDescription.cardioSession.track,
+        getDuration: (position) => position.time,
+        getGroupValue: (positions) => positions.map((p) => p.elevation).average,
+        lineColor: _elevationColor,
+        absolute: false,
+      );
+
+  late DurationChartLine _cadenceLine = _getCadenceLine();
+  DurationChartLine _getCadenceLine() => DurationChartLine.fromDurationList(
+        durations: _cardioSessionDescription.cardioSession.cadence,
+        lineColor: _cadenceColor,
+        absolute: true,
+      );
+
+  late DurationChartLine _heartRateLine = _getHeartRateLine();
+  DurationChartLine _getHeartRateLine() => DurationChartLine.fromDurationList(
+        durations: _cardioSessionDescription.cardioSession.heartRate,
+        lineColor: _heartRateColor,
+        absolute: true,
+      );
+
   List<CardioSession>? _similarSessions;
 
   MapController? _mapController;
@@ -145,6 +185,10 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
         setState(() {
           _cardioSessionDescription = returnObj.payload;
           _similarSessions = null;
+          _elevationLine = _getElevationLine();
+          _speedLine = _getSpeedLine();
+          _cadenceLine = _getCadenceLine();
+          _heartRateLine = _getHeartRateLine();
         });
         await _setBoundsAndLines();
       }
@@ -276,7 +320,7 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
                                 ),
                               if (_speed != null)
                                 Text(
-                                  "$_speed km/h",
+                                  "${_speed?.roundToPrecision(1)} km/h",
                                   style: const TextStyle(color: _speedColor),
                                 ),
                               if (_elevation != null)
@@ -308,10 +352,10 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
                           Expanded(
                             child: DurationChart(
                               chartLines: [
-                                _speedLine(),
-                                _elevationLine(),
-                                _cadenceLine(),
-                                _heartRateLine()
+                                _speedLine,
+                                _elevationLine,
+                                _cadenceLine,
+                                _heartRateLine
                               ],
                               touchCallback: _rateLimiter.execute,
                             ),
@@ -360,41 +404,6 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
     );
   }
 
-  DurationChartLine _speedLine() => DurationChartLine.fromValues<Position>(
-        values: _cardioSessionDescription.cardioSession.track,
-        getDuration: (position) => position.time,
-        getGroupValue: (positions) {
-          final km =
-              (positions.last.distance - positions.first.distance) / 1000;
-          final hour =
-              (positions.last.time - positions.first.time).inMilliseconds /
-                  (1000 * 60 * 60);
-          return km / hour;
-        },
-        lineColor: _speedColor,
-        absolute: true,
-      );
-
-  DurationChartLine _elevationLine() => DurationChartLine.fromValues<Position>(
-        values: _cardioSessionDescription.cardioSession.track,
-        getDuration: (position) => position.time,
-        getGroupValue: (positions) => positions.map((p) => p.elevation).average,
-        lineColor: _elevationColor,
-        absolute: false,
-      );
-
-  DurationChartLine _heartRateLine() => DurationChartLine.fromDurationList(
-        durations: _cardioSessionDescription.cardioSession.heartRate,
-        lineColor: _heartRateColor,
-        absolute: true,
-      );
-
-  DurationChartLine _cadenceLine() => DurationChartLine.fromDurationList(
-        durations: _cardioSessionDescription.cardioSession.cadence,
-        lineColor: _cadenceColor,
-        absolute: true,
-      );
-
   Future<void> _exportFile() async {
     final file = await saveTrackAsGpx(
       _cardioSessionDescription.cardioSession.track ?? [],
@@ -428,14 +437,15 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
         // this should not happen because if there is no data the chart is also not shown
         return;
       }
-      final interval = DurationChartLine.intervalMinutes(totalDuration);
+      final startDuration =
+          DurationChartLine.groupFunction(touchDuration, totalDuration);
 
       final Position? pos;
       if (track != null) {
-        final index = binarySearchLargestLE(
+        final index = binarySearchClosest(
           track,
-          (Position pos) => pos.time,
-          touchDuration,
+          (Position pos) => pos.time.inMilliseconds,
+          touchDuration.inMilliseconds,
         );
         pos = index != null ? track[index] : null;
       } else {
@@ -444,21 +454,21 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
 
       setState(() {
         _time = touchDuration;
-        _speed = session
-            .currentSpeed(
-              touchDuration,
-              touchDuration + interval,
-            )
-            ?.roundToPrecision(1);
-        _elevation = pos?.elevation.round();
-        _heartRate = session.currentHeartRate(
-          touchDuration,
-          touchDuration + interval,
-        );
-        _cadence = session.currentCadence(
-          touchDuration,
-          touchDuration + interval,
-        );
+        _speed = _speedLine.chartValues
+            .firstWhereOrNull((dcv) => dcv.duration == startDuration)
+            ?.rawValue;
+        _elevation = _elevationLine.chartValues
+            .firstWhereOrNull((dcv) => dcv.duration == startDuration)
+            ?.rawValue
+            .round();
+        _cadence = _cadenceLine.chartValues
+            .firstWhereOrNull((dcv) => dcv.duration == startDuration)
+            ?.rawValue
+            .round();
+        _heartRate = _heartRateLine.chartValues
+            .firstWhereOrNull((dcv) => dcv.duration == startDuration)
+            ?.rawValue
+            .round();
       });
       await _mapController?.updateTrackMarker(_touchMarker, pos?.latLng);
       for (final sessionTouchMarker in _similarSessionAnnotations.entries) {

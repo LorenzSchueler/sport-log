@@ -42,6 +42,28 @@ int? binarySearchSmallestGE<T, V extends Comparable<V>>(
   return helper(_Range(0, list.length - 1)).start;
 }
 
+/// Returns the index of element in the list with the smallest difference to the given value.
+///
+/// Assumes the list is sorted ascending and there are no duplicate elements.
+int? binarySearchClosest<T>(
+  List<T> list,
+  num Function(T) getter,
+  num value,
+) {
+  final index = binarySearchLargestLE(list, getter, value);
+
+  if (index == null && list.isNotEmpty) {
+    return 0; // first element is already greater than value
+  } else if (index != null) {
+    return list.length == index + 1
+        ? index
+        : value - getter(list[index]) <= getter(list[index + 1]) - value
+            ? index
+            : index + 1;
+  }
+  return null;
+}
+
 /// An inclusive range.
 class _Range {
   const _Range(this.start, this.end) : assert(start <= end);
