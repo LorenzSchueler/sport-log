@@ -33,7 +33,7 @@ String shortWeekdayNameOfInt(int weekday) {
   return _shortWeekdayNames[weekday - 1];
 }
 
-extension FormatDuration on Duration {
+extension DurationExtension on Duration {
   String _threeDigits(int n) {
     if (n >= 100) return "$n";
     if (n >= 10) return "0$n";
@@ -65,6 +65,11 @@ extension FormatDuration on Duration {
 
   String get formatMsMill =>
       "$_twoDigitMinutes:$_twoDigitSeconds.$_threeDigitMillis";
+
+  bool get isZero => inMilliseconds == 0;
+  double get inSecondFractions => inMilliseconds / 1000;
+  double get inMinuteFractions => inMilliseconds / 60 / 1000;
+  double get inHourFractions => inMilliseconds / 60 / 60 / 1000;
 }
 
 extension DateTimeExtension on DateTime {

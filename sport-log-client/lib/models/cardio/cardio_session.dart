@@ -5,6 +5,7 @@ import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/database/table.dart';
+import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/helpers/search.dart';
 import 'package:sport_log/helpers/serialization/db_serialization.dart';
@@ -95,9 +96,9 @@ class CardioSession extends AtomicEntity {
 
   /// km/h
   double? get speed {
-    return time == null || time!.inMilliseconds == 0 || distance == null
+    return time == null || time!.isZero || distance == null
         ? null
-        : (distance! / 1000) / (time!.inMilliseconds / (1000 * 60 * 60));
+        : (distance! / 1000) / time!.inHourFractions;
   }
 
   /// km/h
@@ -111,8 +112,7 @@ class CardioSession extends AtomicEntity {
         final startPos = track![startIndex];
         final endPos = track![endIndex];
         final km = (endPos.distance - startPos.distance) / 1000;
-        final hours =
-            (endPos.time - startPos.time).inMilliseconds / (1000 * 60 * 60);
+        final hours = (endPos.time - startPos.time).inHourFractions;
         if (hours > 0) {
           return km / hours;
         }
@@ -146,8 +146,7 @@ class CardioSession extends AtomicEntity {
       if (startIndex != null && endIndex != null) {
         final startCadence = cadence![startIndex];
         final endCadence = cadence![endIndex];
-        final minutes =
-            (endCadence - startCadence).inMilliseconds / (1000 * 60);
+        final minutes = (endCadence - startCadence).inMinuteFractions;
         if (minutes > 0) {
           return ((endIndex - startIndex) / minutes).round();
         }
@@ -166,7 +165,7 @@ class CardioSession extends AtomicEntity {
       if (startIndex != null && endIndex != null) {
         final startHR = heartRate![startIndex];
         final endHR = heartRate![endIndex];
-        final minutes = (endHR - startHR).inMilliseconds / (1000 * 60);
+        final minutes = (endHR - startHR).inMinuteFractions;
         if (minutes > 0) {
           return ((endIndex - startIndex) / minutes).round();
         }
@@ -210,17 +209,15 @@ class CardioSession extends AtomicEntity {
   }
 
   void setAvgCadence() {
-    avgCadence = time == null || time!.inMilliseconds == 0 || cadence == null
+    avgCadence = time == null || time!.isZero || cadence == null
         ? null
-        : (cadence!.length / (time!.inMilliseconds / (1000 * 60))).round();
+        : (cadence!.length / time!.inMinuteFractions).round();
   }
 
   void setAvgHeartRate() {
-    avgHeartRate = time == null ||
-            time!.inMilliseconds == 0 ||
-            heartRate == null
+    avgHeartRate = time == null || time!.isZero || heartRate == null
         ? null
-        : (heartRate!.length / (time!.inMilliseconds / (1000 * 60))).round();
+        : (heartRate!.length / (time!.inMinuteFractions)).round();
   }
 
   void cut(Duration start, Duration end) {

@@ -56,12 +56,12 @@ class DurationChartLine {
       values: durations,
       getDuration: (d) => d,
       getGroupValue: (durations, interval) =>
-          durations.length.toDouble() / (interval.inMilliseconds / 60 / 1000),
+          durations.length.toDouble() / interval.inMinuteFractions,
       getLastGroupValue: (durations, interval) =>
           durations.length.toDouble() *
           (interval.inMilliseconds /
               (durations.last.inMilliseconds % interval.inMilliseconds)) /
-          (interval.inMilliseconds / 60 / 1000),
+          interval.inMinuteFractions,
       lineColor: lineColor,
       absolute: absolute,
     );

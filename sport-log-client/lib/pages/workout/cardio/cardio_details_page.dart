@@ -64,8 +64,7 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
           final km =
               (positions.last.distance - positions.first.distance) / 1000;
           final hour =
-              (positions.last.time - positions.first.time).inMilliseconds /
-                  (1000 * 60 * 60);
+              (positions.last.time - positions.first.time).inHourFractions;
           return km / hour;
         },
         lineColor: _speedColor,

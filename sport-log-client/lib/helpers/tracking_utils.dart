@@ -5,6 +5,7 @@ import 'package:flutter/material.dart' hide Route;
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:sport_log/app.dart';
 import 'package:sport_log/data_provider/data_providers/cardio_data_provider.dart';
+import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/gps_position.dart';
 import 'package:sport_log/helpers/heart_rate_utils.dart';
 import 'package:sport_log/helpers/location_utils.dart';
@@ -234,8 +235,7 @@ class TrackingUtils extends ChangeNotifier {
     if (isTracking && track.isNotEmpty) {
       final lastPosition = track.last;
       final km = lastPosition.latLng.distanceTo(location.latLng) / 1000;
-      final hour = (currentDuration - lastPosition.time).inMilliseconds /
-          (1000 * 60 * 60);
+      final hour = (currentDuration - lastPosition.time).inHourFractions;
       final speed = km / hour;
       if (speed > _maxSpeed) {
         return;
