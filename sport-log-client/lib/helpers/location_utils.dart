@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:location/location.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:sport_log/app.dart';
@@ -52,6 +52,9 @@ class LocationUtils extends ChangeNotifier {
     }
 
     await setLocationSettings(useGooglePlayServices: false);
+    // request permission but continue even if not granted
+    await PermissionRequest.request(Permission.notification);
+    await _updateNotification(null);
     _locationSubscription =
         onLocationChanged(inBackground: true).listen((locationData) {
       _onLocationUpdate(
@@ -63,17 +66,25 @@ class LocationUtils extends ChangeNotifier {
     return true;
   }
 
+  Future<void> _updateNotification(
+    GpsPosition? position,
+  ) async {
+    await updateBackgroundNotification(
+      title: "Sport Log Tracking",
+      subtitle: position == null
+          ? "GPS tracking is active"
+          : "[${position.latitude.toStringAsFixed(5)}, ${position.longitude.toStringAsFixed(5)}] ~ ${position.accuracy.round()} m (${position.satellites} satellites)",
+      color: Colors.red,
+      iconName: "notification_icon",
+      onTapBringToFront: true,
+    );
+  }
+
   Future<void> _onLocationUpdate(
     GpsPosition position,
     void Function(GpsPosition) onLocationUpdate,
   ) async {
-    await updateBackgroundNotification(
-      title: "Sport Log Tracking",
-      subtitle:
-          "(${position.latitude.toStringAsFixed(5)}, ${position.longitude.toStringAsFixed(5)}) ~ ${position.accuracy.round()} m [${position.satellites} satellites]",
-      description: "test",
-      onTapBringToFront: true,
-    );
+    await _updateNotification(position);
     _lastLocation = position;
     onLocationUpdate(position);
     notifyListeners();
