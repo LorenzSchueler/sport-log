@@ -27,9 +27,10 @@ class LocationUtils extends ChangeNotifier {
     super.dispose();
   }
 
-  Future<bool> startLocationStream(
-    void Function(GpsPosition) onLocationUpdate,
-  ) async {
+  Future<bool> startLocationStream({
+    required void Function(GpsPosition) onLocationUpdate,
+    required bool inBackground,
+  }) async {
     if (_locationSubscription != null) {
       return false;
     }
@@ -56,7 +57,7 @@ class LocationUtils extends ChangeNotifier {
     await PermissionRequest.request(Permission.notification);
     await _updateNotification(null);
     _locationSubscription =
-        onLocationChanged(inBackground: true).listen((locationData) {
+        onLocationChanged(inBackground: inBackground).listen((locationData) {
       _onLocationUpdate(
         GpsPosition.fromLocationData(locationData),
         onLocationUpdate,

@@ -51,7 +51,10 @@ class _CurrentLocationButtonState extends State<CurrentLocationButton> {
         false,
       );
     } else {
-      await _locationUtils.startLocationStream(_onLocationUpdate);
+      await _locationUtils.startLocationStream(
+        onLocationUpdate: _onLocationUpdate,
+        inBackground: false,
+      );
     }
   }
 

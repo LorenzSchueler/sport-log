@@ -116,7 +116,10 @@ class TrackingUtils extends ChangeNotifier {
       const Duration(minutes: 1),
       (_) => _autoSaveCardioSession(),
     );
-    await _locationUtils.startLocationStream(_onLocationUpdate);
+    await _locationUtils.startLocationStream(
+      onLocationUpdate: _onLocationUpdate,
+      inBackground: true,
+    );
     await _stepUtils.startStepStream(_onStepUpdate);
     await _heartRateUtils?.startHeartRateStream(_onHeartRateUpdate);
   }
