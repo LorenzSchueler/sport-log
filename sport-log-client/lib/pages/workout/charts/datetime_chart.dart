@@ -144,35 +144,28 @@ abstract class DateTimePeriodChart extends StatelessWidget {
   double get minY => _maxY == _minY ? _minY - 1 : _minY;
 
   FlTitlesData titlesData({
-    Widget Function(double, TitleMeta)? getBottomTitles,
+    required Widget Function(double, TitleMeta) getBottomTitles,
     double? reservedSize,
-  }) =>
-      FlTitlesData(
-        topTitles: _noAxisTitles,
-        rightTitles: _noAxisTitles,
-        bottomTitles: AxisTitles(
-          sideTitles: SideTitles(
-            showTitles: true,
-            interval: 1,
-            getTitlesWidget: getBottomTitles,
-            reservedSize: reservedSize,
+  }) {
+    return FlTitlesData(
+      topTitles: const AxisTitles(),
+      rightTitles: const AxisTitles(),
+      bottomTitles: AxisTitles(
+        sideTitles: SideTitles(
+          showTitles: true,
+          interval: 1,
+          getTitlesWidget: getBottomTitles,
+          reservedSize: reservedSize ?? 22,
+        ),
+      ),
+      leftTitles: AxisTitles(
+        sideTitles: SideTitles(
+          showTitles: true,
+          reservedSize: isTime ? 60 : 40,
+          getTitlesWidget: (value, _) => Text(
+            isTime ? Duration(milliseconds: value.round()).formatMsMill : "",
           ),
         ),
-        leftTitles: _leftAxisTitles,
-      );
-
-  static final AxisTitles _noAxisTitles =
-      AxisTitles(sideTitles: SideTitles(showTitles: false));
-
-  AxisTitles get _leftAxisTitles {
-    return AxisTitles(
-      sideTitles: SideTitles(
-        showTitles: true,
-        reservedSize: isTime ? 60 : 40,
-        getTitlesWidget: isTime
-            ? (value, _) =>
-                Text(Duration(milliseconds: value.round()).formatMsMill)
-            : null,
       ),
     );
   }

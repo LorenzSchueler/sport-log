@@ -141,7 +141,7 @@ class DistanceChart extends StatelessWidget {
                       .map((v) => FlSpot(v.distance, v.value))
                       .toList(),
                   color: chartLine.lineColor,
-                  dotData: FlDotData(show: false),
+                  dotData: const FlDotData(show: false),
                 ),
             ],
             minY: minY,
@@ -152,9 +152,8 @@ class DistanceChart extends StatelessWidget {
               touchCallback: _onLongPress,
             ),
             titlesData: FlTitlesData(
-              topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-              rightTitles:
-                  AxisTitles(sideTitles: SideTitles(showTitles: false)),
+              topTitles: const AxisTitles(),
+              rightTitles: const AxisTitles(),
               bottomTitles: AxisTitles(
                 sideTitles: SideTitles(
                   showTitles: true,

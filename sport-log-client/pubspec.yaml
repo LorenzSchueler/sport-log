@@ -32,7 +32,7 @@ dependencies:
   device_info_plus: ^9.0.0
   file_picker: ^5.0.0
   fixnum: ^1.0.0 # used for ids (in web ints go only up to 2^53-1)
-  fl_chart: ^0.62.0
+  fl_chart: ^0.63.0
   flutter:
     sdk: flutter
   flutter_blue_plus: ^1.4.0

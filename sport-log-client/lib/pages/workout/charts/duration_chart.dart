@@ -203,7 +203,7 @@ class _DurationChartState extends State<DurationChart> {
                       )
                       .toList(),
                   color: chartLine.lineColor,
-                  dotData: FlDotData(show: false),
+                  dotData: const FlDotData(show: false),
                   isCurved: true,
                   preventCurveOverShooting: true,
                 ),
@@ -225,9 +225,8 @@ class _DurationChartState extends State<DurationChart> {
               touchCallback: _onLongPress,
             ),
             titlesData: FlTitlesData(
-              topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-              rightTitles:
-                  AxisTitles(sideTitles: SideTitles(showTitles: false)),
+              topTitles: const AxisTitles(),
+              rightTitles: const AxisTitles(),
               bottomTitles: AxisTitles(
                 sideTitles: SideTitles(
                   showTitles: true,
@@ -243,7 +242,7 @@ class _DurationChartState extends State<DurationChart> {
                   reservedSize: 20,
                 ),
               ),
-              leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+              leftTitles: const AxisTitles(),
             ),
             gridData: FlGridData(
               getDrawingHorizontalLine:

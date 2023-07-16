@@ -52,7 +52,7 @@ class AllChart extends DateTimePeriodChart {
                   )
                   .toList(),
               color: Theme.of(context).colorScheme.primary,
-              dotData: FlDotData(show: false),
+              dotData: const FlDotData(show: false),
             ),
           ],
           minY: minY,
