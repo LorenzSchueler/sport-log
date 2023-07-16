@@ -28,7 +28,7 @@ pub struct ActionProviderDb;
 /// Same as trait [`Create`](crate::db::Create) but with mutable references
 impl ActionProviderDb {
     pub fn create(
-        mut action_provider: &mut <Self as Db>::Entity,
+        action_provider: &mut <Self as Db>::Entity,
         db: &mut PgConnection,
     ) -> QueryResult<usize> {
         let salt = SaltString::generate(&mut OsRng);

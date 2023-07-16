@@ -16,10 +16,7 @@ pub struct UserDb;
 
 /// Same as trait [`Create`](crate::db::Create) but with mutable references
 impl UserDb {
-    pub fn create(
-        mut user: &mut <Self as Db>::Entity,
-        db: &mut PgConnection,
-    ) -> QueryResult<usize> {
+    pub fn create(user: &mut <Self as Db>::Entity, db: &mut PgConnection) -> QueryResult<usize> {
         let salt = SaltString::generate(&mut OsRng);
         user.password = build_hasher()
             .hash_password(user.password.as_bytes(), &salt)
@@ -47,10 +44,7 @@ impl UserDb {
 
 /// Same as trait [`Update`](crate::db::Update) but with mutable references
 impl UserDb {
-    pub fn update(
-        mut user: &mut <Self as Db>::Entity,
-        db: &mut PgConnection,
-    ) -> QueryResult<usize> {
+    pub fn update(user: &mut <Self as Db>::Entity, db: &mut PgConnection) -> QueryResult<usize> {
         let salt = SaltString::generate(&mut OsRng);
         user.password = build_hasher()
             .hash_password(user.password.as_bytes(), &salt)
