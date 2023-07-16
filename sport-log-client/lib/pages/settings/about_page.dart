@@ -3,7 +3,7 @@ import 'package:sport_log/config.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/input_fields/edit_tile.dart';
-import 'package:url_launcher/url_launcher_string.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class _Contributor {
   _Contributor(this.name, this.github);
@@ -52,16 +52,18 @@ class AboutPage extends StatelessWidget {
               leading: AppIcons.github,
               caption: "GitHub",
               child: const Text("github.com/LorenzSchueler/sport-log"),
-              onTap: () => launchUrlString(
-                "https://github.com/LorenzSchueler/sport-log",
+              onTap: () => launchUrl(
+                Uri.parse("https://github.com/LorenzSchueler/sport-log"),
+                mode: LaunchMode.externalApplication,
               ),
             ),
             EditTile(
               leading: AppIcons.copyright,
               caption: "Copyright & License",
               child: const Text("GPLv3 license"),
-              onTap: () => launchUrlString(
-                "https://www.gnu.org/licenses/gpl-3.0.html",
+              onTap: () => launchUrl(
+                Uri.parse("https://www.gnu.org/licenses/gpl-3.0.html"),
+                mode: LaunchMode.externalApplication,
               ),
             ),
             EditTile(
@@ -72,7 +74,10 @@ class AboutPage extends StatelessWidget {
                 shrinkWrap: true,
                 itemBuilder: (context, index) => GestureDetector(
                   child: Text(_Contributor.all[index].name),
-                  onTap: () => launchUrlString(_Contributor.all[index].github),
+                  onTap: () => launchUrl(
+                    Uri.parse(_Contributor.all[index].github),
+                    mode: LaunchMode.externalApplication,
+                  ),
                 ),
                 separatorBuilder: (context, index) => const SizedBox(height: 5),
                 itemCount: _Contributor.all.length,
