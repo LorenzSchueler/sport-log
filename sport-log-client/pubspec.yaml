@@ -28,6 +28,7 @@ environment:
 # versions available, run `flutter pub outdated`.
 dependencies:
   audioplayers: ^4.0.1
+  awesome_notifications: ^0.7.4
   collection: ^1.16.0
   device_info_plus: ^9.0.0
   file_picker: ^5.0.0
@@ -79,6 +80,7 @@ dependencies:
   yaml: ^3.1.0
 
 dependency_overrides:
+  intl: ^0.18.1
   location_android: 
     git:
       url: https://github.com/Lyokone/flutterlocation

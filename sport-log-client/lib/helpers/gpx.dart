@@ -1,5 +1,7 @@
 import 'dart:io';
+import 'dart:math';
 
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:collection/collection.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:gpx/gpx.dart';
@@ -65,12 +67,30 @@ String trackToGpx(List<Position> track, {DateTime? startTime}) {
 Future<String?> saveTrackAsGpx(
   List<Position> track, {
   DateTime? startTime,
-}) {
-  return writeToFile(
+}) async {
+  final file = await writeToFile(
     content: trackToGpx(track, startTime: startTime),
     filename: "track",
     fileExtension: "gpx",
   );
+  if (file != null) {
+    await AwesomeNotifications().createNotification(
+      content: NotificationContent(
+        id: Random.secure().nextInt(1 << 31),
+        channelKey: 'file_channel',
+        title: 'Route GPX export',
+        body: file,
+        payload: {"file": file},
+      ),
+      actionButtons: [
+        NotificationActionButton(
+          key: "open_file",
+          label: "Open",
+        )
+      ],
+    );
+  }
+  return file;
 }
 
 Future<Result<List<Position>, String>?> loadTrackFromGpxFile() async {
