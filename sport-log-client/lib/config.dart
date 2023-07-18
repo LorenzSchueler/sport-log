@@ -30,6 +30,7 @@ class Config extends JsonSerializable {
   static late final Config _instance;
   static Config get instance => _instance;
 
+  // ignore: long-method
   static Future<void> init() async {
     try {
       final map = (isTest
@@ -81,6 +82,7 @@ class Config extends JsonSerializable {
     instance.version = Version.fromString(
       isTest ? "0.1.0" : packageInfo.version,
     );
+    instance.packageName = packageInfo.packageName;
 
     _logger
       ..i('Min log level: ${instance.minLogLevel}')
@@ -112,10 +114,16 @@ class Config extends JsonSerializable {
   final bool outputResponseHeaders;
   @JsonKey(defaultValue: false)
   final bool outputDbStatement;
+
   @JsonKey(includeFromJson: false)
   late final bool isAndroidEmulator;
   @JsonKey(includeFromJson: false)
   late final Version version;
+  @JsonKey(includeFromJson: false)
+  late final String packageName;
+  @JsonKey(includeFromJson: false)
+  late final flavor =
+      packageName.endsWith(".dev") ? "development" : "production";
 
   static final Version apiVersion = Version(0, 3);
   // ignore: do_not_use_environment

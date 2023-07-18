@@ -1,7 +1,6 @@
 import 'dart:typed_data';
 
 import 'package:http/http.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 import 'package:sport_log/api/api.dart';
 import 'package:sport_log/config.dart';
 import 'package:sport_log/models/server_version/server_version.dart';
@@ -21,11 +20,10 @@ class AppApi {
     );
   }
 
-  Future<ApiResult<Uint8List>> downloadUpdate() async {
+  Future<ApiResult<Uint8List>> downloadUpdate() {
     const format = "apk";
     const build = Config.debugMode ? "debug" : "release";
-    final packageName = (await PackageInfo.fromPlatform()).packageName;
-    final flavor = packageName.endsWith(".dev") ? "development" : "production";
+    final flavor = Config.instance.flavor;
     final uri = Api.uriFromRoute(
       "/app/download?format=$format&build=$build&flavor=$flavor",
     );

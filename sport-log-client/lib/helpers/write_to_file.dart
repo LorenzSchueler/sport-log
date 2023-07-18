@@ -20,9 +20,7 @@ Future<String?> writeToFile({
 }) async {
   final dir = Config.isAndroid
       ? '/storage/emulated/0/Download'
-      : Config.isIOS
-          ? await getApplicationDocumentsDirectory()
-          : (await getDownloadsDirectory())!;
+      : (await getDownloadsDirectory())!;
   var file = File("$dir/$filename.$fileExtension");
   if (!append) {
     var index = 1;
