@@ -5,18 +5,18 @@ packages:
     dependency: transitive
     description:
       name: _fe_analyzer_shared
-      sha256: "8c7478991c7bbde2c1e18034ac697723176a5d3e7e0ca06c7f9aed69b6f388d7"
+      sha256: ae92f5d747aee634b87f89d9946000c2de774be1d6ac3e58268224348cd0101a
       url: "https://pub.dev"
     source: hosted
-    version: "51.0.0"
+    version: "61.0.0"
   analyzer:
     dependency: transitive
     description:
       name: analyzer
-      sha256: "120fe7ce25377ba616bb210e7584983b163861f45d6ec446744d507e3943881b"
+      sha256: ea3d8652bda62982addfd92fdc2d0214e5f82e43325104990d4f4c4a2a313562
       url: "https://pub.dev"
     source: hosted
-    version: "5.3.1"
+    version: "5.13.0"
   analyzer_plugin:
     dependency: transitive
     description:
@@ -165,10 +165,10 @@ packages:
     dependency: transitive
     description:
       name: build_resolvers
-      sha256: db49b8609ef8c81cca2b310618c3017c00f03a92af44c04d310b907b2d692d95
+      sha256: "6c4dd11d05d056e76320b828a1db0fc01ccd376922526f8e9d6c796a5adbac20"
       url: "https://pub.dev"
     source: hosted
-    version: "2.2.0"
+    version: "2.2.1"
   build_runner:
     dependency: "direct dev"
     description:
@@ -269,10 +269,18 @@ packages:
     dependency: "direct dev"
     description:
       name: dart_code_metrics
-      sha256: "2089d4323d372397a8918636c911bbd140d6bc15c323393ae220fa29984ba990"
+      sha256: "3dede3f7abc077a4181ec7445448a289a9ce08e2981e6a4d49a3fb5099d47e1f"
       url: "https://pub.dev"
     source: hosted
-    version: "5.3.0"
+    version: "5.7.6"
+  dart_code_metrics_presets:
+    dependency: transitive
+    description:
+      name: dart_code_metrics_presets
+      sha256: b71eadf02a3787ebd5c887623f83f6fdc204d45c75a081bd636c4104b3fd8b73
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.8.0"
   dart_sort_queue:
     dependency: transitive
     description:
@@ -285,10 +293,10 @@ packages:
     dependency: transitive
     description:
       name: dart_style
-      sha256: "5be16bf1707658e4c03078d4a9b90208ded217fb02c163e207d334082412f2fb"
+      sha256: "1efa911ca7086affd35f463ca2fc1799584fb6aa89883cf0af8e3664d6a02d55"
       url: "https://pub.dev"
     source: hosted
-    version: "2.2.5"
+    version: "2.3.2"
   device_info_plus:
     dependency: "direct main"
     description:
@@ -386,10 +394,10 @@ packages:
     dependency: "direct main"
     description:
       name: flutter_blue_plus
-      sha256: c2d5c68f0779339f23f1aa70558d53b18d30c661a7b697925dbfc34e0f2d120c
+      sha256: e6f00c3c1f44fc18300a30b229e4e0b8f8ff670c297608809870348df5992a5b
       url: "https://pub.dev"
     source: hosted
-    version: "1.7.5"
+    version: "1.7.8"
   flutter_driver:
     dependency: transitive
     description: flutter
@@ -584,10 +592,10 @@ packages:
     dependency: "direct dev"
     description:
       name: json_serializable
-      sha256: "43793352f90efa5d8b251893a63d767b2f7c833120e3cc02adad55eefec04dc7"
+      sha256: aa1f5a8912615733e0fdc7a02af03308933c93235bdc8d50d0b0c8a8ccb0b969
       url: "https://pub.dev"
     source: hosted
-    version: "6.6.2"
+    version: "6.7.1"
   latlong2:
     dependency: "direct main"
     description:
@@ -948,10 +956,10 @@ packages:
     dependency: transitive
     description:
       name: pub_updater
-      sha256: "42890302ab2672adf567dc2b20e55b4ecc29d7e19c63b6b98143ab68dd717d3a"
+      sha256: "05ae70703e06f7fdeb05f7f02dd680b8aad810e87c756a618f33e1794635115c"
       url: "https://pub.dev"
     source: hosted
-    version: "0.2.4"
+    version: "0.3.0"
   pubspec_parse:
     dependency: transitive
     description:
@@ -1025,10 +1033,10 @@ packages:
     dependency: transitive
     description:
       name: source_helper
-      sha256: "3b67aade1d52416149c633ba1bb36df44d97c6b51830c2198e934e3fca87ca1f"
+      sha256: "6adebc0006c37dd63fe05bca0a929b99f06402fc95aa35bf36d67f5c06de01fd"
       url: "https://pub.dev"
     source: hosted
-    version: "1.3.3"
+    version: "1.3.4"
   source_span:
     dependency: transitive
     description:
