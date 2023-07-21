@@ -111,24 +111,41 @@ class ActionsCard extends StatelessWidget {
       margin: EdgeInsets.zero,
       child: Padding(
         padding: Defaults.edgeInsets.normal,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const CaptionTile(caption: "Actions"),
-            for (final action in actionProviderDescription.actions) ...[
-              const Divider(),
+        child: ProviderConsumer(
+          create: (_) => BoolToggle.off(),
+          builder: (context, expanded, _) => Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
               Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  SizedBox(
-                    width: 120,
-                    child: Text(action.name),
+                  const CaptionTile(caption: "Actions"),
+                  IconButton(
+                    visualDensity: VisualDensity.compact,
+                    onPressed: expanded.toggle,
+                    icon: Icon(
+                      expanded.isOn ? AppIcons.arrowUp : AppIcons.arrowDown,
+                    ),
                   ),
-                  Defaults.sizedBox.horizontal.normal,
-                  Expanded(child: Text(action.description ?? "--")),
                 ],
               ),
-            ]
-          ],
+              if (expanded.isOn) ...[
+                for (final action in actionProviderDescription.actions) ...[
+                  const Divider(),
+                  Row(
+                    children: [
+                      SizedBox(
+                        width: 120,
+                        child: Text(action.name),
+                      ),
+                      Defaults.sizedBox.horizontal.normal,
+                      Expanded(child: Text(action.description ?? "")),
+                    ],
+                  ),
+                ]
+              ]
+            ],
+          ),
         ),
       ),
     );
