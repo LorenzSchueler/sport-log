@@ -45,9 +45,6 @@ Stream<double> initialize() async* {
   await AwesomeNotifications().setListeners(
     onActionReceivedMethod: NotificationController.onActionReceivedMethod,
   );
-  if (!await AwesomeNotifications().isNotificationAllowed()) {
-    await AwesomeNotifications().requestPermissionToSendNotifications();
-  }
   yield 0.6;
   if (Config.isWindows || Config.isLinux) {
     sqfliteFfiInit();

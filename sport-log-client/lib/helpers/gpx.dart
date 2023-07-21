@@ -74,6 +74,9 @@ Future<String?> saveTrackAsGpx(
     fileExtension: "gpx",
   );
   if (file != null) {
+    if (!await AwesomeNotifications().isNotificationAllowed()) {
+      await AwesomeNotifications().requestPermissionToSendNotifications();
+    }
     await AwesomeNotifications().createNotification(
       content: NotificationContent(
         id: Random.secure().nextInt(1 << 31),
