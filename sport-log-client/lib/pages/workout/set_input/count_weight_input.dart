@@ -103,18 +103,15 @@ class _CountWeightInputState extends State<CountWeightInput> {
     _submit();
   }
 
-  void _addWeight() {
+  void _toggleWeight() {
     setState(() {
-      _weight = 0;
-      _secondWeight = 0;
-    });
-    _submit();
-  }
-
-  void _removeWeight() {
-    setState(() {
-      _weight = null;
-      _secondWeight = null;
+      if (_weight == null) {
+        _weight = 0;
+        _secondWeight = 0;
+      } else {
+        _weight = null;
+        _secondWeight = null;
+      }
     });
     _submit();
   }
@@ -211,23 +208,15 @@ class _CountWeightInputState extends State<CountWeightInput> {
                       onUpdate: _setFemaleWeight,
                     ),
                   ),
-                _weight == null
-                    ? ActionChip(
-                        avatar: const Icon(AppIcons.add),
-                        label: const Text("Add Weight"),
-                        onPressed: () {
-                          FocusManager.instance.primaryFocus?.unfocus();
-                          _addWeight();
-                        },
-                      )
-                    : ActionChip(
-                        avatar: const Icon(AppIcons.close),
-                        label: const Text("Remove Weight"),
-                        onPressed: () {
-                          FocusManager.instance.primaryFocus?.unfocus();
-                          _removeWeight();
-                        },
-                      ),
+                ActionChip(
+                  avatar:
+                      Icon(_weight == null ? AppIcons.add : AppIcons.remove),
+                  label: const Text("Weight"),
+                  onPressed: () {
+                    FocusManager.instance.primaryFocus?.unfocus();
+                    _toggleWeight();
+                  },
+                ),
               ],
             ),
           ),

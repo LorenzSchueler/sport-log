@@ -81,13 +81,8 @@ class _SetDurationInputState extends State<SetDurationInput> {
     _submit();
   }
 
-  void _addWeight() {
-    setState(() => _weight = 0);
-    _submit();
-  }
-
-  void _removeWeight() {
-    setState(() => _weight = null);
+  void _toggleWeight() {
+    setState(() => _weight = _weight == null ? 0 : null);
     _submit();
   }
 
@@ -137,23 +132,14 @@ class _SetDurationInputState extends State<SetDurationInput> {
             ),
           ),
         ),
-      _weight == null
-          ? ActionChip(
-              avatar: const Icon(AppIcons.add),
-              label: const Text("Add Weight"),
-              onPressed: () {
-                FocusManager.instance.primaryFocus?.unfocus();
-                _addWeight();
-              },
-            )
-          : ActionChip(
-              avatar: const Icon(AppIcons.close),
-              label: const Text("Remove Weight"),
-              onPressed: () {
-                FocusManager.instance.primaryFocus?.unfocus();
-                _removeWeight();
-              },
-            )
+      ActionChip(
+        avatar: Icon(_weight == null ? AppIcons.add : AppIcons.remove),
+        label: const Text("Weight"),
+        onPressed: () {
+          FocusManager.instance.primaryFocus?.unfocus();
+          _toggleWeight();
+        },
+      )
     ];
   }
 
