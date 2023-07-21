@@ -302,22 +302,16 @@ class _MetconSessionEditPageState extends State<MetconSessionEditPage> {
                       ),
                     ],
                   ),
-                EditTile(
+                EditTile.Switch(
                   caption: "Rx",
                   leading: AppIcons.checkBox,
-                  child: SizedBox(
-                    height: 29, // make it fit into EditTile
-                    width: 34, // remove left padding
-                    child: Switch(
-                      value: _metconSessionDescription.metconSession.rx,
-                      onChanged: (rx) {
-                        FocusManager.instance.primaryFocus?.unfocus();
-                        setState(() {
-                          _metconSessionDescription.metconSession.rx = rx;
-                        });
-                      },
-                    ),
-                  ),
+                  value: _metconSessionDescription.metconSession.rx,
+                  onChanged: (rx) {
+                    FocusManager.instance.primaryFocus?.unfocus();
+                    setState(() {
+                      _metconSessionDescription.metconSession.rx = rx;
+                    });
+                  },
                 ),
                 TextFormField(
                   decoration: const InputDecoration(

@@ -75,19 +75,13 @@ class CardioTrackingSettingsPage extends StatelessWidget {
               if (trackingSettings.route != null)
                 Row(
                   children: [
-                    EditTile(
+                    EditTile.Switch(
                       leading: AppIcons.notification,
                       caption: "Alarm when off Route",
                       shrinkWidth: true,
-                      child: SizedBox(
-                        height: 29, // make it fit into EditTile
-                        width: 34, // remove left padding
-                        child: Switch(
-                          value: trackingSettings.routeAlarmDistance != null,
-                          onChanged: (alarm) => trackingSettings
-                              .routeAlarmDistance = alarm ? 50 : null,
-                        ),
-                      ),
+                      value: trackingSettings.routeAlarmDistance != null,
+                      onChanged: (alarm) => trackingSettings
+                          .routeAlarmDistance = alarm ? 50 : null,
                     ),
                     Defaults.sizedBox.horizontal.big,
                     if (trackingSettings.routeAlarmDistance != null)
