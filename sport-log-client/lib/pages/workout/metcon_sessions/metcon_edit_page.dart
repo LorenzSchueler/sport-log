@@ -339,6 +339,9 @@ class _MetconEditPageState extends State<MetconEditPage> {
     setState(() {
       final oldMove = _metconDescription.moves.removeAt(oldIndex);
       _metconDescription.moves.insert(insertAt, oldMove);
+      for (final (i, move) in _metconDescription.moves.indexed) {
+        move.metconMovement.movementNumber = i;
+      }
     });
   }
 }
