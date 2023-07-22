@@ -1,17 +1,17 @@
 #!/bin/bash
 
+step() {
+    GREEN='\033[1;32m'
+    NC='\033[0m' # No Color
+    printf "\n$GREEN$1$NC\n\n"
+}
+
 USERNAME=ScreenshotUser
 PASSWORD=ScreenshotPassword0
 BASE_URL='http://localhost:8001'
 
 step "set mapbox token"
 #export SDK_REGISTRY_TOKEN=<token> # TODO use GH token
-
-step() {
-    GREEN='\033[1;32m'
-    NC='\033[0m' # No Color
-    printf "\n$GREEN$1$NC\n\n"
-}
 
 step "start server"
 cd ../sport-log-server
