@@ -18,7 +18,7 @@ enum MovementDimension {
   @JsonValue('Distance')
   distance("Distance"),
   @JsonValue('Energy')
-  energy("Energy");
+  energy("Calories");
 
   const MovementDimension(this.name);
 

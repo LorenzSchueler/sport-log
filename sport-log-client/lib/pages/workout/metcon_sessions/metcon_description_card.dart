@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:sport_log/defaults.dart';
+import 'package:sport_log/helpers/extensions/date_time_extension.dart';
+import 'package:sport_log/helpers/extensions/formatting.dart';
 import 'package:sport_log/models/metcon/metcon_description.dart';
+import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/widgets/input_fields/edit_tile.dart';
 
 class MetconDescriptionCard extends StatelessWidget {
@@ -34,14 +37,33 @@ class MetconDescriptionCard extends StatelessWidget {
               child: Table(
                 defaultColumnWidth: const IntrinsicColumnWidth(),
                 children: [
-                  for (var metconMovementDescription in metconDescription.moves)
+                  for (var mmd in metconDescription.moves)
                     TableRow(
                       children: [
                         Padding(
                           padding: const EdgeInsets.only(right: 10),
-                          child: Text(metconMovementDescription.movement.name),
+                          child: Text(mmd.movement.name),
                         ),
-                        Text(metconMovementDescription.countUnitWeight),
+                        Padding(
+                          padding: const EdgeInsets.only(right: 10),
+                          child: Text(
+                            switch (mmd.movement.dimension) {
+                              MovementDimension.distance =>
+                                "${mmd.metconMovement.count} ${mmd.metconMovement.distanceUnit!.name}",
+                              MovementDimension.time =>
+                                Duration(milliseconds: mmd.metconMovement.count)
+                                    .formatTimeShort,
+                              _ =>
+                                "${mmd.metconMovement.count} ${mmd.movement.dimension.name}",
+                            },
+                          ),
+                        ),
+                        Text(
+                          mmd.metconMovement.maleWeight != null &&
+                                  mmd.metconMovement.femaleWeight != null
+                              ? "@ ${formatWeight(mmd.metconMovement.maleWeight!, mmd.metconMovement.femaleWeight)}"
+                              : "",
+                        )
                       ],
                     )
                 ],

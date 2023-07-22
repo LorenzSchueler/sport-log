@@ -1,7 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/db_interfaces.dart';
-import 'package:sport_log/helpers/extensions/date_time_extension.dart';
-import 'package:sport_log/helpers/extensions/formatting.dart';
 import 'package:sport_log/models/entity_interfaces.dart';
 import 'package:sport_log/models/metcon/all.dart';
 import 'package:sport_log/models/movement/movement.dart';
@@ -49,27 +47,5 @@ class MetconMovementDescription extends CompoundEntity {
   void sanitize() {
     metconMovement.sanitize();
     movement.sanitize();
-  }
-
-  String get countUnitWeight {
-    final count = movement.dimension == MovementDimension.time
-        ? Duration(milliseconds: metconMovement.count).formatTimeShort
-        : "${metconMovement.count}";
-
-    final String unit;
-    if (movement.dimension == MovementDimension.distance) {
-      unit = metconMovement.distanceUnit!.name;
-    } else if (movement.dimension == MovementDimension.time) {
-      unit = "";
-    } else {
-      unit = movement.dimension.name;
-    }
-
-    final weight = metconMovement.maleWeight != null &&
-            metconMovement.femaleWeight != null
-        ? " @ ${formatWeight(metconMovement.maleWeight!, metconMovement.femaleWeight)}"
-        : "";
-
-    return "$count $unit $weight";
   }
 }
