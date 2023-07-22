@@ -28,10 +28,6 @@ class MetconSessionResultsCard extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              "Results",
-              style: Theme.of(context).textTheme.headlineSmall,
-            ),
             if (metconSessionDescription != null)
               EditTile(
                 leading: null,

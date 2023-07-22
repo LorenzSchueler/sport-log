@@ -61,10 +61,7 @@ class MapPage extends StatelessWidget {
                             onChanged: searchUtils.searchPlaces,
                             onTap: () => searchUtils
                                 .searchPlaces(searchUtils.search ?? ""),
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleLarge!
-                                .copyWith(color: Colors.black),
+                            style: const TextStyle(color: Colors.black),
                           ),
                     actions: [
                       IconButton(
@@ -147,10 +144,7 @@ class MapSearchResults extends StatelessWidget {
               onTap: () => onItemTap(index),
               child: Text(
                 searchResults[index].placeName ?? "unknown",
-                style: Theme.of(context)
-                    .textTheme
-                    .titleMedium!
-                    .copyWith(color: Colors.black),
+                style: const TextStyle(color: Colors.black),
               ),
             ),
             itemCount: searchResults.length,

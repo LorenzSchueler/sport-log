@@ -322,7 +322,7 @@ class _RouteEditPageState extends State<RouteEditPage> {
                             ),
                             title: Text(
                               "${index + 1}",
-                              style: Theme.of(context).textTheme.titleMedium,
+                              style: Theme.of(context).textTheme.bodyLarge,
                             ),
                             trailing: const Icon(AppIcons.dragHandle),
                             dense: true,

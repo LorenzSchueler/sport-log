@@ -180,7 +180,7 @@ class MetconSessionCard extends StatelessWidget {
       left: [
         Text(
           metconSessionDescription.metconDescription.metcon.name,
-          style: Theme.of(context).textTheme.titleMedium,
+          style: Theme.of(context).textTheme.bodyLarge,
         ),
         if (metconRecord) ...[
           Defaults.sizedBox.vertical.normal,

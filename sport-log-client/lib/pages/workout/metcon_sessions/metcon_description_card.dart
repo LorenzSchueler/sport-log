@@ -21,10 +21,6 @@ class MetconDescriptionCard extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              "Metcon",
-              style: Theme.of(context).textTheme.headlineSmall,
-            ),
             EditTile(
               leading: null,
               caption: "Type",
@@ -59,9 +55,10 @@ class MetconDescriptionCard extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          mmd.metconMovement.maleWeight != null &&
-                                  mmd.metconMovement.femaleWeight != null
-                              ? "@ ${formatWeight(mmd.metconMovement.maleWeight!, mmd.metconMovement.femaleWeight)}"
+                          mmd.metconMovement.maleWeight != null
+                              ? mmd.metconMovement.femaleWeight != null
+                                  ? "@ ${formatWeight(mmd.metconMovement.maleWeight!, mmd.metconMovement.femaleWeight)}"
+                                  : "@ ${formatWeight(mmd.metconMovement.maleWeight!)}"
                               : "",
                         )
                       ],

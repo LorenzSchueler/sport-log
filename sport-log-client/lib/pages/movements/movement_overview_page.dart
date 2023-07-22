@@ -128,7 +128,7 @@ class MovementCard extends StatelessWidget {
                     width: 200,
                     child: Text(
                       movementDescription.movement.name,
-                      style: Theme.of(context).textTheme.titleMedium,
+                      style: Theme.of(context).textTheme.bodyLarge,
                     ),
                   ),
                   Defaults.sizedBox.vertical.normal,

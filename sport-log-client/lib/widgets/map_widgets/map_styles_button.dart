@@ -126,7 +126,7 @@ class _MapStylesBottomSheetState extends State<MapStylesBottomSheet> {
         children: [
           Text(
             "Map Type",
-            style: Theme.of(context).textTheme.bodyLarge,
+            style: Theme.of(context).textTheme.labelLarge,
           ),
           Defaults.sizedBox.vertical.small,
           SegmentedButton(
@@ -155,7 +155,7 @@ class _MapStylesBottomSheetState extends State<MapStylesBottomSheet> {
           const Divider(),
           Text(
             "Map Options",
-            style: Theme.of(context).textTheme.bodyLarge,
+            style: Theme.of(context).textTheme.labelLarge,
           ),
           Defaults.sizedBox.vertical.small,
           SegmentedButton(

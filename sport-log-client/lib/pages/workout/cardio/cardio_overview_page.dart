@@ -228,7 +228,7 @@ class CardioSessionCard extends StatelessWidget {
                   ),
                   Text(
                     cardioSessionDescription.movement.name,
-                    style: Theme.of(context).textTheme.titleMedium,
+                    style: Theme.of(context).textTheme.bodyLarge,
                   )
                 ],
               ),

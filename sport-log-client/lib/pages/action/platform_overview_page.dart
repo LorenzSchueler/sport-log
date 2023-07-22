@@ -73,7 +73,7 @@ class PlatformCard extends StatelessWidget {
               children: [
                 Text(
                   platformDescription.platform.name,
-                  style: Theme.of(context).textTheme.titleMedium,
+                  style: Theme.of(context).textTheme.bodyLarge,
                 ),
                 Defaults.sizedBox.horizontal.normal,
                 Icon(
@@ -113,14 +113,7 @@ class PlatformCard extends StatelessWidget {
                           text:
                               "Credentials are needed before you can use the action providers.",
                         ),
-                child: Row(
-                  children: [
-                    Text(
-                      actionProvider.name,
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                  ],
-                ),
+                child: Text(actionProvider.name),
               ),
             ]
           ],

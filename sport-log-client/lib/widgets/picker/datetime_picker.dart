@@ -28,9 +28,9 @@ class _TimePickerDialogState extends State<TimePickerDialog> {
         isShowSeconds: widget.withSeconds,
         normalTextStyle: Theme.of(context)
             .textTheme
-            .headlineSmall!
+            .bodyLarge!
             .copyWith(color: Theme.of(context).disabledColor),
-        selectedTextStyle: Theme.of(context).textTheme.headlineSmall!,
+        selectedTextStyle: Theme.of(context).textTheme.bodyLarge!,
       ),
       actions: [
         TextButton(

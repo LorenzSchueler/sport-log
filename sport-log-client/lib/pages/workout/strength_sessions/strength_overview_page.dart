@@ -175,7 +175,7 @@ class StrengthSessionCard extends StatelessWidget {
       left: [
         Text(
           strengthSessionDescription.movement.name,
-          style: Theme.of(context).textTheme.titleMedium,
+          style: Theme.of(context).textTheme.bodyLarge,
         ),
         if (strengthRecordTypes.isNotEmpty) ...[
           Defaults.sizedBox.vertical.normal,

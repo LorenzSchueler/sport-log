@@ -124,7 +124,6 @@ class _MovementEditPageState extends State<MovementEditPage> {
                   },
                   validator: Validator.validateStringNotEmpty,
                   autovalidateMode: AutovalidateMode.onUserInteraction,
-                  style: Theme.of(context).textTheme.titleLarge,
                   textInputAction: TextInputAction.next,
                   keyboardType: TextInputType.text,
                   decoration: const InputDecoration(

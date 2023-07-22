@@ -109,11 +109,7 @@ class HeartRatePage extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 const Icon(AppIcons.battery),
-                                Text(
-                                  "${heartRateUtils.battery}%",
-                                  style:
-                                      Theme.of(context).textTheme.titleMedium,
-                                ),
+                                Text("${heartRateUtils.battery}%"),
                               ],
                             )
                         ],

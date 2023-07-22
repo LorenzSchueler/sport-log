@@ -145,7 +145,6 @@ class _MetconEditPageState extends State<MetconEditPage> {
           setState(() => _metconDescription.metcon.name = name),
       validator: Validator.validateStringNotEmpty,
       autovalidateMode: AutovalidateMode.onUserInteraction,
-      style: Theme.of(context).textTheme.titleLarge,
       textInputAction: TextInputAction.next,
       keyboardType: TextInputType.text,
       decoration: const InputDecoration(
@@ -370,7 +369,7 @@ class _MetconMovementCard extends StatelessWidget {
             children: [
               Text(
                 mmd.movement.name,
-                style: Theme.of(context).textTheme.titleMedium,
+                style: Theme.of(context).textTheme.bodyLarge,
               ),
               const Spacer(),
               IconButton(
