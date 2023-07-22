@@ -65,6 +65,7 @@ class _DoubleInputState extends State<DoubleInput> {
               ? null
               : () =>
                   _setValue(_value - widget.stepSize, updateTextField: true),
+          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
         ),
         SizedBox(
           width: 70,
@@ -103,6 +104,7 @@ class _DoubleInputState extends State<DoubleInput> {
               ? null
               : () =>
                   _setValue(_value + widget.stepSize, updateTextField: true),
+          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
         ),
       ],
     );

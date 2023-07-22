@@ -40,55 +40,46 @@ class _DateFilterState extends State<DateFilter> {
   @override
   Widget build(BuildContext context) {
     final appBarColor = Theme.of(context).appBarTheme.foregroundColor!;
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 15),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: _dateFilterState is AllFilter
-            ? MainAxisAlignment.center
-            : MainAxisAlignment.spaceBetween,
-        children: [
-          if (_dateFilterState is! AllFilter)
-            RepeatIconButton(
-              icon: const Icon(AppIcons.arrowLeft),
-              onClick: () => setDateFilterState(_dateFilterState.earlier),
-              color: appBarColor,
-            ),
-          TextButton.icon(
-            icon: Text(
-              _dateFilterState.label,
-              style: TextStyle(color: appBarColor),
-            ),
-            label: Icon(
-              AppIcons.arrowDropDown,
-              color: appBarColor,
-            ),
-            style: const ButtonStyle(
-              minimumSize: MaterialStatePropertyAll(Size.zero),
-              padding: MaterialStatePropertyAll(EdgeInsets.only(bottom: 10)),
-              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            ),
-            // ignore: prefer-extracting-callbacks
-            onPressed: () async {
-              final dateFilterState = await showDateFilterStatePicker(
-                selectedDateFilterState: _dateFilterState,
-                context: context,
-              );
-              if (dateFilterState != null) {
-                setDateFilterState(dateFilterState);
-              }
-            },
+    return Row(
+      mainAxisAlignment: _dateFilterState is AllFilter
+          ? MainAxisAlignment.center
+          : MainAxisAlignment.spaceBetween,
+      children: [
+        if (_dateFilterState is! AllFilter)
+          RepeatIconButton(
+            icon: const Icon(AppIcons.arrowLeft),
+            onClick: () => setDateFilterState(_dateFilterState.earlier),
+            color: appBarColor,
           ),
-          if (_dateFilterState is! AllFilter)
-            RepeatIconButton(
-              icon: const Icon(AppIcons.arrowRight),
-              onClick: _dateFilterState.goingForwardPossible
-                  ? () => setDateFilterState(_dateFilterState.later)
-                  : null,
-              color: appBarColor,
-            ),
-        ],
-      ),
+        TextButton.icon(
+          icon: Text(
+            _dateFilterState.label,
+            style: TextStyle(color: appBarColor),
+          ),
+          label: Icon(
+            AppIcons.arrowDropDown,
+            color: appBarColor,
+          ),
+          // ignore: prefer-extracting-callbacks
+          onPressed: () async {
+            final dateFilterState = await showDateFilterStatePicker(
+              selectedDateFilterState: _dateFilterState,
+              context: context,
+            );
+            if (dateFilterState != null) {
+              setDateFilterState(dateFilterState);
+            }
+          },
+        ),
+        if (_dateFilterState is! AllFilter)
+          RepeatIconButton(
+            icon: const Icon(AppIcons.arrowRight),
+            onClick: _dateFilterState.goingForwardPossible
+                ? () => setDateFilterState(_dateFilterState.later)
+                : null,
+            color: appBarColor,
+          ),
+      ],
     );
   }
 }

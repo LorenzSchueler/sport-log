@@ -62,6 +62,7 @@ class _IntInputState extends State<IntInput> {
               ? null
               : () =>
                   _setValue(_value - widget.stepSize, updateTextField: true),
+          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
         ),
         SizedBox(
           width: 70,
@@ -100,6 +101,7 @@ class _IntInputState extends State<IntInput> {
               ? null
               : () =>
                   _setValue(_value + widget.stepSize, updateTextField: true),
+          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
         ),
       ],
     );

@@ -6,12 +6,14 @@ class RepeatIconButton extends StatefulWidget {
   const RepeatIconButton({
     required this.icon,
     required this.onClick,
+    this.materialTapTargetSize = MaterialTapTargetSize.padded,
     this.color,
     super.key,
   });
 
   final Icon icon;
   final VoidCallback? onClick;
+  final MaterialTapTargetSize materialTapTargetSize;
   final Color? color;
 
   @override
@@ -36,6 +38,9 @@ class _RepeatIconButtonState extends State<RepeatIconButton> {
         icon: widget.icon,
         color: widget.color,
         onPressed: widget.onClick,
+        style: ButtonStyle(
+          tapTargetSize: widget.materialTapTargetSize,
+        ),
       ),
       onLongPress: () => _timer = Timer.periodic(
         const Duration(milliseconds: 80),

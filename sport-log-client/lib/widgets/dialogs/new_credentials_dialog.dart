@@ -56,7 +56,7 @@ class _NewCredentialsDialogState extends State<NewCredentialsDialog> {
             Defaults.sizedBox.vertical.normal,
             Row(
               children: [
-                ElevatedButton(
+                FilledButton(
                   onPressed: Navigator.of(context).pop,
                   child: const Text("Ignore"),
                 ),
@@ -135,7 +135,7 @@ class _NewCredentialsDialogState extends State<NewCredentialsDialog> {
   }
 
   Widget _submitButton() {
-    return ElevatedButton(
+    return FilledButton(
       onPressed: (!_loginPending &&
               _formKey.currentContext != null &&
               _formKey.currentState!.validate())

@@ -122,10 +122,12 @@ class _MetconEditPageState extends State<MetconEditPage> {
               children: [
                 _nameInput(),
                 _descriptionInput(),
+                Defaults.sizedBox.vertical.small,
                 _typeInput(),
                 Defaults.sizedBox.vertical.small,
                 _additionalFieldsInput(),
-                const Divider(thickness: 2),
+                Defaults.sizedBox.vertical.small,
+                const Divider(),
                 _metconMovementsList(),
                 _addMetconMovementButton(),
               ],
@@ -147,44 +149,43 @@ class _MetconEditPageState extends State<MetconEditPage> {
       textInputAction: TextInputAction.next,
       keyboardType: TextInputType.text,
       decoration: const InputDecoration(
+        icon: Icon(AppIcons.notes),
         labelText: "Name",
       ),
     );
   }
 
   Widget _descriptionInput() {
-    return _metconDescription.metcon.description == null
-        ? ActionChip(
-            avatar: const Icon(AppIcons.add),
-            label: const Text("Add Description"),
-            onPressed: () {
-              FocusManager.instance.primaryFocus?.unfocus();
-              setState(() => _metconDescription.metcon.description = "");
-              _descriptionFocusNode.requestFocus();
-            },
-          )
-        : Padding(
-            padding: const EdgeInsets.only(top: 8),
-            child: TextFormField(
-              initialValue: _metconDescription.metcon.description ?? "",
-              focusNode: _descriptionFocusNode,
-              keyboardType: TextInputType.multiline,
-              minLines: 1,
-              maxLines: 5,
-              onChanged: (description) => setState(
-                () => _metconDescription.metcon.description = description,
-              ),
-              decoration: InputDecoration(
-                labelText: "Description",
-                suffixIcon: IconButton(
-                  icon: const Icon(AppIcons.close),
-                  onPressed: () => setState(
-                    () => _metconDescription.metcon.description = null,
-                  ),
-                ),
-              ),
+    return OptionalTextFormField(
+      textFormField: TextFormField(
+        initialValue: _metconDescription.metcon.description ?? "",
+        focusNode: _descriptionFocusNode,
+        keyboardType: TextInputType.multiline,
+        minLines: 1,
+        maxLines: 5,
+        onChanged: (description) => setState(
+          () => _metconDescription.metcon.description = description,
+        ),
+        decoration: InputDecoration(
+          icon: const Icon(AppIcons.notes),
+          labelText: "Description",
+          suffixIcon: IconButton(
+            icon: const Icon(AppIcons.close),
+            onPressed: () => setState(
+              () => _metconDescription.metcon.description = null,
             ),
-          );
+          ),
+        ),
+      ),
+      showTextFormField: _metconDescription.metcon.description != null,
+      leading: AppIcons.notes,
+      buttonText: "Description",
+      onButtonPressed: () {
+        FocusManager.instance.primaryFocus?.unfocus();
+        setState(() => _metconDescription.metcon.description = "");
+        _descriptionFocusNode.requestFocus();
+      },
+    );
   }
 
   Widget _typeInput() {
@@ -256,11 +257,11 @@ class _MetconEditPageState extends State<MetconEditPage> {
   }
 
   Widget _timecapInput({required String caption, required bool allowCancel}) {
-    return EditTile.optionalActionChip(
+    return EditTile.optionalButton(
       leading: AppIcons.timeInterval,
       caption: caption,
-      showActionChip: _metconDescription.metcon.timecap == null,
-      onActionChipTap: () => setState(() {
+      showButton: _metconDescription.metcon.timecap == null,
+      onButtonPressed: () => setState(() {
         _metconDescription.metcon.timecap = Metcon.timecapDefaultValue;
       }),
       builder: () => DurationInput(
@@ -284,7 +285,7 @@ class _MetconEditPageState extends State<MetconEditPage> {
       shrinkWrap: true,
       itemBuilder: (context, index) {
         final mmd = _metconDescription.moves[index];
-        return MetconMovementCard(
+        return _MetconMovementCard(
           key: ObjectKey(mmd),
           onDelete: () {
             setState(() => _metconDescription.moves.removeAt(index));
@@ -301,9 +302,9 @@ class _MetconEditPageState extends State<MetconEditPage> {
   }
 
   Widget _addMetconMovementButton() {
-    return ActionChip(
-      avatar: const Icon(AppIcons.add),
-      label: const Text("Add movement"),
+    return ElevatedButton.icon(
+      icon: const Icon(AppIcons.add),
+      label: const Text("Movement"),
       // ignore: prefer-extracting-callbacks
       onPressed: () async {
         FocusManager.instance.primaryFocus?.unfocus();
@@ -346,8 +347,8 @@ class _MetconEditPageState extends State<MetconEditPage> {
   }
 }
 
-class MetconMovementCard extends StatelessWidget {
-  const MetconMovementCard({
+class _MetconMovementCard extends StatelessWidget {
+  const _MetconMovementCard({
     required this.onDelete,
     required this.onUpdate,
     required this.mmd,
@@ -360,53 +361,50 @@ class MetconMovementCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
+    return Container(
       margin: const EdgeInsets.only(bottom: 10),
-      child: Padding(
-        padding: Defaults.edgeInsets.normal,
-        child: Column(
-          children: [
-            Row(
-              children: [
-                Text(
-                  mmd.movement.name,
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-                const Spacer(),
-                IconButton(
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
-                  icon: const Icon(AppIcons.delete),
-                  onPressed: onDelete,
-                ),
-                Defaults.sizedBox.horizontal.big,
-                ReorderableDragStartListener(
-                  index: mmd.metconMovement.movementNumber,
-                  child: const Icon(AppIcons.dragHandle),
-                ),
-              ],
-            ),
-            Defaults.sizedBox.vertical.normal,
-            NewSetInput(
-              onNewSet: (count, weight, secondWeight, distanceUnit) {
-                mmd.metconMovement.count = count;
-                mmd.metconMovement.maleWeight = weight;
-                mmd.metconMovement.femaleWeight = secondWeight;
-                mmd.metconMovement.distanceUnit = distanceUnit;
-                onUpdate(mmd);
-              },
-              confirmChanges: false,
-              dimension: mmd.movement.dimension,
-              editWeightUnit: true,
-              distanceUnit: mmd.metconMovement.distanceUnit,
-              editDistanceUnit: true,
-              initialCount: mmd.metconMovement.count,
-              initialWeight: mmd.metconMovement.maleWeight,
-              secondWeight: true,
-              initialSecondWeight: mmd.metconMovement.femaleWeight,
-            ),
-          ],
-        ),
+      padding: const EdgeInsets.symmetric(horizontal: 10),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Text(
+                mmd.movement.name,
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              const Spacer(),
+              IconButton(
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+                icon: const Icon(AppIcons.delete),
+                onPressed: onDelete,
+              ),
+              Defaults.sizedBox.horizontal.big,
+              ReorderableDragStartListener(
+                index: mmd.metconMovement.movementNumber,
+                child: const Icon(AppIcons.dragHandle),
+              ),
+            ],
+          ),
+          NewSetInput(
+            onNewSet: (count, weight, secondWeight, distanceUnit) {
+              mmd.metconMovement.count = count;
+              mmd.metconMovement.maleWeight = weight;
+              mmd.metconMovement.femaleWeight = secondWeight;
+              mmd.metconMovement.distanceUnit = distanceUnit;
+              onUpdate(mmd);
+            },
+            confirmChanges: false,
+            dimension: mmd.movement.dimension,
+            editWeightUnit: true,
+            distanceUnit: mmd.metconMovement.distanceUnit,
+            editDistanceUnit: true,
+            initialCount: mmd.metconMovement.count,
+            initialWeight: mmd.metconMovement.maleWeight,
+            secondWeight: true,
+            initialSecondWeight: mmd.metconMovement.femaleWeight,
+          ),
+        ],
       ),
     );
   }

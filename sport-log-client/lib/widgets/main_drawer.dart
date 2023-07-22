@@ -31,7 +31,7 @@ class MainDrawer extends StatelessWidget {
                     children: [
                       Icon(
                         AppIcons.plan,
-                        size: 100,
+                        size: 90,
                       ),
                       Text(
                         "Sport Log",
@@ -54,7 +54,7 @@ class MainDrawer extends StatelessWidget {
                       ListTile(
                         title: const Text('Movements'),
                         leading:
-                            Icon(AppIcons.exercise, color: onBackgroundColor),
+                            Icon(AppIcons.movement, color: onBackgroundColor),
                         onTap: () => Navigator.of(context)
                             .newBase(Routes.movementOverview),
                         selected: selectedRoute == Routes.movementOverview,

@@ -5,6 +5,7 @@ import 'package:sport_log/helpers/validation.dart';
 import 'package:sport_log/models/movement/all.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/dialogs.dart';
+import 'package:sport_log/widgets/input_fields/edit_tile.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
 
 class MovementEditPage extends StatefulWidget {
@@ -114,108 +115,93 @@ class _MovementEditPageState extends State<MovementEditPage> {
             key: _formKey,
             child: ListView(
               children: [
-                _nameInput(context),
-                ..._movementDescription.movement.description == null
-                    ? [
-                        Defaults.sizedBox.vertical.small,
-                        ActionChip(
-                          avatar: const Icon(AppIcons.add),
-                          label: const Text("Add description"),
-                          onPressed: () {
-                            FocusManager.instance.primaryFocus?.unfocus();
-                            setState(() {
-                              _movementDescription.movement.description = "";
-                            });
-                            _descriptionFocusNode.requestFocus();
-                          },
+                TextFormField(
+                  initialValue: _movementDescription.movement.name,
+                  onChanged: (name) {
+                    if (Validator.validateStringNotEmpty(name) == null) {
+                      setState(() => _movementDescription.movement.name = name);
+                    }
+                  },
+                  validator: Validator.validateStringNotEmpty,
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                  style: Theme.of(context).textTheme.titleLarge,
+                  textInputAction: TextInputAction.next,
+                  keyboardType: TextInputType.text,
+                  decoration: const InputDecoration(
+                    icon: Icon(AppIcons.movement),
+                    labelText: "Name",
+                  ),
+                ),
+                OptionalTextFormField(
+                  textFormField: TextFormField(
+                    initialValue: _movementDescription.movement.description,
+                    focusNode: _descriptionFocusNode,
+                    keyboardType: TextInputType.multiline,
+                    minLines: 1,
+                    maxLines: 5,
+                    onChanged: (description) => setState(
+                      () => _movementDescription.movement.description =
+                          description,
+                    ),
+                    decoration: InputDecoration(
+                      icon: const Icon(AppIcons.notes),
+                      labelText: "Description",
+                      suffixIcon: IconButton(
+                        icon: const Icon(AppIcons.close),
+                        onPressed: () => setState(
+                          () =>
+                              _movementDescription.movement.description = null,
                         ),
-                      ]
-                    : [
-                        Padding(
-                          padding: const EdgeInsets.only(top: 8),
-                          child: TextFormField(
-                            initialValue:
-                                _movementDescription.movement.description,
-                            focusNode: _descriptionFocusNode,
-                            keyboardType: TextInputType.multiline,
-                            minLines: 1,
-                            maxLines: 5,
-                            onChanged: (description) => setState(
-                              () => _movementDescription.movement.description =
-                                  description,
-                            ),
-                            decoration: InputDecoration(
-                              labelText: "Description",
-                              suffixIcon: IconButton(
-                                icon: const Icon(AppIcons.close),
-                                onPressed: () => setState(
-                                  () => _movementDescription
-                                      .movement.description = null,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
+                      ),
+                    ),
+                  ),
+                  showTextFormField:
+                      _movementDescription.movement.description != null,
+                  leading: AppIcons.notes,
+                  buttonText: "Description",
+                  onButtonPressed: () {
+                    FocusManager.instance.primaryFocus?.unfocus();
+                    setState(() {
+                      _movementDescription.movement.description = "";
+                    });
+                    _descriptionFocusNode.requestFocus();
+                  },
+                ),
                 Defaults.sizedBox.vertical.small,
-                _dimInput,
-                _categoryInput(context),
+                SegmentedButton(
+                  segments: MovementDimension.values
+                      .map(
+                        (md) => ButtonSegment(
+                          value: md,
+                          label: Text(md.name),
+                        ),
+                      )
+                      .toList(),
+                  selected: {_movementDescription.movement.dimension},
+                  showSelectedIcon: false,
+                  onSelectionChanged: (selected) => setState(
+                    () => _movementDescription.movement.dimension =
+                        selected.first,
+                  ),
+                ),
+                CheckboxListTile(
+                  value: _movementDescription.movement.cardio,
+                  checkColor: Theme.of(context).colorScheme.onPrimary,
+                  onChanged: (bool? isCardio) {
+                    FocusManager.instance.primaryFocus?.unfocus();
+                    if (isCardio != null) {
+                      setState(
+                        () => _movementDescription.movement.cardio = isCardio,
+                      );
+                    }
+                  },
+                  title: const Text('Is suitable for cardio sessions'),
+                )
               ],
             ),
           ),
         ),
       ),
-    );
-  }
-
-  Widget _nameInput(BuildContext context) {
-    return TextFormField(
-      initialValue: _movementDescription.movement.name,
-      onChanged: (name) {
-        if (Validator.validateStringNotEmpty(name) == null) {
-          setState(() => _movementDescription.movement.name = name);
-        }
-      },
-      validator: Validator.validateStringNotEmpty,
-      autovalidateMode: AutovalidateMode.onUserInteraction,
-      style: Theme.of(context).textTheme.titleLarge,
-      textInputAction: TextInputAction.next,
-      keyboardType: TextInputType.text,
-      decoration: const InputDecoration(
-        labelText: "Name",
-      ),
-    );
-  }
-
-  Widget get _dimInput {
-    return SegmentedButton(
-      segments: MovementDimension.values
-          .map(
-            (md) => ButtonSegment(
-              value: md,
-              label: Text(md.name),
-            ),
-          )
-          .toList(),
-      selected: {_movementDescription.movement.dimension},
-      showSelectedIcon: false,
-      onSelectionChanged: (selected) => setState(
-        () => _movementDescription.movement.dimension = selected.first,
-      ),
-    );
-  }
-
-  Widget _categoryInput(BuildContext context) {
-    return CheckboxListTile(
-      value: _movementDescription.movement.cardio,
-      checkColor: Theme.of(context).colorScheme.onPrimary,
-      onChanged: (bool? isCardio) {
-        FocusManager.instance.primaryFocus?.unfocus();
-        if (isCardio != null) {
-          setState(() => _movementDescription.movement.cardio = isCardio);
-        }
-      },
-      title: const Text('Is suitable for cardio sessions'),
     );
   }
 }

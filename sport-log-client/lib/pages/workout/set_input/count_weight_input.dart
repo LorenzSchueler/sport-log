@@ -208,9 +208,8 @@ class _CountWeightInputState extends State<CountWeightInput> {
                       onUpdate: _setFemaleWeight,
                     ),
                   ),
-                ActionChip(
-                  avatar:
-                      Icon(_weight == null ? AppIcons.add : AppIcons.remove),
+                ElevatedButton.icon(
+                  icon: Icon(_weight == null ? AppIcons.add : AppIcons.remove),
                   label: const Text("Weight"),
                   onPressed: () {
                     FocusManager.instance.primaryFocus?.unfocus();

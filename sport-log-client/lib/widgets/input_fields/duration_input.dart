@@ -115,6 +115,7 @@ class _DurationInputState extends State<DurationInput> {
                     _duration - _durationStep,
                     updateTextField: true,
                   ),
+          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
         ),
         SizedBox(
           width: 70,
@@ -155,6 +156,7 @@ class _DurationInputState extends State<DurationInput> {
                     _duration + _durationStep,
                     updateTextField: true,
                   ),
+          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
         ),
       ],
     );

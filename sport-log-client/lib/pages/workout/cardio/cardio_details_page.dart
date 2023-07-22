@@ -364,7 +364,7 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
               ConstrainedBox(
                 constraints: const BoxConstraints(maxHeight: 250),
                 child: _similarSessions == null
-                    ? ElevatedButton(
+                    ? FilledButton(
                         onPressed: _findSimilarSessions,
                         child: const Text("Find Similar Cardio Sessions"),
                       )

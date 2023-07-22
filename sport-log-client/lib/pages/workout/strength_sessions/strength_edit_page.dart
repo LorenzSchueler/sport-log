@@ -139,13 +139,9 @@ class _StrengthEditPageState extends State<StrengthEditPage> {
             children: [
               _movementInput,
               _dateTimeInput,
-              if (_strengthSessionDescription.session.interval != null)
-                _intervalInput,
-              if (_strengthSessionDescription.session.comments != null)
-                _commentInput,
-              if (_strengthSessionDescription.session.interval == null ||
-                  _strengthSessionDescription.session.comments == null)
-                _buttonBar,
+              _intervalInput,
+              _commentInput,
+              const Divider(),
               NewSetInput(
                 onNewSet: (count, weight, _, __) => _addNewSet(count, weight),
                 confirmChanges: true,
@@ -174,7 +170,7 @@ class _StrengthEditPageState extends State<StrengthEditPage> {
   Widget get _movementInput {
     return EditTile(
       caption: 'Movement',
-      leading: AppIcons.exercise,
+      leading: AppIcons.movement,
       onTap: () async {
         final movement = await showMovementPicker(
           selectedMovement: _strengthSessionDescription.movement,
@@ -190,37 +186,6 @@ class _StrengthEditPageState extends State<StrengthEditPage> {
       child: Text(
         '${_strengthSessionDescription.movement.name} (${_strengthSessionDescription.movement.dimension.name})',
       ),
-    );
-  }
-
-  Widget get _buttonBar {
-    return ButtonBar(
-      children: [
-        if (_strengthSessionDescription.session.interval == null)
-          ActionChip(
-            label: const Text('Interval'),
-            avatar: const Icon(AppIcons.add),
-            onPressed: () {
-              FocusManager.instance.primaryFocus?.unfocus();
-              setState(() {
-                _strengthSessionDescription.session.interval =
-                    StrengthSession.defaultInterval;
-              });
-            },
-          ),
-        if (_strengthSessionDescription.session.comments == null)
-          ActionChip(
-            label: const Text('Comment'),
-            avatar: const Icon(AppIcons.add),
-            onPressed: () {
-              FocusManager.instance.primaryFocus?.unfocus();
-              setState(() {
-                _strengthSessionDescription.session.comments = '';
-              });
-              _commentsNode.requestFocus();
-            },
-          ),
-      ],
     );
   }
 
@@ -245,43 +210,61 @@ class _StrengthEditPageState extends State<StrengthEditPage> {
   }
 
   Widget get _intervalInput {
-    assert(_strengthSessionDescription.session.interval != null);
-    return EditTile(
+    return EditTile.optionalButton(
       caption: 'Interval',
       leading: AppIcons.timeInterval,
       onCancel: () =>
           setState(() => _strengthSessionDescription.session.interval = null),
-      child: DurationInput(
+      builder: () => DurationInput(
         onUpdate: (d) =>
             setState(() => _strengthSessionDescription.session.interval = d),
         initialDuration:
             _strengthSessionDescription.session.interval ?? Duration.zero,
         minDuration: const Duration(seconds: 1),
       ),
+      showButton: _strengthSessionDescription.session.interval == null,
+      onButtonPressed: () {
+        FocusManager.instance.primaryFocus?.unfocus();
+        setState(() {
+          _strengthSessionDescription.session.interval =
+              StrengthSession.defaultInterval;
+        });
+      },
     );
   }
 
   Widget get _commentInput {
-    assert(_strengthSessionDescription.session.comments != null);
-    return TextFormField(
-      focusNode: _commentsNode,
-      keyboardType: TextInputType.multiline,
-      minLines: 1,
-      maxLines: 5,
-      onChanged: (text) {
-        setState(() => _strengthSessionDescription.session.comments = text);
-      },
-      initialValue: _strengthSessionDescription.session.comments,
-      decoration: InputDecoration(
-        labelText: 'Comment',
-        icon: const Icon(AppIcons.edit),
-        suffixIcon: IconButton(
-          onPressed: () => setState(
-            () => _strengthSessionDescription.session.comments = null,
+    return OptionalTextFormField(
+      textFormField: TextFormField(
+        focusNode: _commentsNode,
+        keyboardType: TextInputType.multiline,
+        minLines: 1,
+        maxLines: 5,
+        onChanged: (text) {
+          setState(() => _strengthSessionDescription.session.comments = text);
+        },
+        initialValue: _strengthSessionDescription.session.comments,
+        decoration: InputDecoration(
+          labelText: 'Comment',
+          icon: const Icon(AppIcons.edit),
+          suffixIcon: IconButton(
+            onPressed: () => setState(
+              () => _strengthSessionDescription.session.comments = null,
+            ),
+            icon: const Icon(AppIcons.close),
           ),
-          icon: const Icon(AppIcons.close),
         ),
       ),
+      showTextFormField: _strengthSessionDescription.session.comments != null,
+      leading: AppIcons.edit,
+      buttonText: 'Comment',
+      onButtonPressed: () {
+        FocusManager.instance.primaryFocus?.unfocus();
+        setState(() {
+          _strengthSessionDescription.session.comments = '';
+        });
+        _commentsNode.requestFocus();
+      },
     );
   }
 

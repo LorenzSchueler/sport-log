@@ -109,7 +109,7 @@ class CardioTrackingPage extends StatelessWidget {
                                 trackingUtils.cardioSessionDescription,
                             currentDuration: trackingUtils.currentDuration,
                           ),
-                          Defaults.sizedBox.vertical.normal,
+                          Defaults.sizedBox.vertical.small,
                           _TrackingPageButtons(
                             trackingMode: trackingUtils.mode,
                             onStart: trackingUtils.start,
@@ -156,10 +156,9 @@ class _TrackingPageButtons extends StatelessWidget {
     return switch (trackingMode) {
       TrackingMode.tracking => ConstrainedBox(
           constraints: const BoxConstraints(minWidth: double.infinity),
-          child: ElevatedButton(
+          child: FilledButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: Theme.of(context).colorScheme.error,
-              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
             ),
             onPressed: onPause,
             child: const Text("Pause"),
@@ -168,10 +167,9 @@ class _TrackingPageButtons extends StatelessWidget {
       TrackingMode.paused => Row(
           children: [
             Expanded(
-              child: ElevatedButton(
+              child: FilledButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Theme.of(context).colorScheme.errorContainer,
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 ),
                 onPressed: onResume,
                 child: const Text("Resume"),
@@ -179,10 +177,9 @@ class _TrackingPageButtons extends StatelessWidget {
             ),
             Defaults.sizedBox.horizontal.normal,
             Expanded(
-              child: ElevatedButton(
+              child: FilledButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Theme.of(context).colorScheme.error,
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 ),
                 onPressed: onSave,
                 child: const Text("Save"),
@@ -193,10 +190,9 @@ class _TrackingPageButtons extends StatelessWidget {
       TrackingMode.notStarted => Row(
           children: [
             Expanded(
-              child: ElevatedButton(
+              child: FilledButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Theme.of(context).colorScheme.errorContainer,
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 ),
                 onPressed: waitingOnGPS || waitingOnHR ? null : onStart,
                 child: Text(
@@ -210,10 +206,9 @@ class _TrackingPageButtons extends StatelessWidget {
             ),
             Defaults.sizedBox.horizontal.normal,
             Expanded(
-              child: ElevatedButton(
+              child: FilledButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Theme.of(context).colorScheme.error,
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 ),
                 onPressed: () => Navigator.pop(context),
                 child: const Text("Cancel"),

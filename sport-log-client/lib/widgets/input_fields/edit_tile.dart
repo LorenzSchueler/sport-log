@@ -18,7 +18,85 @@ class CaptionTile extends StatelessWidget {
   }
 }
 
-/// A container with a style similar to TextFormField with style ThemeDataExtension.textFormFieldDecoration
+class DefaultSwitch extends StatelessWidget {
+  const DefaultSwitch({
+    required this.value,
+    required this.onChanged,
+    super.key,
+  });
+
+  final bool value;
+  final void Function(bool) onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 25, // make it fit into EditTile
+      child: FittedBox(
+        child: Switch(
+          value: value,
+          onChanged: (isSet) {
+            FocusManager.instance.primaryFocus?.unfocus();
+            onChanged(isSet);
+          },
+          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        ),
+      ),
+    );
+  }
+}
+
+/// Either a TextFormField or EditTile.optionalButton like placeholder.
+class OptionalTextFormField extends StatelessWidget {
+  const OptionalTextFormField({
+    required this.textFormField,
+    required this.showTextFormField,
+    required this.leading,
+    required this.buttonText,
+    required this.onButtonPressed,
+    super.key,
+  });
+
+  final TextFormField textFormField;
+  final bool showTextFormField;
+  final IconData? leading;
+  final String buttonText;
+  final VoidCallback? onButtonPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return showTextFormField
+        ? textFormField
+        : GestureDetector(
+            onTap: onButtonPressed != null
+                ? () {
+                    FocusManager.instance.primaryFocus?.unfocus();
+                    onButtonPressed!();
+                  }
+                : null,
+            behavior: HitTestBehavior.opaque,
+            child: SizedBox(
+              height: EditTile.textFormFieldHeight,
+              child: Row(
+                children: [
+                  if (leading != null)
+                    Padding(
+                      padding: const EdgeInsets.only(right: 15),
+                      child: Icon(leading, color: EditTile.iconCaptionColor),
+                    ),
+                  ElevatedButton.icon(
+                    icon: const Icon(AppIcons.add),
+                    label: Text(buttonText),
+                    onPressed: onButtonPressed,
+                  ),
+                ],
+              ),
+            ),
+          );
+  }
+}
+
+/// A container with a style similar to TextFormField.
 class EditTile extends StatelessWidget {
   const EditTile({
     required this.child,
@@ -41,17 +119,7 @@ class EditTile extends StatelessWidget {
     bool shrinkWidth = false,
     Key? key,
   }) : this(
-          child: SizedBox(
-            height: 29, // make it fit into EditTile
-            width: 34, // remove left padding
-            child: Switch(
-              value: value,
-              onChanged: (isSet) {
-                FocusManager.instance.primaryFocus?.unfocus();
-                onChanged(isSet);
-              },
-            ),
-          ),
+          child: DefaultSwitch(value: value, onChanged: onChanged),
           leading: leading,
           caption: caption,
           onCancel: onCancel,
@@ -59,12 +127,12 @@ class EditTile extends StatelessWidget {
           key: key,
         );
 
-  EditTile.optionalActionChip({
+  EditTile.optionalButton({
     required Widget Function() builder,
     required IconData leading,
     required String caption,
-    required bool showActionChip,
-    required void Function() onActionChipTap,
+    required bool showButton,
+    required void Function() onButtonPressed,
     void Function()? onTap,
     void Function()? onCancel,
     bool unboundedHeight = false,
@@ -72,19 +140,19 @@ class EditTile extends StatelessWidget {
     Key? key,
   }) : this(
           leading: leading,
-          caption: showActionChip ? null : caption,
-          onTap: showActionChip ? null : onTap,
-          onCancel: showActionChip ? null : onCancel,
-          unboundedHeight: showActionChip ? false : unboundedHeight,
+          caption: showButton ? null : caption,
+          onTap: showButton ? null : onTap,
+          onCancel: showButton ? null : onCancel,
+          unboundedHeight: showButton ? false : unboundedHeight,
           shrinkWidth: shrinkWidth,
           key: key,
-          child: showActionChip
-              ? ActionChip(
-                  avatar: const Icon(AppIcons.add),
+          child: showButton
+              ? ElevatedButton.icon(
+                  icon: const Icon(AppIcons.add),
                   label: Text(caption),
                   onPressed: () {
                     FocusManager.instance.primaryFocus?.unfocus();
-                    onActionChipTap();
+                    onButtonPressed();
                   },
                 )
               : builder(),
@@ -103,6 +171,7 @@ class EditTile extends StatelessWidget {
   final bool shrinkWidth;
 
   static const Color iconCaptionColor = Colors.white70;
+  static const double textFormFieldHeight = 49;
 
   Widget _captionChildColumn(BuildContext context) {
     return Column(
@@ -110,7 +179,7 @@ class EditTile extends StatelessWidget {
       children: [
         if (caption != null) CaptionTile(caption: caption!),
         DefaultTextStyle(
-          style: Theme.of(context).textTheme.titleMedium!,
+          style: Theme.of(context).textTheme.bodyLarge!,
           child: child,
         ),
       ],
@@ -128,7 +197,7 @@ class EditTile extends StatelessWidget {
           : null,
       behavior: HitTestBehavior.opaque,
       child: SizedBox(
-        height: unboundedHeight ? null : 49, // height of TextFormField
+        height: unboundedHeight ? null : textFormFieldHeight,
         child: Row(
           mainAxisSize: shrinkWidth ? MainAxisSize.min : MainAxisSize.max,
           children: [

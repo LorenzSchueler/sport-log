@@ -2,6 +2,7 @@ import 'package:fixnum/fixnum.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_log/data_provider/data_providers/action_data_provider.dart';
 import 'package:sport_log/defaults.dart';
+import 'package:sport_log/helpers/bool_toggle.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/action/action_provider.dart';
@@ -10,6 +11,7 @@ import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/dialogs.dart';
 import 'package:sport_log/widgets/input_fields/edit_tile.dart';
+import 'package:sport_log/widgets/provider_consumer.dart';
 import 'package:sport_log/widgets/sync_refresh_indicator.dart';
 
 String actionName(
@@ -172,8 +174,7 @@ class ActionRulesCard extends StatelessWidget {
               children: [
                 const CaptionTile(caption: "Action Rules"),
                 IconButton(
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
+                  visualDensity: VisualDensity.compact,
                   onPressed: () => Navigator.of(context).pushNamed(
                     Routes.actionRuleEdit,
                     arguments: [actionProviderDescription, null],
@@ -208,19 +209,15 @@ class ActionRulesCard extends StatelessWidget {
                           "${actionRule.weekday.name} at ${actionRule.time.formatHm}",
                         ),
                         const Spacer(),
-                        // make as big is add icon
-                        SizedBox(
-                          height: 24,
-                          width: 24,
-                          child: Checkbox(
-                            value: actionRule.enabled,
-                            onChanged: (value) {
-                              if (value != null) {
-                                actionRule.enabled = value;
-                                _dataProvider.updateSingle(actionRule);
-                              }
-                            },
-                          ),
+                        Checkbox(
+                          visualDensity: VisualDensity.compact,
+                          value: actionRule.enabled,
+                          onChanged: (value) {
+                            if (value != null) {
+                              actionRule.enabled = value;
+                              _dataProvider.updateSingle(actionRule);
+                            }
+                          },
                         )
                       ],
                     ),
@@ -263,13 +260,12 @@ class ActionEventsCard extends StatelessWidget {
               children: [
                 const CaptionTile(caption: "Action Events"),
                 IconButton(
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
                   onPressed: () => Navigator.of(context).pushNamed(
                     Routes.actionEventEdit,
                     arguments: [actionProviderDescription, null],
                   ),
                   icon: const Icon(AppIcons.add),
+                  visualDensity: VisualDensity.compact,
                 ),
               ],
             ),
@@ -300,19 +296,15 @@ class ActionEventsCard extends StatelessWidget {
                           actionEvent.datetime.toHumanDateTime(),
                         ),
                         const Spacer(),
-                        // make as big is add icon
-                        SizedBox(
-                          height: 24,
-                          width: 24,
-                          child: Checkbox(
-                            value: actionEvent.enabled,
-                            onChanged: (value) {
-                              if (value != null) {
-                                actionEvent.enabled = value;
-                                _dataProvider.updateSingle(actionEvent);
-                              }
-                            },
-                          ),
+                        Checkbox(
+                          value: actionEvent.enabled,
+                          onChanged: (value) {
+                            if (value != null) {
+                              actionEvent.enabled = value;
+                              _dataProvider.updateSingle(actionEvent);
+                            }
+                          },
+                          visualDensity: VisualDensity.compact,
                         ),
                       ],
                     ),

@@ -25,7 +25,7 @@ class CardioTrackingSettingsPage extends StatelessWidget {
           builder: (_, trackingSettings, __) => ListView(
             children: [
               EditTile(
-                leading: AppIcons.exercise,
+                leading: AppIcons.movement,
                 caption: "Movement",
                 child: Text(trackingSettings.movement.name),
                 onTap: () async {
@@ -143,14 +143,10 @@ class CardioTrackingSettingsPage extends StatelessWidget {
                             trackingSettings.audioFeedback!.metrics[index];
                         return Row(
                           children: [
-                            SizedBox(
-                              height: 29,
-                              width: 34, // remove left padding
-                              child: Switch(
-                                value: metric.isEnabled,
-                                onChanged: (enabled) =>
-                                    metric.isEnabled = enabled,
-                              ),
+                            DefaultSwitch(
+                              value: metric.isEnabled,
+                              onChanged: (enabled) =>
+                                  metric.isEnabled = enabled,
                             ),
                             Defaults.sizedBox.horizontal.normal,
                             Text(metric.name),
@@ -203,16 +199,13 @@ class CardioTrackingSettingsPage extends StatelessWidget {
                         ),
                       ),
                     ),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () => Navigator.pushNamed(
-                    context,
-                    Routes.tracking,
-                    arguments: trackingSettings,
-                  ),
-                  child: const Text("OK"),
+              FilledButton(
+                onPressed: () => Navigator.pushNamed(
+                  context,
+                  Routes.tracking,
+                  arguments: trackingSettings,
                 ),
+                child: const Text("OK"),
               ),
             ],
           ),

@@ -37,22 +37,22 @@ enum SessionsPageTab {
   String get noEntriesWithoutAddText =>
       "Looks like there are no $entryName there yet 😔 \nSelect a different time range above ↑";
 
-  static BottomNavigationBar bottomNavigationBar({
+  static NavigationBar bottomNavigationBar({
     required BuildContext context,
     required SessionsPageTab sessionsPageTab,
   }) {
-    return BottomNavigationBar(
-      items: SessionsPageTab.values
+    return NavigationBar(
+      destinations: SessionsPageTab.values
           .map(
-            (tab) => BottomNavigationBarItem(
+            (tab) => NavigationDestination(
               icon: Icon(tab.icon),
               label: tab.label,
             ),
           )
           .toList(),
-      currentIndex: sessionsPageTab.index,
-      onTap: (index) => Navigator.of(context).newBase(values[index].route),
-      type: BottomNavigationBarType.fixed,
+      selectedIndex: sessionsPageTab.index,
+      onDestinationSelected: (index) =>
+          Navigator.of(context).newBase(values[index].route),
     );
   }
 }

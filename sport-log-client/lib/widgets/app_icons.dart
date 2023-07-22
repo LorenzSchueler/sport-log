@@ -75,7 +75,7 @@ abstract final class AppIcons {
   static const IconData stopwatch = Icons.timer_outlined;
   static const IconData sports = Icons.sports_rounded;
   static const IconData comment = Icons.comment_outlined;
-  static const IconData exercise = Icons.directions_run_rounded;
+  static const IconData movement = Icons.directions_run_rounded;
   static const IconData calendar = Icons.calendar_today_rounded;
   static const IconData notes = Icons.notes_rounded;
   static const IconData cloudUpload = Icons.cloud_upload_outlined;

@@ -212,7 +212,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget _submitButton() {
-    return ElevatedButton(
+    return FilledButton(
       onPressed: (!_loginPending &&
               _formKey.currentContext != null &&
               _formKey.currentState!.validate())

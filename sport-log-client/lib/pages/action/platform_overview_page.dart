@@ -197,12 +197,12 @@ class _PlatformCredentialDialogState extends State<PlatformCredentialDialog> {
               padding: const EdgeInsets.only(left: 24 + 15),
               child: Row(
                 children: [
-                  ElevatedButton(
+                  FilledButton(
                     onPressed: _update,
                     child: Text(widget.isNew ? "Create" : "Edit"),
                   ),
                   const Spacer(),
-                  ElevatedButton(
+                  FilledButton(
                     onPressed: _delete,
                     child: Text(widget.isNew ? "Back" : "Delete"),
                   ),

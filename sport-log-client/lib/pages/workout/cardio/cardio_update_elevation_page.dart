@@ -88,31 +88,25 @@ class _CardioUpdateElevationPageState extends State<CardioUpdateElevationPage> {
               ),
               if (_progress != null) LinearProgressIndicator(value: _progress),
               Defaults.sizedBox.vertical.normal,
-              ElevatedButton(
-                onPressed: _progress == null ? _updateElevation : null,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(context).colorScheme.error,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(AppIcons.trendingUp),
-                    Defaults.sizedBox.horizontal.normal,
-                    const Text("Update Elevation"),
-                  ],
+              SizedBox(
+                width: double.infinity,
+                child: FilledButton.icon(
+                  icon: const Icon(AppIcons.trendingUp),
+                  label: const Text("Update Elevation"),
+                  onPressed: _progress == null ? _updateElevation : null,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Theme.of(context).colorScheme.error,
+                  ),
                 ),
               ),
-              ElevatedButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(AppIcons.close),
-                    Defaults.sizedBox.horizontal.normal,
-                    const Text("Cancel"),
-                  ],
+              SizedBox(
+                width: double.infinity,
+                child: FilledButton.icon(
+                  icon: const Icon(AppIcons.close),
+                  label: const Text("Cancel"),
+                  onPressed: () => Navigator.of(context).pop(),
                 ),
-              ),
+              )
             ],
           ),
         ),

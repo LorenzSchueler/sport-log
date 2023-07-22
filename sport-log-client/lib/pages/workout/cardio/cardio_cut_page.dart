@@ -173,31 +173,29 @@ class _CardioCutPageState extends State<CardioCutPage> {
                       ),
                     ],
                   ),
-                  ElevatedButton(
-                    onPressed: _cutCardioSession,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Theme.of(context).colorScheme.error,
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(AppIcons.cut),
-                        Defaults.sizedBox.horizontal.normal,
-                        const Text("Cut"),
-                      ],
-                    ),
-                  ),
-                  ElevatedButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(AppIcons.close),
-                        Defaults.sizedBox.horizontal.normal,
-                        const Text("Cancel"),
-                      ],
-                    ),
-                  ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: FilledButton.icon(
+                          icon: const Icon(AppIcons.cut),
+                          label: const Text("Cut"),
+                          onPressed: _cutCardioSession,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor:
+                                Theme.of(context).colorScheme.error,
+                          ),
+                        ),
+                      ),
+                      Defaults.sizedBox.horizontal.normal,
+                      Expanded(
+                        child: FilledButton.icon(
+                          icon: const Icon(AppIcons.close),
+                          label: const Text("Cancel"),
+                          onPressed: () => Navigator.of(context).pop(),
+                        ),
+                      ),
+                    ],
+                  )
                 ],
               ),
             )

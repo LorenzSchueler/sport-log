@@ -17,7 +17,7 @@ class LandingPage extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: ElevatedButton(
+                child: FilledButton(
                   onPressed: () {
                     Navigator.pushNamed(context, Routes.login);
                   },
@@ -26,7 +26,7 @@ class LandingPage extends StatelessWidget {
               ),
               Defaults.sizedBox.horizontal.big,
               Expanded(
-                child: ElevatedButton(
+                child: FilledButton(
                   onPressed: () {
                     Navigator.pushNamed(context, Routes.registration);
                   },
@@ -35,7 +35,7 @@ class LandingPage extends StatelessWidget {
               ),
             ],
           ),
-          ElevatedButton(
+          FilledButton(
             onPressed: () {
               Account.noAccount();
               Navigator.of(context).newBase(Routes.timelineOverview);

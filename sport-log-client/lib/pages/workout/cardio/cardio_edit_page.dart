@@ -251,7 +251,7 @@ class _CardioEditPageState extends State<CardioEditPage> {
                   padding: Defaults.edgeInsets.normal,
                   children: [
                     EditTile(
-                      leading: AppIcons.exercise,
+                      leading: AppIcons.movement,
                       caption: "Movement",
                       child: Text(_cardioSessionDescription.movement.name),
                       onTap: () async {
@@ -412,12 +412,12 @@ class _CardioEditPageState extends State<CardioEditPage> {
                         labelText: "Descent (m)",
                       ),
                     ),
-                    EditTile.optionalActionChip(
+                    EditTile.optionalButton(
                       leading: AppIcons.timeInterval,
                       caption: "Time",
-                      showActionChip:
+                      showButton:
                           _cardioSessionDescription.cardioSession.time == null,
-                      onActionChipTap: () => setState(() {
+                      onButtonPressed: () => setState(() {
                         _cardioSessionDescription.cardioSession.time =
                             const Duration(minutes: 1);
                       }),

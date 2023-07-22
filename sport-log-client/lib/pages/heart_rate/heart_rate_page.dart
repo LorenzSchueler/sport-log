@@ -25,7 +25,7 @@ class HeartRatePage extends StatelessWidget {
               create: (_) => HeartRateUtils(),
               builder: (_, heartRateUtils, __) => Column(
                 children: [
-                  ElevatedButton(
+                  FilledButton(
                     onPressed: heartRateUtils.isSearching
                         ? null
                         : () async {
@@ -74,7 +74,7 @@ class HeartRatePage extends StatelessWidget {
                     ),
                     if (heartRateUtils.canConnect) ...[
                       Defaults.sizedBox.vertical.normal,
-                      ElevatedButton(
+                      FilledButton(
                         onPressed: () => heartRateUtils
                             .startHeartRateStream(null, hrv: true),
                         child: const Text("Connect"),

@@ -7,7 +7,6 @@ import 'package:sport_log/helpers/lat_lng.dart';
 abstract class Defaults {
   static const sizedBox = _SizedBox();
   static const edgeInsets = _EdgeInsets();
-  static const borderRadius = _BorderRadius();
   static final mapbox = _Mapbox();
   static final mapboxApi = MapboxApi(accessToken: Config.instance.accessToken);
   static final server = _Server();
@@ -49,14 +48,6 @@ class _Vertical {
   final big = const SizedBox(height: 20);
   final normal = const SizedBox(height: 10);
   final small = const SizedBox(height: 5);
-}
-
-class _BorderRadius {
-  const _BorderRadius();
-
-  final big = const BorderRadius.all(Radius.circular(20));
-  final normal = const BorderRadius.all(Radius.circular(10));
-  final small = const BorderRadius.all(Radius.circular(5));
 }
 
 class _Mapbox {

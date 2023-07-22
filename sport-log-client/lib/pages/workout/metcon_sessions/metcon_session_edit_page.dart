@@ -199,33 +199,28 @@ class _MetconSessionEditPageState extends State<MetconSessionEditPage> {
                     children: [
                       const Text("finished"),
                       Defaults.sizedBox.horizontal.normal,
-                      SizedBox(
-                        height: 29,
-                        width: 34, // remove left padding
-                        child: Switch(
-                          value: _finished,
-                          onChanged: (finished) {
-                            FocusManager.instance.primaryFocus?.unfocus();
-                            setState(() {
-                              _finished = finished;
-                              if (_finished) {
-                                _metconSessionDescription.metconSession.time =
-                                    Duration.zero;
-                                _metconSessionDescription.metconSession.rounds =
-                                    null;
-                                _metconSessionDescription.metconSession.rounds =
-                                    null;
-                              } else {
-                                _metconSessionDescription.metconSession.time =
-                                    null;
-                                _metconSessionDescription.metconSession.rounds =
-                                    0;
-                                _metconSessionDescription.metconSession.reps =
-                                    0;
-                              }
-                            });
-                          },
-                        ),
+                      DefaultSwitch(
+                        value: _finished,
+                        onChanged: (finished) {
+                          FocusManager.instance.primaryFocus?.unfocus();
+                          setState(() {
+                            _finished = finished;
+                            if (_finished) {
+                              _metconSessionDescription.metconSession.time =
+                                  Duration.zero;
+                              _metconSessionDescription.metconSession.rounds =
+                                  null;
+                              _metconSessionDescription.metconSession.rounds =
+                                  null;
+                            } else {
+                              _metconSessionDescription.metconSession.time =
+                                  null;
+                              _metconSessionDescription.metconSession.rounds =
+                                  0;
+                              _metconSessionDescription.metconSession.reps = 0;
+                            }
+                          });
+                        },
                       ),
                     ],
                   ),

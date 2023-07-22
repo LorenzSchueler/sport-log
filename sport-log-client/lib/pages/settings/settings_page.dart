@@ -189,7 +189,7 @@ class SettingsPage extends StatelessWidget {
                     child: Row(
                       children: [
                         Expanded(
-                          child: ElevatedButton(
+                          child: FilledButton(
                             onPressed: () =>
                                 Navigator.of(context).pushNamed(Routes.login),
                             child: const Text('Login'),
@@ -197,7 +197,7 @@ class SettingsPage extends StatelessWidget {
                         ),
                         Defaults.sizedBox.horizontal.normal,
                         Expanded(
-                          child: ElevatedButton(
+                          child: FilledButton(
                             onPressed: () => Navigator.of(context)
                                 .pushNamed(Routes.registration),
                             child: const Text('Register'),
@@ -315,7 +315,7 @@ class SettingsPage extends StatelessWidget {
                             const BoxConstraints(minWidth: double.infinity),
                         child: ElevatedButton(
                           style: ButtonStyle(
-                            backgroundColor: MaterialStateProperty.all(
+                            foregroundColor: MaterialStateProperty.all(
                               Theme.of(context).colorScheme.errorContainer,
                             ),
                           ),
@@ -334,7 +334,7 @@ class SettingsPage extends StatelessWidget {
                           Expanded(
                             child: ElevatedButton(
                               style: ButtonStyle(
-                                backgroundColor: MaterialStateProperty.all(
+                                foregroundColor: MaterialStateProperty.all(
                                   Theme.of(context).colorScheme.error,
                                 ),
                               ),
@@ -348,7 +348,7 @@ class SettingsPage extends StatelessWidget {
                           Expanded(
                             child: ElevatedButton(
                               style: ButtonStyle(
-                                backgroundColor: MaterialStateProperty.all(
+                                foregroundColor: MaterialStateProperty.all(
                                   Theme.of(context).colorScheme.error,
                                 ),
                               ),
@@ -434,7 +434,7 @@ class SettingsPage extends StatelessWidget {
                   child: ConstrainedBox(
                     constraints:
                         const BoxConstraints(minWidth: double.infinity),
-                    child: OutlinedButton(
+                    child: ElevatedButton(
                       child: const Text('About'),
                       onPressed: () =>
                           Navigator.pushNamed(context, Routes.about),

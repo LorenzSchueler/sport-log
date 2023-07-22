@@ -1,7 +1,6 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:sport_log/defaults.dart';
 import 'package:sport_log/widgets/input_fields/edit_tile.dart';
 
 class AppTheme {
@@ -19,6 +18,7 @@ class AppTheme {
       onSurfaceVariant: Colors.white,
       error: _warning,
       errorContainer: _ok, // used for opposite of error like ok, start, ...
+      surfaceTint: Colors.transparent,
     ),
   );
 
@@ -36,8 +36,16 @@ class AppTheme {
 
   // ignore: long-method
   static ThemeData _themeDataFromColors(ColorScheme colorScheme) {
+    final buttonStyle = ButtonStyle(
+      textStyle: MaterialStateProperty.all(
+        const TextStyle(
+          fontSize: 20,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+    );
     return ThemeData(
-      //useMaterial3: true,
+      useMaterial3: true,
       colorScheme: colorScheme,
       primarySwatch: _generateMaterialColor(colorScheme.primary),
       scaffoldBackgroundColor: colorScheme.background,
@@ -49,38 +57,15 @@ class AppTheme {
         backgroundColor: colorScheme.surface,
         selectedItemColor: colorScheme.primary,
       ),
+      dividerTheme: DividerThemeData(color: colorScheme.surfaceVariant),
       drawerTheme: DrawerThemeData(
         backgroundColor: colorScheme.background,
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
-        style: ButtonStyle(
-          textStyle: MaterialStateProperty.all(
-            const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          shape: MaterialStateProperty.all(
-            RoundedRectangleBorder(
-              borderRadius: Defaults.borderRadius.normal,
-            ),
-          ),
-        ),
+        style: buttonStyle,
       ),
-      outlinedButtonTheme: OutlinedButtonThemeData(
-        style: ButtonStyle(
-          textStyle: MaterialStateProperty.all(
-            const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          shape: MaterialStateProperty.all(
-            RoundedRectangleBorder(
-              borderRadius: Defaults.borderRadius.normal,
-            ),
-          ),
-        ),
+      filledButtonTheme: FilledButtonThemeData(
+        style: buttonStyle,
       ),
       segmentedButtonTheme: SegmentedButtonThemeData(
         style: ButtonStyle(
@@ -104,92 +89,50 @@ class AppTheme {
       cardTheme: CardTheme(color: colorScheme.surface),
       dialogTheme: DialogTheme(
         backgroundColor: colorScheme.surface,
-        shape: RoundedRectangleBorder(
-          borderRadius: Defaults.borderRadius.normal,
-        ),
       ),
       snackBarTheme: SnackBarThemeData(
         backgroundColor: colorScheme.surface,
       ),
       switchTheme: SwitchThemeData(
-        trackColor: MaterialStateProperty.resolveWith((states) {
-          if (states.contains(MaterialState.selected)) {
-            return colorScheme.primary.withAlpha(200);
-          }
-          return null;
-        }),
-        thumbColor: MaterialStateProperty.resolveWith((states) {
-          if (states.contains(MaterialState.selected)) {
-            return colorScheme.primary;
-          }
-          return null;
-        }),
+        trackOutlineColor: MaterialStatePropertyAll(colorScheme.primary),
+        trackColor: MaterialStateProperty.resolveWith(
+          (states) => states.contains(MaterialState.selected)
+              ? null
+              : Colors.transparent,
+        ),
+      ),
+      navigationBarTheme: NavigationBarThemeData(
+        height: 65,
+        indicatorColor: colorScheme.primary,
       ),
       checkboxTheme: CheckboxThemeData(
-        fillColor: MaterialStateProperty.resolveWith((states) {
-          if (states.contains(MaterialState.selected)) {
-            return colorScheme.primary;
-          }
-          return null;
-        }),
+        fillColor: MaterialStateProperty.resolveWith(
+          (states) => states.contains(MaterialState.selected)
+              ? colorScheme.primary
+              : null,
+        ),
       ),
       // input decoration for InputDecorator, TextField, and TextFormField
-      inputDecorationTheme: const InputDecorationTheme(
-        contentPadding: EdgeInsets.symmetric(vertical: 5),
+      inputDecorationTheme: InputDecorationTheme(
+        contentPadding: const EdgeInsets.symmetric(vertical: 5),
         border: InputBorder.none,
         iconColor: EditTile.iconCaptionColor,
+        labelStyle: const TextStyle(color: EditTile.iconCaptionColor),
+        floatingLabelStyle: MaterialStateTextStyle.resolveWith(
+          (states) => TextStyle(
+            color: states.contains(MaterialState.selected)
+                ? colorScheme.primary
+                : EditTile.iconCaptionColor,
+            fontSize: 18,
+          ),
+        ),
       ),
       textTheme: const TextTheme(
-        //headline1    96.0  light
-        //Extremely large text.
-        //
-        //headline2    60.0  light
-        //Very, very large text.
-        //Used for the date in the dialog shown by showDatePicker.
-        //
-        //headline3    48.0  regular
-        //Very large text.
-        //
-        //headline4    34.0  regular
-        //Large text.
-        //
-        //headlineSmall    24.0  regular
-        //Used for large text in dialogs (e.g., the month and year in the dialog shown by showDatePicker).
-        //
-        //titleLarge    20.0  medium
-        //Used for the primary text in app bars and dialogs (e.g., AppBar.title and AlertDialog.title).
-        //
-        //titleMedium    16.0  regular
-        //Used for the primary text in lists (e.g., ListTile.title).
-        // TextField, EditTile
-        titleMedium: TextStyle(
+        // TextFormField
+        bodyLarge: TextStyle(
           fontSize: 20,
           height: 1,
         ),
-        //
-        //titleSmall    14.0  medium
-        //For medium emphasis text that's a little smaller than titleMedium.
-        //
-        //bodyLarge        16.0  regular
-        //Used for emphasizing text that would otherwise be bodyText2.
-        // ListTile
-        //
-        //bodyText2        14.0  regular
-        //The default text style for Material.
-        //
-        //button       14.0  medium
-        //Used for text on ElevatedButton, TextButton and OutlinedButton.
-        //
-        //bodySmall      12.0  regular
-        //Used for auxiliary text associated with images.
-        // validator message
-        bodySmall: TextStyle(
-          fontSize: 14,
-        ),
-        //
-        //overline     10.0  regular
-        //The smallest style.
-        //Typically used for captions or to introduce a (larger) headline.
       ),
     );
   }

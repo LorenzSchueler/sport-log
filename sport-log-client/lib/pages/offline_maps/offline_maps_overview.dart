@@ -131,14 +131,13 @@ class _OfflineMapsPageState extends State<OfflineMapsPage> {
                     child: Column(
                       children: [
                         mapDownloadUtils.progress == null
-                            ? ElevatedButton(
-                                onPressed: () => _downloadMap(mapDownloadUtils),
-                                child: const Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(AppIcons.download),
-                                    Text("Download")
-                                  ],
+                            ? SizedBox(
+                                width: double.infinity,
+                                child: FilledButton.icon(
+                                  icon: const Icon(AppIcons.download),
+                                  label: const Text("Download"),
+                                  onPressed: () =>
+                                      _downloadMap(mapDownloadUtils),
                                 ),
                               )
                             : LinearProgressIndicator(

@@ -93,7 +93,7 @@ class _RouteUploadPageState extends State<RouteUploadPage> {
                 children: [
                   SizedBox(
                     width: double.infinity,
-                    child: ElevatedButton(
+                    child: FilledButton(
                       onPressed: _loadFile,
                       child: const Text("Open GPX File"),
                     ),

@@ -61,7 +61,7 @@ class TimerPage extends StatelessWidget {
                         Defaults.sizedBox.vertical.huge,
                         _startStopButton(context, timerState),
                         const SizedBox(height: 100),
-                        timeText(timerState),
+                        _timeText(timerState),
                       ],
                     ),
                     Column(
@@ -79,7 +79,7 @@ class TimerPage extends StatelessWidget {
                             style: const TextStyle(fontSize: 80),
                           ),
                         ),
-                        timeText(timerState),
+                        _timeText(timerState),
                       ],
                     ),
                     Column(
@@ -88,7 +88,7 @@ class TimerPage extends StatelessWidget {
                         Defaults.sizedBox.vertical.huge,
                         _startStopButton(context, timerState),
                         const SizedBox(height: 100),
-                        timeText(timerState),
+                        _timeText(timerState),
                       ],
                     ),
                   ],
@@ -115,11 +115,11 @@ class TimerPage extends StatelessWidget {
   }
 
   Widget _restTimeFormField(TimerState timerState) {
-    return EditTile.optionalActionChip(
+    return EditTile.optionalButton(
       caption: "Rest Time",
       leading: AppIcons.timeInterval,
-      showActionChip: timerState.restTime == null,
-      onActionChipTap: () {
+      showButton: timerState.restTime == null,
+      onButtonPressed: () {
         timerState.restTime = const Duration(minutes: 1);
       },
       onCancel: () => timerState.restTime = null,
@@ -146,14 +146,14 @@ class TimerPage extends StatelessWidget {
 
   Widget _startStopButton(BuildContext context, TimerState timerState) {
     return timerState.isRunning
-        ? ElevatedButton(
+        ? FilledButton(
             onPressed: timerState.stop,
             style: ElevatedButton.styleFrom(
               backgroundColor: Theme.of(context).colorScheme.error,
             ),
             child: const Text("Stop", style: TextStyle(fontSize: 50)),
           )
-        : ElevatedButton(
+        : FilledButton(
             onPressed: () => timerState.time.inSeconds > 0
                 ? timerState.start(
                     TimerType.values[DefaultTabController.of(context).index],
@@ -169,7 +169,7 @@ class TimerPage extends StatelessWidget {
           );
   }
 
-  Widget timeText(TimerState timerState) {
+  Widget _timeText(TimerState timerState) {
     final timeText = timerState.isRunning
         ? timerState.displayTime!.abs().formatTimeShort
         : "00:10";
