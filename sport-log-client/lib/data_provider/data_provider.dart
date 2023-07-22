@@ -52,7 +52,7 @@ abstract class DataProvider<T> extends ChangeNotifier {
       case ApiErrorType.conflict:
         final conflictResolution = await showConflictDialog(
           context: App.globalContext,
-          title: "An error occurred.",
+          title: "An Error Occurred",
           text: error.toString(),
         );
         _logger.i(conflictResolution);
@@ -61,7 +61,7 @@ abstract class DataProvider<T> extends ChangeNotifier {
       default:
         await showMessageDialog(
           context: App.globalContext,
-          title: "An error occurred.",
+          title: "An Error Occurred",
           text: error.toString(),
         );
         return null;
@@ -74,7 +74,7 @@ abstract class DataProvider<T> extends ChangeNotifier {
     _logger.e('Db error: $error');
     await showMessageDialog(
       context: App.globalContext,
-      title: "An error occurred.",
+      title: "An Error Occurred",
       text: error.toString(),
     );
   }

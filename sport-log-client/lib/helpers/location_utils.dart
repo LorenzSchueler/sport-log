@@ -43,6 +43,7 @@ class LocationUtils extends ChangeNotifier {
       if (context.mounted) {
         await showMessageDialog(
           context: context,
+          title: "Permission Required",
           text: "Location must be always allowed.",
         );
       }

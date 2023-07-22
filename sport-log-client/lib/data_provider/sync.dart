@@ -71,6 +71,7 @@ class Sync extends ChangeNotifier {
             unawaited(
               showMessageDialog(
                 context: context,
+                title: "Api Version Not Compatible",
                 text:
                     "Client api version ${Config.apiVersion} is not compatible with server api versions: $_serverVersion\n"
                     "Server synchronization is no longer possible. Please update the app.",

@@ -51,7 +51,7 @@ enum ConflictResolution {
 
 Future<ConflictResolution> showConflictDialog({
   required BuildContext context,
-  String? title,
+  required String title,
   required String text,
 }) async {
   return (await showDialog<ConflictResolution?>(
@@ -71,27 +71,58 @@ Future<ConflictResolution> showConflictDialog({
   ))!;
 }
 
-enum SystemSettings {
+enum PermissionSettings {
   change,
   ignore;
 
-  bool get isChange => this == SystemSettings.change;
-  bool get isIgnore => this == SystemSettings.ignore;
+  bool get isChange => this == PermissionSettings.change;
+  bool get isIgnore => this == PermissionSettings.ignore;
 }
 
-Future<SystemSettings> showSystemSettingsDialog({required String text}) async {
-  final systemSettings = await showDialog<SystemSettings>(
+Future<PermissionSettings> showPermissionRequiredDialog({
+  required String text,
+}) async {
+  final systemSettings = await showDialog<PermissionSettings>(
     context: App.globalContext,
     builder: (_) => _Dialog(
-      title: null,
+      title: "Permission Required",
       text: text,
       options: [
-        _DialogOption(name: "Change Permissions", value: SystemSettings.change),
-        _DialogOption(name: "Ignore", value: SystemSettings.ignore),
+        _DialogOption(
+          name: "Change Permissions",
+          value: PermissionSettings.change,
+        ),
+        _DialogOption(name: "Ignore", value: PermissionSettings.ignore),
       ],
     ),
   );
-  return systemSettings ?? SystemSettings.ignore;
+  return systemSettings ?? PermissionSettings.ignore;
+}
+
+enum ServiceSettings {
+  change,
+  ignore;
+
+  bool get isChange => this == ServiceSettings.change;
+  bool get isIgnore => this == ServiceSettings.ignore;
+}
+
+Future<ServiceSettings> showServiceRequiredDialog({
+  required String title,
+  required String text,
+}) async {
+  final systemSettings = await showDialog<ServiceSettings>(
+    context: App.globalContext,
+    builder: (_) => _Dialog(
+      title: title,
+      text: text,
+      options: [
+        _DialogOption(name: "Enable", value: ServiceSettings.change),
+        _DialogOption(name: "Ignore", value: ServiceSettings.ignore),
+      ],
+    ),
+  );
+  return systemSettings ?? ServiceSettings.ignore;
 }
 
 Future<bool> showApproveDialog({
@@ -105,8 +136,16 @@ Future<bool> showApproveDialog({
       title: title,
       text: text,
       options: [
-        _DialogOption(name: "Cancel", value: false),
-        _DialogOption(name: "Approve", value: true),
+        _DialogOption(
+          name: "Cancel",
+          value: false,
+          color: Theme.of(context).colorScheme.errorContainer,
+        ),
+        _DialogOption(
+          name: "Approve",
+          value: true,
+          color: Theme.of(context).colorScheme.error,
+        ),
       ],
     ),
   );
@@ -117,7 +156,7 @@ Future<bool> showDiscardWarningDialog(BuildContext context) async {
   final discard = await showDialog<bool>(
     context: context,
     builder: (_) => _Dialog(
-      title: 'Discard changes',
+      title: 'Discard Changes',
       text: 'Changes will be lost.',
       options: [
         _DialogOption(

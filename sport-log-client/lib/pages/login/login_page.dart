@@ -234,6 +234,7 @@ class _LoginPageState extends State<LoginPage> {
       } else {
         await showMessageDialog(
           context: context,
+          title: "An Error Occurred",
           text: result.failure.toString(),
         );
       }

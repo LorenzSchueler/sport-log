@@ -90,9 +90,11 @@ class HeartRateUtils extends ChangeNotifier {
           return true;
         }
       }
-      final systemSettings =
-          await showSystemSettingsDialog(text: "Please enable bluetooth.");
-      if (systemSettings.isIgnore) {
+      final serviceSettings = await showServiceRequiredDialog(
+        title: "Bluetooth Required",
+        text: "Please enable bluetooth manually.",
+      );
+      if (serviceSettings.isIgnore) {
         return false;
       }
     }

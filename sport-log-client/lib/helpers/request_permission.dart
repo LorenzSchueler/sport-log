@@ -7,10 +7,10 @@ abstract class PermissionRequest {
   // Returns whether the permission has been granted.
   static Future<bool> request(Permission permission) async {
     while (!await permission.request().isGranted) {
-      final systemSettings = await showSystemSettingsDialog(
+      final permissionSettings = await showPermissionRequiredDialog(
         text: "$permission is required.",
       );
-      if (systemSettings.isIgnore) {
+      if (permissionSettings.isIgnore) {
         return false;
       }
     }
