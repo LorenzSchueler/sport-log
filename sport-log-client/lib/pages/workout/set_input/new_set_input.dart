@@ -39,19 +39,23 @@ class NewSetInput extends StatelessWidget {
   Widget build(BuildContext context) {
     return dimension == MovementDimension.time
         ? SetDurationInput(
-            onNewSet: (count, weight) => onNewSet(count, weight, null, null),
+            onNewSet: (count, weight, secondWeight) =>
+                onNewSet(count, weight, secondWeight, null),
             confirmChanges: confirmChanges,
             initialDuration: Duration(milliseconds: initialCount),
+            editWeightUnit: editWeightUnit,
             initialWeight: initialWeight,
+            initialSecondWeight: initialSecondWeight,
+            secondWeight: secondWeight,
           )
         : CountWeightInput(
             onNewSet: onNewSet,
             confirmChanges: confirmChanges,
             dimension: dimension,
-            editWeightUnit: editWeightUnit,
             distanceUnit: distanceUnit,
             editDistanceUnit: editDistanceUnit,
             initialCount: initialCount,
+            editWeightUnit: editWeightUnit,
             initialWeight: initialWeight,
             secondWeight: secondWeight,
             initialSecondWeight: initialSecondWeight,

@@ -15,14 +15,20 @@ class SetDurationInput extends StatefulWidget {
     required this.onNewSet,
     required this.confirmChanges,
     required this.initialDuration,
+    required this.editWeightUnit,
     required this.initialWeight,
+    required this.secondWeight,
+    required this.initialSecondWeight,
     super.key,
   });
 
-  final void Function(int count, double? weight) onNewSet;
+  final void Function(int count, double? weight, double? secondWeight) onNewSet;
   final bool confirmChanges;
   final Duration initialDuration;
+  final bool editWeightUnit;
   final double? initialWeight;
+  final bool secondWeight;
+  final double? initialSecondWeight;
 
   @override
   State<SetDurationInput> createState() => _SetDurationInputState();
@@ -34,6 +40,10 @@ class _SetDurationInputState extends State<SetDurationInput> {
   late int _seconds = widget.initialDuration.inSeconds % 60;
   late int _milliseconds = widget.initialDuration.inMilliseconds % 1000;
   late double? _weight = widget.initialWeight;
+  late double? _secondWeight = widget.initialSecondWeight;
+  String _weightUnit = "kg";
+
+  static const double _lbToKg = 0.45359237;
 
   final _hoursKey = GlobalKey<_PaddedIntInputState>();
   final _minutesKey = GlobalKey<_PaddedIntInputState>();
@@ -48,7 +58,7 @@ class _SetDurationInputState extends State<SetDurationInput> {
         seconds: _seconds,
         milliseconds: _milliseconds,
       );
-      widget.onNewSet(duration.inMilliseconds, _weight);
+      widget.onNewSet(duration.inMilliseconds, _weight, _secondWeight);
 
       if (confirmed) {
         // clear all inputs
@@ -76,13 +86,43 @@ class _SetDurationInputState extends State<SetDurationInput> {
     }
   }
 
+  void _setUnit(String? unit) {
+    if (unit != null && unit != _weightUnit) {
+      setState(() {
+        _weightUnit = unit;
+        _weight = _weightUnit == "lb" ? _weight! * _lbToKg : _weight! / _lbToKg;
+        if (_secondWeight != null) {
+          _secondWeight = _weightUnit == "lb"
+              ? _secondWeight! * _lbToKg
+              : _secondWeight! / _lbToKg;
+        }
+      });
+      _submit();
+    }
+  }
+
   void _setWeight(double weight) {
-    setState(() => _weight = weight);
+    setState(() => _weight = _weightUnit == "lb" ? weight * _lbToKg : weight);
+    _submit();
+  }
+
+  void _setFemaleWeight(double weight) {
+    setState(
+      () => _secondWeight = _weightUnit == "lb" ? weight * _lbToKg : weight,
+    );
     _submit();
   }
 
   void _toggleWeight() {
-    setState(() => _weight = _weight == null ? 0 : null);
+    setState(() {
+      if (_weight == null) {
+        _weight = 0;
+        _secondWeight = 0;
+      } else {
+        _weight = null;
+        _secondWeight = null;
+      }
+    });
     _submit();
   }
 
@@ -90,151 +130,192 @@ class _SetDurationInputState extends State<SetDurationInput> {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        SizedBox(
-          width: 247,
-          child: Column(
+        Consumer<Settings>(
+          builder: (context, settings, _) => Column(
+            mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _timeInput,
-              ..._weightInput,
+              Table(
+                defaultColumnWidth: const IntrinsicColumnWidth(),
+                children: [
+                  TableRow(
+                    children: [
+                      const Align(
+                        alignment: Alignment.centerRight,
+                        child: CaptionTile(caption: "h"),
+                      ),
+                      Container(),
+                      const Align(
+                        alignment: Alignment.centerRight,
+                        child: CaptionTile(caption: "m"),
+                      ),
+                      Container(),
+                      const Align(
+                        alignment: Alignment.centerRight,
+                        child: CaptionTile(caption: "s"),
+                      ),
+                      Container(),
+                      const Align(
+                        alignment: Alignment.centerRight,
+                        child: CaptionTile(caption: "ms"),
+                      ),
+                    ],
+                  ),
+                  TableRow(
+                    children: [
+                      _PaddedIntInput(
+                        initialValue: _hours,
+                        key: _hoursKey,
+                        placeholder: 0,
+                        numberOfDigits: 2,
+                        onChanged: (value) => setState(() => _hours = value),
+                        onSubmitted: () {
+                          _submit();
+                          _minutesKey.currentState?.requestFocus();
+                        },
+                        submitOnDigitsReached: true,
+                        textInputAction: TextInputAction.next,
+                      ),
+                      Text(
+                        ":",
+                        style: Theme.of(context).textTheme.bodyLarge,
+                      ),
+                      _PaddedIntInput(
+                        initialValue: _minutes,
+                        key: _minutesKey,
+                        placeholder: 0,
+                        numberOfDigits: 2,
+                        maxValue: 59,
+                        onChanged: (value) => setState(() => _minutes = value),
+                        onSubmitted: () {
+                          _submit();
+                          _secondsKey.currentState?.requestFocus();
+                        },
+                        submitOnDigitsReached: true,
+                        textInputAction: TextInputAction.next,
+                      ),
+                      Text(
+                        ":",
+                        style: Theme.of(context).textTheme.bodyLarge,
+                      ),
+                      _PaddedIntInput(
+                        initialValue: _seconds,
+                        key: _secondsKey,
+                        placeholder: 0,
+                        numberOfDigits: 2,
+                        onChanged: (value) => setState(() => _seconds = value),
+                        onSubmitted: () {
+                          _submit();
+                          _millisecondsKey.currentState?.requestFocus();
+                        },
+                        submitOnDigitsReached: true,
+                        textInputAction: TextInputAction.next,
+                      ),
+                      Text(
+                        ",",
+                        style: Theme.of(context).textTheme.bodyLarge,
+                      ),
+                      _PaddedIntInput(
+                        initialValue: _milliseconds,
+                        key: _millisecondsKey,
+                        placeholder: 0,
+                        numberOfDigits: 3,
+                        onChanged: (value) =>
+                            setState(() => _milliseconds = value),
+                        onSubmitted: _submit,
+                        textInputAction: TextInputAction.done,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              if (_weight != null && widget.editWeightUnit)
+                EditTile(
+                  leading: null,
+                  caption: "Weight Unit",
+                  shrinkWidth: true,
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton(
+                      value: _weightUnit,
+                      items: const [
+                        DropdownMenuItem(
+                          value: "kg",
+                          child: Text("kg"),
+                        ),
+                        DropdownMenuItem(
+                          value: "lb",
+                          child: Text("lb"),
+                        ),
+                      ],
+                      onChanged: _setUnit,
+                      isDense: true,
+                    ),
+                  ),
+                ),
+              if (_weight != null)
+                EditTile(
+                  leading: null,
+                  caption: widget.secondWeight ? "Male Weight" : "Weight",
+                  shrinkWidth: true,
+                  child: DoubleInput(
+                    minValue: 0,
+                    maxValue: null,
+                    initialValue:
+                        _weightUnit == "lb" ? _weight! / _lbToKg : _weight!,
+                    stepSize: settings.weightIncrement,
+                    onUpdate: _setWeight,
+                  ),
+                ),
+              if (widget.secondWeight && _secondWeight != null)
+                EditTile(
+                  leading: null,
+                  caption: "Female Weight",
+                  shrinkWidth: true,
+                  child: DoubleInput(
+                    minValue: 0,
+                    maxValue: null,
+                    initialValue: _weightUnit == "lb"
+                        ? _secondWeight! / _lbToKg
+                        : _secondWeight!,
+                    stepSize: settings.weightIncrement,
+                    onUpdate: _setFemaleWeight,
+                  ),
+                ),
+              ElevatedButton.icon(
+                icon: Icon(_weight == null ? AppIcons.add : AppIcons.remove),
+                label: const Text("Weight"),
+                onPressed: () {
+                  FocusManager.instance.primaryFocus?.unfocus();
+                  _toggleWeight();
+                },
+              ),
             ],
           ),
         ),
-        Expanded(
-          child: Center(
-            child: SubmitSetButton(
-              isSubmittable: (_hours != 0 ||
-                      _minutes != 0 ||
-                      _seconds != 0 ||
-                      _milliseconds != 0) &&
-                  (_weight == null || _weight! > 0),
-              onSubmitted: () => _submit(confirmed: true),
+        if (widget.confirmChanges)
+          Expanded(
+            child: Center(
+              child: SubmitSetButton(
+                isSubmittable: (_hours != 0 ||
+                        _minutes != 0 ||
+                        _seconds != 0 ||
+                        _milliseconds != 0) &&
+                    (_weight == null || _weight! > 0),
+                onSubmitted: () => _submit(confirmed: true),
+              ),
             ),
-          ),
-        )
+          )
       ],
-    );
-  }
-
-  List<Widget> get _weightInput {
-    return [
-      if (_weight != null)
-        EditTile(
-          leading: null,
-          caption: "Weight",
-          child: Consumer<Settings>(
-            builder: (context, settings, _) => DoubleInput(
-              initialValue: _weight!,
-              minValue: 0,
-              maxValue: null,
-              stepSize: settings.weightIncrement,
-              onUpdate: _setWeight,
-            ),
-          ),
-        ),
-      ElevatedButton.icon(
-        icon: Icon(_weight == null ? AppIcons.add : AppIcons.remove),
-        label: const Text("Weight"),
-        onPressed: () {
-          FocusManager.instance.primaryFocus?.unfocus();
-          _toggleWeight();
-        },
-      ),
-    ];
-  }
-
-  Widget get _timeInput {
-    return DefaultTextStyle(
-      style: const TextStyle(fontSize: _PaddedIntInput._textFontSize),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          _hoursInput,
-          const Text(':'),
-          _minutesInput,
-          const Text(':'),
-          _secondsInput,
-          const Text(','),
-          _millisecondsInput,
-        ],
-      ),
-    );
-  }
-
-  Widget get _hoursInput {
-    return _PaddedIntInput(
-      initialValue: _hours,
-      key: _hoursKey,
-      placeholder: 0,
-      caption: 'h',
-      numberOfDigits: 2,
-      onChanged: (value) => setState(() => _hours = value),
-      onSubmitted: () {
-        _submit();
-        _minutesKey.currentState?.requestFocus();
-      },
-      submitOnDigitsReached: true,
-      textInputAction: TextInputAction.next,
-    );
-  }
-
-  Widget get _minutesInput {
-    return _PaddedIntInput(
-      initialValue: _minutes,
-      key: _minutesKey,
-      placeholder: 0,
-      caption: 'm',
-      numberOfDigits: 2,
-      maxValue: 59,
-      onChanged: (value) => setState(() => _minutes = value),
-      onSubmitted: () {
-        _submit();
-        _secondsKey.currentState?.requestFocus();
-      },
-      submitOnDigitsReached: true,
-      textInputAction: TextInputAction.next,
-    );
-  }
-
-  Widget get _secondsInput {
-    return _PaddedIntInput(
-      initialValue: _seconds,
-      key: _secondsKey,
-      placeholder: 0,
-      caption: 's',
-      numberOfDigits: 2,
-      onChanged: (value) => setState(() => _seconds = value),
-      onSubmitted: () {
-        _submit();
-        _millisecondsKey.currentState?.requestFocus();
-      },
-      submitOnDigitsReached: true,
-      textInputAction: TextInputAction.next,
-    );
-  }
-
-  Widget get _millisecondsInput {
-    return _PaddedIntInput(
-      initialValue: _milliseconds,
-      key: _millisecondsKey,
-      placeholder: 0,
-      caption: 'ms',
-      numberOfDigits: 3,
-      onChanged: (value) => setState(() => _milliseconds = value),
-      onSubmitted: _submit,
-      textInputAction: TextInputAction.done,
     );
   }
 }
 
-/// Text Field with box that only accepts non-negative ints
+/// Text Field with box that only accepts non-negative integers.
 class _PaddedIntInput extends StatefulWidget {
   const _PaddedIntInput({
     required this.initialValue,
     required this.placeholder,
     required this.onChanged,
-    required this.caption,
     required this.numberOfDigits,
     required this.textInputAction,
     this.submitOnDigitsReached = false,
@@ -247,15 +328,13 @@ class _PaddedIntInput extends StatefulWidget {
   final int placeholder;
   final void Function(int) onChanged;
   final VoidCallback? onSubmitted;
-  final String caption;
   final int numberOfDigits;
   final TextInputAction textInputAction;
   final int? maxValue;
   final bool submitOnDigitsReached;
 
-  static const double _captionFontSize = 14;
-  static const double _textFontSize = 30;
-  static const double _widthPerDigit = 25;
+  static const double _widthPerDigit =
+      13; // based on textTheme.bodyLarge size of 20
 
   @override
   State<_PaddedIntInput> createState() => _PaddedIntInputState();
@@ -273,7 +352,8 @@ class _PaddedIntInputState extends State<_PaddedIntInput> {
   }
 
   void clear() {
-    _controller.clear();
+    _controller.text =
+        widget.placeholder.toString().padLeft(widget.numberOfDigits, '0');
     widget.onChanged(widget.placeholder);
   }
 
@@ -281,41 +361,24 @@ class _PaddedIntInputState extends State<_PaddedIntInput> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       width: _PaddedIntInput._widthPerDigit * widget.numberOfDigits,
-      padding: const EdgeInsets.fromLTRB(8, 4, 8, 0),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          Text(
-            widget.caption,
-            style: Theme.of(context)
-                .textTheme
-                .bodySmall!
-                .copyWith(fontSize: _PaddedIntInput._captionFontSize),
-          ),
-          TextFormField(
-            controller: _controller,
-            onChanged: _onChanged,
-            onFieldSubmitted: (_) => widget.onSubmitted?.call(),
-            focusNode: _focusNode,
-            onTap: requestFocus,
-            textInputAction: widget.textInputAction,
-            inputFormatters: [TextInputFormatter.withFunction(_inputFormatter)],
-            keyboardType: TextInputType.number,
-            textAlign: TextAlign.right,
-            decoration: InputDecoration(
-              hintText: widget.placeholder
-                  .toString()
-                  .padLeft(widget.numberOfDigits, '0'),
-              isDense: true,
-              contentPadding: EdgeInsets.zero,
-            ),
-            style: const TextStyle(fontSize: _PaddedIntInput._textFontSize),
-            scrollPhysics: const NeverScrollableScrollPhysics(),
-          ),
-        ],
+      child: TextFormField(
+        controller: _controller,
+        onChanged: _onChanged,
+        onFieldSubmitted: (_) => widget.onSubmitted?.call(),
+        focusNode: _focusNode,
+        onTap: requestFocus,
+        textInputAction: widget.textInputAction,
+        inputFormatters: [TextInputFormatter.withFunction(_inputFormatter)],
+        keyboardType: TextInputType.number,
+        textAlign: TextAlign.right,
+        decoration: const InputDecoration(
+          contentPadding: EdgeInsets.zero,
+          //isCollapsed: true,
+          isDense: true,
+        ),
+        scrollPhysics: const NeverScrollableScrollPhysics(),
       ),
     );
   }

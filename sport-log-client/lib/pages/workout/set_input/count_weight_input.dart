@@ -14,10 +14,10 @@ class CountWeightInput extends StatefulWidget {
     required this.onNewSet,
     required this.confirmChanges,
     required this.dimension,
-    required this.editWeightUnit,
     required this.distanceUnit,
     required this.editDistanceUnit,
     required this.initialCount,
+    required this.editWeightUnit,
     required this.initialWeight,
     required this.secondWeight,
     required this.initialSecondWeight,
@@ -32,10 +32,10 @@ class CountWeightInput extends StatefulWidget {
   ) onNewSet;
   final bool confirmChanges;
   final MovementDimension dimension;
-  final bool editWeightUnit;
   final DistanceUnit? distanceUnit;
   final bool? editDistanceUnit;
   final int initialCount;
+  final bool editWeightUnit;
   final double? initialWeight;
   final bool secondWeight;
   final double? initialSecondWeight;
@@ -120,104 +120,107 @@ class _CountWeightInputState extends State<CountWeightInput> {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        SizedBox(
-          width: 160,
-          child: Consumer<Settings>(
-            builder: (context, settings, _) => Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (widget.dimension == MovementDimension.distance &&
-                    widget.editDistanceUnit!)
-                  EditTile(
-                    leading: null,
-                    caption: "Distance Unit",
-                    child: DropdownButtonHideUnderline(
-                      child: DropdownButton(
-                        value: _distanceUnit,
-                        items: DistanceUnit.values
-                            .map(
-                              (unit) => DropdownMenuItem(
-                                value: unit,
-                                child: Text(unit.name),
-                              ),
-                            )
-                            .toList(),
-                        onChanged: _setDistanceUnit,
-                        isDense: true,
-                      ),
-                    ),
-                  ),
+        Consumer<Settings>(
+          builder: (context, settings, _) => Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (widget.dimension == MovementDimension.distance &&
+                  widget.editDistanceUnit!)
                 EditTile(
                   leading: null,
-                  caption: widget.dimension == MovementDimension.distance
-                      ? "${widget.dimension.name} (${_distanceUnit!.name})"
-                      : widget.dimension.name,
-                  child: IntInput(
+                  caption: "Distance Unit",
+                  shrinkWidth: true,
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton(
+                      value: _distanceUnit,
+                      items: DistanceUnit.values
+                          .map(
+                            (unit) => DropdownMenuItem(
+                              value: unit,
+                              child: Text(unit.name),
+                            ),
+                          )
+                          .toList(),
+                      onChanged: _setDistanceUnit,
+                      isDense: true,
+                    ),
+                  ),
+                ),
+              EditTile(
+                leading: null,
+                caption: widget.dimension == MovementDimension.distance
+                    ? "${widget.dimension.name} (${_distanceUnit!.name})"
+                    : widget.dimension.name,
+                shrinkWidth: true,
+                child: IntInput(
+                  minValue: 0,
+                  maxValue: null,
+                  initialValue: _count,
+                  onUpdate: _setCount,
+                ),
+              ),
+              if (_weight != null && widget.editWeightUnit)
+                EditTile(
+                  leading: null,
+                  caption: "Weight Unit",
+                  shrinkWidth: true,
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton(
+                      value: _weightUnit,
+                      items: const [
+                        DropdownMenuItem(
+                          value: "kg",
+                          child: Text("kg"),
+                        ),
+                        DropdownMenuItem(
+                          value: "lb",
+                          child: Text("lb"),
+                        ),
+                      ],
+                      onChanged: _setUnit,
+                      isDense: true,
+                    ),
+                  ),
+                ),
+              if (_weight != null)
+                EditTile(
+                  leading: null,
+                  caption: widget.secondWeight ? "Male Weight" : "Weight",
+                  shrinkWidth: true,
+                  child: DoubleInput(
                     minValue: 0,
                     maxValue: null,
-                    initialValue: _count,
-                    onUpdate: _setCount,
+                    initialValue:
+                        _weightUnit == "lb" ? _weight! / _lbToKg : _weight!,
+                    stepSize: settings.weightIncrement,
+                    onUpdate: _setWeight,
                   ),
                 ),
-                if (_weight != null && widget.editWeightUnit)
-                  EditTile(
-                    leading: null,
-                    caption: "Weight Unit",
-                    child: DropdownButtonHideUnderline(
-                      child: DropdownButton(
-                        value: _weightUnit,
-                        items: const [
-                          DropdownMenuItem(
-                            value: "kg",
-                            child: Text("kg"),
-                          ),
-                          DropdownMenuItem(
-                            value: "lb",
-                            child: Text("lb"),
-                          ),
-                        ],
-                        onChanged: _setUnit,
-                        isDense: true,
-                      ),
-                    ),
+              if (widget.secondWeight && _secondWeight != null)
+                EditTile(
+                  leading: null,
+                  caption: "Female Weight",
+                  shrinkWidth: true,
+                  child: DoubleInput(
+                    minValue: 0,
+                    maxValue: null,
+                    initialValue: _weightUnit == "lb"
+                        ? _secondWeight! / _lbToKg
+                        : _secondWeight!,
+                    stepSize: settings.weightIncrement,
+                    onUpdate: _setFemaleWeight,
                   ),
-                if (_weight != null)
-                  EditTile(
-                    leading: null,
-                    caption: widget.secondWeight ? "Male Weight" : "Weight",
-                    child: DoubleInput(
-                      minValue: 0,
-                      maxValue: null,
-                      initialValue:
-                          _weightUnit == "lb" ? _weight! / _lbToKg : _weight!,
-                      stepSize: settings.weightIncrement,
-                      onUpdate: _setWeight,
-                    ),
-                  ),
-                if (widget.secondWeight && _secondWeight != null)
-                  EditTile(
-                    leading: null,
-                    caption: "Female Weight",
-                    child: DoubleInput(
-                      minValue: 0,
-                      maxValue: null,
-                      initialValue: _weightUnit == "lb"
-                          ? _secondWeight! / _lbToKg
-                          : _secondWeight!,
-                      stepSize: settings.weightIncrement,
-                      onUpdate: _setFemaleWeight,
-                    ),
-                  ),
-                ElevatedButton.icon(
-                  icon: Icon(_weight == null ? AppIcons.add : AppIcons.remove),
-                  label: const Text("Weight"),
-                  onPressed: () {
-                    FocusManager.instance.primaryFocus?.unfocus();
-                    _toggleWeight();
-                  },
                 ),
-              ],
-            ),
+              ElevatedButton.icon(
+                icon: Icon(_weight == null ? AppIcons.add : AppIcons.remove),
+                label: const Text("Weight"),
+                onPressed: () {
+                  FocusManager.instance.primaryFocus?.unfocus();
+                  _toggleWeight();
+                },
+              ),
+            ],
           ),
         ),
         if (widget.confirmChanges)
