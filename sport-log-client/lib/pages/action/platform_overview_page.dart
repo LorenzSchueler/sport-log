@@ -93,6 +93,7 @@ class PlatformCard extends StatelessWidget {
                       context: context,
                     ),
                     icon: const Icon(AppIcons.settings),
+                    visualDensity: VisualDensity.compact,
                   ),
               ],
             ),

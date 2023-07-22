@@ -346,6 +346,7 @@ class _RouteEditPageState extends State<RouteEditPage> {
                           validator: Validator.validateStringNotEmpty,
                           autovalidateMode: AutovalidateMode.onUserInteraction,
                           decoration: const InputDecoration(
+                            icon: Icon(AppIcons.route),
                             labelText: "Name",
                           ),
                         ),

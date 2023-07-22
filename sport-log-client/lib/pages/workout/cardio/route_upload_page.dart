@@ -109,6 +109,7 @@ class _RouteUploadPageState extends State<RouteUploadPage> {
                       validator: Validator.validateStringNotEmpty,
                       autovalidateMode: AutovalidateMode.onUserInteraction,
                       decoration: const InputDecoration(
+                        icon: Icon(AppIcons.route),
                         labelText: "Name",
                       ),
                     ),

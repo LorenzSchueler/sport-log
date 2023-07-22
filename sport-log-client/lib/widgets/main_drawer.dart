@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sport_log/data_provider/sync.dart';
+import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/extensions/navigator_extension.dart';
 import 'package:sport_log/routes.dart';
@@ -114,28 +115,32 @@ class MainDrawer extends StatelessWidget {
                   ),
                 ),
                 if (settings.accountCreated)
-                  Consumer<Sync>(
-                    builder: (context, sync, _) {
-                      final title = sync.isSyncing
-                          ? 'Syncing...'
-                          : settings.lastSync == null
-                              ? 'No syncs yet'
-                              : 'Last sync: ${settings.lastSync!.toHumanDateTime()}';
-
-                      return ListTile(
-                        title: Text(title),
-                        trailing: SpinningSync(
-                          color: Theme.of(context).colorScheme.errorContainer,
-                          onPressed: settings.syncEnabled && !sync.isSyncing
-                              ? () => sync.sync(
-                                    onNoInternet: () =>
-                                        showNoInternetToast(context),
-                                  )
-                              : null,
-                          isSpinning: sync.isSyncing,
-                        ),
-                      );
-                    },
+                  Padding(
+                    padding: Defaults.edgeInsets.normal,
+                    child: Consumer<Sync>(
+                      builder: (context, sync, _) => Row(
+                        children: [
+                          Text(
+                            sync.isSyncing
+                                ? 'Syncing...'
+                                : settings.lastSync == null
+                                    ? 'No syncs yet'
+                                    : 'Last sync: ${settings.lastSync!.toHumanDateTime()}',
+                          ),
+                          const Spacer(),
+                          SpinningSync(
+                            color: Theme.of(context).colorScheme.errorContainer,
+                            onPressed: settings.syncEnabled && !sync.isSyncing
+                                ? () => sync.sync(
+                                      onNoInternet: () =>
+                                          showNoInternetToast(context),
+                                    )
+                                : null,
+                            isSpinning: sync.isSyncing,
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
               ],
             );
