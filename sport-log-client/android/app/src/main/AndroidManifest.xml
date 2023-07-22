@@ -4,19 +4,20 @@
 
     <!-- location -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <!-- location + flutter_blue_plus-->
+    <!-- location + flutter_blue_plus -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <!-- location background mode-->
+    <!-- location background mode -->
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
-    <!-- location background mode-->
+    <!-- location background mode -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <!-- location background mode - necessary for notification but not for foreground service-->
+    <!-- location background mode and gpx export - necessary for notification but not for foreground
+    service -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
-    <!-- polar  -->
+    <!-- polar -->
     <uses-permission android:name="android.permission.BLUETOOTH_SCAN"
         android:usesPermissionFlags="neverForLocation" />
-    <!-- flutter_blue_plus-->
+    <!-- flutter_blue_plus -->
     <!-- Request legacy Bluetooth permissions on older devices. -->
     <uses-permission android:name="android.permission.BLUETOOTH"
         android:maxSdkVersion="30" />
@@ -26,9 +27,10 @@
     <!-- pedometer -->
     <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
 
-    <!-- open-file for auto update -->
+    <!-- open-file for auto update  and gpx export -->
     <uses-permission
         android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
+    <!-- open-file for auto update -->
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
     <queries>

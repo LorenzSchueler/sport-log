@@ -77,21 +77,23 @@ Future<String?> saveTrackAsGpx(
     if (!await AwesomeNotifications().isNotificationAllowed()) {
       await AwesomeNotifications().requestPermissionToSendNotifications();
     }
-    await AwesomeNotifications().createNotification(
-      content: NotificationContent(
-        id: Random.secure().nextInt(1 << 31),
-        channelKey: 'file_channel',
-        title: 'Route GPX export',
-        body: file,
-        payload: {"file": file},
-      ),
-      actionButtons: [
-        NotificationActionButton(
-          key: "open_file",
-          label: "Open",
-        )
-      ],
-    );
+    if (await AwesomeNotifications().isNotificationAllowed()) {
+      await AwesomeNotifications().createNotification(
+        content: NotificationContent(
+          id: Random.secure().nextInt(1 << 31),
+          channelKey: 'file_channel',
+          title: 'Route GPX export',
+          body: file,
+          payload: {"file": file},
+        ),
+        actionButtons: [
+          NotificationActionButton(
+            key: "open_file",
+            label: "Open",
+          )
+        ],
+      );
+    }
   }
   return file;
 }
