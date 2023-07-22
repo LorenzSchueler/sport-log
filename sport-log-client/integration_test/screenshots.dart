@@ -47,6 +47,9 @@ import 'package:sport_log/pages/workout/timeline/timeline_page.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
 
+// ignore: unreachable_from_main
+final logger = Logger("Screenshot");
+
 final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
 const serverUrl = "http://10.0.2.2:8001";
@@ -64,7 +67,7 @@ final passwordInput = input("Password");
 
 Finder button(String text) => find.ancestor(
       of: find.text(text),
-      matching: find.byType(ElevatedButton),
+      matching: find.byType(FilledButton),
     );
 final loginButton = button("Login");
 final okButton = button("OK");
@@ -72,7 +75,7 @@ final cancelButton = button("Cancel");
 
 final aboutButton = find.ancestor(
   of: find.text("About", skipOffstage: false),
-  matching: find.byType(OutlinedButton, skipOffstage: false),
+  matching: find.byType(ElevatedButton, skipOffstage: false),
 );
 
 Finder fab(IconData icon) => find.ancestor(
@@ -103,9 +106,7 @@ final discardChanges = find.ancestor(
 
 Finder navItem(String text) => find.ancestor(
       of: find.text(text),
-      matching: find.byWidgetPredicate(
-        (widget) => widget.runtimeType.toString() == "_BottomNavigationTile",
-      ),
+      matching: find.byType(NavigationDestination),
     );
 final strengthNavItem = navItem("Strength");
 final metconNavItem = navItem("Metcon");
@@ -127,7 +128,7 @@ final settingsDrawerItem = drawerItem("Settings");
 // ignore: unreachable_from_main
 void printAncestors(Finder finder) {
   finder.evaluate().first.visitAncestorElements((element) {
-    logInfo("widget: ${element.widget.runtimeType}");
+    logger.i("widget: ${element.widget.runtimeType}");
     return true;
   });
 }
@@ -179,7 +180,7 @@ void main() {
     // do not use app.main() to avoid GlobalErrorHandler
     runApp(const InitAppWrapper());
 
-    // TODO
+    // TODO switch back after taking screenshot
     if (Config.isAndroid) {
       await binding.convertFlutterSurfaceToImage();
     }
@@ -310,7 +311,7 @@ void main() {
     expect(find.byType(CardioTrackingPage), findsOneWidget);
     await tester.pumpAndSettle(mapPumpDuration); // wait for map to render
     await screenshot("tracking");
-    await tap(tester, cancelButton); // back to cardio overview
+    await tap(tester, cancelButton); // back to tracking settings
     await tap(tester, backButton); // back to cardio overview
 
     // go to route overview
@@ -409,14 +410,30 @@ void main() {
         .pumpAndSettle(const Duration(seconds: 1)); // wait for data to load
     await screenshot("action_provider_overview");
 
-    // go to action rule overview
-    await tap(tester, find.byType(ActionRulesCard).first);
+    // go to action rule edit
+    await tap(
+      tester,
+      find
+          .descendant(
+            of: find.byType(ActionRulesCard),
+            matching: find.text("CrossFit"),
+          )
+          .first,
+    );
     expect(find.byType(ActionRuleEditPage), findsOneWidget);
     await screenshot("action_rule_edit");
     await backDiscardChanges(tester); // back to ap overview
 
-    // go to action event overview
-    await tap(tester, find.byType(ActionEventsCard).first);
+    // go to action event edit
+    await tap(
+      tester,
+      find
+          .descendant(
+            of: find.byType(ActionEventsCard),
+            matching: find.text("CrossFit"),
+          )
+          .first,
+    );
     expect(find.byType(ActionEventEditPage), findsOneWidget);
     await screenshot("action_event_edit");
     await backDiscardChanges(tester); // back to ap overview
