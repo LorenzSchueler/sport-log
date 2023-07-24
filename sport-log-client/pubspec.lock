@@ -365,10 +365,10 @@ packages:
     dependency: "direct main"
     description:
       name: file_picker
-      sha256: b1729fc96627dd44012d0a901558177418818d6bd428df59dcfeb594e5f66432
+      sha256: "21145c9c268d54b1f771d8380c195d2d6f655e0567dc1ca2f9c134c02c819e0a"
       url: "https://pub.dev"
     source: hosted
-    version: "5.3.2"
+    version: "5.3.3"
   fixnum:
     dependency: "direct main"
     description:
@@ -394,10 +394,10 @@ packages:
     dependency: "direct main"
     description:
       name: flutter_blue_plus
-      sha256: c2d5c68f0779339f23f1aa70558d53b18d30c661a7b697925dbfc34e0f2d120c
+      sha256: d601805c12217708a7aa4878f3eda5daf1c3e2a2ad67cfa6b64cb5ed7e909805
       url: "https://pub.dev"
     source: hosted
-    version: "1.7.5"
+    version: "1.10.1"
   flutter_driver:
     dependency: transitive
     description: flutter

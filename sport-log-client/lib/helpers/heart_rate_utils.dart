@@ -13,7 +13,6 @@ import 'package:sport_log/widgets/dialogs/dialogs.dart';
 
 class HeartRateUtils extends ChangeNotifier {
   static final _polar = Polar();
-  static final _bluetooth = FlutterBluePlus.instance;
 
   static const _searchDuration = Duration(seconds: 10);
 
@@ -82,11 +81,11 @@ class HeartRateUtils extends ChangeNotifier {
 
   Future<bool> enableBluetooth() async {
     while (true) {
-      await _bluetooth.turnOn();
+      await FlutterBluePlus.turnOn();
       for (var i = 0; i < 100; i++) {
         // ignore: inference_failure_on_instance_creation
         await Future.delayed(const Duration(milliseconds: 100));
-        if (await _bluetooth.isOn) {
+        if (await FlutterBluePlus.isOn) {
           return true;
         }
       }

@@ -1,9 +1,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="org.sport_log.sport_log_client">
+    package="org.sport_log.sport_log_client"
+    xmlns:tools="http://schemas.android.com/tools">
     <uses-permission android:name="android.permission.INTERNET" />
 
     <!-- location -->
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"
+        tools:remove="android:maxSdkVersion" />
     <!-- location + flutter_blue_plus -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <!-- location background mode -->

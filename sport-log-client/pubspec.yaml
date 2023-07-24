@@ -36,7 +36,7 @@ dependencies:
   fl_chart: ^0.63.0
   flutter:
     sdk: flutter
-  flutter_blue_plus: 1.7.5
+  flutter_blue_plus: ^1.7.5
   flutter_localizations:
     sdk: flutter
   flutter_tts: ^3.6.3
