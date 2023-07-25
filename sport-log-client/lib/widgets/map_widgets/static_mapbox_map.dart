@@ -51,15 +51,17 @@ class ElevationMap extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 1,
-      width: 1,
-      child: StaticMapboxMap(
-        onMapCreated: (mapController) async {
-          await mapController.setZoom(15);
-          await mapController.enableTerrain("elevation-terrain-source", 0);
-          onMapCreated(ElevationMapController(mapController));
-        },
+    return Offstage(
+      child: SizedBox(
+        height: 1,
+        width: 1,
+        child: StaticMapboxMap(
+          onMapCreated: (mapController) async {
+            await mapController.setZoom(15);
+            await mapController.enableTerrain("elevation-terrain-source", 0);
+            onMapCreated(ElevationMapController(mapController));
+          },
+        ),
       ),
     );
   }
