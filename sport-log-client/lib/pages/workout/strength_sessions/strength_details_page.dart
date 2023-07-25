@@ -119,9 +119,8 @@ class StrengthSessionDetailsPageState
                   leading: null,
                   caption: 'Comments',
                   unboundedHeight: true,
-                  child: Text(
-                    _strengthSessionDescription.session.comments!,
-                  ),
+                  bigText: false,
+                  child: Text(_strengthSessionDescription.session.comments!),
                 ),
               ),
             ),
@@ -162,6 +161,7 @@ class _StrengthStatsCard extends StatelessWidget {
             EditTile(
               leading: null,
               caption: "Date",
+              bigText: false,
               child: Text(
                 strengthSessionDescription.session.datetime.toHumanDateTime(),
               ),
@@ -169,6 +169,7 @@ class _StrengthStatsCard extends StatelessWidget {
             EditTile(
               leading: null,
               caption: "Sets",
+              bigText: false,
               child: Text(
                 '${strengthSessionDescription.sets.length} sets',
               ),
@@ -177,6 +178,7 @@ class _StrengthStatsCard extends StatelessWidget {
               EditTile(
                 leading: null,
                 caption: "Interval",
+                bigText: false,
                 child: Text(
                   strengthSessionDescription.session.interval!.formatTimeShort,
                 ),
@@ -200,23 +202,27 @@ class _StrengthStatsCard extends StatelessWidget {
             EditTile(
               leading: null,
               caption: 'Max Eorm',
+              bigText: false,
               child: Text(formatWeight(maxEorm)),
             ),
           if (sumVolume != null)
             EditTile(
               leading: null,
               caption: 'Volume',
+              bigText: false,
               child: Text(formatWeight(sumVolume)),
             ),
           if (maxWeight != null)
             EditTile(
               leading: null,
               caption: 'Max Weight',
+              bigText: false,
               child: Text(formatWeight(maxWeight)),
             ),
           EditTile(
             leading: null,
             caption: 'Avg Reps',
+            bigText: false,
             child: Text(stats.avgCount.toStringAsFixed(1)),
           )
         ],
@@ -224,6 +230,7 @@ class _StrengthStatsCard extends StatelessWidget {
           EditTile(
             leading: null,
             caption: 'Best Time',
+            bigText: false,
             child: Text(Duration(milliseconds: stats.minCount).formatMsMill),
           ),
         ],
@@ -231,6 +238,7 @@ class _StrengthStatsCard extends StatelessWidget {
           EditTile(
             leading: null,
             caption: 'Best Distance',
+            bigText: false,
             child: Text("${stats.maxCount} m"),
           ),
         ],
@@ -238,6 +246,7 @@ class _StrengthStatsCard extends StatelessWidget {
           EditTile(
             leading: null,
             caption: 'Total Energy',
+            bigText: false,
             child: Text('${stats.sumCount} cal'),
           ),
         ],
@@ -271,6 +280,7 @@ class _StrengthSetsCard extends StatelessWidget {
               return EditTile(
                 leading: null,
                 caption: "Set ${index + 1}",
+                bigText: false,
                 child: Row(
                   children: [
                     Text(

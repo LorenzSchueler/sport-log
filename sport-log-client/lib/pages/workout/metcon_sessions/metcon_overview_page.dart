@@ -115,10 +115,8 @@ class MetconCard extends StatelessWidget {
                 style: Theme.of(context).textTheme.bodyLarge,
               ),
               Defaults.sizedBox.vertical.normal,
-              Text(
-                metconDescription.typeLengthDescription,
-              ),
-              Defaults.sizedBox.vertical.normal,
+              Text(metconDescription.typeLengthDescription),
+              Defaults.sizedBox.vertical.small,
               Text(
                 metconDescription.moves
                     .map((mmd) => mmd.movement.name)

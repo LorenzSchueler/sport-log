@@ -32,6 +32,7 @@ class MetconSessionResultsCard extends StatelessWidget {
               EditTile(
                 leading: null,
                 caption: "Date",
+                bigText: false,
                 child: Text(
                   metconSessionDescription!.metconSession.datetime
                       .toHumanDate(),
@@ -41,6 +42,7 @@ class MetconSessionResultsCard extends StatelessWidget {
               EditTile(
                 leading: null,
                 caption: "Score",
+                bigText: false,
                 child: Text(
                   "${metconSessionDescription!.shortResultDescription} ${metconSessionDescription!.metconSession.rx ? "Rx" : "Scaled"}",
                 ),
@@ -50,12 +52,14 @@ class MetconSessionResultsCard extends StatelessWidget {
                 leading: null,
                 caption: "Comments",
                 unboundedHeight: true,
+                bigText: false,
                 child: Text(metconSessionDescription!.metconSession.comments!),
               ),
             EditTile(
               leading: null,
               caption: "All Scores",
               unboundedHeight: true,
+              bigText: false,
               child: Table(
                 defaultColumnWidth: const IntrinsicColumnWidth(),
                 children: [
@@ -66,21 +70,14 @@ class MetconSessionResultsCard extends StatelessWidget {
                           padding: const EdgeInsets.only(right: 10),
                           child: Text(msd.shortResultDescription),
                         ),
-                        msd.metconSession.rx
-                            ? Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  const Text("Rx"),
-                                  Defaults.sizedBox.horizontal.normal,
-                                  if (metconRecords.isMetconRecord(msd))
-                                    const Icon(
-                                      AppIcons.medal,
-                                      color: Colors.orange,
-                                      size: 20,
-                                    )
-                                ],
+                        Text(msd.metconSession.rx ? "Rx" : "Scaled"),
+                        metconRecords.isMetconRecord(msd)
+                            ? const Icon(
+                                AppIcons.medal,
+                                color: Colors.orange,
+                                size: 20,
                               )
-                            : const Text("Scaled"),
+                            : Container(),
                         Padding(
                           padding: const EdgeInsets.only(left: 10),
                           child: Text(msd.metconSession.datetime.toHumanDate()),

@@ -106,6 +106,7 @@ class EditTile extends StatelessWidget {
     this.onCancel,
     this.unboundedHeight = false,
     this.shrinkWidth = false,
+    this.bigText = true,
     super.key,
   });
 
@@ -170,6 +171,8 @@ class EditTile extends StatelessWidget {
   /// if enabled [child] must have a bounded width
   final bool shrinkWidth;
 
+  final bool bigText;
+
   static const Color iconCaptionColor = Colors.white70;
   static const double textFormFieldHeight = 49;
 
@@ -178,10 +181,12 @@ class EditTile extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (caption != null) CaptionTile(caption: caption!),
-        DefaultTextStyle(
-          style: Theme.of(context).textTheme.bodyLarge!,
-          child: child,
-        ),
+        bigText
+            ? DefaultTextStyle(
+                style: Theme.of(context).textTheme.bodyLarge!,
+                child: child,
+              )
+            : child,
       ],
     );
   }

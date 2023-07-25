@@ -24,12 +24,14 @@ class MetconDescriptionCard extends StatelessWidget {
             EditTile(
               leading: null,
               caption: "Type",
+              bigText: false,
               child: Text(metconDescription.typeLengthDescription),
             ),
             EditTile(
               leading: null,
               caption: "Movements",
               unboundedHeight: true,
+              bigText: false,
               child: Table(
                 defaultColumnWidth: const IntrinsicColumnWidth(),
                 children: [
@@ -46,9 +48,9 @@ class MetconDescriptionCard extends StatelessWidget {
                             switch (mmd.movement.dimension) {
                               MovementDimension.distance =>
                                 "${mmd.metconMovement.count} ${mmd.metconMovement.distanceUnit!.name}",
-                              MovementDimension.time =>
-                                Duration(milliseconds: mmd.metconMovement.count)
-                                    .formatTimeShort,
+                              MovementDimension.time => Duration(
+                                  milliseconds: mmd.metconMovement.count,
+                                ).formatTimeShort,
                               _ =>
                                 "${mmd.metconMovement.count} ${mmd.movement.dimension.name}",
                             },

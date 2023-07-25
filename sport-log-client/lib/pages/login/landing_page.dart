@@ -24,7 +24,7 @@ class LandingPage extends StatelessWidget {
                   child: const Text("Login"),
                 ),
               ),
-              Defaults.sizedBox.horizontal.big,
+              Defaults.sizedBox.horizontal.normal,
               Expanded(
                 child: FilledButton(
                   onPressed: () {
