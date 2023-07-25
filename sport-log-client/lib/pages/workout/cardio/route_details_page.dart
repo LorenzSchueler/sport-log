@@ -146,10 +146,13 @@ class _RouteDetailsPageState extends State<RouteDetailsPage>
               ),
               if (_route.track != null) ...[
                 const Divider(),
-                DistanceChart(
-                  chartLines: [_elevationLine()],
-                  yFromZero: false,
-                  touchCallback: _touchCallback,
+                SizedBox(
+                  height: 200,
+                  child: DistanceChart(
+                    chartLines: [_elevationLine()],
+                    yFromZero: false,
+                    touchCallback: _touchCallback,
+                  ),
                 )
               ]
             ]

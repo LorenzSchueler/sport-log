@@ -66,7 +66,6 @@ class DistanceChart extends StatelessWidget {
     required this.chartLines,
     required this.yFromZero,
     this.touchCallback,
-    this.height = 200,
     this.labelColor = Colors.white,
     super.key,
   });
@@ -74,7 +73,6 @@ class DistanceChart extends StatelessWidget {
   final List<DistanceChartLine> chartLines;
   final bool yFromZero;
   final void Function(double? distance)? touchCallback;
-  final double height;
   final Color labelColor;
 
   double? lastX;
@@ -130,63 +128,60 @@ class DistanceChart extends StatelessWidget {
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(5, 10, 15, 0),
-      child: SizedBox(
-        height: height,
-        child: LineChart(
-          LineChartData(
-            lineBarsData: [
-              for (final chartLine in chartLines)
-                LineChartBarData(
-                  spots: chartLine.chartValues
-                      .map((v) => FlSpot(v.distance, v.value))
-                      .toList(),
-                  color: chartLine.lineColor,
-                  dotData: const FlDotData(show: false),
-                ),
-            ],
-            minY: minY,
-            maxY: maxY,
-            minX: 0,
-            lineTouchData: LineTouchData(
-              touchSpotThreshold: double.infinity, // always get nearest point
-              touchCallback: _onLongPress,
-            ),
-            titlesData: FlTitlesData(
-              topTitles: const AxisTitles(),
-              rightTitles: const AxisTitles(),
-              bottomTitles: AxisTitles(
-                sideTitles: SideTitles(
-                  showTitles: true,
-                  interval: xInterval,
-                  getTitlesWidget: (m, _) => Text(
-                    m.round() % xInterval.round() == 0
-                        ? (m / 1000).round().toString()
-                        : "", // remove label at last value
-                    style: TextStyle(color: labelColor),
-                  ),
-                  reservedSize: 20,
-                ),
+      child: LineChart(
+        LineChartData(
+          lineBarsData: [
+            for (final chartLine in chartLines)
+              LineChartBarData(
+                spots: chartLine.chartValues
+                    .map((v) => FlSpot(v.distance, v.value))
+                    .toList(),
+                color: chartLine.lineColor,
+                dotData: const FlDotData(show: false),
               ),
-              leftTitles: AxisTitles(
-                sideTitles: SideTitles(
-                  showTitles: true,
-                  reservedSize: 40,
-                  getTitlesWidget: (value, _) => Text(
-                    value.round().toString(),
-                    style: TextStyle(color: labelColor),
-                  ),
-                ),
-              ),
-            ),
-            gridData: FlGridData(
-              getDrawingHorizontalLine:
-                  gridLineDrawer(context: context, color: Colors.grey),
-              verticalInterval: xInterval,
-              getDrawingVerticalLine:
-                  gridLineDrawer(context: context, color: Colors.grey),
-            ),
-            borderData: FlBorderData(show: false),
+          ],
+          minY: minY,
+          maxY: maxY,
+          minX: 0,
+          lineTouchData: LineTouchData(
+            touchSpotThreshold: double.infinity, // always get nearest point
+            touchCallback: _onLongPress,
           ),
+          titlesData: FlTitlesData(
+            topTitles: const AxisTitles(),
+            rightTitles: const AxisTitles(),
+            bottomTitles: AxisTitles(
+              sideTitles: SideTitles(
+                showTitles: true,
+                interval: xInterval,
+                getTitlesWidget: (m, _) => Text(
+                  m.round() % xInterval.round() == 0
+                      ? (m / 1000).round().toString()
+                      : "", // remove label at last value
+                  style: TextStyle(color: labelColor),
+                ),
+                reservedSize: 20,
+              ),
+            ),
+            leftTitles: AxisTitles(
+              sideTitles: SideTitles(
+                showTitles: true,
+                reservedSize: 40,
+                getTitlesWidget: (value, _) => Text(
+                  value.round().toString(),
+                  style: TextStyle(color: labelColor),
+                ),
+              ),
+            ),
+          ),
+          gridData: FlGridData(
+            getDrawingHorizontalLine:
+                gridLineDrawer(context: context, color: Colors.grey),
+            verticalInterval: xInterval,
+            getDrawingVerticalLine:
+                gridLineDrawer(context: context, color: Colors.grey),
+          ),
+          borderData: FlBorderData(show: false),
         ),
       ),
     );

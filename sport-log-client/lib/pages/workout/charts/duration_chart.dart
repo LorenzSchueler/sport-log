@@ -126,7 +126,6 @@ class DurationChart extends StatefulWidget {
   DurationChart({
     required this.chartLines,
     this.touchCallback,
-    this.height = 200,
     this.labelColor = Colors.white,
     super.key,
   })  : xInterval = chartLines
@@ -154,7 +153,6 @@ class DurationChart extends StatefulWidget {
 
   final List<DurationChartLine> chartLines;
   final void Function(Duration? x)? touchCallback;
-  final double height;
   final Color labelColor;
 
   final double xInterval;
@@ -187,72 +185,67 @@ class _DurationChartState extends State<DurationChart> {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(5, 5, 5, 0),
-      child: SizedBox(
-        height: widget.height,
-        child: LineChart(
-          LineChartData(
-            lineBarsData: [
-              for (final chartLine in widget.chartLines)
-                LineChartBarData(
-                  spots: chartLine.chartValues
-                      .map(
-                        (v) => FlSpot(
-                          v.duration.inMilliseconds.toDouble(),
-                          v.value,
-                        ),
-                      )
-                      .toList(),
-                  color: chartLine.lineColor,
-                  dotData: const FlDotData(show: false),
-                  isCurved: true,
-                  preventCurveOverShooting: true,
-                ),
-            ],
-            minY: 0,
-            maxY: 1,
-            minX: 0,
-            maxX: widget.maxX,
-            extraLinesData: lastX == null
-                ? null
-                : ExtraLinesData(
-                    verticalLines: [
-                      VerticalLine(x: lastX!, color: Colors.white)
-                    ],
-                  ),
-            lineTouchData: LineTouchData(
-              enabled: false,
-              touchSpotThreshold: double.infinity, // always get nearest point
-              touchCallback: _onLongPress,
-            ),
-            titlesData: FlTitlesData(
-              topTitles: const AxisTitles(),
-              rightTitles: const AxisTitles(),
-              bottomTitles: AxisTitles(
-                sideTitles: SideTitles(
-                  showTitles: true,
-                  interval: widget.xInterval,
-                  getTitlesWidget: (value, _) => Text(
-                    value.round() % widget.xInterval.round() == 0 &&
-                            value.round() > 0 &&
-                            value.round() < widget.maxX
-                        ? Duration(milliseconds: value.round()).formatHm
-                        : "", // remove label at 0 and last value
-                    style: TextStyle(color: widget.labelColor),
-                  ),
-                  reservedSize: 20,
-                ),
+      child: LineChart(
+        LineChartData(
+          lineBarsData: [
+            for (final chartLine in widget.chartLines)
+              LineChartBarData(
+                spots: chartLine.chartValues
+                    .map(
+                      (v) => FlSpot(
+                        v.duration.inMilliseconds.toDouble(),
+                        v.value,
+                      ),
+                    )
+                    .toList(),
+                color: chartLine.lineColor,
+                dotData: const FlDotData(show: false),
+                isCurved: true,
+                preventCurveOverShooting: true,
               ),
-              leftTitles: const AxisTitles(),
-            ),
-            gridData: FlGridData(
-              getDrawingHorizontalLine:
-                  gridLineDrawer(context: context, color: Colors.grey),
-              verticalInterval: widget.xInterval,
-              getDrawingVerticalLine:
-                  gridLineDrawer(context: context, color: Colors.grey),
-            ),
-            borderData: FlBorderData(show: false),
+          ],
+          minY: 0,
+          maxY: 1,
+          minX: 0,
+          maxX: widget.maxX,
+          extraLinesData: lastX == null
+              ? null
+              : ExtraLinesData(
+                  verticalLines: [VerticalLine(x: lastX!, color: Colors.white)],
+                ),
+          lineTouchData: LineTouchData(
+            enabled: false,
+            touchSpotThreshold: double.infinity, // always get nearest point
+            touchCallback: _onLongPress,
           ),
+          titlesData: FlTitlesData(
+            topTitles: const AxisTitles(),
+            rightTitles: const AxisTitles(),
+            bottomTitles: AxisTitles(
+              sideTitles: SideTitles(
+                showTitles: true,
+                interval: widget.xInterval,
+                getTitlesWidget: (value, _) => Text(
+                  value.round() % widget.xInterval.round() == 0 &&
+                          value.round() > 0 &&
+                          value.round() < widget.maxX
+                      ? Duration(milliseconds: value.round()).formatHm
+                      : "", // remove label at 0 and last value
+                  style: TextStyle(color: widget.labelColor),
+                ),
+                reservedSize: 20,
+              ),
+            ),
+            leftTitles: const AxisTitles(),
+          ),
+          gridData: FlGridData(
+            getDrawingHorizontalLine:
+                gridLineDrawer(context: context, color: Colors.grey),
+            verticalInterval: widget.xInterval,
+            getDrawingVerticalLine:
+                gridLineDrawer(context: context, color: Colors.grey),
+          ),
+          borderData: FlBorderData(show: false),
         ),
       ),
     );
