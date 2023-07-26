@@ -12,7 +12,7 @@ create table movement (
 );
 
 create unique index movement__user_id__name__movement_dimension__key
-    on movement (user_id, name, movement_dimension) where deleted = false;
+    on movement (user_id, name, movement_dimension) nulls not distinct where deleted = false;
 
 create index movement__user_id__last_change__idx
     on movement (user_id, last_change) where deleted = false;

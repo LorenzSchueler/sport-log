@@ -14,7 +14,7 @@ create table metcon (
 );
 
 create unique index metcon__user_id__name__key
-    on metcon (user_id, name) where deleted = false;
+    on metcon (user_id, name) nulls not distinct where deleted = false;
 
 create index metcon__user_id__last_change__idx
     on metcon (user_id, last_change) where deleted = false;
