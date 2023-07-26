@@ -97,7 +97,7 @@ class DiaryOverviewPage extends StatelessWidget {
                                         .whereNotNull()
                                         .toList(),
                                     dateFilterState: dataProvider.dateFilter,
-                                    yFromZero: false,
+                                    absolute: false,
                                     aggregatorType: AggregatorType.avg,
                                   ),
                                   Defaults.sizedBox.vertical.normal,

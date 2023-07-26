@@ -133,7 +133,7 @@ class _StrengthChartState extends State<StrengthChart> {
               .whereNotNull()
               .toList(),
           dateFilterState: widget.dateFilterState,
-          yFromZero: _selectedSeries.yFromZero,
+          absolute: _selectedSeries.yFromZero,
           aggregatorType: _selectedSeries.aggregator,
         ),
       ],

@@ -92,7 +92,7 @@ class _CardioChartState extends State<CardioChart> {
               .whereNotNull()
               .toList(),
           dateFilterState: widget.dateFilterState,
-          yFromZero: _selectedSeries.yFromZero,
+          absolute: _selectedSeries.yFromZero,
           aggregatorType: _selectedSeries.aggregator,
         ),
       ],

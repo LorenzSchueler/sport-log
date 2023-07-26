@@ -8,7 +8,7 @@ import 'package:sport_log/pages/workout/charts/grid_line_drawer.dart';
 class MonthChart extends DateTimePeriodChart {
   MonthChart({
     required super.chartValues,
-    required super.yFromZero,
+    required super.absolute,
     required super.isTime,
     required this.startDateTime,
     super.key,

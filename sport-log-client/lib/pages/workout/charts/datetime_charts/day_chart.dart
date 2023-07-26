@@ -8,7 +8,7 @@ import 'package:sport_log/pages/workout/charts/grid_line_drawer.dart';
 class DayChart extends DateTimePeriodChart {
   DayChart({
     required super.chartValues,
-    required super.yFromZero,
+    required super.absolute,
     required super.isTime,
     super.key,
   });

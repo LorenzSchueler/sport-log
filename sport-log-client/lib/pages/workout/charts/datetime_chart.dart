@@ -42,7 +42,7 @@ class DateTimeChart extends StatelessWidget {
   const DateTimeChart({
     required this.chartValues,
     required this.dateFilterState,
-    required this.yFromZero,
+    required this.absolute,
     required this.aggregatorType,
     this.height = 200,
     super.key,
@@ -50,19 +50,12 @@ class DateTimeChart extends StatelessWidget {
 
   final List<DateTimeChartValue> chartValues;
   final DateFilterState dateFilterState;
-  final bool yFromZero;
+  final bool absolute;
   final AggregatorType aggregatorType;
   final double height;
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: height,
-      child: _chart(),
-    );
-  }
-
-  Widget _chart() {
     final chartValues = this
         .chartValues
         .groupListsBy((v) => _groupFunction(v.datetime))
@@ -76,36 +69,39 @@ class DateTimeChart extends StatelessWidget {
         .toList()
       ..sort((v1, v2) => v1.datetime.compareTo(v2.datetime));
 
-    return switch (dateFilterState.runtimeType) {
-      DayFilter => DayChart(
-          chartValues: chartValues,
-          yFromZero: yFromZero,
-          isTime: false,
-        ),
-      WeekFilter => WeekChart(
-          chartValues: chartValues,
-          yFromZero: yFromZero,
-          isTime: false,
-          startDateTime: dateFilterState.start!,
-        ),
-      MonthFilter => MonthChart(
-          chartValues: chartValues,
-          yFromZero: yFromZero,
-          isTime: false,
-          startDateTime: dateFilterState.start!,
-        ),
-      YearFilter => YearChart(
-          chartValues: chartValues,
-          yFromZero: yFromZero,
-          isTime: false,
-          startDateTime: dateFilterState.start!,
-        ),
-      _ => AllChart(
-          chartValues: chartValues,
-          yFromZero: yFromZero,
-          isTime: false,
-        ),
-    };
+    return SizedBox(
+      height: height,
+      child: switch (dateFilterState.runtimeType) {
+        DayFilter => DayChart(
+            chartValues: chartValues,
+            absolute: absolute,
+            isTime: false,
+          ),
+        WeekFilter => WeekChart(
+            chartValues: chartValues,
+            absolute: absolute,
+            isTime: false,
+            startDateTime: dateFilterState.start!,
+          ),
+        MonthFilter => MonthChart(
+            chartValues: chartValues,
+            absolute: absolute,
+            isTime: false,
+            startDateTime: dateFilterState.start!,
+          ),
+        YearFilter => YearChart(
+            chartValues: chartValues,
+            absolute: absolute,
+            isTime: false,
+            startDateTime: dateFilterState.start!,
+          ),
+        _ => AllChart(
+            chartValues: chartValues,
+            absolute: absolute,
+            isTime: false,
+          ),
+      },
+    );
   }
 
   DateTime _groupFunction(DateTime dateTime) {
@@ -122,12 +118,12 @@ class DateTimeChart extends StatelessWidget {
 abstract class DateTimePeriodChart extends StatelessWidget {
   DateTimePeriodChart({
     required this.chartValues,
-    required this.yFromZero,
+    required this.absolute,
     required this.isTime,
     super.key,
   })  : _maxY =
             (chartValues.map((v) => v.value).maxOrNull ?? 0).ceil().toDouble(),
-        _minY = yFromZero
+        _minY = absolute
             ? 0.0
             : (chartValues.map((v) => v.value).minOrNull ?? 0)
                 .floor()
@@ -135,7 +131,7 @@ abstract class DateTimePeriodChart extends StatelessWidget {
 
   final List<DateTimeChartValue> chartValues;
   final bool isTime;
-  final bool yFromZero;
+  final bool absolute;
   final double _maxY;
   final double _minY;
 

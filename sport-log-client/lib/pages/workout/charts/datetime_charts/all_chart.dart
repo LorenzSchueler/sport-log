@@ -9,7 +9,7 @@ import 'package:sport_log/pages/workout/charts/grid_line_drawer.dart';
 class AllChart extends DateTimePeriodChart {
   AllChart({
     required super.chartValues,
-    required super.yFromZero,
+    required super.absolute,
     required super.isTime,
     super.key,
   });
@@ -75,8 +75,7 @@ class AllChart extends DateTimePeriodChart {
                   ? true
                   : false;
             },
-            getDrawingVerticalLine: 
-             gridLineDrawer(),
+            getDrawingVerticalLine: gridLineDrawer(),
           ),
           borderData: FlBorderData(show: false),
         ),
