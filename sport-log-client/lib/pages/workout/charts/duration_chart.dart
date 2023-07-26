@@ -241,11 +241,9 @@ class _DurationChartState extends State<DurationChart> {
             leftTitles: const AxisTitles(),
           ),
           gridData: FlGridData(
-            getDrawingHorizontalLine:
-                gridLineDrawer(context: context, color: Colors.grey),
+            getDrawingHorizontalLine: gridLineDrawer(),
             verticalInterval: widget._xInterval,
-            getDrawingVerticalLine:
-                gridLineDrawer(context: context, color: Colors.grey),
+            getDrawingVerticalLine: gridLineDrawer(),
           ),
           borderData: FlBorderData(show: false),
         ),

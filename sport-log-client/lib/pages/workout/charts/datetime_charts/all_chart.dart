@@ -67,7 +67,7 @@ class AllChart extends DateTimePeriodChart {
             reservedSize: 35,
           ),
           gridData: FlGridData(
-            getDrawingHorizontalLine: gridLineDrawer(context: context),
+            getDrawingHorizontalLine: gridLineDrawer(),
             verticalInterval: 1,
             checkToShowVerticalLine: (value) {
               final datetime = startDateTime.add(Duration(days: value.round()));
@@ -75,7 +75,8 @@ class AllChart extends DateTimePeriodChart {
                   ? true
                   : false;
             },
-            getDrawingVerticalLine: gridLineDrawer(context: context),
+            getDrawingVerticalLine: 
+             gridLineDrawer(),
           ),
           borderData: FlBorderData(show: false),
         ),

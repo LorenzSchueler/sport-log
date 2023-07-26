@@ -37,7 +37,7 @@ class DayChart extends DateTimePeriodChart {
           getBottomTitles: (value, _) => Text("Set ${value.round()}"),
         ),
         gridData: FlGridData(
-          getDrawingHorizontalLine: gridLineDrawer(context: context),
+          getDrawingHorizontalLine: gridLineDrawer(),
           drawVerticalLine: false,
         ),
         borderData: FlBorderData(show: false),
