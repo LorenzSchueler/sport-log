@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:collection/collection.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:sport_log/pages/workout/charts/chart_helpers.dart';
 import 'package:sport_log/pages/workout/charts/grid_line_drawer.dart';
 
 class DistanceChartValue {
@@ -16,49 +17,45 @@ class DistanceChartValue {
 }
 
 class DistanceChartLine {
-  DistanceChartLine.fromUngroupedChartValues({
-    required List<DistanceChartValue> chartValues,
-    required this.lineColor,
-    required this.absolute,
-  }) : chartValues = chartValues
-            .groupListsBy((v) => _groupFunction(v.distance))
-            .entries
-            .map(
-              (entry) => DistanceChartValue(
-                distance: entry.key,
-                value: entry.value.map((v) => v.value).average,
-              ),
-            )
-            .toList()
-          ..sort((v1, v2) => v1.distance.compareTo(v2.distance));
+  DistanceChartLine._(this.chartValues, this.lineColor, this.absolute);
 
-  DistanceChartLine.fromDurationList({
-    required List<double> distances,
-    required this.lineColor,
-    required this.absolute,
-  }) : chartValues = distances
-            .groupListsBy(_groupFunction)
-            .entries
-            .map(
-              (entry) => DistanceChartValue(
-                distance: entry.key,
-                value: entry.value.length.toDouble(),
-              ),
-            )
-            .toList()
-          ..sort((v1, v2) => v1.distance.compareTo(v2.distance));
+  static DistanceChartLine fromValues<T>({
+    required List<T>? values,
+    required double Function(T v) getDistance,
+    required double Function(T v) getValue,
+    required Color lineColor,
+    required bool absolute,
+  }) {
+    if (values == null || values.isEmpty) {
+      return DistanceChartLine._([], lineColor, absolute);
+    }
+    final totalDistance = getDistance(values.last);
+    final chartValues = values
+        .groupListsBy(
+          (value) => _groupFunction(getDistance(value), totalDistance),
+        )
+        .entries
+        .map(
+          (entry) => DistanceChartValue(
+            distance: entry.key,
+            value: entry.value.map((v) => getValue(v)).average,
+          ),
+        )
+        .toList()
+      ..sort((v1, v2) => v1.distance.compareTo(v2.distance));
+    return DistanceChartLine._(chartValues, lineColor, absolute);
+  }
 
   final List<DistanceChartValue> chartValues;
   final Color lineColor;
   final bool absolute;
 
-  static double _groupFunction(double distance) {
-    // if max - min duration > ...
-    return (distance / 100).round() * 100 + 50;
+  static double _groupFunction(double distance, double totalDistance) {
+    final interval = intervalMeter(totalDistance);
+    return (distance / interval).round() * interval;
   }
 
-  @override
-  String toString() => chartValues.map((e) => e.toString()).toString();
+  static double intervalMeter(double totalDistance) => totalDistance / 100;
 }
 
 // ignore: must_be_immutable

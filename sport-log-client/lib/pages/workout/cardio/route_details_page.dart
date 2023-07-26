@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart' hide Route;
-import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
+import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' hide Position;
 import 'package:sport_log/data_provider/data_providers/cardio_data_provider.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/bool_toggle.dart';
@@ -8,6 +8,7 @@ import 'package:sport_log/helpers/map_controller.dart';
 import 'package:sport_log/helpers/page_return.dart';
 import 'package:sport_log/helpers/pointer.dart';
 import 'package:sport_log/helpers/search.dart';
+import 'package:sport_log/models/cardio/position.dart';
 import 'package:sport_log/models/cardio/route.dart';
 import 'package:sport_log/pages/workout/cardio/no_track.dart';
 import 'package:sport_log/pages/workout/cardio/route_value_unit_description_table.dart';
@@ -42,16 +43,10 @@ class _RouteDetailsPageState extends State<RouteDetailsPage>
 
   late DistanceChartLine _elevationLine = _getElevationLine();
   DistanceChartLine _getElevationLine() =>
-      DistanceChartLine.fromUngroupedChartValues(
-        chartValues: _route.track
-                ?.map(
-                  (t) => DistanceChartValue(
-                    distance: t.distance,
-                    value: t.elevation,
-                  ),
-                )
-                .toList() ??
-            [],
+      DistanceChartLine.fromValues<Position>(
+        values: _route.track,
+        getDistance: (p) => p.distance,
+        getValue: (p) => p.elevation,
         lineColor: _elevationColor,
         absolute: false,
       );
@@ -212,15 +207,30 @@ class _RouteDetailsPageState extends State<RouteDetailsPage>
   }
 
   Future<void> _touchCallback(double? distance) async {
-    final index = distance != null && _route.track != null
-        ? binarySearchClosest(_route.track!, (pos) => pos.distance, distance)
+    final chartIndex = distance != null
+        ? binarySearchClosest(
+            _elevationLine.chartValues,
+            (value) => value.distance,
+            distance,
+          )
         : null;
-    final position = index != null ? _route.track![index] : null;
+    final chartValue =
+        chartIndex != null ? _elevationLine.chartValues[chartIndex] : null;
 
     setState(() {
-      _distance = position?.distance.round();
-      _elevation = position?.elevation.round();
+      _distance = chartValue?.distance.round();
+      _elevation = chartValue?.value.round();
     });
+
+    final positionIndex = distance != null && _route.track != null
+        ? binarySearchClosest(
+            _route.track!,
+            (pos) => pos.distance,
+            distance,
+          )
+        : null;
+    final position =
+        positionIndex != null ? _route.track![positionIndex] : null;
 
     await _mapController?.updateRouteMarker(
       _touchLocationMarker,

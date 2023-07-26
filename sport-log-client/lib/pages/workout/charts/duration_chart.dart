@@ -4,6 +4,7 @@ import 'package:collection/collection.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
+import 'package:sport_log/pages/workout/charts/chart_helpers.dart';
 import 'package:sport_log/pages/workout/charts/grid_line_drawer.dart';
 
 class DurationChartValue {
@@ -118,6 +119,9 @@ class DurationChartLine {
     return Duration(minutes: duration.inMinutes ~/ intervalMin * intervalMin);
   }
 
+  // 0h - 1h: 1 min -> 0 - 60 points
+  // 1h - 2h: 2 min -> 30 - 60 points
+  // 2h - 3h: 3 min -> 40 - 60 points
   static Duration intervalMinutes(Duration totalDuration) =>
       Duration(minutes: totalDuration.inHours + 1);
 }
