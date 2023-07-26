@@ -7,7 +7,6 @@ import 'package:sport_log/data_provider/data_providers/cardio_data_provider.dart
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/bool_toggle.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
-import 'package:sport_log/helpers/extensions/double_extension.dart';
 import 'package:sport_log/helpers/gpx.dart';
 import 'package:sport_log/helpers/map_controller.dart';
 import 'package:sport_log/helpers/page_return.dart';
@@ -316,7 +315,7 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
                                 ),
                               if (_speed != null)
                                 Text(
-                                  "${_speed?.roundToPrecision(1)} km/h",
+                                  "${_speed?.toStringAsFixed(1)} km/h",
                                   style: const TextStyle(color: _speedColor),
                                 ),
                               if (_elevation != null)

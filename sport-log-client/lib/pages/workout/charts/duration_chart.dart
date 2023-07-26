@@ -128,7 +128,7 @@ class DurationChart extends StatefulWidget {
     this.touchCallback,
     this.labelColor = Colors.white,
     super.key,
-  })  : xInterval = chartLines
+  })  : _xInterval = chartLines
             .map(
               (chartLine) =>
                   max(
@@ -141,7 +141,7 @@ class DurationChart extends StatefulWidget {
                   1000,
             )
             .max,
-        maxX = chartLines
+        _maxX = chartLines
             .map(
               (chartLine) =>
                   (chartLine.chartValues.lastOrNull?.duration.inMinutes ?? 0) *
@@ -155,15 +155,15 @@ class DurationChart extends StatefulWidget {
   final void Function(Duration? x)? touchCallback;
   final Color labelColor;
 
-  final double xInterval;
-  final double maxX;
+  final double _xInterval;
+  final double _maxX;
 
   @override
   State<DurationChart> createState() => _DurationChartState();
 }
 
 class _DurationChartState extends State<DurationChart> {
-  double? lastX;
+  double? _lastX;
 
   void _onLongPress(FlTouchEvent event, LineTouchResponse? response) {
     if (event is FlLongPressStart || event is FlLongPressMoveUpdate) {
@@ -171,13 +171,13 @@ class _DurationChartState extends State<DurationChart> {
       final xValue = xValues == null || xValues.isEmpty
           ? null
           : xValues[xValues.length ~/ 2]; // median
-      if (xValue != null && xValue != lastX) {
-        setState(() => lastX = xValue);
+      if (xValue != null && xValue != _lastX) {
+        setState(() => _lastX = xValue);
         widget.touchCallback?.call(Duration(milliseconds: xValue.round()));
       }
     } else if (event is FlLongPressEnd) {
       widget.touchCallback?.call(null);
-      setState(() => lastX = null);
+      setState(() => _lastX = null);
     }
   }
 
@@ -207,11 +207,13 @@ class _DurationChartState extends State<DurationChart> {
           minY: 0,
           maxY: 1,
           minX: 0,
-          maxX: widget.maxX,
-          extraLinesData: lastX == null
+          maxX: widget._maxX,
+          extraLinesData: _lastX == null
               ? null
               : ExtraLinesData(
-                  verticalLines: [VerticalLine(x: lastX!, color: Colors.white)],
+                  verticalLines: [
+                    VerticalLine(x: _lastX!, color: Colors.white)
+                  ],
                 ),
           lineTouchData: LineTouchData(
             enabled: false,
@@ -224,11 +226,11 @@ class _DurationChartState extends State<DurationChart> {
             bottomTitles: AxisTitles(
               sideTitles: SideTitles(
                 showTitles: true,
-                interval: widget.xInterval,
+                interval: widget._xInterval,
                 getTitlesWidget: (value, _) => Text(
-                  value.round() % widget.xInterval.round() == 0 &&
+                  value.round() % widget._xInterval.round() == 0 &&
                           value.round() > 0 &&
-                          value.round() < widget.maxX
+                          value.round() < widget._maxX
                       ? Duration(milliseconds: value.round()).formatHm
                       : "", // remove label at 0 and last value
                   style: TextStyle(color: widget.labelColor),
@@ -241,7 +243,7 @@ class _DurationChartState extends State<DurationChart> {
           gridData: FlGridData(
             getDrawingHorizontalLine:
                 gridLineDrawer(context: context, color: Colors.grey),
-            verticalInterval: widget.xInterval,
+            verticalInterval: widget._xInterval,
             getDrawingVerticalLine:
                 gridLineDrawer(context: context, color: Colors.grey),
           ),

@@ -1,11 +1,4 @@
-import 'dart:math';
-
 extension RoundExtension on double {
-  double roundToPrecision(int precision) {
-    final factor = pow(10, precision);
-    return (this * factor).round() / factor;
-  }
-
   /// (0.123).toStringMaxFixed(3) == "0.123"
   /// (0.120).toStringMaxFixed(3) == "0.12"
   /// (0.100).toStringMaxFixed(3) == "0.1"

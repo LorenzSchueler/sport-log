@@ -1,4 +1,3 @@
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart' hide Route;
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:sport_log/data_provider/data_providers/cardio_data_provider.dart';
@@ -8,6 +7,7 @@ import 'package:sport_log/helpers/gpx.dart';
 import 'package:sport_log/helpers/map_controller.dart';
 import 'package:sport_log/helpers/page_return.dart';
 import 'package:sport_log/helpers/pointer.dart';
+import 'package:sport_log/helpers/search.dart';
 import 'package:sport_log/models/cardio/route.dart';
 import 'package:sport_log/pages/workout/cardio/no_track.dart';
 import 'package:sport_log/pages/workout/cardio/route_value_unit_description_table.dart';
@@ -39,6 +39,28 @@ class _RouteDetailsPageState extends State<RouteDetailsPage>
       NullablePointer.nullPointer();
   final NullablePointer<CircleAnnotation> _touchLocationMarker =
       NullablePointer.nullPointer();
+
+  late DistanceChartLine _elevationLine = _getElevationLine();
+  DistanceChartLine _getElevationLine() =>
+      DistanceChartLine.fromUngroupedChartValues(
+        chartValues: _route.track
+                ?.map(
+                  (t) => DistanceChartValue(
+                    distance: t.distance,
+                    value: t.elevation,
+                  ),
+                )
+                .toList() ??
+            [],
+        lineColor: _elevationColor,
+        absolute: false,
+      );
+
+  int? _distance;
+  int? _elevation;
+
+  static const _distanceColor = Colors.white;
+  static const _elevationColor = Color.fromARGB(255, 170, 130, 100);
 
   Future<void> _onMapCreated(MapController mapController) async {
     _mapController = mapController;
@@ -93,6 +115,7 @@ class _RouteDetailsPageState extends State<RouteDetailsPage>
       } else {
         setState(() {
           _route = returnObj.payload;
+          _elevationLine = _getElevationLine();
         });
         await _setBoundsAndLine();
       }
@@ -145,12 +168,28 @@ class _RouteDetailsPageState extends State<RouteDetailsPage>
                 child: RouteValueUnitDescriptionTable(route: _route),
               ),
               if (_route.track != null) ...[
-                const Divider(),
+                const Divider(height: 0),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    if (_distance != null)
+                      Text(
+                        "${(_distance! / 1000).toStringAsFixed(3)} km",
+                        style: const TextStyle(color: _distanceColor),
+                      ),
+                    if (_elevation != null)
+                      Text(
+                        "$_elevation m",
+                        style: const TextStyle(color: _elevationColor),
+                      ),
+                    // placeholder when no value is set
+                    if (_distance == null && _elevation == null) const Text("")
+                  ],
+                ),
                 SizedBox(
-                  height: 200,
+                  height: 250,
                   child: DistanceChart(
-                    chartLines: [_elevationLine()],
-                    yFromZero: false,
+                    chartLines: [_elevationLine],
                     touchCallback: _touchCallback,
                   ),
                 )
@@ -161,20 +200,6 @@ class _RouteDetailsPageState extends State<RouteDetailsPage>
       ),
     );
   }
-
-  DistanceChartLine _elevationLine() =>
-      DistanceChartLine.fromUngroupedChartValues(
-        chartValues: _route.track
-                ?.map(
-                  (t) => DistanceChartValue(
-                    distance: t.distance,
-                    value: t.elevation,
-                  ),
-                )
-                .toList() ??
-            [],
-        lineColor: Colors.white,
-      );
 
   Future<void> _exportFile() async {
     final file = await saveTrackAsGpx(_route.track ?? []);
@@ -187,12 +212,19 @@ class _RouteDetailsPageState extends State<RouteDetailsPage>
   }
 
   Future<void> _touchCallback(double? distance) async {
-    final latLng = distance != null
-        ? _route.track?.reversed
-            .firstWhereOrNull((pos) => pos.distance <= distance)
-            ?.latLng
+    final index = distance != null && _route.track != null
+        ? binarySearchClosest(_route.track!, (pos) => pos.distance, distance)
         : null;
+    final position = index != null ? _route.track![index] : null;
 
-    await _mapController?.updateRouteMarker(_touchLocationMarker, latLng);
+    setState(() {
+      _distance = position?.distance.round();
+      _elevation = position?.elevation.round();
+    });
+
+    await _mapController?.updateRouteMarker(
+      _touchLocationMarker,
+      position?.latLng,
+    );
   }
 }

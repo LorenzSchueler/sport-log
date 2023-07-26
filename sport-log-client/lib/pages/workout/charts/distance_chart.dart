@@ -3,7 +3,6 @@ import 'dart:math';
 import 'package:collection/collection.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:sport_log/helpers/extensions/double_extension.dart';
 import 'package:sport_log/pages/workout/charts/grid_line_drawer.dart';
 
 class DistanceChartValue {
@@ -20,14 +19,14 @@ class DistanceChartLine {
   DistanceChartLine.fromUngroupedChartValues({
     required List<DistanceChartValue> chartValues,
     required this.lineColor,
+    required this.absolute,
   }) : chartValues = chartValues
             .groupListsBy((v) => _groupFunction(v.distance))
             .entries
             .map(
               (entry) => DistanceChartValue(
                 distance: entry.key,
-                value:
-                    entry.value.map((v) => v.value).average.roundToPrecision(1),
+                value: entry.value.map((v) => v.value).average,
               ),
             )
             .toList()
@@ -36,6 +35,7 @@ class DistanceChartLine {
   DistanceChartLine.fromDurationList({
     required List<double> distances,
     required this.lineColor,
+    required this.absolute,
   }) : chartValues = distances
             .groupListsBy(_groupFunction)
             .entries
@@ -50,6 +50,7 @@ class DistanceChartLine {
 
   final List<DistanceChartValue> chartValues;
   final Color lineColor;
+  final bool absolute;
 
   static double _groupFunction(double distance) {
     // if max - min duration > ...
@@ -61,21 +62,54 @@ class DistanceChartLine {
 }
 
 // ignore: must_be_immutable
-class DistanceChart extends StatelessWidget {
+class DistanceChart extends StatefulWidget {
   DistanceChart({
     required this.chartLines,
-    required this.yFromZero,
     this.touchCallback,
     this.labelColor = Colors.white,
     super.key,
-  });
+  })  :
+        // interval in m only at whole km at most 8
+        _xInterval = chartLines
+            .map(
+              (chartLine) =>
+                  max(
+                    1,
+                    (chartLine.chartValues.lastOrNull?.distance ?? 0) /
+                        8 /
+                        1000,
+                  ).ceil().toDouble() *
+                  1000,
+            )
+            .max,
+        _minY = chartLines
+            .map(
+              (chartLine) => chartLine.absolute
+                  ? 0.0
+                  : chartLine.chartValues.map((v) => v.value).minOrNull ?? 0,
+            )
+            .min,
+        _maxY = chartLines
+            .map(
+              (chartLine) =>
+                  chartLine.chartValues.map((v) => v.value).maxOrNull ?? 0,
+            )
+            .max;
 
   final List<DistanceChartLine> chartLines;
-  final bool yFromZero;
   final void Function(double? distance)? touchCallback;
   final Color labelColor;
 
-  double? lastX;
+  final double _xInterval;
+  final double _minY;
+  final double _maxY;
+
+  @override
+  State<DistanceChart> createState() => _DistanceChartState();
+}
+
+class _DistanceChartState extends State<DistanceChart> {
+  double? _lastX;
 
   void _onLongPress(FlTouchEvent event, LineTouchResponse? response) {
     if (event is FlLongPressStart || event is FlLongPressMoveUpdate) {
@@ -83,67 +117,54 @@ class DistanceChart extends StatelessWidget {
       final xValue = xValues == null || xValues.isEmpty
           ? null
           : xValues[xValues.length ~/ 2]; // median
-      if (xValue != null && xValue != lastX) {
-        touchCallback?.call(xValue);
+      if (xValue != null && xValue != _lastX) {
+        setState(() => _lastX = xValue);
+        widget.touchCallback?.call(xValue);
       }
-      lastX = xValue;
+      _lastX = xValue;
     } else if (event is FlLongPressEnd) {
-      touchCallback?.call(null);
-      lastX = null;
+      widget.touchCallback?.call(null);
+      setState(() => _lastX = null);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    var minY = yFromZero
-        ? 0.0
-        : chartLines
-            .map(
-              (chartLine) =>
-                  chartLine.chartValues.map((v) => v.value).minOrNull ?? 0,
-            )
-            .min;
-    var maxY = chartLines
-        .map(
-          (chartLine) =>
-              chartLine.chartValues.map((v) => v.value).maxOrNull ?? 0,
-        )
-        .max;
-    if (maxY == minY) {
+    var minY = widget._minY;
+    var maxY = widget._maxY;
+    if (widget._maxY == widget._minY) {
       maxY += 1;
       minY -= 1;
     }
-
-    // interval in m only at whole km at most 8
-    final xInterval = chartLines
-        .map(
-          (chartLine) =>
-              max(
-                1,
-                (chartLine.chartValues.lastOrNull?.distance ?? 0) / 8 / 1000,
-              ).ceil().toDouble() *
-              1000,
-        )
-        .max;
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(5, 10, 15, 0),
       child: LineChart(
         LineChartData(
           lineBarsData: [
-            for (final chartLine in chartLines)
+            for (final chartLine in widget.chartLines)
               LineChartBarData(
                 spots: chartLine.chartValues
                     .map((v) => FlSpot(v.distance, v.value))
                     .toList(),
                 color: chartLine.lineColor,
                 dotData: const FlDotData(show: false),
+                isCurved: true,
+                preventCurveOverShooting: true,
               ),
           ],
           minY: minY,
           maxY: maxY,
           minX: 0,
+          extraLinesData: _lastX == null
+              ? null
+              : ExtraLinesData(
+                  verticalLines: [
+                    VerticalLine(x: _lastX!, color: Colors.white)
+                  ],
+                ),
           lineTouchData: LineTouchData(
+            enabled: false,
             touchSpotThreshold: double.infinity, // always get nearest point
             touchCallback: _onLongPress,
           ),
@@ -153,12 +174,12 @@ class DistanceChart extends StatelessWidget {
             bottomTitles: AxisTitles(
               sideTitles: SideTitles(
                 showTitles: true,
-                interval: xInterval,
+                interval: widget._xInterval,
                 getTitlesWidget: (m, _) => Text(
-                  m.round() % xInterval.round() == 0
+                  m.round() % widget._xInterval.round() == 0
                       ? (m / 1000).round().toString()
                       : "", // remove label at last value
-                  style: TextStyle(color: labelColor),
+                  style: TextStyle(color: widget.labelColor),
                 ),
                 reservedSize: 20,
               ),
@@ -169,7 +190,7 @@ class DistanceChart extends StatelessWidget {
                 reservedSize: 40,
                 getTitlesWidget: (value, _) => Text(
                   value.round().toString(),
-                  style: TextStyle(color: labelColor),
+                  style: TextStyle(color: widget.labelColor),
                 ),
               ),
             ),
@@ -177,7 +198,7 @@ class DistanceChart extends StatelessWidget {
           gridData: FlGridData(
             getDrawingHorizontalLine:
                 gridLineDrawer(context: context, color: Colors.grey),
-            verticalInterval: xInterval,
+            verticalInterval: widget._xInterval,
             getDrawingVerticalLine:
                 gridLineDrawer(context: context, color: Colors.grey),
           ),
