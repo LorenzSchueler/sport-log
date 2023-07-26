@@ -111,21 +111,9 @@ class DistanceChart extends StatefulWidget {
 class _DistanceChartState extends State<DistanceChart> {
   double? _lastX;
 
-  void _onLongPress(FlTouchEvent event, LineTouchResponse? response) {
-    if (event is FlLongPressStart || event is FlLongPressMoveUpdate) {
-      final xValues = response?.lineBarSpots?.map((e) => e.x).toList();
-      final xValue = xValues == null || xValues.isEmpty
-          ? null
-          : xValues[xValues.length ~/ 2]; // median
-      if (xValue != null && xValue != _lastX) {
-        setState(() => _lastX = xValue);
-        widget.touchCallback?.call(xValue);
-      }
-      _lastX = xValue;
-    } else if (event is FlLongPressEnd) {
-      widget.touchCallback?.call(null);
-      setState(() => _lastX = null);
-    }
+  void _onLongPress(double? xValue) {
+    setState(() => _lastX = xValue);
+    widget.touchCallback?.call(xValue);
   }
 
   @override
@@ -156,18 +144,8 @@ class _DistanceChartState extends State<DistanceChart> {
           minY: minY,
           maxY: maxY,
           minX: 0,
-          extraLinesData: _lastX == null
-              ? null
-              : ExtraLinesData(
-                  verticalLines: [
-                    VerticalLine(x: _lastX!, color: Colors.white)
-                  ],
-                ),
-          lineTouchData: LineTouchData(
-            enabled: false,
-            touchSpotThreshold: double.infinity, // always get nearest point
-            touchCallback: _onLongPress,
-          ),
+          extraLinesData: touchLine(_lastX),
+          lineTouchData: touchCallback(_onLongPress),
           titlesData: FlTitlesData(
             topTitles: const AxisTitles(),
             rightTitles: const AxisTitles(),

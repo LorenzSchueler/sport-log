@@ -165,20 +165,10 @@ class DurationChart extends StatefulWidget {
 class _DurationChartState extends State<DurationChart> {
   double? _lastX;
 
-  void _onLongPress(FlTouchEvent event, LineTouchResponse? response) {
-    if (event is FlLongPressStart || event is FlLongPressMoveUpdate) {
-      final xValues = response?.lineBarSpots?.map((e) => e.x).toList();
-      final xValue = xValues == null || xValues.isEmpty
-          ? null
-          : xValues[xValues.length ~/ 2]; // median
-      if (xValue != null && xValue != _lastX) {
-        setState(() => _lastX = xValue);
-        widget.touchCallback?.call(Duration(milliseconds: xValue.round()));
-      }
-    } else if (event is FlLongPressEnd) {
-      widget.touchCallback?.call(null);
-      setState(() => _lastX = null);
-    }
+  void _onLongPress(double? xValue) {
+    setState(() => _lastX = xValue);
+    widget.touchCallback
+        ?.call(xValue == null ? null : Duration(milliseconds: xValue.round()));
   }
 
   @override
@@ -208,18 +198,8 @@ class _DurationChartState extends State<DurationChart> {
           maxY: 1,
           minX: 0,
           maxX: widget._maxX,
-          extraLinesData: _lastX == null
-              ? null
-              : ExtraLinesData(
-                  verticalLines: [
-                    VerticalLine(x: _lastX!, color: Colors.white)
-                  ],
-                ),
-          lineTouchData: LineTouchData(
-            enabled: false,
-            touchSpotThreshold: double.infinity, // always get nearest point
-            touchCallback: _onLongPress,
-          ),
+          extraLinesData: touchLine(_lastX),
+          lineTouchData: touchCallback(_onLongPress),
           titlesData: FlTitlesData(
             topTitles: const AxisTitles(),
             rightTitles: const AxisTitles(),
