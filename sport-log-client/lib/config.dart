@@ -100,7 +100,7 @@ class Config extends JsonSerializable {
   final String accessToken;
   @JsonKey(defaultValue: "")
   final String serverAddress;
-  @JsonKey(defaultValue: Level.nothing)
+  @JsonKey(defaultValue: Level.off)
   final Level minLogLevel;
   @JsonKey(defaultValue: false)
   final bool deleteDatabase;

@@ -146,7 +146,7 @@ extension RequestExtension on Request {
     } on TypeError {
       return Failure(ApiError(ApiErrorType.badJson, null));
     } catch (e) {
-      _logger.e("Unhandled error", e);
+      _logger.e("Unknown error", error: e);
       return Failure(ApiError(ApiErrorType.unknownRequestError, null));
     }
   }

@@ -38,27 +38,28 @@ abstract class DataProvider<T> extends ChangeNotifier {
     ApiError error,
     VoidCallback? onNoInternet,
   ) async {
-    _logger.e('Api error: $error', error.errorType);
     switch (error.errorType) {
       case ApiErrorType.serverUnreachable:
-        _logger.i("on no internet != null: ${onNoInternet != null}");
+        _logger.i("Server Unreachable");
         onNoInternet?.call();
         return null;
       case ApiErrorType.unauthorized:
-        _logger.w('Tried sync but access unauthorized.', error);
+        _logger.w("Access Unauthorized", error: error);
         unawaited(showNewCredentialsDialog());
         return null;
       // primary foreign or unique key violation
       case ApiErrorType.conflict:
+        _logger.i("Conflicting Resource", error: error);
         final conflictResolution = await showConflictDialog(
           context: App.globalContext,
-          title: "An Error Occurred",
+          title: "Conflicting Resource",
           text: error.toString(),
         );
         _logger.i(conflictResolution);
         return conflictResolution;
       // ignore: no_default_cases
       default:
+        _logger.e("An unknown error occurred", error: error);
         await showMessageDialog(
           context: App.globalContext,
           title: "An Error Occurred",

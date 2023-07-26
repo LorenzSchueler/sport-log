@@ -27,7 +27,7 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
-  audioplayers: ^4.0.1
+  audioplayers: ^5.0.0
   awesome_notifications: ^0.7.4
   collection: ^1.16.0
   device_info_plus: ^9.0.0
@@ -52,7 +52,7 @@ dependencies:
       url: https://github.com/Lyokone/flutterlocation
       path: packages/location
       ref: 9000a61402aaa437df447e9c5b0544cce2adcc0c
-  logger: ^1.0.0
+  logger: ^2.0.1
   mapbox_api: ^1.0.0
   mapbox_maps_flutter: #^0.4.3
     git:
