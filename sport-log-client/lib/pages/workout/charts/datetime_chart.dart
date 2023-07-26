@@ -162,9 +162,9 @@ abstract class DateTimePeriodChart extends StatelessWidget {
         sideTitles: SideTitles(
           showTitles: true,
           reservedSize: isTime ? 60 : 40,
-          getTitlesWidget: (value, _) => Text(
-            isTime ? Duration(milliseconds: value.round()).formatMsMill : "",
-          ),
+          getTitlesWidget: (value, meta) => isTime
+              ? Text(Duration(milliseconds: value.round()).formatMsMill)
+              : defaultGetTitle(value, meta),
         ),
       ),
     );
