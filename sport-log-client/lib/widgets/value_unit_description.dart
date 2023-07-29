@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
+import 'package:sport_log/helpers/lat_lng.dart';
 import 'package:sport_log/models/cardio/cardio_session.dart';
 
 class ValueUnitDescription extends StatelessWidget {
@@ -121,6 +122,15 @@ class ValueUnitDescription extends StatelessWidget {
           value: elevation?.toString(),
           unit: "m",
           description: "Elevation",
+          scale: 1.3,
+          key: key,
+        );
+
+  ValueUnitDescription.position(LatLng? latLng, {Key? key})
+      : this(
+          value: latLng?.toString(),
+          unit: null,
+          description: "Position",
           scale: 1.3,
           key: key,
         );

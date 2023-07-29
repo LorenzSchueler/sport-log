@@ -23,7 +23,17 @@ class LatLng {
   CameraOptions toCameraOptions() => CameraOptions(center: toJsonPoint());
 
   @override
-  String toString() => "lat: $lat, lng: $lng";
+  String toString() {
+    String toDegreeMinDec(double coord, String pos, String neg) {
+      final isPos = coord >= 0;
+      final absCoord = coord.abs();
+      final degree = absCoord.truncate();
+      final minutes = ((absCoord - degree) * 60).toStringAsFixed(3);
+      return "$degree°$minutes'${isPos ? pos : neg}";
+    }
+
+    return "${toDegreeMinDec(lat, "N", "S")} ${toDegreeMinDec(lng, "O", "W")}";
+  }
 
   double distanceTo(LatLng other) =>
       const lat_long.Distance(roundResult: false).distance(
