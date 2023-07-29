@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart' hide Route;
 import 'package:sport_log/defaults.dart';
+import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/pages/workout/cardio/audio_feedback_config.dart';
 import 'package:sport_log/pages/workout/cardio/tracking_settings.dart';
 import 'package:sport_log/routes.dart';
@@ -7,6 +8,7 @@ import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/input_fields/double_input.dart';
 import 'package:sport_log/widgets/input_fields/edit_tile.dart';
 import 'package:sport_log/widgets/input_fields/int_input.dart';
+import 'package:sport_log/widgets/picker/datetime_picker.dart';
 import 'package:sport_log/widgets/picker/picker.dart';
 import 'package:sport_log/widgets/provider_consumer.dart';
 import 'package:sport_log/widgets/snackbar.dart';
@@ -100,105 +102,173 @@ class CardioTrackingSettingsPage extends StatelessWidget {
                   ],
                 ),
               EditTile.Switch(
-                leading: Icons.record_voice_over_rounded,
-                caption: "Audio Feedback",
-                value: trackingSettings.audioFeedback != null,
-                onChanged: (feedback) => trackingSettings.audioFeedback =
-                    feedback ? AudioFeedbackConfig() : null,
+                leading: AppIcons.mountains,
+                caption: "Expedition Mode",
+                value: trackingSettings.expeditionMode,
+                onChanged: (expeditionMode) =>
+                    trackingSettings.expeditionMode = expeditionMode,
               ),
-              if (trackingSettings.audioFeedback != null) ...[
+              if (trackingSettings.expeditionMode)
                 Padding(
                   // 24 icon + 15 padding
                   padding: const EdgeInsets.only(left: 24 + 15),
                   child: EditTile(
                     leading: null,
-                    caption: "Feedback Interval (km)",
-                    shrinkWidth: true,
-                    child: DoubleInput(
-                      // update if rounded to 100m
-                      key: ValueKey(trackingSettings.audioFeedback!.interval),
-                      onUpdate: (interval) =>
-                          trackingSettings.audioFeedback!.interval =
-                              (interval * 10).round() * 100, // rounded to 100m
-                      initialValue:
-                          trackingSettings.audioFeedback!.interval / 1000.0,
-                      minValue: 0.1,
-                      maxValue: null,
-                    ),
-                  ),
-                ),
-                Padding(
-                  // 24 icon + 15 padding
-                  padding: const EdgeInsets.only(left: 24 + 15),
-                  child: EditTile(
-                    leading: null,
-                    caption: "Feedback Metrics",
+                    caption: "Tracking Times",
                     unboundedHeight: true,
-                    child: ListView.builder(
-                      physics: const NeverScrollableScrollPhysics(),
-                      shrinkWrap: true,
-                      itemCount: trackingSettings.audioFeedback!.metrics.length,
-                      itemBuilder: (context, index) {
-                        final metric =
-                            trackingSettings.audioFeedback!.metrics[index];
-                        return Row(
-                          children: [
-                            DefaultSwitch(
-                              value: metric.isEnabled,
-                              onChanged: (enabled) =>
-                                  metric.isEnabled = enabled,
-                            ),
-                            Defaults.sizedBox.horizontal.normal,
-                            Text(metric.name),
-                          ],
-                        );
-                      },
-                    ),
-                  ),
-                ),
-              ],
-              trackingSettings.heartRateUtils.devices.isEmpty
-                  ? EditTile(
-                      leading: AppIcons.heartbeat,
-                      caption: "Heart Rate Monitor",
-                      child: Text(
-                        trackingSettings.heartRateUtils.isSearching
-                            ? "Searching..."
-                            : "No Device",
-                      ),
-                      onTap: () async {
-                        await trackingSettings.heartRateUtils.searchDevices();
-                        if (context.mounted &&
-                            trackingSettings.heartRateUtils.devices.isEmpty) {
-                          showSimpleToast(context, "No devices found.");
-                        }
-                      },
-                    )
-                  : EditTile(
-                      leading: AppIcons.heartbeat,
-                      caption: "Heart Rate Monitors",
-                      onCancel: trackingSettings.heartRateUtils.reset,
-                      child: DropdownButtonHideUnderline(
-                        child: DropdownButton(
-                          value: trackingSettings.heartRateUtils.deviceId,
-                          items: trackingSettings.heartRateUtils.devices.entries
-                              .map(
-                                (d) => DropdownMenuItem(
-                                  value: d.value,
-                                  child: Text(d.key),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        ListView.builder(
+                          physics: const NeverScrollableScrollPhysics(),
+                          shrinkWrap: true,
+                          itemCount:
+                              trackingSettings.expeditionTrackingTimes!.length,
+                          itemBuilder: (context, index) => Row(
+                            children: [
+                              Text(
+                                trackingSettings.expeditionTrackingTimes!
+                                    .elementAt(index)
+                                    .formatHm,
+                              ),
+                              Defaults.sizedBox.horizontal.normal,
+                              IconButton(
+                                onPressed: () =>
+                                    trackingSettings.removeTrackingTime(index),
+                                icon: const Icon(AppIcons.close),
+                                padding: EdgeInsets.zero,
+                                constraints: const BoxConstraints(),
+                                style: const ButtonStyle(
+                                  tapTargetSize:
+                                      MaterialTapTargetSize.shrinkWrap,
                                 ),
+                                iconSize: 24,
                               )
-                              .toList(),
-                          onChanged: (deviceId) {
-                            if (deviceId != null) {
-                              trackingSettings.heartRateUtils.deviceId =
-                                  deviceId;
+                            ],
+                          ),
+                        ),
+                        ElevatedButton.icon(
+                          icon: const Icon(AppIcons.add),
+                          label: const Text("Tracking Time"),
+                          // ignore: prefer-extracting-callbacks
+                          onPressed: () async {
+                            final time = await showScrollableTimePicker(
+                              context: context,
+                              initialTime: null,
+                            );
+                            if (time != null) {
+                              trackingSettings.addTrackingTime(time);
                             }
                           },
-                          isDense: true,
                         ),
+                      ],
+                    ),
+                  ),
+                ),
+              if (!trackingSettings.expeditionMode) ...[
+                EditTile.Switch(
+                  leading: Icons.record_voice_over_rounded,
+                  caption: "Audio Feedback",
+                  value: trackingSettings.audioFeedback != null,
+                  onChanged: (feedback) => trackingSettings.audioFeedback =
+                      feedback ? AudioFeedbackConfig() : null,
+                ),
+                if (trackingSettings.audioFeedback != null) ...[
+                  Padding(
+                    // 24 icon + 15 padding
+                    padding: const EdgeInsets.only(left: 24 + 15),
+                    child: EditTile(
+                      leading: null,
+                      caption: "Feedback Interval (km)",
+                      shrinkWidth: true,
+                      child: DoubleInput(
+                        // update if rounded to 100m
+                        key: ValueKey(trackingSettings.audioFeedback!.interval),
+                        onUpdate: (interval) => trackingSettings
+                                .audioFeedback!.interval =
+                            (interval * 10).round() * 100, // rounded to 100m
+                        initialValue:
+                            trackingSettings.audioFeedback!.interval / 1000.0,
+                        minValue: 0.1,
+                        maxValue: null,
                       ),
                     ),
+                  ),
+                  Padding(
+                    // 24 icon + 15 padding
+                    padding: const EdgeInsets.only(left: 24 + 15),
+                    child: EditTile(
+                      leading: null,
+                      caption: "Feedback Metrics",
+                      unboundedHeight: true,
+                      child: ListView.builder(
+                        physics: const NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        itemCount:
+                            trackingSettings.audioFeedback!.metrics.length,
+                        itemBuilder: (context, index) {
+                          final metric =
+                              trackingSettings.audioFeedback!.metrics[index];
+                          return Row(
+                            children: [
+                              DefaultSwitch(
+                                value: metric.isEnabled,
+                                onChanged: (enabled) =>
+                                    metric.isEnabled = enabled,
+                              ),
+                              Defaults.sizedBox.horizontal.normal,
+                              Text(metric.name),
+                            ],
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                ],
+                trackingSettings.heartRateUtils.devices.isEmpty
+                    ? EditTile(
+                        leading: AppIcons.heartbeat,
+                        caption: "Heart Rate Monitor",
+                        child: Text(
+                          trackingSettings.heartRateUtils.isSearching
+                              ? "Searching..."
+                              : "No Device",
+                        ),
+                        onTap: () async {
+                          await trackingSettings.heartRateUtils.searchDevices();
+                          if (context.mounted &&
+                              trackingSettings.heartRateUtils.devices.isEmpty) {
+                            showSimpleToast(context, "No devices found.");
+                          }
+                        },
+                      )
+                    : EditTile(
+                        leading: AppIcons.heartbeat,
+                        caption: "Heart Rate Monitors",
+                        onCancel: trackingSettings.heartRateUtils.reset,
+                        child: DropdownButtonHideUnderline(
+                          child: DropdownButton(
+                            value: trackingSettings.heartRateUtils.deviceId,
+                            items:
+                                trackingSettings.heartRateUtils.devices.entries
+                                    .map(
+                                      (d) => DropdownMenuItem(
+                                        value: d.value,
+                                        child: Text(d.key),
+                                      ),
+                                    )
+                                    .toList(),
+                            onChanged: (deviceId) {
+                              if (deviceId != null) {
+                                trackingSettings.heartRateUtils.deviceId =
+                                    deviceId;
+                              }
+                            },
+                            isDense: true,
+                          ),
+                        ),
+                      ),
+              ],
               FilledButton(
                 onPressed: () => Navigator.pushNamed(
                   context,

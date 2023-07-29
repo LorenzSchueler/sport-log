@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart' hide Route;
 import 'package:sport_log/helpers/heart_rate_utils.dart';
 import 'package:sport_log/models/cardio/cardio_session.dart';
@@ -45,6 +46,29 @@ class TrackingSettings extends ChangeNotifier {
   int? get routeAlarmDistance => _routeAlarmDistance;
   set routeAlarmDistance(int? routeAlarmDistance) {
     _routeAlarmDistance = routeAlarmDistance;
+    notifyListeners();
+  }
+
+  List<DateTime>? _expeditionTrackingTimes;
+  // iterable to not allow modification of list
+  Iterable<DateTime>? get expeditionTrackingTimes =>
+      _expeditionTrackingTimes != null
+          ? UnmodifiableListView(_expeditionTrackingTimes!)
+          : null;
+
+  void addTrackingTime(DateTime trackingTime) {
+    _expeditionTrackingTimes?.add(trackingTime);
+    notifyListeners();
+  }
+
+  void removeTrackingTime(int index) {
+    _expeditionTrackingTimes?.removeAt(index);
+    notifyListeners();
+  }
+
+  bool get expeditionMode => _expeditionTrackingTimes != null;
+  set expeditionMode(bool expeditionMode) {
+    _expeditionTrackingTimes = expeditionMode ? [] : null;
     notifyListeners();
   }
 
