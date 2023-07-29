@@ -210,13 +210,13 @@ class Settings extends ChangeNotifier {
       await setUsername(null);
       await setPassword(null);
       await setEmail(null);
-      _logger.i("user deleted");
+      _logger.d("user deleted");
     } else {
       await setUserId(user.id);
       await setUsername(user.username);
       await setPassword(user.password);
       await setEmail(user.email);
-      _logger.i("user updated");
+      _logger.d("user updated");
     }
   }
 

@@ -4,7 +4,6 @@ import 'package:sport_log/data_provider/data_providers/cardio_data_provider.dart
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/bool_toggle.dart';
 import 'package:sport_log/helpers/lat_lng.dart';
-import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/map_controller.dart';
 import 'package:sport_log/helpers/page_return.dart';
 import 'package:sport_log/helpers/pointer.dart';
@@ -32,7 +31,6 @@ class RouteEditPage extends StatefulWidget {
 }
 
 class _RouteEditPageState extends State<RouteEditPage> {
-  final _logger = Logger('RouteEditPage');
   final _formKey = GlobalKey<FormState>();
   final _dataProvider = RouteDataProvider();
   final _lock = Lock();
@@ -54,7 +52,6 @@ class _RouteEditPageState extends State<RouteEditPage> {
     ..markedPositions ??= [];
 
   Future<void> _saveRoute() async {
-    _logger.i("saving route");
     final result = widget.isNew
         ? await _dataProvider.createSingle(_route)
         : await _dataProvider.updateSingle(_route);
@@ -193,7 +190,6 @@ class _RouteEditPageState extends State<RouteEditPage> {
 
   Future<void> _switchPoints(int oldIndex, int newIndex) async {
     setState(() {
-      _logger.i("old: $oldIndex, new: $newIndex");
       if (oldIndex < newIndex - 1) {
         final location = _route.markedPositions!.removeAt(oldIndex);
         if (newIndex - 1 == _route.markedPositions!.length) {

@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:sport_log/data_provider/data_providers/metcon_data_provider.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
-import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/page_return.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/widgets/app_icons.dart';
@@ -30,7 +29,6 @@ class MetconSessionEditPage extends StatefulWidget {
 }
 
 class _MetconSessionEditPageState extends State<MetconSessionEditPage> {
-  final _logger = Logger('MetconSessionEditPage');
   final _formKey = GlobalKey<FormState>();
   final _dataProvider = MetconSessionDescriptionDataProvider();
   final _metconDescriptionDataProvider = MetconDescriptionDataProvider();
@@ -40,7 +38,6 @@ class _MetconSessionEditPageState extends State<MetconSessionEditPage> {
   late bool _finished = _metconSessionDescription.metconSession.time != null;
 
   Future<void> _saveMetconSession() async {
-    _logger.i("saving metcon session: $_metconSessionDescription");
     final result = widget.isNew
         ? await _dataProvider.createSingle(_metconSessionDescription)
         : await _dataProvider.updateSingle(_metconSessionDescription);

@@ -114,10 +114,10 @@ abstract class TableAccessor<T extends AtomicEntity> {
   String get orderByName => orderByNameOfTable(tableName);
 
   Future<void> setup() async {
-    _logger.d("Creating table: $tableName");
+    _logger.d("creating table: $tableName");
     for (final statement in table.setupSql) {
       if (Config.instance.outputDbStatement) {
-        _logger.d(statement);
+        _logger.t(statement);
       }
       await database.execute(statement);
     }
@@ -304,7 +304,7 @@ abstract class TableAccessor<T extends AtomicEntity> {
 
   Future<void> setAllUserId(Int64 userId) async {
     if (table.columns.map((column) => column.name).contains(Columns.userId)) {
-      _logger.d("Setting userId for all rows in table: $tableName");
+      _logger.d("updating userId for all rows in table: $tableName");
       await database.update(tableName, {
         Columns.userId: userId.toInt(),
         Columns.syncStatus: SyncStatus.updated.index

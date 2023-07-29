@@ -35,7 +35,7 @@ class Sync extends ChangeNotifier {
 
   Future<void> init() async {
     if (Config.instance.deleteDatabase) {
-      _logger.i('Removing last sync...');
+      _logger.i("removing last sync");
       await Settings.instance.setLastSync(null);
     }
     await startSync();
@@ -44,18 +44,19 @@ class Sync extends ChangeNotifier {
   // ignore: long-method
   Future<bool> sync({VoidCallback? onNoInternet}) async {
     if (!Settings.instance.userExists()) {
-      _logger.d('Sync cannot run: no user');
+      _logger.d('sync cannot run: no user');
       return false;
     }
     if (!Settings.instance.syncEnabled) {
-      _logger.i("Sync cannot run: sync disabled");
+      _logger.d("sync cannot run: sync disabled");
       return false;
     }
     if (_isSyncing) {
-      _logger.d('Sync job already running');
+      _logger.d("sync job already running");
       return false;
     }
 
+    _logger.i("running synchronization");
     _isSyncing = true;
     notifyListeners();
 
@@ -82,12 +83,14 @@ class Sync extends ChangeNotifier {
           stopSync();
           _isSyncing = false;
           notifyListeners();
+          _logger.i("synchronization failed: incompatible api version");
           return false;
         }
       } else {
         // stop current sync but keep sync timer running
         _isSyncing = false;
         notifyListeners();
+        _logger.i("synchronization failed: unable to retrieve api version");
         return false;
       }
     }
@@ -104,12 +107,13 @@ class Sync extends ChangeNotifier {
           await EntityDataProvider.upSync(onNoInternet: onNoInternet);
       // account for time difference
       final now = DateTime.now().add(const Duration(milliseconds: 100));
-      _logger.i('Setting last sync to $now.');
+      _logger.d("setting last sync to $now.");
       await Settings.instance.setLastSync(now);
     }
 
     _isSyncing = false;
     notifyListeners();
+    _logger.i("synchronization done");
 
     return syncSuccessful;
   }
@@ -144,18 +148,18 @@ class Sync extends ChangeNotifier {
 
   Future<void> startSync() async {
     if (!Settings.instance.userExists()) {
-      _logger.i('Sync cannot run: no user');
+      _logger.d("sync cannot run: no user");
       return;
     }
     if (!Settings.instance.syncEnabled) {
-      _logger.i("Sync cannot run: sync disabled");
+      _logger.d("sync cannot run: sync disabled");
       return;
     }
     if (_syncTimer != null && _syncTimer!.isActive) {
-      _logger.d('Sync already enabled.');
+      _logger.d("sync already enabled");
       return;
     }
-    _logger.d('Starting sync timer.');
+    _logger.i("starting synchronization timer");
     _syncTimer = Timer.periodic(Settings.instance.syncInterval, (_) => sync());
     if (Settings.instance.lastSync == null) {
       await sync(); // wait to make sure movement 1 and metcon 1 exist
@@ -168,7 +172,7 @@ class Sync extends ChangeNotifier {
   }
 
   void stopSync() {
-    _logger.d('Stopping synchronization.');
+    _logger.d("stopping synchronization");
     _serverVersion = null;
     _syncTimer?.cancel();
     _syncTimer = null;

@@ -11,26 +11,22 @@ import 'package:sport_log/models/cardio/position.dart';
 import 'package:sport_log/models/clone_extensions.dart';
 
 enum SnapMode {
-  alwaysSnap,
-  snapIfClose,
-  neverSnap;
+  alwaysSnap("Always Snap"),
+  snapIfClose("Snap If Close"),
+  neverSnap("Never Snap");
 
-  String get name => switch (this) {
-        SnapMode.alwaysSnap => "Always Snap",
-        SnapMode.snapIfClose => "Snap If Close",
-        SnapMode.neverSnap => "Never Snap",
-      };
+  const SnapMode(this.name);
+
+  final String name;
 }
 
 enum RoutePlanningError {
-  noInternet,
-  unknown;
+  noInternet("No Internet Connection"),
+  mapboxApiError("Mapbox API Error");
 
-  String get message {
-    return this == RoutePlanningError.noInternet
-        ? 'No Internet connection.'
-        : 'An unknown Error occurred.';
-  }
+  const RoutePlanningError(this.message);
+
+  final String message;
 }
 
 class RoutePlanningUtils {
@@ -192,8 +188,12 @@ class RoutePlanningUtils {
         return Success(track);
       }
     } else {
-      _logger.i("mapbox api error ${response.error.runtimeType}");
-      return Failure(RoutePlanningError.unknown);
+      _logger.e(
+        "mapbox api error",
+        error: response.error,
+        caughtBy: "RoutePlanningUtils.matchLocations",
+      );
+      return Failure(RoutePlanningError.mapboxApiError);
     }
   }
 }

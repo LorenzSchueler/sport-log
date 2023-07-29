@@ -40,26 +40,30 @@ abstract class DataProvider<T> extends ChangeNotifier {
   ) async {
     switch (error.errorType) {
       case ApiErrorType.serverUnreachable:
-        _logger.i("Server Unreachable");
+        _logger.d("server unreachable");
         onNoInternet?.call();
         return null;
       case ApiErrorType.unauthorized:
-        _logger.w("Access Unauthorized", error: error);
+        _logger.d("access unauthorized", error: error);
         unawaited(showNewCredentialsDialog());
         return null;
       // primary foreign or unique key violation
       case ApiErrorType.conflict:
-        _logger.i("Conflicting Resource", error: error);
+        _logger.d("conflicting resource", error: error);
         final conflictResolution = await showConflictDialog(
           context: App.globalContext,
           title: "Conflicting Resource",
           text: error.toString(),
         );
-        _logger.i(conflictResolution);
+        _logger.d(conflictResolution);
         return conflictResolution;
       // ignore: no_default_cases
       default:
-        _logger.e("An unknown error occurred", error: error);
+        _logger.e(
+          "unknown error",
+          error: error,
+          caughtBy: "DataProvider.handleApiError",
+        );
         await showMessageDialog(
           context: App.globalContext,
           title: "An Error Occurred",
@@ -69,10 +73,12 @@ abstract class DataProvider<T> extends ChangeNotifier {
     }
   }
 
-  static Future<void> _handleDbError(
-    DbError error,
-  ) async {
-    _logger.e('Db error: $error');
+  static Future<void> _handleDbError(DbError error) async {
+    _logger.e(
+      "db error",
+      error: error,
+      caughtBy: "DataProvider._handlerDbError",
+    );
     await showMessageDialog(
       context: App.globalContext,
       title: "An Error Occurred",
@@ -175,19 +181,19 @@ abstract class EntityDataProvider<T extends AtomicEntity>
   ) async {
     switch (conflictResolution) {
       case ConflictResolution.automatic:
-        _logger.w("solving conflict automatically");
+        _logger.d("solving conflict automatically");
         for (final record in records) {
           // check if this record causes a conflict
           final result = await fnSingle(record);
           // if record causes conflict delete it
           if (result.isFailure) {
-            _logger.w("hard deleting record $record");
+            _logger.d("hard deleting record $record");
             await table.hardDeleteSingle(record.id);
           }
         }
         return true; // all entries can be set to synchronized
       case ConflictResolution.manual:
-        _logger.w("solving conflict manually");
+        _logger.d("solving conflict manually");
         return false; // Entries cannot be set to synchronized yet. There are still conflicts.
     }
   }

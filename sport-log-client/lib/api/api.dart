@@ -7,7 +7,6 @@ import 'package:fixnum/fixnum.dart';
 import 'package:http/http.dart';
 import 'package:http/io_client.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:logger/logger.dart' as l;
 import 'package:result_type/result_type.dart';
 import 'package:sport_log/config.dart';
 import 'package:sport_log/helpers/logger.dart';
@@ -28,21 +27,17 @@ void _logRequest(Request request) {
   final jsonStr = Config.instance.outputRequestJson && request.body.isNotEmpty
       ? "\n\n${_prettyJson(jsonDecode(request.body) as Object)}"
       : "";
-  _logger.d("request: ${request.method} ${request.url}$headersStr$jsonStr");
+  _logger.t("request: ${request.method} ${request.url}$headersStr$jsonStr");
 }
 
 void _logResponse(StreamedResponse response, Object? json) {
-  final successful = response.statusCode >= 200 && response.statusCode < 300;
   final headerStr = Config.instance.outputResponseHeaders
       ? "\n${response.headers.entries.map((e) => "${e.key}: ${e.value}").join("\n")}"
       : "";
   final jsonStr = Config.instance.outputResponseJson && json != null
       ? "\n\n${_prettyJson(json)}"
       : "";
-  _logger.log(
-    successful ? l.Level.debug : l.Level.error,
-    "response: ${response.statusCode}$headerStr$jsonStr",
-  );
+  _logger.t("response: ${response.statusCode}$headerStr$jsonStr");
 }
 
 enum ApiErrorType {
@@ -57,7 +52,7 @@ enum ApiErrorType {
   unknownServerError("Unknown server error."),
   serverUnreachable("Unable to establish a connection with the server."),
   badJson("Got bad json from server."),
-  unknownRequestError("Unhandled request error."); // unknown request error
+  unknownRequestError("Unknown request error."); // unknown request error
 
   const ApiErrorType(this.description);
 
@@ -145,8 +140,12 @@ extension RequestExtension on Request {
       return Failure(ApiError(ApiErrorType.serverUnreachable, null));
     } on TypeError {
       return Failure(ApiError(ApiErrorType.badJson, null));
-    } catch (e) {
-      _logger.e("Unknown error", error: e);
+    } catch (error) {
+      _logger.e(
+        "unknown error",
+        error: error,
+        caughtBy: "RequestExtension._handlerError",
+      );
       return Failure(ApiError(ApiErrorType.unknownRequestError, null));
     }
   }

@@ -52,7 +52,7 @@ class _ActionProviderOverviewPageState
   }
 
   Future<void> _update() async {
-    _logger.d('Updating action provider page');
+    _logger.d("updating action provider page");
     final actionProviderDescription =
         await _dataProvider.getByActionProvider(widget.actionProvider);
     if (mounted) {

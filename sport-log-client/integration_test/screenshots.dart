@@ -125,14 +125,6 @@ final heartRateDrawerItem = drawerItem("Heart Rate");
 final serverActionsDrawerItem = drawerItem("Server Actions");
 final settingsDrawerItem = drawerItem("Settings");
 
-// ignore: unreachable_from_main
-void printAncestors(Finder finder) {
-  finder.evaluate().first.visitAncestorElements((element) {
-    logger.i("widget: ${element.widget.runtimeType}");
-    return true;
-  });
-}
-
 Future<void> backDiscardChanges(WidgetTester tester) async {
   await tap(tester, backButton);
   await tap(tester, discardChanges);
@@ -168,7 +160,7 @@ Future<void> screenshot(String filename) async {
     flush: true,
     mode: FileMode.writeOnly,
   );
-  logInfo(file);
+  logger.i(file);
   if (Config.isAndroid) {
     //await revertFlutterImage();
   }

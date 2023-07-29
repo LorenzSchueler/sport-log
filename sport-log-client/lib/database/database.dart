@@ -111,7 +111,7 @@ class AppDatabase {
   }
 
   static Future<void> open() async {
-    _logger.i("Opening Database");
+    _logger.i("opening database");
     _database = await databaseFactory.openDatabase(
       Config.databaseName,
       options: OpenDatabaseOptions(
@@ -119,10 +119,10 @@ class AppDatabase {
         onConfigure: (db) => db.execute('PRAGMA foreign_keys = ON;'),
         onCreate: (db, version) async {
           for (final table in _tables) {
-            _logger.d("Creating table: ${table.tableName}");
+            _logger.i("creating table: ${table.tableName}");
             for (final statement in table.table.setupSql) {
               if (Config.instance.outputDbStatement) {
-                _logger.d(statement);
+                _logger.t(statement);
               }
               await db.execute(statement);
             }
@@ -130,17 +130,17 @@ class AppDatabase {
         },
         //onUpgrade: null,
         //onDowngrade: null,
-        onOpen: (db) => _logger.d("Database initialization done"),
+        onOpen: (db) => _logger.i("database initialization done"),
       ),
     );
-    _logger.i("Database ready");
+    _logger.i("database ready");
   }
 
   static Future<void> reset() async {
-    _logger.i("Deleting Database");
+    _logger.i("deleting database");
     await deleteDatabase(Config.databaseName);
     _database = null;
-    _logger.i('Database deleted');
+    _logger.i("database deleted");
     await open();
   }
 

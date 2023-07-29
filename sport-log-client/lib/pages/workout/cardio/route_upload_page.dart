@@ -3,7 +3,6 @@ import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:sport_log/data_provider/data_providers/cardio_data_provider.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/gpx.dart';
-import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/map_controller.dart';
 import 'package:sport_log/helpers/pointer.dart';
 import 'package:sport_log/helpers/validation.dart';
@@ -22,7 +21,6 @@ class RouteUploadPage extends StatefulWidget {
 }
 
 class _RouteUploadPageState extends State<RouteUploadPage> {
-  final _logger = Logger('RouteUploadPage');
   final _formKey = GlobalKey<FormState>();
   final _dataProvider = RouteDataProvider();
 
@@ -34,7 +32,6 @@ class _RouteUploadPageState extends State<RouteUploadPage> {
   late final Route _route = Route.defaultValue()..track = [];
 
   Future<void> _saveRoute() async {
-    _logger.i("saving route");
     final result = await _dataProvider.createSingle(_route);
     if (mounted) {
       if (result.isSuccess) {

@@ -5,7 +5,7 @@ final _logger = Logger('VALIDATION');
 
 bool validate(bool val, String message) {
   if (!val) {
-    _logger.w(message);
+    _logger.d(message);
     return false;
   }
   return true;

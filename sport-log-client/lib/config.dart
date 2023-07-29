@@ -44,29 +44,42 @@ class Config extends JsonSerializable {
               ? map["profile"]! as YamlMap
               : map["debug"]! as YamlMap;
       _instance = Config.fromJson(instance.cast<String, dynamic>());
-    } on YamlException catch (e) {
-      _logger.i("sport-log-client.yaml is not a valid YAML file: $e");
+    } on YamlException catch (error) {
+      _logger.f(
+        "sport-log-client.yaml is not a valid YAML file",
+        error: error,
+        caughtBy: "Config.init",
+      );
       // ignore: avoid-throw-in-catch-block
-      throw Exception("sport-log-client.yaml is not a valid YAML file: $e");
-    } on MissingRequiredKeysException catch (e) {
-      _logger
-          .i("sport-log-client.yaml does not contain keys: ${e.missingKeys}");
+      throw Exception("sport-log-client.yaml is not a valid YAML file: $error");
+    } on MissingRequiredKeysException catch (error) {
+      _logger.f(
+        "sport-log-client.yaml does not contain keys: ${error.missingKeys}",
+        error: error,
+        caughtBy: "Config.init",
+      );
       // ignore: avoid-throw-in-catch-block
       throw Exception(
-        "sport-log-client.yaml does not contain keys: ${e.missingKeys}",
+        "sport-log-client.yaml does not contain keys: ${error.missingKeys}",
       );
-    } on TypeError catch (e) {
-      _logger.i(
-        "sport-log-client.yaml has a invalid format or contains invalid data types for some fields: $e",
+    } on TypeError catch (error) {
+      _logger.f(
+        "sport-log-client.yaml has a invalid format or contains invalid data types for some fields",
+        error: error,
+        caughtBy: "Config.init",
       );
       // ignore: avoid-throw-in-catch-block
       throw Exception(
-        "sport-log-client.yaml has a invalid format or contains invalid data types for some fields: $e",
+        "sport-log-client.yaml has a invalid format or contains invalid data types for some fields: $error",
       );
-    } catch (e) {
-      _logger.i("sport-log-client.yaml could not be parsed: $e");
+    } catch (error) {
+      _logger.f(
+        "sport-log-client.yaml could not be parsed",
+        error: error,
+        caughtBy: "Config.init",
+      );
       // ignore: avoid-throw-in-catch-block
-      throw Exception("sport-log-client.yaml could not be parsed: $e");
+      throw Exception("sport-log-client.yaml could not be parsed: $error");
     }
 
     final bool isAndroidEmulator;

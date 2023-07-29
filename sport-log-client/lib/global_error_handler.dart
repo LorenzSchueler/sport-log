@@ -13,7 +13,7 @@ class GlobalErrorHandler {
   static void run(void Function() function) {
     FlutterError.onError = (details) {
       FlutterError.presentError(details);
-      GlobalErrorHandler._handleError(
+      GlobalErrorHandler.handleError(
         "FlutterError",
         details.exception,
         details.stack,
@@ -22,19 +22,21 @@ class GlobalErrorHandler {
       );
     };
     PlatformDispatcher.instance.onError = (error, stackTrace) {
-      GlobalErrorHandler._handleError("PlatformDispatcher", error, stackTrace);
+      GlobalErrorHandler.handleError("PlatformDispatcher", error, stackTrace);
       return true;
     };
     runZonedGuarded(
       () => function(),
       (error, stackTrace) =>
-          GlobalErrorHandler._handleError("runZoneGuarded", error, stackTrace),
+          GlobalErrorHandler.handleError("runZoneGuarded", error, stackTrace),
     );
   }
 
-  static Future<void> _handleError(
+  /// Gets called either by [GlobalErrorHandler.run] or when logging with log level [Level.error] or [Level.fatal] in [Logger] and [InitLogger].
+  /// To avoid recursion [handleError] should not log with either of those log levels.
+  static Future<void> handleError(
     String caughtBy,
-    Object error,
+    Object? error,
     StackTrace? stackTrace, [
     DiagnosticsNode? diagnosticsNode,
     String? library,

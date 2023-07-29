@@ -73,7 +73,7 @@ class OverviewDataProvider<T, R, D extends DataProvider<T>, S>
     _isLoading = true;
     notifyListeners();
     _logger.d(
-      'Updating with start = ${_dateFilter.start}, end = ${_dateFilter.end}, selected = $_selected, search = $_search',
+      "updating with start = ${_dateFilter.start}, end = ${_dateFilter.end}, selected = $_selected, search = $_search",
     );
     _entities = await entityAccessor(_dataProvider)(
       _dateFilter.start,
@@ -86,6 +86,6 @@ class OverviewDataProvider<T, R, D extends DataProvider<T>, S>
     if (!_disposed) {
       notifyListeners();
     }
-    _logger.d("Update finished.");
+    _logger.d("update finished");
   }
 }
