@@ -616,18 +616,18 @@ packages:
     dependency: "direct main"
     description:
       path: "packages/location"
-      ref: "9000a61402aaa437df447e9c5b0544cce2adcc0c"
-      resolved-ref: "9000a61402aaa437df447e9c5b0544cce2adcc0c"
-      url: "https://github.com/Lyokone/flutterlocation"
+      ref: develop
+      resolved-ref: f265e45aeed5a8c0f59ea2ea1ccc1f8bf9c4962a
+      url: "https://github.com/LorenzSchueler/flutterlocation"
     source: git
     version: "5.0.0-dev.9"
   location_android:
     dependency: "direct overridden"
     description:
       path: "packages/location_android"
-      ref: "9000a61402aaa437df447e9c5b0544cce2adcc0c"
-      resolved-ref: "9000a61402aaa437df447e9c5b0544cce2adcc0c"
-      url: "https://github.com/Lyokone/flutterlocation"
+      ref: develop
+      resolved-ref: f265e45aeed5a8c0f59ea2ea1ccc1f8bf9c4962a
+      url: "https://github.com/LorenzSchueler/flutterlocation"
     source: git
     version: "5.0.0-dev.4"
   location_ios:

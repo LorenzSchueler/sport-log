@@ -48,10 +48,11 @@ dependencies:
   json_annotation: ^4.4.0
   latlong2: ^0.9.0
   location: 
+    # location from GPS only 
     git:
-      url: https://github.com/Lyokone/flutterlocation
+      url: https://github.com/LorenzSchueler/flutterlocation
       path: packages/location
-      ref: 9000a61402aaa437df447e9c5b0544cce2adcc0c
+      ref: develop
   logger: ^2.0.1
   mapbox_api: ^1.0.0
   mapbox_maps_flutter: #^0.4.3
@@ -82,10 +83,11 @@ dependencies:
 dependency_overrides:
   intl: ^0.18.1
   location_android: 
+    # location from GPS only 
     git:
-      url: https://github.com/Lyokone/flutterlocation
+      url: https://github.com/LorenzSchueler/flutterlocation
       path: packages/location_android
-      ref: 9000a61402aaa437df447e9c5b0544cce2adcc0c
+      ref: develop
   win32: ^4.0.0
 
 dev_dependencies:
