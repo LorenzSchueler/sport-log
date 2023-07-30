@@ -1,3 +1,4 @@
+import 'package:fixnum/fixnum.dart';
 import 'package:sport_log/api/accessors/cardio_api.dart';
 import 'package:sport_log/api/api.dart';
 import 'package:sport_log/data_provider/data_provider.dart';
@@ -95,6 +96,18 @@ class CardioSessionDescriptionDataProvider
   @override
   Future<DbResult> deleteSingle(CardioSessionDescription object) async {
     return _cardioDataProvider.deleteSingle(object.cardioSession);
+  }
+
+  Future<CardioSessionDescription?> getById(Int64 id) async {
+    final session = await _cardioDataProvider.getById(id);
+    if (session == null) {
+      return null;
+    }
+    return CardioSessionDescription(
+      cardioSession: session,
+      route: await _routeDataProvider.getById(session.id),
+      movement: (await _movementDataProvider.getById(session.movementId))!,
+    );
   }
 
   @override
