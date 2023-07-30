@@ -49,14 +49,14 @@ class TrackingSettings extends ChangeNotifier {
     notifyListeners();
   }
 
-  List<DateTime>? _expeditionTrackingTimes;
+  List<TimeOfDay>? _expeditionTrackingTimes;
   // iterable to not allow modification of list
-  Iterable<DateTime>? get expeditionTrackingTimes =>
+  Iterable<TimeOfDay>? get expeditionTrackingTimes =>
       _expeditionTrackingTimes != null
           ? UnmodifiableListView(_expeditionTrackingTimes!)
           : null;
 
-  void addTrackingTime(DateTime trackingTime) {
+  void addTrackingTime(TimeOfDay trackingTime) {
     _expeditionTrackingTimes?.add(trackingTime);
     notifyListeners();
   }

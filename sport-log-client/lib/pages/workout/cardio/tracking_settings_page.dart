@@ -157,7 +157,9 @@ class CardioTrackingSettingsPage extends StatelessWidget {
                               initialTime: null,
                             );
                             if (time != null) {
-                              trackingSettings.addTrackingTime(time);
+                              trackingSettings.addTrackingTime(
+                                TimeOfDay.fromDateTime(time),
+                              );
                             }
                           },
                         ),
