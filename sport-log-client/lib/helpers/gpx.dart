@@ -7,6 +7,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:gpx/gpx.dart';
 import 'package:result_type/result_type.dart';
 import 'package:sport_log/helpers/lat_lng.dart';
+import 'package:sport_log/helpers/notification_controller.dart';
 import 'package:sport_log/helpers/write_to_file.dart';
 import 'package:sport_log/models/cardio/position.dart';
 
@@ -81,14 +82,14 @@ Future<String?> saveTrackAsGpx(
       await AwesomeNotifications().createNotification(
         content: NotificationContent(
           id: Random.secure().nextInt(1 << 31),
-          channelKey: 'file_channel',
-          title: 'Route GPX export',
+          channelKey: NotificationController.expeditionChannel,
+          title: "Route GPX export",
           body: file,
           payload: {"file": file},
         ),
         actionButtons: [
           NotificationActionButton(
-            key: "open_file",
+            key: NotificationController.openFileAction,
             label: "Open",
           )
         ],

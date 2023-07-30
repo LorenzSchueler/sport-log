@@ -4,15 +4,13 @@ import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:open_file/open_file.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:sport_log/app.dart';
 import 'package:sport_log/config.dart';
 import 'package:sport_log/data_provider/sync.dart';
 import 'package:sport_log/database/database.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/global_error_handler.dart';
-import 'package:sport_log/helpers/request_permission.dart';
+import 'package:sport_log/helpers/notification_controller.dart';
 import 'package:sport_log/pages/login/welcome_screen.dart';
 import 'package:sport_log/settings.dart';
 import 'package:sport_log/theme.dart';
@@ -35,7 +33,7 @@ Stream<double> initialize() async* {
     null,
     [
       NotificationChannel(
-        channelKey: "file_channel",
+        channelKey: NotificationController.fileChannel,
         channelName: "File Notifications",
         channelDescription: "Notification channel for file import/ export",
       ),
@@ -54,23 +52,6 @@ Stream<double> initialize() async* {
   yield 0.8;
   await Sync.instance.init();
   yield 1.0;
-}
-
-class NotificationController {
-  @pragma("vm:entry-point")
-  static Future<void> onActionReceivedMethod(
-    ReceivedAction receivedAction,
-  ) async {
-    if (receivedAction.channelKey == "file_channel") {
-      if (receivedAction.buttonKeyPressed == "open_file") {
-        final file = receivedAction.payload?["file"];
-        if (file != null) {
-          await PermissionRequest.request(Permission.manageExternalStorage);
-          await OpenFile.open(file);
-        }
-      }
-    }
-  }
 }
 
 void main() {
