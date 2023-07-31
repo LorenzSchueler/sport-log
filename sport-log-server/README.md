@@ -4,9 +4,6 @@
 
 <h1 align="center">Sport Log Server</h1>
 
-![](https://img.shields.io/github/actions/workflow/status/LorenzSchueler/sport-log/rust.yml?branch=master&label=Rust%20Pipeline)
-![](https://img.shields.io/github/license/LorenzSchueler/sport-log)
-
 ## Setup
 
 1. install postgresql, argon2 and pwgen: 
