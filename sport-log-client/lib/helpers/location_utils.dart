@@ -103,8 +103,9 @@ class LocationUtils extends ChangeNotifier {
 
   GpsPosition? get lastLocation => _lastLocation;
   LatLng? get lastLatLng => _lastLocation?.latLng;
-  bool get hasGps =>
-      (_lastLocation?.isGps ?? false) && _lastLocation?.latLng != null;
+  bool get hasLocation => _lastLocation?.latLng != null;
+  bool get hasAccurateLocation =>
+      hasLocation && (_lastLocation?.isGps ?? false);
 
   bool get enabled => _locationSubscription != null;
 }
