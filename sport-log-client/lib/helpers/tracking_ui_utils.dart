@@ -30,11 +30,11 @@ class TrackingUiUtils {
     }
   }
 
-  Future<void> onTrackUpdate(List<Position>? track) async {
+  Future<void> updateTrack(List<Position>? track) async {
     await _mapController?.updateTrackLine(_line, track);
   }
 
-  Future<void> onLocationUpdate(GpsPosition location) async {
+  Future<void> updateLocation(GpsPosition location) async {
     await centerCurrentLocation(location.latLng);
     await _mapController?.updateCurrentLocationMarker(
       _currentLocationMarker,

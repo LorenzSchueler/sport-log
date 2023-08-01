@@ -25,7 +25,6 @@ class TrackingUtils extends ChangeNotifier {
           cardioSession:
               CardioSession.defaultValue(trackingSettings.movement.id)
                 ..cardioType = trackingSettings.cardioType
-                ..time = Duration.zero
                 ..track = []
                 ..cadence = []
                 ..heartRate = []
@@ -269,9 +268,9 @@ class TrackingUtils extends ChangeNotifier {
     if (isTracking) {
       track.add(position);
       await _trackingUiUtils
-          .onTrackUpdate(_cardioSessionDescription.cardioSession.track);
+          .updateTrack(_cardioSessionDescription.cardioSession.track);
     }
-    await _trackingUiUtils.onLocationUpdate(location);
+    await _trackingUiUtils.updateLocation(location);
 
     await _routeAlarm(position);
     await _audioFeedback();

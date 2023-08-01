@@ -177,7 +177,7 @@ class ExpeditionTrackingUtils extends ChangeNotifier {
             ..setDistance();
 
           await _dataProvider.updateSingle(cardioSessionDescription);
-          await _trackingUiUtils.onTrackUpdate(session.track);
+          await _trackingUiUtils.updateTrack(session.track);
           notifyListeners();
           _logger.i("new location added");
           await scheduleNextLocation();
