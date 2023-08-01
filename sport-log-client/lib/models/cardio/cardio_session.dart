@@ -382,7 +382,6 @@ class CardioSession extends AtomicEntity {
   void sanitize() {
     if (distance != null && distance! <= 0) {
       distance = null;
-      track = null;
     }
     if (time != null && time! <= Duration.zero) {
       time = null;
@@ -392,14 +391,12 @@ class CardioSession extends AtomicEntity {
     }
     if (avgCadence != null && avgCadence! <= 0) {
       avgCadence = null;
-      cadence = null;
     }
     if (cadence != null && cadence!.isEmpty) {
       cadence = null;
     }
     if (avgHeartRate != null && avgHeartRate! <= 0) {
       avgHeartRate = null;
-      heartRate = null;
     }
     if (heartRate != null && heartRate!.isEmpty) {
       heartRate = null;
