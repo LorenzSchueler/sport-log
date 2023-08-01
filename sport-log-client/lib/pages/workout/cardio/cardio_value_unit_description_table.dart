@@ -9,11 +9,13 @@ class CardioValueUnitDescriptionTable extends StatelessWidget {
   const CardioValueUnitDescriptionTable({
     required this.cardioSessionDescription,
     required this.currentDuration,
+    this.expeditionMode = false,
     super.key,
   });
 
   final CardioSessionDescription cardioSessionDescription;
   final Duration? currentDuration;
+  final bool expeditionMode;
 
   @override
   Widget build(BuildContext context) {
@@ -41,59 +43,62 @@ class CardioValueUnitDescriptionTable extends StatelessWidget {
         TableRow(
           children: [
             ValueUnitDescription.time(
-              cardioSessionDescription.cardioSession.time,
+              currentDuration ?? cardioSessionDescription.cardioSession.time,
             ),
             ValueUnitDescription.distance(
               cardioSessionDescription.cardioSession.distance,
             ),
           ],
         ),
-        ...currentDuration != null
-            ? [
-                rowSpacer,
-                TableRow(
-                  children: [
-                    ValueUnitDescription.speed(
-                      cardioSessionDescription.cardioSession.speed,
-                    ),
-                    ValueUnitDescription.speed(
-                      cardioSessionDescription.cardioSession.currentSpeed(
-                        currentDuration! - TrackingUtils.currentDurationOffset,
-                        currentDuration!,
+        if (!expeditionMode)
+          ...currentDuration != null
+              ? [
+                  rowSpacer,
+                  TableRow(
+                    children: [
+                      ValueUnitDescription.speed(
+                        cardioSessionDescription.cardioSession.speed,
                       ),
-                      current: true,
-                    ),
-                  ],
-                ),
-                rowSpacer,
-                TableRow(
-                  children: [
-                    ValueUnitDescription.tempo(
-                      cardioSessionDescription.cardioSession.tempo,
-                    ),
-                    ValueUnitDescription.tempo(
-                      cardioSessionDescription.cardioSession.currentTempo(
-                        currentDuration! - TrackingUtils.currentDurationOffset,
-                        currentDuration!,
+                      ValueUnitDescription.speed(
+                        cardioSessionDescription.cardioSession.currentSpeed(
+                          currentDuration! -
+                              TrackingUtils.currentDurationOffset,
+                          currentDuration!,
+                        ),
+                        current: true,
                       ),
-                      current: true,
-                    ),
-                  ],
-                )
-              ]
-            : [
-                rowSpacer,
-                TableRow(
-                  children: [
-                    ValueUnitDescription.speed(
-                      cardioSessionDescription.cardioSession.speed,
-                    ),
-                    ValueUnitDescription.tempo(
-                      cardioSessionDescription.cardioSession.tempo,
-                    ),
-                  ],
-                )
-              ],
+                    ],
+                  ),
+                  rowSpacer,
+                  TableRow(
+                    children: [
+                      ValueUnitDescription.tempo(
+                        cardioSessionDescription.cardioSession.tempo,
+                      ),
+                      ValueUnitDescription.tempo(
+                        cardioSessionDescription.cardioSession.currentTempo(
+                          currentDuration! -
+                              TrackingUtils.currentDurationOffset,
+                          currentDuration!,
+                        ),
+                        current: true,
+                      ),
+                    ],
+                  )
+                ]
+              : [
+                  rowSpacer,
+                  TableRow(
+                    children: [
+                      ValueUnitDescription.speed(
+                        cardioSessionDescription.cardioSession.speed,
+                      ),
+                      ValueUnitDescription.tempo(
+                        cardioSessionDescription.cardioSession.tempo,
+                      ),
+                    ],
+                  )
+                ],
         rowSpacer,
         TableRow(
           children: [
@@ -114,56 +119,64 @@ class CardioValueUnitDescriptionTable extends StatelessWidget {
                     .cardioSession.track?.lastOrNull?.elevation
                     .round(),
               ),
-              Container()
+              expeditionMode
+                  ? ValueUnitDescription.position(
+                      cardioSessionDescription
+                          .cardioSession.track?.lastOrNull?.latLng,
+                    )
+                  : Container()
             ],
           ),
         ],
-        ...currentDuration != null
-            ? [
-                rowSpacer,
-                TableRow(
-                  children: [
-                    ValueUnitDescription.avgCadence(
-                      cardioSessionDescription.cardioSession.avgCadence,
-                    ),
-                    ValueUnitDescription.avgCadence(
-                      cardioSessionDescription.cardioSession.currentCadence(
-                        currentDuration! - TrackingUtils.currentDurationOffset,
-                        currentDuration!,
+        if (!expeditionMode)
+          ...currentDuration != null
+              ? [
+                  rowSpacer,
+                  TableRow(
+                    children: [
+                      ValueUnitDescription.avgCadence(
+                        cardioSessionDescription.cardioSession.avgCadence,
                       ),
-                      current: true,
-                    ),
-                  ],
-                ),
-                rowSpacer,
-                TableRow(
-                  children: [
-                    ValueUnitDescription.avgHeartRate(
-                      cardioSessionDescription.cardioSession.avgHeartRate,
-                    ),
-                    ValueUnitDescription.avgHeartRate(
-                      cardioSessionDescription.cardioSession.currentHeartRate(
-                        currentDuration! - TrackingUtils.currentDurationOffset,
-                        currentDuration!,
+                      ValueUnitDescription.avgCadence(
+                        cardioSessionDescription.cardioSession.currentCadence(
+                          currentDuration! -
+                              TrackingUtils.currentDurationOffset,
+                          currentDuration!,
+                        ),
+                        current: true,
                       ),
-                      current: true,
-                    ),
-                  ],
-                )
-              ]
-            : [
-                rowSpacer,
-                TableRow(
-                  children: [
-                    ValueUnitDescription.avgCadence(
-                      cardioSessionDescription.cardioSession.avgCadence,
-                    ),
-                    ValueUnitDescription.avgHeartRate(
-                      cardioSessionDescription.cardioSession.avgHeartRate,
-                    ),
-                  ],
-                )
-              ],
+                    ],
+                  ),
+                  rowSpacer,
+                  TableRow(
+                    children: [
+                      ValueUnitDescription.avgHeartRate(
+                        cardioSessionDescription.cardioSession.avgHeartRate,
+                      ),
+                      ValueUnitDescription.avgHeartRate(
+                        cardioSessionDescription.cardioSession.currentHeartRate(
+                          currentDuration! -
+                              TrackingUtils.currentDurationOffset,
+                          currentDuration!,
+                        ),
+                        current: true,
+                      ),
+                    ],
+                  )
+                ]
+              : [
+                  rowSpacer,
+                  TableRow(
+                    children: [
+                      ValueUnitDescription.avgCadence(
+                        cardioSessionDescription.cardioSession.avgCadence,
+                      ),
+                      ValueUnitDescription.avgHeartRate(
+                        cardioSessionDescription.cardioSession.avgHeartRate,
+                      ),
+                    ],
+                  )
+                ],
         //rowSpacer,
         //TableRow(
         //children: [
