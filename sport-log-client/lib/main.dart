@@ -37,6 +37,11 @@ Stream<double> initialize() async* {
         channelName: "File Notifications",
         channelDescription: "Notification channel for file import/ export",
       ),
+      NotificationChannel(
+        channelKey: NotificationController.expeditionChannel,
+        channelName: "Expedition Tracking",
+        channelDescription: "Notification channel for expedition tracking",
+      ),
     ],
     debug: true,
   );
