@@ -272,12 +272,21 @@ class CardioTrackingSettingsPage extends StatelessWidget {
                       ),
               ],
               FilledButton(
-                onPressed: () => Navigator.pushNamed(
-                  context,
-                  Routes.tracking,
-                  arguments: trackingSettings,
+                onPressed:
+                    trackingSettings.expeditionTrackingTimes?.isNotEmpty ?? true
+                        ? () => Navigator.pushNamed(
+                              context,
+                              trackingSettings.expeditionMode
+                                  ? Routes.expeditionTracking
+                                  : Routes.tracking,
+                              arguments: trackingSettings,
+                            )
+                        : null,
+                child: Text(
+                  trackingSettings.expeditionTrackingTimes?.isNotEmpty ?? true
+                      ? "OK"
+                      : "Tracking Times required",
                 ),
-                child: const Text("OK"),
               ),
             ],
           ),

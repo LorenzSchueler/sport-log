@@ -58,6 +58,7 @@ class TrackingSettings extends ChangeNotifier {
 
   void addTrackingTime(TimeOfDay trackingTime) {
     _expeditionTrackingTimes?.add(trackingTime);
+    _expeditionTrackingTimes?.sort();
     notifyListeners();
   }
 
