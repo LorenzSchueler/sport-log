@@ -1,5 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:sport_log/data_provider/data_providers/cardio_data_provider.dart';
 import 'package:sport_log/data_provider/overview_data_provider.dart';
 import 'package:sport_log/defaults.dart';
@@ -14,6 +15,7 @@ import 'package:sport_log/pages/workout/comments_box.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter.dart';
 import 'package:sport_log/pages/workout/session_tab_utils.dart';
 import 'package:sport_log/routes.dart';
+import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/expandable_fab.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
@@ -156,24 +158,45 @@ class CardioOverviewPage extends StatelessWidget {
             sessionsPageTab: SessionsPageTab.cardio,
           ),
           drawer: const MainDrawer(selectedRoute: Routes.cardioOverview),
-          floatingActionButton: ExpandableFab(
-            icon: const Icon(AppIcons.add),
-            buttons: [
-              ActionButton(
-                icon: const Icon(AppIcons.stopwatch),
-                onPressed: () => Navigator.pushNamed(
-                  context,
-                  Routes.trackingSettings,
-                ),
-              ),
-              ActionButton(
-                icon: const Icon(AppIcons.notes),
-                onPressed: () => Navigator.pushNamed(
-                  context,
-                  Routes.cardioEdit,
-                ),
-              ),
-            ],
+          floatingActionButton: Consumer<Settings>(
+            builder: (context, settings, child) =>
+                settings.expeditionData != null
+                    ? FloatingActionButton(
+                        // ignore: prefer-extracting-callbacks
+                        onPressed: () async {
+                          final id = settings.expeditionData!.cardioId;
+                          final cardioSessionDescription =
+                              (await CardioSessionDescriptionDataProvider()
+                                  .getById(id))!;
+                          if (context.mounted) {
+                            await Navigator.pushNamed(
+                              context,
+                              Routes.expeditionTracking,
+                              arguments: cardioSessionDescription,
+                            );
+                          }
+                        },
+                        child: const Icon(AppIcons.mountains),
+                      )
+                    : ExpandableFab(
+                        icon: const Icon(AppIcons.add),
+                        buttons: [
+                          ActionButton(
+                            icon: const Icon(AppIcons.stopwatch),
+                            onPressed: () => Navigator.pushNamed(
+                              context,
+                              Routes.trackingSettings,
+                            ),
+                          ),
+                          ActionButton(
+                            icon: const Icon(AppIcons.notes),
+                            onPressed: () => Navigator.pushNamed(
+                              context,
+                              Routes.cardioEdit,
+                            ),
+                          ),
+                        ],
+                      ),
           ),
         ),
       ),

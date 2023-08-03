@@ -23,6 +23,7 @@ import 'package:sport_log/pages/workout/cardio/cardio_details_page.dart';
 import 'package:sport_log/pages/workout/cardio/cardio_edit_page.dart';
 import 'package:sport_log/pages/workout/cardio/cardio_overview_page.dart';
 import 'package:sport_log/pages/workout/cardio/cardio_update_elevation_page.dart';
+import 'package:sport_log/pages/workout/cardio/expedition_tracking_page.dart';
 import 'package:sport_log/pages/workout/cardio/route_details_page.dart';
 import 'package:sport_log/pages/workout/cardio/route_edit_page.dart';
 import 'package:sport_log/pages/workout/cardio/route_overview_page.dart';
@@ -90,6 +91,7 @@ abstract class Routes {
   static const String cardioCut = '/cardio/cut';
   static const String trackingSettings = '/cardio/tracking_settings';
   static const String tracking = '/cardio/tracking';
+  static const String expeditionTracking = '/cardio/expedition_tracking';
   // diary
   static const String diaryOverview = '/diary/overview';
   static const String diaryEdit = '/diary/edit';
@@ -306,6 +308,16 @@ abstract class Routes {
           final trackingSettings =
               ModalRoute.of(context)!.settings.arguments! as TrackingSettings;
           return CardioTrackingPage(trackingSettings: trackingSettings);
+        }),
+    Routes.expeditionTracking: (context) => _checkUserIdAndroidIos(context, () {
+          final arg = ModalRoute.of(context)!.settings.arguments!;
+          return arg is TrackingSettings
+              ? CardioExpeditionTrackingPage.crate(
+                  trackingSettings: arg,
+                )
+              : CardioExpeditionTrackingPage.attach(
+                  cardioSessionDescription: arg as CardioSessionDescription,
+                );
         }),
     // diary
     Routes.diaryOverview: (_) => _checkUserId(DiaryOverviewPage.new),
