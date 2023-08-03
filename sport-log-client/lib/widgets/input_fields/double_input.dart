@@ -48,7 +48,11 @@ class _DoubleInputState extends State<DoubleInput> {
       widget.maxValue,
     );
     if (validated != null) {
-      showMessageDialog(context: context, text: validated);
+      showMessageDialog(
+        context: context,
+        title: "Invalid Value",
+        text: validated,
+      );
       _textController.text = "$_value";
     }
     // if value is valid it is already set

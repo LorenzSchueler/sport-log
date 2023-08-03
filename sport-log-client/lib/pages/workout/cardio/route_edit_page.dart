@@ -65,8 +65,8 @@ class _RouteEditPageState extends State<RouteEditPage> {
       } else {
         await showMessageDialog(
           context: context,
-          text:
-              "${widget.isNew ? 'Creating' : 'Updating'} Route Entry failed:\n${result.failure}",
+          title: "${widget.isNew ? 'Creating' : 'Updating'} Route Failed",
+          text: result.failure.toString(),
         );
       }
     }
@@ -89,7 +89,8 @@ class _RouteEditPageState extends State<RouteEditPage> {
         } else {
           await showMessageDialog(
             context: context,
-            text: "Deleting Route failed:\n${result.failure}",
+            title: "Deleting Route Failed",
+            text: result.failure.toString(),
           );
         }
       }
@@ -159,8 +160,8 @@ class _RouteEditPageState extends State<RouteEditPage> {
     if (_route.markedPositions!.length >= 25) {
       await showMessageDialog(
         context: context,
-        title: "Point maximum reached",
-        text: "You can only set 25 points.",
+        title: "Point Maximum Reached",
+        text: "You can only mark 25 points.",
       );
       return;
     }

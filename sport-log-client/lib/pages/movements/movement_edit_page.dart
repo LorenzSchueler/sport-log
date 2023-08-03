@@ -56,8 +56,8 @@ class _MovementEditPageState extends State<MovementEditPage> {
     } else if (mounted) {
       await showMessageDialog(
         context: context,
-        text:
-            "${widget.isNew ? 'Creating' : 'Updating'} Movement failed:\n${result.failure}",
+        title: "${widget.isNew ? 'Creating' : 'Updating'} Movement Failed",
+        text: result.failure.toString(),
       );
     }
   }
@@ -78,7 +78,8 @@ class _MovementEditPageState extends State<MovementEditPage> {
         } else {
           await showMessageDialog(
             context: context,
-            text: "Deleting Movement failed:\n${result.failure}",
+            title: "Deleting Movement Failed",
+            text: result.failure.toString(),
           );
         }
       }

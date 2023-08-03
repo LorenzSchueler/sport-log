@@ -20,7 +20,7 @@ class UpdatePage extends StatelessWidget {
       onNoInternet: () => showMessageDialog(
         context: context,
         title: "Update Failed",
-        text: "No Internet",
+        text: "Internet required.",
       ),
     );
     if (updateDownloadResult.isSuccess) {

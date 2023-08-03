@@ -101,8 +101,9 @@ class _CardioEditPageState extends State<CardioEditPage> {
       } else {
         await showMessageDialog(
           context: context,
-          text:
-              "${widget.isNew ? 'Creating' : 'Updating'} Cardio Session failed:\n${result.failure}",
+          title:
+              "${widget.isNew ? 'Creating' : 'Updating'} Cardio Session Failed",
+          text: result.failure.toString(),
         );
       }
     }
@@ -126,7 +127,8 @@ class _CardioEditPageState extends State<CardioEditPage> {
         } else {
           await showMessageDialog(
             context: context,
-            text: "Deleting Cardio Session failed:\n${result.failure}",
+            title: "Deleting Cardio Session Failed",
+            text: result.failure.toString(),
           );
         }
       }

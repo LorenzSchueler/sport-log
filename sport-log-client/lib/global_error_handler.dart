@@ -66,7 +66,7 @@ class GlobalErrorHandler {
     if (context.mounted) {
       await showMessageDialog(
         context: context,
-        title: "An error occurred:",
+        title: "An Error Occurred",
         text: description,
       );
     }

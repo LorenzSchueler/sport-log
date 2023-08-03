@@ -53,8 +53,9 @@ class _StrengthEditPageState extends State<StrengthEditPage> {
       } else {
         await showMessageDialog(
           context: context,
-          text:
-              "${widget.isNew ? 'Creating' : 'Updating'} Strength Session failed:\n${result.failure}",
+          title:
+              "${widget.isNew ? 'Creating' : 'Updating'} Strength Session Failed",
+          text: result.failure.toString(),
         );
       }
     }
@@ -78,7 +79,8 @@ class _StrengthEditPageState extends State<StrengthEditPage> {
         } else {
           await showMessageDialog(
             context: context,
-            text: "Deleting Strength Session failed:\n${result.failure}",
+            title: "Deleting Strength Session Failed",
+            text: result.failure.toString(),
           );
         }
       }

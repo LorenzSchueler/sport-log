@@ -138,7 +138,8 @@ class _CardioCutPageState extends State<CardioCutPage> {
                             if (duration > _cutEndDuration) {
                               await showMessageDialog(
                                 context: context,
-                                text: "Start time can not be after End time.",
+                                title: "Invalid Start Time",
+                                text: "Start time can not be after end time.",
                               );
                             } else {
                               setState(() => _cutStartDuration = duration);
@@ -161,7 +162,8 @@ class _CardioCutPageState extends State<CardioCutPage> {
                             if (duration < _cutStartDuration) {
                               await showMessageDialog(
                                 context: context,
-                                text: "End time can not be before Start time.",
+                                title: "Invalid End Time",
+                                text: "End time can not be before start time.",
                               );
                             } else {
                               setState(() => _cutEndDuration = duration);

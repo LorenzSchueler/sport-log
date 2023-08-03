@@ -110,7 +110,9 @@ class MovementCard extends StatelessWidget {
         } else {
           await showMessageDialog(
             context: context,
-            text: "This is a default movement and cannot be edited.",
+            title: "Default Movement",
+            text:
+                "${movementDescription.movement.name} is a default movement and cannot be edited.",
           );
         }
       },

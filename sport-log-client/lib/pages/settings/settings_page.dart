@@ -25,6 +25,7 @@ class SettingsPage extends StatelessWidget {
     await Sync.instance.sync(
       onNoInternet: () => showMessageDialog(
         context: context,
+        title: "Server Unreachable",
         text:
             "The server could not be reached.\nPlease make sure you are connected to the internet and the server URL is right.",
       ),
@@ -53,6 +54,7 @@ class SettingsPage extends StatelessWidget {
     } else {
       await showMessageDialog(
         context: context,
+        title: "Invalid Server URL",
         text: validated,
       );
     }
@@ -72,6 +74,7 @@ class SettingsPage extends StatelessWidget {
     } else {
       await showMessageDialog(
         context: context,
+        title: "Invalid Username",
         text: validated,
       );
     }
@@ -91,6 +94,7 @@ class SettingsPage extends StatelessWidget {
     } else {
       await showMessageDialog(
         context: context,
+        title: "Invalid Password",
         text: validated,
       );
     }
@@ -110,6 +114,7 @@ class SettingsPage extends StatelessWidget {
     } else {
       await showMessageDialog(
         context: context,
+        title: "Invalid Email",
         text: validated,
       );
     }
@@ -126,6 +131,7 @@ class SettingsPage extends StatelessWidget {
       if (context.mounted && result.isFailure) {
         await showMessageDialog(
           context: context,
+          title: "An Error Occurred",
           text: result.failure.toString(),
         );
       }
@@ -161,8 +167,8 @@ class SettingsPage extends StatelessWidget {
         if (result.isFailure) {
           await showMessageDialog(
             context: context,
-            text:
-                "An error occurred while deleting your account:\n${result.failure}",
+            title: "An Error Occurred",
+            text: result.failure.toString(),
           );
         } else {
           await Navigator.of(context).newBase(Routes.landing);

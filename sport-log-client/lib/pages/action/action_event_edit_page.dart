@@ -43,8 +43,9 @@ class _ActionEventEditPageState extends State<ActionEventEditPage> {
       } else {
         await showMessageDialog(
           context: context,
-          text:
-              "${widget.isNew ? 'Creating' : 'Updating'} Action Event failed:\n${result.failure}",
+          title:
+              "${widget.isNew ? 'Creating' : 'Updating'} Action Event Failed",
+          text: result.failure.toString(),
         );
       }
     }
@@ -63,7 +64,8 @@ class _ActionEventEditPageState extends State<ActionEventEditPage> {
         } else {
           await showMessageDialog(
             context: context,
-            text: "Deleting Action Event failed:\n${result.failure}",
+            title: "Deleting Action Event Failed",
+            text: result.failure.toString(),
           );
         }
       }

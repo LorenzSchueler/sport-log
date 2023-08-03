@@ -161,7 +161,8 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
       } else {
         await showMessageDialog(
           context: context,
-          text: "Deleting Cardio Session failed:\n${result.failure}",
+          title: "Deleting Cardio Session Failed",
+          text: result.failure.toString(),
         );
       }
     }
@@ -407,7 +408,8 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
     if (mounted && file != null) {
       await showMessageDialog(
         context: context,
-        text: 'Track exported to $file',
+        title: "Track Exported",
+        text: "file: $file",
       );
     }
   }

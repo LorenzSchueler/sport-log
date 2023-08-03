@@ -71,7 +71,8 @@ class _CardioUpdateElevationPageState extends State<CardioUpdateElevationPage> {
           if (mounted) {
             await showMessageDialog(
               context: context,
-              text: "Failed to fetch elevation data.",
+              title: "Failed To Fetch Elevation",
+              text: "Internet connection or offline maps required.",
             );
           }
           return;

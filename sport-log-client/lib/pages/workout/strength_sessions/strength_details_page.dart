@@ -62,7 +62,8 @@ class StrengthSessionDetailsPageState
       } else {
         await showMessageDialog(
           context: context,
-          text: "Deleting Strength Session failed:\n${result.failure}",
+          title: "Deleting Strength Session Failed",
+          text: result.failure.toString(),
         );
       }
     }

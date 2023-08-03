@@ -38,7 +38,8 @@ class _MetconDetailsPageState extends State<MetconDetailsPage> {
       } else {
         await showMessageDialog(
           context: context,
-          text: "Deleting Metcon failed:\n${result.failure}",
+          title: "Deleting Metcon Failed",
+          text: result.failure.toString(),
         );
       }
     }

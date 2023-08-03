@@ -36,8 +36,8 @@ class _DiaryEditPageState extends State<DiaryEditPage> {
       } else {
         await showMessageDialog(
           context: context,
-          text:
-              "${widget.isNew ? 'Creating' : 'Updating'} Diary Entry failed:\n${result.failure}",
+          title: "${widget.isNew ? 'Creating' : 'Updating'} Diary Entry Failed",
+          text: result.failure.toString(),
         );
       }
     }
@@ -56,7 +56,8 @@ class _DiaryEditPageState extends State<DiaryEditPage> {
         } else {
           await showMessageDialog(
             context: context,
-            text: "Deleting Diary Entry failed:\n${result.failure}",
+            title: "Deleting Diary Entry Failed",
+            text: result.failure.toString(),
           );
         }
       }

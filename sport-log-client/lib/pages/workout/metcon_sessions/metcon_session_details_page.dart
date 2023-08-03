@@ -66,7 +66,8 @@ class _MetconSessionDetailsPageState extends State<MetconSessionDetailsPage> {
       } else {
         await showMessageDialog(
           context: context,
-          text: "Deleting Metcon Session failed:\n${result.failure}",
+          title: "Deleting Metcon Session Failed",
+          text: result.failure.toString(),
         );
       }
     }

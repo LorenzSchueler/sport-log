@@ -51,8 +51,9 @@ class _MetconSessionEditPageState extends State<MetconSessionEditPage> {
       } else {
         await showMessageDialog(
           context: context,
-          text:
-              "${widget.isNew ? 'Creating' : 'Updating'} Metcon Session failed:\n${result.failure}",
+          title:
+              "${widget.isNew ? 'Creating' : 'Updating'} Metcon Session Failed",
+          text: result.failure.toString(),
         );
       }
     }
@@ -76,7 +77,8 @@ class _MetconSessionEditPageState extends State<MetconSessionEditPage> {
         } else {
           await showMessageDialog(
             context: context,
-            text: "Deleting Metcon Session failed:\n${result.failure}",
+            title: "Deleting Metcon Session Failed",
+            text: result.failure.toString(),
           );
         }
       }

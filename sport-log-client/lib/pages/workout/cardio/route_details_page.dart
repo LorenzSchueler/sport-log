@@ -92,7 +92,8 @@ class _RouteDetailsPageState extends State<RouteDetailsPage>
       } else {
         await showMessageDialog(
           context: context,
-          text: "Deleting Route failed:\n${result.failure}",
+          title: "Deleting Route Failed",
+          text: result.failure.toString(),
         );
       }
     }
@@ -201,7 +202,8 @@ class _RouteDetailsPageState extends State<RouteDetailsPage>
     if (mounted && file != null) {
       await showMessageDialog(
         context: context,
-        text: 'Track exported to $file',
+        title: "Track Exported",
+        text: "file: $file",
       );
     }
   }

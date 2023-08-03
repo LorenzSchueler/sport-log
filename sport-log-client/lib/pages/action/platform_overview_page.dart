@@ -110,8 +110,9 @@ class PlatformCard extends StatelessWidget {
                         )
                     : () => showMessageDialog(
                           context: context,
+                          title: "No Credentials",
                           text:
-                              "Credentials are needed before you can use the action providers.",
+                              "Credentials are needed before you can use the action provider.",
                         ),
                 child: Text(actionProvider.name),
               ),
@@ -217,8 +218,8 @@ class _PlatformCredentialDialogState extends State<PlatformCredentialDialog> {
       if (result.isFailure) {
         await showMessageDialog(
           context: context,
-          text:
-              "${widget.isNew ? 'Creating' : 'Updating'} Credentials failed:\n${result.failure}",
+          title: "${widget.isNew ? 'Creating' : 'Updating'} Credentials Failed",
+          text: result.failure.toString(),
         );
       } else {
         Navigator.pop(context);
@@ -239,7 +240,8 @@ class _PlatformCredentialDialogState extends State<PlatformCredentialDialog> {
         } else {
           await showMessageDialog(
             context: context,
-            text: "Deleting Credentials failed:\n${result.failure}",
+            title: "Deleting Credentials Failed",
+            text: result.failure.toString(),
           );
         }
       }

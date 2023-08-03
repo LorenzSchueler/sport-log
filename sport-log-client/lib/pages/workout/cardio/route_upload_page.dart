@@ -39,7 +39,8 @@ class _RouteUploadPageState extends State<RouteUploadPage> {
       } else {
         await showMessageDialog(
           context: context,
-          text: "Creating Route Entry failed:\n${result.failure}",
+          title: "Creating Route Failed",
+          text: result.failure.toString(),
         );
       }
     }
@@ -126,7 +127,7 @@ class _RouteUploadPageState extends State<RouteUploadPage> {
       if (track.isFailure) {
         await showMessageDialog(
           context: context,
-          title: "An Error occurred",
+          title: "An Error Occurred",
           text: track.failure,
         );
       } else {

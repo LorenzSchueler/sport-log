@@ -17,14 +17,14 @@ class _Dialog<T> extends StatelessWidget {
     super.key,
   });
 
-  final String? title;
+  final String title;
   final String text;
   final List<_DialogOption<T>> options;
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: title == null ? null : Text(title!),
+      title: Text(title),
       content: SingleChildScrollView(child: Text(text)),
       actions: options
           .map(
@@ -219,7 +219,7 @@ Future<bool> showUpdateDialog(BuildContext context) async {
 
 Future<void> showMessageDialog({
   required BuildContext context,
-  String? title,
+  required String title,
   required String text,
 }) async {
   return showDialog<void>(

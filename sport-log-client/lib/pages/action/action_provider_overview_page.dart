@@ -59,7 +59,8 @@ class _ActionProviderOverviewPageState
       if (actionProviderDescription == null) {
         await showMessageDialog(
           context: context,
-          text: "Action Provider was deleted.",
+          title: "Info",
+          text: "Action provider was deleted.",
         );
         if (mounted) {
           Navigator.of(context).pop();

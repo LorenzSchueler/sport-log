@@ -46,12 +46,17 @@ class _OfflineMapsPageState extends State<OfflineMapsPage> {
         if (mounted) {
           await showMessageDialog(
             context: context,
-            text: "Download Successful",
+            title: "Download Successful",
+            text: "Map region has been saved and can be used offline.",
           );
         }
       },
       onError: () async {
-        await showMessageDialog(context: context, text: "Download Failed");
+        await showMessageDialog(
+          context: context,
+          title: "Download Failed",
+          text: "Internet required.",
+        );
       },
     );
   }
@@ -64,6 +69,7 @@ class _OfflineMapsPageState extends State<OfflineMapsPage> {
     } else {
       await showMessageDialog(
         context: context,
+        title: "Usage",
         text: "Please mark 2 points by long pressing on the map.",
       );
     }

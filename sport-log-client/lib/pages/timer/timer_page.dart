@@ -160,6 +160,7 @@ class TimerPage extends StatelessWidget {
                   )
                 : showMessageDialog(
                     context: context,
+                    title: "Invalid Time",
                     text: "The time must be greater than 0.",
                   ),
             style: ElevatedButton.styleFrom(

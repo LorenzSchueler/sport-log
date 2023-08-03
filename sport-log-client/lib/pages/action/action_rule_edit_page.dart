@@ -43,8 +43,8 @@ class _ActionRuleEditPageState extends State<ActionRuleEditPage> {
       } else {
         await showMessageDialog(
           context: context,
-          text:
-              "${widget.isNew ? 'Creating' : 'Updating'} Action Rule failed:\n${result.failure}",
+          title: "${widget.isNew ? 'Creating' : 'Updating'} Action Rule Failed",
+          text: result.failure.toString(),
         );
       }
     }
@@ -63,7 +63,8 @@ class _ActionRuleEditPageState extends State<ActionRuleEditPage> {
         } else {
           await showMessageDialog(
             context: context,
-            text: "Deleting Action Rule failed:\n${result.failure}",
+            title: "Deleting Action Rule Failed",
+            text: result.failure.toString(),
           );
         }
       }

@@ -51,7 +51,11 @@ class _DurationInputState extends State<DurationInput> {
     final duration = _textController.text;
     final validated = _validateDuration(duration);
     if (validated != null) {
-      showMessageDialog(context: context, text: validated);
+      showMessageDialog(
+        context: context,
+        title: "Invalid Value",
+        text: validated,
+      );
     }
     _textController.text = _duration.formatM99S;
   }

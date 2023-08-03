@@ -53,8 +53,8 @@ class _MetconEditPageState extends State<MetconEditPage> {
     } else if (mounted) {
       await showMessageDialog(
         context: context,
-        text:
-            "${widget.isNew ? 'Creating' : 'Updating'} Metcon failed:\n${result.failure}",
+        title: "${widget.isNew ? 'Creating' : 'Updating'} Metcon Failed",
+        text: result.failure.toString(),
       );
     }
   }
@@ -78,7 +78,8 @@ class _MetconEditPageState extends State<MetconEditPage> {
         } else {
           await showMessageDialog(
             context: context,
-            text: "Deleting Metcon failed:\n${result.failure}",
+            title: "Deleting Metcon Failed",
+            text: result.failure.toString(),
           );
         }
       }

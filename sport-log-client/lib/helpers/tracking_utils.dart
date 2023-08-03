@@ -164,7 +164,8 @@ class TrackingUtils extends ChangeNotifier {
       } else {
         await showMessageDialog(
           context: context,
-          text: 'Saving Cardio Session failed:\n${result.failure}',
+          title: "Saving Cardio Session Failed",
+          text: result.failure.toString(),
         );
       }
     }
@@ -193,7 +194,8 @@ class TrackingUtils extends ChangeNotifier {
       if (context.mounted && result.isFailure) {
         await showMessageDialog(
           context: context,
-          text: 'Deleting Cardio Session failed:\n${result.failure}',
+          title: "Deleting Cardio Session Failed",
+          text: result.failure.toString(),
         );
       }
     }
