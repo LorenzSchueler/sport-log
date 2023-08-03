@@ -59,7 +59,7 @@ jobs:
         toolchain: stable
         override: true
     - name: load cache
-      uses: Swatinem/rust-cache@v1
+      uses: Swatinem/rust-cache@v2
     - name: cargo doc
       uses: actions-rs/cargo@v1
       with:
@@ -79,7 +79,7 @@ jobs:
         toolchain: stable
         override: true
     - name: load cache
-      uses: Swatinem/rust-cache@v1
+      uses: Swatinem/rust-cache@v2
     - name: cargo check
       # build every crate on its own to make sure enabled features from other crates do not mask missing dependencies
       run: cargo check --manifest-path sport-log-action-provider-sportstracker/Cargo.toml &&
@@ -120,7 +120,7 @@ jobs:
         toolchain: stable
         override: true
     - name: load cache
-      uses: Swatinem/rust-cache@v1
+      uses: Swatinem/rust-cache@v2
     - name: install postgresql
       run: |
         sudo apt-get update -y
@@ -159,7 +159,7 @@ jobs:
     - name: checkout
       uses: actions/checkout@v3
     - name: load cache
-      uses: Swatinem/rust-cache@v1
+      uses: Swatinem/rust-cache@v2
     - name: install cargo-machete
       run: cargo install cargo-machete
       # actions-rs/install fails to load cached binary
