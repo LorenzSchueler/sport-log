@@ -75,33 +75,33 @@ class CardioTrackingSettingsPage extends StatelessWidget {
                   }
                 },
               ),
-              if (trackingSettings.route != null)
-                Row(
-                  children: [
-                    EditTile.Switch(
-                      leading: AppIcons.notification,
-                      caption: "Alarm when off Route",
-                      shrinkWidth: true,
-                      value: trackingSettings.routeAlarmDistance != null,
-                      onChanged: (alarm) => trackingSettings
-                          .routeAlarmDistance = alarm ? 50 : null,
-                    ),
-                    Defaults.sizedBox.horizontal.big,
-                    if (trackingSettings.routeAlarmDistance != null)
-                      EditTile(
-                        leading: null,
-                        caption: "Maximal Distance (m)",
-                        shrinkWidth: true,
-                        child: IntInput(
-                          onUpdate: (alarm) =>
-                              trackingSettings.routeAlarmDistance = alarm,
-                          initialValue: 50,
-                          minValue: 20,
-                          maxValue: null,
-                        ),
-                      ),
-                  ],
+              if (trackingSettings.route != null) ...[
+                EditTile.Switch(
+                  leading: AppIcons.notification,
+                  caption: "Alarm when off Route",
+                  shrinkWidth: true,
+                  value: trackingSettings.routeAlarmDistance != null,
+                  onChanged: (alarm) =>
+                      trackingSettings.routeAlarmDistance = alarm ? 50 : null,
                 ),
+                if (trackingSettings.routeAlarmDistance != null)
+                  Padding(
+                    // 24 icon + 15 padding
+                    padding: const EdgeInsets.only(left: 24 + 15),
+                    child: EditTile(
+                      leading: null,
+                      caption: "Maximal Distance (m)",
+                      shrinkWidth: true,
+                      child: IntInput(
+                        onUpdate: (alarm) =>
+                            trackingSettings.routeAlarmDistance = alarm,
+                        initialValue: 50,
+                        minValue: 20,
+                        maxValue: null,
+                      ),
+                    ),
+                  ),
+              ],
               EditTile.Switch(
                 leading: AppIcons.mountains,
                 trailing: AppIcons.info,

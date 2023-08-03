@@ -68,10 +68,8 @@ class LocationUtils extends ChangeNotifier {
     return true;
   }
 
-  Future<void> _updateNotification(
-    GpsPosition? position,
-  ) async {
-    await updateBackgroundNotification(
+  Future<void> _updateNotification(GpsPosition? position) {
+    return updateBackgroundNotification(
       title: "Sport Log Tracking",
       subtitle: position == null
           ? "GPS tracking is active"

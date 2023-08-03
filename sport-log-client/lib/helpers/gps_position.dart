@@ -26,4 +26,9 @@ class GpsPosition {
   LatLng get latLng => LatLng(lat: latitude, lng: longitude);
 
   bool get isGps => satellites >= 3 && accuracy <= 20;
+
+  @override
+  String toString() {
+    return "$latLng, ele: ${elevation.round()}, accuracy: ${accuracy.round()}, sat: $satellites";
+  }
 }
