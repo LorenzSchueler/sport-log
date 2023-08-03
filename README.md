@@ -29,11 +29,12 @@ The client has an own database in order to allow offline use. It synchronizes wi
 ## 🥕 Features
 
 - 🔓 open source and add free
-- 🛈 ️open REST API
+- 🛈 open REST API
 - 🔁 auto synchronization and multi device support while still allowing offline use
 - 🏋️ track your strength metrics (input of sets and reps)
 - 💯 track your metcons (enter scores for predefined or user defined workouts)
 - 🏃 GPS tracking for outdoor activities (supports 👣 step counting and 💓 heart rate tracking)
+- ⛺ expedition GPS tracking (track location only at defined time of day to save energy)
 - 🏞 plan routes in advance and use them when tracking (also supports import/ export as GPX)
 - 📝 add diary entries
 - 📊 statistics about workouts including 🏅 records, 📈 charts over time and much more
