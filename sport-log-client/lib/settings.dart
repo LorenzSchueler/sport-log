@@ -1,8 +1,9 @@
 import 'package:fixnum/fixnum.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:sport_log/config.dart';
 import 'package:sport_log/defaults.dart';
+import 'package:sport_log/helpers/expedition_tracking_utils.dart';
 import 'package:sport_log/helpers/lat_lng.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/user/user.dart';
@@ -40,6 +41,7 @@ class Settings extends ChangeNotifier {
   static const String _email = "email";
   static const String _lastMapPosition = "lastMapPosition";
   static const String _lastGpsLatLng = "lastGpsLatLng";
+  static const String _expeditionData = "expeditionData";
   static const String _developer = "developer";
 
   static const Duration _defaultSyncInterval = Duration(minutes: 5);
@@ -48,7 +50,10 @@ class Settings extends ChangeNotifier {
     Hive
       ..registerAdapter(DurationAdapter())
       ..registerAdapter(LatLngAdapter())
-      ..registerAdapter(CameraPositionAdapter());
+      ..registerAdapter(CameraPositionAdapter())
+      ..registerAdapter(TimeOfDayAdapter())
+      ..registerAdapter(Int64Adapter())
+      ..registerAdapter(ExpeditionDataAdapter());
     _storage ??= await Hive.openBox(Config.hiveBoxName);
     await _setDefaults(override: override);
   }
@@ -86,6 +91,11 @@ class Settings extends ChangeNotifier {
     if (!_contains(_id) || override) {
       await _storage!.put(_id, null);
     }
+    if (_storage!.get(_id) is String?) {
+      // upgrade: _id had been stored as String? in past
+      await _storage!
+          .put(_id, Int64.tryParseInt(_storage!.get(_id) as String? ?? ""));
+    }
     if (!_contains(_username) || override) {
       await _storage!.put(_username, null);
     }
@@ -103,6 +113,9 @@ class Settings extends ChangeNotifier {
     }
     if (!_contains(_lastGpsLatLng) || override) {
       await _storage!.put(_lastGpsLatLng, Defaults.mapbox.cameraPosition);
+    }
+    if (!_contains(_expeditionData) || override) {
+      await _storage!.put(_expeditionData, null);
     }
     if (!_contains(_developer) || override) {
       await _storage!.put(_developer, false);
@@ -135,6 +148,11 @@ class Settings extends ChangeNotifier {
   LatLng _getLatLng(String key) => _storage!.get(key)! as LatLng;
 
   LatLngZoom _getLatLngZoom(String key) => _storage!.get(key)! as LatLngZoom;
+
+  Int64? _getInt64Optional(String key) => _storage!.get(key) as Int64?;
+
+  ExpeditionData? _getExpeditionDataOptional(String key) =>
+      _storage!.get(key) as ExpeditionData?;
 
   Future<void> _put(String key, Object? value) async {
     await _storage!.put(key, value);
@@ -185,9 +203,9 @@ class Settings extends ChangeNotifier {
   Future<void> setDurationIncrement(Duration increment) =>
       _put(_durationIncrement, increment);
 
-  Int64? get userId => Int64.tryParseInt(_getStringOptional(_id) ?? "");
+  Int64? get userId => _getInt64Optional(_id);
 
-  Future<void> setUserId(Int64? id) => _put(_id, id?.toString());
+  Future<void> setUserId(Int64? id) => _put(_id, id);
 
   String? get username => _getStringOptional(_username);
 
@@ -237,6 +255,12 @@ class Settings extends ChangeNotifier {
   LatLng get lastGpsLatLng => _getLatLng(_lastGpsLatLng);
 
   Future<void> setLastGpsLatLng(LatLng latLng) => _put(_lastGpsLatLng, latLng);
+
+  ExpeditionData? get expeditionData =>
+      _getExpeditionDataOptional(_expeditionData);
+
+  Future<void> setExpeditionData(ExpeditionData? id) =>
+      _put(_expeditionData, id);
 
   bool get developerMode => _getBool(_developer);
 
@@ -291,5 +315,57 @@ class CameraPositionAdapter extends TypeAdapter<LatLngZoom> {
   @override
   void write(BinaryWriter writer, LatLngZoom obj) {
     writer.writeDoubleList([obj.zoom, obj.latLng.lat, obj.latLng.lng]);
+  }
+}
+
+class TimeOfDayAdapter extends TypeAdapter<TimeOfDay> {
+  @override
+  final typeId = 3;
+
+  @override
+  TimeOfDay read(BinaryReader reader) {
+    final values = reader.readIntList();
+    return TimeOfDay(hour: values[0], minute: values[1]);
+  }
+
+  @override
+  void write(BinaryWriter writer, TimeOfDay obj) {
+    writer.writeIntList([obj.hour, obj.minute]);
+  }
+}
+
+class Int64Adapter extends TypeAdapter<Int64> {
+  @override
+  final typeId = 4;
+
+  @override
+  Int64 read(BinaryReader reader) {
+    final value = reader.readString();
+    return Int64.parseInt(value);
+  }
+
+  @override
+  void write(BinaryWriter writer, Int64 obj) {
+    writer.writeString(obj.toString());
+  }
+}
+
+class ExpeditionDataAdapter extends TypeAdapter<ExpeditionData> {
+  @override
+  final int typeId = 5;
+
+  @override
+  ExpeditionData read(BinaryReader reader) {
+    return ExpeditionData(
+      cardioId: reader.read() as Int64,
+      trackingTimes: reader.readList().cast<TimeOfDay>(),
+    );
+  }
+
+  @override
+  void write(BinaryWriter writer, ExpeditionData obj) {
+    writer
+      ..write(obj.cardioId)
+      ..writeList(obj.trackingTimes);
   }
 }
