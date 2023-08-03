@@ -5,6 +5,7 @@ import 'package:sport_log/pages/workout/cardio/audio_feedback_config.dart';
 import 'package:sport_log/pages/workout/cardio/tracking_settings.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/app_icons.dart';
+import 'package:sport_log/widgets/dialogs/dialogs.dart';
 import 'package:sport_log/widgets/input_fields/double_input.dart';
 import 'package:sport_log/widgets/input_fields/edit_tile.dart';
 import 'package:sport_log/widgets/input_fields/int_input.dart';
@@ -103,10 +104,17 @@ class CardioTrackingSettingsPage extends StatelessWidget {
                 ),
               EditTile.Switch(
                 leading: AppIcons.mountains,
+                trailing: AppIcons.info,
                 caption: "Expedition Mode",
                 value: trackingSettings.expeditionMode,
                 onChanged: (expeditionMode) =>
                     trackingSettings.expeditionMode = expeditionMode,
+                onTrailingTap: () => showMessageDialog(
+                  context: context,
+                  title: "Expedition Tracking",
+                  text:
+                      "Expedition tracking allows to track the location for a long time without draining the battery too much.\nThe location will be determined only at the defined tracking times. Once the location is found or if the location is not found within 5 minutes, tracking is suspended until the next tracking time.\nIf the app is killed, tracking will stop completely, however it can be manually resumed later.",
+                ),
               ),
               if (trackingSettings.expeditionMode)
                 Padding(

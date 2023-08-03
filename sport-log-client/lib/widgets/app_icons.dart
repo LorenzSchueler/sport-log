@@ -53,6 +53,7 @@ abstract final class AppIcons {
   static const IconData centerFocusOff = Icons.center_focus_weak_rounded;
   static const IconData threeD = Icons.threed_rotation_rounded;
   static const IconData invertColors = Icons.invert_colors_rounded;
+  static const IconData info = Icons.info_outline_rounded;
 
   // arrows
   static const IconData arrowLeft = Icons.arrow_back_ios_rounded;
