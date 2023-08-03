@@ -77,7 +77,8 @@ class TrackingUtils extends ChangeNotifier {
       .setCenterLocation(centerLocation, _locationUtils.lastLatLng);
 
   final LocationUtils _locationUtils = LocationUtils();
-  bool get waitingOnGps => !_locationUtils.hasGps;
+  bool get hasLocation => _locationUtils.hasLocation;
+  bool get hasAccurateLocation => _locationUtils.hasAccurateLocation;
 
   final StepCountUtils _stepUtils = StepCountUtils();
 

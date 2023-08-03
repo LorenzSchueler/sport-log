@@ -116,7 +116,9 @@ class CardioTrackingPage extends StatelessWidget {
                             onPause: trackingUtils.pause,
                             onResume: trackingUtils.resume,
                             onSave: () => _saveDialog(context, trackingUtils),
-                            waitingOnGPS: trackingUtils.waitingOnGps,
+                            waitingOnLocation: !trackingUtils.hasLocation,
+                            waitingOnAccurateLocation:
+                                !trackingUtils.hasAccurateLocation,
                             waitingOnHR: trackingUtils.waitingOnHR,
                           ),
                         ],
@@ -139,7 +141,8 @@ class _TrackingPageButtons extends StatelessWidget {
     required this.onPause,
     required this.onResume,
     required this.onSave,
-    required this.waitingOnGPS,
+    required this.waitingOnLocation,
+    required this.waitingOnAccurateLocation,
     required this.waitingOnHR,
   });
 
@@ -148,7 +151,8 @@ class _TrackingPageButtons extends StatelessWidget {
   final VoidCallback onPause;
   final VoidCallback onResume;
   final VoidCallback onSave;
-  final bool waitingOnGPS;
+  final bool waitingOnLocation;
+  final bool waitingOnAccurateLocation;
   final bool waitingOnHR;
 
   @override
@@ -194,13 +198,20 @@ class _TrackingPageButtons extends StatelessWidget {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Theme.of(context).colorScheme.errorContainer,
                 ),
-                onPressed: waitingOnGPS || waitingOnHR ? null : onStart,
+                onPressed:
+                    waitingOnAccurateLocation || waitingOnHR ? null : onStart,
                 child: Text(
-                  waitingOnGPS
-                      ? "Waiting on GPS"
-                      : waitingOnHR
-                          ? "Waiting on HR Monitor"
-                          : "Start",
+                  waitingOnLocation
+                      ? "Waiting on Location"
+                      : waitingOnAccurateLocation
+                          ? "Waiting on Accurate Location"
+                          : waitingOnHR
+                              ? "Waiting on HR Monitor"
+                              : "Start",
+                  style: waitingOnAccurateLocation || waitingOnHR
+                      ? const TextStyle(fontSize: 14)
+                      : null,
+                  textAlign: TextAlign.center,
                 ),
               ),
             ),
