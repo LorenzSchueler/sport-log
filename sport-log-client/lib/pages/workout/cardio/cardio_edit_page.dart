@@ -437,7 +437,7 @@ class _CardioEditPageState extends State<CardioEditPage> {
                           );
                         }
                       },
-                      onCancel: () => setState(() {
+                      onTrailingTap: () => setState(() {
                         _cardioSessionDescription.cardioSession.time = null;
                       }),
                     ),

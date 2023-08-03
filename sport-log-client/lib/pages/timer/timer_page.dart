@@ -122,7 +122,7 @@ class TimerPage extends StatelessWidget {
       onButtonPressed: () {
         timerState.restTime = const Duration(minutes: 1);
       },
-      onCancel: () => timerState.restTime = null,
+      onTrailingTap: () => timerState.restTime = null,
       builder: () => DurationInput(
         onUpdate: (d) => timerState.restTime = d,
         initialDuration: timerState.restTime!,

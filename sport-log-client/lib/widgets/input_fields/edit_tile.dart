@@ -101,9 +101,10 @@ class EditTile extends StatelessWidget {
   const EditTile({
     required this.child,
     required this.leading,
+    this.trailing,
     this.caption,
     this.onTap,
-    this.onCancel,
+    this.onTrailingTap,
     this.unboundedHeight = false,
     this.shrinkWidth = false,
     this.bigText = true,
@@ -113,17 +114,19 @@ class EditTile extends StatelessWidget {
   // ignore: non_constant_identifier_names
   EditTile.Switch({
     required IconData? leading,
+    IconData? trailing,
     String? caption,
     required bool value,
     required void Function(bool) onChanged,
-    void Function()? onCancel,
+    void Function()? onTrailingTap,
     bool shrinkWidth = false,
     Key? key,
   }) : this(
           child: DefaultSwitch(value: value, onChanged: onChanged),
           leading: leading,
+          trailing: trailing,
           caption: caption,
-          onCancel: onCancel,
+          onTrailingTap: onTrailingTap,
           shrinkWidth: shrinkWidth,
           key: key,
         );
@@ -131,19 +134,21 @@ class EditTile extends StatelessWidget {
   EditTile.optionalButton({
     required Widget Function() builder,
     required IconData leading,
+    IconData? trailing,
     required String caption,
     required bool showButton,
     required void Function() onButtonPressed,
     void Function()? onTap,
-    void Function()? onCancel,
+    void Function()? onTrailingTap,
     bool unboundedHeight = false,
     bool shrinkWidth = false,
     Key? key,
   }) : this(
           leading: leading,
+          trailing: trailing,
           caption: showButton ? null : caption,
           onTap: showButton ? null : onTap,
-          onCancel: showButton ? null : onCancel,
+          onTrailingTap: showButton ? null : onTrailingTap,
           unboundedHeight: showButton ? false : unboundedHeight,
           shrinkWidth: shrinkWidth,
           key: key,
@@ -162,8 +167,9 @@ class EditTile extends StatelessWidget {
   final String? caption;
   final Widget child;
   final IconData? leading;
+  final IconData? trailing;
   final VoidCallback? onTap;
-  final VoidCallback? onCancel;
+  final VoidCallback? onTrailingTap;
 
   /// if enabled [child] must have a bounded height
   final bool unboundedHeight;
@@ -214,17 +220,17 @@ class EditTile extends StatelessWidget {
             shrinkWidth
                 ? _captionChildColumn(context)
                 : Expanded(child: _captionChildColumn(context)),
-            if (onCancel != null)
+            if (onTrailingTap != null)
               IconButton(
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(),
-                onPressed: onCancel != null
+                onPressed: onTrailingTap != null
                     ? () {
                         FocusManager.instance.primaryFocus?.unfocus();
-                        onCancel!();
+                        onTrailingTap!();
                       }
                     : null,
-                icon: const Icon(AppIcons.close),
+                icon: Icon(trailing ?? AppIcons.close),
               ),
           ],
         ),

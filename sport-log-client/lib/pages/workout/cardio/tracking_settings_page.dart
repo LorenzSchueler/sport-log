@@ -247,7 +247,7 @@ class CardioTrackingSettingsPage extends StatelessWidget {
                     : EditTile(
                         leading: AppIcons.heartbeat,
                         caption: "Heart Rate Monitors",
-                        onCancel: trackingSettings.heartRateUtils.reset,
+                        onTrailingTap: trackingSettings.heartRateUtils.reset,
                         child: DropdownButtonHideUnderline(
                           child: DropdownButton(
                             value: trackingSettings.heartRateUtils.deviceId,

@@ -271,7 +271,7 @@ class _MetconEditPageState extends State<MetconEditPage> {
           setState(() => _metconDescription.metcon.timecap = timecap);
         },
       ),
-      onCancel: allowCancel
+      onTrailingTap: allowCancel
           ? () => setState(() => _metconDescription.metcon.timecap = null)
           : null,
     );

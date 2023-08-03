@@ -213,7 +213,7 @@ class _StrengthEditPageState extends State<StrengthEditPage> {
     return EditTile.optionalButton(
       caption: 'Interval',
       leading: AppIcons.timeInterval,
-      onCancel: () =>
+      onTrailingTap: () =>
           setState(() => _strengthSessionDescription.session.interval = null),
       builder: () => DurationInput(
         onUpdate: (d) =>
@@ -272,7 +272,7 @@ class _StrengthEditPageState extends State<StrengthEditPage> {
     return EditTile(
       leading: null,
       caption: "Set ${strengthSet.setNumber + 1}",
-      onCancel: () => setState(() {
+      onTrailingTap: () => setState(() {
         _strengthSessionDescription.sets.remove(strengthSet);
         _strengthSessionDescription.orderSets();
       }),
