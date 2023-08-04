@@ -41,8 +41,8 @@ class OverviewCard extends StatelessWidget {
                       children: [
                         Text(
                           dateOnly
-                              ? datetime.toHumanDay()
-                              : datetime.toHumanDateTime(),
+                              ? datetime.humanDate
+                              : datetime.humanDateTime,
                         ),
                         if (left.isNotEmpty) ...[
                           Defaults.sizedBox.vertical.normal,

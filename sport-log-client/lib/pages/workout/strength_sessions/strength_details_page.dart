@@ -164,7 +164,7 @@ class _StrengthStatsCard extends StatelessWidget {
               caption: "Date",
               bigText: false,
               child: Text(
-                strengthSessionDescription.session.datetime.toHumanDateTime(),
+                strengthSessionDescription.session.datetime.humanDateTime,
               ),
             ),
             EditTile(

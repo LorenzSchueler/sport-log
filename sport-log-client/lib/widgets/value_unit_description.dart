@@ -75,7 +75,7 @@ class ValueUnitDescription extends StatelessWidget {
 
   ValueUnitDescription.datetime(DateTime datetime, {Key? key})
       : this(
-          value: datetime.toHumanDateTime(),
+          value: datetime.humanDateTime,
           unit: null,
           description: "Date",
           scale: 1.3,

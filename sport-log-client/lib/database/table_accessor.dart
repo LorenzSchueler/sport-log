@@ -46,7 +46,7 @@ abstract class TableAccessor<T extends AtomicEntity> {
     if (from == null) {
       return "";
     } else if (dateOnly) {
-      return "$tableName.${Columns.date} >= '${from.formatDateyyyyMMdd}'";
+      return "$tableName.${Columns.date} >= '${from.yearMonthDay}'";
     } else {
       return "$tableName.${Columns.datetime} >= '$from'";
     }
@@ -63,7 +63,7 @@ abstract class TableAccessor<T extends AtomicEntity> {
     if (until == null) {
       return "";
     } else if (dateOnly) {
-      return "$tableName.${Columns.date} < '${until.formatDateyyyyMMdd}'";
+      return "$tableName.${Columns.date} < '${until.yearMonthDay}'";
     } else {
       return "$tableName.${Columns.datetime} < '$until'";
     }

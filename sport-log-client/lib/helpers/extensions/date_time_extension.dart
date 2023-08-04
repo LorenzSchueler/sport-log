@@ -1,39 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-const _shortMonthNames = [
-  'Jan',
-  'Feb',
-  'Mar',
-  'Apr',
-  'May',
-  'Jun',
-  'Jul',
-  'Aug',
-  'Sep',
-  'Oct',
-  'Nov',
-  'Dec',
-];
-
-String shortMonthNameOfInt(int month) {
-  return _shortMonthNames[month - 1];
-}
-
-const _shortWeekdayNames = [
-  'Mon',
-  'Tue',
-  'Wed',
-  'Thu',
-  'Fri',
-  'Sat',
-  'Sun',
-];
-
-String shortWeekdayNameOfInt(int weekday) {
-  return _shortWeekdayNames[weekday - 1];
-}
-
 extension DurationExtension on Duration {
   String _threeDigits(int n) {
     if (n >= 100) return "$n";
@@ -74,76 +41,117 @@ extension DurationExtension on Duration {
 }
 
 extension DateTimeExtension on DateTime {
-  String get shortMonthName => shortMonthNameOfInt(month);
-  String get shortWeekdayName => shortWeekdayNameOfInt(weekday);
+  /// example: 01. February 2000
+  String get dayMonthNameYear => DateFormat("dd'.' MMMM yyyy").format(this);
 
-  String get _formatDate => DateFormat("dd'.' MMMM yyyy").format(this);
-  String get _formatDateShort => DateFormat("dd'.' MMMM").format(this);
-  String get formatDateyyyyMMdd => DateFormat('yyyy-MM-dd').format(this);
+  /// example: 01. February
+  String get dayMonthName => DateFormat("dd'.' MMMM").format(this);
 
-  String get _formatMonth => DateFormat('MMMM yyyy').format(this);
+  /// example: 2000-02-01
+  String get yearMonthDay => DateFormat("yyyy-MM-dd").format(this);
+
+  /// example: February 2000
+  String get monthNameYear => DateFormat("MMMM yyyy").format(this);
+
+  /// example: February
   String get longMonthName => DateFormat.MMMM().format(this);
 
+  /// example: Feb
+  String get shortMonthName => DateFormat.MMM().format(this);
+
+  /// example: Monday
   String get longWeekdayName => DateFormat.EEEE().format(this);
 
-  String get formatHms => DateFormat.Hms().format(this);
-  String get formatHm => DateFormat.Hm().format(this);
+  /// example: Mon
+  String get shortWeekdayName => DateFormat("EEE").format(this);
 
-  String toHumanDateTime() => '${toHumanDay()} at $formatHm';
+  /// example: 01:02:03
+  String get hourMinuteSecond => DateFormat.Hms().format(this);
 
-  String toHumanDate() => toHumanDay();
+  /// example: 01:02
+  String get hourMinute => DateFormat.Hm().format(this);
 
-  String toHumanDay() {
+  /// examples:
+  /// Today at 01:02,
+  /// Yesterday at 01:02,
+  /// Tomorrow at 01:02,
+  /// Monday at 01:02,
+  /// 01. February at 01:02,
+  /// 01. February 2000 at 01:02,
+  String get humanDateTime => "$humanDate at $hourMinute";
+
+  /// examples:
+  /// Today,
+  /// Yesterday,
+  /// Tomorrow,
+  /// Monday,
+  /// 01. February,
+  /// 01. February 2000,
+  String get humanDate {
     final now = DateTime.now();
     if (isOnDay(now)) {
-      return 'Today';
+      return "Today";
     } else if (isOnDay(DateTime.now().dayEarlier())) {
-      return 'Yesterday';
+      return "Yesterday";
     } else if (isOnDay(DateTime.now().dayLater())) {
-      return 'Tomorrow';
+      return "Tomorrow";
     } else if (isInWeek(now)) {
       return longWeekdayName;
     } else if (isInYear(now)) {
-      return _formatDateShort;
+      return dayMonthName;
     } else {
-      return _formatDate;
+      return dayMonthNameYear;
     }
   }
 
-  String toHumanWeek() {
+  /// examples:
+  /// This Week,
+  /// Last Week,
+  /// 01. February - 08. February,
+  /// 01. February 2000 - 08. February 2000
+  String get humanWeek {
     final now = DateTime.now();
     if (isInWeek(now)) {
-      return 'This week';
+      return "This Week";
     } else if (weekLater().isInWeek(now)) {
-      return 'Last week';
+      return "Last Week";
     } else if (isInYear(now)) {
       final lastDay = add(const Duration(days: 6));
-      return "$_formatDateShort - ${lastDay._formatDateShort}";
+      return "$dayMonthName - ${lastDay.dayMonthName}";
     } else {
       final lastDay = add(const Duration(days: 6));
-      return "$_formatDate - ${lastDay._formatDate}";
+      return "$dayMonthNameYear - ${lastDay.dayMonthNameYear}";
     }
   }
 
-  String toHumanMonth() {
+  /// examples:
+  /// This Month,
+  /// Last Month,
+  /// February,
+  /// February 2000
+  String get humanMonth {
     final now = DateTime.now();
     if (isInMonth(now)) {
-      return 'This month';
+      return "This Month";
     } else if (monthLater().isInMonth(now)) {
-      return 'Last month';
+      return "Last Month";
     } else if (isInYear(now)) {
       return longMonthName;
     } else {
-      return _formatMonth;
+      return monthNameYear;
     }
   }
 
-  String toHumanYear() {
+  /// examples:
+  /// This Year,
+  /// Last Year,
+  /// 2000
+  String get humanYear {
     final now = DateTime.now();
     if (isInYear(now)) {
-      return 'This year';
+      return "This Year";
     } else if (yearLater().isInYear(now)) {
-      return 'Last year';
+      return "Last Year";
     } else {
       return year.toString();
     }
@@ -244,17 +252,19 @@ extension DateTimeExtension on DateTime {
     return year == date.year;
   }
 
-  bool get isLeapYear {
+  bool get _isLeapYear {
     return (year % 4 == 0 && year % 100 != 0) || year % 400 == 0;
   }
 
   int get numDaysInMonth {
     const numDaysNormYear = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
     const numDaysLeapYear = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-    return isLeapYear ? numDaysLeapYear[month - 1] : numDaysNormYear[month - 1];
+    return _isLeapYear
+        ? numDaysLeapYear[month - 1]
+        : numDaysNormYear[month - 1];
   }
 
-  int get numDaysInYear => isLeapYear ? 366 : 365;
+  int get numDaysInYear => _isLeapYear ? 366 : 365;
 }
 
 extension TimeOfDayExtension on TimeOfDay {

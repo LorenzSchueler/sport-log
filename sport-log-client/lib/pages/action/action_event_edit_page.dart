@@ -135,7 +135,7 @@ class _ActionEventEditPageState extends State<ActionEventEditPage> {
                     });
                   }
                 },
-                child: Text(_actionEvent.datetime.toHumanDateTime()),
+                child: Text(_actionEvent.datetime.humanDateTime),
               ),
               TextFormField(
                 decoration: const InputDecoration(

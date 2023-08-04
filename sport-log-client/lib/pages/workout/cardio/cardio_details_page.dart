@@ -534,7 +534,7 @@ class _SimilarCardioSessionCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    session.datetime.toHumanDateTime(),
+                    session.datetime.humanDateTime,
                     style: const TextStyle(fontSize: 20),
                   ),
                   Row(

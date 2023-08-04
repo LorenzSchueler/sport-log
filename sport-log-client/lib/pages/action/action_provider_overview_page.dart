@@ -207,7 +207,7 @@ class ActionRulesCard extends StatelessWidget {
                         ),
                         Defaults.sizedBox.horizontal.normal,
                         Text(
-                          "${actionRule.weekday.name} at ${actionRule.time.formatHm}",
+                          "${actionRule.weekday.name} at ${actionRule.time.hourMinute}",
                         ),
                         const Spacer(),
                         Checkbox(
@@ -294,7 +294,7 @@ class ActionEventsCard extends StatelessWidget {
                         ),
                         Defaults.sizedBox.horizontal.normal,
                         Text(
-                          actionEvent.datetime.toHumanDateTime(),
+                          actionEvent.datetime.humanDateTime,
                         ),
                         const Spacer(),
                         Checkbox(

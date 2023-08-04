@@ -62,7 +62,7 @@ class DayFilter extends DateFilterState {
   DayFilter get later => DayFilter._(end);
 
   @override
-  String get label => start.toHumanDay();
+  String get label => start.humanDate;
 
   @override
   final String name = 'Day';
@@ -88,7 +88,7 @@ class WeekFilter extends DateFilterState {
   WeekFilter get later => WeekFilter._(end);
 
   @override
-  String get label => start.toHumanWeek();
+  String get label => start.humanWeek;
 
   @override
   final String name = 'Week';
@@ -114,7 +114,7 @@ class MonthFilter extends DateFilterState {
   MonthFilter get later => MonthFilter._(end);
 
   @override
-  String get label => start.toHumanMonth();
+  String get label => start.humanMonth;
 
   @override
   final String name = 'Month';
@@ -140,7 +140,7 @@ class YearFilter extends DateFilterState {
   YearFilter get later => YearFilter._(end);
 
   @override
-  String get label => start.toHumanYear();
+  String get label => start.humanYear;
 
   @override
   final String name = 'Year';

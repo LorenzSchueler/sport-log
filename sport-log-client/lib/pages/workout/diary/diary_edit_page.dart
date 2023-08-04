@@ -96,7 +96,7 @@ class _DiaryEditPageState extends State<DiaryEditPage> {
                 EditTile(
                   leading: AppIcons.calendar,
                   caption: "Date",
-                  child: Text(_diary.date.toHumanDate()),
+                  child: Text(_diary.date.humanDate),
                   onTap: () async {
                     final date = await showDatePickerWithDefaults(
                       context: context,

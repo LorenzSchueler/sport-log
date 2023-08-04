@@ -246,8 +246,8 @@ class CardioSessionCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    cardioSessionDescription.cardioSession.datetime
-                        .toHumanDateTime(),
+                    cardioSessionDescription
+                        .cardioSession.datetime.humanDateTime,
                   ),
                   Text(
                     cardioSessionDescription.movement.name,

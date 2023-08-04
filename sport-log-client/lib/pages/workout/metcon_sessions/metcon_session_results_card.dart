@@ -34,8 +34,7 @@ class MetconSessionResultsCard extends StatelessWidget {
                 caption: "Date",
                 bigText: false,
                 child: Text(
-                  metconSessionDescription!.metconSession.datetime
-                      .toHumanDate(),
+                  metconSessionDescription!.metconSession.datetime.humanDate,
                 ),
               ),
             if (metconSessionDescription != null)
@@ -80,7 +79,7 @@ class MetconSessionResultsCard extends StatelessWidget {
                             : Container(),
                         Padding(
                           padding: const EdgeInsets.only(left: 10),
-                          child: Text(msd.metconSession.datetime.toHumanDate()),
+                          child: Text(msd.metconSession.datetime.humanDate),
                         )
                       ],
                     )

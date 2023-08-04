@@ -206,8 +206,7 @@ class _StrengthEditPageState extends State<StrengthEditPage> {
           });
         }
       },
-      child:
-          Text(_strengthSessionDescription.session.datetime.toHumanDateTime()),
+      child: Text(_strengthSessionDescription.session.datetime.humanDateTime),
     );
   }
 
