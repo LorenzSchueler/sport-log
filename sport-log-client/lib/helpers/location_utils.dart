@@ -30,32 +30,36 @@ class LocationUtils extends ChangeNotifier {
   Future<bool> startLocationStream({
     required void Function(GpsPosition) onLocationUpdate,
     required bool inBackground,
+    // for location tracking in other isolate which can not request permissions
+    bool ignorePermissions = false,
   }) async {
     if (_locationSubscription != null) {
       return false;
     }
 
-    if (!await PermissionRequest.request(Permission.locationWhenInUse)) {
-      return false;
-    }
-    if (!await Permission.locationAlways.isGranted) {
-      final context = App.globalContext;
-      if (context.mounted) {
-        await showMessageDialog(
-          context: context,
-          title: "Permission Required",
-          text: "Location must be always allowed.",
-        );
+    if (!ignorePermissions) {
+      if (!await PermissionRequest.request(Permission.locationWhenInUse)) {
+        return false;
       }
-    }
-    // opens settings only once
-    if (!await PermissionRequest.request(Permission.locationAlways)) {
-      return false;
+      if (!await Permission.locationAlways.isGranted) {
+        final context = App.globalContext;
+        if (context.mounted) {
+          await showMessageDialog(
+            context: context,
+            title: "Permission Required",
+            text: "Location must be always allowed.",
+          );
+        }
+      }
+      // opens settings only once
+      if (!await PermissionRequest.request(Permission.locationAlways)) {
+        return false;
+      }
+      // request permission but continue even if not granted
+      await PermissionRequest.request(Permission.notification);
     }
 
     await setLocationSettings(useGooglePlayServices: false);
-    // request permission but continue even if not granted
-    await PermissionRequest.request(Permission.notification);
     await _updateNotification(null);
     _locationSubscription =
         onLocationChanged(inBackground: inBackground).listen((locationData) {
@@ -70,7 +74,7 @@ class LocationUtils extends ChangeNotifier {
 
   Future<void> _updateNotification(GpsPosition? position) {
     return updateBackgroundNotification(
-      title: "Sport Log Tracking",
+      title: "Tracking",
       subtitle: position == null
           ? "GPS tracking is active"
           : "[${position.latitude.toStringAsFixed(5)}, ${position.longitude.toStringAsFixed(5)}] ~ ${position.accuracy.round()} m (${position.satellites} satellites)",
