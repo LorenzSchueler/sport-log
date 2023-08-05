@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:sport_log/app.dart';
 import 'package:sport_log/config.dart';
@@ -44,6 +45,19 @@ Stream<double> initialize() async* {
     onActionReceivedMethod: NotificationController.onActionReceivedMethod,
   );
   yield 0.6;
+  FlutterForegroundTask.init(
+    androidNotificationOptions: AndroidNotificationOptions(
+      channelId: "expedition_channel",
+      channelName: "Expedition Notifications",
+      channelImportance: NotificationChannelImportance.HIGH,
+      priority: NotificationPriority.HIGH,
+    ),
+    iosNotificationOptions: const IOSNotificationOptions(),
+    foregroundTaskOptions: ForegroundTaskOptions(
+      interval: const Duration(minutes: 15).inMilliseconds,
+    ),
+  );
+  yield 0.7;
   if (Config.isWindows || Config.isLinux) {
     sqfliteFfiInit();
     databaseFactory = databaseFactoryFfi;

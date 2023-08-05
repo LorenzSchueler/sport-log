@@ -37,6 +37,7 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_blue_plus: ^1.7.5
+  flutter_foreground_task: ^6.0.0+1
   flutter_localizations:
     sdk: flutter
   flutter_tts: ^3.6.3
