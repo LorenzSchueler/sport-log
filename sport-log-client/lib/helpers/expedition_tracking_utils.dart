@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:collection/collection.dart';
 import 'package:fixnum/fixnum.dart';
 import 'package:flutter/material.dart' hide Route;
 import 'package:sport_log/data_provider/data_providers/cardio_data_provider.dart';
@@ -28,7 +29,10 @@ class ExpeditionTrackingUtils extends ChangeNotifier {
     this.cardioSessionDescription,
     this._expeditionData,
     this._attached,
-  ) : assert(_expeditionData.trackingTimes.isNotEmpty);
+  )   : assert(_expeditionData.trackingTimes.isNotEmpty),
+        assert(
+          _expeditionData.trackingTimes.isSorted((x, y) => x < y ? -1 : 1),
+        );
 
   // ignore: prefer_constructors_over_static_methods
   static ExpeditionTrackingUtils create({
