@@ -82,7 +82,7 @@ Future<String?> saveTrackAsGpx(
       await AwesomeNotifications().createNotification(
         content: NotificationContent(
           id: Random.secure().nextInt(1 << 31),
-          channelKey: NotificationController.expeditionChannel,
+          channelKey: NotificationController.fileChannel,
           title: "Route GPX export",
           body: file,
           payload: {"file": file},

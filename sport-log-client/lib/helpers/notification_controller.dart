@@ -5,7 +5,6 @@ import 'package:sport_log/helpers/request_permission.dart';
 
 class NotificationController {
   static String fileChannel = "file_channel";
-  static String expeditionChannel = "expedition_channel";
 
   static String openFileAction = "open_file";
 
