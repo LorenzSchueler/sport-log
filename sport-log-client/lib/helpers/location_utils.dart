@@ -27,6 +27,29 @@ class LocationUtils extends ChangeNotifier {
     super.dispose();
   }
 
+  static Future<bool> requestPermissions() async {
+    if (!await PermissionRequest.request(Permission.locationWhenInUse)) {
+      return false;
+    }
+    if (!await Permission.locationAlways.isGranted) {
+      final context = App.globalContext;
+      if (context.mounted) {
+        await showMessageDialog(
+          context: context,
+          title: "Permission Required",
+          text: "Location must be always allowed.",
+        );
+      }
+    }
+    // opens settings only once
+    if (!await PermissionRequest.request(Permission.locationAlways)) {
+      return false;
+    }
+    // request permission but continue even if not granted
+    await PermissionRequest.request(Permission.notification);
+    return true;
+  }
+
   Future<bool> startLocationStream({
     required void Function(GpsPosition) onLocationUpdate,
     required bool inBackground,
@@ -38,25 +61,9 @@ class LocationUtils extends ChangeNotifier {
     }
 
     if (!ignorePermissions) {
-      if (!await PermissionRequest.request(Permission.locationWhenInUse)) {
+      if (!await requestPermissions()) {
         return false;
       }
-      if (!await Permission.locationAlways.isGranted) {
-        final context = App.globalContext;
-        if (context.mounted) {
-          await showMessageDialog(
-            context: context,
-            title: "Permission Required",
-            text: "Location must be always allowed.",
-          );
-        }
-      }
-      // opens settings only once
-      if (!await PermissionRequest.request(Permission.locationAlways)) {
-        return false;
-      }
-      // request permission but continue even if not granted
-      await PermissionRequest.request(Permission.notification);
     }
 
     await setLocationSettings(useGooglePlayServices: false);
