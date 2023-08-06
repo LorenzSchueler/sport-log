@@ -23,6 +23,7 @@ class ExpeditionTaskHandler extends TaskHandler {
   DateTime? _lastTry;
 
   static const Duration _maxLocationTaskDuration = Duration(minutes: 5);
+  static const Duration eventInterval = Duration(minutes: 15);
 
   @override
   Future<void> onStart(DateTime timestamp, SendPort? sendPort) async {

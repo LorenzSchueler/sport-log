@@ -310,14 +310,12 @@ abstract class Routes {
           return CardioTrackingPage(trackingSettings: trackingSettings);
         }),
     Routes.expeditionTracking: (context) => _checkUserIdAndroidIos(context, () {
-          final arg = ModalRoute.of(context)!.settings.arguments!;
+          final arg = ModalRoute.of(context)!.settings.arguments;
           return arg is TrackingSettings
               ? CardioExpeditionTrackingPage.crate(
                   trackingSettings: arg,
                 )
-              : CardioExpeditionTrackingPage.attach(
-                  cardioSessionDescription: arg as CardioSessionDescription,
-                );
+              : const CardioExpeditionTrackingPage.attach();
         }),
     // diary
     Routes.diaryOverview: (_) => _checkUserId(DiaryOverviewPage.new),

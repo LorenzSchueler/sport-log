@@ -4,7 +4,6 @@ import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/bool_toggle.dart';
 import 'package:sport_log/helpers/expedition_tracking_utils.dart';
 import 'package:sport_log/helpers/lat_lng.dart';
-import 'package:sport_log/models/cardio/cardio_session_description.dart';
 import 'package:sport_log/pages/workout/cardio/cardio_value_unit_description_table.dart';
 import 'package:sport_log/pages/workout/cardio/tracking_settings.dart';
 import 'package:sport_log/settings.dart';
@@ -15,15 +14,13 @@ class CardioExpeditionTrackingPage extends StatelessWidget {
   const CardioExpeditionTrackingPage.crate({
     required TrackingSettings this.trackingSettings,
     super.key,
-  }) : cardioSessionDescription = null;
+  });
 
   const CardioExpeditionTrackingPage.attach({
-    required CardioSessionDescription this.cardioSessionDescription,
     super.key,
   }) : trackingSettings = null;
 
   final TrackingSettings? trackingSettings;
-  final CardioSessionDescription? cardioSessionDescription;
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +32,7 @@ class CardioExpeditionTrackingPage extends StatelessWidget {
               ? ExpeditionTrackingUtils.create(
                   trackingSettings: trackingSettings!,
                 )
-              : ExpeditionTrackingUtils.attach(cardioSessionDescription!),
+              : ExpeditionTrackingUtils.attach(),
           builder: (context, trackingUtils, _) => ProviderConsumer(
             create: (_) => BoolToggle.off(),
             builder: (context, fullscreen, _) => Column(
@@ -61,15 +58,17 @@ class CardioExpeditionTrackingPage extends StatelessWidget {
                     padding: Defaults.edgeInsets.normal,
                     child: Column(
                       children: [
-                        CardioValueUnitDescriptionTable(
-                          cardioSessionDescription:
-                              trackingUtils.cardioSessionDescription,
-                          currentDuration: DateTime.now().difference(
-                            trackingUtils.cardioSessionDescription.cardioSession
-                                .datetime,
+                        if (trackingUtils.cardioSessionDescription != null) ...[
+                          CardioValueUnitDescriptionTable(
+                            cardioSessionDescription:
+                                trackingUtils.cardioSessionDescription!,
+                            currentDuration: DateTime.now().difference(
+                              trackingUtils.cardioSessionDescription!
+                                  .cardioSession.datetime,
+                            ),
+                            expeditionMode: true,
                           ),
-                          expeditionMode: true,
-                        ),
+                        ],
                         Defaults.sizedBox.vertical.small,
                         _TrackingPageButtons(
                           running: ExpeditionTrackingUtils.running,

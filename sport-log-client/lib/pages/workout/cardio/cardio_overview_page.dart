@@ -162,20 +162,10 @@ class CardioOverviewPage extends StatelessWidget {
             builder: (context, settings, child) =>
                 settings.expeditionData != null
                     ? FloatingActionButton(
-                        // ignore: prefer-extracting-callbacks
-                        onPressed: () async {
-                          final id = settings.expeditionData!.cardioId;
-                          final cardioSessionDescription =
-                              (await CardioSessionDescriptionDataProvider()
-                                  .getById(id))!;
-                          if (context.mounted) {
-                            await Navigator.pushNamed(
-                              context,
-                              Routes.expeditionTracking,
-                              arguments: cardioSessionDescription,
-                            );
-                          }
-                        },
+                        onPressed: () => Navigator.pushNamed(
+                          context,
+                          Routes.expeditionTracking,
+                        ),
                         child: const Icon(AppIcons.mountains),
                       )
                     : ExpandableFab(

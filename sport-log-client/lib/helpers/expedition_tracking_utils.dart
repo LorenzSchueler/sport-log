@@ -64,12 +64,10 @@ class ExpeditionTrackingUtils extends ChangeNotifier {
   }
 
   // ignore: prefer_constructors_over_static_methods, unreachable_from_main
-  static ExpeditionTrackingUtils attach(
-    CardioSessionDescription cardioSessionDescription,
-  ) {
+  static ExpeditionTrackingUtils attach() {
     assert(running);
     return ExpeditionTrackingUtils._(
-      cardioSessionDescription,
+      null,
       Settings.instance.expeditionData!,
       true,
     );
@@ -79,8 +77,9 @@ class ExpeditionTrackingUtils extends ChangeNotifier {
   final _dataProvider = CardioSessionDescriptionDataProvider();
   final TrackingUiUtils _trackingUiUtils = TrackingUiUtils();
 
-  CardioSessionDescription _cardioSessionDescription;
-  CardioSessionDescription get cardioSessionDescription =>
+  // in create then already set; if attach then loaded in onMapCreated
+  CardioSessionDescription? _cardioSessionDescription;
+  CardioSessionDescription? get cardioSessionDescription =>
       _cardioSessionDescription;
   final ExpeditionData _expeditionData;
   final bool _attached;
@@ -96,12 +95,16 @@ class ExpeditionTrackingUtils extends ChangeNotifier {
   }
 
   Future<void> onMapCreated(MapController mapController) async {
+    _cardioSessionDescription ??= (await _dataProvider
+        // ignore: unnecessary_null_checks
+        .getById(Settings.instance.expeditionData!.cardioId))!;
+    notifyListeners();
     await _trackingUiUtils.onMapCreated(
       mapController,
-      cardioSessionDescription.route,
+      cardioSessionDescription?.route,
     );
     await _trackingUiUtils
-        .updateTrack(cardioSessionDescription.cardioSession.track);
+        .updateTrack(cardioSessionDescription?.cardioSession.track);
     _refreshTimer =
         Timer.periodic(const Duration(minutes: 1), (_) => _refresh());
   }
@@ -111,9 +114,10 @@ class ExpeditionTrackingUtils extends ChangeNotifier {
     if (await FlutterForegroundTask.isRunningService) {
       _logger.d("refreshing expedition tracking page");
       _cardioSessionDescription = (await _dataProvider
+          // ignore: unnecessary_null_checks
           .getById(Settings.instance.expeditionData!.cardioId))!;
       await _trackingUiUtils
-          .updateTrack(cardioSessionDescription.cardioSession.track);
+          .updateTrack(cardioSessionDescription?.cardioSession.track);
       notifyListeners();
     }
   }
@@ -127,8 +131,9 @@ class ExpeditionTrackingUtils extends ChangeNotifier {
     }
     await LocationUtils.enableGPS();
 
-    cardioSessionDescription.cardioSession.datetime = DateTime.now();
-    await _dataProvider.createSingle(cardioSessionDescription);
+    assert(cardioSessionDescription != null);
+    cardioSessionDescription!.cardioSession.datetime = DateTime.now();
+    await _dataProvider.createSingle(cardioSessionDescription!);
     await Settings.instance.setExpeditionData(_expeditionData);
     notifyListeners();
 

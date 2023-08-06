@@ -11,6 +11,7 @@ import 'package:sport_log/data_provider/sync.dart';
 import 'package:sport_log/database/database.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/global_error_handler.dart';
+import 'package:sport_log/helpers/expedition_task_handler.dart';
 import 'package:sport_log/helpers/notification_controller.dart';
 import 'package:sport_log/pages/login/welcome_screen.dart';
 import 'package:sport_log/settings.dart';
@@ -54,7 +55,7 @@ Stream<double> initialize() async* {
     ),
     iosNotificationOptions: const IOSNotificationOptions(),
     foregroundTaskOptions: ForegroundTaskOptions(
-      interval: const Duration(minutes: 15).inMilliseconds,
+      interval: ExpeditionTaskHandler.eventInterval.inMilliseconds,
     ),
   );
   if (!await FlutterForegroundTask.isRunningService) {
