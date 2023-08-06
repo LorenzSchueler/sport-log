@@ -92,8 +92,6 @@ class ExpeditionTrackingUtils extends ChangeNotifier {
 
   Timer? _refreshTimer;
 
-  static const Duration _maxLocationTaskDuration = Duration(minutes: 5);
-
   static bool get running => Settings.instance.expeditionData != null;
 
   @override
@@ -161,36 +159,80 @@ class ExpeditionTrackingUtils extends ChangeNotifier {
       }
     }
   }
+}
+
+@pragma('vm:entry-point')
+void startCallback() {
+  FlutterForegroundTask.setTaskHandler(ExpeditionTaskHandler());
+}
+
+class ExpeditionTaskHandler extends TaskHandler {
+  final _logger = InitLogger("ExpeditionTaskHandler");
+  bool _initialized = false;
+  late final ExpeditionData _expeditionData;
+  DateTime? _lastTry;
+
+  static const Duration _maxLocationTaskDuration = Duration(minutes: 5);
+
+  @override
+  Future<void> onStart(DateTime timestamp, SendPort? sendPort) async {
+    _logger.i("onStart");
+  }
+
+  @override
+  Future<void> onRepeatEvent(DateTime timestamp, SendPort? sendPort) async {
+    GlobalErrorHandler.run(() async {
+      _logger.i("on event");
+      if (!_initialized) {
+        // can not be done in onStart because onRepeatEvent called before onStart finishes
+        await initialize();
+      }
+
+      await expeditionTrackingTask();
+    });
+  }
+
+  @override
+  Future<void> onDestroy(DateTime timestamp, SendPort? sendPort) async {
+    _logger.i("onDestroy");
+  }
+
+  Future<void> initialize() async {
+    await Config.init();
+    await Hive.initFlutter();
+    await Settings.instance.init();
+    if (Config.isWindows || Config.isLinux) {
+      sqfliteFfiInit();
+      databaseFactory = databaseFactoryFfi;
+    }
+    await AppDatabase.init();
+    _initialized = true;
+    _expeditionData = Settings.instance.expeditionData!;
+    _logger.i("initialization done");
+  }
 
   // ignore: long-method
-  static Future<void> expeditionTrackingTask() async {
-    final logger = Logger("ExpeditionTask")..i("task started");
+  Future<void> expeditionTrackingTask() async {
+    _logger.i("task started");
 
-    final expeditionData = Settings.instance.expeditionData;
-    assert(expeditionData != null);
+    if (!nextLocationNeeded()) {
+      _logger.i("next location not yet needed");
+      return;
+    }
+
+    _logger.i("next location needed");
 
     final dataProvider = CardioSessionDescriptionDataProvider();
     final cardioSessionDescription =
-        (await dataProvider.getById(expeditionData!.cardioId))!;
+        (await dataProvider.getById(_expeditionData.cardioId))!;
     final session = cardioSessionDescription.cardioSession;
-
-    if (session.track != null && session.track!.isNotEmpty) {
-      final lastDateTime = session.datetime.add(
-        session.track!.last.time,
-      );
-      if (!nextLocationNeeded(expeditionData.trackingTimes, lastDateTime)) {
-        logger.i("next location not yet needed");
-        return;
-      }
-    }
-    logger.i("next location needed");
 
     Timer? locationTimeoutTimer;
     final locationUtils = LocationUtils();
     await locationUtils.startLocationStream(
       onLocationUpdate: (location) async {
         if (location.isGps) {
-          logger.i("got location $location");
+          _logger.i("got location $location");
           await locationUtils.stopLocationStream();
           locationTimeoutTimer?.cancel();
           locationTimeoutTimer = null;
@@ -216,93 +258,55 @@ class ExpeditionTrackingUtils extends ChangeNotifier {
             ..setDistance();
 
           await dataProvider.updateSingle(cardioSessionDescription);
-          logger.i("new location added");
+          _lastTry = DateTime.now();
+          _logger.i("new location added");
         } else {
-          logger.d("got inaccurate location $location");
+          _logger.d("got inaccurate location $location");
         }
       },
       inBackground: true,
       ignorePermissions: true,
     );
-    logger.i("location stream started");
+    _logger.i("location stream started");
     locationTimeoutTimer = Timer(_maxLocationTaskDuration, () async {
-      logger.i("location stream timed out");
       await locationUtils.stopLocationStream();
+      _lastTry = DateTime.now();
+      _logger.i("location stream timed out");
     });
   }
 
-  static bool nextLocationNeeded(
-    List<TimeOfDay> trackingTimes,
-    DateTime lastDateTime,
-  ) {
-    final lastDate =
-        DateTime(lastDateTime.year, lastDateTime.month, lastDateTime.day);
-    final lastTime = TimeOfDay.fromDateTime(lastDateTime);
+  bool nextLocationNeeded() {
+    final lastTry = _lastTry;
+    if (lastTry == null) {
+      return true;
+    }
+
+    final lastTryDate = DateTime(lastTry.year, lastTry.month, lastTry.day);
+    final lastTryTime = TimeOfDay.fromDateTime(lastTry);
     final nowDateTime = DateTime.now();
     final nowDate =
         DateTime(nowDateTime.year, nowDateTime.month, nowDateTime.day);
     final nowTime = TimeOfDay.fromDateTime(nowDateTime);
 
+    final trackingTimes = _expeditionData.trackingTimes;
     if (trackingTimes.isEmpty) {
       return false;
     }
-    if (lastDate == nowDate) {
-      assert(lastTime < nowTime);
-      // if lastTime before any trackingTime but nowTime after trackingTime we need next location
+    if (lastTryDate == nowDate) {
+      assert(lastTryTime < nowTime);
+      // if lastTryTime before any trackingTime but nowTime after trackingTime we need next location
       return trackingTimes.any(
-        (trackingTime) => lastTime < trackingTime && trackingTime < nowTime,
+        (trackingTime) => lastTryTime < trackingTime && trackingTime < nowTime,
       );
     } else {
-      // lastDate < nowDate
-      return lastTime < nowTime
+      // lastTryDate < nowDate
+      return lastTryTime < nowTime
           ? true // more than one day ago
-          // if any trackingTime after lastTime (yesterday) or before nowTime (today) we need next location
+          // if any trackingTime after lastTryTime (yesterday) or before nowTime (today) we need next location
           : trackingTimes.any(
               (trackingTime) =>
-                  lastTime < trackingTime || trackingTime < nowTime,
+                  lastTryTime < trackingTime || trackingTime < nowTime,
             );
     }
-  }
-}
-
-@pragma('vm:entry-point')
-void startCallback() {
-  FlutterForegroundTask.setTaskHandler(ExpeditionTaskHandler());
-}
-
-class ExpeditionTaskHandler extends TaskHandler {
-  final logger = InitLogger("ExpeditionTaskHandler");
-  bool initialized = false;
-
-  @override
-  Future<void> onStart(DateTime timestamp, SendPort? sendPort) async {
-    logger.i("onStart");
-  }
-
-  @override
-  Future<void> onRepeatEvent(DateTime timestamp, SendPort? sendPort) async {
-    GlobalErrorHandler.run(() async {
-      logger.i("on event");
-      if (!initialized) {
-        // can not be done in onStart because onRepeatEvent called before onStart finishes
-        await Config.init();
-        await Hive.initFlutter();
-        await Settings.instance.init();
-        if (Config.isWindows || Config.isLinux) {
-          sqfliteFfiInit();
-          databaseFactory = databaseFactoryFfi;
-        }
-        await AppDatabase.init();
-        logger.i("initialization done");
-        initialized = true;
-      }
-
-      await ExpeditionTrackingUtils.expeditionTrackingTask();
-    });
-  }
-
-  @override
-  Future<void> onDestroy(DateTime timestamp, SendPort? sendPort) async {
-    logger.i("onDestroy");
   }
 }

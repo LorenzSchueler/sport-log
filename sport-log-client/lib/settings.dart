@@ -259,8 +259,8 @@ class Settings extends ChangeNotifier {
   ExpeditionData? get expeditionData =>
       _getExpeditionDataOptional(_expeditionData);
 
-  Future<void> setExpeditionData(ExpeditionData? id) =>
-      _put(_expeditionData, id);
+  Future<void> setExpeditionData(ExpeditionData? expeditionData) =>
+      _put(_expeditionData, expeditionData);
 
   bool get developerMode => _getBool(_developer);
 
