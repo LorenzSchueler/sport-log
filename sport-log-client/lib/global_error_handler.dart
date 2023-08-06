@@ -13,7 +13,7 @@ class GlobalErrorHandler {
   static void run(void Function() function) {
     FlutterError.onError = (details) {
       FlutterError.presentError(details);
-      GlobalErrorHandler.handleError(
+      handleError(
         "FlutterError",
         details.exception,
         details.stack,
@@ -22,13 +22,12 @@ class GlobalErrorHandler {
       );
     };
     PlatformDispatcher.instance.onError = (error, stackTrace) {
-      GlobalErrorHandler.handleError("PlatformDispatcher", error, stackTrace);
+      handleError("PlatformDispatcher", error, stackTrace);
       return true;
     };
     runZonedGuarded(
       () => function(),
-      (error, stackTrace) =>
-          GlobalErrorHandler.handleError("runZoneGuarded", error, stackTrace),
+      (error, stackTrace) => handleError("runZoneGuarded", error, stackTrace),
     );
   }
 
@@ -62,8 +61,8 @@ class GlobalErrorHandler {
       _logger.w("writing error logs failed");
     }
 
-    final context = App.globalContext;
-    if (context.mounted) {
+    final context = App.globalContextOptional;
+    if (context != null && context.mounted) {
       await showMessageDialog(
         context: context,
         title: "An Error Occurred",

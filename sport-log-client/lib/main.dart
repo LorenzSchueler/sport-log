@@ -57,6 +57,9 @@ Stream<double> initialize() async* {
       interval: const Duration(minutes: 15).inMilliseconds,
     ),
   );
+  if (!await FlutterForegroundTask.isRunningService) {
+    await Settings.instance.setExpeditionData(null);
+  }
   yield 0.7;
   if (Config.isWindows || Config.isLinux) {
     sqfliteFfiInit();

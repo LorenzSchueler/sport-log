@@ -1,9 +1,15 @@
 import 'dart:async';
+import 'dart:isolate';
 
 import 'package:collection/collection.dart';
 import 'package:fixnum/fixnum.dart';
 import 'package:flutter/material.dart' hide Route;
+import 'package:flutter_foreground_task/flutter_foreground_task.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:sport_log/config.dart';
 import 'package:sport_log/data_provider/data_providers/cardio_data_provider.dart';
+import 'package:sport_log/database/database.dart';
+import 'package:sport_log/global_error_handler.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/helpers/location_utils.dart';
@@ -13,6 +19,7 @@ import 'package:sport_log/helpers/tracking_ui_utils.dart';
 import 'package:sport_log/models/cardio/all.dart';
 import 'package:sport_log/pages/workout/cardio/tracking_settings.dart';
 import 'package:sport_log/settings.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 class ExpeditionData {
   ExpeditionData({
@@ -26,7 +33,7 @@ class ExpeditionData {
 
 class ExpeditionTrackingUtils extends ChangeNotifier {
   ExpeditionTrackingUtils._(
-    this.cardioSessionDescription,
+    this._cardioSessionDescription,
     this._expeditionData,
     this._attached,
   )   : assert(_expeditionData.trackingTimes.isNotEmpty),
@@ -34,11 +41,11 @@ class ExpeditionTrackingUtils extends ChangeNotifier {
           _expeditionData.trackingTimes.isSorted((x, y) => x < y ? -1 : 1),
         );
 
-  // ignore: prefer_constructors_over_static_methods
+  // ignore: prefer_constructors_over_static_methods, unreachable_from_main
   static ExpeditionTrackingUtils create({
     required TrackingSettings trackingSettings,
   }) {
-    assert(!created);
+    assert(!running);
     final cardioId = randomId();
     final cardioSessionDescription = CardioSessionDescription(
       cardioSession: CardioSession.defaultValue(
@@ -61,11 +68,11 @@ class ExpeditionTrackingUtils extends ChangeNotifier {
     );
   }
 
-  // ignore: prefer_constructors_over_static_methods
+  // ignore: prefer_constructors_over_static_methods, unreachable_from_main
   static ExpeditionTrackingUtils attach(
     CardioSessionDescription cardioSessionDescription,
   ) {
-    assert(created);
+    assert(running);
     return ExpeditionTrackingUtils._(
       cardioSessionDescription,
       Settings.instance.expeditionData!,
@@ -75,25 +82,23 @@ class ExpeditionTrackingUtils extends ChangeNotifier {
 
   final _logger = Logger("ExpeditionTrackingUtils");
   final _dataProvider = CardioSessionDescriptionDataProvider();
-  final _locationUtils = LocationUtils();
   final TrackingUiUtils _trackingUiUtils = TrackingUiUtils();
 
-  final CardioSessionDescription cardioSessionDescription;
+  CardioSessionDescription _cardioSessionDescription;
+  CardioSessionDescription get cardioSessionDescription =>
+      _cardioSessionDescription;
   final ExpeditionData _expeditionData;
   final bool _attached;
 
-  Timer? _locationTimer;
-  Timer? _locationTimeoutTimer;
+  Timer? _refreshTimer;
+
   static const Duration _maxLocationTaskDuration = Duration(minutes: 5);
 
-  static bool get created => Settings.instance.expeditionData != null;
-  bool get running => _locationTimer != null;
+  static bool get running => Settings.instance.expeditionData != null;
 
   @override
   void dispose() {
-    _locationTimer?.cancel();
-    _locationTimeoutTimer?.cancel();
-    _locationUtils.dispose();
+    _refreshTimer?.cancel();
     super.dispose();
   }
 
@@ -102,42 +107,53 @@ class ExpeditionTrackingUtils extends ChangeNotifier {
       mapController,
       cardioSessionDescription.route,
     );
+    await _trackingUiUtils
+        .updateTrack(cardioSessionDescription.cardioSession.track);
+    _refreshTimer =
+        Timer.periodic(const Duration(minutes: 1), (_) => _refresh());
+  }
+
+  Future<void> _refresh() async {
+    // called every minute
+    if (await FlutterForegroundTask.isRunningService) {
+      _logger.d("refreshing expedition tracking page");
+      _cardioSessionDescription = (await _dataProvider
+          .getById(Settings.instance.expeditionData!.cardioId))!;
+      await _trackingUiUtils
+          .updateTrack(cardioSessionDescription.cardioSession.track);
+      notifyListeners();
+    }
   }
 
   Future<void> start() async {
-    assert(!created);
     assert(!running);
+    assert(!await FlutterForegroundTask.isRunningService);
+
+    if (!await LocationUtils.requestPermissions()) {
+      return;
+    }
 
     cardioSessionDescription.cardioSession.datetime = DateTime.now();
     await _dataProvider.createSingle(cardioSessionDescription);
     await Settings.instance.setExpeditionData(_expeditionData);
-    _locationTimer = Timer(
-      Duration.zero,
-      expeditionTrackingTask,
-    );
     notifyListeners();
-  }
 
-  Future<void> resume() async {
-    assert(created);
-    assert(!running);
-
-    _locationTimer = Timer(
-      Duration.zero,
-      expeditionTrackingTask,
+    _logger.i("starting foreground service");
+    await FlutterForegroundTask.startService(
+      notificationTitle: "Expedition Tracking",
+      notificationText: "Expedition Tracking is active",
+      callback: startCallback,
     );
-    notifyListeners();
   }
 
   Future<void> stop(BuildContext context) async {
-    assert(created);
     assert(running);
+    assert(await FlutterForegroundTask.isRunningService);
 
+    await FlutterForegroundTask.stopService();
     await Settings.instance.setExpeditionData(null);
-    _locationTimer?.cancel();
-    _locationTimer = null;
-    _locationTimeoutTimer?.cancel();
-    _locationTimeoutTimer = null;
+    _refreshTimer?.cancel();
+    _refreshTimer = null;
     if (context.mounted) {
       Navigator.pop(context); // pop tracking page
       if (!_attached) {
@@ -147,18 +163,37 @@ class ExpeditionTrackingUtils extends ChangeNotifier {
   }
 
   // ignore: long-method
-  Future<void> expeditionTrackingTask() async {
-    _logger.i("task started");
+  static Future<void> expeditionTrackingTask() async {
+    final logger = Logger("ExpeditionTask")..i("task started");
 
+    final expeditionData = Settings.instance.expeditionData;
+    assert(expeditionData != null);
+
+    final dataProvider = CardioSessionDescriptionDataProvider();
+    final cardioSessionDescription =
+        (await dataProvider.getById(expeditionData!.cardioId))!;
     final session = cardioSessionDescription.cardioSession;
 
-    await _locationUtils.startLocationStream(
+    if (session.track != null && session.track!.isNotEmpty) {
+      final lastDateTime = session.datetime.add(
+        session.track!.last.time,
+      );
+      if (!nextLocationNeeded(expeditionData.trackingTimes, lastDateTime)) {
+        logger.i("next location not yet needed");
+        return;
+      }
+    }
+    logger.i("next location needed");
+
+    Timer? locationTimeoutTimer;
+    final locationUtils = LocationUtils();
+    await locationUtils.startLocationStream(
       onLocationUpdate: (location) async {
         if (location.isGps) {
-          _logger.i("got location $location");
-          await _locationUtils.stopLocationStream();
-          _locationTimeoutTimer?.cancel();
-          _locationTimeoutTimer = null;
+          logger.i("got location $location");
+          await locationUtils.stopLocationStream();
+          locationTimeoutTimer?.cancel();
+          locationTimeoutTimer = null;
 
           session.track ??= [];
           final track = session.track!;
@@ -180,55 +215,94 @@ class ExpeditionTrackingUtils extends ChangeNotifier {
             ..setAscentDescent()
             ..setDistance();
 
-          await _dataProvider.updateSingle(cardioSessionDescription);
-          await _trackingUiUtils.updateTrack(session.track);
-          notifyListeners();
-          _logger.i("new location added");
-          await scheduleNextLocation();
+          await dataProvider.updateSingle(cardioSessionDescription);
+          logger.i("new location added");
         } else {
-          _logger.d("got inaccurate location $location");
+          logger.d("got inaccurate location $location");
         }
       },
       inBackground: true,
+      ignorePermissions: true,
     );
-    _logger.i("location stream started");
-    _locationTimeoutTimer = Timer(_maxLocationTaskDuration, () async {
-      _logger.i("location stream timed out");
-      await _locationUtils.stopLocationStream();
-      await scheduleNextLocation();
+    logger.i("location stream started");
+    locationTimeoutTimer = Timer(_maxLocationTaskDuration, () async {
+      logger.i("location stream timed out");
+      await locationUtils.stopLocationStream();
     });
   }
 
-  Future<void> scheduleNextLocation() async {
-    final nextLocation = nextLocationAt();
-    _locationTimer =
-        Timer(nextLocation.difference(DateTime.now()), expeditionTrackingTask);
+  static bool nextLocationNeeded(
+    List<TimeOfDay> trackingTimes,
+    DateTime lastDateTime,
+  ) {
+    final lastDate =
+        DateTime(lastDateTime.year, lastDateTime.month, lastDateTime.day);
+    final lastTime = TimeOfDay.fromDateTime(lastDateTime);
+    final nowDateTime = DateTime.now();
+    final nowDate =
+        DateTime(nowDateTime.year, nowDateTime.month, nowDateTime.day);
+    final nowTime = TimeOfDay.fromDateTime(nowDateTime);
 
-    notifyListeners();
+    if (trackingTimes.isEmpty) {
+      return false;
+    }
+    if (lastDate == nowDate) {
+      assert(lastTime < nowTime);
+      // if lastTime before any trackingTime but nowTime after trackingTime we need next location
+      return trackingTimes.any(
+        (trackingTime) => lastTime < trackingTime && trackingTime < nowTime,
+      );
+    } else {
+      // lastDate < nowDate
+      return lastTime < nowTime
+          ? true // more than one day ago
+          // if any trackingTime after lastTime (yesterday) or before nowTime (today) we need next location
+          : trackingTimes.any(
+              (trackingTime) =>
+                  lastTime < trackingTime || trackingTime < nowTime,
+            );
+    }
+  }
+}
+
+@pragma('vm:entry-point')
+void startCallback() {
+  FlutterForegroundTask.setTaskHandler(ExpeditionTaskHandler());
+}
+
+class ExpeditionTaskHandler extends TaskHandler {
+  final logger = InitLogger("ExpeditionTaskHandler");
+  bool initialized = false;
+
+  @override
+  Future<void> onStart(DateTime timestamp, SendPort? sendPort) async {
+    logger.i("onStart");
   }
 
-  DateTime nextLocationAt() {
-    final now = DateTime.now();
-    final nowTime = TimeOfDay.fromDateTime(now);
-
-    // if there is any later time schedule at this time on same day
-    for (final trackingTime in _expeditionData.trackingTimes) {
-      if (nowTime < trackingTime) {
-        return now.copyWith(
-          hour: trackingTime.hour,
-          minute: trackingTime.minute,
-          second: 0,
-        );
+  @override
+  Future<void> onRepeatEvent(DateTime timestamp, SendPort? sendPort) async {
+    GlobalErrorHandler.run(() async {
+      logger.i("on event");
+      if (!initialized) {
+        // can not be done in onStart because onRepeatEvent called before onStart finishes
+        await Config.init();
+        await Hive.initFlutter();
+        await Settings.instance.init();
+        if (Config.isWindows || Config.isLinux) {
+          sqfliteFfiInit();
+          databaseFactory = databaseFactoryFfi;
+        }
+        await AppDatabase.init();
+        logger.i("initialization done");
+        initialized = true;
       }
-    }
-    // otherwise schedule at earliest time on next day
-    final first = _expeditionData.trackingTimes.first;
-    return now
-        .copyWith(
-          hour: first.hour,
-          minute: first.minute,
-          second: 0,
-        )
-        .add(const Duration(days: 1));
+
+      await ExpeditionTrackingUtils.expeditionTrackingTask();
+    });
+  }
+
+  @override
+  Future<void> onDestroy(DateTime timestamp, SendPort? sendPort) async {
+    logger.i("onDestroy");
   }
 }

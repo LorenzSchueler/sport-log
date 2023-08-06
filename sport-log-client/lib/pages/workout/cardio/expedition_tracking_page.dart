@@ -27,16 +27,16 @@ class CardioExpeditionTrackingPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ProviderConsumer(
-      create: (_) => trackingSettings != null
-          ? ExpeditionTrackingUtils.create(
-              trackingSettings: trackingSettings!,
-            )
-          : ExpeditionTrackingUtils.attach(cardioSessionDescription!),
-      builder: (context, trackingUtils, _) => SafeArea(
-        child: Scaffold(
-          resizeToAvoidBottomInset: false,
-          body: ProviderConsumer(
+    return Scaffold(
+      resizeToAvoidBottomInset: false,
+      body: SafeArea(
+        child: ProviderConsumer(
+          create: (_) => trackingSettings != null
+              ? ExpeditionTrackingUtils.create(
+                  trackingSettings: trackingSettings!,
+                )
+              : ExpeditionTrackingUtils.attach(cardioSessionDescription!),
+          builder: (context, trackingUtils, _) => ProviderConsumer(
             create: (_) => BoolToggle.off(),
             builder: (context, fullscreen, _) => Column(
               children: [
@@ -72,10 +72,8 @@ class CardioExpeditionTrackingPage extends StatelessWidget {
                         ),
                         Defaults.sizedBox.vertical.small,
                         _TrackingPageButtons(
-                          created: ExpeditionTrackingUtils.created,
-                          running: trackingUtils.running,
+                          running: ExpeditionTrackingUtils.running,
                           onStart: trackingUtils.start,
-                          onResume: trackingUtils.resume,
                           onStop: () => trackingUtils.stop(context),
                         ),
                       ],
@@ -92,17 +90,13 @@ class CardioExpeditionTrackingPage extends StatelessWidget {
 
 class _TrackingPageButtons extends StatelessWidget {
   const _TrackingPageButtons({
-    required this.created,
     required this.running,
     required this.onStart,
-    required this.onResume,
     required this.onStop,
   });
 
-  final bool created;
   final bool running;
   final VoidCallback onStart;
-  final VoidCallback onResume;
   final VoidCallback onStop;
 
   @override
@@ -118,54 +112,29 @@ class _TrackingPageButtons extends StatelessWidget {
               child: const Text("Stop"),
             ),
           )
-        : created
-            ? Row(
-                children: [
-                  Expanded(
-                    child: FilledButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor:
-                            Theme.of(context).colorScheme.errorContainer,
-                      ),
-                      onPressed: onResume,
-                      child: const Text("Resume"),
-                    ),
+        : Row(
+            children: [
+              Expanded(
+                child: FilledButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor:
+                        Theme.of(context).colorScheme.errorContainer,
                   ),
-                  Defaults.sizedBox.horizontal.normal,
-                  Expanded(
-                    child: FilledButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Theme.of(context).colorScheme.error,
-                      ),
-                      onPressed: onStop,
-                      child: const Text("Stop"),
-                    ),
+                  onPressed: onStart,
+                  child: const Text("Start"),
+                ),
+              ),
+              Defaults.sizedBox.horizontal.normal,
+              Expanded(
+                child: FilledButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Theme.of(context).colorScheme.error,
                   ),
-                ],
-              )
-            : Row(
-                children: [
-                  Expanded(
-                    child: FilledButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor:
-                            Theme.of(context).colorScheme.errorContainer,
-                      ),
-                      onPressed: onStart,
-                      child: const Text("Start"),
-                    ),
-                  ),
-                  Defaults.sizedBox.horizontal.normal,
-                  Expanded(
-                    child: FilledButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Theme.of(context).colorScheme.error,
-                      ),
-                      onPressed: () => Navigator.pop(context),
-                      child: const Text("Cancel"),
-                    ),
-                  ),
-                ],
-              );
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text("Cancel"),
+                ),
+              ),
+            ],
+          );
   }
 }

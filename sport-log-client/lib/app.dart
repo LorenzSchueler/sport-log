@@ -11,9 +11,10 @@ class App extends StatelessWidget {
   const App({super.key});
 
   static final navigatorKey = GlobalKey<NavigatorState>();
-  static BuildContext get globalContext =>
+  static BuildContext? get globalContextOptional =>
       navigatorKey.currentContext ??
-      InitAppWrapperState.navigatorKey.currentContext!;
+      InitAppWrapperState.navigatorKey.currentContext;
+  static BuildContext get globalContext => globalContextOptional!;
 
   @override
   Widget build(BuildContext context) {
