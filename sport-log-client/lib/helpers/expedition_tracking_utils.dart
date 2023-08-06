@@ -125,6 +125,7 @@ class ExpeditionTrackingUtils extends ChangeNotifier {
     if (!await LocationUtils.requestPermissions()) {
       return;
     }
+    await LocationUtils.enableGPS();
 
     cardioSessionDescription.cardioSession.datetime = DateTime.now();
     await _dataProvider.createSingle(cardioSessionDescription);

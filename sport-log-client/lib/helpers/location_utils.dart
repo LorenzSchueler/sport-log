@@ -50,6 +50,11 @@ class LocationUtils extends ChangeNotifier {
     return true;
   }
 
+  static Future<void> enableGPS() async {
+    await setLocationSettings(useGooglePlayServices: false);
+    await getLocation();
+  }
+
   Future<bool> startLocationStream({
     required void Function(GpsPosition) onLocationUpdate,
     required bool inBackground,
