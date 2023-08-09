@@ -17,6 +17,7 @@ import 'package:sport_log/models/cardio/cardio_session_description.dart';
 import 'package:sport_log/models/cardio/position.dart';
 import 'package:sport_log/pages/workout/cardio/cardio_value_unit_description_table.dart';
 import 'package:sport_log/pages/workout/cardio/no_track.dart';
+import 'package:sport_log/pages/workout/charts/chart_header.dart';
 import 'package:sport_log/pages/workout/charts/duration_chart.dart';
 import 'package:sport_log/pages/workout/comments_box.dart';
 import 'package:sport_log/routes.dart';
@@ -306,43 +307,34 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
                     ? Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              if (_time != null)
-                                Text(
-                                  _time!.formatHms,
-                                  style: const TextStyle(color: _timeColor),
-                                ),
-                              if (_speed != null)
-                                Text(
-                                  "${_speed?.toStringAsFixed(1)} km/h",
-                                  style: const TextStyle(color: _speedColor),
-                                ),
-                              if (_elevation != null)
-                                Text(
-                                  "$_elevation m",
-                                  style:
-                                      const TextStyle(color: _elevationColor),
-                                ),
-                              if (_heartRate != null)
-                                Text(
-                                  "$_heartRate bpm",
-                                  style:
-                                      const TextStyle(color: _heartRateColor),
-                                ),
-                              if (_cadence != null)
-                                Text(
-                                  "$_cadence rpm",
-                                  style: const TextStyle(color: _cadenceColor),
-                                ),
-                              // placeholder when no value is set
-                              if (_time == null &&
-                                  _speed == null &&
-                                  _elevation == null &&
-                                  _heartRate == null &&
-                                  _cadence == null)
-                                const Text("")
+                          ChartHeader(
+                            fields: [
+                              (
+                                _time != null ? _time!.formatHms : "Time",
+                                _timeColor
+                              ),
+                              (
+                                _speed != null
+                                    ? "${_speed?.toStringAsFixed(1)} km/h"
+                                    : "Speed",
+                                _speedColor
+                              ),
+                              (
+                                _elevation != null
+                                    ? "$_elevation m"
+                                    : "Elevation",
+                                _elevationColor
+                              ),
+                              (
+                                _heartRate != null
+                                    ? "$_heartRate bpm"
+                                    : "Heart Rate",
+                                _heartRateColor
+                              ),
+                              (
+                                _cadence != null ? "$_cadence rpm" : "Cadence",
+                                _cadenceColor
+                              ),
                             ],
                           ),
                           Expanded(

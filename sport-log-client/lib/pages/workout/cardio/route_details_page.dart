@@ -12,6 +12,7 @@ import 'package:sport_log/models/cardio/position.dart';
 import 'package:sport_log/models/cardio/route.dart';
 import 'package:sport_log/pages/workout/cardio/no_track.dart';
 import 'package:sport_log/pages/workout/cardio/route_value_unit_description_table.dart';
+import 'package:sport_log/pages/workout/charts/chart_header.dart';
 import 'package:sport_log/pages/workout/charts/distance_chart.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/app_icons.dart';
@@ -165,21 +166,18 @@ class _RouteDetailsPageState extends State<RouteDetailsPage>
               ),
               if (_route.track != null) ...[
                 const Divider(height: 0),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    if (_distance != null)
-                      Text(
-                        "${(_distance! / 1000).toStringAsFixed(3)} km",
-                        style: const TextStyle(color: _distanceColor),
-                      ),
-                    if (_elevation != null)
-                      Text(
-                        "$_elevation m",
-                        style: const TextStyle(color: _elevationColor),
-                      ),
-                    // placeholder when no value is set
-                    if (_distance == null && _elevation == null) const Text("")
+                ChartHeader(
+                  fields: [
+                    (
+                      _distance != null
+                          ? "${(_distance! / 1000).toStringAsFixed(3)} km"
+                          : "Distance",
+                      _distanceColor
+                    ),
+                    (
+                      _elevation != null ? "$_elevation m" : "Elevation",
+                      _elevationColor
+                    ),
                   ],
                 ),
                 SizedBox(
