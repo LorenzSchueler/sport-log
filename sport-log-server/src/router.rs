@@ -208,7 +208,7 @@ pub fn get_router(state: AppState) -> Router {
         .layer(
             ServiceBuilder::new()
                 .layer(trace_layer)
-                .layer(DefaultBodyLimit::max(5 * 1024 * 1024))
+                .layer(DefaultBodyLimit::max(100 * 1024 * 1024))
                 .layer(CompressionLayer::new()),
         )
         .with_state(state)
