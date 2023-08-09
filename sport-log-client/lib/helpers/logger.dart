@@ -36,7 +36,11 @@ class Logger extends l.Logger {
     String? caughtBy,
   }) {
     super.e(message, time: time, error: error, stackTrace: stackTrace);
-    GlobalErrorHandler.handleError(caughtBy ?? "Logger.e", error, stackTrace);
+    GlobalErrorHandler.handleError(
+      caughtBy ?? "Logger.e",
+      "$message: $error",
+      stackTrace,
+    );
   }
 
   /// Log error and invoke [GlobalErrorHandler.handleError]
@@ -49,7 +53,11 @@ class Logger extends l.Logger {
     String? caughtBy,
   }) {
     super.f(message, time: time, error: error, stackTrace: stackTrace);
-    GlobalErrorHandler.handleError(caughtBy ?? "Logger.f", error, stackTrace);
+    GlobalErrorHandler.handleError(
+      caughtBy ?? "Logger.f",
+      "$message: $error",
+      stackTrace,
+    );
   }
 }
 
@@ -68,7 +76,7 @@ class InitLogger extends l.Logger {
     super.e(message, time: time, error: error, stackTrace: stackTrace);
     GlobalErrorHandler.handleError(
       caughtBy ?? "InitLogger.e",
-      error,
+      "$message: $error",
       stackTrace,
     );
   }
@@ -85,7 +93,7 @@ class InitLogger extends l.Logger {
     super.f(message, time: time, error: error, stackTrace: stackTrace);
     GlobalErrorHandler.handleError(
       caughtBy ?? "InitLogger.f",
-      error,
+      "$message: $error",
       stackTrace,
     );
   }
