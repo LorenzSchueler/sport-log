@@ -134,7 +134,10 @@ class AppDatabase {
             // alter tables/ indices by creating new table and copying all data over
             await db.execute("pragma foreign_keys=off;");
             final recreateTables = <(String, TableAccessor)>[
-              (Tables.cardioSession, CardioSessionTable()), // drop index
+              (
+                Tables.cardioSession,
+                CardioSessionTable()
+              ), // drop index & drop not null on distance
               (Tables.metconSession, MetconSessionTable()), // drop index
               (Tables.strengthSession, StrengthSessionTable()), // drop index
               (Tables.route, RouteTable()), // drop not null on distance
