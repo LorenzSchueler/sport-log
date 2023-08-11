@@ -34,21 +34,22 @@ class StrengthSessionTable extends TableAccessor<StrengthSession> {
       Column.text(Columns.comments)..nullable(),
     ],
     uniqueColumns: [],
-    rawSql: Table(
-      name: Tables.eorm,
-      columns: [
-        Column.int(Columns.eormReps)
-          ..primaryKey()
-          ..checkGe(1),
-        Column.real(Columns.eormPercentage)..checkGt(0),
-      ],
-      uniqueColumns: [],
-      rawSql: [
-        "insert into ${Tables.eorm} (${Columns.eormReps}, ${Columns.eormPercentage}) values $eormValuesSql;"
-      ],
-    ).rawSql,
   );
 }
+
+final eormTable = Table(
+  name: Tables.eorm,
+  columns: [
+    Column.int(Columns.eormReps)
+      ..primaryKey()
+      ..checkGe(1),
+    Column.real(Columns.eormPercentage)..checkGt(0),
+  ],
+  uniqueColumns: [],
+  rawSql: [
+    "insert into ${Tables.eorm} (${Columns.eormReps}, ${Columns.eormPercentage}) values $eormValuesSql;"
+  ],
+);
 
 class StrengthSetTable extends TableAccessor<StrengthSet> {
   factory StrengthSetTable() => _instance;

@@ -128,6 +128,12 @@ class AppDatabase {
               await db.execute(statement);
             }
           }
+          for (final statement in eormTable.setupSql) {
+            if (Config.instance.outputDbStatement) {
+              _logger.t(statement);
+            }
+            await db.execute(statement);
+          }
         },
         onUpgrade: (db, oldVersion, newVersion) async {
           if (oldVersion < 2 && newVersion >= 2) {
