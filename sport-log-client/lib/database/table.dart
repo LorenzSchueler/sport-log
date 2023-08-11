@@ -143,21 +143,23 @@ class Table {
     required this.columns,
     required List<List<String>> uniqueColumns,
     this.rawSql = const [],
-  })  : uniqueIndices = uniqueColumns.map((c) => UniqueIndex(name, c)).toList(),
-        prefix = '${name}__';
+  }) : uniqueIndices = uniqueColumns.map((c) => UniqueIndex(name, c)).toList();
 
-  final String prefix;
+  late final String prefix = "${name}__";
   final String name;
   final List<Column> columns;
   final List<UniqueIndex> uniqueIndices;
   final List<String> rawSql;
 
-  List<String> get setupSql {
+  List<String> get setupSql =>
+      [tableSetupSql, ...uniqueIndicesSetupSql, triggerSetupSql, ...rawSql];
+
+  String get tableSetupSql {
     final primaryKey =
         columns.where((c) => c.getIsPrimaryKey()).map((c) => c.name);
     final primaryKeyStr =
         primaryKey.isEmpty ? '' : 'primary key(${primaryKey.join(', ')})';
-    final tableSetup = '''
+    return '''
     create table $name (
       ${[
       ...columns.map((c) => c.setUpSql()),
@@ -165,21 +167,29 @@ class Table {
     ].map((s) => '\t$s').join(',\n')}
     );
     ''';
-    final uniqueIndicesSetup = uniqueIndices.map((u) => u.setupSql);
-    final updateTrigger = '''
+  }
+
+  List<String> get uniqueIndicesSetupSql =>
+      uniqueIndices.map((u) => u.setupSql).toList();
+
+  String get triggerSetupSql => '''
       create trigger ${name}_update before update on $name
       begin
         update $name set sync_status = 1 where id = new.id and sync_status = 0;
       end;
       ''';
 
-    return [tableSetup, ...uniqueIndicesSetup, updateTrigger, ...rawSql];
-  }
-
   // used for select statement
   String get allColumns {
     return columns.map((c) => '$name.${c.name} AS $prefix${c.name}').join(', ');
   }
+
+  Table withName(String name) => Table(
+        name: name,
+        columns: columns,
+        uniqueColumns: uniqueIndices.map((i) => i.columns).toList(),
+        rawSql: rawSql,
+      );
 }
 
 abstract class Tables {
