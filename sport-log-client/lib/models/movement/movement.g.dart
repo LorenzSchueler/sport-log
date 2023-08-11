@@ -6,7 +6,7 @@ part of 'movement.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-Movement _$MovementFromJson(Map<String, dynamic> json) => Movement(
+Movement _$MovementFromJson(Map<String, dynamic> json) => Movement._(
       id: const IdConverter().fromJson(json['id'] as String),
       userId: const OptionalIdConverter().fromJson(json['user_id'] as String?),
       name: json['name'] as String,

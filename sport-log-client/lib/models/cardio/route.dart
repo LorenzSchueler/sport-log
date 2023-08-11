@@ -18,7 +18,6 @@ part 'route.g.dart';
 class Route extends AtomicEntity {
   Route({
     required this.id,
-    required this.userId,
     required this.name,
     required this.distance,
     required this.ascent,
@@ -30,7 +29,6 @@ class Route extends AtomicEntity {
 
   Route.defaultValue()
       : id = randomId(),
-        userId = Settings.instance.userId!,
         name = "",
         distance = 0,
         ascent = null,
@@ -42,8 +40,9 @@ class Route extends AtomicEntity {
   @override
   @IdConverter()
   Int64 id;
+  @JsonKey(includeToJson: true, name: "user_id")
   @IdConverter()
-  Int64 userId;
+  Int64 get _userId => Settings.instance.userId!;
   String name;
   int? distance;
   int? ascent;
@@ -81,7 +80,6 @@ class Route extends AtomicEntity {
   @override
   Route clone() => Route(
         id: id.clone(),
-        userId: userId.clone(),
         name: name,
         distance: distance,
         ascent: ascent,
@@ -136,7 +134,6 @@ class DbRouteSerializer extends DbSerializer<Route> {
   Route fromDbRecord(DbRecord r, {String prefix = ''}) {
     return Route(
       id: Int64(r[prefix + Columns.id]! as int),
-      userId: Int64(r[prefix + Columns.userId]! as int),
       name: r[prefix + Columns.name]! as String,
       distance: r[prefix + Columns.distance]! as int,
       ascent: r[prefix + Columns.ascent] as int?,
@@ -155,7 +152,6 @@ class DbRouteSerializer extends DbSerializer<Route> {
   DbRecord toDbRecord(Route o) {
     return {
       Columns.id: o.id.toInt(),
-      Columns.userId: o.userId.toInt(),
       Columns.name: o.name,
       Columns.distance: o.distance,
       Columns.ascent: o.ascent,

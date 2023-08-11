@@ -35,11 +35,10 @@ void testAction() {
   });
 }
 
-void testDiary(User sampleUser) {
+void testDiary() {
   group('Diary', () {
     final diary = Diary(
       id: randomId(),
-      userId: sampleUser.id,
       date: DateTime.now(),
       bodyweight: null,
       comments: "hallo",
@@ -66,11 +65,10 @@ void testDiary(User sampleUser) {
   });
 }
 
-void testStrengthSession(User sampleUser) {
+void testStrengthSession() {
   group('Strength Session', () {
     final strengthSession = StrengthSession(
       id: randomId(),
-      userId: sampleUser.id,
       datetime: DateTime.now(),
       movementId: Int64(1),
       interval: const Duration(minutes: 1),
@@ -107,11 +105,10 @@ void testStrengthSession(User sampleUser) {
   });
 }
 
-void testActionRule(User sampleUser) {
+void testActionRule() {
   group('Action Rule', () {
     final actionRule = ActionRule(
       id: randomId(),
-      userId: sampleUser.id,
       actionId: Int64(1),
       weekday: Weekday.monday,
       time: DateTime.now(),
@@ -165,9 +162,9 @@ Future<void> main() async {
     });
 
     testAction();
-    testDiary(sampleUser);
-    testStrengthSession(sampleUser);
-    testActionRule(sampleUser);
+    testDiary();
+    testStrengthSession();
+    testActionRule();
   });
 
   group("", () {

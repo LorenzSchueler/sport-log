@@ -9,7 +9,6 @@ part of 'strength_session.dart';
 StrengthSession _$StrengthSessionFromJson(Map<String, dynamic> json) =>
     StrengthSession(
       id: const IdConverter().fromJson(json['id'] as String),
-      userId: const IdConverter().fromJson(json['user_id'] as String),
       datetime: const DateTimeConverter().fromJson(json['datetime'] as String),
       movementId: const IdConverter().fromJson(json['movement_id'] as String),
       interval:
@@ -24,7 +23,7 @@ Map<String, dynamic> _$StrengthSessionToJson(StrengthSession instance) =>
       'id': const IdConverter().toJson(instance.id),
       'strength_blueprint_id':
           const OptionalIdConverter().toJson(instance.strengthBlueprintId),
-      'user_id': const IdConverter().toJson(instance.userId),
+      'user_id': const IdConverter().toJson(instance._userId),
       'datetime': const DateTimeConverter().toJson(instance.datetime),
       'movement_id': const IdConverter().toJson(instance.movementId),
       'interval': const OptionalDurationConverter().toJson(instance.interval),

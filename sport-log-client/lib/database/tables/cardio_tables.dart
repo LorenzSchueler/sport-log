@@ -24,7 +24,6 @@ class RouteTable extends TableAccessor<Route> {
       Column.int(Columns.syncStatus)
         ..withDefault('2')
         ..checkIn(<int>[0, 1, 2]),
-      Column.int(Columns.userId),
       Column.text(Columns.name)..checkLengthBetween(2, 80),
       Column.int(Columns.distance)
         ..nullable()
@@ -73,7 +72,6 @@ class CardioSessionTable extends TableAccessor<CardioSession> {
       Column.int(Columns.syncStatus)
         ..withDefault('2')
         ..checkIn(<int>[0, 1, 2]),
-      Column.int(Columns.userId),
       Column.int(Columns.movementId)
         ..references(Tables.movement, onDelete: OnAction.noAction),
       Column.int(Columns.cardioType)..checkIn(<int>[0, 1, 2]),

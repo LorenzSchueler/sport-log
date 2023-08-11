@@ -57,14 +57,6 @@ class Column {
     _check = "$name >= $value";
   }
 
-  void checkLt(num value) {
-    _check = "$name < $value";
-  }
-
-  void checkLe(num value) {
-    _check = "$name <= $value";
-  }
-
   void checkLengthGe(int value) {
     _check = "length($name) >= $value";
   }
@@ -241,6 +233,8 @@ abstract class Columns {
   static const heartRate = 'heart_rate';
   static const id = 'id';
   static const interval = 'interval';
+  static const isDefaultMetcon = 'is_default_metcon';
+  static const isDefaultMovement = 'is_default_movement';
   static const maleWeight = 'male_weight';
   static const markedPositions = 'marked_positions';
   static const maxCount = 'max_count';
@@ -269,7 +263,6 @@ abstract class Columns {
   static const time = 'time';
   static const timecap = 'timecap';
   static const track = 'track';
-  static const userId = 'user_id';
   static const username = 'username';
   static const weekday = 'weekday';
   static const weight = 'weight';

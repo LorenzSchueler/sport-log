@@ -1,4 +1,3 @@
-import 'package:fixnum/fixnum.dart';
 import 'package:result_type/result_type.dart';
 import 'package:sport_log/config.dart';
 import 'package:sport_log/database/table.dart';
@@ -132,6 +131,35 @@ class AppDatabase {
         },
         onUpgrade: (db, oldVersion, newVersion) async {
           if (oldVersion < 2 && newVersion >= 2) {
+            final optionalUserIdTables = [
+              (Tables.movement, Columns.isDefaultMovement),
+              (Tables.metcon, Columns.isDefaultMetcon),
+            ];
+            for (final (table, column) in optionalUserIdTables) {
+              await db.execute(
+                "alter table $table add column $column bool not null default 0 check($column in (0, 1));",
+              );
+              await db.execute(
+                "update table $table set $column = user_id is null;",
+              );
+            }
+            final userIdTables = [
+              Tables.actionEvent,
+              Tables.actionRule,
+              Tables.cardioSession,
+              Tables.route,
+              Tables.diary,
+              Tables.metconSession,
+              Tables.metcon,
+              Tables.movement,
+              Tables.platformCredential,
+              Tables.strengthSession,
+              Tables.wod,
+            ];
+            for (final table in userIdTables) {
+              await db.execute("alter table $table drop column user_id;");
+            }
+
             await db.execute(
               "alter table ${Tables.action} drop column create_before;",
             );
@@ -182,12 +210,6 @@ class AppDatabase {
     _database = null;
     _logger.i("database deleted");
     await open();
-  }
-
-  static Future<void> setUserId(Int64 userId) async {
-    for (final table in _tables) {
-      await table.setAllUserId(userId);
-    }
   }
 
   static List<TableAccessor> get _tables => [

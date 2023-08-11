@@ -23,11 +23,11 @@ enum MetconType {
   final String name;
 }
 
-@JsonSerializable()
+@JsonSerializable(constructor: "_")
 class Metcon extends AtomicEntity {
   Metcon({
     required this.id,
-    required this.userId,
+    required this.isDefaultMetcon,
     required this.name,
     required this.metconType,
     required this.rounds,
@@ -36,9 +36,20 @@ class Metcon extends AtomicEntity {
     required this.deleted,
   });
 
+  Metcon._({
+    required this.id,
+    required Int64? userId,
+    required this.name,
+    required this.metconType,
+    required this.rounds,
+    required this.timecap,
+    required this.description,
+    required this.deleted,
+  }) : isDefaultMetcon = userId == null;
+
   Metcon.defaultValue()
       : id = randomId(),
-        userId = Settings.instance.userId,
+        isDefaultMetcon = false,
         name = "",
         metconType = MetconType.amrap,
         rounds = null,
@@ -51,8 +62,12 @@ class Metcon extends AtomicEntity {
   @override
   @IdConverter()
   Int64 id;
+  @Deprecated("Use isDefaultMetcon instead")
+  @JsonKey(includeToJson: true)
   @OptionalIdConverter()
-  Int64? userId;
+  Int64? get userId => isDefaultMetcon ? null : Settings.instance.userId!;
+  @JsonKey(includeFromJson: false)
+  bool isDefaultMetcon;
   String name;
   MetconType metconType;
   int? rounds;
@@ -71,7 +86,7 @@ class Metcon extends AtomicEntity {
   @override
   Metcon clone() => Metcon(
         id: id.clone(),
-        userId: userId?.clone(),
+        isDefaultMetcon: isDefaultMetcon,
         name: name,
         metconType: metconType,
         rounds: rounds,
@@ -130,9 +145,7 @@ class DbMetconSerializer extends DbSerializer<Metcon> {
   Metcon fromDbRecord(DbRecord r, {String prefix = ''}) {
     return Metcon(
       id: Int64(r[prefix + Columns.id]! as int),
-      userId: r[prefix + Columns.userId] == null
-          ? null
-          : Int64(r[prefix + Columns.userId]! as int),
+      isDefaultMetcon: r[prefix + Columns.isDefaultMetcon]! as int == 1,
       name: r[prefix + Columns.name]! as String,
       metconType: MetconType.values[r[prefix + Columns.metconType]! as int],
       rounds: r[prefix + Columns.rounds] as int?,
@@ -148,7 +161,7 @@ class DbMetconSerializer extends DbSerializer<Metcon> {
   DbRecord toDbRecord(Metcon o) {
     return {
       Columns.id: o.id.toInt(),
-      Columns.userId: o.userId?.toInt(),
+      Columns.isDefaultMetcon: o.isDefaultMetcon ? 1 : 0,
       Columns.name: o.name,
       Columns.metconType: o.metconType.index,
       Columns.rounds: o.rounds,

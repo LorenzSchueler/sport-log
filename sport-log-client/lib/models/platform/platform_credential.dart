@@ -14,7 +14,6 @@ part 'platform_credential.g.dart';
 class PlatformCredential extends AtomicEntity {
   PlatformCredential({
     required this.id,
-    required this.userId,
     required this.platformId,
     required this.username,
     required this.password,
@@ -23,7 +22,6 @@ class PlatformCredential extends AtomicEntity {
 
   PlatformCredential.defaultValue(this.platformId)
       : id = randomId(),
-        userId = Settings.instance.userId!,
         username = "",
         password = "",
         deleted = false;
@@ -34,8 +32,9 @@ class PlatformCredential extends AtomicEntity {
   @override
   @IdConverter()
   Int64 id;
+  @JsonKey(includeToJson: true, name: "user_id")
   @IdConverter()
-  Int64 userId;
+  Int64 get _userId => Settings.instance.userId!;
   @IdConverter()
   Int64 platformId;
   String username;
@@ -49,7 +48,6 @@ class PlatformCredential extends AtomicEntity {
   @override
   PlatformCredential clone() => PlatformCredential(
         id: id.clone(),
-        userId: userId.clone(),
         platformId: platformId.clone(),
         username: username,
         password: password,
@@ -83,7 +81,6 @@ class DbPlatformCredentialSerializer extends DbSerializer<PlatformCredential> {
   PlatformCredential fromDbRecord(DbRecord r, {String prefix = ''}) {
     return PlatformCredential(
       id: Int64(r[prefix + Columns.id]! as int),
-      userId: Int64(r[prefix + Columns.userId]! as int),
       platformId: Int64(r[prefix + Columns.platformId]! as int),
       username: r[prefix + Columns.username]! as String,
       password: r[prefix + Columns.password]! as String,
@@ -95,7 +92,6 @@ class DbPlatformCredentialSerializer extends DbSerializer<PlatformCredential> {
   DbRecord toDbRecord(PlatformCredential o) {
     return {
       Columns.id: o.id.toInt(),
-      Columns.userId: o.userId.toInt(),
       Columns.platformId: o.platformId.toInt(),
       Columns.username: o.username,
       Columns.password: o.password,

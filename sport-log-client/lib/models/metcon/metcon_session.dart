@@ -15,7 +15,6 @@ part 'metcon_session.g.dart';
 class MetconSession extends AtomicEntity {
   MetconSession({
     required this.id,
-    required this.userId,
     required this.metconId,
     required this.datetime,
     required this.time,
@@ -41,7 +40,6 @@ class MetconSession extends AtomicEntity {
     }
     return MetconSession(
       id: randomId(),
-      userId: Settings.instance.userId!,
       metconId: metcon.id,
       datetime: DateTime.now(),
       time: time,
@@ -59,8 +57,9 @@ class MetconSession extends AtomicEntity {
   @override
   @IdConverter()
   Int64 id;
+  @JsonKey(includeToJson: true, name: "user_id")
   @IdConverter()
-  Int64 userId;
+  Int64 get _userId => Settings.instance.userId!;
   @IdConverter()
   Int64 metconId;
   @DateTimeConverter()
@@ -80,7 +79,6 @@ class MetconSession extends AtomicEntity {
   @override
   MetconSession clone() => MetconSession(
         id: id.clone(),
-        userId: userId.clone(),
         metconId: metconId.clone(),
         datetime: datetime.clone(),
         time: time?.clone(),
@@ -124,7 +122,6 @@ class DbMetconSessionSerializer extends DbSerializer<MetconSession> {
   MetconSession fromDbRecord(DbRecord r, {String prefix = ''}) {
     return MetconSession(
       id: Int64(r[prefix + Columns.id]! as int),
-      userId: Int64(r[prefix + Columns.userId]! as int),
       metconId: Int64(r[prefix + Columns.metconId]! as int),
       datetime: DateTime.parse(r[prefix + Columns.datetime]! as String),
       time: r[prefix + Columns.time] == null
@@ -142,7 +139,6 @@ class DbMetconSessionSerializer extends DbSerializer<MetconSession> {
   DbRecord toDbRecord(MetconSession o) {
     return {
       Columns.id: o.id.toInt(),
-      Columns.userId: o.userId.toInt(),
       Columns.metconId: o.metconId.toInt(),
       Columns.datetime: o.datetime.toString(),
       Columns.time: o.time?.inMilliseconds,

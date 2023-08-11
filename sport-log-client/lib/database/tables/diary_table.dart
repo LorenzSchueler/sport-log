@@ -21,7 +21,6 @@ class DiaryTable extends TableAccessor<Diary> {
       Column.int(Columns.syncStatus)
         ..withDefault('2')
         ..checkIn(<int>[0, 1, 2]),
-      Column.int(Columns.userId),
       Column.text(Columns.date),
       Column.real(Columns.bodyweight)
         ..nullable()

@@ -65,7 +65,7 @@ class _MetconEditPageState extends State<MetconEditPage> {
       return;
     }
     if (!widget.isNew) {
-      assert(_metconDescription.metcon.userId != null);
+      assert(!_metconDescription.metcon.isDefaultMetcon);
       assert(!_metconDescription.hasReference);
       final result = await _dataProvider.deleteSingle(_metconDescription);
       if (mounted) {
@@ -100,7 +100,7 @@ class _MetconEditPageState extends State<MetconEditPage> {
           title: Text("${widget.isNew ? 'Create' : 'Edit'} Metcon"),
           actions: [
             if (!_metconDescription.hasReference &&
-                _metconDescription.metcon.userId != null)
+                !_metconDescription.metcon.isDefaultMetcon)
               IconButton(
                 onPressed: _deleteMetcon,
                 icon: const Icon(AppIcons.delete),

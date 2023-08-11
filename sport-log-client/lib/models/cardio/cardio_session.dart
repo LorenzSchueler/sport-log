@@ -34,7 +34,6 @@ enum CardioType {
 class CardioSession extends AtomicEntity {
   CardioSession({
     required this.id,
-    required this.userId,
     required this.movementId,
     required this.cardioType,
     required this.datetime,
@@ -55,7 +54,6 @@ class CardioSession extends AtomicEntity {
 
   CardioSession.defaultValue(this.movementId)
       : id = randomId(),
-        userId = Settings.instance.userId!,
         cardioType = CardioType.training,
         datetime = DateTime.now(),
         deleted = false;
@@ -68,8 +66,9 @@ class CardioSession extends AtomicEntity {
   Int64 id;
   @OptionalIdConverter()
   Int64? cardioBlueprintId;
+  @JsonKey(includeToJson: true, name: "user_id")
   @IdConverter()
-  Int64 userId;
+  Int64 get _userId => Settings.instance.userId!;
   @IdConverter()
   Int64 movementId;
   CardioType cardioType;
@@ -277,7 +276,6 @@ class CardioSession extends AtomicEntity {
   @override
   CardioSession clone() => CardioSession(
         id: id.clone(),
-        userId: userId.clone(),
         movementId: movementId.clone(),
         cardioType: cardioType,
         datetime: datetime.clone(),
@@ -412,7 +410,6 @@ class DbCardioSessionSerializer extends DbSerializer<CardioSession> {
   CardioSession fromDbRecord(DbRecord r, {String prefix = ''}) {
     return CardioSession(
       id: Int64(r[prefix + Columns.id]! as int),
-      userId: Int64(r[prefix + Columns.userId]! as int),
       movementId: Int64(r[prefix + Columns.movementId]! as int),
       cardioType: CardioType.values[r[prefix + Columns.cardioType]! as int],
       datetime: DateTime.parse(r[prefix + Columns.datetime]! as String),
@@ -446,7 +443,6 @@ class DbCardioSessionSerializer extends DbSerializer<CardioSession> {
   DbRecord toDbRecord(CardioSession o) {
     return {
       Columns.id: o.id.toInt(),
-      Columns.userId: o.userId.toInt(),
       Columns.movementId: o.movementId.toInt(),
       Columns.cardioType: o.cardioType.index,
       Columns.datetime: o.datetime.toString(),

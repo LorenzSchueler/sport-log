@@ -21,7 +21,6 @@ class WodTable extends TableAccessor<Wod> {
       Column.int(Columns.syncStatus)
         ..withDefault('2')
         ..checkIn(<int>[0, 1, 2]),
-      Column.int(Columns.userId),
       Column.text(Columns.date),
       Column.text(Columns.description)..nullable()
     ],

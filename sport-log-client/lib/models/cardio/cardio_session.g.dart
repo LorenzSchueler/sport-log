@@ -9,7 +9,6 @@ part of 'cardio_session.dart';
 CardioSession _$CardioSessionFromJson(Map<String, dynamic> json) =>
     CardioSession(
       id: const IdConverter().fromJson(json['id'] as String),
-      userId: const IdConverter().fromJson(json['user_id'] as String),
       movementId: const IdConverter().fromJson(json['movement_id'] as String),
       cardioType: $enumDecode(_$CardioTypeEnumMap, json['cardio_type']),
       datetime: const DateTimeConverter().fromJson(json['datetime'] as String),
@@ -39,7 +38,7 @@ Map<String, dynamic> _$CardioSessionToJson(CardioSession instance) =>
       'id': const IdConverter().toJson(instance.id),
       'cardio_blueprint_id':
           const OptionalIdConverter().toJson(instance.cardioBlueprintId),
-      'user_id': const IdConverter().toJson(instance.userId),
+      'user_id': const IdConverter().toJson(instance._userId),
       'movement_id': const IdConverter().toJson(instance.movementId),
       'cardio_type': _$CardioTypeEnumMap[instance.cardioType]!,
       'datetime': const DateTimeConverter().toJson(instance.datetime),

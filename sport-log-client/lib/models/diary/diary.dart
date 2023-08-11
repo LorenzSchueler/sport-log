@@ -14,7 +14,6 @@ part 'diary.g.dart';
 class Diary extends AtomicEntity {
   Diary({
     required this.id,
-    required this.userId,
     required this.date,
     required this.bodyweight,
     required this.comments,
@@ -23,7 +22,6 @@ class Diary extends AtomicEntity {
 
   Diary.defaultValue()
       : id = randomId(),
-        userId = Settings.instance.userId!,
         date = DateTime.now(),
         bodyweight = null,
         comments = null,
@@ -34,8 +32,9 @@ class Diary extends AtomicEntity {
   @override
   @IdConverter()
   Int64 id;
+  @JsonKey(includeToJson: true, name: "user_id")
   @IdConverter()
-  Int64 userId;
+  Int64 get _userId => Settings.instance.userId!;
   @DateConverter()
   DateTime date;
   double? bodyweight;
@@ -49,7 +48,6 @@ class Diary extends AtomicEntity {
   @override
   Diary clone() => Diary(
         id: id.clone(),
-        userId: userId.clone(),
         date: date.clone(),
         bodyweight: bodyweight,
         comments: comments,
@@ -104,7 +102,6 @@ class DbDiarySerializer extends DbSerializer<Diary> {
   Diary fromDbRecord(DbRecord r, {String prefix = ''}) {
     return Diary(
       id: Int64(r[prefix + Columns.id]! as int),
-      userId: Int64(r[prefix + Columns.userId]! as int),
       date: const DateConverter().fromJson(r[prefix + Columns.date]! as String),
       bodyweight: r[prefix + Columns.bodyweight] as double?,
       comments: r[prefix + Columns.comments] as String?,
@@ -116,7 +113,6 @@ class DbDiarySerializer extends DbSerializer<Diary> {
   DbRecord toDbRecord(Diary o) {
     return {
       Columns.id: o.id.toInt(),
-      Columns.userId: o.userId.toInt(),
       Columns.date: const DateConverter().toJson(o.date),
       Columns.bodyweight: o.bodyweight,
       Columns.comments: o.comments,

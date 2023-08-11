@@ -23,7 +23,7 @@ class MetconTable extends TableAccessor<Metcon> {
       Column.int(Columns.syncStatus)
         ..withDefault('2')
         ..checkIn(<int>[0, 1, 2]),
-      Column.int(Columns.userId)..nullable(),
+      Column.bool(Columns.isDefaultMetcon),
       Column.text(Columns.name)..checkLengthBetween(2, 80),
       Column.int(Columns.metconType)..checkBetween(0, 2),
       Column.int(Columns.rounds)
@@ -132,7 +132,6 @@ class MetconSessionTable extends TableAccessor<MetconSession> {
       Column.int(Columns.syncStatus)
         ..withDefault('2')
         ..checkIn(<int>[0, 1, 2]),
-      Column.int(Columns.userId),
       Column.int(Columns.metconId)
         ..references(Tables.metcon, onDelete: OnAction.noAction),
       Column.text(Columns.datetime),

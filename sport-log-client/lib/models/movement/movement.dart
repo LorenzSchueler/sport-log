@@ -25,11 +25,11 @@ enum MovementDimension {
   final String name;
 }
 
-@JsonSerializable()
+@JsonSerializable(constructor: "_")
 class Movement extends AtomicEntity {
   Movement({
     required this.id,
-    required this.userId,
+    required this.isDefaultMovement,
     required this.name,
     required this.description,
     required this.cardio,
@@ -37,12 +37,22 @@ class Movement extends AtomicEntity {
     required this.dimension,
   });
 
+  Movement._({
+    required this.id,
+    required Int64? userId,
+    required this.name,
+    required this.description,
+    required this.cardio,
+    required this.deleted,
+    required this.dimension,
+  }) : isDefaultMovement = userId == null;
+
   factory Movement.fromJson(Map<String, dynamic> json) =>
       _$MovementFromJson(json);
 
   Movement.defaultValue()
       : id = randomId(),
-        userId = Settings.instance.userId,
+        isDefaultMovement = false,
         name = '',
         description = null,
         cardio = true,
@@ -52,8 +62,12 @@ class Movement extends AtomicEntity {
   @override
   @IdConverter()
   Int64 id;
+  @Deprecated("Use isDefaultMovement instead")
+  @JsonKey(includeToJson: true)
   @OptionalIdConverter()
-  Int64? userId;
+  Int64? get userId => isDefaultMovement ? null : Settings.instance.userId!;
+  @JsonKey(includeFromJson: false)
+  bool isDefaultMovement;
   String name;
   String? description;
   bool cardio;
@@ -73,7 +87,7 @@ class Movement extends AtomicEntity {
   @override
   Movement clone() => Movement(
         id: id.clone(),
-        userId: userId?.clone(),
+        isDefaultMovement: isDefaultMovement,
         name: name,
         description: description,
         cardio: cardio,
@@ -110,7 +124,7 @@ class Movement extends AtomicEntity {
   bool operator ==(Object other) =>
       other is Movement &&
       other.id == id &&
-      other.userId == userId &&
+      other.isDefaultMovement == isDefaultMovement &&
       other.name == name &&
       other.description == description &&
       other.cardio == cardio &&
@@ -118,8 +132,15 @@ class Movement extends AtomicEntity {
       other.dimension == dimension;
 
   @override
-  int get hashCode =>
-      Object.hash(id, userId, name, description, cardio, deleted, dimension);
+  int get hashCode => Object.hash(
+        id,
+        isDefaultMovement,
+        name,
+        description,
+        cardio,
+        deleted,
+        dimension,
+      );
 }
 
 class DbMovementSerializer extends DbSerializer<Movement> {
@@ -127,9 +148,7 @@ class DbMovementSerializer extends DbSerializer<Movement> {
   Movement fromDbRecord(DbRecord r, {String prefix = ''}) {
     return Movement(
       id: Int64(r[prefix + Columns.id]! as int),
-      userId: r[prefix + Columns.userId] == null
-          ? null
-          : Int64(r[prefix + Columns.userId]! as int),
+      isDefaultMovement: r[prefix + Columns.isDefaultMovement]! as int == 1,
       name: r[prefix + Columns.name]! as String,
       description: r[prefix + Columns.description] as String?,
       cardio: r[prefix + Columns.cardio]! as int == 1,
@@ -143,7 +162,7 @@ class DbMovementSerializer extends DbSerializer<Movement> {
   DbRecord toDbRecord(Movement o) {
     return {
       Columns.id: o.id.toInt(),
-      Columns.userId: o.userId?.toInt(),
+      Columns.isDefaultMovement: o.isDefaultMovement ? 1 : 0,
       Columns.name: o.name,
       Columns.description: o.description,
       Columns.cardio: o.cardio ? 1 : 0,

@@ -67,7 +67,6 @@ class ActionEventTable extends TableAccessor<ActionEvent> {
       Column.int(Columns.syncStatus)
         ..withDefault('2')
         ..checkIn(<int>[0, 1, 2]),
-      Column.int(Columns.userId),
       Column.int(Columns.actionId)
         ..references(Tables.action, onDelete: OnAction.cascade),
       Column.text(Columns.datetime),
@@ -117,7 +116,6 @@ class ActionRuleTable extends TableAccessor<ActionRule> {
       Column.int(Columns.syncStatus)
         ..withDefault('2')
         ..checkIn(<int>[0, 1, 2]),
-      Column.int(Columns.userId),
       Column.int(Columns.actionId)
         ..references(Tables.action, onDelete: OnAction.cascade),
       Column.int(Columns.weekday)..checkBetween(0, 6),

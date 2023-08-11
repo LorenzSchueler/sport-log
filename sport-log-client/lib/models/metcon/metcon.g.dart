@@ -6,7 +6,7 @@ part of 'metcon.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-Metcon _$MetconFromJson(Map<String, dynamic> json) => Metcon(
+Metcon _$MetconFromJson(Map<String, dynamic> json) => Metcon._(
       id: const IdConverter().fromJson(json['id'] as String),
       userId: const OptionalIdConverter().fromJson(json['user_id'] as String?),
       name: json['name'] as String,

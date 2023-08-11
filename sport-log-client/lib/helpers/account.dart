@@ -61,10 +61,7 @@ abstract final class Account {
       await Settings.instance.setSyncEnabled(true);
       await Settings.instance.setDefaultSyncInterval();
 
-      // set userId of all data in db to id of new user
-      // because the id is not changed, registering in as a different user on the same server will fail
-      await AppDatabase.setUserId(user.id);
-
+      // because the id of entities is not changed, registering as a different user on the same server will fail unless the old user is deleted first
       await Sync.instance.startSync();
 
       return Success(null);
@@ -98,10 +95,7 @@ abstract final class Account {
       await Settings.instance.setSyncEnabled(true);
       await Settings.instance.setDefaultSyncInterval();
 
-      // set userId of all data in db to id of logged in user
-      // because the id is not changed, logging in as a different user on the same server will fail
-      await AppDatabase.setUserId(user.id);
-
+      // because the id of entities is not changed, logging in as a different user on the same server will fail unless the old user is deleted first
       await Sync.instance.startSync();
 
       return Success(user);
@@ -254,6 +248,6 @@ abstract final class Account {
     await Sync.instance.startSync();
     return Success(null);
 
-    // result: on state change
+    // result: no state change
   }
 }

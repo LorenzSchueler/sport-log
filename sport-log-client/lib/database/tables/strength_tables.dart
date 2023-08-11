@@ -25,7 +25,6 @@ class StrengthSessionTable extends TableAccessor<StrengthSession> {
       Column.int(Columns.syncStatus)
         ..withDefault('2')
         ..checkIn(<int>[0, 1, 2]),
-      Column.int(Columns.userId),
       Column.text(Columns.datetime),
       Column.int(Columns.movementId)
         ..references(Tables.movement, onDelete: OnAction.cascade),
@@ -35,17 +34,19 @@ class StrengthSessionTable extends TableAccessor<StrengthSession> {
       Column.text(Columns.comments)..nullable(),
     ],
     uniqueColumns: [],
-    rawSql: [
-      '''
-        create table ${Tables.eorm} (
-          ${Columns.eormReps} integer primary key check (${Columns.eormReps} >= 1),
-          ${Columns.eormPercentage} real not null check (${Columns.eormPercentage} > 0)
-        );
-        ''',
-      '''
-        insert into ${Tables.eorm} (${Columns.eormReps}, ${Columns.eormPercentage}) values $eormValuesSql;
-        ''',
-    ],
+    rawSql: Table(
+      name: Tables.eorm,
+      columns: [
+        Column.int(Columns.eormReps)
+          ..primaryKey()
+          ..checkGe(1),
+        Column.real(Columns.eormPercentage)..checkGt(0),
+      ],
+      uniqueColumns: [],
+      rawSql: [
+        "insert into ${Tables.eorm} (${Columns.eormReps}, ${Columns.eormPercentage}) values $eormValuesSql;"
+      ],
+    ).rawSql,
   );
 }
 

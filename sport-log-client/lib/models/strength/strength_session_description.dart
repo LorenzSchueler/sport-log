@@ -9,7 +9,6 @@ import 'package:sport_log/models/movement/all.dart';
 import 'package:sport_log/models/strength/strength_session.dart';
 import 'package:sport_log/models/strength/strength_session_stats.dart';
 import 'package:sport_log/models/strength/strength_set.dart';
-import 'package:sport_log/settings.dart';
 
 part 'strength_session_description.g.dart';
 
@@ -40,7 +39,6 @@ class StrengthSessionDescription extends CompoundEntity {
           : StrengthSessionDescription(
               session: StrengthSession(
                 id: randomId(),
-                userId: Settings.instance.userId!,
                 datetime: DateTime.now(),
                 movementId: Movement.defaultMovement!.id,
                 interval: null,

@@ -15,7 +15,6 @@ part 'action_rule.g.dart';
 class ActionRule extends AtomicEntity {
   ActionRule({
     required this.id,
-    required this.userId,
     required this.actionId,
     required this.weekday,
     required this.time,
@@ -26,7 +25,6 @@ class ActionRule extends AtomicEntity {
 
   ActionRule.defaultValue(this.actionId)
       : id = randomId(),
-        userId = Settings.instance.userId!,
         weekday = Weekday.monday,
         time = DateTime.now(),
         arguments = null,
@@ -39,8 +37,9 @@ class ActionRule extends AtomicEntity {
   @override
   @IdConverter()
   Int64 id;
+  @JsonKey(includeToJson: true, name: "user_id")
   @IdConverter()
-  Int64 userId;
+  Int64 get _userId => Settings.instance.userId!;
   @IdConverter()
   Int64 actionId;
   Weekday weekday;
@@ -57,7 +56,6 @@ class ActionRule extends AtomicEntity {
   @override
   ActionRule clone() => ActionRule(
         id: id.clone(),
-        userId: userId.clone(),
         actionId: actionId.clone(),
         weekday: weekday,
         time: time.clone(),
@@ -93,7 +91,6 @@ class DbActionRuleSerializer extends DbSerializer<ActionRule> {
   ActionRule fromDbRecord(DbRecord r, {String prefix = ''}) {
     return ActionRule(
       id: Int64(r[prefix + Columns.id]! as int),
-      userId: Int64(r[prefix + Columns.userId]! as int),
       actionId: Int64(r[prefix + Columns.actionId]! as int),
       weekday: Weekday.values[r[prefix + Columns.weekday]! as int],
       time: DateTime.parse(r[prefix + Columns.time]! as String),
@@ -107,7 +104,6 @@ class DbActionRuleSerializer extends DbSerializer<ActionRule> {
   DbRecord toDbRecord(ActionRule o) {
     return {
       Columns.id: o.id.toInt(),
-      Columns.userId: o.userId.toInt(),
       Columns.actionId: o.actionId.toInt(),
       Columns.weekday: o.weekday.index,
       Columns.time: o.time.toString(),

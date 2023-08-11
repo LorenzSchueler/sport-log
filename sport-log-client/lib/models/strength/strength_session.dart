@@ -6,6 +6,7 @@ import 'package:sport_log/helpers/serialization/json_serialization.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/models/clone_extensions.dart';
 import 'package:sport_log/models/entity_interfaces.dart';
+import 'package:sport_log/settings.dart';
 
 part 'strength_session.g.dart';
 
@@ -13,7 +14,6 @@ part 'strength_session.g.dart';
 class StrengthSession extends AtomicEntity {
   StrengthSession({
     required this.id,
-    required this.userId,
     required this.datetime,
     required this.movementId,
     required this.interval,
@@ -29,8 +29,9 @@ class StrengthSession extends AtomicEntity {
   Int64 id;
   @OptionalIdConverter()
   Int64? strengthBlueprintId;
+  @JsonKey(includeToJson: true, name: "user_id")
   @IdConverter()
-  Int64 userId;
+  Int64 get _userId => Settings.instance.userId!;
   @DateTimeConverter()
   DateTime datetime;
   @IdConverter()
@@ -81,7 +82,6 @@ class StrengthSession extends AtomicEntity {
   @override
   StrengthSession clone() => StrengthSession(
         id: id.clone(),
-        userId: userId.clone(),
         datetime: datetime.clone(),
         movementId: movementId.clone(),
         interval: interval?.clone(),
@@ -95,7 +95,6 @@ class DbStrengthSessionSerializer extends DbSerializer<StrengthSession> {
   StrengthSession fromDbRecord(DbRecord r, {String prefix = ''}) {
     return StrengthSession(
       id: Int64(r[prefix + Columns.id]! as int),
-      userId: Int64(r[prefix + Columns.userId]! as int),
       datetime: DateTime.parse(r[prefix + Columns.datetime]! as String),
       movementId: Int64(r[prefix + Columns.movementId]! as int),
       interval: r[prefix + Columns.interval] == null
@@ -110,7 +109,6 @@ class DbStrengthSessionSerializer extends DbSerializer<StrengthSession> {
   DbRecord toDbRecord(StrengthSession o) {
     return {
       Columns.id: o.id.toInt(),
-      Columns.userId: o.userId.toInt(),
       Columns.datetime: o.datetime.toString(),
       Columns.movementId: o.movementId.toInt(),
       Columns.interval: o.interval?.inMilliseconds,

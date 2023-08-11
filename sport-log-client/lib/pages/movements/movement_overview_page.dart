@@ -91,7 +91,7 @@ class MovementCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () async {
-        if (movementDescription.movement.userId != null) {
+        if (!movementDescription.movement.isDefaultMovement) {
           if (movementDescription.hasReference) {
             final approved = await showApproveDialog(
               context: context,

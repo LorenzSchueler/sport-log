@@ -22,7 +22,7 @@ class MovementTable extends TableAccessor<Movement> {
       Column.int(Columns.syncStatus)
         ..withDefault('2')
         ..checkIn(<int>[0, 1, 2]),
-      Column.int(Columns.userId)..nullable(),
+      Column.bool(Columns.isDefaultMovement),
       Column.text(Columns.name)..checkLengthBetween(2, 80),
       Column.text(Columns.description)..nullable(),
       Column.bool(Columns.cardio),
@@ -43,16 +43,6 @@ class MovementTable extends TableAccessor<Movement> {
         notDeleted,
         TableAccessor.cardioOnlyOfTable(cardioOnly),
         TableAccessor.distanceOnlyOfTable(distanceOnly),
-        '''
-        (${Columns.userId} IS NOT NULL OR NOT EXISTS (
-          SELECT * FROM $tableName m2
-          WHERE ${TableAccessor.combineFilter([
-              "$tableName.${Columns.id} <> m2.${Columns.id}",
-              "$tableName.${Columns.name} = m2.${Columns.name}",
-              "$tableName.${Columns.dimension} = m2.${Columns.dimension}",
-              "m2.${Columns.userId} IS NOT NULL",
-            ])}
-        ))''',
       ]),
       orderBy: orderByName,
     );
@@ -86,19 +76,7 @@ class MovementDescriptionTable {
           )
         ) AS $hasReference
       FROM ${Tables.movement}
-      WHERE ${TableAccessor.combineFilter([
-            TableAccessor.notDeletedOfTable(Tables.movement),
-            """
-            (${Columns.userId} IS NOT NULL OR NOT EXISTS (
-              SELECT * FROM ${Tables.movement} m2
-              WHERE ${TableAccessor.combineFilter([
-                  "${Tables.movement}.${Columns.id} <> m2.${Columns.id}",
-                  "${Tables.movement}.${Columns.name} = m2.${Columns.name}",
-                  "${Tables.movement}.${Columns.dimension} = m2.${Columns.dimension}",
-                  "m2.${Columns.userId} IS NOT NULL",
-                ])}
-            ))"""
-          ])}
+      WHERE ${TableAccessor.notDeletedOfTable(Tables.movement)}
       ORDER BY ${TableAccessor.orderByNameOfTable(Tables.movement)}
       ''',
     );
@@ -140,16 +118,6 @@ class MovementDescriptionTable {
             TableAccessor.notDeletedOfTable(Tables.movement),
             TableAccessor.cardioOnlyOfTable(cardioOnly),
             TableAccessor.distanceOnlyOfTable(distanceOnly),
-            """
-            (${Columns.userId} IS NOT NULL OR NOT EXISTS (
-            SELECT * FROM ${Tables.movement} m2
-            WHERE ${TableAccessor.combineFilter([
-                  "${Tables.movement}.${Columns.id} <> m2.${Columns.id}",
-                  "${Tables.movement}.${Columns.name} = m2.${Columns.name}",
-                  "${Tables.movement}.${Columns.dimension} = m2.${Columns.dimension}",
-                  "m2.${Columns.userId} IS NOT NULL",
-                ])}
-            ))"""
           ])}
       ORDER BY ${TableAccessor.orderByNameOfTable(Tables.movement)}
       ''',

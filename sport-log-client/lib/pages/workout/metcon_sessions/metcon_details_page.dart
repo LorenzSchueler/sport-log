@@ -29,7 +29,7 @@ class _MetconDetailsPageState extends State<MetconDetailsPage> {
     if (!delete) {
       return;
     }
-    assert(_metconDescription.metcon.userId != null);
+    assert(!_metconDescription.metcon.isDefaultMetcon);
     assert(!_metconDescription.hasReference);
     final result = await _dataProvider.deleteSingle(_metconDescription);
     if (mounted) {
@@ -76,12 +76,12 @@ class _MetconDetailsPageState extends State<MetconDetailsPage> {
             icon: const Icon(AppIcons.add),
           ),
           if (!_metconDescription.hasReference &&
-              _metconDescription.metcon.userId != null)
+              !_metconDescription.metcon.isDefaultMetcon)
             IconButton(
               onPressed: _deleteMetcon,
               icon: const Icon(AppIcons.delete),
             ),
-          if (_metconDescription.metcon.userId != null)
+          if (!_metconDescription.metcon.isDefaultMetcon)
             IconButton(
               onPressed: _pushEditPage,
               icon: const Icon(AppIcons.edit),

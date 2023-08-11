@@ -68,7 +68,7 @@ class _MovementEditPageState extends State<MovementEditPage> {
       return;
     }
     if (!widget.isNew) {
-      assert(_movementDescription.movement.userId != null);
+      assert(!_movementDescription.movement.isDefaultMovement);
       assert(!_movementDescription.hasReference);
       final result =
           await _dataProvider.deleteSingle(_movementDescription.movement);

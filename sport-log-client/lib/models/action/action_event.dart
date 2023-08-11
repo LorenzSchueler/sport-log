@@ -14,7 +14,6 @@ part 'action_event.g.dart';
 class ActionEvent extends AtomicEntity {
   ActionEvent({
     required this.id,
-    required this.userId,
     required this.actionId,
     required this.datetime,
     required this.arguments,
@@ -24,7 +23,6 @@ class ActionEvent extends AtomicEntity {
 
   ActionEvent.defaultValue(this.actionId)
       : id = randomId(),
-        userId = Settings.instance.userId!,
         datetime = DateTime.now(),
         arguments = null,
         enabled = true,
@@ -36,8 +34,9 @@ class ActionEvent extends AtomicEntity {
   @override
   @IdConverter()
   Int64 id;
+  @JsonKey(includeToJson: true, name: "user_id")
   @IdConverter()
-  Int64 userId;
+  Int64 get _userId => Settings.instance.userId!;
   @IdConverter()
   Int64 actionId;
   @DateTimeConverter()
@@ -53,7 +52,6 @@ class ActionEvent extends AtomicEntity {
   @override
   ActionEvent clone() => ActionEvent(
         id: id.clone(),
-        userId: userId.clone(),
         actionId: actionId.clone(),
         datetime: datetime.clone(),
         arguments: arguments,
@@ -88,7 +86,6 @@ class DbActionEventSerializer extends DbSerializer<ActionEvent> {
   ActionEvent fromDbRecord(DbRecord r, {String prefix = ''}) {
     return ActionEvent(
       id: Int64(r[prefix + Columns.id]! as int),
-      userId: Int64(r[prefix + Columns.userId]! as int),
       actionId: Int64(r[prefix + Columns.actionId]! as int),
       datetime: DateTime.parse(r[prefix + Columns.datetime]! as String),
       arguments: r[prefix + Columns.arguments] as String?,
@@ -101,7 +98,6 @@ class DbActionEventSerializer extends DbSerializer<ActionEvent> {
   DbRecord toDbRecord(ActionEvent o) {
     return {
       Columns.id: o.id.toInt(),
-      Columns.userId: o.userId.toInt(),
       Columns.actionId: o.actionId.toInt(),
       Columns.datetime: o.datetime.toString(),
       Columns.arguments: o.arguments,

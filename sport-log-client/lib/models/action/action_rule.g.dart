@@ -8,7 +8,6 @@ part of 'action_rule.dart';
 
 ActionRule _$ActionRuleFromJson(Map<String, dynamic> json) => ActionRule(
       id: const IdConverter().fromJson(json['id'] as String),
-      userId: const IdConverter().fromJson(json['user_id'] as String),
       actionId: const IdConverter().fromJson(json['action_id'] as String),
       weekday: $enumDecode(_$WeekdayEnumMap, json['weekday']),
       time: const DateTimeConverter().fromJson(json['time'] as String),
@@ -20,7 +19,7 @@ ActionRule _$ActionRuleFromJson(Map<String, dynamic> json) => ActionRule(
 Map<String, dynamic> _$ActionRuleToJson(ActionRule instance) =>
     <String, dynamic>{
       'id': const IdConverter().toJson(instance.id),
-      'user_id': const IdConverter().toJson(instance.userId),
+      'user_id': const IdConverter().toJson(instance._userId),
       'action_id': const IdConverter().toJson(instance.actionId),
       'weekday': _$WeekdayEnumMap[instance.weekday]!,
       'time': const DateTimeConverter().toJson(instance.time),

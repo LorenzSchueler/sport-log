@@ -302,16 +302,6 @@ abstract class TableAccessor<T extends AtomicEntity> {
     );
   }
 
-  Future<void> setAllUserId(Int64 userId) async {
-    if (table.columns.map((column) => column.name).contains(Columns.userId)) {
-      _logger.d("updating userId for all rows in table: $tableName");
-      await database.update(tableName, {
-        Columns.userId: userId.toInt(),
-        Columns.syncStatus: SyncStatus.updated.index
-      });
-    }
-  }
-
   Future<DbResult> upsertMultiple(
     List<T> objects, {
     required bool synchronized,
