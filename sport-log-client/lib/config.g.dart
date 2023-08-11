@@ -15,8 +15,8 @@ Config _$ConfigFromJson(Map<String, dynamic> json) {
     accessToken: json['access_token'] as String,
     serverAddress: json['server_address'] as String? ?? '',
     deleteDatabase: json['delete_database'] as bool? ?? false,
-    minLogLevel: $enumDecodeNullable(_$LevelEnumMap, json['min_log_level']) ??
-        Level.nothing,
+    minLogLevel:
+        $enumDecodeNullable(_$LevelEnumMap, json['min_log_level']) ?? Level.off,
     outputRequestJson: json['output_request_json'] as bool? ?? false,
     outputRequestHeaders: json['output_request_headers'] as bool? ?? false,
     outputResponseJson: json['output_response_json'] as bool? ?? false,
@@ -38,11 +38,15 @@ Map<String, dynamic> _$ConfigToJson(Config instance) => <String, dynamic>{
     };
 
 const _$LevelEnumMap = {
+  Level.all: 'all',
   Level.verbose: 'verbose',
+  Level.trace: 'trace',
   Level.debug: 'debug',
   Level.info: 'info',
   Level.warning: 'warning',
   Level.error: 'error',
   Level.wtf: 'wtf',
+  Level.fatal: 'fatal',
   Level.nothing: 'nothing',
+  Level.off: 'off',
 };
