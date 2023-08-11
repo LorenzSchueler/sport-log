@@ -87,10 +87,6 @@ create table metcon_session (
     deleted boolean not null default false
 );
 
-create unique index metcon_session__user_id__metcon_id__datetime__key
-    on metcon_session (user_id, metcon_id, datetime)     
-    where deleted = false;
-
 create index metcon_session__user_id__last_change__idx
     on metcon_session (user_id, last_change)     
     where deleted = false;

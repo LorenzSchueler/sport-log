@@ -148,9 +148,7 @@ class MetconSessionTable extends TableAccessor<MetconSession> {
       Column.bool(Columns.rx)..checkIn(<int>[0, 1]),
       Column.text(Columns.comments)..nullable()
     ],
-    uniqueColumns: [
-      [Columns.metconId, Columns.datetime]
-    ],
+    uniqueColumns: [],
   );
 
   Future<bool> existsByMetcon(Metcon metcon) async {

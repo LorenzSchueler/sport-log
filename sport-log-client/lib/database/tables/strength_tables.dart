@@ -34,9 +34,7 @@ class StrengthSessionTable extends TableAccessor<StrengthSession> {
         ..checkGt(0),
       Column.text(Columns.comments)..nullable(),
     ],
-    uniqueColumns: [
-      [Columns.datetime, Columns.movementId]
-    ],
+    uniqueColumns: [],
     rawSql: [
       '''
         create table ${Tables.eorm} (

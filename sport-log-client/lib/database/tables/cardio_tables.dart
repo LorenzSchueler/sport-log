@@ -105,9 +105,7 @@ class CardioSessionTable extends TableAccessor<CardioSession> {
         ..references(Tables.route, onDelete: OnAction.setNull),
       Column.text(Columns.comments)..nullable(),
     ],
-    uniqueColumns: [
-      [Columns.movementId, Columns.datetime]
-    ],
+    uniqueColumns: [],
   );
 
   Future<List<CardioSession>> getByMovementWithTrackOrderDatetime({

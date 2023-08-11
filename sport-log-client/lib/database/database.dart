@@ -1,6 +1,7 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:result_type/result_type.dart';
 import 'package:sport_log/config.dart';
+import 'package:sport_log/database/table.dart';
 import 'package:sport_log/database/table_accessor.dart';
 import 'package:sport_log/database/tables/action_tables.dart';
 import 'package:sport_log/database/tables/cardio_tables.dart';
@@ -115,8 +116,8 @@ class AppDatabase {
     _database = await databaseFactory.openDatabase(
       Config.databaseName,
       options: OpenDatabaseOptions(
-        version: 1,
-        onConfigure: (db) => db.execute('PRAGMA foreign_keys = ON;'),
+        version: 2,
+        onConfigure: (db) => db.execute("pragma foreign_keys = ON;"),
         onCreate: (db, version) async {
           for (final table in _tables) {
             _logger.i("creating table: ${table.tableName}");
@@ -128,7 +129,31 @@ class AppDatabase {
             }
           }
         },
-        //onUpgrade: null,
+        onUpgrade: (db, oldVersion, newVersion) async {
+          if (oldVersion < 2 && newVersion >= 2) {
+            // delete indices by creating new table without indices and copying all data over
+            await db.execute("pragma foreign_keys=off;");
+            final removeIndexTables = <(String, TableAccessor)>[
+              (Tables.cardioSession, CardioSessionTable()),
+              (Tables.metconSession, MetconSessionTable()),
+              (Tables.strengthSession, StrengthSessionTable()),
+            ];
+            for (final (table, tableAccessor) in removeIndexTables) {
+              await db.transaction((txn) async {
+                final oldTable = "old_$table";
+                await txn.execute("alter table $table rename to $oldTable;");
+                for (final statement in tableAccessor.table.setupSql) {
+                  await txn.execute(statement);
+                }
+                await txn
+                    .execute("insert into $table select * from $oldTable;");
+                await txn.execute("drop table $oldTable;");
+              });
+            }
+            await db.execute("pragma foreign_keys=on;");
+          }
+          _logger.i("database migration done");
+        },
         //onDowngrade: null,
         onOpen: (db) => _logger.i("database initialization done"),
       ),

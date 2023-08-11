@@ -100,10 +100,6 @@ create table cardio_session (
     deleted boolean not null default false
 );
 
-create unique index cardio_session__user_id__movement_id__datetime__key
-    on cardio_session (user_id, movement_id, datetime) 
-    where deleted = false;
-
 create index cardio_session__user_id__last_change__idx
     on cardio_session (user_id, last_change) 
     where deleted = false;
