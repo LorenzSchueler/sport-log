@@ -12,7 +12,7 @@ create table route (
     id bigint primary key,
     user_id bigint not null references "user" on delete cascade,
     name varchar(80) not null check (length(name) >= 2),
-    distance integer not null check (distance > 0),
+    distance integer check (distance > 0),
     ascent integer check (ascent >= 0),
     descent integer check (descent >= 0),
     track "position"[],

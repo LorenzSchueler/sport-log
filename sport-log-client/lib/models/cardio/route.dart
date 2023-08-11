@@ -45,7 +45,7 @@ class Route extends AtomicEntity {
   @IdConverter()
   Int64 userId;
   String name;
-  int distance;
+  int? distance;
   int? ascent;
   int? descent;
   List<Position>? track;
@@ -98,7 +98,7 @@ class Route extends AtomicEntity {
           name.length >= 2 && name.length <= 80,
           'Route: name.length is < 2 or > 80',
         ) &&
-        validate(distance > 0, 'Route: distance <= 0') &&
+        validate(distance == null || distance! >= 0, 'Route: distance < 0') &&
         validate(ascent == null || ascent! >= 0, 'Route: ascent < 0') &&
         validate(descent == null || descent! >= 0, 'Route: descent < 0');
   }
@@ -106,6 +106,7 @@ class Route extends AtomicEntity {
   @override
   bool isValid() {
     return isValidBeforeSanitation() &&
+        validate(distance == null || distance! > 0, 'Route: distance <= 0') &&
         validate(
           track == null || track!.isNotEmpty,
           'Route: track is empty but not null',
@@ -118,6 +119,9 @@ class Route extends AtomicEntity {
 
   @override
   void sanitize() {
+    if (distance != null && distance! <= 0) {
+      distance = null;
+    }
     if (track != null && track!.isEmpty) {
       track = null;
     }

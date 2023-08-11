@@ -336,7 +336,7 @@ diesel::table! {
         user_id -> Int8,
         #[max_length = 80]
         name -> Varchar,
-        distance -> Int4,
+        distance -> Nullable<Int4>,
         ascent -> Nullable<Int4>,
         descent -> Nullable<Int4>,
         track -> Nullable<Array<Position>>,

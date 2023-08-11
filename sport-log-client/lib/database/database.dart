@@ -131,14 +131,15 @@ class AppDatabase {
         },
         onUpgrade: (db, oldVersion, newVersion) async {
           if (oldVersion < 2 && newVersion >= 2) {
-            // delete indices by creating new table without indices and copying all data over
+            // alter tables/ indices by creating new table and copying all data over
             await db.execute("pragma foreign_keys=off;");
-            final removeIndexTables = <(String, TableAccessor)>[
-              (Tables.cardioSession, CardioSessionTable()),
-              (Tables.metconSession, MetconSessionTable()),
-              (Tables.strengthSession, StrengthSessionTable()),
+            final recreateTables = <(String, TableAccessor)>[
+              (Tables.cardioSession, CardioSessionTable()), // drop index
+              (Tables.metconSession, MetconSessionTable()), // drop index
+              (Tables.strengthSession, StrengthSessionTable()), // drop index
+              (Tables.route, RouteTable()), // drop not null on distance
             ];
-            for (final (table, tableAccessor) in removeIndexTables) {
+            for (final (table, tableAccessor) in recreateTables) {
               await db.transaction((txn) async {
                 final oldTable = "old_$table";
                 await txn.execute("alter table $table rename to $oldTable;");

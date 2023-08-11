@@ -10,7 +10,7 @@ Route _$RouteFromJson(Map<String, dynamic> json) => Route(
       id: const IdConverter().fromJson(json['id'] as String),
       userId: const IdConverter().fromJson(json['user_id'] as String),
       name: json['name'] as String,
-      distance: json['distance'] as int,
+      distance: json['distance'] as int?,
       ascent: json['ascent'] as int?,
       descent: json['descent'] as int?,
       track: (json['track'] as List<dynamic>?)

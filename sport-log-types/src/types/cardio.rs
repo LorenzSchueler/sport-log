@@ -118,7 +118,8 @@ pub struct Route {
     pub id: RouteId,
     pub user_id: UserId,
     pub name: String,
-    pub distance: i32,
+    #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
+    pub distance: Option<i32>,
     #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
     pub ascent: Option<i32>,
     #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
