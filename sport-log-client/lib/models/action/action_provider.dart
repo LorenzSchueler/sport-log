@@ -14,7 +14,6 @@ class ActionProvider extends AtomicEntity {
   ActionProvider._({
     required this.id,
     required this.name,
-    required this.password,
     required this.platformId,
     required this.description,
     required this.deleted,
@@ -27,7 +26,6 @@ class ActionProvider extends AtomicEntity {
   @IdConverter()
   Int64 id;
   String name;
-  String password;
   @IdConverter()
   Int64 platformId;
   String? description;
@@ -41,7 +39,6 @@ class ActionProvider extends AtomicEntity {
   ActionProvider clone() => ActionProvider._(
         id: id.clone(),
         name: name,
-        password: password,
         platformId: platformId.clone(),
         description: description,
         deleted: deleted,
@@ -66,7 +63,6 @@ class DbActionProviderSerializer extends DbSerializer<ActionProvider> {
     return ActionProvider._(
       id: Int64(r[prefix + Columns.id]! as int),
       name: r[prefix + Columns.name]! as String,
-      password: r[prefix + Columns.password]! as String,
       platformId: Int64(r[prefix + Columns.platformId]! as int),
       description: r[prefix + Columns.description] as String?,
       deleted: r[prefix + Columns.deleted]! as int == 1,
@@ -78,7 +74,6 @@ class DbActionProviderSerializer extends DbSerializer<ActionProvider> {
     return {
       Columns.id: o.id.toInt(),
       Columns.name: o.name,
-      Columns.password: o.password,
       Columns.platformId: o.platformId.toInt(),
       Columns.description: o.description,
       Columns.deleted: o.deleted ? 1 : 0,

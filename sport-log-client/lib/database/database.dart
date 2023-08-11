@@ -111,6 +111,7 @@ class AppDatabase {
     }
   }
 
+  // ignore: long-method
   static Future<void> open() async {
     _logger.i("opening database");
     _database = await databaseFactory.openDatabase(
@@ -131,6 +132,16 @@ class AppDatabase {
         },
         onUpgrade: (db, oldVersion, newVersion) async {
           if (oldVersion < 2 && newVersion >= 2) {
+            await db.execute(
+              "alter table ${Tables.action} drop column create_before;",
+            );
+            await db.execute(
+              "alter table ${Tables.action} drop column delete_after;",
+            );
+            await db.execute(
+              "alter table ${Tables.actionProvider} drop column password;",
+            );
+
             // alter tables/ indices by creating new table and copying all data over
             await db.execute("pragma foreign_keys=off;");
             final recreateTables = <(String, TableAccessor)>[

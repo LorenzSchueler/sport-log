@@ -26,8 +26,6 @@ class ActionTable extends TableAccessor<Action> {
       Column.int(Columns.actionProviderId)
         ..references(Tables.actionProvider, onDelete: OnAction.cascade),
       Column.text(Columns.description)..nullable(),
-      Column.int(Columns.createBefore)..checkGe(0),
-      Column.int(Columns.deleteAfter)..checkGe(0),
     ],
     uniqueColumns: [
       [Columns.actionProviderId, Columns.name]
@@ -171,7 +169,6 @@ class ActionProviderTable extends TableAccessor<ActionProvider> {
         ..withDefault('2')
         ..checkIn(<int>[0, 1, 2]),
       Column.text(Columns.name)..checkLengthBetween(2, 80),
-      Column.text(Columns.password)..checkLengthLe(120),
       Column.int(Columns.platformId)
         ..references(Tables.platform, onDelete: OnAction.cascade),
       Column.text(Columns.description)..nullable()
