@@ -110,6 +110,13 @@ class AppDatabase {
     }
   }
 
+  static Future<void> _execute(DatabaseExecutor db, String statement) async {
+    if (Config.instance.outputDbStatement) {
+      _logger.t(statement);
+    }
+    await db.execute(statement);
+  }
+
   // ignore: long-method
   static Future<void> open() async {
     _logger.i("opening database");
@@ -117,38 +124,35 @@ class AppDatabase {
       Config.databaseName,
       options: OpenDatabaseOptions(
         version: 2,
-        onConfigure: (db) => db.execute("pragma foreign_keys = ON;"),
+        onConfigure: (db) => _execute(db, "pragma foreign_keys = on;"),
         onCreate: (db, version) async {
           for (final table in _tables) {
             _logger.i("creating table: ${table.tableName}");
             for (final statement in table.table.setupSql) {
-              if (Config.instance.outputDbStatement) {
-                _logger.t(statement);
-              }
-              await db.execute(statement);
+              await _execute(db, statement);
             }
           }
           for (final statement in eormTable.setupSql) {
-            if (Config.instance.outputDbStatement) {
-              _logger.t(statement);
-            }
-            await db.execute(statement);
+            await _execute(db, statement);
           }
         },
         onUpgrade: (db, oldVersion, newVersion) async {
           _logger.i("upgrading db from version $oldVersion to $newVersion");
           if (oldVersion < 2 && newVersion >= 2) {
             await db.transaction((txn) async {
-              await txn.execute("pragma defer_foreign_keys = on;");
+              await _execute(txn, "pragma defer_foreign_keys = on;");
 
               // drop indices
-              await txn.execute(
+              await _execute(
+                txn,
                 "drop index ${Tables.cardioSession}__movement_id__datetime__key;",
               );
-              await txn.execute(
+              await _execute(
+                txn,
                 "drop index ${Tables.metconSession}__metcon_id__datetime__key;",
               );
-              await txn.execute(
+              await _execute(
+                txn,
                 "drop index ${Tables.strengthSession}__datetime__movement_id__key;",
               );
 
@@ -158,10 +162,12 @@ class AppDatabase {
                 (Tables.metcon, Columns.isDefaultMetcon),
               ];
               for (final (table, column) in optionalUserIdTables) {
-                await txn.execute(
+                await _execute(
+                  txn,
                   "alter table $table add column $column integer not null default 0 check($column in (0, 1));",
                 );
-                await txn.execute(
+                await _execute(
+                  txn,
                   "update $table set $column = user_id is null;",
                 );
               }
@@ -191,23 +197,21 @@ class AppDatabase {
                 // create new table
                 final tableSetupSql =
                     tableAccessor.table.withName(newTable).tableSetupSql;
-                _logger.i(tableSetupSql);
-                await txn.execute(tableSetupSql);
+                await _execute(txn, tableSetupSql);
 
                 // insert all columns of new table from old table into new table
-                final columnNameList =
+                final columns =
                     tableAccessor.table.columns.map((c) => c.name).join(', ');
-                await txn.execute(
-                  "insert into $newTable ($columnNameList) select $columnNameList from $table;",
+                await _execute(
+                  txn,
+                  "insert into $newTable ($columns) select $columns from $table;",
                 );
 
                 // drop old table
-                _logger.i("drop table $table;");
-                await txn.execute("drop table $table;");
+                await _execute(txn, "drop table $table;");
 
                 // rename new table to original name
-                _logger.i("alter table $newTable rename to $table;");
-                await txn.execute("alter table $newTable rename to $table;");
+                await _execute(txn, "alter table $newTable rename to $table;");
 
                 // create indices, triggers and rawSql for new renamed tabled
                 final setupSql = [
@@ -216,11 +220,10 @@ class AppDatabase {
                   ...tableAccessor.table.rawSql,
                 ];
                 for (final statement in setupSql) {
-                  _logger.i(statement);
-                  await txn.execute(statement);
+                  await _execute(txn, statement);
                 }
               }
-              await txn.execute("pragma defer_foreign_keys = off;");
+              await _execute(txn, "pragma defer_foreign_keys = off;");
             });
             _logger.i("migration to version 2 done");
           }
