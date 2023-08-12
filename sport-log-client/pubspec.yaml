@@ -57,6 +57,7 @@ dependencies:
   logger: ^2.0.1
   mapbox_api: ^1.0.0
   mapbox_maps_flutter: #^0.4.3
+    # onTap Point and ScreenCoordinate
     git:
       url: https://github.com/LorenzSchueler/mapbox-maps-flutter
   mapbox_search: ^3.0.1+2

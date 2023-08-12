@@ -12,12 +12,15 @@ import 'package:sport_log/helpers/expedition_tracking_utils.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/location_utils.dart';
 import 'package:sport_log/helpers/logger.dart';
-import 'package:sport_log/models/cardio/all.dart';
+import 'package:sport_log/models/cardio/position.dart';
 import 'package:sport_log/settings.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 class ExpeditionTaskHandler extends TaskHandler {
   final _logger = InitLogger("ExpeditionTaskHandler");
+  final _locationUtils = LocationUtils();
+  late final CardioSessionDescriptionDataProvider _dataProvider;
+
   bool _initialized = false;
   late final ExpeditionData _expeditionData;
   DateTime? _lastTry;
@@ -39,7 +42,17 @@ class ExpeditionTaskHandler extends TaskHandler {
         await initialize();
       }
 
-      await expeditionTrackingTask();
+      if (!nextLocationNeeded()) {
+        _logger.i("next location not yet needed");
+        return;
+      }
+
+      _logger.i("next location needed");
+
+      // only start task if no one currently running
+      if (!_locationUtils.enabled) {
+        await expeditionTrackingTask();
+      }
     });
   }
 
@@ -57,8 +70,9 @@ class ExpeditionTaskHandler extends TaskHandler {
       databaseFactory = databaseFactoryFfi;
     }
     await AppDatabase.init();
-    _initialized = true;
     _expeditionData = Settings.instance.expeditionData!;
+    _dataProvider = CardioSessionDescriptionDataProvider();
+    _initialized = true;
     _logger.i("initialization done");
   }
 
@@ -66,25 +80,16 @@ class ExpeditionTaskHandler extends TaskHandler {
   Future<void> expeditionTrackingTask() async {
     _logger.i("task started");
 
-    if (!nextLocationNeeded()) {
-      _logger.i("next location not yet needed");
-      return;
-    }
-
-    _logger.i("next location needed");
-
-    final dataProvider = CardioSessionDescriptionDataProvider();
     final cardioSessionDescription =
-        (await dataProvider.getById(_expeditionData.cardioId))!;
+        (await _dataProvider.getById(_expeditionData.cardioId))!;
     final session = cardioSessionDescription.cardioSession;
 
     Timer? locationTimeoutTimer;
-    final locationUtils = LocationUtils();
-    await locationUtils.startLocationStream(
+    await _locationUtils.startLocationStream(
       onLocationUpdate: (location) async {
         if (location.isGps) {
           _logger.i("got location $location");
-          await locationUtils.stopLocationStream();
+          await _locationUtils.stopLocationStream();
           locationTimeoutTimer?.cancel();
           locationTimeoutTimer = null;
 
@@ -108,9 +113,9 @@ class ExpeditionTaskHandler extends TaskHandler {
             ..setAscentDescent()
             ..setDistance();
 
-          await dataProvider.updateSingle(cardioSessionDescription);
+          await _dataProvider.updateSingle(cardioSessionDescription);
           _lastTry = DateTime.now();
-          _logger.i("new location added");
+          _logger.i("new location added $location");
         } else {
           _logger.d("got inaccurate location $location");
         }
@@ -120,7 +125,7 @@ class ExpeditionTaskHandler extends TaskHandler {
     );
     _logger.i("location stream started");
     locationTimeoutTimer = Timer(_maxLocationTaskDuration, () async {
-      await locationUtils.stopLocationStream();
+      await _locationUtils.stopLocationStream();
       _lastTry = DateTime.now();
       _logger.i("location stream timed out");
     });
