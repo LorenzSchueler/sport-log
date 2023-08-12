@@ -102,20 +102,22 @@ class CardioTrackingSettingsPage extends StatelessWidget {
                     ),
                   ),
               ],
-              EditTile.Switch(
-                leading: AppIcons.mountains,
-                trailing: AppIcons.info,
-                caption: "Expedition Mode",
-                value: trackingSettings.expeditionMode,
-                onChanged: (expeditionMode) =>
-                    trackingSettings.expeditionMode = expeditionMode,
-                onTrailingTap: () => showMessageDialog(
-                  context: context,
-                  title: "Expedition Tracking",
-                  text:
-                      "Expedition tracking allows to track the location for a long time without draining the battery too much.\nThe location will be determined only at the defined tracking times. Once the location is found or if the location is not found within 5 minutes, tracking is suspended until the next tracking time.\nIf the app is killed, tracking will stop completely, however it can be manually resumed later.",
+              if (false)
+                // ignore: dead_code
+                EditTile.Switch(
+                  leading: AppIcons.mountains,
+                  trailing: AppIcons.info,
+                  caption: "Expedition Mode",
+                  value: trackingSettings.expeditionMode,
+                  onChanged: (expeditionMode) =>
+                      trackingSettings.expeditionMode = expeditionMode,
+                  onTrailingTap: () => showMessageDialog(
+                    context: context,
+                    title: "Expedition Tracking",
+                    text:
+                        "Expedition tracking allows to track the location for a long time without draining the battery too much.\nThe location will be determined only at the defined tracking times. Once the location is found or if the location is not found within 5 minutes, tracking is suspended until the next tracking time.\nIf the app is killed, tracking will stop completely, however it can be manually resumed later.",
+                  ),
                 ),
-              ),
               if (trackingSettings.expeditionMode)
                 Padding(
                   // 24 icon + 15 padding
