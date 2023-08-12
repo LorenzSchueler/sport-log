@@ -124,7 +124,6 @@ class AppDatabase {
       Config.databaseName,
       options: OpenDatabaseOptions(
         version: 2,
-        onConfigure: (db) => _execute(db, "pragma foreign_keys = on;"),
         onCreate: (db, version) async {
           for (final table in _tables) {
             _logger.i("creating table: ${table.tableName}");
@@ -137,100 +136,107 @@ class AppDatabase {
           }
         },
         onUpgrade: (db, oldVersion, newVersion) async {
+          // onUpgrade is executed in a single transaction
+          // foreign keys are not yet enabled
           _logger.i("upgrading db from version $oldVersion to $newVersion");
           if (oldVersion < 2 && newVersion >= 2) {
-            await db.transaction((txn) async {
-              await _execute(txn, "pragma defer_foreign_keys = on;");
+            // drop indices
+            await _execute(
+              db,
+              "drop index ${Tables.cardioSession}__movement_id__datetime__key;",
+            );
+            await _execute(
+              db,
+              "drop index ${Tables.metconSession}__metcon_id__datetime__key;",
+            );
+            await _execute(
+              db,
+              "drop index ${Tables.strengthSession}__datetime__movement_id__key;",
+            );
 
-              // drop indices
+            // create isDefaultMovement / isDefaultMetcon columns based on userId
+            final optionalUserIdTables = [
+              (Tables.movement, Columns.isDefaultMovement),
+              (Tables.metcon, Columns.isDefaultMetcon),
+            ];
+            for (final (table, column) in optionalUserIdTables) {
               await _execute(
-                txn,
-                "drop index ${Tables.cardioSession}__movement_id__datetime__key;",
+                db,
+                "alter table $table add column $column integer not null default 0 check($column in (0, 1));",
               );
               await _execute(
-                txn,
-                "drop index ${Tables.metconSession}__metcon_id__datetime__key;",
+                db,
+                "update $table set $column = user_id is null;",
               );
+              // set default movements/ metcons as synchronized as they can not be updated by the user
+              // all user defined movements/ metcons stay in the updated state in case they were there before
               await _execute(
-                txn,
-                "drop index ${Tables.strengthSession}__datetime__movement_id__key;",
+                db,
+                "update $table set ${Columns.syncStatus} = ${SyncStatus.synchronized.index} where $column = true;",
+              );
+            }
+
+            final dropColumnTables = <TableAccessor>[
+              DiaryTable(), // drop user_id
+              WodTable(), // drop user_id
+              MovementTable(), // drop user_id
+              MetconTable(), // drop user_id
+              MetconSessionTable(), // drop user_id
+              RouteTable(), // drop user_id, drop not null on distance
+              CardioSessionTable(), // drop user_id, drop not null on distance
+              StrengthSessionTable(), // drop user_id
+              PlatformCredentialTable(), // drop user_id
+              ActionProviderTable(), // drop password
+              ActionTable(), // drop create_before and delete_after
+              ActionRuleTable(), // drop user_id
+              ActionEventTable(), // drop user_id
+            ];
+            for (final tableAccessor in dropColumnTables) {
+              // see: https://www.sqlite.org/lang_altertable.html
+              // "alter table drop column" only supported beginning with sqlite 3.35.0
+              // "alter table alter column drop not null" not supported
+              // therefore create new table and copy all relevant data over
+              final table = tableAccessor.table.name;
+              final newTable = "new_$table";
+
+              // create new table
+              final tableSetupSql =
+                  tableAccessor.table.withName(newTable).tableSetupSql;
+              await _execute(db, tableSetupSql);
+
+              // insert all columns of new table from old table into new table
+              final columns =
+                  tableAccessor.table.columns.map((c) => c.name).join(', ');
+              await _execute(
+                db,
+                "insert into $newTable ($columns) select $columns from $table;",
               );
 
-              // create isDefaultMovement / isDefaultMetcon columns based on userId
-              final optionalUserIdTables = [
-                (Tables.movement, Columns.isDefaultMovement),
-                (Tables.metcon, Columns.isDefaultMetcon),
+              // drop old table
+              await _execute(db, "drop table $table;");
+
+              // rename new table to original name
+              await _execute(db, "alter table $newTable rename to $table;");
+
+              // create indices, triggers and rawSql for new renamed tabled
+              final setupSql = [
+                ...tableAccessor.table.uniqueIndicesSetupSql,
+                tableAccessor.table.triggerSetupSql,
+                ...tableAccessor.table.rawSql,
               ];
-              for (final (table, column) in optionalUserIdTables) {
-                await _execute(
-                  txn,
-                  "alter table $table add column $column integer not null default 0 check($column in (0, 1));",
-                );
-                await _execute(
-                  txn,
-                  "update $table set $column = user_id is null;",
-                );
+              for (final statement in setupSql) {
+                await _execute(db, statement);
               }
-
-              final dropColumnTables = <TableAccessor>[
-                DiaryTable(), // drop user_id
-                WodTable(), // drop user_id
-                MovementTable(), // drop user_id
-                MetconTable(), // drop user_id
-                MetconSessionTable(), // drop user_id
-                RouteTable(), // drop user_id, drop not null on distance
-                CardioSessionTable(), // drop user_id, drop not null on distance
-                StrengthSessionTable(), // drop user_id
-                PlatformCredentialTable(), // drop user_id
-                ActionProviderTable(), // drop password
-                ActionTable(), // drop create_before and delete_after
-                ActionRuleTable(), // drop user_id
-                ActionEventTable(), // drop user_id
-              ];
-              for (final tableAccessor in dropColumnTables) {
-                // "alter table drop column" only supported beginning with sqlite 3.35.0
-                // "alter table alter column drop not null" not supported
-                // therefore create new table and copy all relevant data over
-                final table = tableAccessor.table.name;
-                final newTable = "new_$table";
-
-                // create new table
-                final tableSetupSql =
-                    tableAccessor.table.withName(newTable).tableSetupSql;
-                await _execute(txn, tableSetupSql);
-
-                // insert all columns of new table from old table into new table
-                final columns =
-                    tableAccessor.table.columns.map((c) => c.name).join(', ');
-                await _execute(
-                  txn,
-                  "insert into $newTable ($columns) select $columns from $table;",
-                );
-
-                // drop old table
-                await _execute(txn, "drop table $table;");
-
-                // rename new table to original name
-                await _execute(txn, "alter table $newTable rename to $table;");
-
-                // create indices, triggers and rawSql for new renamed tabled
-                final setupSql = [
-                  ...tableAccessor.table.uniqueIndicesSetupSql,
-                  tableAccessor.table.triggerSetupSql,
-                  ...tableAccessor.table.rawSql,
-                ];
-                for (final statement in setupSql) {
-                  await _execute(txn, statement);
-                }
-              }
-              await _execute(txn, "pragma defer_foreign_keys = off;");
-            });
+            }
             _logger.i("migration to version 2 done");
           }
           _logger.i("database migration done");
         },
         //onDowngrade: null,
-        onOpen: (db) => _logger.i("database initialization done"),
+        onOpen: (db) async {
+          await _execute(db, "pragma foreign_keys = on;");
+          _logger.i("database initialization done");
+        },
       ),
     );
     _logger.i("database ready");
