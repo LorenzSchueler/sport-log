@@ -135,7 +135,7 @@ class DbRouteSerializer extends DbSerializer<Route> {
     return Route(
       id: Int64(r[prefix + Columns.id]! as int),
       name: r[prefix + Columns.name]! as String,
-      distance: r[prefix + Columns.distance]! as int,
+      distance: r[prefix + Columns.distance] as int?,
       ascent: r[prefix + Columns.ascent] as int?,
       descent: r[prefix + Columns.descent] as int?,
       track: DbPositionListConverter.mapToDart(
