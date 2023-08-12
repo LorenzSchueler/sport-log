@@ -16,6 +16,7 @@ import 'package:sport_log/models/cardio/all.dart';
 import 'package:sport_log/pages/workout/cardio/tracking_settings.dart';
 import 'package:sport_log/settings.dart';
 
+// ignore: unreachable_from_main
 class ExpeditionData {
   ExpeditionData({
     required this.cardioId,
@@ -26,6 +27,7 @@ class ExpeditionData {
   final List<TimeOfDay> trackingTimes;
 }
 
+// ignore: unreachable_from_main
 class ExpeditionTrackingUtils extends ChangeNotifier {
   ExpeditionTrackingUtils._(
     this._cardioSessionDescription,
@@ -86,6 +88,7 @@ class ExpeditionTrackingUtils extends ChangeNotifier {
 
   Timer? _refreshTimer;
 
+  // ignore: unreachable_from_main
   static bool get running => Settings.instance.expeditionData != null;
 
   @override

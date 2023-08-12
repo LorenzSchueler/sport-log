@@ -81,20 +81,21 @@ class HeartRateUtils extends ChangeNotifier {
 
   Future<bool> enableBluetooth() async {
     while (true) {
-      await FlutterBluePlus.turnOn();
-      for (var i = 0; i < 100; i++) {
-        // ignore: inference_failure_on_instance_creation
-        await Future.delayed(const Duration(milliseconds: 100));
-        if (await FlutterBluePlus.isOn) {
-          return true;
+      try {
+        await FlutterBluePlus.turnOn();
+        return true;
+      } on FlutterBluePlusException catch (e) {
+        if (e.code == FbpErrorCode.timeout.index) {
+          final serviceSettings = await showServiceRequiredDialog(
+            title: "Bluetooth Required",
+            text: "Please enable bluetooth manually.",
+          );
+          if (serviceSettings.isIgnore) {
+            return false;
+          }
+        } else {
+          rethrow;
         }
-      }
-      final serviceSettings = await showServiceRequiredDialog(
-        title: "Bluetooth Required",
-        text: "Please enable bluetooth manually.",
-      );
-      if (serviceSettings.isIgnore) {
-        return false;
       }
     }
   }
@@ -112,6 +113,10 @@ class HeartRateUtils extends ChangeNotifier {
 
     await requestPermissions();
     if (!await enableBluetooth()) {
+      _isSearching = false;
+      if (!_disposed) {
+        notifyListeners();
+      }
       return;
     }
 
