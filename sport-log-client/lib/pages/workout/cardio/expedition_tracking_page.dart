@@ -53,7 +53,7 @@ class CardioExpeditionTrackingPage extends StatelessWidget {
                     onMapCreated: trackingUtils.onMapCreated,
                   ),
                 ),
-                if (!fullscreen.isOn)
+                if (fullscreen.isOff)
                   Padding(
                     padding: Defaults.edgeInsets.normal,
                     child: Column(

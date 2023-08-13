@@ -53,10 +53,6 @@ class AppTheme {
         foregroundColor: colorScheme.onSurface,
         backgroundColor: colorScheme.surface,
       ),
-      bottomNavigationBarTheme: BottomNavigationBarThemeData(
-        backgroundColor: colorScheme.surface,
-        selectedItemColor: colorScheme.primary,
-      ),
       dividerTheme: DividerThemeData(color: colorScheme.surfaceVariant),
       drawerTheme: DrawerThemeData(
         backgroundColor: colorScheme.background,
@@ -81,10 +77,6 @@ class AppTheme {
       ),
       iconTheme: IconThemeData(
         color: colorScheme.primary,
-      ),
-      floatingActionButtonTheme: FloatingActionButtonThemeData(
-        backgroundColor: colorScheme.primary,
-        foregroundColor: colorScheme.onPrimary,
       ),
       cardTheme: CardTheme(color: colorScheme.surface),
       dialogTheme: DialogTheme(

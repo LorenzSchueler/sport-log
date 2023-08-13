@@ -99,7 +99,7 @@ class CardioTrackingPage extends StatelessWidget {
                   ElevationMap(
                     onMapCreated: trackingUtils.onElevationMapCreated,
                   ),
-                  if (!fullscreen.isOn)
+                  if (fullscreen.isOff)
                     Padding(
                       padding: Defaults.edgeInsets.normal,
                       child: Column(

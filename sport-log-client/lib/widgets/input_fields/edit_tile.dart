@@ -167,6 +167,8 @@ class EditTile extends StatelessWidget {
   final String? caption;
   final Widget child;
   final IconData? leading;
+
+  /// Only displayed if [onTrailingTap] is set. Defaults to [AppIcons.close].
   final IconData? trailing;
   final VoidCallback? onTap;
   final VoidCallback? onTrailingTap;
@@ -177,6 +179,7 @@ class EditTile extends StatelessWidget {
   /// if enabled [child] must have a bounded width
   final bool shrinkWidth;
 
+  /// If true font size is the same as the one of TextFormField. Otherwise it is the default text size.
   final bool bigText;
 
   static const Color iconCaptionColor = Colors.white70;
