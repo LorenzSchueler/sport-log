@@ -355,3 +355,6 @@ impl VerifyMultipleForUserOrAPCreate for Unverified<Vec<StrengthSet>> {
         }
     }
 }
+
+#[derive(Db, VerifyIdForAdmin, GetById, GetByIds, GetAll)]
+pub struct EormDb;

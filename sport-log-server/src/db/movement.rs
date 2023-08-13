@@ -375,6 +375,3 @@ impl CheckOptionalUserId for MovementMuscleDb {
             .map(|eqs: Vec<bool>| eqs.into_iter().all(|eq| eq))
     }
 }
-
-#[derive(Db, VerifyIdForAdmin, GetById, GetByIds, GetAll)]
-pub struct EormDb;

@@ -1,5 +1,5 @@
 use axum::{extract::Query, http::StatusCode, Json};
-use sport_log_types::{StrengthSession, StrengthSessionId, StrengthSet, StrengthSetId};
+use sport_log_types::{Eorm, StrengthSession, StrengthSessionId, StrengthSet, StrengthSetId};
 
 use crate::{
     auth::AuthUserOrAP,
@@ -353,4 +353,8 @@ pub async fn update_strength_sets(
     }
     .map(|_| StatusCode::OK)
     .map_err(Into::into)
+}
+
+pub async fn get_eorms(_auth: AuthUserOrAP, mut db: DbConn) -> HandlerResult<Json<Vec<Eorm>>> {
+    EormDb::get_all(&mut db).map(Json).map_err(Into::into)
 }

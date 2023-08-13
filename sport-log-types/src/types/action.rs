@@ -128,7 +128,7 @@ impl Weekday {
 #[serde(try_from = "IdString", into = "IdString")]
 #[cfg_attr(
     feature = "db",
-    derive(Hash, FromSqlRow, AsExpression, IdToSql, IdFromSql, ),
+    derive(Hash, FromSqlRow, AsExpression, IdToSql, IdFromSql),
     diesel(sql_type = BigInt)
 )]
 pub struct ActionRuleId(pub i64);

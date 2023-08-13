@@ -8,7 +8,7 @@ use sport_log_types_derive::{IdFromSql, IdToSql};
 
 #[cfg(feature = "db")]
 use crate::{
-    schema::{strength_blueprint, strength_blueprint_set, strength_session, strength_set},
+    schema::{eorm, strength_blueprint, strength_blueprint_set, strength_session, strength_set},
     Movement, TrainingPlan, User,
 };
 use crate::{types::IdString, MovementId, TrainingPlanId, UserId};
@@ -146,4 +146,25 @@ pub struct StrengthSet {
     #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
     pub weight: Option<f32>,
     pub deleted: bool,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, IdString)]
+#[serde(try_from = "IdString", into = "IdString")]
+#[cfg_attr(
+    feature = "db",
+    derive(Hash, FromSqlRow, AsExpression, IdToSql, IdFromSql),
+    diesel(sql_type = BigInt)
+)]
+pub struct EormId(pub i64);
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[cfg_attr(
+    feature = "db",
+    derive(Insertable, Identifiable, Queryable, Selectable),
+    diesel(table_name = eorm)
+)]
+pub struct Eorm {
+    pub id: EormId,
+    pub reps: i32,
+    pub percentage: f32,
 }

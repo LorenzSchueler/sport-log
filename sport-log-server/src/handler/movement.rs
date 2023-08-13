@@ -1,5 +1,5 @@
 use axum::{extract::Query, http::StatusCode, Json};
-use sport_log_types::{Eorm, Movement, MovementId};
+use sport_log_types::{Movement, MovementId};
 
 use crate::{
     auth::*,
@@ -168,7 +168,3 @@ pub async fn update_movements(
 //) -> HandlerResult<Json<Vec<MuscleGroup>>> {
 //MuscleGroupDb::get_all(&mut db).map(Json).map_err(Into::into)
 //}
-
-pub async fn get_eorms(_auth: AuthUserOrAP, mut db: DbConn) -> HandlerResult<Json<Vec<Eorm>>> {
-    EormDb::get_all(&mut db).map(Json).map_err(Into::into)
-}
