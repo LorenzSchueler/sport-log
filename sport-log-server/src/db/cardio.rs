@@ -9,6 +9,8 @@ use crate::db::*;
 
 #[derive(
     Db,
+    DbWithUserId,
+    ModifiableDb,
     VerifyIdForUserOrAP,
     Create,
     GetById,
@@ -25,6 +27,8 @@ pub struct RouteDb;
 
 #[derive(
     Db,
+    DbWithUserId,
+    ModifiableDb,
     VerifyIdForUserOrAP,
     Create,
     GetById,
@@ -65,6 +69,9 @@ impl CheckUserId for CardioBlueprintDb {
 
 #[derive(
     Db,
+    DbWithUserId,
+    DbWithDateTime,
+    ModifiableDb,
     VerifyIdForUserOrAP,
     Create,
     GetById,

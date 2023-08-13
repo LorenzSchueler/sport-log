@@ -9,14 +9,21 @@ use sport_log_types_derive::*;
 
 use crate::{auth::*, db::*};
 
-#[derive(Db, Create, GetById, GetByIds, Update, HardDelete, CheckOptionalUserId)]
+#[derive(
+    Db,
+    DbWithUserId,
+    ModifiableDb,
+    Create,
+    GetById,
+    GetByIds,
+    Update,
+    HardDelete,
+    CheckOptionalUserId,
+)]
 pub struct MetconDb;
 
 impl GetByUser for MetconDb {
-    fn get_by_user(
-        user_id: UserId,
-        db: &mut PgConnection,
-    ) -> QueryResult<Vec<<Self as Db>::Entity>> {
+    fn get_by_user(user_id: UserId, db: &mut PgConnection) -> QueryResult<Vec<<Self as Db>::Type>> {
         metcon::table
             .filter(
                 metcon::columns::user_id
@@ -33,7 +40,7 @@ impl GetByUserSync for MetconDb {
         user_id: UserId,
         last_sync: DateTime<Utc>,
         db: &mut PgConnection,
-    ) -> QueryResult<Vec<<Self as Db>::Entity>>
+    ) -> QueryResult<Vec<<Self as Db>::Type>>
     where
         Self: Sized,
     {
@@ -66,13 +73,13 @@ impl VerifyIdForUserOrAP for UnverifiedId<MetconId> {
 }
 
 impl VerifyForUserOrAPWithDb for Unverified<Metcon> {
-    type Entity = Metcon;
+    type Type = Metcon;
 
     fn verify_user_ap(
         self,
         auth: AuthUserOrAP,
         db: &mut PgConnection,
-    ) -> Result<Self::Entity, StatusCode> {
+    ) -> Result<Self::Type, StatusCode> {
         let metcon = self.0;
         if metcon.user_id == Some(*auth)
             && MetconDb::check_user_id(metcon.id, *auth, db)
@@ -86,13 +93,13 @@ impl VerifyForUserOrAPWithDb for Unverified<Metcon> {
 }
 
 impl VerifyMultipleForUserOrAPWithDb for Unverified<Vec<Metcon>> {
-    type Entity = Metcon;
+    type Type = Metcon;
 
     fn verify_user_ap(
         self,
         auth: AuthUserOrAP,
         db: &mut PgConnection,
-    ) -> Result<Vec<Self::Entity>, StatusCode> {
+    ) -> Result<Vec<Self::Type>, StatusCode> {
         let metcons = self.0;
         let metcon_ids: Vec<_> = metcons.iter().map(|metcon| metcon.id).collect();
         if metcons.iter().all(|metcon| metcon.user_id == Some(*auth))
@@ -107,9 +114,9 @@ impl VerifyMultipleForUserOrAPWithDb for Unverified<Vec<Metcon>> {
 }
 
 impl VerifyForUserOrAPWithoutDb for Unverified<Metcon> {
-    type Entity = Metcon;
+    type Type = Metcon;
 
-    fn verify_user_ap_without_db(self, auth: AuthUserOrAP) -> Result<Self::Entity, StatusCode> {
+    fn verify_user_ap_without_db(self, auth: AuthUserOrAP) -> Result<Self::Type, StatusCode> {
         let metcon = self.0;
         if metcon.user_id == Some(*auth) {
             Ok(metcon)
@@ -120,12 +127,9 @@ impl VerifyForUserOrAPWithoutDb for Unverified<Metcon> {
 }
 
 impl VerifyMultipleForUserOrAPWithoutDb for Unverified<Vec<Metcon>> {
-    type Entity = Metcon;
+    type Type = Metcon;
 
-    fn verify_user_ap_without_db(
-        self,
-        auth: AuthUserOrAP,
-    ) -> Result<Vec<Self::Entity>, StatusCode> {
+    fn verify_user_ap_without_db(self, auth: AuthUserOrAP) -> Result<Vec<Self::Type>, StatusCode> {
         let metcons = self.0;
         if metcons.iter().all(|metcon| metcon.user_id == Some(*auth)) {
             Ok(metcons)
@@ -135,14 +139,11 @@ impl VerifyMultipleForUserOrAPWithoutDb for Unverified<Vec<Metcon>> {
     }
 }
 
-#[derive(Db, Create, GetById, GetByIds, Update, HardDelete)]
+#[derive(Db, ModifiableDb, Create, GetById, GetByIds, Update, HardDelete)]
 pub struct MetconMovementDb;
 
 impl GetByUser for MetconMovementDb {
-    fn get_by_user(
-        user_id: UserId,
-        db: &mut PgConnection,
-    ) -> QueryResult<Vec<<Self as Db>::Entity>> {
+    fn get_by_user(user_id: UserId, db: &mut PgConnection) -> QueryResult<Vec<<Self as Db>::Type>> {
         metcon_movement::table
             .filter(
                 metcon_movement::columns::metcon_id.eq_any(
@@ -165,7 +166,7 @@ impl GetByUserSync for MetconMovementDb {
         user_id: UserId,
         last_sync: DateTime<Utc>,
         db: &mut PgConnection,
-    ) -> QueryResult<Vec<<Self as Db>::Entity>>
+    ) -> QueryResult<Vec<<Self as Db>::Type>>
     where
         Self: Sized,
     {
@@ -268,13 +269,13 @@ impl VerifyIdForUserOrAP for UnverifiedId<MetconMovementId> {
 }
 
 impl VerifyForUserOrAPWithDb for Unverified<MetconMovement> {
-    type Entity = MetconMovement;
+    type Type = MetconMovement;
 
     fn verify_user_ap(
         self,
         auth: AuthUserOrAP,
         db: &mut PgConnection,
-    ) -> Result<Self::Entity, StatusCode> {
+    ) -> Result<Self::Type, StatusCode> {
         let metcon_movement = self.0;
         if MetconMovementDb::check_user_id(metcon_movement.id, *auth, db)
             .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
@@ -287,13 +288,13 @@ impl VerifyForUserOrAPWithDb for Unverified<MetconMovement> {
 }
 
 impl VerifyMultipleForUserOrAPWithDb for Unverified<Vec<MetconMovement>> {
-    type Entity = MetconMovement;
+    type Type = MetconMovement;
 
     fn verify_user_ap(
         self,
         auth: AuthUserOrAP,
         db: &mut PgConnection,
-    ) -> Result<Vec<Self::Entity>, StatusCode> {
+    ) -> Result<Vec<Self::Type>, StatusCode> {
         let metcon_movements = self.0;
         let metcon_movement_ids: Vec<_> = metcon_movements
             .iter()
@@ -310,13 +311,13 @@ impl VerifyMultipleForUserOrAPWithDb for Unverified<Vec<MetconMovement>> {
 }
 
 impl VerifyForUserOrAPCreate for Unverified<MetconMovement> {
-    type Entity = MetconMovement;
+    type Type = MetconMovement;
 
     fn verify_user_ap_create(
         self,
         auth: AuthUserOrAP,
         db: &mut PgConnection,
-    ) -> Result<Self::Entity, StatusCode> {
+    ) -> Result<Self::Type, StatusCode> {
         let metcon_movement = self.0;
         if MetconDb::check_user_id(metcon_movement.metcon_id, *auth, db)
             .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
@@ -329,13 +330,13 @@ impl VerifyForUserOrAPCreate for Unverified<MetconMovement> {
 }
 
 impl VerifyMultipleForUserOrAPCreate for Unverified<Vec<MetconMovement>> {
-    type Entity = MetconMovement;
+    type Type = MetconMovement;
 
     fn verify_user_ap_create(
         self,
         auth: AuthUserOrAP,
         db: &mut PgConnection,
-    ) -> Result<Vec<Self::Entity>, StatusCode> {
+    ) -> Result<Vec<Self::Type>, StatusCode> {
         let metcon_movements = self.0;
         let mut metcon_ids: Vec<_> = metcon_movements
             .iter()
@@ -353,14 +354,11 @@ impl VerifyMultipleForUserOrAPCreate for Unverified<Vec<MetconMovement>> {
     }
 }
 
-#[derive(Db, VerifyIdForUserOrAP, Create, GetById, GetByIds, Update, HardDelete)]
+#[derive(Db, ModifiableDb, VerifyIdForUserOrAP, Create, GetById, GetByIds, Update, HardDelete)]
 pub struct MetconItemDb;
 
 impl GetByUser for MetconItemDb {
-    fn get_by_user(
-        user_id: UserId,
-        db: &mut PgConnection,
-    ) -> QueryResult<Vec<<Self as Db>::Entity>> {
+    fn get_by_user(user_id: UserId, db: &mut PgConnection) -> QueryResult<Vec<<Self as Db>::Type>> {
         metcon_item::table
             .filter(
                 metcon_item::columns::training_plan_id.eq_any(
@@ -379,7 +377,7 @@ impl GetByUserSync for MetconItemDb {
         user_id: UserId,
         last_sync: DateTime<Utc>,
         db: &mut PgConnection,
-    ) -> QueryResult<Vec<<Self as Db>::Entity>>
+    ) -> QueryResult<Vec<<Self as Db>::Type>>
     where
         Self: Sized,
     {
@@ -452,13 +450,13 @@ impl CheckOptionalUserId for MetconItemDb {
 }
 
 impl VerifyForUserOrAPWithDb for Unverified<MetconItem> {
-    type Entity = MetconItem;
+    type Type = MetconItem;
 
     fn verify_user_ap(
         self,
         auth: AuthUserOrAP,
         db: &mut PgConnection,
-    ) -> Result<Self::Entity, StatusCode> {
+    ) -> Result<Self::Type, StatusCode> {
         let metcon_item = self.0;
         if MetconItemDb::check_user_id(metcon_item.id, *auth, db)
             .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
@@ -471,13 +469,13 @@ impl VerifyForUserOrAPWithDb for Unverified<MetconItem> {
 }
 
 impl VerifyMultipleForUserOrAPWithDb for Unverified<Vec<MetconItem>> {
-    type Entity = MetconItem;
+    type Type = MetconItem;
 
     fn verify_user_ap(
         self,
         auth: AuthUserOrAP,
         db: &mut PgConnection,
-    ) -> Result<Vec<Self::Entity>, StatusCode> {
+    ) -> Result<Vec<Self::Type>, StatusCode> {
         let metcon_items = self.0;
         let metcon_item_ids: Vec<_> = metcon_items
             .iter()
@@ -494,13 +492,13 @@ impl VerifyMultipleForUserOrAPWithDb for Unverified<Vec<MetconItem>> {
 }
 
 impl VerifyForUserOrAPCreate for Unverified<MetconItem> {
-    type Entity = MetconItem;
+    type Type = MetconItem;
 
     fn verify_user_ap_create(
         self,
         auth: AuthUserOrAP,
         db: &mut PgConnection,
-    ) -> Result<Self::Entity, StatusCode> {
+    ) -> Result<Self::Type, StatusCode> {
         let metcon_item = self.0;
         if MetconDb::check_optional_user_id(metcon_item.metcon_id, *auth, db)
             .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
@@ -513,13 +511,13 @@ impl VerifyForUserOrAPCreate for Unverified<MetconItem> {
 }
 
 impl VerifyMultipleForUserOrAPCreate for Unverified<Vec<MetconItem>> {
-    type Entity = MetconItem;
+    type Type = MetconItem;
 
     fn verify_user_ap_create(
         self,
         auth: AuthUserOrAP,
         db: &mut PgConnection,
-    ) -> Result<Vec<Self::Entity>, StatusCode> {
+    ) -> Result<Vec<Self::Type>, StatusCode> {
         let metcon_items = self.0;
         let mut metcon_ids: Vec<_> = metcon_items
             .iter()
@@ -539,6 +537,9 @@ impl VerifyMultipleForUserOrAPCreate for Unverified<Vec<MetconItem>> {
 
 #[derive(
     Db,
+    DbWithUserId,
+    DbWithDateTime,
+    ModifiableDb,
     VerifyIdForUserOrAP,
     Create,
     GetById,

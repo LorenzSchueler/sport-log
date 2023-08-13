@@ -13,6 +13,7 @@ use crate::{auth::*, db::*};
 
 #[derive(
     Db,
+    ModifiableDb,
     VerifyIdForAdmin,
     VerifyIdUnchecked,
     GetById,
@@ -28,7 +29,7 @@ pub struct ActionProviderDb;
 /// Same as trait [`Create`](crate::db::Create) but with mutable references
 impl ActionProviderDb {
     pub fn create(
-        action_provider: &mut <Self as Db>::Entity,
+        action_provider: &mut <Self as Db>::Type,
         db: &mut PgConnection,
     ) -> QueryResult<usize> {
         let salt = SaltString::generate(&mut OsRng);
@@ -43,7 +44,7 @@ impl ActionProviderDb {
     }
 
     pub fn create_multiple(
-        action_providers: &mut [<Self as Db>::Entity],
+        action_providers: &mut [<Self as Db>::Type],
         db: &mut PgConnection,
     ) -> QueryResult<usize> {
         for action_provider in &mut *action_providers {
@@ -130,6 +131,8 @@ impl ActionProviderDb {
 
 #[derive(
     Db,
+    DbWithApId,
+    ModifiableDb,
     VerifyIdUnchecked,
     VerifyIdForActionProvider,
     Create,
@@ -148,7 +151,7 @@ impl ActionDb {
     pub fn get_by_action_provider(
         action_provider_id: ActionProviderId,
         db: &mut PgConnection,
-    ) -> QueryResult<Vec<<Self as Db>::Entity>> {
+    ) -> QueryResult<Vec<<Self as Db>::Type>> {
         action::table
             .filter(action::columns::action_provider_id.eq(action_provider_id))
             .select(Action::as_select())
@@ -158,6 +161,8 @@ impl ActionDb {
 
 #[derive(
     Db,
+    DbWithUserId,
+    ModifiableDb,
     VerifyIdForUser,
     Create,
     GetById,
@@ -174,6 +179,8 @@ pub struct ActionRuleDb;
 
 #[derive(
     Db,
+    DbWithUserId,
+    ModifiableDb,
     VerifyIdForUser,
     VerifyIdForActionProvider,
     VerifyIdsForActionProvider,
@@ -260,11 +267,20 @@ pub struct CreatableActionRuleDb;
 
 impl Db for CreatableActionRuleDb {
     type Id = ActionRuleId;
-    type Entity = CreatableActionRule;
+    type Type = CreatableActionRule;
+    type Table = action_rule::table;
+
+    fn table() -> Self::Table {
+        action_rule::table
+    }
+
+    fn id_column() -> <Self::Table as Table>::PrimaryKey {
+        action_rule::columns::id
+    }
 }
 
 impl GetAll for CreatableActionRuleDb {
-    fn get_all(db: &mut PgConnection) -> QueryResult<Vec<<Self as Db>::Entity>> {
+    fn get_all(db: &mut PgConnection) -> QueryResult<Vec<<Self as Db>::Type>> {
         action_rule::table
             .inner_join(action::table)
             .filter(action_rule::columns::enabled.eq(true))
@@ -286,7 +302,16 @@ pub struct ExecutableActionEventDb;
 
 impl Db for ExecutableActionEventDb {
     type Id = ActionEventId;
-    type Entity = ExecutableActionEvent;
+    type Type = ExecutableActionEvent;
+    type Table = action_event::table;
+
+    fn table() -> Self::Table {
+        action_event::table
+    }
+
+    fn id_column() -> <Self::Table as Table>::PrimaryKey {
+        action_event::columns::id
+    }
 }
 
 impl ExecutableActionEventDb {
@@ -347,20 +372,29 @@ impl ExecutableActionEventDb {
     }
 }
 
-pub struct DeletableActionEventDb;
+pub struct DeletableActionEventDb();
 
 impl Db for DeletableActionEventDb {
     type Id = ActionEventId;
-    type Entity = DeletableActionEvent;
+    type Type = DeletableActionEvent;
+    type Table = action_event::table;
+
+    fn table() -> Self::Table {
+        action_event::table
+    }
+
+    fn id_column() -> <Self::Table as Table>::PrimaryKey {
+        action_event::columns::id
+    }
 }
 
 impl GetAll for DeletableActionEventDb {
-    fn get_all(db: &mut PgConnection) -> QueryResult<Vec<<Self as Db>::Entity>> {
-        action_event::table
+    fn get_all(db: &mut PgConnection) -> QueryResult<Vec<<Self as Db>::Type>> {
+        Self::table()
             .inner_join(action::table)
             .filter(action_event::columns::deleted.eq(false))
             .select((
-                action_event::columns::id,
+                Self::table().primary_key(),
                 action_event::columns::datetime,
                 action::columns::delete_after,
             ))

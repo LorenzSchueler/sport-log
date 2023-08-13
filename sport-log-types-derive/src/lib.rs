@@ -12,10 +12,9 @@ use types::*;
 
 struct Identifiers {
     db_type: Ident,
-    entity_type: Ident,
+    value_type: Ident,
     id_type: Ident,
-    id_name: Ident,
-    entity_name: Ident,
+    value_name: Ident,
 }
 
 impl Identifiers {
@@ -24,14 +23,12 @@ impl Identifiers {
         let db_type_str = db_type.to_string();
         let entity_type = Ident::new(&db_type_str[..db_type_str.len() - 2], db_type.span());
         let id_type = format_ident!("{entity_type}Id");
-        let id_name = Ident::new(&id_type.to_string().to_snake_case(), db_type.span());
         let entity_name = Ident::new(&entity_type.to_string().to_snake_case(), db_type.span());
         Identifiers {
             db_type,
-            entity_type,
+            value_type: entity_type,
             id_type,
-            id_name,
-            entity_name,
+            value_name: entity_name,
         }
     }
 }
@@ -44,8 +41,8 @@ impl Identifiers {
 /// - there is a type called `New[ThisTypeName]` that implements `diesel::prelude::Insertable` for this table
 #[proc_macro_derive(Create)]
 pub fn create_derive(input: TokenStream) -> TokenStream {
-    let ast = syn::parse(input).unwrap();
-    impl_create(Identifiers::from_ast(&ast))
+    let ast: syn::DeriveInput = syn::parse(input).unwrap();
+    impl_create(&ast.ident)
 }
 
 /// Derives `sport_log_types::GetById`.
@@ -55,8 +52,8 @@ pub fn create_derive(input: TokenStream) -> TokenStream {
 /// - there is a type called `[ThisTypeName]Id` which is the primary key of the table.
 #[proc_macro_derive(GetById)]
 pub fn get_by_id_derive(input: TokenStream) -> TokenStream {
-    let ast = syn::parse(input).unwrap();
-    impl_get_by_id(Identifiers::from_ast(&ast))
+    let ast: syn::DeriveInput = syn::parse(input).unwrap();
+    impl_get_by_id(&ast.ident)
 }
 
 /// Derives `sport_log_types::GetByIds`.
@@ -66,8 +63,8 @@ pub fn get_by_id_derive(input: TokenStream) -> TokenStream {
 /// - there is a type called `[ThisTypeName]Id` which is the primary key of the table.
 #[proc_macro_derive(GetByIds)]
 pub fn get_by_ids_derive(input: TokenStream) -> TokenStream {
-    let ast = syn::parse(input).unwrap();
-    impl_get_by_ids(Identifiers::from_ast(&ast))
+    let ast: syn::DeriveInput = syn::parse(input).unwrap();
+    impl_get_by_ids(&ast.ident)
 }
 
 /// Derives `sport_log_types::GetByUser`.
@@ -77,8 +74,8 @@ pub fn get_by_ids_derive(input: TokenStream) -> TokenStream {
 /// - the table has a column `user_id` which references the table `user`.
 #[proc_macro_derive(GetByUser)]
 pub fn get_by_user_derive(input: TokenStream) -> TokenStream {
-    let ast = syn::parse(input).unwrap();
-    impl_get_by_user(Identifiers::from_ast(&ast))
+    let ast: syn::DeriveInput = syn::parse(input).unwrap();
+    impl_get_by_user(&ast.ident)
 }
 
 /// Derives `sport_log_types::GetByUserTimespan`.
@@ -89,8 +86,8 @@ pub fn get_by_user_derive(input: TokenStream) -> TokenStream {
 /// - the table has a column `datetime` with type `timestamptz`.
 #[proc_macro_derive(GetByUserTimespan)]
 pub fn get_by_user_and_timespan_derive(input: TokenStream) -> TokenStream {
-    let ast = syn::parse(input).unwrap();
-    impl_get_by_user_and_timespan(Identifiers::from_ast(&ast))
+    let ast: syn::DeriveInput = syn::parse(input).unwrap();
+    impl_get_by_user_and_timespan(&ast.ident)
 }
 
 /// Derives `sport_log_types::GetByUserSync`.
@@ -101,8 +98,8 @@ pub fn get_by_user_and_timespan_derive(input: TokenStream) -> TokenStream {
 /// - the table has a column `last_sync` with type `timestamptz`.
 #[proc_macro_derive(GetByUserSync)]
 pub fn get_by_user_and_last_sync_derive(input: TokenStream) -> TokenStream {
-    let ast = syn::parse(input).unwrap();
-    impl_get_by_user_and_last_sync(Identifiers::from_ast(&ast))
+    let ast: syn::DeriveInput = syn::parse(input).unwrap();
+    impl_get_by_user_and_last_sync(&ast.ident)
 }
 
 /// Derives `sport_log_types::GetBySync`.
@@ -112,8 +109,8 @@ pub fn get_by_user_and_last_sync_derive(input: TokenStream) -> TokenStream {
 /// - the table has a column `last_sync` with type `timestamptz`.
 #[proc_macro_derive(GetBySync)]
 pub fn get_by_last_sync_derive(input: TokenStream) -> TokenStream {
-    let ast = syn::parse(input).unwrap();
-    impl_get_by_last_sync(Identifiers::from_ast(&ast))
+    let ast: syn::DeriveInput = syn::parse(input).unwrap();
+    impl_get_by_last_sync(&ast.ident)
 }
 
 /// Derives `sport_log_types::GetAll`.
@@ -122,8 +119,8 @@ pub fn get_by_last_sync_derive(input: TokenStream) -> TokenStream {
 /// - the corresponding table has the same name like this type but in snake_case
 #[proc_macro_derive(GetAll)]
 pub fn get_all_derive(input: TokenStream) -> TokenStream {
-    let ast = syn::parse(input).unwrap();
-    impl_get_all(Identifiers::from_ast(&ast))
+    let ast: syn::DeriveInput = syn::parse(input).unwrap();
+    impl_get_all(&ast.ident)
 }
 
 /// Derives `sport_log_types::Update`.
@@ -133,8 +130,8 @@ pub fn get_all_derive(input: TokenStream) -> TokenStream {
 /// - this type implements `diesel::prelude::AsChangeset`
 #[proc_macro_derive(Update)]
 pub fn update_derive(input: TokenStream) -> TokenStream {
-    let ast = syn::parse(input).unwrap();
-    impl_update(Identifiers::from_ast(&ast))
+    let ast: syn::DeriveInput = syn::parse(input).unwrap();
+    impl_update(&ast.ident)
 }
 
 /// Derives `sport_log_types::HardDelete`.
@@ -144,116 +141,116 @@ pub fn update_derive(input: TokenStream) -> TokenStream {
 /// - the table has the columns `deleted` ([`bool`]) and `last_change` (`chrono::DateTime`)
 #[proc_macro_derive(HardDelete)]
 pub fn hard_delete_derive(input: TokenStream) -> TokenStream {
-    let ast = syn::parse(input).unwrap();
-    impl_hard_delete(Identifiers::from_ast(&ast))
+    let ast: syn::DeriveInput = syn::parse(input).unwrap();
+    impl_hard_delete(&ast.ident)
 }
 
 #[proc_macro_derive(CheckUserId)]
 pub fn check_user_id_derive(input: TokenStream) -> TokenStream {
-    let ast = syn::parse(input).unwrap();
-    impl_check_user_id(Identifiers::from_ast(&ast))
+    let ast: syn::DeriveInput = syn::parse(input).unwrap();
+    impl_check_user_id(&ast.ident)
 }
 
 #[proc_macro_derive(CheckOptionalUserId)]
 pub fn check_optional_user_id_derive(input: TokenStream) -> TokenStream {
-    let ast = syn::parse(input).unwrap();
-    impl_check_optional_user_id(Identifiers::from_ast(&ast))
+    let ast: syn::DeriveInput = syn::parse(input).unwrap();
+    impl_check_optional_user_id(&ast.ident)
 }
 
 #[proc_macro_derive(CheckAPId)]
 pub fn check_ap_id_derive(input: TokenStream) -> TokenStream {
-    let ast = syn::parse(input).unwrap();
-    impl_check_ap_id(Identifiers::from_ast(&ast))
+    let ast: syn::DeriveInput = syn::parse(input).unwrap();
+    impl_check_ap_id(&ast.ident)
 }
 
 #[proc_macro_derive(VerifyIdForUser)]
 pub fn verify_id_for_user_derive(input: TokenStream) -> TokenStream {
-    let ast = syn::parse(input).unwrap();
-    impl_verify_id_for_user(Identifiers::from_ast(&ast))
+    let ast: syn::DeriveInput = syn::parse(input).unwrap();
+    impl_verify_id_for_user(&ast.ident)
 }
 
 #[proc_macro_derive(VerifyIdForUserOrAP)]
 pub fn verify_id_for_user_or_ap_derive(input: TokenStream) -> TokenStream {
-    let ast = syn::parse(input).unwrap();
-    impl_verify_id_for_user_or_ap(Identifiers::from_ast(&ast))
+    let ast: syn::DeriveInput = syn::parse(input).unwrap();
+    impl_verify_id_for_user_or_ap(&ast.ident)
 }
 
 #[proc_macro_derive(VerifyIdForActionProvider)]
 pub fn verify_id_for_action_provider_derive(input: TokenStream) -> TokenStream {
-    let ast = syn::parse(input).unwrap();
-    impl_verify_id_for_action_provider(Identifiers::from_ast(&ast))
+    let ast: syn::DeriveInput = syn::parse(input).unwrap();
+    impl_verify_id_for_action_provider(&ast.ident)
 }
 
 #[proc_macro_derive(VerifyIdsForActionProvider)]
 pub fn verify_ids_for_action_provider_derive(input: TokenStream) -> TokenStream {
-    let ast = syn::parse(input).unwrap();
-    impl_verify_ids_for_action_provider(Identifiers::from_ast(&ast))
+    let ast: syn::DeriveInput = syn::parse(input).unwrap();
+    impl_verify_ids_for_action_provider(&ast.ident)
 }
 
 #[proc_macro_derive(VerifyIdForAdmin)]
 pub fn verify_id_for_admin_derive(input: TokenStream) -> TokenStream {
-    let ast = syn::parse(input).unwrap();
-    impl_verify_id_for_admin(Identifiers::from_ast(&ast))
+    let ast: syn::DeriveInput = syn::parse(input).unwrap();
+    impl_verify_id_for_admin(&ast.ident)
 }
 
 #[proc_macro_derive(VerifyIdsForAdmin)]
 pub fn verify_ids_for_admin_derive(input: TokenStream) -> TokenStream {
-    let ast = syn::parse(input).unwrap();
-    impl_verify_ids_for_admin(Identifiers::from_ast(&ast))
+    let ast: syn::DeriveInput = syn::parse(input).unwrap();
+    impl_verify_ids_for_admin(&ast.ident)
 }
 
 #[proc_macro_derive(VerifyIdUnchecked)]
 pub fn verify_id_unchecked_derive(input: TokenStream) -> TokenStream {
-    let ast = syn::parse(input).unwrap();
-    impl_verify_id_unchecked(Identifiers::from_ast(&ast))
+    let ast: syn::DeriveInput = syn::parse(input).unwrap();
+    impl_verify_id_unchecked(&ast.ident)
 }
 
 #[proc_macro_derive(VerifyForUserWithDb)]
 pub fn verify_for_user_with_db_derive(input: TokenStream) -> TokenStream {
-    let ast = syn::parse(input).unwrap();
-    impl_verify_for_user_with_db(Identifiers::from_ast(&ast))
+    let ast: syn::DeriveInput = syn::parse(input).unwrap();
+    impl_verify_for_user_with_db(&ast.ident)
 }
 
 #[proc_macro_derive(VerifyForUserWithoutDb)]
 pub fn verify_for_user_without_db_derive(input: TokenStream) -> TokenStream {
-    let ast = syn::parse(input).unwrap();
-    impl_verify_for_user_without_db(Identifiers::from_ast(&ast))
+    let ast: syn::DeriveInput = syn::parse(input).unwrap();
+    impl_verify_for_user_without_db(&ast.ident)
 }
 
 #[proc_macro_derive(VerifyForUserOrAPWithDb)]
 pub fn verify_for_user_or_ap_with_db_derive(input: TokenStream) -> TokenStream {
-    let ast = syn::parse(input).unwrap();
-    impl_verify_for_user_or_ap_with_db(Identifiers::from_ast(&ast))
+    let ast: syn::DeriveInput = syn::parse(input).unwrap();
+    impl_verify_for_user_or_ap_with_db(&ast.ident)
 }
 
 #[proc_macro_derive(VerifyForUserOrAPWithoutDb)]
 pub fn verify_for_user_or_ap_without_db_derive(input: TokenStream) -> TokenStream {
-    let ast = syn::parse(input).unwrap();
-    impl_verify_for_user_or_ap_without_db(Identifiers::from_ast(&ast))
+    let ast: syn::DeriveInput = syn::parse(input).unwrap();
+    impl_verify_for_user_or_ap_without_db(&ast.ident)
 }
 
 #[proc_macro_derive(VerifyForActionProviderWithDb)]
 pub fn verify_for_action_provider_with_db_derive(input: TokenStream) -> TokenStream {
-    let ast = syn::parse(input).unwrap();
-    impl_verify_for_action_provider_with_db(Identifiers::from_ast(&ast))
+    let ast: syn::DeriveInput = syn::parse(input).unwrap();
+    impl_verify_for_action_provider_with_db(&ast.ident)
 }
 
 #[proc_macro_derive(VerifyForActionProviderWithoutDb)]
 pub fn verify_for_action_provider_without_db_derive(input: TokenStream) -> TokenStream {
-    let ast = syn::parse(input).unwrap();
-    impl_verify_for_action_provider_without_db(Identifiers::from_ast(&ast))
+    let ast: syn::DeriveInput = syn::parse(input).unwrap();
+    impl_verify_for_action_provider_without_db(&ast.ident)
 }
 
 #[proc_macro_derive(VerifyForAdminWithoutDb)]
 pub fn verify_for_admin_without_db_derive(input: TokenStream) -> TokenStream {
-    let ast = syn::parse(input).unwrap();
-    impl_verify_for_admin_without_db(Identifiers::from_ast(&ast))
+    let ast: syn::DeriveInput = syn::parse(input).unwrap();
+    impl_verify_for_admin_without_db(&ast.ident)
 }
 
 #[proc_macro_derive(VerifyUnchecked)]
 pub fn verify_unchecked_derive(input: TokenStream) -> TokenStream {
-    let ast = syn::parse(input).unwrap();
-    impl_verify_unchecked(Identifiers::from_ast(&ast))
+    let ast: syn::DeriveInput = syn::parse(input).unwrap();
+    impl_verify_unchecked(&ast.ident)
 }
 
 /// Derives `diesel::types::ToSql<diesel::sql_types::BigInt, diesel::pg::Pg>`.
@@ -288,4 +285,32 @@ pub fn unverified_id_string(input: TokenStream) -> TokenStream {
 pub fn db(input: TokenStream) -> TokenStream {
     let ast = syn::parse(input).unwrap();
     impl_db(Identifiers::from_ast(&ast))
+}
+
+/// Derives `DbWithUserId`.
+#[proc_macro_derive(DbWithUserId)]
+pub fn db_with_user_id(input: TokenStream) -> TokenStream {
+    let ast = syn::parse(input).unwrap();
+    impl_db_with_user_id(Identifiers::from_ast(&ast))
+}
+
+/// Derives `DbWithApId`.
+#[proc_macro_derive(DbWithApId)]
+pub fn db_with_ap_id(input: TokenStream) -> TokenStream {
+    let ast = syn::parse(input).unwrap();
+    impl_db_with_ap_id(Identifiers::from_ast(&ast))
+}
+
+/// Derives `DbWithDateTime`.
+#[proc_macro_derive(DbWithDateTime)]
+pub fn db_with_datetime(input: TokenStream) -> TokenStream {
+    let ast = syn::parse(input).unwrap();
+    impl_db_with_datetime(Identifiers::from_ast(&ast))
+}
+
+/// Derives `ModifiableDd`.
+#[proc_macro_derive(ModifiableDb)]
+pub fn modifiable_db(input: TokenStream) -> TokenStream {
+    let ast = syn::parse(input).unwrap();
+    impl_modifiable_db(Identifiers::from_ast(&ast))
 }

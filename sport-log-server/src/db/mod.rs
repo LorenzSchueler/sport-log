@@ -3,7 +3,7 @@ use argon2::Argon2;
 use argon2::{Algorithm, Params, Version};
 use axum::http::StatusCode;
 use chrono::{DateTime, Utc};
-use diesel::{PgConnection, QueryResult};
+use diesel::{Column, PgConnection, QueryResult, Table};
 use serde::Deserialize;
 use sport_log_types::{ActionProviderId, UserId};
 
@@ -85,7 +85,37 @@ pub enum Timespan {
 
 pub trait Db {
     type Id;
-    type Entity;
+    type Type;
+    type Table: Table;
+
+    fn table() -> Self::Table;
+    fn id_column() -> <Self::Table as Table>::PrimaryKey;
+}
+
+pub trait DbWithUserId: Db {
+    type UserIdColumn: Column;
+
+    fn user_id_column() -> Self::UserIdColumn;
+}
+
+pub trait DbWithApId: Db {
+    type ApIdColumn: Column;
+
+    fn ap_id_column() -> Self::ApIdColumn;
+}
+
+pub trait DbWithDateTime: Db {
+    type DateTimeColumn: Column;
+
+    fn datetime_column() -> Self::DateTimeColumn;
+}
+
+pub trait ModifiableDb: Db {
+    type LastChangeColumn: Column;
+    type DeletedColumn: Column;
+
+    fn last_change_column() -> Self::LastChangeColumn;
+    fn deleted_column() -> Self::DeletedColumn;
 }
 
 /// A type for which a new database entry can be created.
@@ -96,9 +126,9 @@ pub trait Db {
 ///
 /// For restrictions on the types for derive to work please see [`sport_log_types_derive::Create`].
 pub trait Create: Db {
-    fn create(entity: &Self::Entity, db: &mut PgConnection) -> QueryResult<usize>;
+    fn create(value: &Self::Type, db: &mut PgConnection) -> QueryResult<usize>;
 
-    fn create_multiple(entities: &[Self::Entity], db: &mut PgConnection) -> QueryResult<usize>;
+    fn create_multiple(values: &[Self::Type], db: &mut PgConnection) -> QueryResult<usize>;
 }
 
 /// A type for which an entry can be retrieved by id from the database.
@@ -109,7 +139,7 @@ pub trait Create: Db {
 ///
 /// For restrictions on the types for derive to work please see [`sport_log_types_derive::GetById`].
 pub trait GetById: Db {
-    fn get_by_id(id: Self::Id, db: &mut PgConnection) -> QueryResult<Self::Entity>;
+    fn get_by_id(id: Self::Id, db: &mut PgConnection) -> QueryResult<Self::Type>;
 }
 
 /// A type for which entries can be retrieved by id from the database.
@@ -120,7 +150,7 @@ pub trait GetById: Db {
 ///
 /// For restrictions on the types for derive to work please see [`sport_log_types_derive::GetByIds`].
 pub trait GetByIds: Db {
-    fn get_by_ids(ids: &[Self::Id], db: &mut PgConnection) -> QueryResult<Vec<Self::Entity>>;
+    fn get_by_ids(ids: &[Self::Id], db: &mut PgConnection) -> QueryResult<Vec<Self::Type>>;
 }
 
 /// A type for which entries can be retrieved by user from the database.
@@ -131,7 +161,7 @@ pub trait GetByIds: Db {
 ///
 /// For restrictions on the types for derive to work please see [`sport_log_types_derive::GetByUser`].
 pub trait GetByUser: Db {
-    fn get_by_user(user_id: UserId, db: &mut PgConnection) -> QueryResult<Vec<Self::Entity>>;
+    fn get_by_user(user_id: UserId, db: &mut PgConnection) -> QueryResult<Vec<Self::Type>>;
 }
 
 /// A type for which entries can be retrieved by user and the timespan from the database.
@@ -146,7 +176,7 @@ pub trait GetByUserTimespan: Db {
         user_id: UserId,
         timespan: Timespan,
         db: &mut PgConnection,
-    ) -> QueryResult<Vec<Self::Entity>>;
+    ) -> QueryResult<Vec<Self::Type>>;
 }
 
 /// A type for which entries can be retrieved by user and the timestamp of the last synchronization from the database.
@@ -161,7 +191,7 @@ pub trait GetByUserSync: Db {
         user_id: UserId,
         last_sync: DateTime<Utc>,
         db: &mut PgConnection,
-    ) -> QueryResult<Vec<Self::Entity>>;
+    ) -> QueryResult<Vec<Self::Type>>;
 }
 
 /// A type for which entries can be retrieved by the timestamp of the last synchronization from the database.
@@ -175,7 +205,7 @@ pub trait GetBySync: Db {
     fn get_by_last_sync(
         last_sync: DateTime<Utc>,
         db: &mut PgConnection,
-    ) -> QueryResult<Vec<Self::Entity>>;
+    ) -> QueryResult<Vec<Self::Type>>;
 }
 
 /// A type for which all entries can be retrieved from the database.
@@ -186,7 +216,7 @@ pub trait GetBySync: Db {
 ///
 /// For restrictions on the types for derive to work please see [`sport_log_types_derive::GetAll`].
 pub trait GetAll: Db {
-    fn get_all(db: &mut PgConnection) -> QueryResult<Vec<Self::Entity>>;
+    fn get_all(db: &mut PgConnection) -> QueryResult<Vec<Self::Type>>;
 }
 
 /// A type which can be used to update an entry in the database.
@@ -197,9 +227,9 @@ pub trait GetAll: Db {
 ///
 /// For restrictions on the types for derive to work please see [`sport_log_types_derive::Update`].
 pub trait Update: Db {
-    fn update(entity: &Self::Entity, db: &mut PgConnection) -> QueryResult<usize>;
+    fn update(value: &Self::Type, db: &mut PgConnection) -> QueryResult<usize>;
 
-    fn update_multiple(entities: &[Self::Entity], db: &mut PgConnection) -> QueryResult<usize>;
+    fn update_multiple(values: &[Self::Type], db: &mut PgConnection) -> QueryResult<usize>;
 }
 
 /// A type for which all soft deleted entities can be hard deleted.
@@ -312,119 +342,117 @@ pub trait VerifyIdUnchecked {
 }
 
 pub trait VerifyForUserWithDb {
-    type Entity;
+    type Type;
 
-    fn verify_user(self, auth: AuthUser, db: &mut PgConnection)
-        -> Result<Self::Entity, StatusCode>;
+    fn verify_user(self, auth: AuthUser, db: &mut PgConnection) -> Result<Self::Type, StatusCode>;
 }
 
 pub trait VerifyMultipleForUserWithDb {
-    type Entity;
+    type Type;
 
     fn verify_user(
         self,
         auth: AuthUser,
         db: &mut PgConnection,
-    ) -> Result<Vec<Self::Entity>, StatusCode>;
+    ) -> Result<Vec<Self::Type>, StatusCode>;
 }
 
 pub trait VerifyForUserWithoutDb {
-    type Entity;
+    type Type;
 
-    fn verify_user_without_db(self, auth: AuthUser) -> Result<Self::Entity, StatusCode>;
+    fn verify_user_without_db(self, auth: AuthUser) -> Result<Self::Type, StatusCode>;
 }
 
 pub trait VerifyMultipleForUserWithoutDb {
-    type Entity;
+    type Type;
 
-    fn verify_user_without_db(self, auth: AuthUser) -> Result<Vec<Self::Entity>, StatusCode>;
+    fn verify_user_without_db(self, auth: AuthUser) -> Result<Vec<Self::Type>, StatusCode>;
 }
 
 pub trait VerifyForUserOrAPWithDb {
-    type Entity;
+    type Type;
 
     fn verify_user_ap(
         self,
         auth: AuthUserOrAP,
         db: &mut PgConnection,
-    ) -> Result<Self::Entity, StatusCode>;
+    ) -> Result<Self::Type, StatusCode>;
 }
 
 pub trait VerifyMultipleForUserOrAPWithDb {
-    type Entity;
+    type Type;
 
     fn verify_user_ap(
         self,
         auth: AuthUserOrAP,
         db: &mut PgConnection,
-    ) -> Result<Vec<Self::Entity>, StatusCode>;
+    ) -> Result<Vec<Self::Type>, StatusCode>;
 }
 
 pub trait VerifyForUserOrAPCreate {
-    type Entity;
+    type Type;
 
     fn verify_user_ap_create(
         self,
         auth: AuthUserOrAP,
         db: &mut PgConnection,
-    ) -> Result<Self::Entity, StatusCode>;
+    ) -> Result<Self::Type, StatusCode>;
 }
 
 pub trait VerifyMultipleForUserOrAPCreate {
-    type Entity;
+    type Type;
 
     fn verify_user_ap_create(
         self,
         auth: AuthUserOrAP,
         db: &mut PgConnection,
-    ) -> Result<Vec<Self::Entity>, StatusCode>;
+    ) -> Result<Vec<Self::Type>, StatusCode>;
 }
 
 pub trait VerifyForUserOrAPWithoutDb {
-    type Entity;
+    type Type;
 
-    fn verify_user_ap_without_db(self, auth: AuthUserOrAP) -> Result<Self::Entity, StatusCode>;
+    fn verify_user_ap_without_db(self, auth: AuthUserOrAP) -> Result<Self::Type, StatusCode>;
 }
 
 pub trait VerifyMultipleForUserOrAPWithoutDb {
-    type Entity;
+    type Type;
 
-    fn verify_user_ap_without_db(self, auth: AuthUserOrAP)
-        -> Result<Vec<Self::Entity>, StatusCode>;
+    fn verify_user_ap_without_db(self, auth: AuthUserOrAP) -> Result<Vec<Self::Type>, StatusCode>;
 }
 
 pub trait VerifyForActionProviderWithDb {
-    type Entity;
+    type Type;
 
-    fn verify_ap(self, auth: AuthAP, db: &mut PgConnection) -> Result<Self::Entity, StatusCode>;
+    fn verify_ap(self, auth: AuthAP, db: &mut PgConnection) -> Result<Self::Type, StatusCode>;
 }
 
 pub trait VerifyForActionProviderWithoutDb {
-    type Entity;
+    type Type;
 
-    fn verify_ap_without_db(self, auth: AuthAP) -> Result<Self::Entity, StatusCode>;
+    fn verify_ap_without_db(self, auth: AuthAP) -> Result<Self::Type, StatusCode>;
 }
 
 pub trait VerifyMultipleForActionProviderWithoutDb {
-    type Entity;
+    type Type;
 
-    fn verify_ap_without_db(self, auth: AuthAP) -> Result<Vec<Self::Entity>, StatusCode>;
+    fn verify_ap_without_db(self, auth: AuthAP) -> Result<Vec<Self::Type>, StatusCode>;
 }
 
 pub trait VerifyForAdminWithoutDb {
-    type Entity;
+    type Type;
 
-    fn verify_adm(self, auth: AuthAdmin) -> Result<Self::Entity, StatusCode>;
+    fn verify_adm(self, auth: AuthAdmin) -> Result<Self::Type, StatusCode>;
 }
 
 pub trait VerifyMultipleForAdminWithoutDb {
-    type Entity;
+    type Type;
 
-    fn verify_adm(self, auth: AuthAdmin) -> Result<Vec<Self::Entity>, StatusCode>;
+    fn verify_adm(self, auth: AuthAdmin) -> Result<Vec<Self::Type>, StatusCode>;
 }
 
 pub trait VerifyUnchecked {
-    type Entity;
+    type Type;
 
-    fn verify_unchecked(self) -> Result<Self::Entity, StatusCode>;
+    fn verify_unchecked(self) -> Result<Self::Type, StatusCode>;
 }

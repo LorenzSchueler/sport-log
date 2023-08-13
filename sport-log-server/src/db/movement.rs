@@ -11,6 +11,8 @@ use crate::{auth::*, db::*};
 
 #[derive(
     Db,
+    DbWithUserId,
+    ModifiableDb,
     VerifyIdForAdmin,
     VerifyIdUnchecked,
     Create,
@@ -24,10 +26,7 @@ use crate::{auth::*, db::*};
 pub struct MovementDb;
 
 impl GetByUser for MovementDb {
-    fn get_by_user(
-        user_id: UserId,
-        db: &mut PgConnection,
-    ) -> QueryResult<Vec<<Self as Db>::Entity>> {
+    fn get_by_user(user_id: UserId, db: &mut PgConnection) -> QueryResult<Vec<<Self as Db>::Type>> {
         movement::table
             .filter(
                 movement::columns::user_id
@@ -44,7 +43,7 @@ impl GetByUserSync for MovementDb {
         user_id: UserId,
         last_sync: chrono::DateTime<chrono::Utc>,
         db: &mut PgConnection,
-    ) -> QueryResult<Vec<<Self as Db>::Entity>>
+    ) -> QueryResult<Vec<<Self as Db>::Type>>
     where
         Self: Sized,
     {
@@ -79,13 +78,13 @@ impl VerifyIdForUserOrAP for UnverifiedId<MovementId> {
 }
 
 impl VerifyForUserOrAPWithDb for Unverified<Movement> {
-    type Entity = Movement;
+    type Type = Movement;
 
     fn verify_user_ap(
         self,
         auth: AuthUserOrAP,
         db: &mut PgConnection,
-    ) -> Result<Self::Entity, StatusCode> {
+    ) -> Result<Self::Type, StatusCode> {
         let movement = self.0;
         if movement.user_id == Some(*auth)
             && MovementDb::get_by_id(movement.id, db)
@@ -101,13 +100,13 @@ impl VerifyForUserOrAPWithDb for Unverified<Movement> {
 }
 
 impl VerifyMultipleForUserOrAPWithDb for Unverified<Vec<Movement>> {
-    type Entity = Movement;
+    type Type = Movement;
 
     fn verify_user_ap(
         self,
         auth: AuthUserOrAP,
         db: &mut PgConnection,
-    ) -> Result<Vec<Self::Entity>, StatusCode> {
+    ) -> Result<Vec<Self::Type>, StatusCode> {
         let movements = self.0;
         let movement_ids: Vec<_> = movements.iter().map(|movement| movement.id).collect();
         if movements
@@ -124,9 +123,9 @@ impl VerifyMultipleForUserOrAPWithDb for Unverified<Vec<Movement>> {
 }
 
 impl VerifyForUserOrAPWithoutDb for Unverified<Movement> {
-    type Entity = Movement;
+    type Type = Movement;
 
-    fn verify_user_ap_without_db(self, auth: AuthUserOrAP) -> Result<Self::Entity, StatusCode> {
+    fn verify_user_ap_without_db(self, auth: AuthUserOrAP) -> Result<Self::Type, StatusCode> {
         let movement = self.0;
         if movement.user_id == Some(*auth) {
             Ok(movement)
@@ -137,12 +136,9 @@ impl VerifyForUserOrAPWithoutDb for Unverified<Movement> {
 }
 
 impl VerifyMultipleForUserOrAPWithoutDb for Unverified<Vec<Movement>> {
-    type Entity = Movement;
+    type Type = Movement;
 
-    fn verify_user_ap_without_db(
-        self,
-        auth: AuthUserOrAP,
-    ) -> Result<Vec<Self::Entity>, StatusCode> {
+    fn verify_user_ap_without_db(self, auth: AuthUserOrAP) -> Result<Vec<Self::Type>, StatusCode> {
         let movements = self.0;
         if movements
             .iter()
@@ -158,7 +154,7 @@ impl VerifyMultipleForUserOrAPWithoutDb for Unverified<Vec<Movement>> {
 #[derive(Db, VerifyIdForAdmin, GetById, GetByIds, GetAll)]
 pub struct MuscleGroupDb;
 
-#[derive(Db, Create, GetById, GetByIds, Update, HardDelete)]
+#[derive(Db, ModifiableDb, Create, GetById, GetByIds, Update, HardDelete)]
 pub struct MovementMuscleDb;
 
 impl VerifyIdForUserOrAP for UnverifiedId<MovementMuscleId> {
@@ -180,13 +176,13 @@ impl VerifyIdForUserOrAP for UnverifiedId<MovementMuscleId> {
 }
 
 impl VerifyForUserOrAPWithDb for Unverified<MovementMuscle> {
-    type Entity = MovementMuscle;
+    type Type = MovementMuscle;
 
     fn verify_user_ap(
         self,
         auth: AuthUserOrAP,
         db: &mut PgConnection,
-    ) -> Result<Self::Entity, StatusCode> {
+    ) -> Result<Self::Type, StatusCode> {
         let movement_muscle = self.0;
         if MovementMuscleDb::check_user_id(movement_muscle.id, *auth, db)
             .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
@@ -199,13 +195,13 @@ impl VerifyForUserOrAPWithDb for Unverified<MovementMuscle> {
 }
 
 impl VerifyMultipleForUserOrAPWithDb for Unverified<Vec<MovementMuscle>> {
-    type Entity = MovementMuscle;
+    type Type = MovementMuscle;
 
     fn verify_user_ap(
         self,
         auth: AuthUserOrAP,
         db: &mut PgConnection,
-    ) -> Result<Vec<Self::Entity>, StatusCode> {
+    ) -> Result<Vec<Self::Type>, StatusCode> {
         let movement_muscle = self.0;
         let movement_muscle_ids: Vec<_> = movement_muscle
             .iter()
@@ -222,13 +218,13 @@ impl VerifyMultipleForUserOrAPWithDb for Unverified<Vec<MovementMuscle>> {
 }
 
 impl VerifyForUserOrAPCreate for Unverified<MovementMuscle> {
-    type Entity = MovementMuscle;
+    type Type = MovementMuscle;
 
     fn verify_user_ap_create(
         self,
         auth: AuthUserOrAP,
         db: &mut PgConnection,
-    ) -> Result<Self::Entity, StatusCode> {
+    ) -> Result<Self::Type, StatusCode> {
         let movement_muscle = self.0;
         if MovementDb::check_user_id(movement_muscle.movement_id, *auth, db)
             .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
@@ -241,13 +237,13 @@ impl VerifyForUserOrAPCreate for Unverified<MovementMuscle> {
 }
 
 impl VerifyMultipleForUserOrAPCreate for Unverified<Vec<MovementMuscle>> {
-    type Entity = MovementMuscle;
+    type Type = MovementMuscle;
 
     fn verify_user_ap_create(
         self,
         auth: AuthUserOrAP,
         db: &mut PgConnection,
-    ) -> Result<Vec<Self::Entity>, StatusCode> {
+    ) -> Result<Vec<Self::Type>, StatusCode> {
         let movement_muscle = self.0;
         let mut movement_ids: Vec<_> = movement_muscle
             .iter()
@@ -266,10 +262,7 @@ impl VerifyMultipleForUserOrAPCreate for Unverified<Vec<MovementMuscle>> {
 }
 
 impl GetByUser for MovementMuscleDb {
-    fn get_by_user(
-        user_id: UserId,
-        db: &mut PgConnection,
-    ) -> QueryResult<Vec<<Self as Db>::Entity>> {
+    fn get_by_user(user_id: UserId, db: &mut PgConnection) -> QueryResult<Vec<<Self as Db>::Type>> {
         movement_muscle::table
             .filter(
                 movement_muscle::columns::movement_id.eq_any(
@@ -292,7 +285,7 @@ impl GetByUserSync for MovementMuscleDb {
         user_id: UserId,
         last_sync: DateTime<Utc>,
         db: &mut PgConnection,
-    ) -> QueryResult<Vec<<Self as Db>::Entity>>
+    ) -> QueryResult<Vec<<Self as Db>::Type>>
     where
         Self: Sized,
     {

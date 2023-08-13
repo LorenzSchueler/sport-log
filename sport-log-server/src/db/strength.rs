@@ -11,6 +11,8 @@ use crate::{auth::*, db::*};
 
 #[derive(
     Db,
+    DbWithUserId,
+    ModifiableDb,
     VerifyIdForUserOrAP,
     Create,
     GetById,
@@ -25,14 +27,11 @@ use crate::{auth::*, db::*};
 )]
 pub struct StrengthBlueprintDb;
 
-#[derive(Db, VerifyIdForUserOrAP, Create, GetById, GetByIds, Update, HardDelete)]
+#[derive(Db, ModifiableDb, VerifyIdForUserOrAP, Create, GetById, GetByIds, Update, HardDelete)]
 pub struct StrengthBlueprintSetDb;
 
 impl GetByUser for StrengthBlueprintSetDb {
-    fn get_by_user(
-        user_id: UserId,
-        db: &mut PgConnection,
-    ) -> QueryResult<Vec<<Self as Db>::Entity>> {
+    fn get_by_user(user_id: UserId, db: &mut PgConnection) -> QueryResult<Vec<<Self as Db>::Type>> {
         strength_blueprint_set::table
             .filter(
                 strength_blueprint_set::columns::strength_blueprint_id.eq_any(
@@ -51,7 +50,7 @@ impl GetByUserSync for StrengthBlueprintSetDb {
         user_id: UserId,
         last_sync: DateTime<Utc>,
         db: &mut PgConnection,
-    ) -> QueryResult<Vec<Self::Entity>>
+    ) -> QueryResult<Vec<Self::Type>>
     where
         Self: Sized,
     {
@@ -95,13 +94,13 @@ impl CheckUserId for StrengthBlueprintSetDb {
 }
 
 impl VerifyForUserOrAPWithDb for Unverified<StrengthBlueprintSet> {
-    type Entity = StrengthBlueprintSet;
+    type Type = StrengthBlueprintSet;
 
     fn verify_user_ap(
         self,
         auth: AuthUserOrAP,
         db: &mut PgConnection,
-    ) -> Result<Self::Entity, StatusCode> {
+    ) -> Result<Self::Type, StatusCode> {
         let strength_blueprint_set = self.0;
         if StrengthBlueprintSetDb::check_user_id(strength_blueprint_set.id, *auth, db)
             .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
@@ -114,13 +113,13 @@ impl VerifyForUserOrAPWithDb for Unverified<StrengthBlueprintSet> {
 }
 
 impl VerifyMultipleForUserOrAPWithDb for Unverified<Vec<StrengthBlueprintSet>> {
-    type Entity = StrengthBlueprintSet;
+    type Type = StrengthBlueprintSet;
 
     fn verify_user_ap(
         self,
         auth: AuthUserOrAP,
         db: &mut PgConnection,
-    ) -> Result<Vec<Self::Entity>, StatusCode> {
+    ) -> Result<Vec<Self::Type>, StatusCode> {
         let strength_blueprint_sets = self.0;
         let strength_blueprint_set_ids: Vec<_> = strength_blueprint_sets
             .iter()
@@ -137,13 +136,13 @@ impl VerifyMultipleForUserOrAPWithDb for Unverified<Vec<StrengthBlueprintSet>> {
 }
 
 impl VerifyForUserOrAPCreate for Unverified<StrengthBlueprintSet> {
-    type Entity = StrengthBlueprintSet;
+    type Type = StrengthBlueprintSet;
 
     fn verify_user_ap_create(
         self,
         auth: AuthUserOrAP,
         db: &mut PgConnection,
-    ) -> Result<Self::Entity, StatusCode> {
+    ) -> Result<Self::Type, StatusCode> {
         let strength_blueprint_set = self.0;
         if StrengthBlueprintDb::check_user_id(
             strength_blueprint_set.strength_blueprint_id,
@@ -160,13 +159,13 @@ impl VerifyForUserOrAPCreate for Unverified<StrengthBlueprintSet> {
 }
 
 impl VerifyMultipleForUserOrAPCreate for Unverified<Vec<StrengthBlueprintSet>> {
-    type Entity = StrengthBlueprintSet;
+    type Type = StrengthBlueprintSet;
 
     fn verify_user_ap_create(
         self,
         auth: AuthUserOrAP,
         db: &mut PgConnection,
-    ) -> Result<Vec<Self::Entity>, StatusCode> {
+    ) -> Result<Vec<Self::Type>, StatusCode> {
         let strength_blueprint_sets = self.0;
         let mut strength_blueprint_ids: Vec<_> = strength_blueprint_sets
             .iter()
@@ -186,6 +185,9 @@ impl VerifyMultipleForUserOrAPCreate for Unverified<Vec<StrengthBlueprintSet>> {
 
 #[derive(
     Db,
+    DbWithUserId,
+    DbWithDateTime,
+    ModifiableDb,
     VerifyIdForUserOrAP,
     Create,
     GetById,
@@ -201,14 +203,11 @@ impl VerifyMultipleForUserOrAPCreate for Unverified<Vec<StrengthBlueprintSet>> {
 )]
 pub struct StrengthSessionDb;
 
-#[derive(Db, VerifyIdForUserOrAP, Create, GetById, GetByIds, Update, HardDelete)]
+#[derive(Db, ModifiableDb, VerifyIdForUserOrAP, Create, GetById, GetByIds, Update, HardDelete)]
 pub struct StrengthSetDb;
 
 impl GetByUser for StrengthSetDb {
-    fn get_by_user(
-        user_id: UserId,
-        db: &mut PgConnection,
-    ) -> QueryResult<Vec<<Self as Db>::Entity>> {
+    fn get_by_user(user_id: UserId, db: &mut PgConnection) -> QueryResult<Vec<<Self as Db>::Type>> {
         strength_set::table
             .filter(
                 strength_set::columns::strength_session_id.eq_any(
@@ -227,7 +226,7 @@ impl GetByUserSync for StrengthSetDb {
         user_id: UserId,
         last_sync: DateTime<Utc>,
         db: &mut PgConnection,
-    ) -> QueryResult<Vec<<Self as Db>::Entity>>
+    ) -> QueryResult<Vec<<Self as Db>::Type>>
     where
         Self: Sized,
     {
@@ -271,13 +270,13 @@ impl CheckUserId for StrengthSetDb {
 }
 
 impl VerifyForUserOrAPWithDb for Unverified<StrengthSet> {
-    type Entity = StrengthSet;
+    type Type = StrengthSet;
 
     fn verify_user_ap(
         self,
         auth: AuthUserOrAP,
         db: &mut PgConnection,
-    ) -> Result<Self::Entity, StatusCode> {
+    ) -> Result<Self::Type, StatusCode> {
         let strength_set = self.0;
         if StrengthSetDb::check_user_id(strength_set.id, *auth, db)
             .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
@@ -290,13 +289,13 @@ impl VerifyForUserOrAPWithDb for Unverified<StrengthSet> {
 }
 
 impl VerifyMultipleForUserOrAPWithDb for Unverified<Vec<StrengthSet>> {
-    type Entity = StrengthSet;
+    type Type = StrengthSet;
 
     fn verify_user_ap(
         self,
         auth: AuthUserOrAP,
         db: &mut PgConnection,
-    ) -> Result<Vec<Self::Entity>, StatusCode> {
+    ) -> Result<Vec<Self::Type>, StatusCode> {
         let strength_sets = self.0;
         let strength_set_ids: Vec<_> = strength_sets
             .iter()
@@ -313,13 +312,13 @@ impl VerifyMultipleForUserOrAPWithDb for Unverified<Vec<StrengthSet>> {
 }
 
 impl VerifyForUserOrAPCreate for Unverified<StrengthSet> {
-    type Entity = StrengthSet;
+    type Type = StrengthSet;
 
     fn verify_user_ap_create(
         self,
         auth: AuthUserOrAP,
         db: &mut PgConnection,
-    ) -> Result<Self::Entity, StatusCode> {
+    ) -> Result<Self::Type, StatusCode> {
         let strength_set = self.0;
         if StrengthSessionDb::check_user_id(strength_set.strength_session_id, *auth, db)
             .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
@@ -332,13 +331,13 @@ impl VerifyForUserOrAPCreate for Unverified<StrengthSet> {
 }
 
 impl VerifyMultipleForUserOrAPCreate for Unverified<Vec<StrengthSet>> {
-    type Entity = StrengthSet;
+    type Type = StrengthSet;
 
     fn verify_user_ap_create(
         self,
         auth: AuthUserOrAP,
         db: &mut PgConnection,
-    ) -> Result<Vec<Self::Entity>, StatusCode> {
+    ) -> Result<Vec<Self::Type>, StatusCode> {
         let strength_sets = self.0;
         let mut strength_session_ids: Vec<StrengthSessionId> = strength_sets
             .iter()

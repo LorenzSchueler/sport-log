@@ -2,6 +2,7 @@ use sport_log_types_derive::*;
 
 #[derive(
     Db,
+    ModifiableDb,
     VerifyIdForAdmin,
     VerifyIdUnchecked,
     Create,
@@ -17,6 +18,8 @@ pub struct PlatformDb;
 
 #[derive(
     Db,
+    ModifiableDb,
+    DbWithUserId,
     VerifyIdForUser,
     Create,
     GetById,

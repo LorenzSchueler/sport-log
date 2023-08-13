@@ -1,4 +1,5 @@
 use proc_macro::TokenStream;
+use proc_macro2::Ident;
 use quote::quote;
 
 use crate::Identifiers;
@@ -6,40 +7,127 @@ use crate::Identifiers;
 pub(crate) fn impl_db(
     Identifiers {
         db_type,
-        entity_type,
+        value_type,
         id_type,
+        value_name,
         ..
     }: Identifiers,
 ) -> TokenStream {
     quote! {
         impl crate::db::Db for #db_type {
             type Id = sport_log_types::#id_type;
-            type Entity = sport_log_types::#entity_type;
+            type Type = sport_log_types::#value_type;
+            type Table = sport_log_types::schema::#value_name::table;
+
+            fn table() -> Self::Table {
+                sport_log_types::schema::#value_name::table
+            }
+
+            fn id_column() -> <Self::Table as Table>::PrimaryKey {
+                sport_log_types::schema::#value_name::columns::id
+            }
         }
     }
     .into()
 }
 
-pub(crate) fn impl_create(
+pub(crate) fn impl_db_with_user_id(
     Identifiers {
         db_type,
-        entity_name,
+        value_name,
         ..
     }: Identifiers,
 ) -> TokenStream {
+    quote! {
+        impl crate::db::DbWithUserId for #db_type {
+            type UserIdColumn = sport_log_types::schema::#value_name::columns::user_id;
+
+            fn user_id_column() -> Self::UserIdColumn {
+                sport_log_types::schema::#value_name::columns::user_id
+            }
+        }
+    }
+    .into()
+}
+
+pub(crate) fn impl_db_with_ap_id(
+    Identifiers {
+        db_type,
+        value_name,
+        ..
+    }: Identifiers,
+) -> TokenStream {
+    quote! {
+        impl crate::db::DbWithApId for #db_type {
+            type ApIdColumn = sport_log_types::schema::#value_name::columns::action_provider_id;
+
+            fn ap_id_column() -> Self::ApIdColumn {
+                sport_log_types::schema::#value_name::columns::action_provider_id
+            }
+        }
+    }
+    .into()
+}
+
+pub(crate) fn impl_db_with_datetime(
+    Identifiers {
+        db_type,
+        value_name,
+        ..
+    }: Identifiers,
+) -> TokenStream {
+    quote! {
+        impl crate::db::DbWithDateTime for #db_type {
+            type DateTimeColumn = sport_log_types::schema::#value_name::columns::datetime;
+
+            fn datetime_column() -> Self::DateTimeColumn {
+                sport_log_types::schema::#value_name::columns::datetime
+            }
+        }
+    }
+    .into()
+}
+
+pub(crate) fn impl_modifiable_db(
+    Identifiers {
+        db_type,
+        value_name,
+        ..
+    }: Identifiers,
+) -> TokenStream {
+    quote! {
+        impl crate::db::ModifiableDb for #db_type {
+            type LastChangeColumn = sport_log_types::schema::#value_name::columns::last_change;
+            type DeletedColumn = sport_log_types::schema::#value_name::columns::deleted;
+
+            fn last_change_column() -> Self::LastChangeColumn {
+                sport_log_types::schema::#value_name::columns::last_change
+            }
+
+            fn deleted_column() -> Self::DeletedColumn {
+                sport_log_types::schema::#value_name::columns::deleted
+            }
+        }
+    }
+    .into()
+}
+
+pub(crate) fn impl_create(db_type: &Ident) -> TokenStream {
     quote! {
         use diesel::prelude::*;
 
         impl crate::db::Create for crate::db::#db_type {
-            fn create(#entity_name: &Self::Entity, db: &mut PgConnection) -> QueryResult<usize> {
-                diesel::insert_into(sport_log_types::schema::#entity_name::table)
-                    .values(#entity_name)
+            fn create(value: &Self::Type, db: &mut PgConnection) -> QueryResult<usize> {
+                use crate::db::Db;
+                diesel::insert_into(Self::table())
+                    .values(value)
                     .execute(db)
             }
 
-            fn create_multiple(#entity_name: &[Self::Entity], db: &mut PgConnection) -> QueryResult<usize> {
-                diesel::insert_into(sport_log_types::schema::#entity_name::table)
-                    .values(#entity_name)
+            fn create_multiple(values: &[Self::Type], db: &mut PgConnection) -> QueryResult<usize> {
+                use crate::db::Db;
+                diesel::insert_into(Self::table())
+                    .values(values)
                     .execute(db)
             }
         }
@@ -47,22 +135,16 @@ pub(crate) fn impl_create(
     .into()
 }
 
-pub(crate) fn impl_get_by_id(
-    Identifiers {
-        db_type,
-        id_name,
-        entity_name,
-        ..
-    }: Identifiers,
-) -> TokenStream {
+pub(crate) fn impl_get_by_id(db_type: &Ident) -> TokenStream {
     quote! {
         use diesel::prelude::*;
 
         impl crate::db::GetById for crate::db::#db_type {
-            fn get_by_id(#id_name: Self::Id, db: &mut PgConnection) -> QueryResult<Self::Entity> {
-                sport_log_types::schema::#entity_name::table
-                    .find(#id_name)
-                    .select(Self::Entity::as_select())
+            fn get_by_id(id: Self::Id, db: &mut PgConnection) -> QueryResult<Self::Type> {
+                use crate::db::Db;
+                Self::table()
+                    .find(Self::id_column())
+                    .select(Self::Type::as_select())
                     .get_result(db)
             }
         }
@@ -70,21 +152,16 @@ pub(crate) fn impl_get_by_id(
     .into()
 }
 
-pub(crate) fn impl_get_by_ids(
-    Identifiers {
-        db_type,
-        entity_name,
-        ..
-    }: Identifiers,
-) -> TokenStream {
+pub(crate) fn impl_get_by_ids(db_type: &Ident) -> TokenStream {
     quote! {
         use diesel::prelude::*;
 
         impl crate::db::GetByIds for crate::db::#db_type {
-            fn get_by_ids(ids: &[Self::Id], db: &mut PgConnection) -> QueryResult<Vec<Self::Entity>> {
-                sport_log_types::schema::#entity_name::table
-                    .filter(sport_log_types::schema::#entity_name::columns::id.eq_any(ids))
-                    .select(Self::Entity::as_select())
+            fn get_by_ids(ids: &[Self::Id], db: &mut PgConnection) -> QueryResult<Vec<Self::Type>> {
+                use crate::db::Db;
+                Self::table()
+                    .filter(Self::id_column().eq_any(ids))
+                    .select(Self::Type::as_select())
                     .get_results(db)
             }
         }
@@ -92,21 +169,16 @@ pub(crate) fn impl_get_by_ids(
     .into()
 }
 
-pub(crate) fn impl_get_by_user(
-    Identifiers {
-        db_type,
-        entity_name,
-        ..
-    }: Identifiers,
-) -> TokenStream {
+pub(crate) fn impl_get_by_user(db_type: &Ident) -> TokenStream {
     quote! {
         use diesel::prelude::*;
 
         impl crate::db::GetByUser for crate::db::#db_type {
-            fn get_by_user(user_id: sport_log_types::UserId, db: &mut PgConnection) -> QueryResult<Vec<Self::Entity>> {
-                sport_log_types::schema::#entity_name::table
-                    .filter(sport_log_types::schema::#entity_name::columns::user_id.eq(user_id))
-                    .select(Self::Entity::as_select())
+            fn get_by_user(user_id: sport_log_types::UserId, db: &mut PgConnection) -> QueryResult<Vec<Self::Type>> {
+                use crate::db::{Db, DbWithUserId};
+                Self::table()
+                    .filter(Self::user_id_column().eq(user_id))
+                    .select(Self::Type::as_select())
                     .get_results(db)
             }
         }
@@ -114,62 +186,51 @@ pub(crate) fn impl_get_by_user(
     .into()
 }
 
-pub(crate) fn impl_get_by_user_and_timespan(
-    Identifiers {
-        db_type,
-        entity_name,
-        ..
-    }: Identifiers,
-) -> TokenStream {
+pub(crate) fn impl_get_by_user_and_timespan(db_type: &Ident) -> TokenStream {
     quote! {
-            use diesel::prelude::*;
+        use diesel::prelude::*;
 
-            impl crate::db::GetByUserTimespan for crate::db::#db_type {
-                fn get_by_user_and_timespan(
-                    user_id: sport_log_types::UserId,
-                    timespan: crate::db::Timespan,
-                    db: &mut PgConnection
-                ) -> QueryResult<Vec<Self::Entity>> {
-                    let filter_user = sport_log_types::schema::#entity_name::table
-                        .filter(sport_log_types::schema::#entity_name::columns::user_id.eq(user_id));
-                    match timespan {
-                        crate::db::Timespan::StartEnd(start, end) => {
-                            filter_user
-                                .filter(sport_log_types::schema::#entity_name::columns::datetime.between(start, end))
-                                .select(Self::Entity::as_select())
-                                .get_results(db)
-                        },
-                        crate::db::Timespan::Start(start) => {
-                            filter_user
-                                .filter(sport_log_types::schema::#entity_name::columns::datetime.ge(start))
-                                .select(Self::Entity::as_select())
-                                .get_results(db)
-                        },
-                        crate::db::Timespan::End(end) => {
-                            filter_user
-                                .filter(sport_log_types::schema::#entity_name::columns::datetime.le(end))
-                                .select(Self::Entity::as_select())
-                                .get_results(db)
-                        }
-                        crate::db::Timespan::All => {
-                            filter_user
-                                .select(Self::Entity::as_select())
-                                .get_results(db)
-                        }
+        impl crate::db::GetByUserTimespan for crate::db::#db_type {
+            fn get_by_user_and_timespan(
+                user_id: sport_log_types::UserId,
+                timespan: crate::db::Timespan,
+                db: &mut PgConnection
+            ) -> QueryResult<Vec<Self::Type>> {
+                use crate::db::{Db, DbWithUserId, DbWithDateTime};
+                let filter_user = Self::table()
+                    .filter(Self::user_id_column().eq(user_id));
+                match timespan {
+                    crate::db::Timespan::StartEnd(start, end) => {
+                        filter_user
+                            .filter(Self::datetime_column().between(start, end))
+                            .select(Self::Type::as_select())
+                            .get_results(db)
+                    },
+                    crate::db::Timespan::Start(start) => {
+                        filter_user
+                            .filter(Self::datetime_column().ge(start))
+                            .select(Self::Type::as_select())
+                            .get_results(db)
+                    },
+                    crate::db::Timespan::End(end) => {
+                        filter_user
+                            .filter(Self::datetime_column().le(end))
+                            .select(Self::Type::as_select())
+                            .get_results(db)
+                    }
+                    crate::db::Timespan::All => {
+                        filter_user
+                            .select(Self::Type::as_select())
+                            .get_results(db)
                     }
                 }
             }
         }
+    }
     .into()
 }
 
-pub(crate) fn impl_get_by_user_and_last_sync(
-    Identifiers {
-        db_type,
-        entity_name,
-        ..
-    }: Identifiers,
-) -> TokenStream {
+pub(crate) fn impl_get_by_user_and_last_sync(db_type: &Ident) -> TokenStream {
     quote! {
         use diesel::prelude::*;
 
@@ -178,11 +239,12 @@ pub(crate) fn impl_get_by_user_and_last_sync(
                 user_id: sport_log_types::UserId,
                 last_sync: chrono::DateTime<chrono::Utc>,
                 db: &mut PgConnection
-            ) -> QueryResult<Vec<Self::Entity>> {
-                sport_log_types::schema::#entity_name::table
-                    .filter(sport_log_types::schema::#entity_name::columns::user_id.eq(user_id))
-                    .filter(sport_log_types::schema::#entity_name::columns::last_change.ge(last_sync))
-                    .select(Self::Entity::as_select())
+            ) -> QueryResult<Vec<Self::Type>> {
+                use crate::db::{Db, DbWithUserId, ModifiableDb};
+                Self::table()
+                    .filter(Self::user_id_column().eq(user_id))
+                    .filter(Self::last_change_column().ge(last_sync))
+                    .select(Self::Type::as_select())
                     .get_results(db)
             }
         }
@@ -190,21 +252,16 @@ pub(crate) fn impl_get_by_user_and_last_sync(
     .into()
 }
 
-pub(crate) fn impl_get_by_last_sync(
-    Identifiers {
-        db_type,
-        entity_name,
-        ..
-    }: Identifiers,
-) -> TokenStream {
+pub(crate) fn impl_get_by_last_sync(db_type: &Ident) -> TokenStream {
     quote! {
         use diesel::prelude::*;
 
         impl crate::db::GetBySync for crate::db::#db_type {
-            fn get_by_last_sync(last_sync: chrono::DateTime<chrono::Utc>, db: &mut PgConnection) -> QueryResult<Vec<Self::Entity>> {
-                sport_log_types::schema::#entity_name::table
-                    .filter(sport_log_types::schema::#entity_name::columns::last_change.ge(last_sync))
-                    .select(Self::Entity::as_select())
+            fn get_by_last_sync(last_sync: chrono::DateTime<chrono::Utc>, db: &mut PgConnection) -> QueryResult<Vec<Self::Type>> {
+                use crate::db::{Db, ModifiableDb};
+                Self::table()
+                    .filter(Self::last_change_column().ge(last_sync))
+                    .select(Self::Type::as_select())
                     .get_results(db)
             }
         }
@@ -212,48 +269,39 @@ pub(crate) fn impl_get_by_last_sync(
     .into()
 }
 
-pub(crate) fn impl_get_all(
-    Identifiers {
-        db_type,
-        entity_name,
-        ..
-    }: Identifiers,
-) -> TokenStream {
+pub(crate) fn impl_get_all(db_type: &Ident) -> TokenStream {
     quote! {
         use diesel::prelude::*;
 
         impl crate::db::GetAll for crate::db::#db_type {
-            fn get_all(db: &mut PgConnection) -> QueryResult<Vec<Self::Entity>> {
-                sport_log_types::schema::#entity_name::table.select(Self::Entity::as_select()).load(db)
+            fn get_all(db: &mut PgConnection) -> QueryResult<Vec<Self::Type>> {
+                use crate::db::Db;
+                Self::table().select(Self::Type::as_select()).load(db)
             }
         }
     }
     .into()
 }
 
-pub(crate) fn impl_update(
-    Identifiers {
-        db_type,
-        entity_name,
-        ..
-    }: Identifiers,
-) -> TokenStream {
+pub(crate) fn impl_update(db_type: &Ident) -> TokenStream {
     quote! {
         use diesel::prelude::*;
 
         impl crate::db::Update for crate::db::#db_type {
-            fn update(#entity_name: &Self::Entity, db: &mut PgConnection) -> QueryResult<usize> {
-                diesel::update(sport_log_types::schema::#entity_name::table.find(#entity_name.id))
-                    .set(#entity_name)
+            fn update(value: &Self::Type, db: &mut PgConnection) -> QueryResult<usize> {
+                use crate::db::Db;
+                diesel::update(Self::table().find(value.id))
+                    .set(value)
                     .execute(db)
             }
 
-            fn update_multiple(#entity_name: &[Self::Entity], db: &mut PgConnection) -> QueryResult<usize> {
+            fn update_multiple(values: &[Self::Type], db: &mut PgConnection) -> QueryResult<usize> {
+                use crate::db::Db;
                 db.transaction(|db| {
-                    let len = #entity_name.len();
-                    for entity in #entity_name {
-                        diesel::update(sport_log_types::schema::#entity_name::table.find(entity.id))
-                            .set(entity)
+                    let len = values.len();
+                    for value in values {
+                        diesel::update(Self::table().find(value.id))
+                            .set(value)
                             .execute(db)?;
                     }
 
@@ -265,22 +313,17 @@ pub(crate) fn impl_update(
     .into()
 }
 
-pub(crate) fn impl_hard_delete(
-    Identifiers {
-        db_type,
-        entity_name,
-        ..
-    }: Identifiers,
-) -> TokenStream {
+pub(crate) fn impl_hard_delete(db_type: &Ident) -> TokenStream {
     quote! {
         use diesel::prelude::*;
 
         impl crate::db::HardDelete for crate::db::#db_type {
             fn hard_delete(last_change: chrono::DateTime<chrono::Utc>, db: &mut PgConnection) -> QueryResult<usize> {
+                use crate::db::{Db, ModifiableDb};
                 diesel::delete(
-                    sport_log_types::schema::#entity_name::table
-                        .filter(sport_log_types::schema::#entity_name::columns::deleted.eq(true))
-                        .filter(sport_log_types::schema::#entity_name::columns::last_change.le(last_change))
+                    Self::table()
+                        .filter(Self::deleted_column().eq(true))
+                        .filter(Self::last_change_column().le(last_change))
                 ).execute(db)
             }
         }
@@ -288,21 +331,16 @@ pub(crate) fn impl_hard_delete(
     .into()
 }
 
-pub(crate) fn impl_check_user_id(
-    Identifiers {
-        db_type,
-        entity_name,
-        ..
-    }: Identifiers,
-) -> TokenStream {
+pub(crate) fn impl_check_user_id(db_type: &Ident) -> TokenStream {
     quote! {
         use diesel::prelude::*;
 
         impl crate::db::CheckUserId for crate::db::#db_type {
             fn check_user_id(id: Self::Id, user_id: sport_log_types::UserId, db: &mut PgConnection) -> QueryResult<bool> {
-                sport_log_types::schema::#entity_name::table
-                    .filter(sport_log_types::schema::#entity_name::columns::id.eq(id))
-                    .select(sport_log_types::schema::#entity_name::columns::user_id.eq(user_id))
+                use crate::db::{Db, DbWithUserId};
+                Self::table()
+                    .filter(Self::id_column().eq(id))
+                    .select(Self::user_id_column().eq(user_id))
                     .get_result(db)
                     .optional()
                     .map(|eq| eq.unwrap_or(false))
@@ -313,9 +351,10 @@ pub(crate) fn impl_check_user_id(
                 user_id: sport_log_types::UserId,
                 db: &mut PgConnection,
             ) -> QueryResult<bool> {
-                sport_log_types::schema::#entity_name::table
-                    .filter(sport_log_types::schema::#entity_name::columns::id.eq_any(ids))
-                    .select(sport_log_types::schema::#entity_name::columns::user_id.eq(user_id))
+                use crate::db::{Db, DbWithUserId};
+                Self::table()
+                    .filter(Self::id_column().eq_any(ids))
+                    .select(Self::user_id_column().eq(user_id))
                     .get_results(db)
                     .map(|eqs: Vec<bool>| eqs.into_iter().all(|eq| eq))
             }
@@ -324,23 +363,18 @@ pub(crate) fn impl_check_user_id(
     .into()
 }
 
-pub(crate) fn impl_check_optional_user_id(
-    Identifiers {
-        db_type,
-        entity_name,
-        ..
-    }: Identifiers,
-) -> TokenStream {
+pub(crate) fn impl_check_optional_user_id(db_type: &Ident) -> TokenStream {
     quote! {
         use diesel::prelude::*;
 
         impl crate::db::CheckOptionalUserId for crate::db::#db_type {
             fn check_optional_user_id(id: Self::Id, user_id: sport_log_types::UserId, db: &mut PgConnection) -> QueryResult<bool> {
-                sport_log_types::schema::#entity_name::table
-                    .filter(sport_log_types::schema::#entity_name::columns::id.eq(id))
-                    .select(sport_log_types::schema::#entity_name::columns::user_id
+                use crate::db::{Db, DbWithUserId};
+                Self::table()
+                    .filter(Self::id_column().eq(id))
+                    .select(Self::user_id_column()
                         .is_not_distinct_from(user_id)
-                        .or(sport_log_types::schema::#entity_name::columns::user_id.is_null())
+                        .or(Self::user_id_column().is_null())
                     )
                     .get_result(db)
                     .optional()
@@ -352,11 +386,12 @@ pub(crate) fn impl_check_optional_user_id(
                 user_id: sport_log_types::UserId,
                 db: &mut PgConnection,
             ) -> QueryResult<bool> {
-                sport_log_types::schema::#entity_name::table
-                    .filter(sport_log_types::schema::#entity_name::columns::id.eq_any(ids))
-                    .select(sport_log_types::schema::#entity_name::columns::user_id
+                use crate::db::Db;
+                Self::table()
+                    .filter(Self::id_column().eq_any(ids))
+                    .select(Self::user_id_column()
                         .is_not_distinct_from(user_id)
-                        .or(sport_log_types::schema::#entity_name::columns::user_id.is_null())
+                        .or(Self::user_id_column().is_null())
                     )
                     .get_results(db)
                     .map(|eqs: Vec<bool>| eqs.into_iter().all(|eq| eq))
@@ -365,9 +400,10 @@ pub(crate) fn impl_check_optional_user_id(
 
         impl crate::db::CheckUserId for crate::db::#db_type {
             fn check_user_id(id: Self::Id, user_id: sport_log_types::UserId, db: &mut PgConnection) -> QueryResult<bool> {
-                sport_log_types::schema::#entity_name::table
-                    .filter(sport_log_types::schema::#entity_name::columns::id.eq(id))
-                    .select(sport_log_types::schema::#entity_name::columns::user_id.is_not_distinct_from(user_id))
+                use crate::db::Db;
+                Self::table()
+                    .filter(Self::id_column().eq(id))
+                    .select(Self::user_id_column().is_not_distinct_from(user_id))
                     .get_result(db)
                     .optional()
                     .map(|eq| eq.unwrap_or(false))
@@ -378,9 +414,10 @@ pub(crate) fn impl_check_optional_user_id(
                 user_id: sport_log_types::UserId,
                 db: &mut PgConnection,
             ) -> QueryResult<bool> {
-                sport_log_types::schema::#entity_name::table
-                    .filter(sport_log_types::schema::#entity_name::columns::id.eq_any(ids))
-                    .select(sport_log_types::schema::#entity_name::columns::user_id.is_not_distinct_from(user_id))
+                use crate::db::Db;
+                Self::table()
+                    .filter(Self::id_column().eq_any(ids))
+                    .select(Self::user_id_column().is_not_distinct_from(user_id))
                     .get_results(db)
                     .map(|eqs: Vec<bool>| eqs.into_iter().all(|eq| eq))
             }
@@ -389,21 +426,16 @@ pub(crate) fn impl_check_optional_user_id(
     .into()
 }
 
-pub(crate) fn impl_check_ap_id(
-    Identifiers {
-        db_type,
-        entity_name,
-        ..
-    }: Identifiers,
-) -> TokenStream {
+pub(crate) fn impl_check_ap_id(db_type: &Ident) -> TokenStream {
     quote! {
         use diesel::prelude::*;
 
         impl crate::db::CheckAPId for crate::db::#db_type {
             fn check_ap_id(id: Self::Id, ap_id: ActionProviderId, db: &mut PgConnection) -> QueryResult<bool> {
-                sport_log_types::schema::#entity_name::table
-                    .filter(sport_log_types::schema::#entity_name::columns::id.eq(id))
-                    .select(sport_log_types::schema::#entity_name::columns::action_provider_id.eq(ap_id))
+                use crate::db::{Db, DbWithApId};
+                Self::table()
+                    .filter(Self::id_column().eq(id))
+                    .select(Self::ap_id_column().eq(ap_id))
                     .get_result(db)
                     .optional()
                     .map(|eq| eq.unwrap_or(false))
@@ -414,9 +446,10 @@ pub(crate) fn impl_check_ap_id(
                 ap_id: ActionProviderId,
                 db: &mut PgConnection,
             ) -> QueryResult<bool> {
-                sport_log_types::schema::#entity_name::table
-                    .filter(sport_log_types::schema::#entity_name::columns::id.eq_any(ids))
-                    .select(sport_log_types::schema::#entity_name::columns::action_provider_id.eq(ap_id))
+                use crate::db::Db;
+                Self::table()
+                    .filter(Self::id_column().eq_any(ids))
+                    .select(Self::ap_id_column().eq(ap_id))
                     .get_results(db)
                     .map(|eqs: Vec<bool>| eqs.into_iter().all(|eq| eq))
             }
@@ -425,14 +458,10 @@ pub(crate) fn impl_check_ap_id(
     .into()
 }
 
-pub(crate) fn impl_verify_id_for_user(
-    Identifiers {
-        db_type, id_type, ..
-    }: Identifiers,
-) -> TokenStream {
+pub(crate) fn impl_verify_id_for_user(db_type: &Ident) -> TokenStream {
     quote! {
-        impl crate::db::VerifyIdForUser for crate::db::UnverifiedId<sport_log_types::#id_type> {
-            type Id = sport_log_types::#id_type;
+        impl crate::db::VerifyIdForUser for crate::db::UnverifiedId<<#db_type as crate::db::Db>::Id> {
+            type Id = <#db_type as crate::db::Db>::Id;
 
             fn verify_user(
                 self,
@@ -454,15 +483,10 @@ pub(crate) fn impl_verify_id_for_user(
     .into()
 }
 
-pub(crate) fn impl_verify_id_for_user_or_ap(
-    Identifiers {
-        db_type, id_type, ..
-    }: Identifiers,
-) -> TokenStream {
+pub(crate) fn impl_verify_id_for_user_or_ap(db_type: &Ident) -> TokenStream {
     quote! {
-        impl crate::db::VerifyIdForUserOrAP for crate::db::UnverifiedId<sport_log_types::#id_type> {
-            type Id = sport_log_types::#id_type;
-
+        impl crate::db::VerifyIdForUserOrAP for crate::db::UnverifiedId<<#db_type as crate::db::Db>::Id> {
+            type Id = <#db_type as crate::db::Db>::Id;
             fn verify_user_ap(
                 self,
                 auth: crate::auth::AuthUserOrAP,
@@ -483,20 +507,16 @@ pub(crate) fn impl_verify_id_for_user_or_ap(
     .into()
 }
 
-pub(crate) fn impl_verify_id_for_action_provider(
-    Identifiers {
-        db_type, id_type, ..
-    }: Identifiers,
-) -> TokenStream {
+pub(crate) fn impl_verify_id_for_action_provider(db_type: &Ident) -> TokenStream {
     quote! {
-        impl crate::db::VerifyIdForActionProvider for crate::db::UnverifiedId<sport_log_types::#id_type> {
-            type Id = sport_log_types::#id_type;
+        impl crate::db::VerifyIdForActionProvider for crate::db::UnverifiedId<<#db_type as crate::db::Db>::Id> {
+            type Id = <#db_type as crate::db::Db>::Id;
 
             fn verify_ap(
                 self,
                 auth: crate::auth::AuthAP,
                 db: &mut diesel::pg::PgConnection,
-            ) -> Result<sport_log_types::#id_type, axum::http::StatusCode> {
+            ) -> Result<Self::Id, axum::http::StatusCode> {
                 use crate::db::CheckAPId;
 
                 if crate::db::#db_type::check_ap_id(self.0, *auth, db)
@@ -512,20 +532,16 @@ pub(crate) fn impl_verify_id_for_action_provider(
     .into()
 }
 
-pub(crate) fn impl_verify_ids_for_action_provider(
-    Identifiers {
-        db_type, id_type, ..
-    }: Identifiers,
-) -> TokenStream {
+pub(crate) fn impl_verify_ids_for_action_provider(db_type: &Ident) -> TokenStream {
     quote! {
-        impl crate::db::VerifyIdsForActionProvider for crate::db::UnverifiedIds<sport_log_types::#id_type> {
-            type Id = sport_log_types::#id_type;
+        impl crate::db::VerifyIdsForActionProvider for crate::db::UnverifiedIds<<#db_type as crate::db::Db>::Id> {
+            type Id = <#db_type as crate::db::Db>::Id;
 
             fn verify_ap(
                 self,
                 auth: crate::auth::AuthAP,
                 db: &mut diesel::pg::PgConnection,
-            ) -> Result<Vec<sport_log_types::#id_type>, axum::http::StatusCode> {
+            ) -> Result<Vec<Self::Id>, axum::http::StatusCode> {
                 use crate::db::CheckAPId;
 
                 if crate::db::#db_type::check_ap_ids(&self.0, *auth, db)
@@ -541,15 +557,15 @@ pub(crate) fn impl_verify_ids_for_action_provider(
     .into()
 }
 
-pub(crate) fn impl_verify_id_for_admin(Identifiers { id_type, .. }: Identifiers) -> TokenStream {
+pub(crate) fn impl_verify_id_for_admin(db_type: &Ident) -> TokenStream {
     quote! {
-        impl crate::db::VerifyIdForAdmin for crate::db::UnverifiedId<sport_log_types::#id_type> {
-            type Id = sport_log_types::#id_type;
+        impl crate::db::VerifyIdForAdmin for crate::db::UnverifiedId<<#db_type as crate::db::Db>::Id> {
+            type Id = <#db_type as crate::db::Db>::Id;
 
             fn verify_adm(
                 self,
                 auth: crate::auth::AuthAdmin,
-            ) -> Result<sport_log_types::#id_type, axum::http::StatusCode> {
+            ) -> Result<Self::Id, axum::http::StatusCode> {
                 Ok(self.0)
             }
         }
@@ -557,15 +573,15 @@ pub(crate) fn impl_verify_id_for_admin(Identifiers { id_type, .. }: Identifiers)
     .into()
 }
 
-pub(crate) fn impl_verify_ids_for_admin(Identifiers { id_type, .. }: Identifiers) -> TokenStream {
+pub(crate) fn impl_verify_ids_for_admin(db_type: &Ident) -> TokenStream {
     quote! {
-        impl crate::db::VerifyIdsForAdmin for crate::db::UnverifiedIds<sport_log_types::#id_type> {
-            type Id = sport_log_types::#id_type;
+        impl crate::db::VerifyIdsForAdmin for crate::db::UnverifiedIds<<#db_type as crate::db::Db>::Id> {
+            type Id = <#db_type as crate::db::Db>::Id;
 
             fn verify_adm(
                 self,
                 auth: crate::auth::AuthAdmin,
-            ) -> Result<Vec<sport_log_types::#id_type>, axum::http::StatusCode> {
+            ) -> Result<Vec<Self::Id>, axum::http::StatusCode> {
                 Ok(self.0)
             }
         }
@@ -573,14 +589,14 @@ pub(crate) fn impl_verify_ids_for_admin(Identifiers { id_type, .. }: Identifiers
     .into()
 }
 
-pub(crate) fn impl_verify_id_unchecked(Identifiers { id_type, .. }: Identifiers) -> TokenStream {
+pub(crate) fn impl_verify_id_unchecked(db_type: &Ident) -> TokenStream {
     quote! {
-        impl crate::db::VerifyIdUnchecked for crate::db::UnverifiedId<sport_log_types::#id_type> {
-            type Id = sport_log_types::#id_type;
+        impl crate::db::VerifyIdUnchecked for crate::db::UnverifiedId<<#db_type as crate::db::Db>::Id> {
+            type Id = <#db_type as crate::db::Db>::Id;
 
             fn verify_unchecked(
                 self,
-            ) -> Result<sport_log_types::#id_type, axum::http::StatusCode> {
+            ) -> Result<Self::Id, axum::http::StatusCode> {
                 Ok(self.0)
             }
         }
@@ -588,53 +604,47 @@ pub(crate) fn impl_verify_id_unchecked(Identifiers { id_type, .. }: Identifiers)
     .into()
 }
 
-pub(crate) fn impl_verify_for_user_with_db(
-    Identifiers {
-        db_type,
-        entity_type,
-        ..
-    }: Identifiers,
-) -> TokenStream {
+pub(crate) fn impl_verify_for_user_with_db(db_type: &Ident) -> TokenStream {
     quote! {
-        impl crate::db::VerifyForUserWithDb for crate::db::Unverified<sport_log_types::#entity_type> {
-            type Entity = sport_log_types::#entity_type;
+        impl crate::db::VerifyForUserWithDb for crate::db::Unverified<<#db_type as crate::db::Db>::Type> {
+            type Type = <#db_type as crate::db::Db>::Type;
 
             fn verify_user(
                 self,
                 auth: crate::auth::AuthUser,
                 db: &mut diesel::pg::PgConnection,
-            ) -> Result<Self::Entity, axum::http::StatusCode> {
+            ) -> Result<Self::Type, axum::http::StatusCode> {
                 use crate::db::CheckUserId;
 
-                let entity = self.0;
-                if entity.user_id == *auth
-                    && crate::db::#db_type::check_user_id(entity.id, *auth, db)
+                let value = self.0;
+                if value.user_id == *auth
+                    && crate::db::#db_type::check_user_id(value.id, *auth, db)
                     .map_err(|_| axum::http::StatusCode::INTERNAL_SERVER_ERROR)?
                 {
-                    Ok(entity)
+                    Ok(value)
                 } else {
                     Err(axum::http::StatusCode::FORBIDDEN)
                 }
             }
         }
 
-        impl crate::db::VerifyMultipleForUserWithDb for crate::db::Unverified<Vec<sport_log_types::#entity_type>> {
-            type Entity = sport_log_types::#entity_type;
+        impl crate::db::VerifyMultipleForUserWithDb for crate::db::Unverified<Vec<<#db_type as crate::db::Db>::Type>> {
+            type Type = <#db_type as crate::db::Db>::Type;
 
             fn verify_user(
                 self,
                 auth: crate::auth::AuthUser,
                 db: &mut diesel::pg::PgConnection,
-            ) -> Result<Vec<Self::Entity>, axum::http::StatusCode> {
+            ) -> Result<Vec<Self::Type>, axum::http::StatusCode> {
                 use crate::db::CheckUserId;
 
-                let entities = self.0;
-                let ids: Vec<_> = entities.iter().map(|entity| entity.id).collect();
-                if entities.iter().all(|entity| entity.user_id == *auth)
+                let values = self.0;
+                let ids: Vec<_> = values.iter().map(|value| value.id).collect();
+                if values.iter().all(|value| value.user_id == *auth)
                     && crate::db::#db_type::check_user_ids(&ids, *auth, db)
                     .map_err(|_| axum::http::StatusCode::INTERNAL_SERVER_ERROR)?
                 {
-                    Ok(entities)
+                    Ok(values)
                 } else {
                     Err(axum::http::StatusCode::FORBIDDEN)
                 }
@@ -644,53 +654,47 @@ pub(crate) fn impl_verify_for_user_with_db(
     .into()
 }
 
-pub(crate) fn impl_verify_for_user_or_ap_with_db(
-    Identifiers {
-        db_type,
-        entity_type,
-        ..
-    }: Identifiers,
-) -> TokenStream {
+pub(crate) fn impl_verify_for_user_or_ap_with_db(db_type: &Ident) -> TokenStream {
     quote! {
-        impl crate::db::VerifyForUserOrAPWithDb for crate::db::Unverified<sport_log_types::#entity_type> {
-            type Entity = sport_log_types::#entity_type;
+        impl crate::db::VerifyForUserOrAPWithDb for crate::db::Unverified<<#db_type as crate::db::Db>::Type> {
+            type Type = <#db_type as crate::db::Db>::Type;
 
             fn verify_user_ap(
                 self,
                 auth: crate::auth::AuthUserOrAP,
                 db: &mut diesel::pg::PgConnection,
-            ) -> Result<Self::Entity, axum::http::StatusCode> {
+            ) -> Result<Self::Type, axum::http::StatusCode> {
                 use crate::db::CheckUserId;
 
-                let entity = self.0;
-                if entity.user_id == *auth
-                    && crate::db::#db_type::check_user_id(entity.id, *auth, db)
+                let value = self.0;
+                if value.user_id == *auth
+                    && crate::db::#db_type::check_user_id(value.id, *auth, db)
                     .map_err(|_| axum::http::StatusCode::INTERNAL_SERVER_ERROR)?
                 {
-                    Ok(entity)
+                    Ok(value)
                 } else {
                     Err(axum::http::StatusCode::FORBIDDEN)
                 }
             }
         }
 
-        impl crate::db::VerifyMultipleForUserOrAPWithDb for crate::db::Unverified<Vec<sport_log_types::#entity_type>> {
-            type Entity = sport_log_types::#entity_type;
+        impl crate::db::VerifyMultipleForUserOrAPWithDb for crate::db::Unverified<Vec<<#db_type as crate::db::Db>::Type>> {
+            type Type = <#db_type as crate::db::Db>::Type;
 
             fn verify_user_ap(
                 self,
                 auth: crate::auth::AuthUserOrAP,
                 db: &mut diesel::pg::PgConnection,
-            ) -> Result<Vec<Self::Entity>, axum::http::StatusCode> {
+            ) -> Result<Vec<Self::Type>, axum::http::StatusCode> {
                 use crate::db::CheckUserId;
 
-                let entities = self.0;
-                let ids: Vec<_> = entities.iter().map(|entity| entity.id).collect();
-                if entities.iter().all(|entity| entity.user_id == *auth)
+                let values = self.0;
+                let ids: Vec<_> = values.iter().map(|value| value.id).collect();
+                if values.iter().all(|value| value.user_id == *auth)
                     && crate::db::#db_type::check_user_ids(&ids, *auth, db)
                     .map_err(|_| axum::http::StatusCode::INTERNAL_SERVER_ERROR)?
                 {
-                    Ok(entities)
+                    Ok(values)
                 } else {
                     Err(axum::http::StatusCode::FORBIDDEN)
                 }
@@ -700,36 +704,34 @@ pub(crate) fn impl_verify_for_user_or_ap_with_db(
     .into()
 }
 
-pub(crate) fn impl_verify_for_user_without_db(
-    Identifiers { entity_type, .. }: Identifiers,
-) -> TokenStream {
+pub(crate) fn impl_verify_for_user_without_db(db_type: &Ident) -> TokenStream {
     quote! {
-        impl crate::db::VerifyForUserWithoutDb for crate::db::Unverified<sport_log_types::#entity_type> {
-            type Entity = sport_log_types::#entity_type;
+        impl crate::db::VerifyForUserWithoutDb for crate::db::Unverified<<#db_type as crate::db::Db>::Type> {
+            type Type = <#db_type as crate::db::Db>::Type;
 
             fn verify_user_without_db(
                 self,
                 auth: crate::auth::AuthUser,
-            ) -> Result<Self::Entity, axum::http::StatusCode> {
-                let entity = self.0;
-                if entity.user_id == *auth {
-                    Ok(entity)
+            ) -> Result<Self::Type, axum::http::StatusCode> {
+                let value = self.0;
+                if value.user_id == *auth {
+                    Ok(value)
                 } else {
                     Err(axum::http::StatusCode::FORBIDDEN)
                 }
             }
         }
 
-        impl crate::db::VerifyMultipleForUserWithoutDb for crate::db::Unverified<Vec<sport_log_types::#entity_type>> {
-            type Entity = sport_log_types::#entity_type;
+        impl crate::db::VerifyMultipleForUserWithoutDb for crate::db::Unverified<Vec<<#db_type as crate::db::Db>::Type>> {
+            type Type = <#db_type as crate::db::Db>::Type;
 
             fn verify_user_without_db(
                 self,
                 auth: crate::auth::AuthUser,
-            ) -> Result<Vec<Self::Entity>, axum::http::StatusCode> {
-                let entities = self.0;
-                if entities.iter().all(|entity| entity.user_id == *auth) {
-                    Ok(entities)
+            ) -> Result<Vec<Self::Type>, axum::http::StatusCode> {
+                let values = self.0;
+                if values.iter().all(|value| value.user_id == *auth) {
+                    Ok(values)
                 } else {
                     Err(axum::http::StatusCode::FORBIDDEN)
                 }
@@ -739,36 +741,34 @@ pub(crate) fn impl_verify_for_user_without_db(
     .into()
 }
 
-pub(crate) fn impl_verify_for_user_or_ap_without_db(
-    Identifiers { entity_type, .. }: Identifiers,
-) -> TokenStream {
+pub(crate) fn impl_verify_for_user_or_ap_without_db(db_type: &Ident) -> TokenStream {
     quote! {
-        impl crate::db::VerifyForUserOrAPWithoutDb for crate::db::Unverified<sport_log_types::#entity_type> {
-            type Entity = sport_log_types::#entity_type;
+        impl crate::db::VerifyForUserOrAPWithoutDb for crate::db::Unverified<<#db_type as crate::db::Db>::Type> {
+            type Type = <#db_type as crate::db::Db>::Type;
 
             fn verify_user_ap_without_db(
                 self,
                 auth: crate::auth::AuthUserOrAP,
-            ) -> Result<Self::Entity, axum::http::StatusCode> {
-                let entity = self.0;
-                if entity.user_id == *auth {
-                    Ok(entity)
+            ) -> Result<Self::Type, axum::http::StatusCode> {
+                let value = self.0;
+                if value.user_id == *auth {
+                    Ok(value)
                 } else {
                     Err(axum::http::StatusCode::FORBIDDEN)
                 }
             }
         }
 
-        impl crate::db::VerifyMultipleForUserOrAPWithoutDb for crate::db::Unverified<Vec<sport_log_types::#entity_type>> {
-            type Entity = sport_log_types::#entity_type;
+        impl crate::db::VerifyMultipleForUserOrAPWithoutDb for crate::db::Unverified<Vec<<#db_type as crate::db::Db>::Type>> {
+            type Type = <#db_type as crate::db::Db>::Type;
 
             fn verify_user_ap_without_db(
                 self,
                 auth: crate::auth::AuthUserOrAP,
-            ) -> Result<Vec<Self::Entity>, axum::http::StatusCode> {
-                let entities = self.0;
-                if entities.iter().all(|entity| entity.user_id == *auth) {
-                    Ok(entities)
+            ) -> Result<Vec<Self::Type>, axum::http::StatusCode> {
+                let values = self.0;
+                if values.iter().all(|value| value.user_id == *auth) {
+                    Ok(values)
                 } else {
                     Err(axum::http::StatusCode::FORBIDDEN)
                 }
@@ -778,30 +778,24 @@ pub(crate) fn impl_verify_for_user_or_ap_without_db(
     .into()
 }
 
-pub(crate) fn impl_verify_for_action_provider_with_db(
-    Identifiers {
-        db_type,
-        entity_type,
-        ..
-    }: Identifiers,
-) -> TokenStream {
+pub(crate) fn impl_verify_for_action_provider_with_db(db_type: &Ident) -> TokenStream {
     quote! {
-        impl crate::db::VerifyForActionProviderWithDb for crate::db::Unverified<sport_log_types::#entity_type> {
-            type Entity = sport_log_types::#entity_type;
+        impl crate::db::VerifyForActionProviderWithDb for crate::db::Unverified<<#db_type as crate::db::Db>::Type> {
+            type Type = <#db_type as crate::db::Db>::Type;
 
             fn verify_ap(
                 self,
                 auth: crate::auth::AuthAP,
                 db: &mut diesel::pg::PgConnection,
-            ) -> Result<Self::Entity, axum::http::StatusCode> {
+            ) -> Result<Self::Type, axum::http::StatusCode> {
                 use crate::db::CheckAPId;
 
-                let entity = self.0;
-                if entity.action_provider_id == *auth
-                    && crate::db::#db_type::check_ap_id(entity.id, *auth, db)
+                let value = self.0;
+                if value.action_provider_id == *auth
+                    && crate::db::#db_type::check_ap_id(value.id, *auth, db)
                     .map_err(|_| axum::http::StatusCode::INTERNAL_SERVER_ERROR)?
                 {
-                    Ok(entity)
+                    Ok(value)
                 } else {
                     Err(axum::http::StatusCode::FORBIDDEN)
                 }
@@ -811,36 +805,34 @@ pub(crate) fn impl_verify_for_action_provider_with_db(
     .into()
 }
 
-pub(crate) fn impl_verify_for_action_provider_without_db(
-    Identifiers { entity_type, .. }: Identifiers,
-) -> TokenStream {
+pub(crate) fn impl_verify_for_action_provider_without_db(db_type: &Ident) -> TokenStream {
     quote! {
-        impl crate::db::VerifyForActionProviderWithoutDb for crate::db::Unverified<sport_log_types::#entity_type> {
-            type Entity = sport_log_types::#entity_type;
+        impl crate::db::VerifyForActionProviderWithoutDb for crate::db::Unverified<<#db_type as crate::db::Db>::Type> {
+            type Type = <#db_type as crate::db::Db>::Type;
 
             fn verify_ap_without_db(
                 self,
                 auth: crate::auth::AuthAP,
-            ) -> Result<Self::Entity, axum::http::StatusCode> {
-                let entity = self.0;
-                if entity.action_provider_id == *auth {
-                    Ok(entity)
+            ) -> Result<Self::Type, axum::http::StatusCode> {
+                let value = self.0;
+                if value.action_provider_id == *auth {
+                    Ok(value)
                 } else {
                     Err(axum::http::StatusCode::FORBIDDEN)
                 }
             }
         }
 
-        impl crate::db::VerifyMultipleForActionProviderWithoutDb for crate::db::Unverified<Vec<sport_log_types::#entity_type>> {
-            type Entity = sport_log_types::#entity_type;
+        impl crate::db::VerifyMultipleForActionProviderWithoutDb for crate::db::Unverified<Vec<<#db_type as crate::db::Db>::Type>> {
+            type Type = <#db_type as crate::db::Db>::Type;
 
             fn verify_ap_without_db(
                 self,
                 auth: crate::auth::AuthAP,
-            ) -> Result<Vec<Self::Entity>, axum::http::StatusCode> {
-                let entities = self.0;
-                if entities.iter().all(|entity| entity.action_provider_id == *auth) {
-                    Ok(entities)
+            ) -> Result<Vec<Self::Type>, axum::http::StatusCode> {
+                let values = self.0;
+                if values.iter().all(|value| value.action_provider_id == *auth) {
+                    Ok(values)
                 } else {
                     Err(axum::http::StatusCode::FORBIDDEN)
                 }
@@ -850,28 +842,26 @@ pub(crate) fn impl_verify_for_action_provider_without_db(
     .into()
 }
 
-pub(crate) fn impl_verify_for_admin_without_db(
-    Identifiers { entity_type, .. }: Identifiers,
-) -> TokenStream {
+pub(crate) fn impl_verify_for_admin_without_db(db_type: &Ident) -> TokenStream {
     quote! {
-        impl crate::db::VerifyForAdminWithoutDb for crate::db::Unverified<sport_log_types::#entity_type> {
-            type Entity = sport_log_types::#entity_type;
+        impl crate::db::VerifyForAdminWithoutDb for crate::db::Unverified<<#db_type as crate::db::Db>::Type> {
+            type Type = <#db_type as crate::db::Db>::Type;
 
             fn verify_adm(
                 self,
                 auth: crate::auth::AuthAdmin,
-            ) -> Result<Self::Entity, axum::http::StatusCode> {
+            ) -> Result<Self::Type, axum::http::StatusCode> {
                 Ok(self.0)
             }
         }
 
-        impl crate::db::VerifyMultipleForAdminWithoutDb for crate::db::Unverified<Vec<sport_log_types::#entity_type>> {
-            type Entity = sport_log_types::#entity_type;
+        impl crate::db::VerifyMultipleForAdminWithoutDb for crate::db::Unverified<Vec<<#db_type as crate::db::Db>::Type>> {
+            type Type = <#db_type as crate::db::Db>::Type;
 
             fn verify_adm(
                 self,
                 auth: crate::auth::AuthAdmin,
-            ) -> Result<Vec<Self::Entity>, axum::http::StatusCode> {
+            ) -> Result<Vec<Self::Type>, axum::http::StatusCode> {
                 Ok(self.0)
             }
         }
@@ -879,14 +869,13 @@ pub(crate) fn impl_verify_for_admin_without_db(
     .into()
 }
 
-pub(crate) fn impl_verify_unchecked(Identifiers { entity_type, .. }: Identifiers) -> TokenStream {
+pub(crate) fn impl_verify_unchecked(db_type: &Ident) -> TokenStream {
     quote! {
-        impl crate::db::VerifyUnchecked for crate::db::Unverified<sport_log_types::#entity_type> {
-            type Entity = sport_log_types::#entity_type;
+        impl crate::db::VerifyUnchecked for crate::db::Unverified<<#db_type as crate::db::Db>::Type> {
+            type Type = <#db_type as crate::db::Db>::Type;
 
-            fn verify_unchecked(
-                self,
-            ) -> Result<Self::Entity, axum::http::StatusCode> {
+            fn verify_unchecked(self) -> Result<Self::Type, axum::http::StatusCode> {
+
                 Ok(self.0)
             }
         }

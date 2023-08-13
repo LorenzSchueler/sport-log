@@ -16,7 +16,7 @@ pub struct UserDb;
 
 /// Same as trait [`Create`](crate::db::Create) but with mutable references
 impl UserDb {
-    pub fn create(user: &mut <Self as Db>::Entity, db: &mut PgConnection) -> QueryResult<usize> {
+    pub fn create(user: &mut <Self as Db>::Type, db: &mut PgConnection) -> QueryResult<usize> {
         let salt = SaltString::generate(&mut OsRng);
         user.password = build_hasher()
             .hash_password(user.password.as_bytes(), &salt)
@@ -27,7 +27,7 @@ impl UserDb {
     }
 
     pub fn create_multiple(
-        users: &mut [<Self as Db>::Entity],
+        users: &mut [<Self as Db>::Type],
         db: &mut PgConnection,
     ) -> QueryResult<usize> {
         for user in &mut *users {
@@ -44,7 +44,7 @@ impl UserDb {
 
 /// Same as trait [`Update`](crate::db::Update) but with mutable references
 impl UserDb {
-    pub fn update(user: &mut <Self as Db>::Entity, db: &mut PgConnection) -> QueryResult<usize> {
+    pub fn update(user: &mut <Self as Db>::Type, db: &mut PgConnection) -> QueryResult<usize> {
         let salt = SaltString::generate(&mut OsRng);
         user.password = build_hasher()
             .hash_password(user.password.as_bytes(), &salt)
@@ -114,13 +114,9 @@ impl UserDb {
 }
 
 impl VerifyForUserWithDb for Unverified<User> {
-    type Entity = User;
+    type Type = User;
 
-    fn verify_user(
-        self,
-        auth: AuthUser,
-        db: &mut PgConnection,
-    ) -> Result<Self::Entity, StatusCode> {
+    fn verify_user(self, auth: AuthUser, db: &mut PgConnection) -> Result<Self::Type, StatusCode> {
         let user = self.0;
         if user.id == *auth
             && UserDb::check_user_id(user.id, *auth, db)

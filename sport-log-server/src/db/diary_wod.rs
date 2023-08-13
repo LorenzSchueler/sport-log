@@ -2,6 +2,8 @@ use sport_log_types_derive::*;
 
 #[derive(
     Db,
+    DbWithUserId,
+    ModifiableDb,
     VerifyIdForUserOrAP,
     Create,
     GetById,
@@ -18,6 +20,8 @@ pub struct DiaryDb;
 
 #[derive(
     Db,
+    DbWithUserId,
+    ModifiableDb,
     VerifyIdForUserOrAP,
     Create,
     GetById,
