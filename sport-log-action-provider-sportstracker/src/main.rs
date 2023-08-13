@@ -3,7 +3,7 @@ use std::{env, fs, process};
 use chrono::{DateTime, Duration, NaiveDateTime, Utc};
 use lazy_static::lazy_static;
 use rand::Rng;
-use reqwest::{Client, Error as ReqwestError, StatusCode};
+use reqwest::{Client, Error as ReqwestError};
 use serde::Deserialize;
 use sport_log_ap_utils::{disable_events, get_events, setup as setup_db};
 use sport_log_types::{
@@ -35,19 +35,14 @@ enum UserError {
     NoCredential(ActionEventId),
     #[error("can not log in: login failed")]
     LoginFailed(ActionEventId),
-    #[error("failed to create cardio session: unknown activity id {0}")]
-    UnknownActivityId(u32, ActionEventId),
-    #[error("failed to create cardio session: unknown movement {0}")]
-    UnknownMovement(&'static str, ActionEventId),
 }
 
 impl UserError {
     fn action_event_id(&self) -> ActionEventId {
         match self {
-            Self::NoCredential(action_event_id)
-            | Self::LoginFailed(action_event_id)
-            | Self::UnknownActivityId(_, action_event_id)
-            | Self::UnknownMovement(_, action_event_id) => *action_event_id,
+            Self::NoCredential(action_event_id) | Self::LoginFailed(action_event_id) => {
+                *action_event_id
+            }
         }
     }
 }
@@ -279,15 +274,40 @@ async fn fetch() -> Result<(), Error> {
                 let workout_track =
                     get_workout_track(&client, &token, &workout_key.workout_key).await?;
 
-                let cardio_session = match to_cardio_session(
+                let Some(cardio_session) = try_into_cardio_session(
                     workout_stats,
                     workout_track,
                     &exec_action_event,
                     &movements,
-                ) {
-                    Ok(cardio_session) => cardio_session,
-                    Err(err) => return Ok(Err(err)),
+                ) else {
+                    continue;
                 };
+
+                let datetime = cardio_session.datetime.to_rfc3339().replace("+00:00", "Z");
+                // all cardio sessions of user with same datetime
+                let conflicting_cardio_sessions: Vec<CardioSession> = client
+                    .get(route_max_version(
+                        &CONFIG.server_url,
+                        CARDIO_SESSION,
+                        Some(&[("start", datetime.as_str()), ("end", datetime.as_str())]),
+                    ))
+                    .basic_auth(NAME, Some(&CONFIG.password))
+                    .header(ID_HEADER, exec_action_event.user_id.0)
+                    .send()
+                    .await?
+                    .json()
+                    .await?;
+
+                if conflicting_cardio_sessions
+                    .iter()
+                    .any(|c| c.movement_id == cardio_session.movement_id)
+                {
+                    info!(
+                        "everything up to date for user {}",
+                        exec_action_event.user_id.0
+                    );
+                    break;
+                }
 
                 let response = client
                     .post(route_max_version(&CONFIG.server_url, CARDIO_SESSION, None))
@@ -303,13 +323,6 @@ async fn fetch() -> Result<(), Error> {
                             "cardio session saved for user {}",
                             exec_action_event.user_id.0
                         );
-                    }
-                    StatusCode::CONFLICT => {
-                        info!(
-                            "everything up to date for user {}",
-                            exec_action_event.user_id.0
-                        );
-                        break;
                     }
                     _ => {
                         response.error_for_status()?; // this will always fail and return the error
@@ -353,36 +366,35 @@ async fn fetch() -> Result<(), Error> {
     Ok(())
 }
 
-fn to_cardio_session(
+fn try_into_cardio_session(
     workout_stats: WorkoutStats,
     workout_track: WorkoutTrack,
     exec_action_event: &ExecutableActionEvent,
     movements: &[Movement],
-) -> Result<CardioSession, UserError> {
-    let activity = match workout_stats.activity_id {
+) -> Option<CardioSession> {
+    let movement_name = match workout_stats.activity_id {
         1 => "running",
         2 => "biking",
         11 => "hiking",
         22 => "trailrunning",
         31 => "skitouring",
         id => {
-            return Err(UserError::UnknownActivityId(
-                id,
-                exec_action_event.action_event_id,
-            ))
-        } // unknown movement
+            info!("failed to create cardio session: unknown activity id {id}");
+            return None;
+        }
     };
 
     let movement_id = movements
         .iter()
-        .find(|movement| movement.name == activity)
-        .map(|movement| movement.id)
-        .ok_or(UserError::UnknownMovement(
-            activity,
-            exec_action_event.action_event_id,
-        ))?; // movement does no exist in sport log
+        .find(|movement| movement.name == movement_name)
+        .map(|movement| movement.id);
 
-    let cardio_type = if activity == "running" || activity == "trailrunning" {
+    let Some(movement_id) = movement_id else {
+        info!("failed to create cardio session: unknown movement {movement_name}");
+        return None;
+    };
+
+    let cardio_type = if movement_name == "running" || movement_name == "trailrunning" {
         CardioType::Training
     } else {
         CardioType::Freetime
@@ -404,7 +416,7 @@ fn to_cardio_session(
         })
         .collect();
 
-    Ok(CardioSession {
+    Some(CardioSession {
         id: CardioSessionId(rand::thread_rng().gen()),
         user_id: exec_action_event.user_id,
         cardio_blueprint_id: None,
