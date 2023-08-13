@@ -81,6 +81,18 @@ pub fn get_by_user_derive(input: TokenStream) -> TokenStream {
     impl_get_by_user(Identifiers::from_ast(&ast))
 }
 
+/// Derives `sport_log_types::GetByUserTimespan`.
+///
+/// This macro only works if the following conditions are satisfied:
+/// - the corresponding table has the same name like this type but in snake_case
+/// - the table has a column `user_id` which references the table `user`.
+/// - the table has a column `datetime` with type `timestamptz`.
+#[proc_macro_derive(GetByUserTimespan)]
+pub fn get_by_user_and_timespan_derive(input: TokenStream) -> TokenStream {
+    let ast = syn::parse(input).unwrap();
+    impl_get_by_user_and_timespan(Identifiers::from_ast(&ast))
+}
+
 /// Derives `sport_log_types::GetByUserSync`.
 ///
 /// This macro only works if the following conditions are satisfied:

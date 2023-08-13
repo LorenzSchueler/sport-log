@@ -191,6 +191,7 @@ impl VerifyMultipleForUserOrAPCreate for Unverified<Vec<StrengthBlueprintSet>> {
     GetById,
     GetByIds,
     GetByUser,
+    GetByUserTimespan,
     GetByUserSync,
     Update,
     HardDelete,

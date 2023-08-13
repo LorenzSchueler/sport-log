@@ -75,6 +75,14 @@ pub struct UnverifiedId<I>(pub(super) I);
 #[serde(transparent)]
 pub struct UnverifiedIds<I>(pub(super) Vec<I>);
 
+#[derive(Debug, Clone, Deserialize)]
+pub enum Timespan {
+    StartEnd(DateTime<Utc>, DateTime<Utc>),
+    Start(DateTime<Utc>),
+    End(DateTime<Utc>),
+    All,
+}
+
 pub trait Db {
     type Id;
     type Entity;
@@ -124,6 +132,21 @@ pub trait GetByIds: Db {
 /// For restrictions on the types for derive to work please see [`sport_log_types_derive::GetByUser`].
 pub trait GetByUser: Db {
     fn get_by_user(user_id: UserId, db: &mut PgConnection) -> QueryResult<Vec<Self::Entity>>;
+}
+
+/// A type for which entries can be retrieved by user and the timespan from the database.
+///
+/// ### Deriving
+///
+/// This trait can be automatically derived by adding `#[derive(GetByUserTimespan)]` to your struct.
+///
+/// For restrictions on the types for derive to work please see [`sport_log_types_derive::GetByUserTimespan`].
+pub trait GetByUserTimespan: Db {
+    fn get_by_user_and_timespan(
+        user_id: UserId,
+        timespan: Timespan,
+        db: &mut PgConnection,
+    ) -> QueryResult<Vec<Self::Entity>>;
 }
 
 /// A type for which entries can be retrieved by user and the timestamp of the last synchronization from the database.

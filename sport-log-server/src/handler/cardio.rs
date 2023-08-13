@@ -4,7 +4,7 @@ use sport_log_types::{CardioSession, CardioSessionId, Route, RouteId};
 use crate::{
     auth::AuthUserOrAP,
     db::*,
-    handler::{HandlerResult, IdOption, UnverifiedSingleOrVec},
+    handler::{HandlerResult, IdOption, TimeSpanOption, UnverifiedSingleOrVec},
     state::DbConn,
 };
 
@@ -182,6 +182,7 @@ pub async fn create_cardio_sessions(
 pub async fn get_cardio_sessions(
     auth: AuthUserOrAP,
     Query(IdOption { id }): Query<IdOption<UnverifiedId<CardioSessionId>>>,
+    Query(time_span_option): Query<TimeSpanOption>,
     mut db: DbConn,
 ) -> HandlerResult<Json<Vec<CardioSession>>> {
     match id {
@@ -189,7 +190,7 @@ pub async fn get_cardio_sessions(
             let cardio_session_id = id.verify_user_ap(auth, &mut db)?;
             CardioSessionDb::get_by_id(cardio_session_id, &mut db).map(|c| vec![c])
         }
-        None => CardioSessionDb::get_by_user(*auth, &mut db),
+        None => CardioSessionDb::get_by_user_and_timespan(*auth, time_span_option.into(), &mut db),
     }
     .map(Json)
     .map_err(Into::into)

@@ -2,7 +2,7 @@ use axum::http::StatusCode;
 use chrono::{DateTime, Utc};
 use serde::Deserialize;
 
-use crate::db::Unverified;
+use crate::db::{Timespan, Unverified};
 pub use crate::error::*;
 
 mod account;
@@ -52,6 +52,29 @@ pub struct TimeSpanOption {
     pub start: Option<DateTime<Utc>>,
     #[serde(default = "none")]
     pub end: Option<DateTime<Utc>>,
+}
+
+impl From<TimeSpanOption> for Timespan {
+    fn from(tso: TimeSpanOption) -> Self {
+        match tso {
+            TimeSpanOption {
+                start: Some(start),
+                end: Some(end),
+            } => Timespan::StartEnd(start, end),
+            TimeSpanOption {
+                start: Some(start),
+                end: None,
+            } => Timespan::Start(start),
+            TimeSpanOption {
+                start: None,
+                end: Some(end),
+            } => Timespan::End(end),
+            TimeSpanOption {
+                start: None,
+                end: None,
+            } => Timespan::All,
+        }
+    }
 }
 
 fn none<T>() -> Option<T> {

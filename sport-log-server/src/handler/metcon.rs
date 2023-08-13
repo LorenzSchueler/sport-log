@@ -6,7 +6,7 @@ use sport_log_types::{
 use crate::{
     auth::AuthUserOrAP,
     db::*,
-    handler::{HandlerResult, IdOption, UnverifiedSingleOrVec},
+    handler::{HandlerResult, IdOption, TimeSpanOption, UnverifiedSingleOrVec},
     state::DbConn,
 };
 
@@ -32,6 +32,7 @@ pub async fn create_metcon_sessions(
 pub async fn get_metcon_sessions(
     auth: AuthUserOrAP,
     Query(IdOption { id }): Query<IdOption<UnverifiedId<MetconSessionId>>>,
+    Query(time_span_option): Query<TimeSpanOption>,
     mut db: DbConn,
 ) -> HandlerResult<Json<Vec<MetconSession>>> {
     match id {
@@ -39,7 +40,7 @@ pub async fn get_metcon_sessions(
             let metcon_session_id = id.verify_user_ap(auth, &mut db)?;
             MetconSessionDb::get_by_id(metcon_session_id, &mut db).map(|m| vec![m])
         }
-        None => MetconSessionDb::get_by_user(*auth, &mut db),
+        None => MetconSessionDb::get_by_user_and_timespan(*auth, time_span_option.into(), &mut db),
     }
     .map(Json)
     .map_err(Into::into)

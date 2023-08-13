@@ -70,6 +70,7 @@ impl CheckUserId for CardioBlueprintDb {
     GetById,
     GetByIds,
     GetByUser,
+    GetByUserTimespan,
     GetByUserSync,
     Update,
     HardDelete,

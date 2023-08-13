@@ -544,6 +544,7 @@ impl VerifyMultipleForUserOrAPCreate for Unverified<Vec<MetconItem>> {
     GetById,
     GetByIds,
     GetByUser,
+    GetByUserTimespan,
     GetByUserSync,
     Update,
     HardDelete,

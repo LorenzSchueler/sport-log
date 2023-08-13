@@ -4,7 +4,7 @@ use sport_log_types::{StrengthSession, StrengthSessionId, StrengthSet, StrengthS
 use crate::{
     auth::AuthUserOrAP,
     db::*,
-    handler::{HandlerResult, IdOption, UnverifiedSingleOrVec},
+    handler::{HandlerResult, IdOption, TimeSpanOption, UnverifiedSingleOrVec},
     state::DbConn,
 };
 
@@ -252,6 +252,7 @@ pub async fn create_strength_sessions(
 pub async fn get_strength_sessions(
     auth: AuthUserOrAP,
     Query(IdOption { id }): Query<IdOption<UnverifiedId<StrengthSessionId>>>,
+    Query(time_span_option): Query<TimeSpanOption>,
     mut db: DbConn,
 ) -> HandlerResult<Json<Vec<StrengthSession>>> {
     match id {
@@ -259,7 +260,9 @@ pub async fn get_strength_sessions(
             let strength_session_id = id.verify_user_ap(auth, &mut db)?;
             StrengthSessionDb::get_by_id(strength_session_id, &mut db).map(|s| vec![s])
         }
-        None => StrengthSessionDb::get_by_user(*auth, &mut db),
+        None => {
+            StrengthSessionDb::get_by_user_and_timespan(*auth, time_span_option.into(), &mut db)
+        }
     }
     .map(Json)
     .map_err(Into::into)

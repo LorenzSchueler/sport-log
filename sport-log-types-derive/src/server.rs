@@ -114,6 +114,55 @@ pub(crate) fn impl_get_by_user(
     .into()
 }
 
+pub(crate) fn impl_get_by_user_and_timespan(
+    Identifiers {
+        db_type,
+        entity_name,
+        ..
+    }: Identifiers,
+) -> TokenStream {
+    quote! {
+            use diesel::prelude::*;
+
+            impl crate::db::GetByUserTimespan for crate::db::#db_type {
+                fn get_by_user_and_timespan(
+                    user_id: sport_log_types::UserId,
+                    timespan: crate::db::Timespan,
+                    db: &mut PgConnection
+                ) -> QueryResult<Vec<Self::Entity>> {
+                    let filter_user = sport_log_types::schema::#entity_name::table
+                        .filter(sport_log_types::schema::#entity_name::columns::user_id.eq(user_id));
+                    match timespan {
+                        crate::db::Timespan::StartEnd(start, end) => {
+                            filter_user
+                                .filter(sport_log_types::schema::#entity_name::columns::datetime.between(start, end))
+                                .select(Self::Entity::as_select())
+                                .get_results(db)
+                        },
+                        crate::db::Timespan::Start(start) => {
+                            filter_user
+                                .filter(sport_log_types::schema::#entity_name::columns::datetime.ge(start))
+                                .select(Self::Entity::as_select())
+                                .get_results(db)
+                        },
+                        crate::db::Timespan::End(end) => {
+                            filter_user
+                                .filter(sport_log_types::schema::#entity_name::columns::datetime.le(end))
+                                .select(Self::Entity::as_select())
+                                .get_results(db)
+                        }
+                        crate::db::Timespan::All => {
+                            filter_user
+                                .select(Self::Entity::as_select())
+                                .get_results(db)
+                        }
+                    }
+                }
+            }
+        }
+    .into()
+}
+
 pub(crate) fn impl_get_by_user_and_last_sync(
     Identifiers {
         db_type,
