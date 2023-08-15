@@ -2,6 +2,8 @@
 
 USERNAME=ScreenshotUser
 PASSWORD=ScreenshotPassword0
+AP_USERNAME='wodify-login'
+AP_PASSWORD=Wodify-Login-Password1
 BASE_URL='http://localhost:8001'
 EMULATOR_DEVICE=Pixel_6_API_34
 GIT_REF=$(git show-ref --head --hash=7 HEAD)
@@ -36,6 +38,7 @@ step "delete user if exits"
 curl -u $USERNAME:$PASSWORD -X DELETE "$BASE_URL/v0.3/user"
 
 step "create user"
+# requires user self auth
 curl -X POST "$BASE_URL/v0.3/user" \
     -H 'Accept: application/json' \
     -H 'Content-Type: application/json' \
@@ -57,13 +60,30 @@ else
     exit 2
 fi
 
-step "run setup"
-entities=(diary strength_session strength_set metcon_session route cardio_session platform platform_credential action action_rule action_event)
+step "run ap setup"
+# requires ap self auth
+entities=(platform action_provider)
 for entity in "${entities[@]}"; do
-    curl -u $USERNAME:$PASSWORD -X POST "$BASE_URL/v0.3/$entity" \
+    curl -X POST "$BASE_URL/v0.3/ap/$entity" \
         -H 'Accept: application/json' \
         -H 'Content-Type: application/json' \
         -d @integration_test/$entity.json
+done
+curl -u $AP_USERNAME:$AP_PASSWORD -X POST "$BASE_URL/v0.3/ap/action" \
+    -H 'Accept: application/json' \
+    -H 'Content-Type: application/json' \
+    -d @integration_test/action.json
+
+step "run user setup"
+entities=(diary strength_session strength_set metcon_session route cardio_session platform_credential action_rule action_event)
+for entity in "${entities[@]}"; do
+    cat integration_test/$entity.json | \
+    sed "s/2023-07-04/$(date +%Y-%m-%d)/g" | \
+    sed "s/2023-07-02/$(date -d -2day +%Y-%m-%d)/g" | \
+    curl -u $USERNAME:$PASSWORD -X POST "$BASE_URL/v0.3/$entity" \
+        -H 'Accept: application/json' \
+        -H 'Content-Type: application/json' \
+        -d @-
 done
 
 step "start emulator"
