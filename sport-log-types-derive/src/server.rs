@@ -143,7 +143,7 @@ pub(crate) fn impl_get_by_id(db_type: &Ident) -> TokenStream {
             fn get_by_id(id: Self::Id, db: &mut PgConnection) -> QueryResult<Self::Type> {
                 use crate::db::Db;
                 Self::table()
-                    .find(Self::id_column())
+                    .find(id)
                     .select(Self::Type::as_select())
                     .get_result(db)
             }
