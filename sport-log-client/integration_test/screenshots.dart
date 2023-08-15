@@ -86,6 +86,7 @@ final addFab = fab(AppIcons.add);
 final stopwatchFab = fab(AppIcons.stopwatch);
 final routeFab = fab(AppIcons.route);
 final uploadFab = fab(AppIcons.upload);
+final layersFab = fab(AppIcons.layers);
 
 final backButton = find.byType(BackButton);
 
@@ -135,9 +136,13 @@ Future<void> openDrawer(WidgetTester tester) async {
   expect(find.byType(MainDrawer), findsOneWidget);
 }
 
-Future<void> tap(WidgetTester tester, Finder finder) async {
+Future<void> tap(
+  WidgetTester tester,
+  Finder finder, {
+  bool warnIfMissed = true,
+}) async {
   expect(finder, findsOneWidget);
-  await tester.tap(finder);
+  await tester.tap(finder, warnIfMissed: warnIfMissed);
   await tester.pumpAndSettle();
 }
 
@@ -178,7 +183,7 @@ void main() {
     }
 
     // landing
-    await tester.pumpAndSettle(const Duration(seconds: 10));
+    await tester.pumpAndSettle(const Duration(seconds: 15));
     expect(find.byType(LandingPage), findsOneWidget);
     await screenshot("landing");
 
@@ -375,6 +380,19 @@ void main() {
     expect(find.byType(MapPage), findsOneWidget);
     await tester.pumpAndSettle(mapPumpDuration); // wait for map to render
     await screenshot("map");
+
+    await tap(tester, layersFab);
+    await tap(
+      tester,
+      //find.descendant(
+      //of: find.byType(SegmentedButton),
+      //matching:
+      find.byIcon(AppIcons.satellite),
+      //),
+    );
+    await tester.pumpAndSettle(mapPumpDuration); // wait for map to render
+    await screenshot("map_satellite");
+    await tap(tester, layersFab, warnIfMissed: false); // hide map style sheet
 
     // go to offline maps
     await openDrawer(tester);

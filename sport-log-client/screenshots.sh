@@ -79,6 +79,7 @@ entities=(diary strength_session strength_set metcon_session route cardio_sessio
 for entity in "${entities[@]}"; do
     cat integration_test/$entity.json | \
     sed "s/2023-07-04/$(date +%Y-%m-%d)/g" | \
+    sed "s/2023-07-05/$(date -d +1day +%Y-%m-%d)/g" | \
     sed "s/2023-07-02/$(date -d -2day +%Y-%m-%d)/g" | \
     curl -u $USERNAME:$PASSWORD -X POST "$BASE_URL/v0.3/$entity" \
         -H 'Accept: application/json' \
