@@ -123,7 +123,7 @@ class _PickerWithSearchState<T> extends State<PickerWithSearch<T>> {
                       itemCount: _items.length,
                     ),
                   ),
-          )
+          ),
         ],
       ),
     );

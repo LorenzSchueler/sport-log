@@ -304,7 +304,7 @@ class _SetDurationInputState extends State<SetDurationInput> {
                 onSubmitted: () => _submit(confirmed: true),
               ),
             ),
-          )
+          ),
       ],
     );
   }

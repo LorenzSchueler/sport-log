@@ -80,9 +80,9 @@ class MetconSessionResultsCard extends StatelessWidget {
                         Padding(
                           padding: const EdgeInsets.only(left: 10),
                           child: Text(msd.metconSession.datetime.humanDate),
-                        )
+                        ),
                       ],
-                    )
+                    ),
                 ],
               ),
             ),

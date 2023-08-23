@@ -96,7 +96,7 @@ class _MapStylesBottomSheetState extends State<MapStylesBottomSheet> {
       _style = style;
       _options = {
         if (hasHillshade) const _HillshadeOption(),
-        if (hasTerrain) const _TerrainOption()
+        if (hasTerrain) const _TerrainOption(),
       };
     });
   }

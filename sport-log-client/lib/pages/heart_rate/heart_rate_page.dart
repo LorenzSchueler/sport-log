@@ -111,7 +111,7 @@ class HeartRatePage extends StatelessWidget {
                                 const Icon(AppIcons.battery),
                                 Text("${heartRateUtils.battery}%"),
                               ],
-                            )
+                            ),
                         ],
                       ],
                     ),

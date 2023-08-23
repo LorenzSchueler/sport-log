@@ -32,10 +32,10 @@ class MetconTable extends TableAccessor<Metcon> {
       Column.int(Columns.timecap)
         ..nullable()
         ..checkGt(0),
-      Column.text(Columns.description)..nullable()
+      Column.text(Columns.description)..nullable(),
     ],
     uniqueColumns: [
-      [Columns.name]
+      [Columns.name],
     ],
   );
 
@@ -86,7 +86,7 @@ class MetconMovementTable extends TableAccessor<MetconMovement> {
         ..checkBetween(0, 4),
     ],
     uniqueColumns: [
-      [Columns.metconId, Columns.movementNumber]
+      [Columns.metconId, Columns.movementNumber],
     ],
   );
 
@@ -145,7 +145,7 @@ class MetconSessionTable extends TableAccessor<MetconSession> {
         ..nullable()
         ..checkGe(0),
       Column.bool(Columns.rx)..checkIn(<int>[0, 1]),
-      Column.text(Columns.comments)..nullable()
+      Column.text(Columns.comments)..nullable(),
     ],
     uniqueColumns: [],
   );
@@ -201,7 +201,7 @@ class MetconSessionTable extends TableAccessor<MetconSession> {
     return {
       for (final record in records)
         Int64(record[Columns.metconId]! as int):
-            MetconRecord.fromDbRecord(record)
+            MetconRecord.fromDbRecord(record),
     };
   }
 }

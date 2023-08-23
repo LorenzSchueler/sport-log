@@ -107,7 +107,7 @@ class _MovementEditPageState extends State<MovementEditPage> {
                   ? _saveMovement
                   : null,
               icon: const Icon(AppIcons.save),
-            )
+            ),
           ],
         ),
         body: Padding(
@@ -196,7 +196,7 @@ class _MovementEditPageState extends State<MovementEditPage> {
                     }
                   },
                   title: const Text('Is suitable for cardio sessions'),
-                )
+                ),
               ],
             ),
           ),

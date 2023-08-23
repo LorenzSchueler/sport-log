@@ -71,8 +71,8 @@ class _NewCredentialsDialogState extends State<NewCredentialsDialog> {
             ),
             if (_errorMessage != null) ...[
               Defaults.sizedBox.vertical.big,
-              Text(_errorMessage!)
-            ]
+              Text(_errorMessage!),
+            ],
           ],
         ),
       ),

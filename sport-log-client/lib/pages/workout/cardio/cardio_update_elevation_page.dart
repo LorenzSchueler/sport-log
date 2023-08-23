@@ -151,7 +151,7 @@ class _CardioUpdateElevationPageState extends State<CardioUpdateElevationPage> {
                               ),
                             ),
                           ),
-                        )
+                        ),
                       ],
                     )
                   : SizedBox(
@@ -161,7 +161,7 @@ class _CardioUpdateElevationPageState extends State<CardioUpdateElevationPage> {
                         label: const Text("Update Elevation"),
                         onPressed: _progress == null ? _updateElevation : null,
                       ),
-                    )
+                    ),
             ],
           ),
         ),

@@ -46,8 +46,8 @@ class OverviewCard extends StatelessWidget {
                         ),
                         if (left.isNotEmpty) ...[
                           Defaults.sizedBox.vertical.normal,
-                          ...left
-                        ]
+                          ...left,
+                        ],
                       ],
                     ),
                   ),

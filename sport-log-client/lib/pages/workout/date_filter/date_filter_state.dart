@@ -35,7 +35,7 @@ abstract class DateFilterState {
       WeekFilter(end),
       MonthFilter(end),
       YearFilter(end),
-      const AllFilter()
+      const AllFilter(),
     ];
   }
 

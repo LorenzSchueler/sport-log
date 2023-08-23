@@ -22,10 +22,10 @@ class WodTable extends TableAccessor<Wod> {
         ..withDefault('2')
         ..checkIn(<int>[0, 1, 2]),
       Column.text(Columns.date),
-      Column.text(Columns.description)..nullable()
+      Column.text(Columns.description)..nullable(),
     ],
     uniqueColumns: [
-      [Columns.date]
+      [Columns.date],
     ],
   );
 

@@ -61,7 +61,7 @@ class ErrorMessage extends JsonSerializable {
           'column': column,
           'columns': columns,
           'error': error,
-        }
+        },
       };
 
   @override

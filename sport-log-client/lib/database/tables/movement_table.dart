@@ -29,7 +29,7 @@ class MovementTable extends TableAccessor<Movement> {
       Column.int(Columns.dimension),
     ],
     uniqueColumns: [
-      [Columns.name, Columns.dimension]
+      [Columns.name, Columns.dimension],
     ],
   );
 

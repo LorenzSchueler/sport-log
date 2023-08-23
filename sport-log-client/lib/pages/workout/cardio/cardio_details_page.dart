@@ -242,7 +242,7 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
           IconButton(
             onPressed: _pushEditPage,
             icon: const Icon(AppIcons.edit),
-          )
+          ),
         ],
       ),
       body: ProviderConsumer(
@@ -296,7 +296,7 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
                         comments:
                             _cardioSessionDescription.cardioSession.comments!,
                       ),
-                    ]
+                    ],
                   ],
                 ),
               ),
@@ -343,7 +343,7 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
                                 _speedLine,
                                 _elevationLine,
                                 _cadenceLine,
-                                _heartRateLine
+                                _heartRateLine,
                               ],
                               touchCallback: _touchCallback,
                             ),
@@ -415,7 +415,7 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
       final totalDuration = [
         track?.lastOrNull?.time,
         session.heartRate?.lastOrNull,
-        session.cadence?.lastOrNull
+        session.cadence?.lastOrNull,
       ].whereNotNull().maxOrNull;
       if (totalDuration == null) {
         // this should not happen because if there is no data the chart is also not shown
@@ -549,7 +549,7 @@ class _SimilarCardioSessionCard extends StatelessWidget {
                 : IconButton(
                     onPressed: onHide,
                     icon: const Icon(AppIcons.remove),
-                  )
+                  ),
           ],
         ),
       ),

@@ -91,7 +91,7 @@ Future<String?> saveTrackAsGpx(
           NotificationActionButton(
             key: NotificationController.openFileAction,
             label: "Open",
-          )
+          ),
         ],
       );
     }

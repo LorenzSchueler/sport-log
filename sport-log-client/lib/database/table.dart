@@ -120,7 +120,7 @@ class Column {
       nonNullStr,
       defaultValueStr,
       _referenceString,
-      checkStr
+      checkStr,
     ].where((s) => s.isNotEmpty).join(' ');
   }
 }

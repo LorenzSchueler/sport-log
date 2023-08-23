@@ -146,7 +146,7 @@ class MovementCard extends StatelessWidget {
                     softWrap: true,
                   ),
                 ),
-              ]
+              ],
             ],
           ),
         ),

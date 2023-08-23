@@ -98,7 +98,8 @@ class PlatformCard extends StatelessWidget {
               ],
             ),
             const Divider(),
-            for (var actionProvider in platformDescription.actionProviders) ...[
+            for (final actionProvider
+                in platformDescription.actionProviders) ...[
               Defaults.sizedBox.vertical.small,
               GestureDetector(
                 behavior: HitTestBehavior.opaque,
@@ -116,7 +117,7 @@ class PlatformCard extends StatelessWidget {
                         ),
                 child: Text(actionProvider.name),
               ),
-            ]
+            ],
           ],
         ),
       ),

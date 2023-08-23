@@ -153,7 +153,7 @@ class CardioTrackingSettingsPage extends StatelessWidget {
                                       MaterialTapTargetSize.shrinkWrap,
                                 ),
                                 iconSize: 24,
-                              )
+                              ),
                             ],
                           ),
                         ),

@@ -38,7 +38,7 @@ class RouteTable extends TableAccessor<Route> {
       Column.blob(Columns.markedPositions)..nullable(),
     ],
     uniqueColumns: [
-      [Columns.name]
+      [Columns.name],
     ],
   );
 

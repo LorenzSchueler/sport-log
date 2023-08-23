@@ -35,7 +35,7 @@ class MetconDescriptionCard extends StatelessWidget {
               child: Table(
                 defaultColumnWidth: const IntrinsicColumnWidth(),
                 children: [
-                  for (var mmd in metconDescription.moves)
+                  for (final mmd in metconDescription.moves)
                     TableRow(
                       children: [
                         Padding(
@@ -62,9 +62,9 @@ class MetconDescriptionCard extends StatelessWidget {
                                   ? "@ ${formatWeight(mmd.metconMovement.maleWeight!, mmd.metconMovement.femaleWeight)}"
                                   : "@ ${formatWeight(mmd.metconMovement.maleWeight!)}"
                               : "",
-                        )
+                        ),
                       ],
-                    )
+                    ),
                 ],
               ),
             ),

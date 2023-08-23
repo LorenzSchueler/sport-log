@@ -238,7 +238,7 @@ class ApiHeaders {
   ) =>
       {
         HttpHeaders.authorizationHeader:
-            "Basic ${base64Encode(utf8.encode('$username:$password'))}"
+            "Basic ${base64Encode(utf8.encode('$username:$password'))}",
       };
 
   static const Map<String, String> contentTypeJson = {

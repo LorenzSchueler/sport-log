@@ -25,7 +25,7 @@ class PlatformTable extends TableAccessor<Platform> {
       Column.bool(Columns.credential),
     ],
     uniqueColumns: [
-      [Columns.name]
+      [Columns.name],
     ],
   );
 }
@@ -56,7 +56,7 @@ class PlatformCredentialTable extends TableAccessor<PlatformCredential> {
       Column.text(Columns.password)..checkLengthLe(80),
     ],
     uniqueColumns: [
-      [Columns.platformId]
+      [Columns.platformId],
     ],
   );
 

@@ -197,10 +197,10 @@ class _CardioCutPageState extends State<CardioCutPage> {
                         ),
                       ),
                     ],
-                  )
+                  ),
                 ],
               ),
-            )
+            ),
           ],
         ),
       ),

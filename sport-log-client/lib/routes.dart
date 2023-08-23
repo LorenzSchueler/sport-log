@@ -322,7 +322,7 @@ abstract class Routes {
     Routes.diaryEdit: (context) => _checkUserId(() {
           final diary = ModalRoute.of(context)?.settings.arguments as Diary?;
           return DiaryEditPage(diary: diary);
-        })
+        }),
   };
 
   static Map<String, Widget Function(BuildContext)> get all => _routeList;

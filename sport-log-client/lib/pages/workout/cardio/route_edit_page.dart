@@ -241,7 +241,7 @@ class _RouteEditPageState extends State<RouteEditPage> {
                   ? _saveRoute
                   : null,
               icon: const Icon(AppIcons.save),
-            )
+            ),
           ],
         ),
         body: ProviderConsumer(

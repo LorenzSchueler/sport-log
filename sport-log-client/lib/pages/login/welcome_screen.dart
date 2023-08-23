@@ -31,7 +31,7 @@ class WelcomeScreen extends StatelessWidget {
                 "License: GPLv3",
               ),
               Defaults.sizedBox.vertical.huge,
-              content
+              content,
             ],
           ),
         ),

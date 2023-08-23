@@ -225,7 +225,7 @@ class _StrengthStatsCard extends StatelessWidget {
             caption: 'Avg Reps',
             bigText: false,
             child: Text(stats.avgCount.toStringAsFixed(1)),
-          )
+          ),
         ],
       MovementDimension.time => [
           EditTile(

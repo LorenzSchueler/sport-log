@@ -85,7 +85,7 @@ class _MetconDetailsPageState extends State<MetconDetailsPage> {
             IconButton(
               onPressed: _pushEditPage,
               icon: const Icon(AppIcons.edit),
-            )
+            ),
         ],
       ),
       body: Padding(

@@ -28,7 +28,7 @@ class ActionTable extends TableAccessor<Action> {
       Column.text(Columns.description)..nullable(),
     ],
     uniqueColumns: [
-      [Columns.actionProviderId, Columns.name]
+      [Columns.actionProviderId, Columns.name],
     ],
   );
 
@@ -74,7 +74,7 @@ class ActionEventTable extends TableAccessor<ActionEvent> {
       Column.int(Columns.enabled)..checkIn(<int>[0, 1]),
     ],
     uniqueColumns: [
-      [Columns.actionId, Columns.datetime]
+      [Columns.actionId, Columns.datetime],
     ],
   );
 
@@ -87,7 +87,7 @@ class ActionEventTable extends TableAccessor<ActionEvent> {
         notDeleted,
         '${Columns.actionId} in (select ${Columns.id} from ${Tables.action} where ${TableAccessor.combineFilter([
               TableAccessor.notDeletedOfTable(Tables.action),
-              "${Columns.actionProviderId} = ?"
+              "${Columns.actionProviderId} = ?",
             ])})',
       ]),
       whereArgs: [actionProvider.id.toInt()],
@@ -124,7 +124,7 @@ class ActionRuleTable extends TableAccessor<ActionRule> {
       Column.int(Columns.enabled)..checkIn(<int>[0, 1]),
     ],
     uniqueColumns: [
-      [Columns.actionId, Columns.weekday, Columns.time]
+      [Columns.actionId, Columns.weekday, Columns.time],
     ],
   );
 
@@ -137,7 +137,7 @@ class ActionRuleTable extends TableAccessor<ActionRule> {
         notDeleted,
         '${Columns.actionId} in (select ${Columns.id} from ${Tables.action} where ${TableAccessor.combineFilter([
               TableAccessor.notDeletedOfTable(Tables.action),
-              "${Columns.actionProviderId} = ?"
+              "${Columns.actionProviderId} = ?",
             ])})',
       ]),
       whereArgs: [actionProvider.id.toInt()],
@@ -169,10 +169,10 @@ class ActionProviderTable extends TableAccessor<ActionProvider> {
       Column.text(Columns.name)..checkLengthBetween(2, 80),
       Column.int(Columns.platformId)
         ..references(Tables.platform, onDelete: OnAction.cascade),
-      Column.text(Columns.description)..nullable()
+      Column.text(Columns.description)..nullable(),
     ],
     uniqueColumns: [
-      [Columns.name]
+      [Columns.name],
     ],
   );
 

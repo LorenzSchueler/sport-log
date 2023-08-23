@@ -125,7 +125,7 @@ class HeartRateUtils extends ChangeNotifier {
             _searchDuration,
             onTimeout: (sink) => sink.close(),
           ))
-        d.name: d.deviceId
+        d.name: d.deviceId,
     };
 
     deviceId = devices.values.firstOrNull; // auto select first one

@@ -69,7 +69,7 @@ class _RouteUploadPageState extends State<RouteUploadPage> {
                   ? _saveRoute
                   : null,
               icon: const Icon(AppIcons.save),
-            )
+            ),
           ],
         ),
         body: Column(
@@ -114,7 +114,7 @@ class _RouteUploadPageState extends State<RouteUploadPage> {
                   ),
                 ],
               ),
-            )
+            ),
           ],
         ),
       ),

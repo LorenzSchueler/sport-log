@@ -104,7 +104,7 @@ class _MetconSessionDetailsPageState extends State<MetconSessionDetailsPage> {
           IconButton(
             onPressed: _pushEditPage,
             icon: const Icon(AppIcons.edit),
-          )
+          ),
         ],
       ),
       body: ListView(

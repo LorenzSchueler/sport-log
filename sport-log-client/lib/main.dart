@@ -94,6 +94,7 @@ class InitAppWrapperState extends State<InitAppWrapper> {
 
   @override
   void initState() {
+    super.initState();
     initialize().listen(
       (progress) => setState(() => _progress = progress),
       onDone: () {
@@ -103,7 +104,6 @@ class InitAppWrapperState extends State<InitAppWrapper> {
       onError: (Object error) => setState(() => _error = error),
       cancelOnError: true,
     );
-    super.initState();
   }
 
   @override

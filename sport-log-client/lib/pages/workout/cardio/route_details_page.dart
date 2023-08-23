@@ -137,7 +137,7 @@ class _RouteDetailsPageState extends State<RouteDetailsPage>
           IconButton(
             onPressed: _pushEditPage,
             icon: const Icon(AppIcons.edit),
-          )
+          ),
         ],
       ),
       body: ProviderConsumer(
@@ -186,9 +186,9 @@ class _RouteDetailsPageState extends State<RouteDetailsPage>
                     chartLines: [_elevationLine],
                     touchCallback: _touchCallback,
                   ),
-                )
-              ]
-            ]
+                ),
+              ],
+            ],
           ],
         ),
       ),

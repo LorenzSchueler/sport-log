@@ -38,7 +38,10 @@ class MapSearchUtils extends ChangeNotifier {
     try {
       places = await _placesSearch.getPlaces(_search!);
     } on SocketException {
-      showNoInternetToast(App.globalContext);
+      final context = App.globalContext;
+      if (context.mounted) {
+        showNoInternetToast(context);
+      }
     }
     _searchResults = places ?? [];
     notifyListeners();
@@ -55,7 +58,7 @@ class MapSearchUtils extends ChangeNotifier {
     if (bbox != null) {
       final bounds = [
         LatLng(lat: bbox[1], lng: bbox[0]),
-        LatLng(lat: bbox[3], lng: bbox[2])
+        LatLng(lat: bbox[3], lng: bbox[2]),
       ].latLngBounds!;
       await _mapController?.setBoundsX(bounds, padded: false);
     } else if (center != null) {

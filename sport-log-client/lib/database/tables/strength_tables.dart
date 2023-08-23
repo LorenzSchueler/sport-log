@@ -47,7 +47,7 @@ final eormTable = Table(
   ],
   uniqueColumns: [],
   rawSql: [
-    "insert into ${Tables.eorm} (${Columns.eormReps}, ${Columns.eormPercentage}) values $eormValuesSql;"
+    "insert into ${Tables.eorm} (${Columns.eormReps}, ${Columns.eormPercentage}) values $eormValuesSql;",
   ],
 );
 
@@ -79,7 +79,7 @@ class StrengthSetTable extends TableAccessor<StrengthSet> {
         ..checkGt(0),
     ],
     uniqueColumns: [
-      [Columns.strengthSessionId, Columns.setNumber]
+      [Columns.strengthSessionId, Columns.setNumber],
     ],
   );
 
@@ -122,7 +122,7 @@ class StrengthSetTable extends TableAccessor<StrengthSet> {
     return {
       for (final record in records)
         Int64(record[Columns.movementId]! as int):
-            StrengthRecord.fromDbRecord(record)
+            StrengthRecord.fromDbRecord(record),
     };
   }
 }

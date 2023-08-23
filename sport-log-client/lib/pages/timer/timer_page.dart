@@ -45,7 +45,7 @@ class TimerPage extends StatelessWidget {
                       Tab(
                         text: "Stopwatch",
                         icon: Icon(AppIcons.stopwatch),
-                      )
+                      ),
                     ],
                   ),
                 ),

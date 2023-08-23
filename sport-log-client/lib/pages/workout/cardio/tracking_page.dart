@@ -50,7 +50,7 @@ class CardioTrackingPage extends StatelessWidget {
                     ? () => trackingUtils.saveCardioSession(context)
                     : null,
             child: const Text("Save"),
-          )
+          ),
         ],
       ),
     );

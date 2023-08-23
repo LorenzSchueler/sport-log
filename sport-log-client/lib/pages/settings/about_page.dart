@@ -19,7 +19,7 @@ class _Contributor {
     _Contributor(
       "Oliver Portee",
       "https://github.com/OliverPortee",
-    )
+    ),
   ];
 }
 

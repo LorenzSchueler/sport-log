@@ -84,7 +84,7 @@ class CardioValueUnitDescriptionTable extends StatelessWidget {
                         current: true,
                       ),
                     ],
-                  )
+                  ),
                 ]
               : [
                   rowSpacer,
@@ -97,7 +97,7 @@ class CardioValueUnitDescriptionTable extends StatelessWidget {
                         cardioSessionDescription.cardioSession.tempo,
                       ),
                     ],
-                  )
+                  ),
                 ],
         rowSpacer,
         TableRow(
@@ -124,7 +124,7 @@ class CardioValueUnitDescriptionTable extends StatelessWidget {
                       cardioSessionDescription
                           .cardioSession.track?.lastOrNull?.latLng,
                     )
-                  : Container()
+                  : Container(),
             ],
           ),
         ],
@@ -162,7 +162,7 @@ class CardioValueUnitDescriptionTable extends StatelessWidget {
                         current: true,
                       ),
                     ],
-                  )
+                  ),
                 ]
               : [
                   rowSpacer,
@@ -175,7 +175,7 @@ class CardioValueUnitDescriptionTable extends StatelessWidget {
                         cardioSessionDescription.cardioSession.avgHeartRate,
                       ),
                     ],
-                  )
+                  ),
                 ],
         //rowSpacer,
         //TableRow(

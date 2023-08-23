@@ -321,7 +321,7 @@ class _MetconSessionEditPageState extends State<MetconSessionEditPage> {
                     _metconSessionDescription.metconSession.comments =
                         comments.isEmpty ? null : comments;
                   }),
-                )
+                ),
               ],
             ),
           ),

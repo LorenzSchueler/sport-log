@@ -28,7 +28,7 @@ extension StrengthRecordExtension on StrengthRecords {
         if (isRecord(strengthSessionStats.maxCount, strengthRecord?.maxCount))
           StrengthRecordType.maxCount,
         if (isRecord(strengthSessionStats.maxEorm, strengthRecord?.maxEorm))
-          StrengthRecordType.maxEorm
+          StrengthRecordType.maxEorm,
       ];
 
   List<StrengthRecordType> getRecordTypes(

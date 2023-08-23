@@ -40,7 +40,7 @@ class _TimePickerDialogState extends State<TimePickerDialog> {
         TextButton(
           onPressed: () => Navigator.pop(context, _datetime),
           child: const Text('OK'),
-        )
+        ),
       ],
     );
   }

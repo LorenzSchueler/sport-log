@@ -228,7 +228,7 @@ class _CardioEditPageState extends State<CardioEditPage> {
                   ? _saveCardioSession
                   : null,
               icon: const Icon(AppIcons.save),
-            )
+            ),
           ],
         ),
         body: Column(

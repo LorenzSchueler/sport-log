@@ -128,7 +128,7 @@ class _OfflineMapsPageState extends State<OfflineMapsPage> {
                             ? _updatePoint2(null)
                             : _updatePoint1(null),
                       ),
-                    )
+                    ),
                   ],
                 ),
                 Expanded(

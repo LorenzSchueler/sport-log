@@ -183,7 +183,7 @@ abstract class TableAccessor<T extends AtomicEntity> {
         tableName,
         {
           ...serde.toDbRecord(object),
-          if (isSynchronized) Columns.syncStatus: SyncStatus.synchronized.index
+          if (isSynchronized) Columns.syncStatus: SyncStatus.synchronized.index,
         },
         where: combineFilter([
           notDeleted,
@@ -207,7 +207,7 @@ abstract class TableAccessor<T extends AtomicEntity> {
           {
             ...serde.toDbRecord(object),
             if (isSynchronized)
-              Columns.syncStatus: SyncStatus.synchronized.index
+              Columns.syncStatus: SyncStatus.synchronized.index,
           },
           where: combineFilter([
             notDeleted,
@@ -274,7 +274,7 @@ abstract class TableAccessor<T extends AtomicEntity> {
   }
 
   static final synchronized = {
-    Columns.syncStatus: SyncStatus.synchronized.index
+    Columns.syncStatus: SyncStatus.synchronized.index,
   };
 
   Future<void> setSynchronized(Int64 id) async {

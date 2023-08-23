@@ -145,8 +145,8 @@ class ActionsCard extends StatelessWidget {
                       Expanded(child: Text(action.description ?? "")),
                     ],
                   ),
-                ]
-              ]
+                ],
+              ],
             ],
           ),
         ),
@@ -219,7 +219,7 @@ class ActionRulesCard extends StatelessWidget {
                               _dataProvider.updateSingle(actionRule);
                             }
                           },
-                        )
+                        ),
                       ],
                     ),
                     if (actionRule.arguments != null)
@@ -233,7 +233,7 @@ class ActionRulesCard extends StatelessWidget {
                   ],
                 ),
               ),
-            ]
+            ],
           ],
         ),
       ),

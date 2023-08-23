@@ -64,11 +64,14 @@ abstract class DataProvider<T> extends ChangeNotifier {
           error: error,
           caughtBy: "DataProvider.handleApiError",
         );
-        await showMessageDialog(
-          context: App.globalContext,
-          title: "An Error Occurred",
-          text: error.toString(),
-        );
+        final context = App.globalContext;
+        if (context.mounted) {
+          await showMessageDialog(
+            context: context,
+            title: "An Error Occurred",
+            text: error.toString(),
+          );
+        }
         return null;
     }
   }

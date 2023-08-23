@@ -25,10 +25,10 @@ class DiaryTable extends TableAccessor<Diary> {
       Column.real(Columns.bodyweight)
         ..nullable()
         ..checkGt(0),
-      Column.text(Columns.comments)..nullable()
+      Column.text(Columns.comments)..nullable(),
     ],
     uniqueColumns: [
-      [Columns.date]
+      [Columns.date],
     ],
   );
 
