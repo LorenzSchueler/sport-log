@@ -59,7 +59,7 @@ class MovementDescriptionTable {
 
   Future<List<MovementDescription>> getNonDeleted() async {
     const hasReference = 'has_reference';
-    final records = await AppDatabase.database!.rawQuery(
+    final records = await AppDatabase.database.rawQuery(
       '''
       SELECT
         ${MovementTable().table.allColumns},
@@ -97,7 +97,7 @@ class MovementDescriptionTable {
     bool distanceOnly = false,
   }) async {
     const hasReference = 'has_reference';
-    final records = await AppDatabase.database!.rawQuery(
+    final records = await AppDatabase.database.rawQuery(
       '''
       SELECT
         ${MovementTable().table.allColumns},

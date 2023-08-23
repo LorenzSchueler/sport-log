@@ -21,7 +21,7 @@ abstract class TableAccessor<T extends AtomicEntity> {
 
   String get tableName => table.name;
 
-  Database get database => AppDatabase.database!;
+  Database get database => AppDatabase.database;
 
   static String combineFilter(List<String> filter) {
     return filter.where((element) => element.isNotEmpty).join(" and ");

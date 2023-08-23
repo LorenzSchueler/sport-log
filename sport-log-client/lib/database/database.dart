@@ -94,13 +94,11 @@ class DbResult {
   DbError get failure => result.failure;
 }
 
-class AppDatabase {
-  AppDatabase._();
-
+abstract final class AppDatabase {
   static Database? _database;
-  static Database? get database {
-    return _database;
-  }
+
+  /// This should only be called after the database was initialized.
+  static Database get database => _database!;
 
   static Future<void> init() async {
     if (Config.instance.deleteDatabase) {

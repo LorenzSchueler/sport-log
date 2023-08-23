@@ -139,7 +139,7 @@ class CardioSessionDescriptionTable {
     Movement? movement,
     String? comment,
   }) async {
-    final records = await AppDatabase.database!.rawQuery(
+    final records = await AppDatabase.database.rawQuery(
       '''
       SELECT
         ${_cardioSessionTable.table.allColumns},

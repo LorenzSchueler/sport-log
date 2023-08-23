@@ -140,7 +140,7 @@ class StrengthSessionDescriptionTable {
   static final StrengthSetTable _strengthSetTable = StrengthSetTable();
 
   Future<StrengthSessionDescription?> getById(Int64 idValue) async {
-    final records = await AppDatabase.database!.rawQuery(
+    final records = await AppDatabase.database.rawQuery(
       '''
       SELECT
         ${_strengthSessionTable.table.allColumns},
@@ -176,7 +176,7 @@ class StrengthSessionDescriptionTable {
     Movement? movement,
     String? comment,
   }) async {
-    final records = await AppDatabase.database!.rawQuery(
+    final records = await AppDatabase.database.rawQuery(
       '''
       SELECT
         ${_strengthSessionTable.table.allColumns},
