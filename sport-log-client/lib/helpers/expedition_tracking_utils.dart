@@ -115,11 +115,20 @@ class ExpeditionTrackingUtils extends ChangeNotifier {
     // called every minute
     if (await FlutterForegroundTask.isRunningService) {
       _logger.d("refreshing expedition tracking page");
+      final oldPositions =
+          _cardioSessionDescription?.cardioSession.track?.length ?? 0;
       _cardioSessionDescription = (await _dataProvider
           // ignore: unnecessary_null_checks
           .getById(Settings.instance.expeditionData!.cardioId))!;
+      final newPositions =
+          _cardioSessionDescription?.cardioSession.track?.length ?? 0;
       await _trackingUiUtils
           .updateTrack(cardioSessionDescription?.cardioSession.track);
+      if (oldPositions < newPositions) {
+        await _trackingUiUtils.centerCurrentLocation(
+          cardioSessionDescription?.cardioSession.track?.last.latLng,
+        );
+      }
       notifyListeners();
     }
   }
