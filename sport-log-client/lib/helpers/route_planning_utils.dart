@@ -88,12 +88,14 @@ class RoutePlanningUtils {
     final track = <Position>[];
     final latLngs = _decodePolyline(navRoute.geometry as String);
     for (final latLng in latLngs) {
-      final elevation = await getElevation?.call(latLng);
+      final elevation = (await getElevation?.call(latLng)) ??
+          track.lastOrNull?.elevation ??
+          0;
       track.add(
         Position(
           latitude: latLng.lat,
           longitude: latLng.lng,
-          elevation: elevation ?? track.last.elevation,
+          elevation: elevation,
           distance: track.isEmpty
               ? 0
               : track.last.distance + track.last.latLng.distanceTo(latLng),
