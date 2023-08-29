@@ -246,98 +246,99 @@ class _RouteEditPageState extends State<RouteEditPage> {
         ),
         body: ProviderConsumer(
           create: (_) => BoolToggle.on(),
-          builder: (context, fullscreen, _) => Column(
-            children: [
-              Expanded(
-                child: Stack(
-                  children: [
-                    MapboxMapWrapper(
-                      showFullscreenButton: false,
-                      showMapStylesButton: true,
-                      showSelectRouteButton: false,
-                      showSetNorthButton: true,
-                      showCurrentLocationButton: false,
-                      showCenterLocationButton: false,
-                      scaleAtTop: true,
-                      onMapCreated: _onMapCreated,
-                      onLongTap: _extendLine,
-                    ),
-                    if (_isSearching)
-                      const Align(
-                        alignment: Alignment.topCenter,
-                        child: Padding(
-                          padding: EdgeInsets.only(top: 10),
-                          child:
-                              CircularProgressIndicator(color: Colors.black45),
-                        ),
-                      ),
-                    Align(
-                      alignment: Alignment.bottomCenter,
-                      child: IconButton(
-                        onPressed: fullscreen.toggle,
-                        iconSize: 50,
-                        icon: Icon(
-                          fullscreen.isOn
-                              ? AppIcons.arrowUp
-                              : AppIcons.arrowDown,
-                          color: Colors.black,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              ElevationMap(onMapCreated: _onElevationMapCreated),
-              if (fullscreen.isOff)
-                Padding(
-                  padding: Defaults.edgeInsets.normal,
-                  child: Column(
+          builder: (context, fullscreen, _) => Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                Expanded(
+                  child: Stack(
                     children: [
-                      SegmentedButton(
-                        segments: SnapMode.values
-                            .map(
-                              (snapMode) => ButtonSegment(
-                                value: snapMode,
-                                label: Text(snapMode.name),
-                              ),
-                            )
-                            .toList(),
-                        selected: {_snapMode},
-                        showSelectedIcon: false,
-                        onSelectionChanged: (selected) {
-                          setState(() => _snapMode = selected.first);
-                          _updateLine();
-                        },
+                      MapboxMapWrapper(
+                        showFullscreenButton: false,
+                        showMapStylesButton: true,
+                        showSelectRouteButton: false,
+                        showSetNorthButton: true,
+                        showCurrentLocationButton: false,
+                        showCenterLocationButton: false,
+                        scaleAtTop: true,
+                        onMapCreated: _onMapCreated,
+                        onLongTap: _extendLine,
                       ),
-                      ConstrainedBox(
-                        constraints: const BoxConstraints(maxHeight: 200),
-                        child: ReorderableListView.builder(
-                          itemBuilder: (context, index) => ListTile(
-                            key: ValueKey(index),
-                            leading: IconButton(
-                              onPressed: () => _removePoint(index),
-                              icon: const Icon(AppIcons.delete),
+                      if (_isSearching)
+                        const Align(
+                          alignment: Alignment.topCenter,
+                          child: Padding(
+                            padding: EdgeInsets.only(top: 10),
+                            child: CircularProgressIndicator(
+                              color: Colors.black45,
                             ),
-                            title: Text(
-                              "${index + 1}",
-                              style: Theme.of(context).textTheme.bodyLarge,
-                            ),
-                            trailing: const Icon(AppIcons.dragHandle),
-                            dense: true,
-                            visualDensity: VisualDensity.compact,
-                            contentPadding: const EdgeInsets.only(right: 10),
                           ),
-                          itemCount: _route.markedPositions!.length,
-                          onReorder: _switchPoints,
-                          shrinkWrap: true,
+                        ),
+                      Align(
+                        alignment: Alignment.bottomCenter,
+                        child: IconButton(
+                          onPressed: fullscreen.toggle,
+                          iconSize: 50,
+                          icon: Icon(
+                            fullscreen.isOn
+                                ? AppIcons.arrowUp
+                                : AppIcons.arrowDown,
+                            color: Colors.black,
+                          ),
                         ),
                       ),
-                      const Divider(),
-                      RouteValueUnitDescriptionTable(route: _route),
-                      const Divider(),
-                      Form(
-                        key: _formKey,
-                        child: TextFormField(
+                    ],
+                  ),
+                ),
+                ElevationMap(onMapCreated: _onElevationMapCreated),
+                if (fullscreen.isOff)
+                  Padding(
+                    padding: Defaults.edgeInsets.normal,
+                    child: Column(
+                      children: [
+                        SegmentedButton(
+                          segments: SnapMode.values
+                              .map(
+                                (snapMode) => ButtonSegment(
+                                  value: snapMode,
+                                  label: Text(snapMode.name),
+                                ),
+                              )
+                              .toList(),
+                          selected: {_snapMode},
+                          showSelectedIcon: false,
+                          onSelectionChanged: (selected) {
+                            setState(() => _snapMode = selected.first);
+                            _updateLine();
+                          },
+                        ),
+                        ConstrainedBox(
+                          constraints: const BoxConstraints(maxHeight: 200),
+                          child: ReorderableListView.builder(
+                            itemBuilder: (context, index) => ListTile(
+                              key: ValueKey(index),
+                              leading: IconButton(
+                                onPressed: () => _removePoint(index),
+                                icon: const Icon(AppIcons.delete),
+                              ),
+                              title: Text(
+                                "${index + 1}",
+                                style: Theme.of(context).textTheme.bodyLarge,
+                              ),
+                              trailing: const Icon(AppIcons.dragHandle),
+                              dense: true,
+                              visualDensity: VisualDensity.compact,
+                              contentPadding: const EdgeInsets.only(right: 10),
+                            ),
+                            itemCount: _route.markedPositions!.length,
+                            onReorder: _switchPoints,
+                            shrinkWrap: true,
+                          ),
+                        ),
+                        const Divider(),
+                        RouteValueUnitDescriptionTable(route: _route),
+                        const Divider(),
+                        TextFormField(
                           onChanged: (name) =>
                               setState(() => _route.name = name),
                           initialValue: _route.name,
@@ -348,11 +349,11 @@ class _RouteEditPageState extends State<RouteEditPage> {
                             labelText: "Name",
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
