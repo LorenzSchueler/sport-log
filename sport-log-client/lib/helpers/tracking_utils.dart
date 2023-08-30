@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart' hide Route;
-import 'package:flutter_tts/flutter_tts.dart';
 import 'package:sport_log/app.dart';
 import 'package:sport_log/data_provider/data_providers/cardio_data_provider.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
@@ -12,6 +11,7 @@ import 'package:sport_log/helpers/location_utils.dart';
 import 'package:sport_log/helpers/map_controller.dart';
 import 'package:sport_log/helpers/step_count_utils.dart';
 import 'package:sport_log/helpers/tracking_ui_utils.dart';
+import 'package:sport_log/helpers/tts_utils.dart';
 import 'package:sport_log/models/cardio/all.dart';
 import 'package:sport_log/pages/workout/cardio/audio_feedback_config.dart';
 import 'package:sport_log/pages/workout/cardio/tracking_settings.dart';
@@ -89,9 +89,7 @@ class TrackingUtils extends ChangeNotifier {
 
   final int? _routeAlarmDistance;
   DateTime? _lastAlarm;
-  final _tts = FlutterTts()
-    ..setVoice({"name": "en-US-language", "locale": "en-US"})
-    ..awaitSpeakCompletion(true);
+  final _tts = TtsUtils();
 
   final AudioFeedbackConfig? _audioFeedbackConfig;
 
@@ -299,13 +297,9 @@ class TrackingUtils extends ChangeNotifier {
       final prevLap = track[track.length - 2].distance ~/ config.interval;
       final currLap = track.last.distance ~/ config.interval;
       if (prevLap < currLap) {
-        await _tts.speak("The current metrics are:");
-        for (final metric in config.metrics) {
-          final text = metric.text(session);
-          if (text != null) {
-            await _tts.speak(text);
-          }
-        }
+        final text =
+            "The current metrics are: ${config.metrics.map((e) => e.text(session)).whereNotNull().join(", ")}";
+        await _tts.speak(text);
       }
     }
   }
