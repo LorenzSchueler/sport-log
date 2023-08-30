@@ -232,8 +232,11 @@ async fn fetch() -> Result<(), Error> {
             debug!("processing {:#?}", exec_action_event);
 
             let (Some(username), Some(password)) =
-                (&exec_action_event.username, &exec_action_event.password) else {
-                return Ok(Err(UserError::NoCredential(exec_action_event.action_event_id)));
+                (&exec_action_event.username, &exec_action_event.password)
+            else {
+                return Ok(Err(UserError::NoCredential(
+                    exec_action_event.action_event_id,
+                )));
             };
 
             let token = match get_token(

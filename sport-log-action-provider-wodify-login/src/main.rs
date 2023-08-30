@@ -218,8 +218,11 @@ async fn login(mode: Mode) -> Result<()> {
             debug!("processing {:#?}", exec_action_event);
 
             let (Some(username), Some(password)) =
-                (&exec_action_event.username, &exec_action_event.password) else {
-                return Ok(Err(UserError::NoCredential(exec_action_event.action_event_id)));
+                (&exec_action_event.username, &exec_action_event.password)
+            else {
+                return Ok(Err(UserError::NoCredential(
+                    exec_action_event.action_event_id,
+                )));
             };
 
             let driver = WebDriver::new(WEBDRIVER_ADDRESS, caps).await?;
