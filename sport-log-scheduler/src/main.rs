@@ -169,7 +169,7 @@ fn datetimes_for_rule_from_start(
     if start.time() > creatable_action_rule.time.time() {
         start += Duration::days(1);
     }
-    let first_datetime = DateTime::from_utc(
+    let first_datetime = DateTime::from_naive_utc_and_offset(
         start
             .date_naive()
             .and_time(creatable_action_rule.time.time())
@@ -276,7 +276,7 @@ mod tests {
     use sport_log_types::{ActionId, ActionRuleId, CreatableActionRule, UserId, Weekday};
 
     fn datetime(datetime: &str) -> DateTime<Utc> {
-        DateTime::from_utc(NaiveDateTime::from_str(datetime).unwrap(), Utc)
+        DateTime::from_naive_utc_and_offset(NaiveDateTime::from_str(datetime).unwrap(), Utc)
     }
 
     #[test]

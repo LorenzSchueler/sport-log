@@ -425,7 +425,7 @@ fn try_into_cardio_session(
         cardio_blueprint_id: None,
         movement_id,
         cardio_type,
-        datetime: DateTime::from_utc(
+        datetime: DateTime::from_naive_utc_and_offset(
             NaiveDateTime::from_timestamp_opt(workout_stats.start_time as i64 / 1000, 0).unwrap(),
             Utc,
         ),

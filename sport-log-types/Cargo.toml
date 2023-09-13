@@ -11,8 +11,7 @@ chrono = { version = "0.4", features = ["serde"] }
 const_format = "0.2.30"
 http = "0.2.9"
 diesel = { version = "2", features = ["postgres", "chrono"], optional = true }
-diesel-async = { version = "0.4.1", features = ["postgres"], optional = true }
 diesel-derive-enum = { version = "2", features = ["postgres"], optional = true }
 
 [features]
-db = [ "diesel", "diesel-async", "diesel-derive-enum"]
+db = [ "diesel", "diesel-derive-enum"]
