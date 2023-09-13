@@ -324,18 +324,6 @@ class CardioSession extends AtomicEntity {
         validate(
           avgHeartRate == null || avgHeartRate! >= 0,
           'CardioSession: avgHeartRate < 0',
-        ) &&
-        validate(
-          track == null || track!.length <= 1 || distance != null,
-          'CardioSession: distance == null when track is set',
-        ) &&
-        validate(
-          cadence == null || cadence!.length <= 1 || avgCadence != null,
-          'CardioSession: avgCadence == null when cadence is set',
-        ) &&
-        validate(
-          heartRate == null || heartRate!.length <= 1 || avgHeartRate != null,
-          'CardioSession: avgHeartRate == null when heartRate is set',
         );
   }
 
@@ -371,6 +359,18 @@ class CardioSession extends AtomicEntity {
           'CardioSession: heartRate is empty but not null',
         ) &&
         validate(
+          track == null || track!.length <= 1 || distance != null,
+          'CardioSession: distance == null when track is set',
+        ) &&
+        validate(
+          cadence == null || cadence!.length <= 1 || avgCadence != null,
+          'CardioSession: avgCadence == null when cadence is set',
+        ) &&
+        validate(
+          heartRate == null || heartRate!.length <= 1 || avgHeartRate != null,
+          'CardioSession: avgHeartRate == null when heartRate is set',
+        ) &&
+        validate(
           comments == null || comments!.isNotEmpty,
           'CardioSession: comments is empty but not null',
         );
@@ -378,25 +378,25 @@ class CardioSession extends AtomicEntity {
 
   @override
   void sanitize() {
-    if (distance != null && distance! <= 0) {
-      distance = null;
-    }
     if (time != null && time! <= Duration.zero) {
       time = null;
     }
-    if (track != null && track!.isEmpty) {
+    if (distance != null && distance! <= 0) {
+      distance = null;
+    }
+    if (track != null && track!.isEmpty || distance == null) {
       track = null;
     }
     if (avgCadence != null && avgCadence! <= 0) {
       avgCadence = null;
     }
-    if (cadence != null && cadence!.isEmpty) {
+    if (cadence != null && cadence!.isEmpty || avgCadence == null) {
       cadence = null;
     }
     if (avgHeartRate != null && avgHeartRate! <= 0) {
       avgHeartRate = null;
     }
-    if (heartRate != null && heartRate!.isEmpty) {
+    if (heartRate != null && heartRate!.isEmpty || avgHeartRate == null) {
       heartRate = null;
     }
     if (comments != null && comments!.isEmpty) {
