@@ -1,9 +1,11 @@
 use argon2::Argon2;
 #[cfg(test)]
 use argon2::{Algorithm, Params, Version};
+use async_trait::async_trait;
 use axum::http::StatusCode;
 use chrono::{DateTime, Utc};
-use diesel::{Column, PgConnection, QueryResult, Table};
+use diesel::{Column, QueryResult, Table};
+use diesel_async::AsyncPgConnection;
 use serde::Deserialize;
 use sport_log_types::{ActionProviderId, UserId};
 
@@ -125,10 +127,14 @@ pub trait ModifiableDb: Db {
 /// This trait can be automatically derived by adding `#[derive(Create)]` to your struct.
 ///
 /// For restrictions on the types for derive to work please see [`sport_log_types_derive::Create`].
+#[async_trait]
 pub trait Create: Db {
-    fn create(value: &Self::Type, db: &mut PgConnection) -> QueryResult<usize>;
+    async fn create(value: &Self::Type, db: &mut AsyncPgConnection) -> QueryResult<usize>;
 
-    fn create_multiple(values: &[Self::Type], db: &mut PgConnection) -> QueryResult<usize>;
+    async fn create_multiple(
+        values: &[Self::Type],
+        db: &mut AsyncPgConnection,
+    ) -> QueryResult<usize>;
 }
 
 /// A type for which an entry can be retrieved by id from the database.
@@ -138,8 +144,9 @@ pub trait Create: Db {
 /// This trait can be automatically derived by adding `#[derive(GetById)]` to your struct.
 ///
 /// For restrictions on the types for derive to work please see [`sport_log_types_derive::GetById`].
+#[async_trait]
 pub trait GetById: Db {
-    fn get_by_id(id: Self::Id, db: &mut PgConnection) -> QueryResult<Self::Type>;
+    async fn get_by_id(id: Self::Id, db: &mut AsyncPgConnection) -> QueryResult<Self::Type>;
 }
 
 /// A type for which entries can be retrieved by id from the database.
@@ -149,8 +156,12 @@ pub trait GetById: Db {
 /// This trait can be automatically derived by adding `#[derive(GetByIds)]` to your struct.
 ///
 /// For restrictions on the types for derive to work please see [`sport_log_types_derive::GetByIds`].
+#[async_trait]
 pub trait GetByIds: Db {
-    fn get_by_ids(ids: &[Self::Id], db: &mut PgConnection) -> QueryResult<Vec<Self::Type>>;
+    async fn get_by_ids(
+        ids: &[Self::Id],
+        db: &mut AsyncPgConnection,
+    ) -> QueryResult<Vec<Self::Type>>;
 }
 
 /// A type for which entries can be retrieved by user from the database.
@@ -160,8 +171,12 @@ pub trait GetByIds: Db {
 /// This trait can be automatically derived by adding `#[derive(GetByUser)]` to your struct.
 ///
 /// For restrictions on the types for derive to work please see [`sport_log_types_derive::GetByUser`].
+#[async_trait]
 pub trait GetByUser: Db {
-    fn get_by_user(user_id: UserId, db: &mut PgConnection) -> QueryResult<Vec<Self::Type>>;
+    async fn get_by_user(
+        user_id: UserId,
+        db: &mut AsyncPgConnection,
+    ) -> QueryResult<Vec<Self::Type>>;
 }
 
 /// A type for which entries can be retrieved by user and the timespan from the database.
@@ -171,11 +186,12 @@ pub trait GetByUser: Db {
 /// This trait can be automatically derived by adding `#[derive(GetByUserTimespan)]` to your struct.
 ///
 /// For restrictions on the types for derive to work please see [`sport_log_types_derive::GetByUserTimespan`].
+#[async_trait]
 pub trait GetByUserTimespan: Db {
-    fn get_by_user_and_timespan(
+    async fn get_by_user_and_timespan(
         user_id: UserId,
         timespan: Timespan,
-        db: &mut PgConnection,
+        db: &mut AsyncPgConnection,
     ) -> QueryResult<Vec<Self::Type>>;
 }
 
@@ -186,11 +202,12 @@ pub trait GetByUserTimespan: Db {
 /// This trait can be automatically derived by adding `#[derive(GetByUserSync)]` to your struct.
 ///
 /// For restrictions on the types for derive to work please see [`sport_log_types_derive::GetByUserSync`].
+#[async_trait]
 pub trait GetByUserSync: Db {
-    fn get_by_user_and_last_sync(
+    async fn get_by_user_and_last_sync(
         user_id: UserId,
         last_sync: DateTime<Utc>,
-        db: &mut PgConnection,
+        db: &mut AsyncPgConnection,
     ) -> QueryResult<Vec<Self::Type>>;
 }
 
@@ -201,10 +218,11 @@ pub trait GetByUserSync: Db {
 /// This trait can be automatically derived by adding `#[derive(GetBySync)]` to your struct.
 ///
 /// For restrictions on the types for derive to work please see [`sport_log_types_derive::GetBySync`].
+#[async_trait]
 pub trait GetBySync: Db {
-    fn get_by_last_sync(
+    async fn get_by_last_sync(
         last_sync: DateTime<Utc>,
-        db: &mut PgConnection,
+        db: &mut AsyncPgConnection,
     ) -> QueryResult<Vec<Self::Type>>;
 }
 
@@ -215,8 +233,9 @@ pub trait GetBySync: Db {
 /// This trait can be automatically derived by adding `#[derive(GetAll)]` to your struct.
 ///
 /// For restrictions on the types for derive to work please see [`sport_log_types_derive::GetAll`].
+#[async_trait]
 pub trait GetAll: Db {
-    fn get_all(db: &mut PgConnection) -> QueryResult<Vec<Self::Type>>;
+    async fn get_all(db: &mut AsyncPgConnection) -> QueryResult<Vec<Self::Type>>;
 }
 
 /// A type which can be used to update an entry in the database.
@@ -226,10 +245,14 @@ pub trait GetAll: Db {
 /// This trait can be automatically derived by adding `#[derive(Update)]` to your struct.
 ///
 /// For restrictions on the types for derive to work please see [`sport_log_types_derive::Update`].
+#[async_trait]
 pub trait Update: Db {
-    fn update(value: &Self::Type, db: &mut PgConnection) -> QueryResult<usize>;
+    async fn update(value: &Self::Type, db: &mut AsyncPgConnection) -> QueryResult<usize>;
 
-    fn update_multiple(values: &[Self::Type], db: &mut PgConnection) -> QueryResult<usize>;
+    async fn update_multiple(
+        values: &[Self::Type],
+        db: &mut AsyncPgConnection,
+    ) -> QueryResult<usize>;
 }
 
 /// A type for which all soft deleted entities can be hard deleted.
@@ -243,8 +266,12 @@ pub trait Update: Db {
 /// This trait can be automatically derived by adding `#[derive(HardDelete)]` to your struct.
 ///
 /// For restrictions on the types for derive to work please see [`sport_log_types_derive::HardDelete`].
+#[async_trait]
 pub trait HardDelete: Db {
-    fn hard_delete(last_change: DateTime<Utc>, db: &mut PgConnection) -> QueryResult<usize>;
+    async fn hard_delete(
+        last_change: DateTime<Utc>,
+        db: &mut AsyncPgConnection,
+    ) -> QueryResult<usize>;
 }
 
 /// A type which can be checked if it belongs to a User.
@@ -252,75 +279,98 @@ pub trait HardDelete: Db {
 /// ### Deriving
 ///
 /// This trait can be automatically derived by adding `#[derive(CheckUserId)]` to your struct if the struct has a field `user_id` of type [`UserId`].
+#[async_trait]
 pub trait CheckUserId: Db {
     /// Check if the entry with id `id` in the database belongs to the [`User`](sport_log_types::User) with `user_id`.
-    fn check_user_id(id: Self::Id, user_id: UserId, db: &mut PgConnection) -> QueryResult<bool>;
+    async fn check_user_id(
+        id: Self::Id,
+        user_id: UserId,
+        db: &mut AsyncPgConnection,
+    ) -> QueryResult<bool>;
 
     /// Check if the entries with an id in `ids` in the database belong to the [`User`](sport_log_types::User) with `user_id`.
-    fn check_user_ids(
+    async fn check_user_ids(
         ids: &[Self::Id],
         user_id: UserId,
-        db: &mut PgConnection,
+        db: &mut AsyncPgConnection,
     ) -> QueryResult<bool>;
 }
 
 /// A type which can be checked if it belongs to a User or is public.
+#[async_trait]
 pub trait CheckOptionalUserId: Db {
     /// Check if the entry with id `id` in the database belongs to the [`User`](sport_log_types::User) with `user_id` or is public (`user_id` is None).
-    fn check_optional_user_id(
+    async fn check_optional_user_id(
         id: Self::Id,
         user_id: UserId,
-        db: &mut PgConnection,
+        db: &mut AsyncPgConnection,
     ) -> QueryResult<bool>;
 
     /// Check if the entries with an id in `ids` in the database belong to the [`User`](sport_log_types::User) with `user_id` or are public (`user_id` is None).
-    fn check_optional_user_ids(
+    async fn check_optional_user_ids(
         ids: &[Self::Id],
         user_id: UserId,
-        db: &mut PgConnection,
+        db: &mut AsyncPgConnection,
     ) -> QueryResult<bool>;
 }
 
+#[async_trait]
 pub trait CheckAPId: Db {
-    fn check_ap_id(
+    async fn check_ap_id(
         id: Self::Id,
         ap_id: ActionProviderId,
-        db: &mut PgConnection,
+        db: &mut AsyncPgConnection,
     ) -> QueryResult<bool>;
 
-    fn check_ap_ids(
+    async fn check_ap_ids(
         ids: &[Self::Id],
         ap_id: ActionProviderId,
-        db: &mut PgConnection,
+        db: &mut AsyncPgConnection,
     ) -> QueryResult<bool>;
 }
 
+#[async_trait]
 pub trait VerifyIdForUser {
     type Id;
 
-    fn verify_user(self, auth: AuthUser, db: &mut PgConnection) -> Result<Self::Id, StatusCode>;
-}
-
-pub trait VerifyIdForUserOrAP {
-    type Id;
-
-    fn verify_user_ap(
+    async fn verify_user(
         self,
-        auth: AuthUserOrAP,
-        db: &mut PgConnection,
+        auth: AuthUser,
+        db: &mut AsyncPgConnection,
     ) -> Result<Self::Id, StatusCode>;
 }
 
+#[async_trait]
+pub trait VerifyIdForUserOrAP {
+    type Id;
+
+    async fn verify_user_ap(
+        self,
+        auth: AuthUserOrAP,
+        db: &mut AsyncPgConnection,
+    ) -> Result<Self::Id, StatusCode>;
+}
+
+#[async_trait]
 pub trait VerifyIdForActionProvider {
     type Id;
 
-    fn verify_ap(self, auth: AuthAP, db: &mut PgConnection) -> Result<Self::Id, StatusCode>;
+    async fn verify_ap(
+        self,
+        auth: AuthAP,
+        db: &mut AsyncPgConnection,
+    ) -> Result<Self::Id, StatusCode>;
 }
 
+#[async_trait]
 pub trait VerifyIdsForActionProvider {
     type Id;
 
-    fn verify_ap(self, auth: AuthAP, db: &mut PgConnection) -> Result<Vec<Self::Id>, StatusCode>;
+    async fn verify_ap(
+        self,
+        auth: AuthAP,
+        db: &mut AsyncPgConnection,
+    ) -> Result<Vec<Self::Id>, StatusCode>;
 }
 
 pub trait VerifyIdForAdmin {
@@ -341,19 +391,25 @@ pub trait VerifyIdUnchecked {
     fn verify_unchecked(self) -> Result<Self::Id, StatusCode>;
 }
 
+#[async_trait]
 pub trait VerifyForUserWithDb {
     type Type;
 
-    fn verify_user(self, auth: AuthUser, db: &mut PgConnection) -> Result<Self::Type, StatusCode>;
+    async fn verify_user(
+        self,
+        auth: AuthUser,
+        db: &mut AsyncPgConnection,
+    ) -> Result<Self::Type, StatusCode>;
 }
 
+#[async_trait]
 pub trait VerifyMultipleForUserWithDb {
     type Type;
 
-    fn verify_user(
+    async fn verify_user(
         self,
         auth: AuthUser,
-        db: &mut PgConnection,
+        db: &mut AsyncPgConnection,
     ) -> Result<Vec<Self::Type>, StatusCode>;
 }
 
@@ -369,43 +425,47 @@ pub trait VerifyMultipleForUserWithoutDb {
     fn verify_user_without_db(self, auth: AuthUser) -> Result<Vec<Self::Type>, StatusCode>;
 }
 
+#[async_trait]
 pub trait VerifyForUserOrAPWithDb {
     type Type;
 
-    fn verify_user_ap(
+    async fn verify_user_ap(
         self,
         auth: AuthUserOrAP,
-        db: &mut PgConnection,
+        db: &mut AsyncPgConnection,
     ) -> Result<Self::Type, StatusCode>;
 }
 
+#[async_trait]
 pub trait VerifyMultipleForUserOrAPWithDb {
     type Type;
 
-    fn verify_user_ap(
+    async fn verify_user_ap(
         self,
         auth: AuthUserOrAP,
-        db: &mut PgConnection,
+        db: &mut AsyncPgConnection,
     ) -> Result<Vec<Self::Type>, StatusCode>;
 }
 
+#[async_trait]
 pub trait VerifyForUserOrAPCreate {
     type Type;
 
-    fn verify_user_ap_create(
+    async fn verify_user_ap_create(
         self,
         auth: AuthUserOrAP,
-        db: &mut PgConnection,
+        db: &mut AsyncPgConnection,
     ) -> Result<Self::Type, StatusCode>;
 }
 
+#[async_trait]
 pub trait VerifyMultipleForUserOrAPCreate {
     type Type;
 
-    fn verify_user_ap_create(
+    async fn verify_user_ap_create(
         self,
         auth: AuthUserOrAP,
-        db: &mut PgConnection,
+        db: &mut AsyncPgConnection,
     ) -> Result<Vec<Self::Type>, StatusCode>;
 }
 
@@ -421,10 +481,15 @@ pub trait VerifyMultipleForUserOrAPWithoutDb {
     fn verify_user_ap_without_db(self, auth: AuthUserOrAP) -> Result<Vec<Self::Type>, StatusCode>;
 }
 
+#[async_trait]
 pub trait VerifyForActionProviderWithDb {
     type Type;
 
-    fn verify_ap(self, auth: AuthAP, db: &mut PgConnection) -> Result<Self::Type, StatusCode>;
+    async fn verify_ap(
+        self,
+        auth: AuthAP,
+        db: &mut AsyncPgConnection,
+    ) -> Result<Self::Type, StatusCode>;
 }
 
 pub trait VerifyForActionProviderWithoutDb {

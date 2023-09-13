@@ -16,11 +16,11 @@ pub async fn create_wods(
     match wods {
         UnverifiedSingleOrVec::Single(wod) => {
             let wod = wod.verify_user_ap_without_db(auth)?;
-            WodDb::create(&wod, &mut db)
+            WodDb::create(&wod, &mut db).await
         }
         UnverifiedSingleOrVec::Vec(wods) => {
             let wods = wods.verify_user_ap_without_db(auth)?;
-            WodDb::create_multiple(&wods, &mut db)
+            WodDb::create_multiple(&wods, &mut db).await
         }
     }
     .map(|_| StatusCode::OK)
@@ -46,10 +46,10 @@ pub async fn get_wods(
 ) -> HandlerResult<Json<Vec<Wod>>> {
     match id {
         Some(id) => {
-            let wod_id = id.verify_user_ap(auth, &mut db)?;
-            WodDb::get_by_id(wod_id, &mut db).map(|w| vec![w])
+            let wod_id = id.verify_user_ap(auth, &mut db).await?;
+            WodDb::get_by_id(wod_id, &mut db).await.map(|w| vec![w])
         }
-        None => WodDb::get_by_user(*auth, &mut db),
+        None => WodDb::get_by_user(*auth, &mut db).await,
     }
     .map(Json)
     .map_err(Into::into)
@@ -62,12 +62,12 @@ pub async fn update_wods(
 ) -> HandlerResult<StatusCode> {
     match wods {
         UnverifiedSingleOrVec::Single(wod) => {
-            let wod = wod.verify_user_ap(auth, &mut db)?;
-            WodDb::update(&wod, &mut db)
+            let wod = wod.verify_user_ap(auth, &mut db).await?;
+            WodDb::update(&wod, &mut db).await
         }
         UnverifiedSingleOrVec::Vec(wods) => {
-            let wods = wods.verify_user_ap(auth, &mut db)?;
-            WodDb::update_multiple(&wods, &mut db)
+            let wods = wods.verify_user_ap(auth, &mut db).await?;
+            WodDb::update_multiple(&wods, &mut db).await
         }
     }
     .map(|_| StatusCode::OK)
@@ -82,11 +82,11 @@ pub async fn create_diaries(
     match diaries {
         UnverifiedSingleOrVec::Single(diary) => {
             let diary = diary.verify_user_ap_without_db(auth)?;
-            DiaryDb::create(&diary, &mut db)
+            DiaryDb::create(&diary, &mut db).await
         }
         UnverifiedSingleOrVec::Vec(diaries) => {
             let diaries = diaries.verify_user_ap_without_db(auth)?;
-            DiaryDb::create_multiple(&diaries, &mut db)
+            DiaryDb::create_multiple(&diaries, &mut db).await
         }
     }
     .map(|_| StatusCode::OK)
@@ -100,10 +100,10 @@ pub async fn get_diaries(
 ) -> HandlerResult<Json<Vec<Diary>>> {
     match id {
         Some(id) => {
-            let diary_id = id.verify_user_ap(auth, &mut db)?;
-            DiaryDb::get_by_id(diary_id, &mut db).map(|d| vec![d])
+            let diary_id = id.verify_user_ap(auth, &mut db).await?;
+            DiaryDb::get_by_id(diary_id, &mut db).await.map(|d| vec![d])
         }
-        None => DiaryDb::get_by_user(*auth, &mut db),
+        None => DiaryDb::get_by_user(*auth, &mut db).await,
     }
     .map(Json)
     .map_err(Into::into)
@@ -128,12 +128,12 @@ pub async fn update_diaries(
 ) -> HandlerResult<StatusCode> {
     match diaries {
         UnverifiedSingleOrVec::Single(diary) => {
-            let diary = diary.verify_user_ap(auth, &mut db)?;
-            DiaryDb::update(&diary, &mut db)
+            let diary = diary.verify_user_ap(auth, &mut db).await?;
+            DiaryDb::update(&diary, &mut db).await
         }
         UnverifiedSingleOrVec::Vec(diaries) => {
-            let diaries = diaries.verify_user_ap(auth, &mut db)?;
-            DiaryDb::update_multiple(&diaries, &mut db)
+            let diaries = diaries.verify_user_ap(auth, &mut db).await?;
+            DiaryDb::update_multiple(&diaries, &mut db).await
         }
     }
     .map(|_| StatusCode::OK)

@@ -18,14 +18,14 @@ pub async fn adm_create_users(
         UnverifiedSingleOrVec::Single(user) => {
             let mut user = user.verify_adm(auth)?;
             check_password(&user.password)?;
-            UserDb::create(&mut user, &mut db)
+            UserDb::create(&mut user, &mut db).await
         }
         UnverifiedSingleOrVec::Vec(users) => {
             let mut users = users.verify_adm(auth)?;
             for user in &users {
                 check_password(&user.password)?;
             }
-            UserDb::create_multiple(&mut users, &mut db)
+            UserDb::create_multiple(&mut users, &mut db).await
         }
     }
     .map(|_| StatusCode::OK)
@@ -49,12 +49,14 @@ pub async fn create_user(
     let mut user = user.verify_unchecked()?;
     check_password(&user.password)?;
     UserDb::create(&mut user, &mut db)
+        .await
         .map(|_| StatusCode::OK)
         .map_err(Into::into)
 }
 
 pub async fn get_user(auth: AuthUser, mut db: DbConn) -> HandlerResult<Json<User>> {
     UserDb::get_by_id(*auth, &mut db)
+        .await
         .map(Json)
         .map_err(Into::into)
 }
@@ -64,15 +66,17 @@ pub async fn update_user(
     mut db: DbConn,
     Json(user): Json<Unverified<User>>,
 ) -> HandlerResult<StatusCode> {
-    let mut user = user.verify_user(auth, &mut db)?;
+    let mut user = user.verify_user(auth, &mut db).await?;
     check_password(&user.password)?;
     UserDb::update(&mut user, &mut db)
+        .await
         .map(|_| StatusCode::OK)
         .map_err(Into::into)
 }
 
 pub async fn delete_user(auth: AuthUser, mut db: DbConn) -> HandlerResult<StatusCode> {
     UserDb::delete(*auth, &mut db)
+        .await
         .map(|_| StatusCode::OK)
         .map_err(Into::into)
 }

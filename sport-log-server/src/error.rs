@@ -7,11 +7,11 @@ use axum::{
     Json,
 };
 use diesel::result::{DatabaseErrorKind, Error as DieselError};
+use diesel_async::pooled_connection::deadpool::PoolError;
 use hyper::{
     header::{AUTHORIZATION, WWW_AUTHENTICATE},
     HeaderMap,
 };
-use r2d2::Error as R2D2Error;
 use serde::{ser::SerializeStruct, Deserialize, Serialize};
 use tracing::info;
 
@@ -97,13 +97,11 @@ impl From<TypedHeaderRejection> for HandlerError {
     }
 }
 
-impl From<R2D2Error> for HandlerError {
-    fn from(error: R2D2Error) -> Self {
+impl From<PoolError> for HandlerError {
+    fn from(_: PoolError) -> Self {
         HandlerError {
             status: StatusCode::INTERNAL_SERVER_ERROR,
-            message: Some(ErrorMessage::Other {
-                error: error.to_string(),
-            }),
+            message: None,
             headers: None,
         }
     }

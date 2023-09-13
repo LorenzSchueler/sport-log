@@ -1,6 +1,7 @@
 use argon2::{password_hash::SaltString, PasswordHash, PasswordHasher, PasswordVerifier};
 use chrono::{DateTime, Utc};
 use diesel::{prelude::*, result::Error};
+use diesel_async::RunQueryDsl;
 use rand_core::OsRng;
 use sport_log_types::{
     schema::{action, action_event, action_provider, action_rule, platform_credential},
@@ -28,9 +29,9 @@ pub struct ActionProviderDb;
 
 /// Same as trait [`Create`](crate::db::Create) but with mutable references
 impl ActionProviderDb {
-    pub fn create(
+    pub async fn create(
         action_provider: &mut <Self as Db>::Type,
-        db: &mut PgConnection,
+        db: &mut AsyncPgConnection,
     ) -> QueryResult<usize> {
         let salt = SaltString::generate(&mut OsRng);
         action_provider.password = build_hasher()
@@ -41,11 +42,12 @@ impl ActionProviderDb {
         diesel::insert_into(action_provider::table)
             .values(&*action_provider)
             .execute(db)
+            .await
     }
 
-    pub fn create_multiple(
+    pub async fn create_multiple(
         action_providers: &mut [<Self as Db>::Type],
-        db: &mut PgConnection,
+        db: &mut AsyncPgConnection,
     ) -> QueryResult<usize> {
         for action_provider in &mut *action_providers {
             let salt = SaltString::generate(&mut OsRng);
@@ -58,14 +60,15 @@ impl ActionProviderDb {
         diesel::insert_into(action_provider::table)
             .values(&*action_providers)
             .execute(db)
+            .await
     }
 }
 
 impl ActionProviderDb {
-    pub fn auth(
+    pub async fn auth(
         name: &str,
         password: &str,
-        db: &mut PgConnection,
+        db: &mut AsyncPgConnection,
     ) -> QueryResult<ActionProviderId> {
         let (action_provider_id, password_hash): (ActionProviderId, String) =
             action_provider::table
@@ -74,7 +77,8 @@ impl ActionProviderDb {
                     action_provider::columns::id,
                     action_provider::columns::password,
                 ))
-                .get_result(db)?;
+                .get_result(db)
+                .await?;
 
         let password_hash =
             PasswordHash::new(password_hash.as_str()).map_err(|_| Error::RollbackTransaction)?; // this should not happen but prevents panic
@@ -88,11 +92,11 @@ impl ActionProviderDb {
         }
     }
 
-    pub fn auth_as_user(
+    pub async fn auth_as_user(
         name: &str,
         password: &str,
         user_id: UserId,
-        db: &mut PgConnection,
+        db: &mut AsyncPgConnection,
     ) -> QueryResult<AuthApForUser> {
         let (action_provider_id, password_hash): (ActionProviderId, String) =
             action_provider::table
@@ -101,7 +105,8 @@ impl ActionProviderDb {
                     action_provider::columns::id,
                     action_provider::columns::password,
                 ))
-                .get_result(db)?;
+                .get_result(db)
+                .await?;
 
         let password_hash =
             PasswordHash::new(password_hash.as_str()).map_err(|_| Error::RollbackTransaction)?; // this should not happen but prevents panic
@@ -116,7 +121,8 @@ impl ActionProviderDb {
                 .filter(action_event::columns::enabled.eq(true))
                 .filter(action_event::columns::deleted.eq(false))
                 .count()
-                .get_result(db)?;
+                .get_result(db)
+                .await?;
 
             if action_events > 0 {
                 Ok(AuthApForUser::Allowed(action_provider_id))
@@ -148,14 +154,15 @@ impl ActionProviderDb {
 pub struct ActionDb;
 
 impl ActionDb {
-    pub fn get_by_action_provider(
+    pub async fn get_by_action_provider(
         action_provider_id: ActionProviderId,
-        db: &mut PgConnection,
+        db: &mut AsyncPgConnection,
     ) -> QueryResult<Vec<<Self as Db>::Type>> {
         action::table
             .filter(action::columns::action_provider_id.eq(action_provider_id))
             .select(Action::as_select())
             .get_results(db)
+            .await
     }
 }
 
@@ -200,66 +207,72 @@ pub struct ActionRuleDb;
 )]
 pub struct ActionEventDb;
 
+#[async_trait]
 impl CheckAPId for ActionEventDb {
-    fn check_ap_id(
+    async fn check_ap_id(
         id: Self::Id,
         ap_id: ActionProviderId,
-        db: &mut PgConnection,
+        db: &mut AsyncPgConnection,
     ) -> QueryResult<bool> {
         action_event::table
             .inner_join(action::table)
             .filter(action_event::columns::id.eq(id))
             .select(action::columns::action_provider_id.eq(ap_id))
             .get_result(db)
+            .await
             .optional()
             .map(|eq| eq.unwrap_or(false))
     }
 
-    fn check_ap_ids(
+    async fn check_ap_ids(
         ids: &[Self::Id],
         ap_id: ActionProviderId,
-        db: &mut PgConnection,
+        db: &mut AsyncPgConnection,
     ) -> QueryResult<bool> {
         action_event::table
             .inner_join(action::table)
             .filter(action_event::columns::id.eq_any(ids))
             .select(action::columns::action_provider_id.eq(ap_id))
             .get_results(db)
+            .await
             .map(|eqs: Vec<bool>| eqs.into_iter().all(|eq| eq))
     }
 }
 
 impl ActionEventDb {
-    pub fn create_multiple_ignore_conflict(
+    pub async fn create_multiple_ignore_conflict(
         action_events: Vec<ActionEvent>,
-        db: &mut PgConnection,
+        db: &mut AsyncPgConnection,
     ) -> QueryResult<usize> {
         diesel::insert_into(action_event::table)
             .values(action_events)
             .on_conflict_do_nothing()
             .execute(db)
+            .await
     }
 
-    pub fn disable_multiple(
+    pub async fn disable_multiple(
         action_event_ids: Vec<ActionEventId>,
-        db: &mut PgConnection,
+        db: &mut AsyncPgConnection,
     ) -> QueryResult<usize> {
         diesel::update(
             action_event::table.filter(action_event::columns::id.eq_any(action_event_ids)),
         )
         .set(action_event::columns::enabled.eq(false))
         .execute(db)
+        .await
     }
 
-    pub fn delete_multiple(
+    pub async fn delete_multiple(
         action_event_ids: Vec<ActionEventId>,
-        db: &mut PgConnection,
+        db: &mut AsyncPgConnection,
     ) -> QueryResult<usize> {
         diesel::update(
             action_event::table.filter(action_event::columns::id.eq_any(action_event_ids)),
         )
         .set(action_event::columns::deleted.eq(true))
         .execute(db)
+        .await
     }
 }
 
@@ -279,8 +292,9 @@ impl Db for CreatableActionRuleDb {
     }
 }
 
+#[async_trait]
 impl GetAll for CreatableActionRuleDb {
-    fn get_all(db: &mut PgConnection) -> QueryResult<Vec<<Self as Db>::Type>> {
+    async fn get_all(db: &mut AsyncPgConnection) -> QueryResult<Vec<<Self as Db>::Type>> {
         action_rule::table
             .inner_join(action::table)
             .filter(action_rule::columns::enabled.eq(true))
@@ -295,6 +309,7 @@ impl GetAll for CreatableActionRuleDb {
                 action::columns::create_before,
             ))
             .get_results(db)
+            .await
     }
 }
 
@@ -315,9 +330,9 @@ impl Db for ExecutableActionEventDb {
 }
 
 impl ExecutableActionEventDb {
-    pub fn get_by_action_provider(
+    pub async fn get_by_action_provider(
         action_provider_id: ActionProviderId,
-        db: &mut PgConnection,
+        db: &mut AsyncPgConnection,
     ) -> QueryResult<Vec<ExecutableActionEvent>> {
         action_event::table
             .inner_join(action::table.inner_join(action_provider::table))
@@ -339,13 +354,14 @@ impl ExecutableActionEventDb {
                 platform_credential::columns::password.nullable(),
             ))
             .get_results(db)
+            .await
     }
 
-    pub fn get_ordered_by_action_provider_and_timespan(
+    pub async fn get_ordered_by_action_provider_and_timespan(
         action_provider_id: ActionProviderId,
         start_datetime: DateTime<Utc>,
         end_datetime: DateTime<Utc>,
-        db: &mut PgConnection,
+        db: &mut AsyncPgConnection,
     ) -> QueryResult<Vec<ExecutableActionEvent>> {
         action_event::table
             .inner_join(action::table.inner_join(action_provider::table))
@@ -369,6 +385,7 @@ impl ExecutableActionEventDb {
             ))
             .order_by(action_event::columns::datetime)
             .get_results(db)
+            .await
     }
 }
 
@@ -388,8 +405,9 @@ impl Db for DeletableActionEventDb {
     }
 }
 
+#[async_trait]
 impl GetAll for DeletableActionEventDb {
-    fn get_all(db: &mut PgConnection) -> QueryResult<Vec<<Self as Db>::Type>> {
+    async fn get_all(db: &mut AsyncPgConnection) -> QueryResult<Vec<<Self as Db>::Type>> {
         Self::table()
             .inner_join(action::table)
             .filter(action_event::columns::deleted.eq(false))
@@ -399,5 +417,6 @@ impl GetAll for DeletableActionEventDb {
                 action::columns::delete_after,
             ))
             .get_results(db)
+            .await
     }
 }
