@@ -77,17 +77,21 @@ class _CardioUpdateElevationPageState extends State<CardioUpdateElevationPage> {
           }
           return;
         }
-        setState(() {
-          _progress = i / track.length;
-        });
+        if (mounted) {
+          setState(() => _progress = i / track.length);
+        } else {
+          return;
+        }
       }
     }
-    setState(() {
-      _cardioSessionDescription.cardioSession.setAscentDescent();
-      _updatedElevationLine = _getUpdatedElevationLine();
-      _progress = null;
-      _changed = true;
-    });
+    if (mounted) {
+      setState(() {
+        _cardioSessionDescription.cardioSession.setAscentDescent();
+        _updatedElevationLine = _getUpdatedElevationLine();
+        _progress = null;
+        _changed = true;
+      });
+    }
   }
 
   void _return({required bool apply}) {
