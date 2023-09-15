@@ -13,6 +13,7 @@ import 'package:sport_log/widgets/map_widgets/mapbox_map_wrapper.dart';
 import 'package:sport_log/widgets/map_widgets/static_mapbox_map.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
 import 'package:sport_log/widgets/provider_consumer.dart';
+import 'package:sport_log/widgets/swipe_button.dart';
 
 class CardioTrackingPage extends StatelessWidget {
   const CardioTrackingPage({required this.trackingSettings, super.key});
@@ -160,12 +161,10 @@ class _TrackingPageButtons extends StatelessWidget {
     return switch (trackingMode) {
       TrackingMode.tracking => ConstrainedBox(
           constraints: const BoxConstraints(minWidth: double.infinity),
-          child: FilledButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Theme.of(context).colorScheme.error,
-            ),
-            onPressed: onPause,
-            child: const Text("Pause"),
+          child: SwipeButton(
+            onSwipe: onPause,
+            thumbLabel: "Pause",
+            color: Theme.of(context).colorScheme.error,
           ),
         ),
       TrackingMode.paused => Row(
