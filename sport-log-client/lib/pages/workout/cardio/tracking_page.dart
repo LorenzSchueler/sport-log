@@ -194,6 +194,16 @@ class _TrackingPageButtons extends StatelessWidget {
             Expanded(
               child: FilledButton(
                 style: ElevatedButton.styleFrom(
+                  backgroundColor: Theme.of(context).colorScheme.error,
+                ),
+                onPressed: () => Navigator.pop(context),
+                child: const Text("Cancel"),
+              ),
+            ),
+            Defaults.sizedBox.horizontal.normal,
+            Expanded(
+              child: FilledButton(
+                style: ElevatedButton.styleFrom(
                   backgroundColor: Theme.of(context).colorScheme.errorContainer,
                 ),
                 onPressed:
@@ -211,16 +221,6 @@ class _TrackingPageButtons extends StatelessWidget {
                       : null,
                   textAlign: TextAlign.center,
                 ),
-              ),
-            ),
-            Defaults.sizedBox.horizontal.normal,
-            Expanded(
-              child: FilledButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(context).colorScheme.error,
-                ),
-                onPressed: () => Navigator.pop(context),
-                child: const Text("Cancel"),
               ),
             ),
           ],

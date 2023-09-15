@@ -179,6 +179,14 @@ class _CardioCutPageState extends State<CardioCutPage> {
                     children: [
                       Expanded(
                         child: FilledButton.icon(
+                          icon: const Icon(AppIcons.close),
+                          label: const Text("Cancel"),
+                          onPressed: () => Navigator.of(context).pop(),
+                        ),
+                      ),
+                      Defaults.sizedBox.horizontal.normal,
+                      Expanded(
+                        child: FilledButton.icon(
                           icon: const Icon(AppIcons.cut),
                           label: const Text("Cut"),
                           onPressed: _cutCardioSession,
@@ -186,14 +194,6 @@ class _CardioCutPageState extends State<CardioCutPage> {
                             backgroundColor:
                                 Theme.of(context).colorScheme.error,
                           ),
-                        ),
-                      ),
-                      Defaults.sizedBox.horizontal.normal,
-                      Expanded(
-                        child: FilledButton.icon(
-                          icon: const Icon(AppIcons.close),
-                          label: const Text("Cancel"),
-                          onPressed: () => Navigator.of(context).pop(),
                         ),
                       ),
                     ],
