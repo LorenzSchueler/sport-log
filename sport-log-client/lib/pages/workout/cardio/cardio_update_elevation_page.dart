@@ -138,7 +138,7 @@ class _CardioUpdateElevationPageState extends State<CardioUpdateElevationPage> {
                             onPressed: () => _return(apply: false),
                             style: ButtonStyle(
                               backgroundColor: MaterialStatePropertyAll(
-                                Theme.of(context).colorScheme.errorContainer,
+                                Theme.of(context).colorScheme.error,
                               ),
                             ),
                           ),
@@ -151,7 +151,7 @@ class _CardioUpdateElevationPageState extends State<CardioUpdateElevationPage> {
                             onPressed: () => _return(apply: true),
                             style: ButtonStyle(
                               backgroundColor: MaterialStatePropertyAll(
-                                Theme.of(context).colorScheme.error,
+                                Theme.of(context).colorScheme.errorContainer,
                               ),
                             ),
                           ),

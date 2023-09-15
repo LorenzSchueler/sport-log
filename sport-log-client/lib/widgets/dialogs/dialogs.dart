@@ -139,12 +139,12 @@ Future<bool> showApproveDialog({
         _DialogOption(
           name: "Cancel",
           value: false,
-          color: Theme.of(context).colorScheme.errorContainer,
+          color: Theme.of(context).colorScheme.error,
         ),
         _DialogOption(
           name: "Approve",
           value: true,
-          color: Theme.of(context).colorScheme.error,
+          color: Theme.of(context).colorScheme.errorContainer,
         ),
       ],
     ),
@@ -162,12 +162,12 @@ Future<bool> showDiscardWarningDialog(BuildContext context) async {
         _DialogOption(
           name: "Cancel",
           value: false,
-          color: Theme.of(context).colorScheme.errorContainer,
+          color: Theme.of(context).colorScheme.error,
         ),
         _DialogOption(
           name: "Discard Changes",
           value: true,
-          color: Theme.of(context).colorScheme.error,
+          color: Theme.of(context).colorScheme.errorContainer,
         ),
       ],
     ),
@@ -188,12 +188,12 @@ Future<bool> showDeleteWarningDialog(
         _DialogOption(
           name: "Cancel",
           value: false,
-          color: Theme.of(context).colorScheme.errorContainer,
+          color: Theme.of(context).colorScheme.error,
         ),
         _DialogOption(
           name: "Delete",
           value: true,
-          color: Theme.of(context).colorScheme.error,
+          color: Theme.of(context).colorScheme.errorContainer,
         ),
       ],
     ),

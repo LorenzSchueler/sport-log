@@ -182,6 +182,10 @@ class _CardioCutPageState extends State<CardioCutPage> {
                           icon: const Icon(AppIcons.close),
                           label: const Text("Cancel"),
                           onPressed: () => Navigator.of(context).pop(),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor:
+                                Theme.of(context).colorScheme.error,
+                          ),
                         ),
                       ),
                       Defaults.sizedBox.horizontal.normal,
@@ -192,7 +196,7 @@ class _CardioCutPageState extends State<CardioCutPage> {
                           onPressed: _cutCardioSession,
                           style: ElevatedButton.styleFrom(
                             backgroundColor:
-                                Theme.of(context).colorScheme.error,
+                                Theme.of(context).colorScheme.errorContainer,
                           ),
                         ),
                       ),
