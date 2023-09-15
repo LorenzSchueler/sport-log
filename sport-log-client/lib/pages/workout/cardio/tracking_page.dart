@@ -59,14 +59,13 @@ class CardioTrackingPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ProviderConsumer(
-      create: (_) => TrackingUtils(trackingSettings: trackingSettings),
-      builder: (context, trackingUtils, _) => DiscardWarningOnPop(
-        onDiscard: () => trackingUtils.deleteIfSaved(context),
-        child: SafeArea(
-          child: Scaffold(
-            resizeToAvoidBottomInset: false,
-            body: ProviderConsumer(
+    return NeverPop(
+      child: SafeArea(
+        child: Scaffold(
+          resizeToAvoidBottomInset: false,
+          body: ProviderConsumer(
+            create: (_) => TrackingUtils(trackingSettings: trackingSettings),
+            builder: (context, trackingUtils, _) => ProviderConsumer(
               create: (_) => BoolToggle.off(),
               builder: (context, fullscreen, _) => Column(
                 children: [
