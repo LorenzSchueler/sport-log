@@ -71,7 +71,7 @@ dependencies:
       url: https://github.com/LorenzSchueler/flutter-plugins
       path: packages/pedometer
       ref: fa6072adb257648c3e45f4d10a71fe8d5f8b784b
-  permission_handler: ^10.0.0
+  permission_handler: ^11.0.0
   polar: ^6.0.1
   provider: ^6.0.2 # state management
   result_type: ^0.2.0 # convenience for returning something that can either be a success or failure
@@ -84,7 +84,6 @@ dependencies:
   yaml: ^3.1.0
 
 dependency_overrides:
-  intl: ^0.18.1
   location_android: 
     # location from GPS only 
     git:
