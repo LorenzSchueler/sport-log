@@ -55,6 +55,7 @@ class TrackingUtils extends ChangeNotifier {
   TrackingMode _trackingMode = TrackingMode.notStarted;
   TrackingMode get mode => _trackingMode;
   bool get isTracking => _trackingMode == TrackingMode.tracking;
+  bool get isPaused => _trackingMode == TrackingMode.paused;
   late DateTime _lastResumeTime;
   Duration _lastStopDuration = Duration.zero;
 
@@ -87,6 +88,8 @@ class TrackingUtils extends ChangeNotifier {
 
   ElevationMapController? _elevationMapController;
 
+  bool _movingWhenPausedAlarmFired = false;
+  static const int _movingWhenPausedAlarmDistance = 50;
   final int? _routeAlarmDistance;
   DateTime? _lastAlarm;
   final _tts = TtsUtils();
@@ -271,8 +274,27 @@ class TrackingUtils extends ChangeNotifier {
     }
     await _trackingUiUtils.updateLocation(location);
 
+    await _movingWhenPausedAlarm(position);
     await _routeAlarm(position);
     await _audioFeedback();
+  }
+
+  Future<void> _movingWhenPausedAlarm(Position position) async {
+    if (!isPaused) {
+      _movingWhenPausedAlarmFired = false;
+      return;
+    }
+    final lastPosition =
+        cardioSessionDescription.cardioSession.track?.lastOrNull;
+    if (!_movingWhenPausedAlarmFired && lastPosition != null) {
+      final distance = position.distanceTo(lastPosition);
+      if (distance > _movingWhenPausedAlarmDistance) {
+        _movingWhenPausedAlarmFired = true;
+        await _tts.speak(
+          "You more than $_movingWhenPausedAlarmDistance meters from the position where you paused recording. You may want to resume recording.",
+        );
+      }
+    }
   }
 
   Future<void> _routeAlarm(Position position) async {
