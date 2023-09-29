@@ -9,3 +9,5 @@ members = [
     "sport-log-action-provider-wodify-login",
     "sport-log-action-provider-wodify-wod",
 ]
+
+resolver = "2"
