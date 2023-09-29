@@ -60,7 +60,7 @@ abstract class DataProvider<T> extends ChangeNotifier {
       // ignore: no_default_cases
       default:
         _logger.e(
-          "unknown error",
+          "api error",
           error: error,
           caughtBy: "DataProvider.handleApiError",
         );

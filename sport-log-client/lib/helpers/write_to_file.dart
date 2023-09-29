@@ -35,8 +35,12 @@ Future<String?> writeToFile({
       flush: true,
       mode: append ? FileMode.writeOnlyAppend : FileMode.writeOnly,
     );
-  } on FileSystemException catch (error) {
-    _logger.w("writing file $file failed", error: error);
+  } on FileSystemException catch (error, stackTrace) {
+    _logger.w(
+      "writing file $file failed",
+      error: error,
+      stackTrace: stackTrace,
+    );
     return null;
   }
   return file.path;
@@ -60,8 +64,12 @@ Future<String?> writeBytesToFile({
       flush: true,
       mode: FileMode.writeOnly,
     );
-  } on FileSystemException catch (error) {
-    _logger.w("writing file $file failed", error: error);
+  } on FileSystemException catch (error, stackTrace) {
+    _logger.w(
+      "writing file $file failed",
+      error: error,
+      stackTrace: stackTrace,
+    );
     return null;
   }
   return file.path;

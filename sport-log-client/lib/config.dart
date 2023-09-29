@@ -44,39 +44,43 @@ class Config extends JsonSerializable {
               ? map["profile"]! as YamlMap
               : map["debug"]! as YamlMap;
       _instance = Config.fromJson(instance.cast<String, dynamic>());
-    } on YamlException catch (error) {
+    } on YamlException catch (error, stackTrace) {
       _logger.f(
         "sport-log-client.yaml is not a valid YAML file",
         error: error,
         caughtBy: "Config.init",
+        stackTrace: stackTrace,
       );
       // ignore: avoid-throw-in-catch-block
       throw Exception("sport-log-client.yaml is not a valid YAML file: $error");
-    } on MissingRequiredKeysException catch (error) {
+    } on MissingRequiredKeysException catch (error, stackTrace) {
       _logger.f(
         "sport-log-client.yaml does not contain keys: ${error.missingKeys}",
         error: error,
         caughtBy: "Config.init",
+        stackTrace: stackTrace,
       );
       // ignore: avoid-throw-in-catch-block
       throw Exception(
         "sport-log-client.yaml does not contain keys: ${error.missingKeys}",
       );
-    } on TypeError catch (error) {
+    } on TypeError catch (error, stackTrace) {
       _logger.f(
         "sport-log-client.yaml has a invalid format or contains invalid data types for some fields",
         error: error,
         caughtBy: "Config.init",
+        stackTrace: stackTrace,
       );
       // ignore: avoid-throw-in-catch-block
       throw Exception(
         "sport-log-client.yaml has a invalid format or contains invalid data types for some fields: $error",
       );
-    } catch (error) {
+    } catch (error, stackTrace) {
       _logger.f(
         "sport-log-client.yaml could not be parsed",
         error: error,
         caughtBy: "Config.init",
+        stackTrace: stackTrace,
       );
       // ignore: avoid-throw-in-catch-block
       throw Exception("sport-log-client.yaml could not be parsed: $error");

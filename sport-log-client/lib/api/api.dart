@@ -138,13 +138,26 @@ extension RequestExtension on Request {
       return await fn();
     } on SocketException {
       return Failure(ApiError(ApiErrorType.serverUnreachable, null));
+    } on OSError catch (error, stackTrace) {
+      if (error.message.contains("Software caused connection abort")) {
+        return Failure(ApiError(ApiErrorType.serverUnreachable, null));
+      } else {
+        _logger.e(
+          "unknown error",
+          error: error,
+          caughtBy: "RequestExtension._handlerError",
+          stackTrace: stackTrace,
+        );
+        return Failure(ApiError(ApiErrorType.unknownRequestError, null));
+      }
     } on TypeError {
       return Failure(ApiError(ApiErrorType.badJson, null));
-    } catch (error) {
+    } catch (error, stackTrace) {
       _logger.e(
         "unknown error",
         error: error,
         caughtBy: "RequestExtension._handlerError",
+        stackTrace: stackTrace,
       );
       return Failure(ApiError(ApiErrorType.unknownRequestError, null));
     }

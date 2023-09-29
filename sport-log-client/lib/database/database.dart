@@ -41,7 +41,7 @@ class DbError {
         final table = longColumns[0].split(".")[0];
         final columns = longColumns.map((c) => c.split(".")[1]).toList();
         return DbError.uniqueViolation(table, columns);
-      } on RangeError catch (_) {
+      } on RangeError {
         return DbError.unknown(databaseException);
       }
     } else {
