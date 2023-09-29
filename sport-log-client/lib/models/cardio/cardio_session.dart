@@ -264,6 +264,76 @@ class CardioSession extends AtomicEntity {
     }
   }
 
+  // ignore: long-method
+  CardioSession? combineWith(CardioSession other) {
+    final CardioSession session1, session2;
+    if (datetime.compareTo(other.datetime) < 0) {
+      session1 = this;
+      session2 = other;
+    } else {
+      session1 = other;
+      session2 = this;
+    }
+
+    final time1 = session1.time;
+    final track1 = session1.track;
+    final time2 = session2.time;
+    final track2 = session2.track;
+    if (time1 == null ||
+        track1 == null ||
+        track1.isEmpty ||
+        time2 == null ||
+        track2 == null ||
+        track2.isEmpty) {
+      return null;
+    }
+
+    final betweenTime =
+        session2.datetime.difference(session1.datetime.add(session1.time!));
+    if (betweenTime.isNegative) {
+      return null;
+    }
+
+    final time = time1 + betweenTime + time2;
+    final shiftTime = time1 + betweenTime;
+    final shiftDistance =
+        track1.last.distance + track1.last.distanceTo(track2.first);
+    final track = track1 +
+        track2.map((position) {
+          position
+            ..time += shiftTime
+            ..distance += shiftDistance;
+          return position;
+        }).toList();
+    final cadence = (session1.cadence ?? []) +
+        (session2.cadence?.map((time) => time + shiftTime).toList() ?? []);
+    final heartRate = (session1.heartRate ?? []) +
+        (session2.heartRate?.map((time) => time + shiftTime).toList() ?? []);
+    return CardioSession(
+      id: randomId(),
+      movementId: session1.movementId,
+      cardioType: session1.cardioType,
+      datetime: session1.datetime,
+      distance: null, // set later
+      ascent: null, // set later
+      descent: null, // set later
+      time: time,
+      calories: null,
+      track: track,
+      avgCadence: null, // set later
+      cadence: cadence,
+      avgHeartRate: null, // set later
+      heartRate: heartRate,
+      routeId: session1.routeId,
+      comments: session1.comments,
+      deleted: false,
+    )
+      ..setDistance()
+      ..setAscentDescent()
+      ..setAvgCadence()
+      ..setAvgHeartRate();
+  }
+
   bool similarTo(CardioSession other) =>
       movementId == other.movementId &&
       track != null &&

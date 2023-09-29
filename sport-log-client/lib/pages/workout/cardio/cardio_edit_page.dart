@@ -179,6 +179,61 @@ class _CardioEditPageState extends State<CardioEditPage> {
     }
   }
 
+  Future<void> _combineSessions() async {
+    final session = _cardioSessionDescription.cardioSession;
+    final sessions = (await CardioSessionDescriptionDataProvider()
+            .getByTimerangeAndMovementAndComment(
+      from: session.datetime.subtract(const Duration(days: 1)),
+      until: session.datetime
+          .add(session.time ?? Duration.zero)
+          .add(const Duration(days: 1)),
+      movement: _cardioSessionDescription.movement,
+      comment: null,
+    ))
+        .where(
+          (s) =>
+              s.cardioSession.id != session.id &&
+              s.cardioSession.time != null &&
+              s.cardioSession.track != null,
+        )
+        .toList();
+    if (!mounted) {
+      return;
+    }
+    final otherSession = await showCardioSessionPicker(
+      selectedCardioSession: null,
+      cardioSessions: sessions,
+      context: context,
+    );
+    if (otherSession == null) {
+      return;
+    }
+
+    final combinedSession = session.combineWith(otherSession.cardioSession);
+    if (combinedSession == null) {
+      return;
+    }
+
+    final result =
+        await CardioSessionDataProvider().createSingle(combinedSession);
+    if (mounted) {
+      if (result.isSuccess) {
+        Navigator.pop(
+          context,
+          ReturnObject.created(
+            _cardioSessionDescription..cardioSession = combinedSession,
+          ),
+        ); // needed for cardio details page
+      } else {
+        await showMessageDialog(
+          context: context,
+          title: "Combining Cardio Sessions Failed",
+          text: result.failure.toString(),
+        );
+      }
+    }
+  }
+
   Future<void> _onMapCreated(MapController mapController) async {
     _mapController = mapController;
     await _setBoundsAndLines();
@@ -216,6 +271,12 @@ class _CardioEditPageState extends State<CardioEditPage> {
               IconButton(
                 onPressed: _showCutPage,
                 icon: const Icon(AppIcons.cut),
+              ),
+            if (_cardioSessionDescription.cardioSession.time != null &&
+                _cardioSessionDescription.cardioSession.track != null)
+              IconButton(
+                onPressed: _combineSessions,
+                icon: const Icon(AppIcons.combine),
               ),
             IconButton(
               onPressed: _deleteCardioSession,

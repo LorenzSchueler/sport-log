@@ -4,11 +4,11 @@ import 'package:flutter/material.dart' hide Action, Route;
 import 'package:sport_log/data_provider/data_providers/cardio_data_provider.dart';
 import 'package:sport_log/data_provider/data_providers/metcon_data_provider.dart';
 import 'package:sport_log/data_provider/data_providers/movement_data_provider.dart';
+import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/extensions/sort_extension.dart';
 import 'package:sport_log/models/action/action.dart';
 import 'package:sport_log/models/action/weekday.dart';
-import 'package:sport_log/models/cardio/cardio_session.dart';
-import 'package:sport_log/models/cardio/route.dart';
+import 'package:sport_log/models/cardio/all.dart';
 import 'package:sport_log/models/metcon/metcon.dart';
 import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/models/timeline_union.dart';
@@ -16,11 +16,12 @@ import 'package:sport_log/pages/workout/date_filter/date_filter_state.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 
-class Picker<T> extends StatelessWidget {
+class Picker<T, C> extends StatelessWidget {
   const Picker({
     required this.items,
     required this.selectedItem,
     required this.title,
+    required this.subtitle,
     required this.compareWith,
     super.key,
   });
@@ -28,7 +29,8 @@ class Picker<T> extends StatelessWidget {
   final List<T> items;
   final T? selectedItem;
   final String Function(T) title;
-  final Object Function(T) compareWith;
+  final String Function(T)? subtitle;
+  final C Function(T) compareWith;
 
   @override
   Widget build(BuildContext context) {
@@ -39,6 +41,7 @@ class Picker<T> extends StatelessWidget {
           final item = items[index];
           return ListTile(
             title: Text(title(item)),
+            subtitle: subtitle != null ? Text(subtitle!.call(item)) : null,
             selected: selectedItem != null
                 ? compareWith(item) == compareWith(selectedItem as T)
                 : false,
@@ -53,7 +56,7 @@ class Picker<T> extends StatelessWidget {
   }
 }
 
-class PickerWithSearch<T> extends StatefulWidget {
+class PickerWithSearch<T, C> extends StatefulWidget {
   const PickerWithSearch({
     required this.selectedItem,
     required this.getByName,
@@ -67,15 +70,15 @@ class PickerWithSearch<T> extends StatefulWidget {
   final T? selectedItem;
   final Future<List<T>> Function(String) getByName;
   final String? editRoute;
-  final bool Function(T, T?) compareWith;
+  final C Function(T) compareWith;
   final String Function(T) title;
   final String? Function(T)? subtitle;
 
   @override
-  State<PickerWithSearch<T>> createState() => _PickerWithSearchState<T>();
+  State<PickerWithSearch<T, C>> createState() => _PickerWithSearchState<T, C>();
 }
 
-class _PickerWithSearchState<T> extends State<PickerWithSearch<T>> {
+class _PickerWithSearchState<T, C> extends State<PickerWithSearch<T, C>> {
   List<T> _items = [];
   String _search = '';
 
@@ -87,9 +90,11 @@ class _PickerWithSearchState<T> extends State<PickerWithSearch<T>> {
 
   Future<void> _update(String search) async {
     final items = await widget.getByName(search.trim());
-    if (widget.selectedItem != null) {
-      final index = items
-          .indexWhere((item) => widget.compareWith(item, widget.selectedItem));
+    final selectedItem = widget.selectedItem;
+    if (selectedItem != null) {
+      final index = items.indexWhere(
+        (item) => widget.compareWith(item) == widget.compareWith(selectedItem),
+      );
       if (index >= 0) {
         items.insert(0, items.removeAt(index));
       }
@@ -157,11 +162,14 @@ class _PickerWithSearchState<T> extends State<PickerWithSearch<T>> {
     final item = _items[index];
     final subtitle =
         widget.subtitle != null ? widget.subtitle!.call(item) : null;
+    final selectedItem = widget.selectedItem;
 
     return ListTile(
       title: Text(widget.title(item)),
       subtitle: subtitle != null ? Text(subtitle) : null,
-      selected: widget.compareWith(item, widget.selectedItem),
+      selected: selectedItem != null
+          ? widget.compareWith(item) == widget.compareWith(selectedItem)
+          : false,
       onTap: () => Navigator.pop(context, item),
     );
   }
@@ -175,10 +183,11 @@ Future<Action?> showActionPicker({
 }) async {
   FocusManager.instance.primaryFocus?.unfocus();
   return showDialog<Action>(
-    builder: (_) => Picker<Action>(
+    builder: (_) => Picker(
       items: actions,
       selectedItem: selectedAction,
       title: (action) => action.name,
+      subtitle: null,
       compareWith: (action) => action.id,
     ),
     barrierDismissible: dismissible,
@@ -193,10 +202,11 @@ Future<CardioType?> showCardioTypePicker({
 }) async {
   FocusManager.instance.primaryFocus?.unfocus();
   return showDialog<CardioType>(
-    builder: (_) => Picker<CardioType>(
+    builder: (_) => Picker(
       items: CardioType.values,
       selectedItem: selectedCardioType,
       title: (cardioType) => cardioType.name,
+      subtitle: null,
       compareWith: (cardioType) => cardioType.index,
     ),
     barrierDismissible: dismissible,
@@ -211,10 +221,11 @@ Future<DateFilterState?> showDateFilterStatePicker({
 }) async {
   FocusManager.instance.primaryFocus?.unfocus();
   return showDialog<DateFilterState>(
-    builder: (_) => Picker<DateFilterState>(
+    builder: (_) => Picker(
       items: DateFilterState.all(selectedDateFilterState),
       selectedItem: selectedDateFilterState,
       title: (dateFilterState) => dateFilterState.name,
+      subtitle: null,
       compareWith: (dateFilterState) => dateFilterState,
     ),
     barrierDismissible: dismissible,
@@ -229,11 +240,11 @@ Future<Metcon?> showMetconPicker({
 }) async {
   FocusManager.instance.primaryFocus?.unfocus();
   return showDialog<Metcon>(
-    builder: (_) => PickerWithSearch<Metcon>(
+    builder: (_) => PickerWithSearch(
       selectedItem: selectedMetcon,
       getByName: (name) => MetconDataProvider().getByName(name),
       editRoute: Routes.metconEdit,
-      compareWith: (m1, m2) => m1.id == m2?.id,
+      compareWith: (metcon) => metcon.id,
       title: (metcon) => metcon.name,
       subtitle: null,
     ),
@@ -251,12 +262,12 @@ Future<Movement?> showMovementPicker({
 }) async {
   FocusManager.instance.primaryFocus?.unfocus();
   return showDialog<Movement>(
-    builder: (_) => PickerWithSearch<Movement>(
+    builder: (_) => PickerWithSearch(
       selectedItem: selectedMovement,
       getByName: (name) => MovementDataProvider()
           .getByName(name, cardioOnly: cardioOnly, distanceOnly: distanceOnly),
       editRoute: Routes.movementEdit,
-      compareWith: (m1, m2) => m1.id == m2?.id,
+      compareWith: (movement) => movement.id,
       title: (movement) => movement.name,
       subtitle: (movement) => movement.dimension.name,
     ),
@@ -272,7 +283,7 @@ Future<MovementOrMetcon?> showMovementOrMetconPicker({
 }) async {
   FocusManager.instance.primaryFocus?.unfocus();
   return showDialog<MovementOrMetcon>(
-    builder: (_) => PickerWithSearch<MovementOrMetcon>(
+    builder: (_) => PickerWithSearch(
       selectedItem: selectedMovementOrMetcon,
       getByName: (name) async => ((await MovementDataProvider().getNonDeleted())
                   .map(MovementOrMetcon.movement)
@@ -282,7 +293,7 @@ Future<MovementOrMetcon?> showMovementOrMetconPicker({
                   .toList())
           .fuzzySort(query: name, toString: (m) => m.name),
       editRoute: null,
-      compareWith: (m1, m2) => m1 == m2,
+      compareWith: (movementOrMetcon) => movementOrMetcon,
       title: (movementOrMetcon) => movementOrMetcon.name,
       subtitle: (movementOrMetcon) => movementOrMetcon.movement?.dimension.name,
     ),
@@ -298,17 +309,40 @@ Future<Route?> showRoutePicker({
 }) async {
   FocusManager.instance.primaryFocus?.unfocus();
   return showDialog<Route>(
-    builder: (_) => PickerWithSearch<Route>(
+    builder: (_) => PickerWithSearch(
       selectedItem: selectedRoute,
       getByName: (name) => RouteDataProvider().getByName(name),
       editRoute: Routes.routeEdit,
-      compareWith: (r1, r2) => r1.id == r2?.id,
+      compareWith: (route) => route.id,
       title: (route) => route.name,
       subtitle: null,
     ),
     barrierDismissible: dismissible,
     context: context,
   );
+}
+
+// ignore: long-parameter-list
+Future<CardioSessionDescription?> showCardioSessionPicker({
+  required CardioSessionDescription? selectedCardioSession,
+  required List<CardioSessionDescription> cardioSessions,
+  bool dismissible = true,
+  required BuildContext context,
+}) async {
+  FocusManager.instance.primaryFocus?.unfocus();
+  return context.mounted
+      ? showDialog<CardioSessionDescription>(
+          builder: (_) => Picker(
+            selectedItem: selectedCardioSession,
+            items: cardioSessions,
+            compareWith: (csd) => csd.cardioSession.id,
+            title: (csd) => csd.movement.name,
+            subtitle: (csd) => csd.cardioSession.datetime.humanDateTime,
+          ),
+          barrierDismissible: dismissible,
+          context: context,
+        )
+      : null;
 }
 
 Future<Weekday?> showWeekdayPicker({
@@ -318,11 +352,12 @@ Future<Weekday?> showWeekdayPicker({
 }) async {
   FocusManager.instance.primaryFocus?.unfocus();
   return showDialog<Weekday>(
-    builder: (_) => Picker<Weekday>(
+    builder: (_) => Picker(
       items: Weekday.values,
       selectedItem: selectedWeekday,
       title: (weekday) => weekday.name,
       compareWith: (weekday) => weekday.index,
+      subtitle: null,
     ),
     barrierDismissible: dismissible,
     context: context,

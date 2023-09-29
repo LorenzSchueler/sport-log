@@ -54,6 +54,7 @@ abstract final class AppIcons {
   static const IconData threeD = Icons.threed_rotation_rounded;
   static const IconData invertColors = Icons.invert_colors_rounded;
   static const IconData info = Icons.info_outline_rounded;
+  static const IconData combine = Icons.merge;
 
   // arrows
   static const IconData arrowLeft = Icons.arrow_back_ios_rounded;
