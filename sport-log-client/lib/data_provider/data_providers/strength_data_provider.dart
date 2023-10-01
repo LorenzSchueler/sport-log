@@ -46,6 +46,9 @@ class StrengthSetDataProvider extends EntityDataProvider<StrengthSet> {
   List<StrengthSet> getFromAccountData(AccountData accountData) =>
       accountData.strengthSets;
 
+  Future<StrengthSet?> getLastByMovement(Movement movement) =>
+      table.getLastByMovement(movement);
+
   Future<List<StrengthSet>> getByStrengthSession(
     StrengthSession strengthSession,
   ) =>

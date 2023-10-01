@@ -36,8 +36,30 @@ class _StrengthEditPageState extends State<StrengthEditPage> {
   late final StrengthSessionDescription _strengthSessionDescription =
       widget.strengthSessionDescription.clone();
 
+  int initialCount = 0;
+  double? initialWeight;
+
   final _commentsNode = FocusNode();
   final _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+
+    _setInitialCountAndWeight();
+  }
+
+  Future<void> _setInitialCountAndWeight() async {
+    final lastSet = _strengthSessionDescription.sets.lastOrNull ??
+        await StrengthSetDataProvider()
+            .getLastByMovement(_strengthSessionDescription.movement);
+    if (lastSet != null && mounted) {
+      setState(() {
+        initialCount = lastSet.count;
+        initialWeight = lastSet.weight;
+      });
+    }
+  }
 
   Future<void> _saveStrengthSession() async {
     final result = widget.isNew
@@ -145,12 +167,16 @@ class _StrengthEditPageState extends State<StrengthEditPage> {
               _commentInput,
               const Divider(),
               NewSetInput(
+                // reset input if new initial values
+                key: ValueKey((initialCount, initialWeight)),
                 onNewSet: (count, weight, _, __) => _addNewSet(count, weight),
                 confirmChanges: true,
                 dimension: _strengthSessionDescription.movement.dimension,
                 editWeightUnit: false,
                 distanceUnit: DistanceUnit.m,
                 editDistanceUnit: false,
+                initialCount: initialCount,
+                initialWeight: initialWeight,
               ),
               const Divider(),
               Expanded(
@@ -183,6 +209,7 @@ class _StrengthEditPageState extends State<StrengthEditPage> {
             _strengthSessionDescription.session.movementId = movement.id;
             _strengthSessionDescription.movement = movement;
           });
+          await _setInitialCountAndWeight();
         }
       },
       child: Text(
