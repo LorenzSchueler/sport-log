@@ -165,7 +165,7 @@ class StrengthSessionDescriptionTable {
             TableAccessor.notDeletedOfTable(Tables.movement),
             "${Tables.strengthSession}.${Columns.id} = ?",
           ])}
-    ''',
+      ''',
       [idValue.toInt()],
     );
     if (records.isEmpty) {
@@ -207,10 +207,8 @@ class StrengthSessionDescriptionTable {
             ),
             TableAccessor.commentFilterOfTable(Tables.strengthSession, comment),
           ])}
-      GROUP BY ${TableAccessor.groupByIdOfTable(Tables.strengthSession)}
       ORDER BY ${TableAccessor.orderByDatetimeOfTable(Tables.strengthSession)}
-      ;
-    ''',
+      ''',
     );
     final strengthSessionDescriptions = <StrengthSessionDescription>[];
     for (final record in records) {

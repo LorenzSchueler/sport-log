@@ -93,10 +93,6 @@ abstract class TableAccessor<T extends AtomicEntity> {
       "$tableName.${Columns.track} is not null";
   String get withTrack => withTrackOfTable(tableName);
 
-  static String groupByIdOfTable(String tableName) =>
-      "$tableName.${Columns.id}";
-  String get groupById => groupByIdOfTable(tableName);
-
   static String orderByDatetimeOfTable(String tableName) =>
       "$tableName.${Columns.datetime} desc";
   String get orderByDatetime => orderByDatetimeOfTable(tableName);

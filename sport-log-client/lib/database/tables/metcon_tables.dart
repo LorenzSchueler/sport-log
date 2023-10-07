@@ -177,7 +177,6 @@ class MetconSessionTable extends TableAccessor<MetconSession> {
         metcon == null ? "" : "${Columns.metconId} = ${metcon.id}",
         commentFilter(comment),
       ]),
-      groupBy: groupById,
       orderBy: orderByDatetime,
     );
     return records.map((e) => serde.fromDbRecord(e)).toList();

@@ -162,9 +162,8 @@ class CardioSessionDescriptionTable {
             ),
             TableAccessor.commentFilterOfTable(Tables.cardioSession, comment),
           ])}
-      GROUP BY ${TableAccessor.groupByIdOfTable(Tables.cardioSession)}
       ORDER BY ${TableAccessor.orderByDatetimeOfTable(Tables.cardioSession)}
-    ''',
+      ''',
     );
     return records
         .map(
