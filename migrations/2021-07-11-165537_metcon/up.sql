@@ -104,29 +104,3 @@ create trigger archive_metcon_session
     after insert or update of deleted or delete
     on metcon_session
     for each row execute procedure archive_record();
-
-create table metcon_item (
-    id bigint primary key,
-    training_plan_id bigint not null references training_plan on delete cascade,
-    metcon_id bigint not null references metcon on delete cascade,
-    last_change timestamptz not null default now(),
-    deleted boolean not null default false
-);
-
-create trigger set_timestamp before update on metcon_item
-    for each row execute procedure trigger_set_timestamp();
-
-create table metcon_item_archive (
-    primary key (id),
-    check (deleted = true)
-) inherits (metcon_item);
-
-create trigger archive_metcon_item
-    after insert or update of deleted or delete
-    on metcon_item
-    for each row execute procedure archive_record();
-
-create trigger check_metcon_exists_trigger
-    after insert 
-    on metcon_item_archive
-    for each row execute procedure check_metcon_exists();
