@@ -36,8 +36,8 @@ class _StrengthEditPageState extends State<StrengthEditPage> {
   late final StrengthSessionDescription _strengthSessionDescription =
       widget.strengthSessionDescription.clone();
 
-  int initialCount = 0;
-  double? initialWeight;
+  int _initialCount = 0;
+  double? _initialWeight;
 
   final _commentsNode = FocusNode();
   final _scrollController = ScrollController();
@@ -46,18 +46,30 @@ class _StrengthEditPageState extends State<StrengthEditPage> {
   void initState() {
     super.initState();
 
-    _setInitialCountAndWeight();
+    final lastSet = _strengthSessionDescription.sets.lastOrNull;
+    if (lastSet != null) {
+      _initialCount = lastSet.count;
+      _initialWeight = lastSet.weight;
+    }
   }
 
-  Future<void> _setInitialCountAndWeight() async {
-    final lastSet = _strengthSessionDescription.sets.lastOrNull ??
-        await StrengthSetDataProvider()
-            .getLastByMovement(_strengthSessionDescription.movement);
-    if (lastSet != null && mounted) {
-      setState(() {
-        initialCount = lastSet.count;
-        initialWeight = lastSet.weight;
-      });
+  Future<void> _updateInitialCountWeightInterval() async {
+    if (widget.isNew) {
+      final lastSSD = await _dataProvider
+          .getLastByMovement(_strengthSessionDescription.movement);
+      if (mounted) {
+        final lastInterval = lastSSD?.session.interval;
+        final lastCount = lastSSD?.sets.lastOrNull?.count;
+        final lastWeight = lastSSD?.sets.lastOrNull?.weight;
+        setState(() {
+          _strengthSessionDescription.session.interval = lastInterval;
+          // override only if no sets created yet (otherwise values from last set are kept)
+          if (_strengthSessionDescription.sets.isEmpty) {
+            _initialCount = lastCount ?? 0;
+            _initialWeight = lastWeight;
+          }
+        });
+      }
     }
   }
 
@@ -168,15 +180,15 @@ class _StrengthEditPageState extends State<StrengthEditPage> {
               const Divider(),
               NewSetInput(
                 // reset input if new initial values
-                key: ValueKey((initialCount, initialWeight)),
+                key: ValueKey((_initialCount, _initialWeight)),
                 onNewSet: (count, weight, _, __) => _addNewSet(count, weight),
                 confirmChanges: true,
                 dimension: _strengthSessionDescription.movement.dimension,
                 editWeightUnit: false,
                 distanceUnit: DistanceUnit.m,
                 editDistanceUnit: false,
-                initialCount: initialCount,
-                initialWeight: initialWeight,
+                initialCount: _initialCount,
+                initialWeight: _initialWeight,
               ),
               const Divider(),
               Expanded(
@@ -209,7 +221,7 @@ class _StrengthEditPageState extends State<StrengthEditPage> {
             _strengthSessionDescription.session.movementId = movement.id;
             _strengthSessionDescription.movement = movement;
           });
-          await _setInitialCountAndWeight();
+          await _updateInitialCountWeightInterval();
         }
       },
       child: Text(
@@ -239,6 +251,7 @@ class _StrengthEditPageState extends State<StrengthEditPage> {
 
   Widget get _intervalInput {
     return EditTile.optionalButton(
+      key: ValueKey(_strengthSessionDescription.session.interval),
       caption: 'Interval',
       leading: AppIcons.timeInterval,
       onTrailingTap: () =>

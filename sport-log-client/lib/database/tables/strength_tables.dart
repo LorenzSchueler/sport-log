@@ -35,6 +35,19 @@ class StrengthSessionTable extends TableAccessor<StrengthSession> {
     ],
     uniqueColumns: [],
   );
+
+  Future<StrengthSession?> getLastByMovement(Movement movement) async {
+    final records = await database.query(
+      tableName,
+      where: TableAccessor.combineFilter([
+        notDeleted,
+        movementIdFilter(movement),
+      ]),
+      orderBy: orderByDatetime,
+      limit: 1,
+    );
+    return records.map(serde.fromDbRecord).firstOrNull;
+  }
 }
 
 final eormTable = Table(
@@ -82,22 +95,6 @@ class StrengthSetTable extends TableAccessor<StrengthSet> {
       [Columns.strengthSessionId, Columns.setNumber],
     ],
   );
-
-  Future<StrengthSet?> getLastByMovement(Movement movement) async {
-    final records = await database.rawQuery("""
-      select * from $tableName
-      join ${Tables.strengthSession} 
-      on $tableName.${Columns.strengthSessionId} = ${Tables.strengthSession}.${Columns.id}
-      where ${TableAccessor.combineFilter([
-          notDeleted,
-          TableAccessor.notDeletedOfTable(Tables.strengthSession),
-          "${Tables.strengthSession}.${Columns.movementId} = ${movement.id.toInt()}",
-        ])}
-      order by ${Tables.strengthSession}.${Columns.datetime} desc, $tableName.${Columns.setNumber} desc
-      limit 1;
-      """);
-    return records.map(serde.fromDbRecord).firstOrNull;
-  }
 
   Future<List<StrengthSet>> getByStrengthSession(
     StrengthSession strengthSession,

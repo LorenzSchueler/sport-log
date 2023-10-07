@@ -27,6 +27,9 @@ class StrengthSessionDataProvider extends EntityDataProvider<StrengthSession> {
   @override
   List<StrengthSession> getFromAccountData(AccountData accountData) =>
       accountData.strengthSessions;
+
+  Future<StrengthSession?> getLastByMovement(Movement movement) =>
+      table.getLastByMovement(movement);
 }
 
 class StrengthSetDataProvider extends EntityDataProvider<StrengthSet> {
@@ -45,9 +48,6 @@ class StrengthSetDataProvider extends EntityDataProvider<StrengthSet> {
   @override
   List<StrengthSet> getFromAccountData(AccountData accountData) =>
       accountData.strengthSets;
-
-  Future<StrengthSet?> getLastByMovement(Movement movement) =>
-      table.getLastByMovement(movement);
 
   Future<List<StrengthSet>> getByStrengthSession(
     StrengthSession strengthSession,
@@ -170,6 +170,21 @@ class StrengthSessionDescriptionDataProvider
       until: until,
       movement: movement,
       comment: comment,
+    );
+  }
+
+  Future<StrengthSessionDescription?> getLastByMovement(
+    Movement movement,
+  ) async {
+    final session =
+        await _strengthSessionDataProvider.getLastByMovement(movement);
+    if (session == null) {
+      return null;
+    }
+    return StrengthSessionDescription(
+      session: session,
+      movement: (await _movementDataProvider.getById(session.movementId))!,
+      sets: await _strengthSetDataProvider.getByStrengthSession(session),
     );
   }
 
