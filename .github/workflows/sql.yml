@@ -1,0 +1,66 @@
+name: SQL
+
+permissions:
+  contents: read
+  checks: write
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  migrations:
+    name: migrations
+    runs-on: ubuntu-latest
+
+    env:
+      POSTGRES_DB: sport_log
+      POSTGRES_PASSWORD: test-passwd
+      POSTGRES_USER: sport_admin
+
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_DB: sport_log
+          POSTGRES_PASSWORD: test-passwd
+          POSTGRES_USER: sport_admin
+        ports:
+          - 5432:5432
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4
+    - name: install rust
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+        override: true
+    - name: load cache
+      uses: Swatinem/rust-cache@v2
+    - name: install postgresql
+      run: |
+        sudo apt-get update -y
+        sudo apt-get install libpq-dev postgresql-client-common postgresql
+    - name: install diesel_cli
+      run: cargo install diesel_cli --no-default-features --features postgres
+    - name: create .env file
+      working-directory: sport-log-types
+      run: echo "DATABASE_URL=postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@localhost/$POSTGRES_DB" > .env
+    - name: setup database
+      working-directory: sport-log-types
+      run: diesel database setup # --locked-schema # TODO
+    - name: revert migrations
+      working-directory: sport-log-types
+      run: diesel migration revert --all
+    - name: run migrations
+      working-directory: sport-log-types
+      run: diesel migration run
