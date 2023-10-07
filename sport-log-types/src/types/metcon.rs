@@ -10,10 +10,10 @@ use sport_log_types_derive::{IdFromSql, IdToSql};
 
 #[cfg(feature = "db")]
 use crate::{
-    schema::{metcon, metcon_item, metcon_movement, metcon_session},
-    Movement, TrainingPlan, User,
+    schema::{metcon, metcon_movement, metcon_session},
+    Movement, User,
 };
-use crate::{types::IdString, MovementId, TrainingPlanId, UserId};
+use crate::{types::IdString, MovementId, UserId};
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq)]
 #[cfg_attr(
@@ -159,34 +159,5 @@ pub struct MetconSession {
     pub rx: bool,
     #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
     pub comments: Option<String>,
-    pub deleted: bool,
-}
-
-#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, IdString)]
-#[serde(try_from = "IdString", into = "IdString")]
-#[cfg_attr(
-    feature = "db",
-    derive(Hash, FromSqlRow, AsExpression, IdToSql, IdFromSql),
-    diesel(sql_type = BigInt)
-)]
-pub struct MetconItemId(pub i64);
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[cfg_attr(
-    feature = "db",
-    derive(
-        Insertable,
-        Associations,
-        Identifiable,
-        Queryable,
-        Selectable,
-        AsChangeset,
-    ),
-    diesel(table_name = metcon_item, belongs_to(TrainingPlan), belongs_to(Metcon))
-)]
-pub struct MetconItem {
-    pub id: MetconItemId,
-    pub training_plan_id: TrainingPlanId,
-    pub metcon_id: MetconId,
     pub deleted: bool,
 }

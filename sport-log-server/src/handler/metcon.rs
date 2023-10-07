@@ -164,17 +164,6 @@ pub async fn get_metcon_movements(
     .map_err(Into::into)
 }
 
-//pub async fn get_metcon_movements_by_metcon(
-//auth: AuthUserOrAP,
-//Path(metcon_id): Path<UnverifiedId<MetconId>>,
-//mut db: DbConn,
-//) -> HandlerResult<Json<Vec<MetconMovement>>> {
-//let metcon_id = metcon_id.verify_user_ap(auth, &mut db).map_err(Error::from)?;
-//MetconMovementDb::get_by_metcon(metcon_id, &mut db)
-//.map(Json)
-//.map_err(Into::into)
-//}
-
 pub async fn update_metcon_movements(
     auth: AuthUserOrAP,
     mut db: DbConn,
@@ -193,75 +182,3 @@ pub async fn update_metcon_movements(
     .map(|_| StatusCode::OK)
     .map_err(Into::into)
 }
-
-//pub async fn create_metcon_item(
-//auth: AuthUserOrAP,
-//mut db: DbConn,
-//Json(metcon_item): Json<Unverified<MetconItem>>,
-//) -> HandlerResult<Json<MetconItem>> {
-//let metcon_item = metcon_item
-//.verify_user_ap_create(auth, &mut db)
-//.map_err(Error::from)?;
-//MetconItemDb::create(&metcon_item, &mut db)
-//.map(Json)
-//.map_err(Into::into)
-//}
-
-//pub async fn create_metcon_items(
-//auth: AuthUserOrAP,
-//mut db: DbConn,
-//Json(metcon_items): Json<UnverifiedSingleOrVec<MetconItem>>>,
-//) -> HandlerResult<Json<Vec<MetconItem>>> {
-//let metcon_items = metcon_items
-//.verify_user_ap_create(auth, &mut db)
-//;
-//MetconItemDb::create_multiple(&metcon_items, &mut db)
-//.map(Json)
-//.map_err(Into::into)
-//}
-
-//pub async fn get_metcon_item(
-//auth: AuthUserOrAP,
-//Path(metcon_item_id): Path<UnverifiedId<MetconItemId>>,
-//mut db: DbConn,
-//) -> HandlerResult<Json<MetconItem>> {
-//let metcon_item_id = metcon_item_id
-//.verify_user_ap(auth, &mut db)
-//;
-//MetconItemDb::get_by_id(metcon_item_id, &mut db)
-//.map(Json)
-//.map_err(Into::into)
-//}
-
-//pub async fn get_metcon_items(
-//auth: AuthUserOrAP,
-//mut db: DbConn,
-//) -> HandlerResult<Json<Vec<MetconItem>>> {
-//MetconItemDb::get_by_user(*auth, &mut db)
-//.map(Json)
-//.map_err(Into::into)
-//}
-
-//pub async fn update_metcon_item(
-//auth: AuthUserOrAP,
-//mut db: DbConn,
-//Json(metcon_item): Json<Unverified<MetconItem>>,
-//) -> HandlerResult<Json<MetconItem>> {
-//let metcon_item = metcon_item.verify_user_ap(auth, &mut db).map_err(Error::from)?;
-//MetconItemDb::update(&metcon_item, &mut db)
-//.map(Json)
-//.map_err(Into::into)
-//}
-
-//pub async fn update_metcon_items(
-//auth: AuthUserOrAP,
-//mut db: DbConn,
-//Json(metcon_items): Json<UnverifiedSingleOrVec<MetconItem>>>,
-//) -> HandlerResult<Json<Vec<MetconItem>>> {
-//let metcon_items = metcon_items
-//.verify_user_ap(auth, &mut db)
-//;
-//MetconItemDb::update_multiple(&metcon_items, &mut db)
-//.map(Json)
-//.map_err(Into::into)
-//}

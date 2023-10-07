@@ -27,17 +27,6 @@ pub async fn create_wods(
     .map_err(Into::into)
 }
 
-//pub async fn get_ordered_wods_by_timespan(
-//auth: AuthUserOrAP,
-//Path(start_datetime): Path<DateTime<Utc>>,
-//Path(end_datetime): Path<DateTime<Utc>>,
-//mut db: DbConn,
-//) -> HandlerResult<Json<Vec<Wod>>> {
-//WodDb::get_ordered_by_user_and_timespan(*auth, start_datetime, end_datetime, &mut db)
-//.map(Json)
-//.map_err(Into::into)
-//}
-
 pub async fn get_wods(
     auth: AuthUserOrAP,
     Query(IdOption { id }): Query<IdOption<UnverifiedId<WodId>>>,
@@ -107,17 +96,6 @@ pub async fn get_diaries(
     .map(Json)
     .map_err(Into::into)
 }
-
-//pub async fn get_ordered_diarys_by_timespan(
-//auth: AuthUserOrAP,
-//Path(start_datetime): Path<DateTime<Utc>>,
-//Path(end_datetime): Path<DateTime<Utc>>,
-//mut db: DbConn,
-//) -> HandlerResult<Json<Vec<Diary>>> {
-//DiaryDb::get_ordered_by_user_and_timespan(*auth, start_datetime, end_datetime, &mut db)
-//.map(Json)
-//.map_err(Into::into)
-//}
 
 pub async fn update_diaries(
     auth: AuthUserOrAP,

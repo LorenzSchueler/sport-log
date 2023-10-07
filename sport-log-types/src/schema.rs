@@ -93,37 +93,11 @@ diesel::table! {
 diesel::table! {
     use diesel::sql_types::*;
     use super::sql_types::CardioType;
-
-    cardio_blueprint (id) {
-        id -> Int8,
-        user_id -> Int8,
-        training_plan_id -> Int8,
-        #[max_length = 80]
-        name -> Varchar,
-        description -> Nullable<Text>,
-        movement_id -> Int8,
-        cardio_type -> CardioType,
-        distance -> Nullable<Int4>,
-        ascent -> Nullable<Int4>,
-        descent -> Nullable<Int4>,
-        time -> Nullable<Int4>,
-        calories -> Nullable<Int4>,
-        avg_heart_rate -> Nullable<Int4>,
-        route_id -> Nullable<Int8>,
-        last_change -> Timestamptz,
-        deleted -> Bool,
-    }
-}
-
-diesel::table! {
-    use diesel::sql_types::*;
-    use super::sql_types::CardioType;
     use super::sql_types::Position;
 
     cardio_session (id) {
         id -> Int8,
         user_id -> Int8,
-        cardio_blueprint_id -> Nullable<Int8>,
         movement_id -> Int8,
         cardio_type -> CardioType,
         datetime -> Timestamptz,
@@ -205,18 +179,6 @@ diesel::table! {
         rounds -> Nullable<Int4>,
         timecap -> Nullable<Int4>,
         description -> Nullable<Text>,
-        last_change -> Timestamptz,
-        deleted -> Bool,
-    }
-}
-
-diesel::table! {
-    use diesel::sql_types::*;
-
-    metcon_item (id) {
-        id -> Int8,
-        training_plan_id -> Int8,
-        metcon_id -> Int8,
         last_change -> Timestamptz,
         deleted -> Bool,
     }
@@ -397,41 +359,9 @@ diesel::table! {
 diesel::table! {
     use diesel::sql_types::*;
 
-    strength_blueprint (id) {
-        id -> Int8,
-        user_id -> Int8,
-        training_plan_id -> Int8,
-        #[max_length = 80]
-        name -> Varchar,
-        description -> Nullable<Text>,
-        movement_id -> Int8,
-        interval -> Nullable<Int4>,
-        last_change -> Timestamptz,
-        deleted -> Bool,
-    }
-}
-
-diesel::table! {
-    use diesel::sql_types::*;
-
-    strength_blueprint_set (id) {
-        id -> Int8,
-        strength_blueprint_id -> Int8,
-        set_number -> Int4,
-        count -> Int4,
-        weight -> Nullable<Float4>,
-        last_change -> Timestamptz,
-        deleted -> Bool,
-    }
-}
-
-diesel::table! {
-    use diesel::sql_types::*;
-
     strength_session (id) {
         id -> Int8,
         user_id -> Int8,
-        strength_blueprint_id -> Nullable<Int8>,
         datetime -> Timestamptz,
         movement_id -> Int8,
         interval -> Nullable<Int4>,
@@ -450,23 +380,6 @@ diesel::table! {
         set_number -> Int4,
         count -> Int4,
         weight -> Nullable<Float4>,
-        last_change -> Timestamptz,
-        deleted -> Bool,
-    }
-}
-
-diesel::table! {
-    use diesel::sql_types::*;
-    use super::sql_types::Weekday;
-
-    training_plan (id) {
-        id -> Int8,
-        user_id -> Int8,
-        #[max_length = 80]
-        name -> Varchar,
-        description -> Nullable<Text>,
-        date -> Nullable<Date>,
-        weekday -> Nullable<Weekday>,
         last_change -> Timestamptz,
         deleted -> Bool,
     }
@@ -506,11 +419,6 @@ diesel::joinable!(action_event -> user (user_id));
 diesel::joinable!(action_provider -> platform (platform_id));
 diesel::joinable!(action_rule -> action (action_id));
 diesel::joinable!(action_rule -> user (user_id));
-diesel::joinable!(cardio_blueprint -> movement (movement_id));
-diesel::joinable!(cardio_blueprint -> route (route_id));
-diesel::joinable!(cardio_blueprint -> training_plan (training_plan_id));
-diesel::joinable!(cardio_blueprint -> user (user_id));
-diesel::joinable!(cardio_session -> cardio_blueprint (cardio_blueprint_id));
 diesel::joinable!(cardio_session -> movement (movement_id));
 diesel::joinable!(cardio_session -> route (route_id));
 diesel::joinable!(cardio_session -> user (user_id));
@@ -518,8 +426,6 @@ diesel::joinable!(diary -> user (user_id));
 diesel::joinable!(group_user -> group (group_id));
 diesel::joinable!(group_user -> user (user_id));
 diesel::joinable!(metcon -> user (user_id));
-diesel::joinable!(metcon_item -> metcon (metcon_id));
-diesel::joinable!(metcon_item -> training_plan (training_plan_id));
 diesel::joinable!(metcon_movement -> metcon (metcon_id));
 diesel::joinable!(metcon_movement -> movement (movement_id));
 diesel::joinable!(metcon_session -> metcon (metcon_id));
@@ -538,15 +444,9 @@ diesel::joinable!(shared_metcon_session -> group (group_id));
 diesel::joinable!(shared_metcon_session -> metcon_session (metcon_session_id));
 diesel::joinable!(shared_strength_session -> group (group_id));
 diesel::joinable!(shared_strength_session -> strength_session (strength_session_id));
-diesel::joinable!(strength_blueprint -> movement (movement_id));
-diesel::joinable!(strength_blueprint -> training_plan (training_plan_id));
-diesel::joinable!(strength_blueprint -> user (user_id));
-diesel::joinable!(strength_blueprint_set -> strength_blueprint (strength_blueprint_id));
 diesel::joinable!(strength_session -> movement (movement_id));
-diesel::joinable!(strength_session -> strength_blueprint (strength_blueprint_id));
 diesel::joinable!(strength_session -> user (user_id));
 diesel::joinable!(strength_set -> strength_session (strength_session_id));
-diesel::joinable!(training_plan -> user (user_id));
 diesel::joinable!(wod -> user (user_id));
 
 diesel::allow_tables_to_appear_in_same_query!(
@@ -554,14 +454,12 @@ diesel::allow_tables_to_appear_in_same_query!(
     action_event,
     action_provider,
     action_rule,
-    cardio_blueprint,
     cardio_session,
     diary,
     eorm,
     group,
     group_user,
     metcon,
-    metcon_item,
     metcon_movement,
     metcon_session,
     movement,
@@ -574,11 +472,8 @@ diesel::allow_tables_to_appear_in_same_query!(
     shared_diary,
     shared_metcon_session,
     shared_strength_session,
-    strength_blueprint,
-    strength_blueprint_set,
     strength_session,
     strength_set,
-    training_plan,
     user,
     wod,
 );

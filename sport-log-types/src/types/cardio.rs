@@ -16,10 +16,10 @@ use sport_log_types_derive::{IdFromSql, IdToSql};
 
 #[cfg(feature = "db")]
 use crate::{
-    schema::{cardio_blueprint, cardio_session, route},
-    Movement, TrainingPlan, User,
+    schema::{cardio_session, route},
+    Movement, User,
 };
-use crate::{types::IdString, MovementId, TrainingPlanId, UserId};
+use crate::{types::IdString, MovementId, UserId};
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq)]
 #[cfg_attr(
@@ -138,54 +138,6 @@ pub struct Route {
     derive(Hash, FromSqlRow, AsExpression, IdToSql, IdFromSql),
     diesel(sql_type = BigInt)
 )]
-pub struct CardioBlueprintId(pub i64);
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[cfg_attr(
-    feature = "db",
-    derive(
-        Insertable,
-        Associations,
-        Identifiable,
-        Queryable,
-        Selectable,
-        AsChangeset,
-    ),
-    diesel(table_name = cardio_blueprint, belongs_to(User), belongs_to(TrainingPlan), belongs_to(Movement), belongs_to(Route))
-)]
-pub struct CardioBlueprint {
-    pub id: CardioBlueprintId,
-    pub user_id: UserId,
-    pub training_plan_id: TrainingPlanId,
-    pub name: String,
-    #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
-    pub description: Option<String>,
-    pub movement_id: MovementId,
-    pub cardio_type: CardioType,
-    #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
-    pub distance: Option<i32>,
-    #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
-    pub ascent: Option<i32>,
-    #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
-    pub descent: Option<i32>,
-    #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
-    pub time: Option<i32>,
-    #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
-    pub calories: Option<i32>,
-    #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
-    pub avg_heart_rate: Option<i32>,
-    #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
-    pub route_id: Option<RouteId>,
-    pub deleted: bool,
-}
-
-#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, IdString)]
-#[serde(try_from = "IdString", into = "IdString")]
-#[cfg_attr(
-    feature = "db",
-    derive(Hash, FromSqlRow, AsExpression, IdToSql, IdFromSql),
-    diesel(sql_type = BigInt)
-)]
 pub struct CardioSessionId(pub i64);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -199,12 +151,11 @@ pub struct CardioSessionId(pub i64);
         Selectable,
         AsChangeset,
     ),
-    diesel(table_name = cardio_session, belongs_to(User), belongs_to(CardioBlueprint), belongs_to(Movement), belongs_to(Route))
+    diesel(table_name = cardio_session, belongs_to(User), belongs_to(Movement), belongs_to(Route))
 )]
 pub struct CardioSession {
     pub id: CardioSessionId,
     pub user_id: UserId,
-    pub cardio_blueprint_id: Option<CardioBlueprintId>,
     pub movement_id: MovementId,
     pub cardio_type: CardioType,
     pub datetime: DateTime<Utc>,

@@ -202,18 +202,6 @@ pub async fn get_action_rules(
     .map_err(Into::into)
 }
 
-//pub async fn get_action_rules_by_action_provider(
-//auth: AuthUser,
-//Path(action_provider_id): Path<UnverifiedId<ActionProviderId>>,
-//mut db: DbConn,
-//) -> HandlerResult<Json<Vec<ActionRule>>> {
-//
-//let action_provider_id = action_provider_id.verify_unchecked().map_err(Error::from)?;
-//ActionRuleDb::get_by_user_and_action_provider(*auth, action_provider_id, &mut db)
-//.map(Json)
-//.map_err(Into::into)
-//}
-
 pub async fn update_action_rules(
     auth: AuthUser,
     mut db: DbConn,
@@ -288,18 +276,6 @@ pub async fn get_action_events(
     .map(Json)
     .map_err(Into::into)
 }
-
-//pub async fn get_action_events_by_action_provider(
-//auth: AuthUser,
-//Path(action_provider_id): Path<UnverifiedId<ActionProviderId>>,
-//mut db: DbConn,
-//) -> HandlerResult<Json<Vec<ActionEvent>>> {
-//
-//let action_provider_id = action_provider_id.verify_unchecked().map_err(Error::from)?;
-//ActionEventDb::get_by_user_and_action_provider(*auth, action_provider_id, &mut db)
-//.map(Json)
-//.map_err(Into::into)
-//}
 
 pub async fn update_action_events(
     auth: AuthUser,

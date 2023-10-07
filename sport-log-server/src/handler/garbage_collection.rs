@@ -24,17 +24,12 @@ pub async fn adm_do_garbage_collection(
     WodDb::hard_delete(last_change, &mut db).await?;
     MovementDb::hard_delete(last_change, &mut db).await?;
     MovementMuscleDb::hard_delete(last_change, &mut db).await?;
-    TrainingPlanDb::hard_delete(last_change, &mut db).await?;
-    StrengthBlueprintDb::hard_delete(last_change, &mut db).await?;
-    StrengthBlueprintSetDb::hard_delete(last_change, &mut db).await?;
     StrengthSessionDb::hard_delete(last_change, &mut db).await?;
     StrengthSetDb::hard_delete(last_change, &mut db).await?;
     MetconDb::hard_delete(last_change, &mut db).await?;
     MetconMovementDb::hard_delete(last_change, &mut db).await?;
     MetconSessionDb::hard_delete(last_change, &mut db).await?;
-    MetconItemDb::hard_delete(last_change, &mut db).await?;
     RouteDb::hard_delete(last_change, &mut db).await?;
-    CardioBlueprintDb::hard_delete(last_change, &mut db).await?;
     CardioSessionDb::hard_delete(last_change, &mut db).await?;
     GroupDb::hard_delete(last_change, &mut db).await?;
     GroupUserDb::hard_delete(last_change, &mut db).await?;

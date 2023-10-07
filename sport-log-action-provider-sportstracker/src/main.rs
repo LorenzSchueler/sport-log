@@ -422,7 +422,6 @@ fn try_into_cardio_session(
     Some(CardioSession {
         id: CardioSessionId(rand::thread_rng().gen()),
         user_id: exec_action_event.user_id,
-        cardio_blueprint_id: None,
         movement_id,
         cardio_type,
         datetime: DateTime::from_naive_utc_and_offset(

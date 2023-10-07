@@ -11,7 +11,6 @@ mod movement;
 mod platform;
 mod sharing;
 mod strength;
-mod training_plan;
 pub mod uri;
 mod user;
 mod version;
@@ -26,7 +25,6 @@ pub use movement::*;
 pub use platform::*;
 pub use sharing::*;
 pub use strength::*;
-pub use training_plan::*;
 pub use user::*;
 pub use version::*;
 

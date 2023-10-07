@@ -15,7 +15,6 @@ mod metcon;
 mod movement;
 mod platform;
 mod strength;
-//mod training_plan;
 mod user;
 
 pub use account::*;
@@ -28,7 +27,6 @@ pub use metcon::*;
 pub use movement::*;
 pub use platform::*;
 pub use strength::*;
-//pub use training_plan::*;
 pub use user::*;
 
 #[derive(Debug, Deserialize)]

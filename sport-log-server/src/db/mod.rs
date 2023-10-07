@@ -19,7 +19,6 @@ mod movement;
 mod platform;
 mod sharing;
 mod strength;
-mod training_plan;
 mod user;
 
 pub use account::*;
@@ -32,7 +31,6 @@ pub use movement::*;
 pub use platform::*;
 pub use sharing::*;
 pub use strength::*;
-pub use training_plan::*;
 pub use user::*;
 
 use crate::auth::*;
