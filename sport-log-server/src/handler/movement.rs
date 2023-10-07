@@ -64,11 +64,6 @@ pub async fn update_movements(
     .map_err(Into::into)
 }
 
-////#[post(
-////"/movement_muscle",
-////format = "application/json",
-////data = "<movement_muscle>"
-////)]
 //pub async fn create_movement_muscle(
 //auth: AuthUserOrAP,
 //mut db: DbConn,
@@ -82,11 +77,6 @@ pub async fn update_movements(
 //.map_err(Into::into)
 //}
 
-////#[post(
-////"/movement_muscles",
-////format = "application/json",
-////data = "<movement_muscles>"
-////)]
 //pub async fn create_movement_muscles(
 //auth: AuthUserOrAP,
 //mut db: DbConn,
@@ -103,7 +93,6 @@ pub async fn update_movements(
 //.map_err(Into::into)
 //}
 
-////#[get("/movement_muscle/<movement_muscle_id>")]
 //pub async fn get_movement_muscle(
 //auth: AuthUserOrAP,
 //Path(movement_muscle_id): Path<UnverifiedId<MovementMuscleId>>,
@@ -117,7 +106,6 @@ pub async fn update_movements(
 //.map_err(Into::into)
 //}
 
-////#[get("/movement_muscle")]
 //pub async fn get_movement_muscles(
 //auth: AuthUserOrAP,
 //mut db: DbConn,
@@ -127,11 +115,6 @@ pub async fn update_movements(
 //.map_err(Into::into)
 //}
 
-////#[put(
-////"/movement_muscle",
-////format = "application/json",
-////data = "<movement_muscle>"
-////)]
 //pub async fn update_movement_muscle(
 //auth: AuthUserOrAP,
 //mut db: DbConn,
@@ -145,11 +128,6 @@ pub async fn update_movements(
 //.map_err(Into::into)
 //}
 
-////#[put(
-////"/movement_muscles",
-////format = "application/json",
-////data = "<movement_muscles>"
-////)]
 //pub async fn update_movement_muscles(
 //auth: AuthUserOrAP,
 //mut db: DbConn,
@@ -163,7 +141,6 @@ pub async fn update_movements(
 //.map_err(Into::into)
 //}
 
-////#[get("/muscle_group")]
 //pub async fn get_muscle_groups(
 //_auth: AuthUserOrAP,
 //mut db: DbConn,

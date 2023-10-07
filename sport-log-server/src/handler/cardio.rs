@@ -20,7 +20,11 @@ pub async fn create_routes(
         }
         UnverifiedSingleOrVec::Vec(routes) => {
             let routes = routes.verify_user_ap_without_db(auth)?;
-            RouteDb::create_multiple(&routes, &mut db).await
+            let r = RouteDb::create_multiple(&routes, &mut db).await;
+            println!("\n\n\n##########\n{:?}\n##########\n\n\n", r);
+            // Err(SerializationError(FailedToLookupTypeError(PgMetadataCacheKey { schema: None, type_name: "position" })))
+            // https://github.com/weiznich/diesel_async/issues/103
+            r
         }
     }
     .map(|_| StatusCode::OK)
@@ -62,11 +66,6 @@ pub async fn update_routes(
     .map_err(Into::into)
 }
 
-//#[post(
-//"/cardio_blueprint",
-//format = "application/json",
-//data = "<cardio_blueprint>"
-//)]
 //pub async fn create_cardio_blueprint(
 //auth: AuthUserOrAP,
 //mut db: DbConn,
@@ -80,11 +79,6 @@ pub async fn update_routes(
 //.map_err(Into::into)
 //}
 
-//#[post(
-//"/cardio_blueprints",
-//format = "application/json",
-//data = "<cardio_blueprints>"
-//)]
 //pub async fn create_cardio_blueprints(
 //auth: AuthUserOrAP,
 //mut db: DbConn,
@@ -102,7 +96,6 @@ pub async fn update_routes(
 //.map_err(Into::into)
 //}
 
-////#[get("/cardio_blueprint/<cardio_blueprint_id>")]
 //pub async fn get_cardio_blueprint(
 //auth: AuthUserOrAP,
 //Path(cardio_blueprint_id): Path<UnverifiedId<CardioBlueprintId>>,
@@ -115,7 +108,6 @@ pub async fn update_routes(
 //.map_err(Into::into)
 //}
 
-////#[get("/cardio_blueprint")]
 //pub async fn get_cardio_blueprints(
 //auth: AuthUserOrAP,
 //mut db: DbConn,
@@ -125,11 +117,6 @@ pub async fn update_routes(
 //.map_err(Into::into)
 //}
 
-//#[put(
-//"/cardio_blueprint",
-//format = "application/json",
-//data = "<cardio_blueprint>"
-//)]
 //pub async fn update_cardio_blueprint(
 //auth: AuthUserOrAP,
 //mut db: DbConn,
@@ -143,11 +130,6 @@ pub async fn update_routes(
 //.map_err(Into::into)
 //}
 
-//#[put(
-//"/cardio_blueprints",
-//format = "application/json",
-//data = "<cardio_blueprints>"
-//)]
 //pub async fn update_cardio_blueprints(
 //auth: AuthUserOrAP,
 //mut db: DbConn,

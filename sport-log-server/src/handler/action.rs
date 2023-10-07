@@ -202,7 +202,6 @@ pub async fn get_action_rules(
     .map_err(Into::into)
 }
 
-//#[get("/action_rule/action_provider/<action_provider_id>")]
 //pub async fn get_action_rules_by_action_provider(
 //auth: AuthUser,
 //Path(action_provider_id): Path<UnverifiedId<ActionProviderId>>,
@@ -290,7 +289,6 @@ pub async fn get_action_events(
     .map_err(Into::into)
 }
 
-//#[get("/action_event/action_provider/<action_provider_id>")]
 //pub async fn get_action_events_by_action_provider(
 //auth: AuthUser,
 //Path(action_provider_id): Path<UnverifiedId<ActionProviderId>>,

@@ -27,7 +27,6 @@ pub async fn create_wods(
     .map_err(Into::into)
 }
 
-//#[get("/wod/timespan/<start_datetime>/<end_datetime>")]
 //pub async fn get_ordered_wods_by_timespan(
 //auth: AuthUserOrAP,
 //Path(start_datetime): Path<DateTime<Utc>>,
@@ -109,7 +108,6 @@ pub async fn get_diaries(
     .map_err(Into::into)
 }
 
-//#[get("/diary/timespan/<start_datetime>/<end_datetime>")]
 //pub async fn get_ordered_diarys_by_timespan(
 //auth: AuthUserOrAP,
 //Path(start_datetime): Path<DateTime<Utc>>,

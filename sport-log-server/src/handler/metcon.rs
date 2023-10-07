@@ -164,7 +164,6 @@ pub async fn get_metcon_movements(
     .map_err(Into::into)
 }
 
-////#[get("/metcon_movement/metcon/<metcon_id>")]
 //pub async fn get_metcon_movements_by_metcon(
 //auth: AuthUserOrAP,
 //Path(metcon_id): Path<UnverifiedId<MetconId>>,
@@ -195,7 +194,6 @@ pub async fn update_metcon_movements(
     .map_err(Into::into)
 }
 
-//#[post("/metcon_item", format = "application/json", data = "<metcon_item>")]
 //pub async fn create_metcon_item(
 //auth: AuthUserOrAP,
 //mut db: DbConn,
@@ -209,7 +207,6 @@ pub async fn update_metcon_movements(
 //.map_err(Into::into)
 //}
 
-//#[post("/metcon_items", format = "application/json", data = "<metcon_items>")]
 //pub async fn create_metcon_items(
 //auth: AuthUserOrAP,
 //mut db: DbConn,
@@ -223,7 +220,6 @@ pub async fn update_metcon_movements(
 //.map_err(Into::into)
 //}
 
-////#[get("/metcon_item/<metcon_item_id>")]
 //pub async fn get_metcon_item(
 //auth: AuthUserOrAP,
 //Path(metcon_item_id): Path<UnverifiedId<MetconItemId>>,
@@ -237,7 +233,6 @@ pub async fn update_metcon_movements(
 //.map_err(Into::into)
 //}
 
-////#[get("/metcon_item")]
 //pub async fn get_metcon_items(
 //auth: AuthUserOrAP,
 //mut db: DbConn,
@@ -247,7 +242,6 @@ pub async fn update_metcon_movements(
 //.map_err(Into::into)
 //}
 
-//#[put("/metcon_item", format = "application/json", data = "<metcon_item>")]
 //pub async fn update_metcon_item(
 //auth: AuthUserOrAP,
 //mut db: DbConn,
@@ -259,7 +253,6 @@ pub async fn update_metcon_movements(
 //.map_err(Into::into)
 //}
 
-//#[put("/metcon_items", format = "application/json", data = "<metcon_items>")]
 //pub async fn update_metcon_items(
 //auth: AuthUserOrAP,
 //mut db: DbConn,

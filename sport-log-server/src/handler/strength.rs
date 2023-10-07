@@ -8,11 +8,6 @@ use crate::{
     state::DbConn,
 };
 
-//#[post(
-//"/strength_blueprint",
-//format = "application/json",
-//data = "<strength_blueprint>"
-//)]
 //pub async fn create_strength_blueprint(
 //auth: AuthUserOrAP,
 //mut db: DbConn,
@@ -26,11 +21,6 @@ use crate::{
 //.map_err(Into::into)
 //}
 
-////#[post(
-////"/strength_blueprints",
-////format = "application/json",
-////data = "<strength_blueprints>"
-////)]
 //pub async fn create_strength_blueprints(
 //auth: AuthUserOrAP,
 //mut db: DbConn,
@@ -44,7 +34,6 @@ use crate::{
 //.map_err(Into::into)
 //}
 
-////#[get("/strength_blueprint/<strength_blueprint_id>")]
 //pub async fn get_strength_blueprint(
 //auth: AuthUserOrAP,
 //Path(strength_blueprint_id): Path<UnverifiedId<StrengthBlueprintId>>,
@@ -62,7 +51,6 @@ use crate::{
 //.map_err(Into::into)
 //}
 
-////#[get("/strength_blueprint")]
 //pub async fn get_strength_blueprints(
 //auth: AuthUserOrAP,
 //mut db: DbConn,
@@ -72,11 +60,6 @@ use crate::{
 //.map_err(Into::into)
 //}
 
-////#[put(
-////"/strength_blueprint",
-////format = "application/json",
-////data = "<strength_blueprint>"
-////)]
 //pub async fn update_strength_blueprint(
 //auth: AuthUserOrAP,
 //mut db: DbConn,
@@ -90,11 +73,6 @@ use crate::{
 //.map_err(Into::into)
 //}
 
-////#[put(
-////"/strength_blueprints",
-////format = "application/json",
-////data = "<strength_blueprints>"
-////)]
 //pub async fn update_strength_blueprints(
 //auth: AuthUserOrAP,
 //mut db: DbConn,
@@ -108,11 +86,6 @@ use crate::{
 //.map_err(Into::into)
 //}
 
-////#[post(
-////"/strength_blueprint_set",
-////format = "application/json",
-////data = "<strength_blueprint_set>"
-////)]
 //pub async fn create_strength_blueprint_set(
 //auth: AuthUserOrAP,
 //mut db: DbConn,
@@ -126,11 +99,6 @@ use crate::{
 //.map_err(Into::into)
 //}
 
-////#[post(
-////"/strength_blueprint_sets",
-////format = "application/json",
-////data = "<strength_blueprint_sets>"
-////)]
 //pub async fn create_strength_blueprint_sets(
 //auth: AuthUserOrAP,
 //mut db: DbConn,
@@ -144,7 +112,6 @@ use crate::{
 //.map_err(Into::into)
 //}
 
-////#[get("/strength_blueprint_set/<strength_blueprint_set_id>")]
 //pub async fn get_strength_blueprint_set(
 //auth: AuthUserOrAP,
 //Path(strength_blueprint_set_id): Path<UnverifiedId<StrengthBlueprintSetId>>,
@@ -158,7 +125,6 @@ use crate::{
 //.map_err(Into::into)
 //}
 
-////#[get("/strength_blueprint_set")]
 //pub async fn get_strength_blueprint_sets(
 //auth: AuthUserOrAP,
 //mut db: DbConn,
@@ -168,7 +134,6 @@ use crate::{
 //.map_err(Into::into)
 //}
 
-////#[get("/strength_blueprint_set/strength_blueprint/<strength_blueprint_id>")]
 //pub async fn get_strength_blueprint_sets_by_strength_blueprint(
 //auth: AuthUserOrAP,
 //Path(strength_blueprint_id): Path<UnverifiedId<StrengthBlueprintId>>,
@@ -186,11 +151,6 @@ use crate::{
 //.map_err(Into::into)
 //}
 
-////#[put(
-////"/strength_blueprint_set",
-////format = "application/json",
-////data = "<strength_blueprint_set>"
-////)]
 //pub async fn update_strength_blueprint_set(
 //auth: AuthUserOrAP,
 //mut db: DbConn,
@@ -208,11 +168,6 @@ use crate::{
 //.map_err(Into::into)
 //}
 
-////#[put(
-////"/strength_blueprint_sets",
-////format = "application/json",
-////data = "<strength_blueprint_sets>"
-////)]
 //pub async fn update_strength_blueprint_sets(
 //auth: AuthUserOrAP,
 //mut db: DbConn,
@@ -327,7 +282,6 @@ pub async fn get_strength_sets(
     .map_err(Into::into)
 }
 
-//#[get("/strength_set/strength_session/<strength_session_id>")]
 //pub async fn get_strength_sets_by_strength_session(
 //auth: AuthUserOrAP,
 //Path(strength_session_id): Path<UnverifiedId<StrengthSessionId>>,
