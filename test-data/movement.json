@@ -1,0 +1,11 @@
+[
+    {
+        "id": "1085926547349545281",
+        "user_id": "0",
+        "name": "MyMovement",
+        "description": null,
+        "movement_dimension": "Distance",
+        "cardio": true,
+        "deleted": false
+    }
+]

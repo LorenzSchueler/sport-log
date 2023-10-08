@@ -203,12 +203,16 @@ jobs:
     - name: run server
       working-directory: sport-log-server
       run: |
+        set -e
+
         cargo build
         cargo run &
         sleep 1
     - name: test end-to-end
       working-directory: test-data
       run: |
+        set -e
+
         # create user - requires user self auth
         curl -X POST "$BASE_URL/v0.3/user" \
             -H 'Accept: application/json' \
@@ -232,7 +236,7 @@ jobs:
 
         # create user entities
         # entities=(diary strength_session strength_set metcon_session route cardio_session platform_credential action_rule action_event) # TODO cardio and route broken because of diesel-async
-        entities=(diary strength_session strength_set metcon_session platform_credential action_rule action_event)
+        entities=(movement diary strength_session strength_set metcon metcon_movement metcon_session platform_credential action_rule action_event)
         for entity in "${entities[@]}"; do
             curl -u $USERNAME:$PASSWORD -X POST "$BASE_URL/v0.3/$entity" \
                 -H 'Accept: application/json' \
