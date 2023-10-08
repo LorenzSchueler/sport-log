@@ -1,0 +1,74 @@
+[
+    {
+        "id": "-4102898288099195907",
+        "name": "CrossFit",
+        "action_provider_id": "2432838314050000638",
+        "description": "Reserve a spot in a CrossFit class.",
+        "create_before": 168,
+        "delete_after": 0,
+        "deleted": false
+    },
+    {
+        "id": "-948919045062674147",
+        "name": "Weightlifting",
+        "action_provider_id": "2432838314050000638",
+        "description": "Reserve a spot in a Weightlifting class.",
+        "create_before": 168,
+        "delete_after": 0,
+        "deleted": false
+    },
+    {
+        "id": "6044457901686901998",
+        "name": "Open Fridge",
+        "action_provider_id": "2432838314050000638",
+        "description": "Reserve a spot in a Open Fridge class.",
+        "create_before": 168,
+        "delete_after": 0,
+        "deleted": false
+    },
+    {
+        "id": "3355694655798255634",
+        "name": "Open Gym",
+        "action_provider_id": "2432838314050000638",
+        "description": "Reserve a spot in a Open Gym class.",
+        "create_before": 168,
+        "delete_after": 0,
+        "deleted": false
+    },
+    {
+        "id": "-4384137185089477243",
+        "name": "Gymnastics",
+        "action_provider_id": "2432838314050000638",
+        "description": "Reserve a spot in a Gymnastics class.",
+        "create_before": 168,
+        "delete_after": 0,
+        "deleted": false
+    },
+    {
+        "id": "5526833610490268216",
+        "name": "Strongmen",
+        "action_provider_id": "2432838314050000638",
+        "description": "Reserve a spot in a Strongmen class.",
+        "create_before": 168,
+        "delete_after": 0,
+        "deleted": false
+    },
+    {
+        "id": "5111649884140813019",
+        "name": "Yoga",
+        "action_provider_id": "2432838314050000638",
+        "description": "Reserve a spot in a Yoga class.",
+        "create_before": 168,
+        "delete_after": 0,
+        "deleted": false
+    },
+    {
+        "id": "-2204749973180424983",
+        "name": "Swim WOD",
+        "action_provider_id": "2432838314050000638",
+        "description": "Reserve a spot in a Swim class.",
+        "create_before": 168,
+        "delete_after": 0,
+        "deleted": false
+    }
+]

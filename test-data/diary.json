@@ -1,0 +1,18 @@
+[
+    {
+        "id": "-6458822748943388746",
+        "user_id": "0",
+        "date": "2023-07-04",
+        "bodyweight": 75.3,
+        "comments": "great day",
+        "deleted": false
+    },
+    {
+        "id": "-5324087120561274719",
+        "user_id": "0",
+        "date": "2023-07-02",
+        "bodyweight": 76.1,
+        "comments": "tired",
+        "deleted": false
+    }
+]

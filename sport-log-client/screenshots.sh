@@ -42,7 +42,7 @@ step "create user"
 curl -X POST "$BASE_URL/v0.3/user" \
     -H 'Accept: application/json' \
     -H 'Content-Type: application/json' \
-    -d @integration_test/user.json
+    -d @../test-data/user.json
 
 step "check git ref"
 NEW_VERSION=$(curl -s -u $USERNAME:$PASSWORD "$BASE_URL/v0.3/app/info?git_ref=$GIT_REF")
@@ -67,17 +67,17 @@ for entity in "${entities[@]}"; do
     curl -X POST "$BASE_URL/v0.3/ap/$entity" \
         -H 'Accept: application/json' \
         -H 'Content-Type: application/json' \
-        -d @integration_test/$entity.json
+        -d @../test-data/$entity.json
 done
 curl -u $AP_USERNAME:$AP_PASSWORD -X POST "$BASE_URL/v0.3/ap/action" \
     -H 'Accept: application/json' \
     -H 'Content-Type: application/json' \
-    -d @integration_test/action.json
+    -d @../test-data/action.json
 
 step "run user setup"
 entities=(diary strength_session strength_set metcon_session route cardio_session platform_credential action_rule action_event)
 for entity in "${entities[@]}"; do
-    cat integration_test/$entity.json | \
+    cat ../test-data/$entity.json | \
     sed "s/2023-07-04/$(date +%Y-%m-%d)/g" | \
     sed "s/2023-07-05/$(date -d +1day +%Y-%m-%d)/g" | \
     sed "s/2023-07-02/$(date -d -2day +%Y-%m-%d)/g" | \
