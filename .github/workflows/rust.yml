@@ -136,6 +136,110 @@ jobs:
     - name: cargo test
       run: cargo test
 
+  test-end-to-end:
+    name: test-end-to-end
+    runs-on: ubuntu-latest
+
+    env:
+      POSTGRES_DB: sport_log
+      POSTGRES_PASSWORD: sport_admin_passwd
+      POSTGRES_USER: sport_admin
+      USERNAME: ScreenshotUser
+      PASSWORD: ScreenshotPassword0
+      AP_USERNAME: wodify-login
+      AP_PASSWORD: Wodify-Login-Password1
+      BASE_URL: http://localhost:8001
+
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_DB: sport_log
+          POSTGRES_PASSWORD: sport_admin_passwd
+          POSTGRES_USER: sport_admin
+        ports:
+          - 5432:5432
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+    - name: env
+      run: echo "DATABASE_URL=postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@localhost/$POSTGRES_DB" >> $GITHUB_ENV
+    - name: checkout
+      uses: actions/checkout@v4
+    - name: install rust
+      uses: dtolnay/rust-toolchain@stable
+    - name: load cache
+      uses: Swatinem/rust-cache@v2
+    - name: install postgresql
+      run: |
+        sudo apt-get update -y
+        sudo apt-get install libpq-dev postgresql-client-common postgresql
+    - name: install diesel_cli
+      run: cargo install diesel_cli --no-default-features --features postgres
+    - name: setup database
+      working-directory: sport-log-types
+      run: |
+        diesel database setup
+        patch src/schema.rs src/schema.patch
+      # diesel database setup --locked-schema TODO
+    - name: create sport-log-server.toml file
+      working-directory: sport-log-server
+      env:
+        ADMIN_PASSWORD: "$argon2id$v=19$m=4096,t=3,p=1$jfQMFwbuWJW6kYF3K6Opxg$8zmHSEMYeXuxhxl7HNv8/zsgSx/LWm6Iy1EciOBJdQM" # = "admin-passwd"
+      run: |
+        echo "
+        admin_password = \"$ADMIN_PASSWORD\"
+        user_self_registration = true
+        ap_self_registration = true
+        database_url = \"postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@localhost/$POSTGRES_DB\"
+        release_address = \"0.0.0.0:8000\"
+        debug_address = \"0.0.0.0:8001\"
+        " > sport-log-server.toml
+    - name: run server
+      working-directory: sport-log-server
+      run: |
+        cargo build
+        cargo run &
+        sleep 1
+    - name: test end-to-end
+      working-directory: test-data
+      run: |
+        # create user - requires user self auth
+        curl -X POST "$BASE_URL/v0.3/user" \
+            -H 'Accept: application/json' \
+            -H 'Content-Type: application/json' \
+            -d @user.json
+
+        # create platform and ap - requires ap self auth
+        entities=(platform action_provider)
+        for entity in "${entities[@]}"; do
+            curl -X POST "$BASE_URL/v0.3/ap/$entity" \
+                -H 'Accept: application/json' \
+                -H 'Content-Type: application/json' \
+                -d @$entity.json
+        done
+
+        # create action
+        curl -u $AP_USERNAME:$AP_PASSWORD -X POST "$BASE_URL/v0.3/ap/action" \
+            -H 'Accept: application/json' \
+            -H 'Content-Type: application/json' \
+            -d @action.json
+
+        # create user entities
+        # entities=(diary strength_session strength_set metcon_session route cardio_session platform_credential action_rule action_event) # TODO cardio and route broken because of diesel-async
+        entities=(diary strength_session strength_set metcon_session platform_credential action_rule action_event)
+        for entity in "${entities[@]}"; do
+            curl -u $USERNAME:$PASSWORD -X POST "$BASE_URL/v0.3/$entity" \
+                -H 'Accept: application/json' \
+                -H 'Content-Type: application/json' \
+                -d @$entity.json
+        done
+
   deps:
     name: unused deps
     runs-on: ubuntu-latest
