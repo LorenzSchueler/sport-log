@@ -22,16 +22,11 @@ jobs:
     - name: checkout
       uses: actions/checkout@v4
     - name: install rust
-      uses: actions-rs/toolchain@v1
+      uses: dtolnay/rust-toolchain@stable
       with:
-        toolchain: stable
-        override: true
         components: rustfmt
     - name: cargo fmt
-      uses: actions-rs/cargo@v1
-      with:
-        command: fmt
-        args: --check
+      run: cargo fmt --check
 
   clippy:
     name: clippy
@@ -41,10 +36,7 @@ jobs:
     - name: checkout
       uses: actions/checkout@v4
     - name: cargo clippy
-      uses: actions-rs/clippy-check@v1
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        args: --all-features
+      run: cargo clippy --all-features
     
   doc:
     name: doc
@@ -54,17 +46,11 @@ jobs:
     - name: checkout
       uses: actions/checkout@v4
     - name: install rust
-      uses: actions-rs/toolchain@v1
-      with:
-        toolchain: stable
-        override: true
+      uses: dtolnay/rust-toolchain@stable
     - name: load cache
       uses: Swatinem/rust-cache@v2
     - name: cargo doc
-      uses: actions-rs/cargo@v1
-      with:
-        command: doc
-        args: --no-deps --all-features
+      run: cargo doc --no-deps --all-features
 
   build:
     name: check
@@ -74,10 +60,7 @@ jobs:
     - name: checkout
       uses: actions/checkout@v4
     - name: install rust
-      uses: actions-rs/toolchain@v1
-      with:
-        toolchain: stable
-        override: true
+      uses: dtolnay/rust-toolchain@stable
     - name: load cache
       uses: Swatinem/rust-cache@v2
     - name: cargo check
@@ -117,13 +100,12 @@ jobs:
           --health-retries 5
 
     steps:
+    - name: env
+      run: echo "DATABASE_URL=postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@localhost/$POSTGRES_DB" >> $GITHUB_ENV
     - name: checkout
       uses: actions/checkout@v4
     - name: install rust
-      uses: actions-rs/toolchain@v1
-      with:
-        toolchain: stable
-        override: true
+      uses: dtolnay/rust-toolchain@stable
     - name: load cache
       uses: Swatinem/rust-cache@v2
     - name: install postgresql
@@ -132,9 +114,6 @@ jobs:
         sudo apt-get install libpq-dev postgresql-client-common postgresql
     - name: install diesel_cli
       run: cargo install diesel_cli --no-default-features --features postgres
-    - name: create .env file
-      working-directory: sport-log-types
-      run: echo "DATABASE_URL=postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@localhost/$POSTGRES_DB" > .env
     - name: setup database
       working-directory: sport-log-types
       run: |
@@ -150,14 +129,12 @@ jobs:
         admin_password = \"$ADMIN_PASSWORD\"
         user_self_registration = true
         ap_self_registration = true
-        database_url = \"postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@localhost/$POSTGRES_DB\"
+        database_url = \"$DATABASE_URL\"
         release_address = \"0.0.0.0:8000\"
         debug_address = \"0.0.0.0:8001\"
         " > sport-log-server.toml
     - name: cargo test
-      uses: actions-rs/cargo@v1
-      with:
-        command: test
+      run: cargo test
 
   deps:
     name: unused deps
@@ -170,11 +147,5 @@ jobs:
       uses: Swatinem/rust-cache@v2
     - name: install cargo-machete
       run: cargo install cargo-machete
-      # actions-rs/install fails to load cached binary # TODO
-      # uses: actions-rs/install@v0.1
-      # with:
-        # crate: cargo-machete
-        # version: latest
-        # use-tool-cache: true
     - name: cargo machete
       run: cargo machete
