@@ -7,8 +7,5 @@ drop function archive_record_metcon;
 drop function check_strength_session_exists;
 drop function delete_record_strength_session;
 drop function archive_record_strength_session;
-drop function check_strength_blueprint_exists;
-drop function delete_record_strength_blueprint;
-drop function archive_record_strength_blueprint;
 drop function archive_record;
 drop function trigger_set_timestamp;
