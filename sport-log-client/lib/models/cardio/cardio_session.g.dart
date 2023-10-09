@@ -30,14 +30,11 @@ CardioSession _$CardioSessionFromJson(Map<String, dynamic> json) =>
           const OptionalIdConverter().fromJson(json['route_id'] as String?),
       comments: json['comments'] as String?,
       deleted: json['deleted'] as bool,
-    )..cardioBlueprintId = const OptionalIdConverter()
-        .fromJson(json['cardio_blueprint_id'] as String?);
+    );
 
 Map<String, dynamic> _$CardioSessionToJson(CardioSession instance) =>
     <String, dynamic>{
       'id': const IdConverter().toJson(instance.id),
-      'cardio_blueprint_id':
-          const OptionalIdConverter().toJson(instance.cardioBlueprintId),
       'user_id': const IdConverter().toJson(instance._userId),
       'movement_id': const IdConverter().toJson(instance.movementId),
       'cardio_type': _$CardioTypeEnumMap[instance.cardioType]!,

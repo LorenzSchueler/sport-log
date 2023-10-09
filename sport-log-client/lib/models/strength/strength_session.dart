@@ -27,8 +27,6 @@ class StrengthSession extends AtomicEntity {
   @override
   @IdConverter()
   Int64 id;
-  @OptionalIdConverter()
-  Int64? strengthBlueprintId;
   @JsonKey(includeToJson: true, name: "user_id")
   @IdConverter()
   Int64 get _userId => Settings.instance.userId!;
