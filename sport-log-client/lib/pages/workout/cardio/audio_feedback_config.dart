@@ -36,6 +36,8 @@ extension on int {
   }
 }
 
+enum IntervalType { distance, time }
+
 class AudioFeedbackConfig extends ChangeNotifier {
   factory AudioFeedbackConfig() {
     final audioFeedback = AudioFeedbackConfig._();
@@ -55,6 +57,15 @@ class AudioFeedbackConfig extends ChangeNotifier {
     super.dispose();
   }
 
+  IntervalType _intervalType = IntervalType.distance;
+  IntervalType get intervalType => _intervalType;
+  set intervalType(IntervalType intervalType) {
+    _intervalType = intervalType;
+    interval = _intervalType == IntervalType.distance ? 1000 : 60;
+    notifyListeners();
+  }
+
+  // meter/ seconds
   int _interval = 1000;
   int get interval => _interval;
   set interval(int interval) {

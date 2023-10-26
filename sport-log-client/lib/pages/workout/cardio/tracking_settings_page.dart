@@ -7,6 +7,7 @@ import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/dialogs.dart';
 import 'package:sport_log/widgets/input_fields/double_input.dart';
+import 'package:sport_log/widgets/input_fields/duration_input.dart';
 import 'package:sport_log/widgets/input_fields/edit_tile.dart';
 import 'package:sport_log/widgets/input_fields/int_input.dart';
 import 'package:sport_log/widgets/picker/datetime_picker.dart';
@@ -79,7 +80,6 @@ class CardioTrackingSettingsPage extends StatelessWidget {
                 EditTile.Switch(
                   leading: AppIcons.notification,
                   caption: "Alarm when off Route",
-                  shrinkWidth: true,
                   value: trackingSettings.routeAlarmDistance != null,
                   onChanged: (alarm) =>
                       trackingSettings.routeAlarmDistance = alarm ? 50 : null,
@@ -91,7 +91,6 @@ class CardioTrackingSettingsPage extends StatelessWidget {
                     child: EditTile(
                       leading: null,
                       caption: "Maximal Distance (m)",
-                      shrinkWidth: true,
                       child: IntInput(
                         onUpdate: (alarm) =>
                             trackingSettings.routeAlarmDistance = alarm,
@@ -188,28 +187,73 @@ class CardioTrackingSettingsPage extends StatelessWidget {
                     // 24 icon + 15 padding
                     padding: const EdgeInsets.only(left: 24 + 15),
                     child: EditTile(
+                      unboundedHeight: true,
                       leading: null,
-                      caption: "Feedback Interval (km)",
-                      shrinkWidth: true,
-                      child: DoubleInput(
-                        // update if rounded to 100m
-                        key: ValueKey(trackingSettings.audioFeedback!.interval),
-                        onUpdate: (interval) => trackingSettings
-                                .audioFeedback!.interval =
-                            (interval * 10).round() * 100, // rounded to 100m
-                        initialValue:
-                            trackingSettings.audioFeedback!.interval / 1000.0,
-                        minValue: 0.1,
-                        maxValue: null,
+                      caption: "Interval Type",
+                      child: SegmentedButton(
+                        segments: const [
+                          ButtonSegment(
+                            value: IntervalType.distance,
+                            label: Text("Distance"),
+                          ),
+                          ButtonSegment(
+                            value: IntervalType.time,
+                            label: Text("Time"),
+                          ),
+                        ],
+                        selected: {
+                          trackingSettings.audioFeedback!.intervalType,
+                        },
+                        onSelectionChanged: (selected) => trackingSettings
+                            .audioFeedback!.intervalType = selected.first,
+                        showSelectedIcon: false,
                       ),
                     ),
                   ),
                   Padding(
                     // 24 icon + 15 padding
                     padding: const EdgeInsets.only(left: 24 + 15),
+                    child: trackingSettings.audioFeedback!.intervalType ==
+                            IntervalType.distance
+                        ? EditTile(
+                            leading: null,
+                            caption: "Interval (km)",
+                            child: DoubleInput(
+                              // update if rounded to 100m
+                              key: ValueKey(
+                                trackingSettings.audioFeedback!.interval,
+                              ),
+                              onUpdate: (interval) =>
+                                  trackingSettings.audioFeedback!.interval =
+                                      (interval * 10).round() *
+                                          100, // rounded to 100m
+                              initialValue:
+                                  trackingSettings.audioFeedback!.interval /
+                                      1000.0,
+                              minValue: 0.1,
+                              maxValue: null,
+                            ),
+                          )
+                        : EditTile(
+                            leading: null,
+                            caption: "Interval",
+                            child: DurationInput(
+                              onUpdate: (interval) => trackingSettings
+                                  .audioFeedback!.interval = interval.inSeconds,
+                              initialDuration: Duration(
+                                seconds:
+                                    trackingSettings.audioFeedback!.interval,
+                              ),
+                              minDuration: const Duration(seconds: 10),
+                            ),
+                          ),
+                  ),
+                  Padding(
+                    // 24 icon + 15 padding
+                    padding: const EdgeInsets.only(left: 24 + 15),
                     child: EditTile(
                       leading: null,
-                      caption: "Feedback Metrics",
+                      caption: "Metrics",
                       unboundedHeight: true,
                       child: ListView.builder(
                         physics: const NeverScrollableScrollPhysics(),
