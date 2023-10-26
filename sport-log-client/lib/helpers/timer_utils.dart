@@ -94,6 +94,12 @@ class TimerUtils {
   }
 
   final _player = AudioPlayer();
+  static const _audioCtx = AudioContext(
+    android: AudioContextAndroid(
+      usageType: AndroidUsageType.alarm,
+      audioFocus: AndroidAudioFocus.gainTransientMayDuck,
+    ),
+  );
 
   static const initialCountdown = Duration(seconds: 10);
 
@@ -117,14 +123,14 @@ class TimerUtils {
     onStop();
   }
 
-  void _tickCallback() {
+  Future<void> _tickCallback() async {
     onTick();
     if (_currentTime.inSeconds == 0) {
-      _player.play(Defaults.assets.beepLong);
+      await _player.play(Defaults.assets.beepLong, ctx: _audioCtx);
     } else if (_currentTime >=
         totalTime * (timerType == TimerType.interval ? rounds : 1)) {
       stopTimer();
-      _player.play(Defaults.assets.beepLong);
+      await _player.play(Defaults.assets.beepLong, ctx: _audioCtx);
     } else if (_currentTime.inSeconds > 0 && timerType == TimerType.interval) {
       final roundStart =
           Duration(seconds: _currentTime.inSeconds % totalTime.inSeconds)
@@ -135,7 +141,7 @@ class TimerUtils {
           ).inSeconds ==
           0;
       if (roundStart || restStart) {
-        _player.play(Defaults.assets.beepShort);
+        await _player.play(Defaults.assets.beepShort, ctx: _audioCtx);
       }
     }
   }

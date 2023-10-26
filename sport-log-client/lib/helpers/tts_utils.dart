@@ -24,7 +24,7 @@ class TtsUtils {
             usage: AndroidAudioUsage.assistanceNavigationGuidance,
           ),
           androidAudioFocusGainType:
-              AndroidAudioFocusGainType.gainTransientExclusive,
+              AndroidAudioFocusGainType.gainTransientMayDuck,
           androidWillPauseWhenDucked: true,
         ),
       );
