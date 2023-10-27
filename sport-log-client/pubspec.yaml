@@ -29,12 +29,12 @@ environment:
 dependencies:
   audio_session: ^0.1.16
   audioplayers: ^5.0.0
-  awesome_notifications: ^0.7.4
+  awesome_notifications: ^0.8.2
   collection: ^1.16.0
   device_info_plus: ^9.0.0
-  file_picker: ^5.0.0
+  file_picker: ^6.0.0
   fixnum: ^1.0.0 # used for ids (in web ints go only up to 2^53-1)
-  fl_chart: ^0.63.0
+  fl_chart: ^0.64.0
   flutter:
     sdk: flutter
   flutter_blue_plus: ^1.7.5
@@ -100,7 +100,7 @@ dev_dependencies:
     # dart run dart_code_metrics:metrics check-unused-files lib
     # dart run dart_code_metrics:metrics check-unused-code lib
   faker: ^2.0.0
-  flutter_lints: ^2.0.1
+  flutter_lints: ^3.0.0
   flutter_test:
     sdk: flutter
   icons_launcher: ^2.0.1 

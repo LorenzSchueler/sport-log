@@ -72,24 +72,24 @@ class DateTimeChart extends StatelessWidget {
     return SizedBox(
       height: height,
       child: switch (dateFilterState.runtimeType) {
-        DayFilter => DayChart(
+        DayFilter _ => DayChart(
             chartValues: chartValues,
             absolute: absolute,
             isTime: false,
           ),
-        WeekFilter => WeekChart(
-            chartValues: chartValues,
-            absolute: absolute,
-            isTime: false,
-            startDateTime: dateFilterState.start!,
-          ),
-        MonthFilter => MonthChart(
+        WeekFilter _ => WeekChart(
             chartValues: chartValues,
             absolute: absolute,
             isTime: false,
             startDateTime: dateFilterState.start!,
           ),
-        YearFilter => YearChart(
+        MonthFilter _ => MonthChart(
+            chartValues: chartValues,
+            absolute: absolute,
+            isTime: false,
+            startDateTime: dateFilterState.start!,
+          ),
+        YearFilter _ => YearChart(
             chartValues: chartValues,
             absolute: absolute,
             isTime: false,
@@ -106,10 +106,10 @@ class DateTimeChart extends StatelessWidget {
 
   DateTime _groupFunction(DateTime dateTime) {
     return switch (dateFilterState.runtimeType) {
-      DayFilter => dateTime,
-      WeekFilter => dateTime.beginningOfDay(),
-      MonthFilter => dateTime.beginningOfDay(),
-      YearFilter => dateTime.beginningOfMonth().add(const Duration(days: 15)),
+      DayFilter _ => dateTime,
+      WeekFilter _ => dateTime.beginningOfDay(),
+      MonthFilter _ => dateTime.beginningOfDay(),
+      YearFilter _ => dateTime.beginningOfMonth().add(const Duration(days: 15)),
       _ => dateTime.beginningOfMonth().add(const Duration(days: 15)),
     };
   }
