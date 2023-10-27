@@ -71,12 +71,12 @@ class TimerPage extends StatelessWidget {
                         _roundsFormField(timerState),
                         Defaults.sizedBox.vertical.huge,
                         _startStopButton(context, timerState),
-                        const SizedBox(height: 80),
+                        const SizedBox(height: 50),
                         FittedBox(
                           child: Text(
                             "Round ${timerState.currentRound ?? '0'}",
                             softWrap: false,
-                            style: const TextStyle(fontSize: 80),
+                            style: const TextStyle(fontSize: 80, height: 1),
                           ),
                         ),
                         _timeText(timerState),
@@ -181,7 +181,7 @@ class TimerPage extends StatelessWidget {
       child: Text(
         timeText,
         softWrap: false,
-        style: TextStyle(fontSize: 200, color: color),
+        style: TextStyle(fontSize: 200, height: 1, color: color),
       ),
     );
   }
