@@ -42,22 +42,23 @@ class AudioFeedbackUtils {
   }
 
   Future<void> _onTimer() async {
+    final config = _audioFeedbackConfig;
     final session = _getCardioSession();
-    if (_getTrackingMode().isTracking && _audioFeedbackConfig != null) {
-      await _audioFeedback(_audioFeedbackConfig!, session);
+    if (config != null &&
+        config.intervalType.isTime &&
+        _getTrackingMode().isTracking) {
+      await _audioFeedback(config, session);
     }
   }
 
   Future<void> onNewPosition() async {
-    if (!_audioFeedbackConfig!.intervalType.isDistance) {
-      return;
-    }
+    final config = _audioFeedbackConfig;
     final session = _getCardioSession();
     final track = session.track!;
-    if (_getTrackingMode().isTracking &&
-        _audioFeedbackConfig != null &&
+    if (config != null &&
+        config.intervalType.isDistance &&
+        _getTrackingMode().isTracking &&
         track.length >= 2) {
-      final config = _audioFeedbackConfig!;
       final prevLap = track[track.length - 2].distance ~/ config.interval;
       final currLap = track.last.distance ~/ config.interval;
       if (prevLap < currLap) {
