@@ -213,8 +213,8 @@ class CardioTrackingSettingsPage extends StatelessWidget {
                   Padding(
                     // 24 icon + 15 padding
                     padding: const EdgeInsets.only(left: 24 + 15),
-                    child: trackingSettings.audioFeedback!.intervalType ==
-                            IntervalType.distance
+                    child: trackingSettings
+                            .audioFeedback!.intervalType.isDistance
                         ? EditTile(
                             leading: null,
                             caption: "Interval (km)",

@@ -4,6 +4,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart' hide Route;
 import 'package:sport_log/app.dart';
 import 'package:sport_log/data_provider/data_providers/cardio_data_provider.dart';
+import 'package:sport_log/helpers/audio_feedback_utils.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/gps_position.dart';
 import 'package:sport_log/helpers/heart_rate_utils.dart';
@@ -13,11 +14,18 @@ import 'package:sport_log/helpers/step_count_utils.dart';
 import 'package:sport_log/helpers/tracking_ui_utils.dart';
 import 'package:sport_log/helpers/tts_utils.dart';
 import 'package:sport_log/models/cardio/all.dart';
-import 'package:sport_log/pages/workout/cardio/audio_feedback_config.dart';
 import 'package:sport_log/pages/workout/cardio/tracking_settings.dart';
 import 'package:sport_log/widgets/dialogs/dialogs.dart';
 
-enum TrackingMode { notStarted, tracking, paused }
+enum TrackingMode {
+  notStarted,
+  tracking,
+  paused;
+
+  bool get isNotStarted => this == TrackingMode.notStarted;
+  bool get isTracking => this == TrackingMode.tracking;
+  bool get isPaused => this == TrackingMode.paused;
+}
 
 class TrackingUtils extends ChangeNotifier {
   TrackingUtils({required TrackingSettings trackingSettings})
@@ -35,11 +43,17 @@ class TrackingUtils extends ChangeNotifier {
         _routeAlarmDistance = trackingSettings.route?.track != null
             ? trackingSettings.routeAlarmDistance
             : null,
-        _audioFeedbackConfig = trackingSettings.audioFeedback,
+        _audioFeedbackUtils =
+            AudioFeedbackUtils(trackingSettings.audioFeedback),
         _heartRateUtils = trackingSettings.heartRateUtils.deviceId != null
             ? (HeartRateUtils() // trackingSettings.heartRateUtils is disposed
               ..deviceId = trackingSettings.heartRateUtils.deviceId)
-            : null;
+            : null {
+    _audioFeedbackUtils.setCallbacks(
+      () => cardioSessionDescription.cardioSession,
+      () => mode,
+    );
+  }
 
   static const _maxSpeed = 250; // km/ h
   static const currentDurationOffset = Duration(minutes: 1);
@@ -54,12 +68,10 @@ class TrackingUtils extends ChangeNotifier {
 
   TrackingMode _trackingMode = TrackingMode.notStarted;
   TrackingMode get mode => _trackingMode;
-  bool get isTracking => _trackingMode == TrackingMode.tracking;
-  bool get isPaused => _trackingMode == TrackingMode.paused;
+
   late DateTime _lastResumeTime;
   Duration _lastStopDuration = Duration.zero;
-
-  Duration get currentDuration => isTracking
+  Duration get currentDuration => _trackingMode.isTracking
       ? _lastStopDuration + DateTime.now().difference(_lastResumeTime)
       : _lastStopDuration;
 
@@ -92,9 +104,10 @@ class TrackingUtils extends ChangeNotifier {
   static const int _movingWhenPausedAlarmDistance = 50;
   final int? _routeAlarmDistance;
   DateTime? _lastAlarm;
+
   final _tts = TtsUtils();
 
-  final AudioFeedbackConfig? _audioFeedbackConfig;
+  final AudioFeedbackUtils _audioFeedbackUtils;
 
   @override
   void dispose() {
@@ -103,6 +116,7 @@ class TrackingUtils extends ChangeNotifier {
     _stepUtils.dispose();
     _locationUtils.dispose();
     _heartRateUtils?.dispose();
+    _audioFeedbackUtils.dispose();
     super.dispose();
   }
 
@@ -133,6 +147,7 @@ class TrackingUtils extends ChangeNotifier {
     _trackingMode = TrackingMode.tracking;
     _lastResumeTime = DateTime.now();
     _cardioSessionDescription.cardioSession.datetime = _lastResumeTime;
+    _audioFeedbackUtils.onStart();
     notifyListeners();
   }
 
@@ -173,6 +188,7 @@ class TrackingUtils extends ChangeNotifier {
   }
 
   Future<void> saveCardioSession(BuildContext context) async {
+    _audioFeedbackUtils.onStop();
     await _save(context, () {
       Navigator.pop(context); // pop dialog
       Navigator.pop(context); // pop tracking page
@@ -215,7 +231,7 @@ class TrackingUtils extends ChangeNotifier {
   void _onHeartRateUpdate(List<int> rrs) {
     final heartRate = _cardioSessionDescription.cardioSession.heartRate!;
 
-    if (isTracking) {
+    if (_trackingMode.isTracking) {
       var duration = currentDuration - Duration(milliseconds: rrs.sum);
       for (final rr in rrs) {
         duration += Duration(milliseconds: rr);
@@ -228,7 +244,7 @@ class TrackingUtils extends ChangeNotifier {
   }
 
   void _onStepUpdate() {
-    if (isTracking) {
+    if (_trackingMode.isTracking) {
       _cardioSessionDescription.cardioSession.cadence!.add(currentDuration);
     }
     _stepInfo = "last step: $currentDuration";
@@ -238,7 +254,7 @@ class TrackingUtils extends ChangeNotifier {
     final track = _cardioSessionDescription.cardioSession.track!;
 
     // filter GPS jumps in tracking mode
-    if (isTracking && track.isNotEmpty) {
+    if (_trackingMode.isTracking && track.isNotEmpty) {
       final lastPosition = track.last;
       final km = lastPosition.latLng.distanceTo(location.latLng) / 1000;
       final hour = (currentDuration - lastPosition.time).inHourFractions;
@@ -267,7 +283,7 @@ class TrackingUtils extends ChangeNotifier {
         "elevation Mbx: ${elevation?.round()} m\n"
         "points:      ${track.length}";
 
-    if (isTracking) {
+    if (_trackingMode.isTracking) {
       track.add(position);
       await _trackingUiUtils
           .updateTrack(_cardioSessionDescription.cardioSession.track);
@@ -276,11 +292,11 @@ class TrackingUtils extends ChangeNotifier {
 
     await _movingWhenPausedAlarm(position);
     await _routeAlarm(position);
-    await _audioFeedback();
+    await _audioFeedbackUtils.onNewPosition();
   }
 
   Future<void> _movingWhenPausedAlarm(Position position) async {
-    if (!isPaused) {
+    if (!_trackingMode.isPaused) {
       _movingWhenPausedAlarmFired = false;
       return;
     }
@@ -298,7 +314,7 @@ class TrackingUtils extends ChangeNotifier {
   }
 
   Future<void> _routeAlarm(Position position) async {
-    if (isTracking &&
+    if (_trackingMode.isTracking &&
         _routeAlarmDistance != null &&
         (_lastAlarm?.isBefore(DateTime.now().subtract(_minAlarmInterval)) ??
             true)) {
@@ -307,21 +323,6 @@ class TrackingUtils extends ChangeNotifier {
       if (distance > _routeAlarmDistance! && index != null) {
         _lastAlarm = DateTime.now();
         await _tts.speak("You are off route by ${distance.round()} meters.");
-      }
-    }
-  }
-
-  Future<void> _audioFeedback() async {
-    final session = _cardioSessionDescription.cardioSession;
-    final track = session.track!;
-    if (isTracking && _audioFeedbackConfig != null && track.length >= 2) {
-      final config = _audioFeedbackConfig!;
-      final prevLap = track[track.length - 2].distance ~/ config.interval;
-      final currLap = track.last.distance ~/ config.interval;
-      if (prevLap < currLap) {
-        final text =
-            "The current metrics are: ${config.metrics.map((e) => e.text(session)).whereNotNull().join(", ")}";
-        await _tts.speak(text);
       }
     }
   }

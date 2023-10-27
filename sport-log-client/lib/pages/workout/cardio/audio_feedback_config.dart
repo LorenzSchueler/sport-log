@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_log/helpers/extensions/double_extension.dart';
 import 'package:sport_log/helpers/tracking_utils.dart';
@@ -36,7 +37,13 @@ extension on int {
   }
 }
 
-enum IntervalType { distance, time }
+enum IntervalType {
+  distance,
+  time;
+
+  bool get isDistance => this == IntervalType.distance;
+  bool get isTime => this == IntervalType.time;
+}
 
 class AudioFeedbackConfig extends ChangeNotifier {
   factory AudioFeedbackConfig() {
@@ -178,6 +185,12 @@ class AudioFeedbackConfig extends ChangeNotifier {
       "meters",
     ),
   ];
+
+  String text(CardioSession session) {
+    final metricsText =
+        metrics.map((e) => e.text(session)).whereNotNull().join(", ");
+    return "The current metrics are: $metricsText";
+  }
 }
 
 class AudioFeedbackMetric extends ChangeNotifier {
