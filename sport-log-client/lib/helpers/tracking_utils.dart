@@ -4,6 +4,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart' hide Route;
 import 'package:sport_log/app.dart';
 import 'package:sport_log/data_provider/data_providers/cardio_data_provider.dart';
+import 'package:sport_log/helpers/alarm_utils.dart';
 import 'package:sport_log/helpers/audio_feedback_utils.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/gps_position.dart';
@@ -12,7 +13,6 @@ import 'package:sport_log/helpers/location_utils.dart';
 import 'package:sport_log/helpers/map_controller.dart';
 import 'package:sport_log/helpers/step_count_utils.dart';
 import 'package:sport_log/helpers/tracking_ui_utils.dart';
-import 'package:sport_log/helpers/tts_utils.dart';
 import 'package:sport_log/models/cardio/all.dart';
 import 'package:sport_log/pages/workout/cardio/tracking_settings.dart';
 import 'package:sport_log/widgets/dialogs/dialogs.dart';
@@ -40,9 +40,11 @@ class TrackingUtils extends ChangeNotifier {
           movement: trackingSettings.movement,
           route: trackingSettings.route,
         ),
-        _routeAlarmDistance = trackingSettings.route?.track != null
-            ? trackingSettings.routeAlarmDistance
-            : null,
+        _alarmUtils = AlarmUtils(
+          trackingSettings.route?.track != null
+              ? trackingSettings.routeAlarmDistance
+              : null,
+        ),
         _audioFeedbackUtils =
             AudioFeedbackUtils(trackingSettings.audioFeedback),
         _heartRateUtils = trackingSettings.heartRateUtils.deviceId != null
@@ -53,11 +55,14 @@ class TrackingUtils extends ChangeNotifier {
       () => cardioSessionDescription.cardioSession,
       () => mode,
     );
+    _alarmUtils.setCallbacks(
+      () => cardioSessionDescription.cardioSession.track!,
+      () => mode,
+    );
   }
 
   static const _maxSpeed = 250; // km/ h
   static const currentDurationOffset = Duration(minutes: 1);
-  static const _minAlarmInterval = Duration(minutes: 1);
 
   final _dataProvider = CardioSessionDescriptionDataProvider();
 
@@ -100,14 +105,8 @@ class TrackingUtils extends ChangeNotifier {
 
   ElevationMapController? _elevationMapController;
 
-  bool _movingWhenPausedAlarmFired = false;
-  static const int _movingWhenPausedAlarmDistance = 50;
-  final int? _routeAlarmDistance;
-  DateTime? _lastAlarm;
-
-  final _tts = TtsUtils();
-
   final AudioFeedbackUtils _audioFeedbackUtils;
+  final AlarmUtils _alarmUtils;
 
   @override
   void dispose() {
@@ -290,40 +289,7 @@ class TrackingUtils extends ChangeNotifier {
     }
     await _trackingUiUtils.updateLocation(location);
 
-    await _movingWhenPausedAlarm(position);
-    await _routeAlarm(position);
     await _audioFeedbackUtils.onNewPosition();
-  }
-
-  Future<void> _movingWhenPausedAlarm(Position position) async {
-    if (!_trackingMode.isPaused) {
-      _movingWhenPausedAlarmFired = false;
-      return;
-    }
-    final lastPosition =
-        cardioSessionDescription.cardioSession.track?.lastOrNull;
-    if (!_movingWhenPausedAlarmFired && lastPosition != null) {
-      final distance = position.distanceTo(lastPosition);
-      if (distance > _movingWhenPausedAlarmDistance) {
-        _movingWhenPausedAlarmFired = true;
-        await _tts.speak(
-          "You more than $_movingWhenPausedAlarmDistance meters from the position where you paused recording. You may want to resume recording.",
-        );
-      }
-    }
-  }
-
-  Future<void> _routeAlarm(Position position) async {
-    if (_trackingMode.isTracking &&
-        _routeAlarmDistance != null &&
-        (_lastAlarm?.isBefore(DateTime.now().subtract(_minAlarmInterval)) ??
-            true)) {
-      final (distance, index) =
-          position.minDistanceTo(cardioSessionDescription.route!.track!);
-      if (distance > _routeAlarmDistance! && index != null) {
-        _lastAlarm = DateTime.now();
-        await _tts.speak("You are off route by ${distance.round()} meters.");
-      }
-    }
+    await _alarmUtils.onNewPosition(position);
   }
 }
