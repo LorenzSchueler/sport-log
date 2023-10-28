@@ -1,11 +1,20 @@
+import 'package:flutter/widgets.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
+import 'package:sport_log/pages/workout/charts/datetime_chart.dart';
+import 'package:sport_log/pages/workout/charts/datetime_charts/all_chart.dart';
+import 'package:sport_log/pages/workout/charts/datetime_charts/day_chart.dart';
+import 'package:sport_log/pages/workout/charts/datetime_charts/month_chart.dart';
+import 'package:sport_log/pages/workout/charts/datetime_charts/week_chart.dart';
+import 'package:sport_log/pages/workout/charts/datetime_charts/year_chart.dart';
 
-abstract class DateFilterState {
+sealed class DateFilterState {
   const DateFilterState();
 
   DateTime? get start;
 
   DateTime get end;
+
+  DateTime groupFunction(DateTime datetime);
 
   bool get goingForwardPossible => end.isBefore(DateTime.now());
 
@@ -18,6 +27,12 @@ abstract class DateFilterState {
 
   /// return static String with name of filter
   String get name;
+
+  Widget chart(
+    List<DateTimeChartValue> chartValues,
+    bool absolute,
+    ChartValueFormatter formatter,
+  );
 
   @override
   int get hashCode => Object.hash(runtimeType, start, end);
@@ -56,6 +71,9 @@ class DayFilter extends DateFilterState {
   DateTime get end => start.dayLater();
 
   @override
+  DateTime groupFunction(DateTime datetime) => datetime;
+
+  @override
   DayFilter get earlier => DayFilter._(start.dayEarlier());
 
   @override
@@ -66,6 +84,19 @@ class DayFilter extends DateFilterState {
 
   @override
   final String name = 'Day';
+
+  @override
+  Widget chart(
+    List<DateTimeChartValue> chartValues,
+    bool absolute,
+    ChartValueFormatter formatter,
+  ) {
+    return DayChart(
+      chartValues: chartValues,
+      absolute: absolute,
+      formatter: formatter,
+    );
+  }
 }
 
 class WeekFilter extends DateFilterState {
@@ -82,6 +113,9 @@ class WeekFilter extends DateFilterState {
   DateTime get end => start.weekLater();
 
   @override
+  DateTime groupFunction(DateTime datetime) => datetime.beginningOfDay();
+
+  @override
   WeekFilter get earlier => WeekFilter._(start.weekEarlier());
 
   @override
@@ -92,6 +126,20 @@ class WeekFilter extends DateFilterState {
 
   @override
   final String name = 'Week';
+
+  @override
+  Widget chart(
+    List<DateTimeChartValue> chartValues,
+    bool absolute,
+    ChartValueFormatter formatter,
+  ) {
+    return WeekChart(
+      chartValues: chartValues,
+      absolute: absolute,
+      formatter: formatter,
+      startDateTime: start,
+    );
+  }
 }
 
 class MonthFilter extends DateFilterState {
@@ -108,6 +156,9 @@ class MonthFilter extends DateFilterState {
   DateTime get end => start.monthLater();
 
   @override
+  DateTime groupFunction(DateTime datetime) => datetime.beginningOfDay();
+
+  @override
   MonthFilter get earlier => MonthFilter._(start.monthEarlier());
 
   @override
@@ -118,6 +169,20 @@ class MonthFilter extends DateFilterState {
 
   @override
   final String name = 'Month';
+
+  @override
+  Widget chart(
+    List<DateTimeChartValue> chartValues,
+    bool absolute,
+    ChartValueFormatter formatter,
+  ) {
+    return MonthChart(
+      chartValues: chartValues,
+      absolute: absolute,
+      formatter: formatter,
+      startDateTime: start,
+    );
+  }
 }
 
 class YearFilter extends DateFilterState {
@@ -134,6 +199,10 @@ class YearFilter extends DateFilterState {
   DateTime get end => start.yearLater();
 
   @override
+  DateTime groupFunction(DateTime datetime) =>
+      datetime.beginningOfMonth().add(const Duration(days: 15));
+
+  @override
   YearFilter get earlier => YearFilter._(start.yearEarlier());
 
   @override
@@ -144,6 +213,20 @@ class YearFilter extends DateFilterState {
 
   @override
   final String name = 'Year';
+
+  @override
+  Widget chart(
+    List<DateTimeChartValue> chartValues,
+    bool absolute,
+    ChartValueFormatter formatter,
+  ) {
+    return YearChart(
+      chartValues: chartValues,
+      absolute: absolute,
+      formatter: formatter,
+      startDateTime: start,
+    );
+  }
 }
 
 class AllFilter extends DateFilterState {
@@ -156,6 +239,10 @@ class AllFilter extends DateFilterState {
   DateTime get end => DateTime.now();
 
   @override
+  DateTime groupFunction(DateTime datetime) =>
+      datetime.beginningOfMonth().add(const Duration(days: 15));
+
+  @override
   DateFilterState get earlier => this;
 
   @override
@@ -166,4 +253,17 @@ class AllFilter extends DateFilterState {
 
   @override
   final String name = 'All';
+
+  @override
+  Widget chart(
+    List<DateTimeChartValue> chartValues,
+    bool absolute,
+    ChartValueFormatter formatter,
+  ) {
+    return AllChart(
+      chartValues: chartValues,
+      absolute: absolute,
+      formatter: formatter,
+    );
+  }
 }

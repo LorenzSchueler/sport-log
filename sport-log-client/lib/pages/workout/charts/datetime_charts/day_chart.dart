@@ -9,7 +9,7 @@ class DayChart extends DateTimePeriodChart {
   DayChart({
     required super.chartValues,
     required super.absolute,
-    required super.isTime,
+    required super.formatter,
     super.key,
   });
 
@@ -34,7 +34,7 @@ class DayChart extends DateTimePeriodChart {
         minY: minY,
         maxY: maxY,
         titlesData: titlesData(
-          getBottomTitles: (value, _) => Text("Set ${value.round()}"),
+          getBottomTitles: (value, _) => Text("Session ${value.round()}"),
         ),
         gridData: FlGridData(
           getDrawingHorizontalLine: gridLineDrawer(),

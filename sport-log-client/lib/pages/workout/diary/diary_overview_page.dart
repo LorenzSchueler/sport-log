@@ -98,6 +98,7 @@ class DiaryOverviewPage extends StatelessWidget {
                                         .toList(),
                                     dateFilterState: dataProvider.dateFilter,
                                     absolute: false,
+                                    formatter: ChartValueFormatter.float,
                                     aggregatorType: AggregatorType.avg,
                                   ),
                                   Defaults.sizedBox.vertical.normal,

@@ -10,7 +10,7 @@ class AllChart extends DateTimePeriodChart {
   AllChart({
     required super.chartValues,
     required super.absolute,
-    required super.isTime,
+    required super.formatter,
     super.key,
   });
 

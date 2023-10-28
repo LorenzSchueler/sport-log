@@ -2,11 +2,6 @@ import 'package:collection/collection.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
-import 'package:sport_log/pages/workout/charts/datetime_charts/all_chart.dart';
-import 'package:sport_log/pages/workout/charts/datetime_charts/day_chart.dart';
-import 'package:sport_log/pages/workout/charts/datetime_charts/month_chart.dart';
-import 'package:sport_log/pages/workout/charts/datetime_charts/week_chart.dart';
-import 'package:sport_log/pages/workout/charts/datetime_charts/year_chart.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_state.dart';
 
 class DateTimeChartValue {
@@ -17,6 +12,30 @@ class DateTimeChartValue {
 
   @override
   String toString() => "$datetime: $value";
+}
+
+enum ChartValueFormatter {
+  float,
+  hms,
+  ms,
+  msMilli;
+
+  double get width => switch (this) {
+        ChartValueFormatter.float => 40.0,
+        ChartValueFormatter.hms => 60.0,
+        ChartValueFormatter.ms => 40.0,
+        ChartValueFormatter.msMilli => 70.0,
+      };
+
+  Widget text(double value, TitleMeta meta) => switch (this) {
+        ChartValueFormatter.float => defaultGetTitle(value, meta),
+        ChartValueFormatter.hms =>
+          Text(Duration(milliseconds: value.round()).formatHms),
+        ChartValueFormatter.ms =>
+          Text(Duration(milliseconds: value.round()).formatM99S),
+        ChartValueFormatter.msMilli =>
+          Text(Duration(milliseconds: value.round()).formatMsMill),
+      };
 }
 
 enum AggregatorType {
@@ -43,6 +62,7 @@ class DateTimeChart extends StatelessWidget {
     required this.chartValues,
     required this.dateFilterState,
     required this.absolute,
+    required this.formatter,
     required this.aggregatorType,
     this.height = 200,
     super.key,
@@ -51,6 +71,7 @@ class DateTimeChart extends StatelessWidget {
   final List<DateTimeChartValue> chartValues;
   final DateFilterState dateFilterState;
   final bool absolute;
+  final ChartValueFormatter formatter;
   final AggregatorType aggregatorType;
   final double height;
 
@@ -58,7 +79,7 @@ class DateTimeChart extends StatelessWidget {
   Widget build(BuildContext context) {
     final chartValues = this
         .chartValues
-        .groupListsBy((v) => _groupFunction(v.datetime))
+        .groupListsBy((v) => dateFilterState.groupFunction(v.datetime))
         .entries
         .map(
           (entry) => DateTimeChartValue(
@@ -71,47 +92,8 @@ class DateTimeChart extends StatelessWidget {
 
     return SizedBox(
       height: height,
-      child: switch (dateFilterState.runtimeType) {
-        DayFilter _ => DayChart(
-            chartValues: chartValues,
-            absolute: absolute,
-            isTime: false,
-          ),
-        WeekFilter _ => WeekChart(
-            chartValues: chartValues,
-            absolute: absolute,
-            isTime: false,
-            startDateTime: dateFilterState.start!,
-          ),
-        MonthFilter _ => MonthChart(
-            chartValues: chartValues,
-            absolute: absolute,
-            isTime: false,
-            startDateTime: dateFilterState.start!,
-          ),
-        YearFilter _ => YearChart(
-            chartValues: chartValues,
-            absolute: absolute,
-            isTime: false,
-            startDateTime: dateFilterState.start!,
-          ),
-        _ => AllChart(
-            chartValues: chartValues,
-            absolute: absolute,
-            isTime: false,
-          ),
-      },
+      child: dateFilterState.chart(chartValues, absolute, formatter),
     );
-  }
-
-  DateTime _groupFunction(DateTime dateTime) {
-    return switch (dateFilterState.runtimeType) {
-      DayFilter _ => dateTime,
-      WeekFilter _ => dateTime.beginningOfDay(),
-      MonthFilter _ => dateTime.beginningOfDay(),
-      YearFilter _ => dateTime.beginningOfMonth().add(const Duration(days: 15)),
-      _ => dateTime.beginningOfMonth().add(const Duration(days: 15)),
-    };
   }
 }
 
@@ -119,7 +101,7 @@ abstract class DateTimePeriodChart extends StatelessWidget {
   DateTimePeriodChart({
     required this.chartValues,
     required this.absolute,
-    required this.isTime,
+    required this.formatter,
     super.key,
   })  : _maxY =
             (chartValues.map((v) => v.value).maxOrNull ?? 0).ceil().toDouble(),
@@ -130,7 +112,7 @@ abstract class DateTimePeriodChart extends StatelessWidget {
                 .toDouble();
 
   final List<DateTimeChartValue> chartValues;
-  final bool isTime;
+  final ChartValueFormatter formatter;
   final bool absolute;
   final double _maxY;
   final double _minY;
@@ -157,10 +139,8 @@ abstract class DateTimePeriodChart extends StatelessWidget {
       leftTitles: AxisTitles(
         sideTitles: SideTitles(
           showTitles: true,
-          reservedSize: isTime ? 60 : 40,
-          getTitlesWidget: (value, meta) => isTime
-              ? Text(Duration(milliseconds: value.round()).formatMsMill)
-              : defaultGetTitle(value, meta),
+          reservedSize: formatter.width,
+          getTitlesWidget: formatter.text,
         ),
       ),
     );

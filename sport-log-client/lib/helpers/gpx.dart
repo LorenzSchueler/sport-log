@@ -60,7 +60,7 @@ String trackToGpx(List<Position> track, {DateTime? startTime}) {
       )
       .toList();
   final gpx = Gpx()
-    ..creator = "Sport-Log-Client"
+    ..creator = "Sport Log"
     ..trks.add(Trk(trksegs: [Trkseg(trkpts: points)]));
   return GpxWriter().asString(gpx);
 }

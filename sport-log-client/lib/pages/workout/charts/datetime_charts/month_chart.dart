@@ -9,7 +9,7 @@ class MonthChart extends DateTimePeriodChart {
   MonthChart({
     required super.chartValues,
     required super.absolute,
-    required super.isTime,
+    required super.formatter,
     required this.startDateTime,
     super.key,
   });

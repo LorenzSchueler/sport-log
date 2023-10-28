@@ -8,20 +8,61 @@ import 'package:sport_log/pages/workout/charts/datetime_chart.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_state.dart';
 
 enum _SeriesType {
-  maxWeight('Max Weight', AggregatorType.max, false), // kg
-  avgWeight('Avg Weight', AggregatorType.avg, false), // kg
-  maxDistance('Max Distance', AggregatorType.max, true), // m
-  minTime('Best Time', AggregatorType.min, false), // mSecs
-  sumCalories('Total Calories', AggregatorType.sum, false), // cal
-  maxReps('Max Reps', AggregatorType.max, true), // reps
-  avgReps('Avg Reps', AggregatorType.avg, true), // reps
-  maxEorm('Eorm', AggregatorType.max, false), // kg
-  sumVolume('Total Volume', AggregatorType.sum, true); // kg
+  maxWeight(
+    'Max Weight',
+    AggregatorType.max,
+    ChartValueFormatter.float,
+    false,
+  ), // kg
+  avgWeight(
+    'Avg Weight',
+    AggregatorType.avg,
+    ChartValueFormatter.float,
+    false,
+  ), // kg
+  maxDistance(
+    'Max Distance',
+    AggregatorType.max,
+    ChartValueFormatter.float,
+    true,
+  ), // m
+  minTime(
+    'Best Time',
+    AggregatorType.min,
+    ChartValueFormatter.msMilli,
+    false,
+  ), // ms
+  sumCalories(
+    'Total Calories',
+    AggregatorType.sum,
+    ChartValueFormatter.float,
+    false,
+  ), // cal
+  maxReps(
+    'Max Reps',
+    AggregatorType.max,
+    ChartValueFormatter.float,
+    true,
+  ), // reps
+  avgReps(
+    'Avg Reps',
+    AggregatorType.avg,
+    ChartValueFormatter.float,
+    true,
+  ), // reps
+  maxEorm('Eorm', AggregatorType.max, ChartValueFormatter.float, false), // kg
+  sumVolume(
+    'Total Volume',
+    AggregatorType.sum,
+    ChartValueFormatter.float,
+    true,
+  ); // kg
 
-  const _SeriesType(this.name, this.aggregator, this.yFromZero);
+  const _SeriesType(this.name, this.aggregator, this.formatter, this.yFromZero);
 
   final String name;
   final AggregatorType aggregator;
+  final ChartValueFormatter formatter;
   final bool yFromZero;
 
   double? value(StrengthSessionStats stats) {
@@ -134,6 +175,7 @@ class _StrengthChartState extends State<StrengthChart> {
               .toList(),
           dateFilterState: widget.dateFilterState,
           absolute: _selectedSeries.yFromZero,
+          formatter: _selectedSeries.formatter,
           aggregatorType: _selectedSeries.aggregator,
         ),
       ],

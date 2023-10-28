@@ -6,17 +6,48 @@ import 'package:sport_log/pages/workout/charts/datetime_chart.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_state.dart';
 
 enum _SeriesType {
-  sumDistance('Sum Distance', AggregatorType.sum, true),
-  sumDuration('Sum Duration', AggregatorType.sum, true),
-  avgSpeed('Avg Speed', AggregatorType.avg, true),
-  avgTempo('Avg Tempo', AggregatorType.avg, true),
-  avgCadence('Avg Cadence', AggregatorType.avg, false),
-  avgHeartRate('Avg Heart Rate', AggregatorType.avg, false);
+  sumDistance(
+    'Sum Distance',
+    AggregatorType.sum,
+    ChartValueFormatter.float,
+    true,
+  ), // m
+  sumDuration(
+    'Sum Duration',
+    AggregatorType.sum,
+    ChartValueFormatter.hms,
+    true,
+  ), // ms
+  avgSpeed(
+    'Avg Speed',
+    AggregatorType.avg,
+    ChartValueFormatter.float,
+    true,
+  ), // m/s
+  avgTempo(
+    'Avg Tempo',
+    AggregatorType.avg,
+    ChartValueFormatter.ms,
+    true,
+  ), // ms/km
+  avgCadence(
+    'Avg Cadence',
+    AggregatorType.avg,
+    ChartValueFormatter.float,
+    false,
+  ), // rpm
+  avgHeartRate(
+    'Avg Heart Rate',
+    AggregatorType.avg,
+    ChartValueFormatter.float,
+    false,
+  ); // bpm
 
-  const _SeriesType(this.name, this.aggregator, this.yFromZero);
+  const _SeriesType(this.name, this.aggregator, this.formatter, this.yFromZero);
 
   final String name;
   final AggregatorType aggregator;
+  final ChartValueFormatter formatter;
   final bool yFromZero;
 
   double? value(CardioSession cardioSession) {
@@ -25,13 +56,11 @@ enum _SeriesType {
         final distance = cardioSession.distance;
         return distance == null ? null : distance / 1000;
       case _SeriesType.sumDuration:
-        final seconds = cardioSession.time?.inSeconds;
-        return seconds == null ? null : seconds / 3600;
+        return cardioSession.time?.inMilliseconds.toDouble();
       case _SeriesType.avgSpeed:
         return cardioSession.speed;
       case _SeriesType.avgTempo:
-        final seconds = cardioSession.tempo?.inSeconds;
-        return seconds == null ? null : seconds / 60;
+        return cardioSession.tempo?.inMilliseconds.toDouble();
       case _SeriesType.avgCadence:
         return cardioSession.avgCadence?.toDouble();
       case _SeriesType.avgHeartRate:
@@ -93,6 +122,7 @@ class _CardioChartState extends State<CardioChart> {
               .toList(),
           dateFilterState: widget.dateFilterState,
           absolute: _selectedSeries.yFromZero,
+          formatter: _selectedSeries.formatter,
           aggregatorType: _selectedSeries.aggregator,
         ),
       ],
