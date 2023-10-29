@@ -1,12 +1,11 @@
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_log/data_provider/data_providers/diary_data_provider.dart';
 import 'package:sport_log/data_provider/overview_data_provider.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/models/diary/diary.dart';
-import 'package:sport_log/pages/workout/charts/datetime_chart.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_state.dart';
+import 'package:sport_log/pages/workout/diary/diary_chart.dart';
 import 'package:sport_log/pages/workout/overview_card.dart';
 import 'package:sport_log/pages/workout/session_tab_utils.dart';
 import 'package:sport_log/routes.dart';
@@ -83,23 +82,9 @@ class DiaryOverviewPage extends StatelessWidget {
                               SliverList.list(
                                 children: [
                                   Defaults.sizedBox.vertical.normal,
-                                  DateTimeChart(
-                                    chartValues: dataProvider.entities
-                                        .map((s) {
-                                          final value = s.bodyweight;
-                                          return value == null
-                                              ? null
-                                              : DateTimeChartValue(
-                                                  datetime: s.date,
-                                                  value: value,
-                                                );
-                                        })
-                                        .whereNotNull()
-                                        .toList(),
+                                  DiaryChart(
+                                    diaries: dataProvider.entities,
                                     dateFilterState: dataProvider.dateFilter,
-                                    absolute: false,
-                                    formatter: ChartValueFormatter.float,
-                                    aggregatorType: AggregatorType.avg,
                                   ),
                                   Defaults.sizedBox.vertical.normal,
                                 ],
