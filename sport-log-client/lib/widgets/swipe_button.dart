@@ -62,7 +62,7 @@ class SwipeButtonState extends State<SwipeButton>
               height: widget.height,
               decoration: BoxDecoration(
                 color: widget.backgroundColor ??
-                    Theme.of(context).colorScheme.surface,
+                    Theme.of(context).colorScheme.surfaceVariant,
                 borderRadius: widget.borderRadius,
               ),
             ),
