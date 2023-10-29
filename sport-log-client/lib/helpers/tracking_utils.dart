@@ -74,11 +74,8 @@ class TrackingUtils extends ChangeNotifier {
   TrackingMode _trackingMode = TrackingMode.notStarted;
   TrackingMode get mode => _trackingMode;
 
-  late DateTime _lastResumeTime;
-  Duration _lastStopDuration = Duration.zero;
-  Duration get currentDuration => _trackingMode.isTracking
-      ? _lastStopDuration + DateTime.now().difference(_lastResumeTime)
-      : _lastStopDuration;
+  final Stopwatch _stopwatch = Stopwatch();
+  Duration get currentDuration => _stopwatch.elapsed;
 
   String _locationInfo = "no data";
   String get locationInfo => _locationInfo;
@@ -143,22 +140,22 @@ class TrackingUtils extends ChangeNotifier {
   }
 
   void start() {
+    _stopwatch.start();
     _trackingMode = TrackingMode.tracking;
-    _lastResumeTime = DateTime.now();
-    _cardioSessionDescription.cardioSession.datetime = _lastResumeTime;
+    _cardioSessionDescription.cardioSession.datetime = DateTime.now();
     _audioFeedbackUtils.onStart();
     notifyListeners();
   }
 
   void resume() {
+    _stopwatch.start();
     _trackingMode = TrackingMode.tracking;
-    _lastResumeTime = DateTime.now();
     notifyListeners();
   }
 
   void pause() {
     _trackingMode = TrackingMode.paused;
-    _lastStopDuration += DateTime.now().difference(_lastResumeTime);
+    _stopwatch.stop();
     notifyListeners();
   }
 
