@@ -73,6 +73,24 @@ class _MapStylesBottomSheetState extends State<MapStylesBottomSheet> {
   Set<_MapOption> _options = {};
   String _style = MapboxStyles.OUTDOORS;
 
+  // based on mapbox SATELLITE_STREETS
+  // road network - surface: road-street
+  //     opacity: 0.5
+  // road network - surface: road-minor
+  //     color: hsl(35, 80%, 48%)
+  //     opacity: 1
+  //     width: 2
+  //     dash-array: 5, 2
+  // road network - surface: road-minor-case
+  //     color: hsl(35, 80%, 0%)
+  // walking, cycling, etc - surface - road-path
+  //     color: hsl(35, 80%, 48%)
+  //     opacity: 1
+  //     width: 2
+  //     dash-array: 2, 1
+  static const String satelliteStreetsWithPaths =
+      "mapbox://styles/hi-ker/cloa9i53h011s01qsdf867pcy";
+
   final style = ButtonStyle(
     shape: MaterialStateProperty.all(const CircleBorder()),
     padding: MaterialStateProperty.all(const EdgeInsets.all(10)),
@@ -142,7 +160,7 @@ class _MapStylesBottomSheetState extends State<MapStylesBottomSheet> {
                 label: Text("Street"),
               ),
               ButtonSegment(
-                value: MapboxStyles.SATELLITE,
+                value: satelliteStreetsWithPaths,
                 icon: Icon(AppIcons.satellite),
                 label: Text("Satellite"),
               ),
