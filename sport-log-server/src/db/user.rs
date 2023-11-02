@@ -14,7 +14,7 @@ use crate::{auth::AuthUser, db::*};
 #[derive(Db, GetById, GetByIds, VerifyUnchecked, VerifyForAdminWithoutDb)]
 pub struct UserDb;
 
-/// Same as trait [`Create`](crate::db::Create) but with mutable references
+/// Same as trait [`Create`] but with mutable references
 impl UserDb {
     pub fn create(user: &mut <Self as Db>::Type, db: &mut PgConnection) -> QueryResult<usize> {
         let salt = SaltString::generate(&mut OsRng);
@@ -42,7 +42,7 @@ impl UserDb {
     }
 }
 
-/// Same as trait [`Update`](crate::db::Update) but with mutable references
+/// Same as trait [`Update`] but with mutable references
 impl UserDb {
     pub fn update(user: &mut <Self as Db>::Type, db: &mut PgConnection) -> QueryResult<usize> {
         let salt = SaltString::generate(&mut OsRng);
