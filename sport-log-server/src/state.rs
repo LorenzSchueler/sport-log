@@ -3,9 +3,9 @@ use axum::{
     extract::{FromRef, FromRequestParts},
     http::{request::Parts, StatusCode},
 };
-use diesel_async::{
-    pooled_connection::deadpool::{Object, Pool},
-    AsyncPgConnection,
+use diesel::{
+    r2d2::{ConnectionManager, Pool, PooledConnection},
+    PgConnection,
 };
 
 use crate::Config;
@@ -16,8 +16,8 @@ pub struct AppState {
     pub config: &'static Config,
 }
 
-pub type DbPool = Pool<AsyncPgConnection>;
-pub type DbConn = Object<AsyncPgConnection>;
+pub type DbPool = Pool<ConnectionManager<PgConnection>>;
+pub type DbConn = PooledConnection<ConnectionManager<PgConnection>>;
 
 impl FromRef<AppState> for &'static Config {
     fn from_ref(state: &AppState) -> Self {
@@ -36,7 +36,6 @@ impl FromRequestParts<AppState> for DbConn {
         state
             .db_pool
             .get()
-            .await
             .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)
     }
 }

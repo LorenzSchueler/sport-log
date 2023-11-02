@@ -18,11 +18,9 @@ use std::env;
 use axum::{Router, Server};
 #[cfg_attr(test, macro_use)]
 extern crate lazy_static;
-use diesel::Connection;
-use diesel_async::{
-    async_connection_wrapper::AsyncConnectionWrapper,
-    pooled_connection::{deadpool::Pool, AsyncDieselConnectionManager},
-    AsyncPgConnection,
+use diesel::{
+    r2d2::{ConnectionManager, Pool},
+    PgConnection,
 };
 use diesel_migrations::{EmbeddedMigrations, HarnessWithOutput, MigrationHarness};
 use tokio::fs;
@@ -70,27 +68,18 @@ async fn get_config() -> Result<Config, String> {
     toml::from_str(&config_file).map_err(|err| format!("failed to parse config file: {err}"))
 }
 
-async fn get_db_pool(config: &Config) -> Result<DbPool, String> {
-    let db_config = AsyncDieselConnectionManager::<AsyncPgConnection>::new(&config.database_url);
-    let pool = Pool::builder(db_config)
-        .build()
+fn get_db_pool(config: &Config) -> Result<DbPool, String> {
+    let pool = Pool::new(ConnectionManager::<PgConnection>::new(&config.database_url))
         .map_err(|err| format!("failed to create database connection pool: {err}"))?;
 
+    let mut db = pool.get().map_err(|err| {
+        format!("failed to retrieve database connection from connection pool: {err}")
+    })?;
+
     info!("running database migrations...");
-    let db_url = config.database_url.clone();
-    tokio::task::spawn_blocking(move || {
-        let mut conn = AsyncConnectionWrapper::<AsyncPgConnection>::establish(&db_url)
-            .map_err(|err| format!("failed to create migration database connection: {err}"))?;
-
-        HarnessWithOutput::new(&mut conn, std::io::stderr())
-            .run_pending_migrations(MIGRATIONS)
-            .map_err(|err| format!("failed to run database migrations: {err}"))?;
-
-        Result::<(), String>::Ok(())
-    })
-    .await
-    .map_err(|err| format!("failed to run database migrations: {err}"))??;
-
+    HarnessWithOutput::new(&mut db, std::io::stderr())
+        .run_pending_migrations(MIGRATIONS)
+        .map_err(|err| format!("failed to run database migrations: {err}"))?;
     info!("database is up to date");
 
     Ok(pool)
@@ -124,7 +113,7 @@ async fn main() {
         }
     };
 
-    let db_pool = match get_db_pool(config).await {
+    let db_pool = match get_db_pool(config) {
         Ok(db_pool) => db_pool,
         Err(err) => {
             error!("{}", err);

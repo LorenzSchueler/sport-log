@@ -20,10 +20,8 @@ pub async fn get_account_data(
     mut db: DbConn,
 ) -> HandlerResult<Json<AccountData>> {
     match last_sync {
-        Some(last_sync) => {
-            AccountDataDb::get_by_user_and_last_sync(*auth, last_sync, &mut db).await
-        }
-        None => AccountDataDb::get_by_user(*auth, &mut db).await,
+        Some(last_sync) => AccountDataDb::get_by_user_and_last_sync(*auth, last_sync, &mut db),
+        None => AccountDataDb::get_by_user(*auth, &mut db),
     }
     .map(Json)
     .map_err(Into::into)
