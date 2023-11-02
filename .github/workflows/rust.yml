@@ -336,8 +336,7 @@ jobs:
         curl -f -u $USERNAME:$PASSWORD "$BASE_URL/v0.3/account_data" \
             -H 'Accept: application/json' 
         
-        # entities=(diary strength_session strength_set metcon_session route cardio_session platform_credential action_rule action_event) # TODO cardio and route broken because of diesel-async
-        entities=(movement diary strength_session strength_set metcon metcon_movement metcon_session platform_credential action_rule action_event)
+        entities=(movement diary strength_session strength_set metcon metcon_movement metcon_session route cardio_session platform_credential action_rule action_event)
         for entity in "${entities[@]}"; do
             echo -e "\n\nPOST $BASE_URL/v0.3/$entity"
             curl -f -u $USERNAME:$PASSWORD -X POST "$BASE_URL/v0.3/$entity" \
