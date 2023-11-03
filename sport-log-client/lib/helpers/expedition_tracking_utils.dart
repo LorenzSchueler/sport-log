@@ -31,6 +31,7 @@ class ExpeditionData {
 class ExpeditionTrackingUtils extends ChangeNotifier {
   ExpeditionTrackingUtils._(
     this._cardioSessionDescription,
+    this._trackingUiUtils,
     this._expeditionData,
     this._attached,
   )   : assert(_expeditionData.trackingTimes.isNotEmpty),
@@ -58,8 +59,13 @@ class ExpeditionTrackingUtils extends ChangeNotifier {
       cardioId: cardioId,
       trackingTimes: trackingSettings.expeditionTrackingTimes!.toList(),
     );
+    final trackingUiUtils = TrackingUiUtils(
+      trackingSettings.route,
+      trackingSettings.cardioSession,
+    );
     return ExpeditionTrackingUtils._(
       cardioSessionDescription,
+      trackingUiUtils,
       expeditionData,
       false,
     );
@@ -68,8 +74,10 @@ class ExpeditionTrackingUtils extends ChangeNotifier {
   // ignore: prefer_constructors_over_static_methods
   static ExpeditionTrackingUtils attach() {
     assert(running);
+    final trackingUiUtils = TrackingUiUtils(null, null);
     return ExpeditionTrackingUtils._(
       null,
+      trackingUiUtils,
       Settings.instance.expeditionData!,
       true,
     );
@@ -77,7 +85,7 @@ class ExpeditionTrackingUtils extends ChangeNotifier {
 
   final _logger = Logger("ExpeditionTrackingUtils");
   final _dataProvider = CardioSessionDescriptionDataProvider();
-  final TrackingUiUtils _trackingUiUtils = TrackingUiUtils();
+  final TrackingUiUtils _trackingUiUtils;
 
   // in create then already set; if attach then loaded in onMapCreated
   CardioSessionDescription? _cardioSessionDescription;
@@ -100,11 +108,10 @@ class ExpeditionTrackingUtils extends ChangeNotifier {
     _cardioSessionDescription ??= (await _dataProvider
         // ignore: unnecessary_null_checks
         .getById(Settings.instance.expeditionData!.cardioId))!;
+    // set cardio session if attached and therefor not available in initialization
+    // _trackingUiUtils.setCardioSession(_cardioSessionDescription.cardioSession); // TODO
     notifyListeners();
-    await _trackingUiUtils.onMapCreated(
-      mapController,
-      cardioSessionDescription?.route,
-    );
+    await _trackingUiUtils.onMapCreated(mapController);
     await _trackingUiUtils
         .updateTrack(cardioSessionDescription?.cardioSession.track);
     _refreshTimer =

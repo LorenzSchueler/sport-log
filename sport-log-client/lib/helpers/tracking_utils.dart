@@ -40,6 +40,10 @@ class TrackingUtils extends ChangeNotifier {
           movement: trackingSettings.movement,
           route: trackingSettings.route,
         ),
+        _trackingUiUtils = TrackingUiUtils(
+          trackingSettings.route,
+          trackingSettings.cardioSession,
+        ),
         _alarmUtils = AlarmUtils(
           trackingSettings.route?.track != null
               ? trackingSettings.routeAlarmDistance
@@ -87,7 +91,7 @@ class TrackingUtils extends ChangeNotifier {
   Timer? _refreshTimer;
   Timer? _autosaveTimer;
 
-  final TrackingUiUtils _trackingUiUtils = TrackingUiUtils();
+  final TrackingUiUtils _trackingUiUtils;
   void setCenterLocation(bool centerLocation) => _trackingUiUtils
       .setCenterLocation(centerLocation, _locationUtils.lastLatLng);
 
@@ -117,10 +121,7 @@ class TrackingUtils extends ChangeNotifier {
   }
 
   Future<void> onMapCreated(MapController mapController) async {
-    await _trackingUiUtils.onMapCreated(
-      mapController,
-      cardioSessionDescription.route,
-    );
+    await _trackingUiUtils.onMapCreated(mapController);
     _refreshTimer =
         Timer.periodic(const Duration(seconds: 1), (_) => _refresh());
     _autosaveTimer = Timer.periodic(
@@ -221,6 +222,7 @@ class TrackingUtils extends ChangeNotifier {
     _cardioSessionDescription.cardioSession.setAvgCadence();
     _cardioSessionDescription.cardioSession.setAvgHeartRate();
     _cardioSessionDescription.cardioSession.setDistance();
+    _trackingUiUtils.updateSessionProgressMarker(currentDuration);
     notifyListeners();
   }
 
