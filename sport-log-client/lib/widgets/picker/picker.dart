@@ -323,21 +323,22 @@ Future<Route?> showRoutePicker({
 }
 
 // ignore: long-parameter-list
-Future<CardioSessionDescription?> showCardioSessionPicker({
-  required CardioSessionDescription? selectedCardioSession,
-  required List<CardioSessionDescription> cardioSessions,
+Future<CardioSession?> showProvidedCardioSessionPicker({
+  required CardioSession? selected,
+  required Movement movement,
+  required List<CardioSession> cardioSessions,
   bool dismissible = true,
   required BuildContext context,
 }) async {
   FocusManager.instance.primaryFocus?.unfocus();
   return context.mounted
-      ? showDialog<CardioSessionDescription>(
+      ? showDialog<CardioSession>(
           builder: (_) => Picker(
-            selectedItem: selectedCardioSession,
+            selectedItem: selected,
             items: cardioSessions,
-            compareWith: (csd) => csd.cardioSession.id,
-            title: (csd) => csd.movement.name,
-            subtitle: (csd) => csd.cardioSession.datetime.humanDateTime,
+            compareWith: (cs) => cs.id,
+            title: (_) => movement.name,
+            subtitle: (cs) => cs.datetime.humanDateTime,
           ),
           barrierDismissible: dismissible,
           context: context,

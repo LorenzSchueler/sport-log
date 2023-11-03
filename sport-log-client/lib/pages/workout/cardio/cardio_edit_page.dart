@@ -190,18 +190,17 @@ class _CardioEditPageState extends State<CardioEditPage> {
       movement: _cardioSessionDescription.movement,
       comment: null,
     ))
+        .map((csd) => csd.cardioSession)
         .where(
-          (s) =>
-              s.cardioSession.id != session.id &&
-              s.cardioSession.time != null &&
-              s.cardioSession.track != null,
+          (cs) => cs.id != session.id && cs.time != null && cs.track != null,
         )
         .toList();
     if (!mounted) {
       return;
     }
-    final otherSession = await showCardioSessionPicker(
-      selectedCardioSession: null,
+    final otherSession = await showProvidedCardioSessionPicker(
+      selected: null,
+      movement: _cardioSessionDescription.movement,
       cardioSessions: sessions,
       context: context,
     );
@@ -209,7 +208,7 @@ class _CardioEditPageState extends State<CardioEditPage> {
       return;
     }
 
-    final combinedSession = session.combineWith(otherSession.cardioSession);
+    final combinedSession = session.combineWith(otherSession);
     if (combinedSession == null) {
       return;
     }
