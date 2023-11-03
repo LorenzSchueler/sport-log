@@ -1,3 +1,4 @@
+import 'package:fixnum/fixnum.dart';
 import 'package:sport_log/database/database.dart';
 import 'package:sport_log/database/table.dart';
 import 'package:sport_log/database/table_accessor.dart';
@@ -119,6 +120,29 @@ class CardioSessionTable extends TableAccessor<CardioSession> {
       orderBy: orderByDatetime,
     );
     return records.map(serde.fromDbRecord).toList();
+  }
+
+  Future<List<(Int64, DateTime)>> getIdDatetimeByMovementWithTrack({
+    required Movement movement,
+    required bool hasTrack,
+  }) async {
+    final records = await database.query(
+      tableName,
+      columns: [Columns.id, Columns.datetime],
+      where: TableAccessor.combineFilter(
+        [notDeleted, movementIdFilter(movement), if (hasTrack) withTrack],
+      ),
+      orderBy: orderByDatetime,
+    );
+
+    return records
+        .map(
+          (r) => (
+            Int64(r[Columns.id]! as int),
+            DateTime.parse(r[Columns.datetime]! as String),
+          ),
+        )
+        .toList();
   }
 }
 

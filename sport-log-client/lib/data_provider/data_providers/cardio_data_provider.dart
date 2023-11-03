@@ -60,6 +60,15 @@ class CardioSessionDataProvider extends EntityDataProvider<CardioSession> {
         .where((c) => cardioSessionDescription.cardioSession.id != c.id)
         .toList();
   }
+
+  Future<List<(Int64, DateTime)>> getIdDatetimeByMovementWithTrack({
+    required Movement movement,
+    required bool hasTrack,
+  }) =>
+      table.getIdDatetimeByMovementWithTrack(
+        movement: movement,
+        hasTrack: hasTrack,
+      );
 }
 
 class CardioSessionDescriptionDataProvider

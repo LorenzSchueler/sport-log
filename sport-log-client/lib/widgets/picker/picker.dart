@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:fixnum/fixnum.dart';
 import 'package:flutter/material.dart' hide Action, Route;
 import 'package:sport_log/data_provider/data_providers/cardio_data_provider.dart';
 import 'package:sport_log/data_provider/data_providers/metcon_data_provider.dart';
@@ -343,6 +344,38 @@ Future<CardioSession?> showProvidedCardioSessionPicker({
           barrierDismissible: dismissible,
           context: context,
         )
+      : null;
+}
+
+Future<CardioSession?> showCardioSessionPicker({
+  required CardioSession? selected,
+  required Movement movement,
+  required bool hasTrack,
+  bool dismissible = true,
+  required BuildContext context,
+}) async {
+  FocusManager.instance.primaryFocus?.unfocus();
+  final idDatetimes =
+      await CardioSessionDataProvider().getIdDatetimeByMovementWithTrack(
+    movement: movement,
+    hasTrack: hasTrack,
+  );
+  if (!context.mounted) {
+    return null;
+  }
+  final newSelected = await showDialog<(Int64, DateTime)>(
+    builder: (_) => Picker(
+      selectedItem: selected != null ? (selected.id, selected.datetime) : null,
+      items: idDatetimes,
+      compareWith: (idDatetime) => idDatetime.$1,
+      title: (_) => movement.name,
+      subtitle: (idDatetime) => idDatetime.$2.humanDateTime,
+    ),
+    barrierDismissible: dismissible,
+    context: context,
+  );
+  return newSelected != null
+      ? CardioSessionDataProvider().getById(newSelected.$1)
       : null;
 }
 
