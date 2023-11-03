@@ -36,6 +36,13 @@ class TrackingSettings extends ChangeNotifier {
     notifyListeners();
   }
 
+  CardioSession? _cardioSession;
+  CardioSession? get cardioSession => _cardioSession;
+  set cardioSession(CardioSession? cardioSession) {
+    _cardioSession = cardioSession;
+    notifyListeners();
+  }
+
   Route? _route;
   Route? get route => _route;
   set route(Route? route) {

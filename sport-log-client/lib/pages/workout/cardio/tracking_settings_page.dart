@@ -59,7 +59,30 @@ class CardioTrackingSettingsPage extends StatelessWidget {
                 },
               ),
               EditTile(
-                leading: AppIcons.map,
+                leading: AppIcons.stopwatch,
+                caption: "Session to follow",
+                child: Text(
+                  trackingSettings.cardioSession?.datetime.humanDate ??
+                      "No Session",
+                ),
+                onTap: () async {
+                  final session = await showCardioSessionPicker(
+                    selected: trackingSettings.cardioSession,
+                    movement: trackingSettings.movement,
+                    hasTrack: true,
+                    context: context,
+                  );
+                  if (session == null) {
+                    return;
+                  } else if (session.id == trackingSettings.cardioSession?.id) {
+                    trackingSettings.cardioSession = null;
+                  } else {
+                    trackingSettings.cardioSession = session;
+                  }
+                },
+              ),
+              EditTile(
+                leading: AppIcons.route,
                 caption: "Route to follow",
                 child: Text(trackingSettings.route?.name ?? "No Route"),
                 onTap: () async {
@@ -101,20 +124,22 @@ class CardioTrackingSettingsPage extends StatelessWidget {
                     ),
                   ),
               ],
-              EditTile.Switch(
-                leading: AppIcons.mountains,
-                trailing: AppIcons.info,
-                caption: "Expedition Mode",
-                value: trackingSettings.expeditionMode,
-                onChanged: (expeditionMode) =>
-                    trackingSettings.expeditionMode = expeditionMode,
-                onTrailingTap: () => showMessageDialog(
-                  context: context,
-                  title: "Expedition Tracking",
-                  text:
-                      "Expedition tracking allows to track the location for a long time without draining the battery too much.\nThe location will be determined only at the defined tracking times. Once the location is found or if the location is not found within 5 minutes, tracking is suspended until the next tracking time. Notice however, that checking whether a new location is needed is done only every 15 minutes. This means that the location fix can be up to 15 + 5 minutes delayed.\nIf the app is closed tracking continues, however if the app is killed, tracking stops.",
+              if (false)
+                // ignore: dead_code
+                EditTile.Switch(
+                  leading: AppIcons.mountains,
+                  trailing: AppIcons.info,
+                  caption: "Expedition Mode",
+                  value: trackingSettings.expeditionMode,
+                  onChanged: (expeditionMode) =>
+                      trackingSettings.expeditionMode = expeditionMode,
+                  onTrailingTap: () => showMessageDialog(
+                    context: context,
+                    title: "Expedition Tracking",
+                    text:
+                        "Expedition tracking allows to track the location for a long time without draining the battery too much.\nThe location will be determined only at the defined tracking times. Once the location is found or if the location is not found within 5 minutes, tracking is suspended until the next tracking time. Notice however, that checking whether a new location is needed is done only every 15 minutes. This means that the location fix can be up to 15 + 5 minutes delayed.\nIf the app is closed tracking continues, however if the app is killed, tracking stops.",
+                  ),
                 ),
-              ),
               if (trackingSettings.expeditionMode)
                 Padding(
                   // 24 icon + 15 padding
