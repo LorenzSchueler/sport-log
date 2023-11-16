@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:mapbox_search/mapbox_search.dart';
+import 'package:mapbox_search/mapbox_search.dart' hide Color;
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/bool_toggle.dart';
 import 'package:sport_log/helpers/map_search_utils.dart';
@@ -17,6 +17,8 @@ class MapPage extends StatelessWidget {
   static const _searchBackgroundColor = Color.fromARGB(150, 255, 255, 255);
 
   final _searchBar = FocusNode();
+
+  final _searchController = TextEditingController();
 
   Future<void> _onDrawerChanged(bool open) async {
     if (open) {
@@ -54,20 +56,21 @@ class MapPage extends StatelessWidget {
             extendBodyBehindAppBar: true,
             appBar: showOverlays.isOn
                 ? AppBar(
-                    title: searchUtils.search == null
-                        ? null
-                        : TextFormField(
+                    title: searchUtils.isSearchActive
+                        ? TextFormField(
+                            controller: _searchController,
                             focusNode: _searchBar,
                             onChanged: searchUtils.searchPlaces,
                             onTap: () => searchUtils
-                                .searchPlaces(searchUtils.search ?? ""),
+                                .searchPlaces(_searchController.text),
                             style: const TextStyle(color: Colors.black),
-                          ),
+                          )
+                        : null,
                     actions: [
                       IconButton(
                         onPressed: () => searchUtils.toggleSearch(_searchBar),
                         icon: Icon(
-                          searchUtils.search != null
+                          searchUtils.isSearchActive
                               ? AppIcons.close
                               : AppIcons.search,
                         ),
@@ -93,14 +96,18 @@ class MapPage extends StatelessWidget {
                   showOverlays: showOverlays.isOn,
                   buttonTopOffset: 100,
                   onMapCreated: searchUtils.setMapController,
-                  onTap: (_) => showOverlays.toggle(),
+                  onTap: (_) => searchUtils.isSearchActive
+                      ? searchUtils.toggleSearch(_searchBar)
+                      : showOverlays.toggle(),
                 ),
-                if (showOverlays.isOn && searchUtils.searchResults.isNotEmpty)
+                if (showOverlays.isOn &&
+                    searchUtils.searchResults != null &&
+                    searchUtils.searchResults!.isNotEmpty)
                   SafeArea(
                     child: Align(
                       alignment: Alignment.topCenter,
                       child: MapSearchResults(
-                        searchResults: searchUtils.searchResults,
+                        searchResults: searchUtils.searchResults!,
                         backgroundColor: _searchBackgroundColor,
                         onItemTap: searchUtils.goToSearchItem,
                       ),
@@ -125,7 +132,7 @@ class MapSearchResults extends StatelessWidget {
 
   final List<MapBoxPlace> searchResults;
   final Color backgroundColor;
-  final void Function(int) onItemTap;
+  final void Function(MapBoxPlace) onItemTap;
 
   @override
   Widget build(BuildContext context) {
@@ -141,7 +148,7 @@ class MapSearchResults extends StatelessWidget {
           child: ListView.separated(
             padding: EdgeInsets.zero,
             itemBuilder: (context, index) => GestureDetector(
-              onTap: () => onItemTap(index),
+              onTap: () => onItemTap(searchResults[index]),
               child: Text(
                 searchResults[index].placeName ?? "unknown",
                 style: const TextStyle(color: Colors.black),

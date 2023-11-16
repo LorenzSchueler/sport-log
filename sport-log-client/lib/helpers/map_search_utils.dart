@@ -9,61 +9,63 @@ import 'package:sport_log/helpers/map_controller.dart';
 import 'package:sport_log/widgets/snackbar.dart';
 
 class MapSearchUtils extends ChangeNotifier {
-  final _placesSearch =
-      PlacesSearch(apiKey: Config.instance.accessToken, limit: 10);
+  final _searchApi = GeoCoding(
+    apiKey: Config.instance.accessToken,
+    limit: 10,
+    types: PlaceType.values,
+  );
   MapController? _mapController;
   void setMapController(MapController mapController) =>
       _mapController = mapController;
 
-  String? _search;
-  String? get search => _search;
-  List<MapBoxPlace> _searchResults = [];
-  List<MapBoxPlace> get searchResults => _searchResults;
+  List<MapBoxPlace>? _searchResults;
+  List<MapBoxPlace>? get searchResults => _searchResults;
+  bool get isSearchActive => _searchResults != null;
 
   void toggleSearch(FocusNode searchBar) {
-    _search = _search == null ? "" : null;
-    if (_search == null) {
-      _searchResults = [];
-    }
+    _searchResults = _searchResults == null ? [] : null;
     notifyListeners();
-    if (_search != null) {
+    if (_searchResults != null) {
       searchBar.requestFocus();
     }
   }
 
   Future<void> searchPlaces(String name) async {
-    _search = name;
     notifyListeners();
-    List<MapBoxPlace>? places;
     try {
-      places = await _placesSearch.getPlaces(_search!);
+      final pos = await _mapController?.center;
+      final places = await _searchApi.getPlaces(
+        name,
+        proximity: pos != null
+            ? Proximity.LatLong(lat: pos.lat, long: pos.lng)
+            : Proximity.LocationNone(),
+      );
+      _searchResults = places.success ?? [];
+      notifyListeners();
     } on SocketException {
       final context = App.globalContext;
       if (context.mounted) {
         showNoInternetToast(context);
       }
     }
-    _searchResults = places ?? [];
-    notifyListeners();
   }
 
-  Future<void> goToSearchItem(int index) async {
+  Future<void> goToSearchItem(MapBoxPlace place) async {
     FocusManager.instance.primaryFocus?.unfocus();
-    final item = _searchResults[index];
-    _searchResults = [];
+    _searchResults = null;
     notifyListeners();
 
-    final bbox = item.bbox;
-    final center = item.center;
+    final bbox = place.bbox;
+    final center = place.center;
     if (bbox != null) {
       final bounds = [
-        LatLng(lat: bbox[1], lng: bbox[0]),
-        LatLng(lat: bbox[3], lng: bbox[2]),
+        LatLng(lat: bbox.min.lat, lng: bbox.min.long),
+        LatLng(lat: bbox.max.lat, lng: bbox.max.long),
       ].latLngBounds!;
       await _mapController?.setBoundsX(bounds, padded: false);
     } else if (center != null) {
       await _mapController
-          ?.animateCenter(LatLng(lat: center[1], lng: center[0]));
+          ?.animateCenter(LatLng(lat: center.lat, lng: center.long));
       await _mapController?.setZoom(16);
     }
   }
