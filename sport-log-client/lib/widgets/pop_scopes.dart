@@ -8,7 +8,7 @@ class NeverPop extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(child: child, onWillPop: () async => false);
+    return PopScope(canPop: false, child: child);
   }
 }
 
@@ -18,17 +18,25 @@ class DiscardWarningOnPop extends StatelessWidget {
   final Widget child;
   final void Function()? onDiscard;
 
+  Future<void> onPopInvoked(BuildContext context, bool didPop) async {
+    if (didPop) {
+      return;
+    }
+    final discard = await showDiscardWarningDialog(context);
+    if (discard) {
+      onDiscard?.call();
+      if (context.mounted) {
+        Navigator.of(context).pop();
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (didPop) => onPopInvoked(context, didPop),
       child: child,
-      onWillPop: () async {
-        final discard = await showDiscardWarningDialog(context);
-        if (discard) {
-          onDiscard?.call();
-        }
-        return discard;
-      },
     );
   }
 }

@@ -161,8 +161,7 @@ class _PickerWithSearchState<T, C> extends State<PickerWithSearch<T, C>> {
 
   Widget _routeBuilder(BuildContext context, int index) {
     final item = _items[index];
-    final subtitle =
-        widget.subtitle != null ? widget.subtitle!.call(item) : null;
+    final subtitle = widget.subtitle?.call(item);
     final selectedItem = widget.selectedItem;
 
     return ListTile(
