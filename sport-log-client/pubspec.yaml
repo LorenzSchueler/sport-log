@@ -100,7 +100,7 @@ dev_dependencies:
   dart_code_linter: #^1.1.1
     git: 
       url: https://github.com/bancolombia/dart-code-linter
-      ref: 5e5620d400606705fdb6ade3590b8315136101e5
+      ref: 8dffeffe04c7aa7f46980e416418ce41aee104a7
     # dart run dart_code_linter:metrics analyze lib
     # dart run dart_code_linter:metrics check-unnecessary-nullable lib
     # dart run dart_code_linter:metrics check-unused-files lib
