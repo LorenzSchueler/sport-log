@@ -1,6 +1,6 @@
 use chrono::{DateTime, Utc};
 #[cfg(feature = "db")]
-use diesel::sql_types::BigInt;
+use diesel::{deserialize::FromSqlRow, expression::AsExpression, prelude::*, sql_types::BigInt};
 use serde::{Deserialize, Serialize};
 use sport_log_types_derive::IdString;
 #[cfg(feature = "db")]

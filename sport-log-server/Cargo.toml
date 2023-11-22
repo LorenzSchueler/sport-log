@@ -9,26 +9,34 @@ sport-log-types = { path = "../sport-log-types", features = ["db"] }
 sport-log-types-derive = { path = "../sport-log-types-derive" }
 
 tokio = { version = "1.9", features = ["full"] }
-axum = { version = "0.6", features = [ "headers", "macros" ] }
-axum-extra = { version = "0.7", features = [ "async-read-body" ] }
+axum = { version = "0.6", features = ["headers", "macros"] }
+axum-extra = { version = "0.7", features = ["async-read-body"] }
 r2d2 = { version = "0.8" }
 hyper = "0.14"
-tower = { version = "0.4", features = [ "util" ] }
-tower-http = {version = "0.4", features = [ "trace", "sensitive-headers", "compression-gzip", "decompression-gzip"] }
+tower = { version = "0.4", features = ["util"] }
+tower-http = { version = "0.4", features = [
+    "trace",
+    "sensitive-headers",
+    "compression-gzip",
+    "decompression-gzip",
+] }
 diesel = { version = "2", features = ["postgres", "r2d2", "chrono"] }
 diesel_migrations = "2"
 argon2 = { version = "0.5" }
 rand_core = { version = "0.6", features = ["std"] }
-serde = { version = "1.0", features = ["derive"]}
-serde_json = "1.0"
+serde = { version = "1.0", features = ["derive"] }
 toml = "0.8"
 chrono = { version = "0.4", features = ["serde"] }
-tracing = "0.1" 
-tracing-subscriber = { version = "0.3", features = ["env-filter"]}
-lazy_static = "1.4.0"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 
 [dev-dependencies]
 mime = "0.3"
 base64 = "0.21"
 flate2 = "1.0.25"
+lazy_static = "1.4.0"
 rand = "0.8"
+serde_json = "1.0"
+
+[lints]
+workspace = true

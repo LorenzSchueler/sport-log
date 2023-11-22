@@ -79,9 +79,9 @@ fn none<T>() -> Option<T> {
 
 fn check_password(password: &str) -> HandlerResult<()> {
     if password.len() >= 8
-        && password.chars().any(|c| c.is_lowercase())
-        && password.chars().any(|c| c.is_uppercase())
-        && password.chars().any(|c| c.is_numeric())
+        && password.chars().any(char::is_lowercase)
+        && password.chars().any(char::is_uppercase)
+        && password.chars().any(char::is_numeric)
     {
         Ok(())
     } else {

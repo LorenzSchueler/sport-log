@@ -2,8 +2,10 @@ use chrono::{DateTime, Utc};
 #[cfg(feature = "db")]
 use diesel::{
     backend::Backend,
-    deserialize::{self, FromSql},
+    deserialize::{self, FromSql, FromSqlRow},
+    expression::AsExpression,
     pg::Pg,
+    prelude::*,
     serialize::{self, Output, ToSql, WriteTuple},
     sql_types::{BigInt, Double, Integer, Nullable, Record},
 };

@@ -1,6 +1,6 @@
 use chrono::{DateTime, Utc};
 #[cfg(feature = "db")]
-use diesel::sql_types::BigInt;
+use diesel::{deserialize::FromSqlRow, expression::AsExpression, prelude::*, sql_types::BigInt};
 #[cfg(feature = "db")]
 use diesel_derive_enum::DbEnum;
 use serde::{Deserialize, Serialize};

@@ -15,6 +15,7 @@ use chrono::{DateTime, Duration, Utc};
 use diesel::r2d2::{ConnectionManager, CustomizeConnection, Pool};
 use flate2::write::GzDecoder;
 use hyper::{body, header::CONTENT_ENCODING};
+use lazy_static::lazy_static;
 use mime::APPLICATION_JSON;
 use rand::Rng;
 use serde::de::DeserializeOwned;
@@ -336,7 +337,7 @@ async fn admin_auth() {
         ADMIN_USERNAME,
         ADMIN_PASSWORD_PLAINTEXT,
     )
-    .await
+    .await;
 }
 
 #[tokio::test]
@@ -887,7 +888,7 @@ async fn get_account_data() {
         let datetime = datetime.map(|datetime| datetime.to_rfc3339().replace("+00:00", "Z"));
         let datetime = datetime.as_ref();
         let query = datetime.map(|datetime| [("last_sync", datetime.as_str())]);
-        let query = query.as_ref().map(|x| x.as_slice());
+        let query = query.as_ref().map(<[_; 1]>::as_slice);
         let response = request(
             router,
             Request::get(route_max_version("", ACCOUNT_DATA, query))

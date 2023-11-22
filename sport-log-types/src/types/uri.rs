@@ -9,7 +9,7 @@ pub const MIN_VERSION: &str = VERSION_0_3;
 pub const MAX_VERSION: &str = VERSION_0_3;
 
 pub fn route_max_version(address: &str, route: &str, query: Option<&[(&str, &str)]>) -> String {
-    if let (Some(query), Some(false)) = (query, query.map(|q| q.is_empty())) {
+    if let (Some(query), Some(false)) = (query, query.map(<[_]>::is_empty)) {
         let mut query_string: String = query
             .iter()
             .flat_map(|(key, value)| [key, "=", value, "&"])

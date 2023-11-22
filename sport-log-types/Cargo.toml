@@ -19,3 +19,6 @@ diesel-derive-enum = { version = "2", features = ["postgres"], optional = true }
 
 [features]
 db = ["diesel", "diesel-derive-enum"]
+
+[lints]
+workspace = true

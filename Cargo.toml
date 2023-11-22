@@ -11,3 +11,34 @@ members = [
 ]
 
 resolver = "2"
+
+[workspace.lints.rust]
+#must_not_suspend = "warn"
+macro_use_extern_crate = "warn"
+unused_crate_dependencies = "warn"
+
+[workspace.lints.clippy]
+cloned_instead_of_copied = "warn"
+copy_iterator = "warn"
+default_trait_access = "warn"
+filter_map_next = "warn"
+implicit_clone = "warn"
+inconsistent_struct_constructor = "warn"
+inefficient_to_string = "warn"
+items_after_statements = "warn"
+large_types_passed_by_value = "warn"
+macro_use_imports = "warn"
+manual_let_else = "warn"
+manual_ok_or = "warn"
+manual_string_new = "warn"
+map_unwrap_or = "warn"
+match_same_arms = "warn"
+needless_for_each = "warn"
+needless_pass_by_value = "warn"
+redundant_closure_for_method_calls = "warn"
+semicolon_if_nothing_returned = "warn"
+single_match_else = "warn"
+trivially_copy_pass_by_ref = "warn"
+unnested_or_patterns = "warn"
+unused_async = "warn"
+unused_self = "warn"
