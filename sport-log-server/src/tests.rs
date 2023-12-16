@@ -1,11 +1,10 @@
 use std::io::Write;
 
 use axum::{
-    body::{Body, HttpBody},
-    headers::HeaderName,
+    body::{self, Body},
     http::{
         header::{ACCEPT_ENCODING, AUTHORIZATION, CONTENT_TYPE},
-        HeaderValue, Request, StatusCode,
+        HeaderName, HeaderValue, Request, StatusCode,
     },
     response::Response,
     Router,
@@ -14,7 +13,7 @@ use base64::{engine::general_purpose::STANDARD, Engine};
 use chrono::{DateTime, Duration, Utc};
 use diesel::r2d2::{ConnectionManager, CustomizeConnection, Pool};
 use flate2::write::GzDecoder;
-use hyper::{body, header::CONTENT_ENCODING};
+use hyper::header::CONTENT_ENCODING;
 use lazy_static::lazy_static;
 use mime::APPLICATION_JSON;
 use rand::Rng;
@@ -26,7 +25,7 @@ use sport_log_types::{
     AccountData, Action, ActionEvent, ActionEventId, ActionId, ActionProvider, ActionProviderId,
     Diary, DiaryId, Platform, PlatformId, User, UserId, ADMIN_USERNAME, ID_HEADER,
 };
-use tower::{Service, ServiceExt};
+use tower::Service;
 
 use crate::{
     config::Config,
@@ -164,21 +163,27 @@ fn assert_json(response: &Response) {
     );
 }
 
-async fn request<B>(router: &mut Router<(), B>, request: Request<B>) -> Response
-where
-    B: HttpBody + Send + 'static,
-{
-    router.ready().await.unwrap().call(request).await.unwrap()
+async fn request(router: &mut Router, request: Request<Body>) -> Response {
+    <axum::Router as tower::ServiceExt<Request<Body>>>::ready(router)
+        .await
+        .unwrap()
+        .call(request)
+        .await
+        .unwrap()
 }
 
 async fn parse_body<T: DeserializeOwned>(response: Response) -> T {
-    let bytes = body::to_bytes(response.into_body()).await.unwrap();
+    let bytes = body::to_bytes(response.into_body(), usize::MAX)
+        .await
+        .unwrap();
     let data = std::str::from_utf8(&bytes).unwrap();
     serde_json::from_str(data).unwrap()
 }
 
 async fn parse_gzip_body<T: DeserializeOwned>(response: Response) -> T {
-    let bytes = body::to_bytes(response.into_body()).await.unwrap();
+    let bytes = body::to_bytes(response.into_body(), usize::MAX)
+        .await
+        .unwrap();
     let mut decoded = Vec::new();
     let mut decoder = GzDecoder::new(decoded);
     decoder.write_all(&bytes).unwrap();

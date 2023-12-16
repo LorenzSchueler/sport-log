@@ -15,7 +15,7 @@
 
 use std::env;
 
-use axum::{Router, Server};
+use axum::Router;
 use diesel::{
     r2d2::{ConnectionManager, Pool},
     PgConnection,
@@ -89,12 +89,13 @@ async fn run_server(router: Router, config: &Config) -> Result<(), String> {
     } else {
         &config.release_address
     };
-    let server_builder = Server::try_bind(address)
-        .map_err(|err| format! {"failed to create server builder: {err}"})?;
+
+    let listener = tokio::net::TcpListener::bind(address)
+        .await
+        .map_err(|err| format!("failed to bind to {address}: {err}"))?;
 
     info!("starting server at {address}");
-    server_builder
-        .serve(router.into_make_service())
+    axum::serve(listener, router)
         .await
         .map_err(|err| format! {"failed to start server: {err}"})
 }

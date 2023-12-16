@@ -1,11 +1,11 @@
 use std::convert::Infallible;
 
 use axum::{
-    extract::rejection::{TypedHeaderRejection, TypedHeaderRejectionReason},
     http::{HeaderValue, StatusCode},
     response::{IntoResponse, Response},
     Json,
 };
+use axum_extra::typed_header::{TypedHeaderRejection, TypedHeaderRejectionReason};
 use diesel::result::{DatabaseErrorKind, Error as DieselError};
 use hyper::{
     header::{AUTHORIZATION, WWW_AUTHENTICATE},

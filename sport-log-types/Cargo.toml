@@ -9,7 +9,7 @@ sport-log-types-derive = { path = "../sport-log-types-derive" }
 serde = { version = "1.0", features = ["derive"] }
 chrono = { version = "0.4", features = ["serde"] }
 const_format = "0.2.30"
-http = "0.2.9"
+http = "1.0"
 diesel = { version = "2", features = [
     "postgres",
     "r2d2",

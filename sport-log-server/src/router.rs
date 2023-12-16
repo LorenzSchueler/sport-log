@@ -1,7 +1,7 @@
 use std::{iter, time::Duration};
 
 use axum::{
-    body::{Body, BoxBody, Bytes},
+    body::{Body, Bytes},
     extract::DefaultBodyLimit,
     http::{header::AUTHORIZATION, Request, StatusCode},
     response::Response,
@@ -173,7 +173,7 @@ pub fn get_router(state: AppState) -> Router {
                     debug!("request\n{:#?}", request.headers());
                 })
                 .on_response(
-                    |response: &Response<CompressionBody<BoxBody>>,
+                    |response: &Response<CompressionBody<Body>>,
                      _latency: Duration,
                      _span: &Span| {
                         debug!("response {}\n{:#?}", response.status(), response.headers());

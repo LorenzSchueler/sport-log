@@ -11,13 +11,15 @@ use serde::Deserialize;
 use sport_log_ap_utils::{disable_events, get_events, setup as setup_db};
 use sport_log_types::{
     uri::{route_max_version, WOD},
-    ActionEventId, ExecutableActionEvent, Wod, WodId, ID_HEADER,
+    ActionEventId, ExecutableActionEvent, Wod, WodId,
 };
 use thirtyfour::{error::WebDriverError, prelude::*, WebDriver};
 use thiserror::Error;
 use tokio::{process::Command, time};
 use tracing::{debug, error, info, warn};
 use tracing_subscriber::EnvFilter;
+
+const ID_HEADER: &str = "id"; // TODO use ID_HEADER from sport-log-types
 
 const CONFIG_FILE: &str = "sport-log-action-provider-wodify-wod.toml";
 const NAME: &str = "wodify-wod";

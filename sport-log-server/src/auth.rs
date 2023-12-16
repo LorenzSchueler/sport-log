@@ -3,8 +3,10 @@ use std::ops::Deref;
 use axum::{
     async_trait,
     extract::{FromRef, FromRequestParts, State},
-    headers::{authorization::Basic, Authorization},
     http::{request::Parts, StatusCode},
+};
+use axum_extra::{
+    headers::{authorization::Basic, Authorization},
     TypedHeader,
 };
 use sport_log_types::{ActionProviderId, UserId, ID_HEADER};
