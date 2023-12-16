@@ -29,6 +29,9 @@
 # Web related
 lib/generated_plugin_registrant.dart
 
+# MacOs
+macos/Flutter/ephemeral
+
 # Symbolication related
 app.*.symbols
 
