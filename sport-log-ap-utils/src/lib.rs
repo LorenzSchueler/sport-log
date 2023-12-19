@@ -15,15 +15,15 @@ use tracing::{error, info};
 
 #[allow(clippy::too_many_arguments)]
 pub async fn setup(
-    base_url: &str,
+    server_url: &str,
     name: &str,
     password: &str,
     description: &str,
     platform_name: &str,
     credential: bool,
     actions: &[(&str, &str)],
-    create_before: i32,
-    delete_after: i32,
+    create_before: Duration,
+    delete_after: Duration,
 ) -> Result<(), Error> {
     let client = Client::new();
 
@@ -37,7 +37,7 @@ pub async fn setup(
     };
 
     let response = client
-        .post(route_max_version(base_url, AP_PLATFORM, None))
+        .post(route_max_version(server_url, AP_PLATFORM, None))
         .json(&platform)
         .send()
         .await?;
@@ -50,7 +50,7 @@ pub async fn setup(
         StatusCode::CONFLICT => {
             info!("platform already exists");
             let platforms: Vec<Platform> = client
-                .get(route_max_version(base_url, AP_PLATFORM, None))
+                .get(route_max_version(server_url, AP_PLATFORM, None))
                 .send()
                 .await?
                 .json()
@@ -81,7 +81,7 @@ pub async fn setup(
     };
 
     let response = client
-        .post(route_max_version(base_url, AP_ACTION_PROVIDER, None))
+        .post(route_max_version(server_url, AP_ACTION_PROVIDER, None))
         .basic_auth(name, Some(&password))
         .json(&action_provider)
         .send()
@@ -95,7 +95,7 @@ pub async fn setup(
         StatusCode::CONFLICT => {
             info!("action provider already exists");
             let action_provider: ActionProvider = client
-                .get(route_max_version(base_url, AP_ACTION_PROVIDER, None))
+                .get(route_max_version(server_url, AP_ACTION_PROVIDER, None))
                 .basic_auth(name, Some(&password))
                 .send()
                 .await?
@@ -120,14 +120,14 @@ pub async fn setup(
             name: action.0.to_owned(),
             action_provider_id,
             description: Some(action.1.to_owned()),
-            create_before,
-            delete_after,
+            create_before: create_before.num_milliseconds() as i32,
+            delete_after: delete_after.num_milliseconds() as i32,
             deleted: false,
         })
         .collect();
 
     match client
-        .post(route_max_version(base_url, AP_ACTION, None))
+        .post(route_max_version(server_url, AP_ACTION, None))
         .basic_auth(name, Some(&password))
         .json(&actions)
         .send()

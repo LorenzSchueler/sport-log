@@ -184,7 +184,7 @@ fn datetimes_for_rule_from_start(
     let mut datetimes = vec![];
     for weeks in 0.. {
         let datetime = first_datetime + Duration::weeks(weeks);
-        if datetime <= start + Duration::hours(creatable_action_rule.create_before as i64) {
+        if datetime <= start + Duration::milliseconds(creatable_action_rule.create_before as i64) {
             datetimes.push(datetime);
         } else {
             break;
@@ -216,7 +216,7 @@ fn delete_action_events(client: &Client, config: &Config) -> Result<(), ReqwestE
     for deletable_action_event in deletable_action_events {
         if Utc::now()
             >= deletable_action_event.datetime
-                + Duration::hours(deletable_action_event.delete_after as i64)
+                + Duration::milliseconds(deletable_action_event.delete_after as i64)
         {
             action_event_ids.push(deletable_action_event.action_event_id);
         }

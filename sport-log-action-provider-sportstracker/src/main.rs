@@ -189,8 +189,8 @@ async fn setup() {
         PLATFORM_NAME,
         true,
         &[("fetch", "Fetch and save new workouts.")],
-        168,
-        0,
+        Duration::hours(168),
+        Duration::zero(),
     )
     .await
     .unwrap();

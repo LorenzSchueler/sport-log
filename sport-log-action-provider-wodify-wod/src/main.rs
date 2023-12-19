@@ -134,8 +134,8 @@ async fn setup() {
             "Metcon",
             "Fetch and save the metcon description and results for the current day.",
         )],
-        168,
-        24,
+        Duration::hours(168),
+        Duration::hours(24),
     )
     .await
     .unwrap();

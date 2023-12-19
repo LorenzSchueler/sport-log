@@ -70,7 +70,7 @@ type UserResult<T> = StdResult<T, UserError>;
 ///
 /// `admin_password` is the password for the admin endpoints.
 ///
-/// `base_url` is the left part of the URL (everything before `/<version>/...`)
+/// `server_url` is the left part of the URL (everything before `/<version>/...`)
 #[derive(Deserialize, Debug)]
 struct Config {
     password: String,
@@ -155,8 +155,8 @@ async fn setup() {
             ("Yoga", "Reserve a spot in a Yoga class."),
             ("Swim WOD", "Reserve a spot in a Swim class."),
         ],
-        168,
-        0,
+        Duration::hours(168),
+        Duration::zero(),
     )
     .await
     .unwrap();
@@ -186,7 +186,7 @@ async fn login(mode: Mode) -> Result<()> {
         &CONFIG.server_url,
         NAME,
         &CONFIG.password,
-        Duration::hours(0),
+        Duration::zero(),
         Duration::days(1) + Duration::minutes(2),
     )
     .await?;
