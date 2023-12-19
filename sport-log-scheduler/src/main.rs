@@ -272,7 +272,7 @@ fn garbage_collection(client: &Client, config: &Config) -> Result<(), ReqwestErr
 mod tests {
     use std::str::FromStr;
 
-    use chrono::{DateTime, NaiveDateTime, Utc};
+    use chrono::{DateTime, Duration, NaiveDateTime, Utc};
     use sport_log_types::{ActionId, ActionRuleId, CreatableActionRule, UserId, Weekday};
 
     fn datetime(datetime: &str) -> DateTime<Utc> {
@@ -289,7 +289,7 @@ mod tests {
             weekday: Weekday::Monday,
             time: datetime("2000-01-01T12:00:00"),
             arguments: None,
-            create_before: 14 * 24,
+            create_before: Duration::days(14).num_milliseconds() as i32,
         };
 
         // next day and in 8 days
