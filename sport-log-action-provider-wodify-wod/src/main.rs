@@ -3,9 +3,10 @@ use std::{
     time::Duration as StdDuration,
 };
 
-use chrono::{Duration, Local, Utc};
+use chrono::Duration;
 use lazy_static::lazy_static;
 use rand::Rng;
+use regex::Regex;
 use reqwest::{Client, Error as ReqwestError, StatusCode};
 use serde::Deserialize;
 use sport_log_ap_utils::{disable_events, get_events, setup as setup_db};
@@ -13,10 +14,11 @@ use sport_log_types::{
     uri::{route_max_version, WOD},
     ActionEventId, ExecutableActionEvent, Wod, WodId,
 };
+use sysinfo::{ProcessExt, System, SystemExt};
 use thirtyfour::{error::WebDriverError, prelude::*, WebDriver};
 use thiserror::Error;
 use tokio::{process::Command, time};
-use tracing::{debug, error, info, warn};
+use tracing::{debug, error, info};
 use tracing_subscriber::EnvFilter;
 
 const ID_HEADER: &str = "id"; // TODO use ID_HEADER from sport-log-types
@@ -26,6 +28,9 @@ const NAME: &str = "wodify-wod";
 const DESCRIPTION: &str =
     "Wodify Wod can fetch the Workout of the Day and save it in your wods. The action names correspond to the class type the wod should be fetched for.";
 const PLATFORM_NAME: &str = "wodify";
+
+const GECKODRIVER: &str = "geckodriver";
+const WEBDRIVER_ADDRESS: &str = "http://localhost:4444/";
 
 #[derive(Debug, Error)]
 enum Error {
@@ -41,6 +46,8 @@ enum Error {
     LoginFailed(ActionEventId),
     #[error("the wod could not be found")]
     WodNotFound(ActionEventId),
+    #[error("the result for the wod could not be found")]
+    ResultNotFound(ActionEventId),
 }
 
 type Result<T> = StdResult<T, Error>;
@@ -51,11 +58,11 @@ type Result<T> = StdResult<T, Error>;
 ///
 /// `admin_password` is the password for the admin endpoints.
 ///
-/// `base_url` is the left part of the URL (everything before `/<version>/...`)
+/// `server_url` is the left part of the URL (everything before `/<version>/...`)
 #[derive(Deserialize, Debug)]
 struct Config {
     password: String,
-    base_url: String,
+    server_url: String,
 }
 
 lazy_static! {
@@ -117,28 +124,18 @@ async fn main() {
 
 async fn setup() {
     setup_db(
-        &CONFIG.base_url,
+        &CONFIG.server_url,
         NAME,
         &CONFIG.password,
         DESCRIPTION,
         PLATFORM_NAME,
         true,
-        &[
-            (
-                "CrossFit",
-                "Fetch and save the CrossFit wod for the current day.",
-            ),
-            (
-                "Weightlifting",
-                "Fetch and save the Weightlifting wod for the current day.",
-            ),
-            (
-                "Open Fridge",
-                "Fetch and save the Open Fridge wod for the current day.",
-            ),
-        ],
+        &[(
+            "Metcon",
+            "Fetch and save the metcon description and results for the current day.",
+        )],
         168,
-        0,
+        24,
     )
     .await
     .unwrap();
@@ -165,25 +162,31 @@ async fn get_wod(mode: Mode) -> Result<()> {
 
     let exec_action_events = get_events(
         &client,
-        &CONFIG.base_url,
+        &CONFIG.server_url,
         NAME,
         &CONFIG.password,
-        Duration::hours(0),
-        Duration::days(1) + Duration::minutes(1),
+        Duration::days(-1),
+        Duration::zero(),
     )
     .await?;
 
-    info!("got {} executable action events", exec_action_events.len());
+    debug!("got {} executable action events", exec_action_events.len());
 
     if exec_action_events.is_empty() {
         return Ok(());
     }
 
-    let mut webdriver = Command::new("../geckodriver").spawn()?;
+    for p in System::new_all().processes_by_name(GECKODRIVER) {
+        p.kill();
+    }
+
+    let mut webdriver = Command::new(GECKODRIVER).spawn()?;
+
+    time::sleep(StdDuration::from_secs(1)).await; // make sure geckodriver is available
 
     let mut caps = DesiredCapabilities::firefox();
     if mode == Mode::Headless {
-        caps.set_headless().unwrap_or(());
+        caps.set_headless()?;
     }
 
     let mut tasks = vec![];
@@ -192,19 +195,17 @@ async fn get_wod(mode: Mode) -> Result<()> {
         let client = client.clone();
 
         tasks.push(tokio::spawn(async move {
-            info!("processing: {:#?}", exec_action_event);
+            debug!("processing: {:#?}", exec_action_event);
 
             let (Some(username), Some(password)) =
                 (&exec_action_event.username, &exec_action_event.password)
             else {
-                warn!("can not log in: no credential provided");
-
                 return Err(Error::NoCredential(exec_action_event.action_event_id));
             };
 
-            let driver = WebDriver::new("http://localhost:4444/", caps).await?;
+            let driver = WebDriver::new(WEBDRIVER_ADDRESS, caps).await?;
 
-            let result = try_get_wod(
+            let result = try_create_wod(
                 &driver,
                 &client,
                 username,
@@ -214,7 +215,7 @@ async fn get_wod(mode: Mode) -> Result<()> {
             )
             .await;
 
-            info!("closing browser");
+            debug!("closing browser");
             driver.quit().await?;
 
             result
@@ -239,13 +240,16 @@ async fn get_wod(mode: Mode) -> Result<()> {
         }
     }
 
-    info!("deleting {} action events", delete_action_event_ids.len());
-    debug!("delete event ids: {:?}", delete_action_event_ids);
+    debug!(
+        "deleting {} action event ({:?})",
+        delete_action_event_ids.len(),
+        delete_action_event_ids
+    );
 
     if !delete_action_event_ids.is_empty() {
         disable_events(
             &client,
-            &CONFIG.base_url,
+            &CONFIG.server_url,
             NAME,
             &CONFIG.password,
             &delete_action_event_ids,
@@ -253,13 +257,13 @@ async fn get_wod(mode: Mode) -> Result<()> {
         .await?;
     }
 
-    info!("terminating webdriver");
-    let _ = webdriver.kill().await;
+    debug!("terminating webdriver");
+    webdriver.kill().await?;
 
     Ok(())
 }
 
-async fn try_get_wod(
+async fn try_create_wod(
     driver: &WebDriver,
     client: &Client,
     username: &str,
@@ -267,10 +271,11 @@ async fn try_get_wod(
     exec_action_event: &ExecutableActionEvent,
     mode: Mode,
 ) -> Result<ActionEventId> {
+    let action_date = exec_action_event.datetime.date_naive();
+    let action_date_string = action_date.format("%m/%d/%Y").to_string();
+
     driver.delete_all_cookies().await?;
-    driver
-        .goto("https://app.wodify.com/WOD/WODEntry.aspx")
-        .await?;
+    driver.goto("https://app.wodify.com").await?;
 
     time::sleep(StdDuration::from_secs(3)).await;
 
@@ -289,122 +294,124 @@ async fn try_get_wod(
         .await?
         .click()
         .await?;
-    time::sleep(StdDuration::from_secs(2)).await;
 
-    if driver
-        .find(By::Id("AthleteTheme_wtLayoutNormal_block_wt9_wtLogoutLink"))
-        .await
-        .is_err()
-    {
-        warn!("login failed");
+    time::sleep(StdDuration::from_secs(5)).await;
+
+    if driver.find(By::LinkText("Logout")).await.is_err() {
         return Err(Error::LoginFailed(exec_action_event.action_event_id));
     }
     debug!("login successful");
 
-    // select wod type
-    //let type_picker = driver
-    //.find(By::Id(
-    //"AthleteTheme_wtLayoutNormal_block_wtSubNavigation_wtcbDate",
-    //))
-    //.await?;
-    //type_picker.click().await?;
-    //type_picker.send_keys(exec_action_event.action_name).await?; // TODO does not work
-    //time::sleep(StdDuration::from_secs(2)).await;
+    driver
+        .goto("https://app.wodify.com/WOD/WODEntry.aspx")
+        .await?;
 
-    if let Ok(wod) = driver
-        .find(By::Id(
-            "AthleteTheme_wtLayoutNormal_block_wtMainContent_WOD_UI_wt9_block_wtWODComponentsList",
-        ))
+    let date_input = driver.find(By::Id("AthleteTheme_wtLayoutNormal_block_wtSubNavigation_W_Utils_UI_wt3_block_wtDateInputFrom")).await?;
+    date_input.clear().await?;
+    date_input.send_keys(&action_date_string).await?;
+
+    time::sleep(StdDuration::from_secs(3)).await;
+
+    let wod = driver
+        .find(By::ClassName("ListRecords"))
         .await
-    {
-        let elements = wod
-            .find_all(By::ClassName("component_show_wrapper"))
-            .await?;
+        .map_err(|_| Error::WodNotFound(exec_action_event.action_event_id))?
+        .find(By::ClassName("component_show_wrapper"))
+        .await?;
 
-        let mut description = String::new();
-        for element in elements {
-            let name = element
-                .find(By::ClassName("component_name"))
-                .await?
-                .inner_html()
-                .await?
-                .replace("<br>", "\n")
-                .replace("&nbsp;", " ");
-            description += name.as_str();
-            description += "\n";
+    let name = wod
+        .find(By::ClassName("component_name"))
+        .await?
+        .inner_html()
+        .await?;
 
-            let content = element
-                .find(By::ClassName("component_wrapper"))
-                .await?
-                .inner_html()
-                .await?
-                .replace("<br>", "\n")
-                .replace("&nbsp;", " ");
-            description += content.as_str();
-            description += "\n";
-        }
+    let content = wod
+        .find(By::ClassName("component_wrapper"))
+        .await?
+        .inner_html()
+        .await?;
 
-        let wod = Wod {
-            id: WodId(rand::thread_rng().gen()),
-            user_id: exec_action_event.user_id,
-            date: Utc::now().date_naive(),
-            description: Some(description.clone()),
-            deleted: false,
-        };
+    let name = parse_inner_html(&name);
+    let content = parse_inner_html(&content);
 
-        let response = client
-            .post(route_max_version(&CONFIG.base_url, WOD, None))
-            .basic_auth(NAME, Some(&CONFIG.password))
-            .header(ID_HEADER, exec_action_event.user_id.0)
-            .json(&wod)
-            .send()
-            .await?;
-        match response.status() {
-            StatusCode::CONFLICT => {
-                let today = Local::now().date_naive().format("%Y-%m-%d").to_string();
-                let wods: Vec<Wod> = client
-                    .get(route_max_version(
-                        &CONFIG.base_url,
-                        WOD,
-                        Some(&[("start", &today), ("end", &today)]),
-                    ))
-                    .basic_auth(NAME, Some(&CONFIG.password))
-                    .header(ID_HEADER, exec_action_event.user_id.0)
-                    .send()
-                    .await?
-                    .json()
-                    .await?;
-                let mut wod = wods
-                    .into_iter()
-                    .next()
-                    .expect("server returned multiple wods for the same date");
-                if let Some(old_description) = wod.description {
-                    wod.description = Some(old_description + description.as_str());
-                } else {
-                    wod.description = Some(description);
-                }
-                client
-                    .put(route_max_version(&CONFIG.base_url, WOD, None))
-                    .basic_auth(NAME, Some(&CONFIG.password))
-                    .header(ID_HEADER, exec_action_event.user_id.0)
-                    .json(&wod)
-                    .send()
-                    .await?;
-            }
-            StatusCode::OK => {
-                info!("new wod created");
-            }
-            _ => {
-                response.error_for_status()?; // this will always fail and return the error
-            }
-        }
+    driver
+        .goto("https://app.wodify.com/Performance/MyPerformance_Metcon.aspx")
+        .await?;
 
-        if mode == Mode::Interactive {
-            time::sleep(StdDuration::from_secs(2)).await;
-        }
+    let result_entry = driver
+        .find(By::ClassName("TableRecords"))
+        .await
+        .map_err(|_| Error::ResultNotFound(exec_action_event.action_event_id))?
+        .find(By::Tag("tbody"))
+        .await?
+        .find(By::Tag("tr"))
+        .await?
+        .find_all(By::Tag("td"))
+        .await?;
 
-        Ok(exec_action_event.action_event_id)
-    } else {
-        Err(Error::WodNotFound(exec_action_event.action_event_id))
+    let date = result_entry[0].inner_html().await?;
+    if date != action_date_string {
+        return Err(Error::ResultNotFound(exec_action_event.action_event_id));
     }
+    let result = result_entry[6].inner_html().await?;
+    let rx = result_entry[7]
+        .find(By::ClassName("RxOnNoClick"))
+        .await
+        .is_ok();
+    let comments = parse_inner_html(&result_entry[9].inner_html().await?);
+
+    let description = format!(
+        "{name}\n{content}\n\nResult: {result} {}{}",
+        if rx { "RX" } else { "Scaled" },
+        if !comments.is_empty() {
+            "\nComments: ".to_owned() + &comments
+        } else {
+            "".to_owned()
+        }
+    );
+
+    let wod = Wod {
+        id: WodId(rand::thread_rng().gen()),
+        user_id: exec_action_event.user_id,
+        date: action_date,
+        description: Some(description),
+        deleted: false,
+    };
+
+    let response = client
+        .post(route_max_version(&CONFIG.server_url, WOD, None))
+        .basic_auth(NAME, Some(&CONFIG.password))
+        .header(ID_HEADER, exec_action_event.user_id.0)
+        .json(&wod)
+        .send()
+        .await?;
+
+    match response.status() {
+        StatusCode::CONFLICT => info!("wod already exists"),
+        StatusCode::OK => info!("new wod created"),
+        _ => {
+            response.error_for_status()?; // this will always fail and return the error
+        }
+    }
+
+    if mode == Mode::Interactive {
+        time::sleep(StdDuration::from_secs(2)).await;
+    }
+
+    Ok(exec_action_event.action_event_id)
+}
+
+fn parse_inner_html(inner_html: &str) -> String {
+    //static re: LazyCell<Regex> = LazyCell::new(|| Regex::new(r"</*.+?>").unwrap());
+    let content = inner_html
+        .replace("<br>", "\n")
+        .replace("<p>", "\n")
+        .replace("&nbsp;", " ");
+    Regex::new(r"</*.+?>")
+        .unwrap()
+        .replace_all(&content, "")
+        .replace("\n\n", "\n")
+        .replace("\n ", "\n")
+        .trim()
+        .to_owned()
 }

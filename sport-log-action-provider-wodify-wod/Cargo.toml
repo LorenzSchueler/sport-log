@@ -21,6 +21,8 @@ thiserror = "1"
 lazy_static = "1.4.0"
 tracing = "0.1.26"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+sysinfo = "0.29.11"
+regex = "1.10.2"
 
 [lints]
 workspace = true
