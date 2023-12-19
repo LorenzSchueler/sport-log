@@ -1,5 +1,8 @@
 use std::{
-    env, fs, io::Error as IoError, process, result::Result as StdResult,
+    env, fs,
+    io::Error as IoError,
+    process::{self, Stdio},
+    result::Result as StdResult,
     time::Duration as StdDuration,
 };
 
@@ -17,7 +20,7 @@ use sport_log_types::{
 use sysinfo::{ProcessExt, System, SystemExt};
 use thirtyfour::{error::WebDriverError, prelude::*, WebDriver};
 use thiserror::Error;
-use tokio::{process::Command, time};
+use tokio::{process::Command, task::JoinError, time};
 use tracing::{debug, error, info};
 use tracing_subscriber::EnvFilter;
 
@@ -40,9 +43,17 @@ enum Error {
     Io(#[from] IoError),
     #[error("{0}")]
     WebDriver(#[from] WebDriverError),
-    #[error("ExecutableActionEvent doesn't contain credentials")]
+    #[error("{0}")]
+    Join(#[from] JoinError),
+}
+
+type Result<T> = StdResult<T, Error>;
+
+#[derive(Debug, Error)]
+enum UserError {
+    #[error("can not log in: no credentials provided")]
     NoCredential(ActionEventId),
-    #[error("login failed")]
+    #[error("can not log in: login failed")]
     LoginFailed(ActionEventId),
     #[error("the wod could not be found")]
     WodNotFound(ActionEventId),
@@ -50,7 +61,18 @@ enum Error {
     ResultNotFound(ActionEventId),
 }
 
-type Result<T> = StdResult<T, Error>;
+impl UserError {
+    fn action_event_id(&self) -> ActionEventId {
+        match self {
+            Self::NoCredential(action_event_id)
+            | Self::LoginFailed(action_event_id)
+            | Self::WodNotFound(action_event_id)
+            | Self::ResultNotFound(action_event_id) => *action_event_id,
+        }
+    }
+}
+
+type UserResult<T> = StdResult<T, UserError>;
 
 /// The config for [`sport-log-action-provider-wodify-wod`](crate).
 ///
@@ -96,7 +118,7 @@ async fn main() {
                 "info,sport_log_action_provider_wodify_wod=debug",
             );
         } else {
-            env::set_var("RUST_LOG", "warn");
+            env::set_var("RUST_LOG", "warn,sport_log_action_provider_wodify_wod=info");
         }
     }
 
@@ -180,7 +202,7 @@ async fn get_wod(mode: Mode) -> Result<()> {
         p.kill();
     }
 
-    let mut webdriver = Command::new(GECKODRIVER).spawn()?;
+    let mut webdriver = Command::new(GECKODRIVER).stdout(Stdio::null()).spawn()?;
 
     time::sleep(StdDuration::from_secs(1)).await; // make sure geckodriver is available
 
@@ -200,7 +222,9 @@ async fn get_wod(mode: Mode) -> Result<()> {
             let (Some(username), Some(password)) =
                 (&exec_action_event.username, &exec_action_event.password)
             else {
-                return Err(Error::NoCredential(exec_action_event.action_event_id));
+                return Ok(Err(UserError::NoCredential(
+                    exec_action_event.action_event_id,
+                )));
             };
 
             let driver = WebDriver::new(WEBDRIVER_ADDRESS, caps).await?;
@@ -222,37 +246,30 @@ async fn get_wod(mode: Mode) -> Result<()> {
         }));
     }
 
-    let mut delete_action_event_ids = vec![];
+    let mut disable_action_event_ids = vec![];
     for task in tasks {
-        match task.await {
-            Ok(result) => match result {
-                Ok(action_event_id) => delete_action_event_ids.push(action_event_id),
-                Err(
-                    Error::NoCredential(action_event_id)
-                    | Error::LoginFailed(action_event_id)
-                    | Error::WodNotFound(action_event_id),
-                ) => {
-                    delete_action_event_ids.push(action_event_id);
-                }
-                Err(error) => error!("{}", error),
-            },
-            Err(join_error) => error!("execution of action event failed: {}", join_error),
+        match task.await?? {
+            Ok(action_event_id) => disable_action_event_ids.push(action_event_id),
+            Err(error) => {
+                info!("{error}");
+                disable_action_event_ids.push(error.action_event_id());
+            }
         }
     }
 
     debug!(
         "deleting {} action event ({:?})",
-        delete_action_event_ids.len(),
-        delete_action_event_ids
+        disable_action_event_ids.len(),
+        disable_action_event_ids
     );
 
-    if !delete_action_event_ids.is_empty() {
+    if !disable_action_event_ids.is_empty() {
         disable_events(
             &client,
             &CONFIG.server_url,
             NAME,
             &CONFIG.password,
-            &delete_action_event_ids,
+            &disable_action_event_ids,
         )
         .await?;
     }
@@ -270,7 +287,7 @@ async fn try_create_wod(
     password: &str,
     exec_action_event: &ExecutableActionEvent,
     mode: Mode,
-) -> Result<ActionEventId> {
+) -> Result<UserResult<ActionEventId>> {
     let action_date = exec_action_event.datetime.date_naive();
     let action_date_string = action_date.format("%m/%d/%Y").to_string();
 
@@ -298,7 +315,9 @@ async fn try_create_wod(
     time::sleep(StdDuration::from_secs(5)).await;
 
     if driver.find(By::LinkText("Logout")).await.is_err() {
-        return Err(Error::LoginFailed(exec_action_event.action_event_id));
+        return Ok(Err(UserError::LoginFailed(
+            exec_action_event.action_event_id,
+        )));
     }
     debug!("login successful");
 
@@ -312,12 +331,12 @@ async fn try_create_wod(
 
     time::sleep(StdDuration::from_secs(3)).await;
 
-    let wod = driver
-        .find(By::ClassName("ListRecords"))
-        .await
-        .map_err(|_| Error::WodNotFound(exec_action_event.action_event_id))?
-        .find(By::ClassName("component_show_wrapper"))
-        .await?;
+    let Ok(wod) = driver.find(By::ClassName("ListRecords")).await else {
+        return Ok(Err(UserError::WodNotFound(
+            exec_action_event.action_event_id,
+        )));
+    };
+    let wod = wod.find(By::ClassName("component_show_wrapper")).await?;
 
     let name = wod
         .find(By::ClassName("component_name"))
@@ -338,10 +357,12 @@ async fn try_create_wod(
         .goto("https://app.wodify.com/Performance/MyPerformance_Metcon.aspx")
         .await?;
 
-    let result_entry = driver
-        .find(By::ClassName("TableRecords"))
-        .await
-        .map_err(|_| Error::ResultNotFound(exec_action_event.action_event_id))?
+    let Ok(result_table) = driver.find(By::ClassName("TableRecords")).await else {
+        return Ok(Err(UserError::ResultNotFound(
+            exec_action_event.action_event_id,
+        )));
+    };
+    let result_entry = result_table
         .find(By::Tag("tbody"))
         .await?
         .find(By::Tag("tr"))
@@ -351,7 +372,9 @@ async fn try_create_wod(
 
     let date = result_entry[0].inner_html().await?;
     if date != action_date_string {
-        return Err(Error::ResultNotFound(exec_action_event.action_event_id));
+        return Ok(Err(UserError::ResultNotFound(
+            exec_action_event.action_event_id,
+        )));
     }
     let result = result_entry[6].inner_html().await?;
     let rx = result_entry[7]
@@ -395,10 +418,10 @@ async fn try_create_wod(
     }
 
     if mode == Mode::Interactive {
-        time::sleep(StdDuration::from_secs(2)).await;
+        time::sleep(StdDuration::from_secs(3)).await;
     }
 
-    Ok(exec_action_event.action_event_id)
+    Ok(Ok(exec_action_event.action_event_id))
 }
 
 fn parse_inner_html(inner_html: &str) -> String {
