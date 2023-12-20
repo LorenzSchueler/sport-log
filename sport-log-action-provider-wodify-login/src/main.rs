@@ -7,6 +7,7 @@ use std::{
 };
 
 use chrono::{Duration, Local, Utc};
+use clap::Parser;
 use lazy_static::lazy_static;
 use reqwest::{Client, Error as ReqwestError};
 use serde::Deserialize;
@@ -99,6 +100,19 @@ enum Mode {
     Interactive,
 }
 
+/// Wodify Login Action Provider
+#[derive(Parser, Debug)]
+#[command( about, long_about = None)]
+struct Args {
+    /// create own actions
+    #[arg(short, long)]
+    setup: bool,
+
+    /// use interactive webdriver session (with browser window)
+    #[arg(short, long)]
+    interactive: bool,
+}
+
 #[tokio::main]
 async fn main() {
     if env::var("RUST_LOG").is_err() {
@@ -120,24 +134,25 @@ async fn main() {
         .with_env_filter(EnvFilter::from_default_env())
         .init();
 
-    match &env::args().collect::<Vec<_>>()[1..] {
-        [] => {
-            if let Err(error) = login(Mode::Headless).await {
-                warn!("login failed: {}", error);
-            }
+    let args = Args::parse();
+
+    if args.setup {
+        if let Err(error) = setup().await {
+            warn!("setup failed: {}", error);
         }
-        [option] if option == "--interactive" => {
-            if let Err(error) = login(Mode::Interactive).await {
-                warn!("login failed: {}", error);
-            }
+    } else {
+        let mode = if args.interactive {
+            Mode::Interactive
+        } else {
+            Mode::Headless
+        };
+        if let Err(error) = login(mode).await {
+            warn!("login failed: {}", error);
         }
-        [option] if option == "--setup" => setup().await,
-        [option] if ["help", "-h", "--help"].contains(&option.as_str()) => help(),
-        _ => wrong_use(),
     }
 }
 
-async fn setup() {
+async fn setup() -> Result<()> {
     setup_db(
         &CONFIG.server_url,
         NAME,
@@ -158,24 +173,9 @@ async fn setup() {
         Duration::hours(168),
         Duration::zero(),
     )
-    .await
-    .unwrap();
-}
+    .await?;
 
-fn help() {
-    println!(
-        "Wodify Login Action Provider\n\n\
-        USAGE:\n\
-        sport-log-action-provider-wodify-login [OPTIONS]\n\n\
-        OPTIONS:\n\
-        -h, --help\tprint this help page\n\
-        --interactive\tuse interactive webdriver session (with browser window)\n\
-        --setup\t\tcreate own actions"
-    );
-}
-
-fn wrong_use() {
-    println!("no such options");
+    Ok(())
 }
 
 async fn login(mode: Mode) -> Result<()> {

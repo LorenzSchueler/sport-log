@@ -7,6 +7,7 @@ use std::{
 };
 
 use chrono::Duration;
+use clap::Parser;
 use lazy_static::lazy_static;
 use rand::Rng;
 use regex::Regex;
@@ -21,7 +22,7 @@ use sysinfo::{ProcessExt, System, SystemExt};
 use thirtyfour::{error::WebDriverError, prelude::*, WebDriver};
 use thiserror::Error;
 use tokio::{process::Command, task::JoinError, time};
-use tracing::{debug, error, info};
+use tracing::{debug, error, info, warn};
 use tracing_subscriber::EnvFilter;
 
 const ID_HEADER: &str = "id"; // TODO use ID_HEADER from sport-log-types
@@ -109,6 +110,19 @@ enum Mode {
     Interactive,
 }
 
+/// Wodify Wod Action Provider
+#[derive(Parser, Debug)]
+#[command( about, long_about = None)]
+struct Args {
+    /// create own actions
+    #[arg(short, long)]
+    setup: bool,
+
+    /// use interactive webdriver session (with browser window)
+    #[arg(short, long)]
+    interactive: bool,
+}
+
 #[tokio::main]
 async fn main() {
     if env::var("RUST_LOG").is_err() {
@@ -127,24 +141,25 @@ async fn main() {
         .with_env_filter(EnvFilter::from_default_env())
         .init();
 
-    match &env::args().collect::<Vec<_>>()[1..] {
-        [] => {
-            if let Err(error) = get_wod(Mode::Headless).await {
-                error!("login failed: {}", error);
-            }
+    let args = Args::parse();
+
+    if args.setup {
+        if let Err(error) = setup().await {
+            warn!("setup failed: {}", error);
         }
-        [option] if option == "--interactive" => {
-            if let Err(error) = get_wod(Mode::Interactive).await {
-                error!("login failed: {}", error);
-            }
+    } else {
+        let mode = if args.interactive {
+            Mode::Interactive
+        } else {
+            Mode::Headless
+        };
+        if let Err(error) = get_wod(mode).await {
+            warn!("fetching wod failed: {}", error);
         }
-        [option] if option == "--setup" => setup().await,
-        [option] if ["help", "-h", "--help"].contains(&option.as_str()) => help(),
-        _ => wrong_use(),
     }
 }
 
-async fn setup() {
+async fn setup() -> Result<()> {
     setup_db(
         &CONFIG.server_url,
         NAME,
@@ -159,24 +174,9 @@ async fn setup() {
         Duration::hours(168),
         Duration::hours(24),
     )
-    .await
-    .unwrap();
-}
+    .await?;
 
-fn help() {
-    println!(
-        "Wodify Wod Action Provider\n\n\
-        USAGE:\n\
-        sport-log-action-provider-wodify-wod [OPTIONS]\n\n\
-        OPTIONS:\n\
-        -h, --help\tprint this help page\n\
-        --interactive\tuse interactive webdriver session (with browser window)\n\
-        --setup\t\tcreate own actions"
-    );
-}
-
-fn wrong_use() {
-    println!("no such options");
+    Ok(())
 }
 
 async fn get_wod(mode: Mode) -> Result<()> {
@@ -389,7 +389,7 @@ async fn try_create_wod(
         if !comments.is_empty() {
             "\nComments: ".to_owned() + &comments
         } else {
-            "".to_owned()
+            String::new()
         }
     );
 

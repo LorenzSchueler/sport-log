@@ -1,6 +1,7 @@
-use std::{env, fs, process};
+use std::{env, fs, process, result::Result as StdResult};
 
 use chrono::{DateTime, Duration, NaiveDateTime, Utc};
+use clap::Parser;
 use lazy_static::lazy_static;
 use rand::Rng;
 use reqwest::{Client, Error as ReqwestError};
@@ -31,6 +32,8 @@ enum Error {
     Join(#[from] JoinError),
 }
 
+type Result<T> = StdResult<T, Error>;
+
 #[derive(Debug, Error)]
 enum UserError {
     #[error("can not log in: no credentials provided")]
@@ -48,6 +51,8 @@ impl UserError {
         }
     }
 }
+
+type UserResult<T> = StdResult<T, UserError>;
 
 /// The config for [`sport-log-action-provider-sportstracker`](crate).
 ///
@@ -145,6 +150,15 @@ struct Location {
     d: u64, // timestamp in 1 / 1000 s
 }
 
+/// Sportstracker Action Provider
+#[derive(Parser, Debug)]
+#[command( about, long_about = None)]
+struct Args {
+    /// create own actions
+    #[arg(short, long)]
+    setup: bool,
+}
+
 #[tokio::main]
 async fn main() {
     if env::var("RUST_LOG").is_err() {
@@ -166,21 +180,21 @@ async fn main() {
         .with_env_filter(EnvFilter::from_default_env())
         .init();
 
-    match &env::args().collect::<Vec<_>>()[1..] {
-        [] => {
-            if let Err(error) = fetch().await {
-                warn!("fetching new workouts failed: {}", error);
-            }
+    let args = Args::parse();
+
+    if args.setup {
+        if let Err(error) = setup().await {
+            warn!("setup failed: {}", error);
         }
-        [option] if option == "--setup" => {
-            setup().await;
+    } else {
+        #[allow(clippy::collapsible_else_if)]
+        if let Err(error) = fetch().await {
+            warn!("fetching session failed: {}", error);
         }
-        [option] if ["help", "-h", "--help"].contains(&option.as_str()) => help(),
-        _ => wrong_use(),
     }
 }
 
-async fn setup() {
+async fn setup() -> Result<()> {
     setup_db(
         &CONFIG.server_url,
         NAME,
@@ -192,26 +206,12 @@ async fn setup() {
         Duration::hours(168),
         Duration::zero(),
     )
-    .await
-    .unwrap();
+    .await?;
+
+    Ok(())
 }
 
-fn help() {
-    println!(
-        "Sportstracker Action Provider\n\n\
-        USAGE:\n\
-        sport-log-action-provider-sportstracker [OPTIONS]\n\n\
-        OPTIONS:\n\
-        -h, --help\tprint this help page\n\
-        --setup\t\tcreate own actions"
-    );
-}
-
-fn wrong_use() {
-    println!("no such options");
-}
-
-async fn fetch() -> Result<(), Error> {
+async fn fetch() -> Result<()> {
     let client = Client::new();
 
     let exec_action_events = get_events(
@@ -226,7 +226,7 @@ async fn fetch() -> Result<(), Error> {
 
     debug!("got {} executable action events", exec_action_events.len());
 
-    let mut tasks: Vec<JoinHandle<Result<Result<ActionEventId, UserError>, Error>>> = vec![];
+    let mut tasks: Vec<JoinHandle<Result<UserResult<ActionEventId>>>> = vec![];
     for exec_action_event in exec_action_events {
         let client = client.clone();
 
@@ -451,7 +451,7 @@ async fn get_token(
     username: &str,
     password: &str,
     action_event_id: ActionEventId,
-) -> Result<Result<(&'static str, String), UserError>, ReqwestError> {
+) -> Result<UserResult<(&'static str, String)>> {
     let credentials = [("l", username), ("p", password), ("captchaToken", "0")];
     let user: User = client
         .post("https://api.sports-tracker.com/apiserver/v1/login")
@@ -469,10 +469,7 @@ async fn get_token(
         .ok_or(UserError::LoginFailed(action_event_id)))
 }
 
-async fn get_workout_keys(
-    client: &Client,
-    token: &(&str, &str),
-) -> Result<WorkoutKeys, ReqwestError> {
+async fn get_workout_keys(client: &Client, token: &(&str, &str)) -> Result<WorkoutKeys> {
     let limited = &("limited", "true");
     let limit = &("limit", "100000");
     let workouts: WorkoutKeys = client
@@ -490,7 +487,7 @@ async fn get_workout_stats(
     client: &Client,
     token: &(&str, &str),
     workout_key: &str,
-) -> Result<WorkoutStats, ReqwestError> {
+) -> Result<WorkoutStats> {
     let samples = &("samples", "100000");
 
     Ok(client
@@ -509,7 +506,7 @@ async fn get_workout_track(
     client: &Client,
     token: &(&str, &str),
     workout_key: &str,
-) -> Result<WorkoutTrack, ReqwestError> {
+) -> Result<WorkoutTrack> {
     let samples = &("samples", "100000");
 
     Ok(client
