@@ -56,9 +56,9 @@ enum UserError {
     NoCredential(ActionEventId),
     #[error("can not log in: login failed")]
     LoginFailed(ActionEventId),
-    #[error("the wod could not be found")]
+    #[error("no wod found")]
     WodNotFound(ActionEventId),
-    #[error("the result for the wod could not be found")]
+    #[error("no wod result found")]
     ResultNotFound(ActionEventId),
 }
 
@@ -93,12 +93,12 @@ lazy_static! {
         Ok(file) => match toml::from_str(&file) {
             Ok(config) => config,
             Err(error) => {
-                error!("Failed to parse {}: {}", CONFIG_FILE, error);
+                error!("failed to parse {}: {}", CONFIG_FILE, error);
                 process::exit(1);
             }
         },
         Err(error) => {
-            error!("Failed to read {}: {}", CONFIG_FILE, error);
+            error!("failed to read {}: {}", CONFIG_FILE, error);
             process::exit(1);
         }
     };
@@ -202,7 +202,10 @@ async fn get_wod(mode: Mode) -> Result<()> {
         p.kill();
     }
 
-    let mut webdriver = Command::new(GECKODRIVER).stdout(Stdio::null()).spawn()?;
+    let mut webdriver = Command::new(GECKODRIVER)
+        .stdout(Stdio::null())
+        .stderr(Stdio::null())
+        .spawn()?;
 
     time::sleep(StdDuration::from_secs(1)).await; // make sure geckodriver is available
 
@@ -258,7 +261,7 @@ async fn get_wod(mode: Mode) -> Result<()> {
     }
 
     debug!(
-        "deleting {} action event ({:?})",
+        "disabling {} action events: {:?}",
         disable_action_event_ids.len(),
         disable_action_event_ids
     );

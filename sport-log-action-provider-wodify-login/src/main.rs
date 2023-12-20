@@ -6,7 +6,7 @@ use std::{
     time::Duration as StdDuration,
 };
 
-use chrono::{Duration, Local, Utc};
+use chrono::{DateTime, Duration, Local, Utc};
 use clap::Parser;
 use lazy_static::lazy_static;
 use reqwest::{Client, Error as ReqwestError};
@@ -49,8 +49,8 @@ enum UserError {
     NoCredential(ActionEventId),
     #[error("can not log in: login failed")]
     LoginFailed(ActionEventId),
-    #[error("the class could not be found within the timeout")]
-    ClassNotFound(ActionEventId),
+    #[error("{1} class at {2} not found within timeout")]
+    ClassNotFound(ActionEventId, String, DateTime<Utc>),
 }
 
 impl UserError {
@@ -58,7 +58,7 @@ impl UserError {
         match self {
             Self::NoCredential(action_event_id)
             | Self::LoginFailed(action_event_id)
-            | Self::ClassNotFound(action_event_id) => *action_event_id,
+            | Self::ClassNotFound(action_event_id, ..) => *action_event_id,
         }
     }
 }
@@ -83,12 +83,12 @@ lazy_static! {
         Ok(file) => match toml::from_str(&file) {
             Ok(config) => config,
             Err(error) => {
-                error!("Failed to parse {}: {}", CONFIG_FILE, error);
+                error!("failed to parse {}: {}", CONFIG_FILE, error);
                 process::exit(1);
             }
         },
         Err(error) => {
-            error!("Failed to read {}: {}", CONFIG_FILE, error);
+            error!("failed to read {}: {}", CONFIG_FILE, error);
             process::exit(1);
         }
     };
@@ -201,7 +201,10 @@ async fn login(mode: Mode) -> Result<()> {
         p.kill();
     }
 
-    let mut webdriver = Command::new(GECKODRIVER).stdout(Stdio::null()).spawn()?;
+    let mut webdriver = Command::new(GECKODRIVER)
+        .stdout(Stdio::null())
+        .stderr(Stdio::null())
+        .spawn()?;
 
     time::sleep(StdDuration::from_secs(1)).await; // make sure geckodriver is available
 
@@ -248,7 +251,7 @@ async fn login(mode: Mode) -> Result<()> {
     }
 
     debug!(
-        "deleting {} action events ({:?})",
+        "disabling {} action events: {:?}",
         disable_action_event_ids.len(),
         disable_action_event_ids
     );
@@ -321,11 +324,11 @@ async fn wodify_login(
     if let Ok(duration) = (exec_action_event.datetime - Duration::days(1) - Utc::now()).to_std() {
         time::sleep(duration).await;
     }
-    info!("ready");
+    info!("ready"); // info for timing purposes
 
     for _ in 0..3 {
         driver.refresh().await?;
-        info!("reload done");
+        info!("reload done"); // info for timing purposes
 
         let table = driver
             .find(By::ClassName("TableRecords"))
@@ -383,14 +386,11 @@ async fn wodify_login(
                 return Ok(Ok(exec_action_event.action_event_id));
             }
         }
-
-        info!(
-            "no {} class at {} found",
-            &exec_action_event.action_name, &exec_action_event.datetime
-        );
     }
 
     Ok(Err(UserError::ClassNotFound(
         exec_action_event.action_event_id,
+        exec_action_event.action_name.clone(),
+        exec_action_event.datetime,
     )))
 }

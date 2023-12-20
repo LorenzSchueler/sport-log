@@ -73,12 +73,12 @@ lazy_static! {
         Ok(file) => match toml::from_str(&file) {
             Ok(config) => config,
             Err(error) => {
-                error!("Failed to parse {}: {}", CONFIG_FILE, error);
+                error!("failed to parse {}: {}", CONFIG_FILE, error);
                 process::exit(1);
             }
         },
         Err(error) => {
-            error!("Failed to read {}: {}", CONFIG_FILE, error);
+            error!("failed to read {}: {}", CONFIG_FILE, error);
             process::exit(1);
         }
     };
@@ -352,7 +352,7 @@ async fn fetch() -> Result<()> {
     }
 
     debug!(
-        "deleting {} action events ({:?})",
+        "disabling {} action events: {:?}",
         delete_action_event_ids.len(),
         delete_action_event_ids
     );
