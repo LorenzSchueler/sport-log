@@ -7,28 +7,38 @@ class TimelineUnion {
     StrengthSessionDescription this._strengthSessionDescription,
   )   : _metconSessionDescription = null,
         _cardioSessionDescription = null,
+        _wod = null,
         _diary = null;
 
   TimelineUnion.metconSession(
     MetconSessionDescription this._metconSessionDescription,
   )   : _strengthSessionDescription = null,
         _cardioSessionDescription = null,
+        _wod = null,
         _diary = null;
 
   TimelineUnion.cardioSession(
     CardioSessionDescription this._cardioSessionDescription,
   )   : _strengthSessionDescription = null,
         _metconSessionDescription = null,
+        _wod = null,
         _diary = null;
 
+  TimelineUnion.wod(Wod this._wod)
+      : _strengthSessionDescription = null,
+        _metconSessionDescription = null,
+        _cardioSessionDescription = null,
+        _diary = null;
   TimelineUnion.diary(Diary this._diary)
       : _strengthSessionDescription = null,
         _metconSessionDescription = null,
-        _cardioSessionDescription = null;
+        _cardioSessionDescription = null,
+        _wod = null;
 
   final StrengthSessionDescription? _strengthSessionDescription;
   final MetconSessionDescription? _metconSessionDescription;
   final CardioSessionDescription? _cardioSessionDescription;
+  final Wod? _wod;
   final Diary? _diary;
 
   DateTime get datetime {
@@ -38,6 +48,8 @@ class TimelineUnion {
       return _metconSessionDescription!.metconSession.datetime;
     } else if (_cardioSessionDescription != null) {
       return _cardioSessionDescription!.cardioSession.datetime;
+    } else if (_wod != null) {
+      return _wod!.date;
     } else {
       return _diary!.date;
     }
@@ -47,6 +59,7 @@ class TimelineUnion {
     T Function(StrengthSessionDescription) strengthFunction,
     T Function(MetconSessionDescription) metconFunction,
     T Function(CardioSessionDescription) cardioFunction,
+    T Function(Wod) wodFunction,
     T Function(Diary) diaryFunction,
   ) {
     if (_strengthSessionDescription != null) {
@@ -55,6 +68,8 @@ class TimelineUnion {
       return metconFunction(_metconSessionDescription!);
     } else if (_cardioSessionDescription != null) {
       return cardioFunction(_cardioSessionDescription!);
+    } else if (_wod != null) {
+      return wodFunction(_wod!);
     } else {
       return diaryFunction(_diary!);
     }

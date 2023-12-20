@@ -2,6 +2,7 @@ import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/database/table.dart';
+import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
 import 'package:sport_log/models/clone_extensions.dart';
 import 'package:sport_log/models/entity_interfaces.dart';
@@ -17,6 +18,12 @@ class Wod extends AtomicEntity {
     required this.description,
     required this.deleted,
   });
+
+  Wod.defaultValue()
+      : id = randomId(),
+        date = DateTime.now(),
+        description = null,
+        deleted = false;
 
   factory Wod.fromJson(Map<String, dynamic> json) => _$WodFromJson(json);
 

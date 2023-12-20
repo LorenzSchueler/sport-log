@@ -9,6 +9,7 @@ import 'package:sport_log/pages/workout/diary/diary_overview_page.dart';
 import 'package:sport_log/pages/workout/metcon_sessions/metcon_session_overview_page.dart';
 import 'package:sport_log/pages/workout/session_tab_utils.dart';
 import 'package:sport_log/pages/workout/strength_sessions/strength_overview_page.dart';
+import 'package:sport_log/pages/workout/wod/wod_overview_page.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
@@ -139,6 +140,7 @@ class TimelinePage extends StatelessWidget {
       ),
       (cardioSession) =>
           CardioSessionCard(cardioSessionDescription: cardioSession),
+      (wod) => WodCard(wod: wod),
       (diary) => DiaryCard(diary: diary),
     );
   }

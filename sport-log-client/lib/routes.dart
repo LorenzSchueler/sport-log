@@ -43,6 +43,8 @@ import 'package:sport_log/pages/workout/strength_sessions/strength_details_page.
 import 'package:sport_log/pages/workout/strength_sessions/strength_edit_page.dart';
 import 'package:sport_log/pages/workout/strength_sessions/strength_overview_page.dart';
 import 'package:sport_log/pages/workout/timeline/timeline_page.dart';
+import 'package:sport_log/pages/workout/wod/wod_edit_page.dart';
+import 'package:sport_log/pages/workout/wod/wod_overview_page.dart';
 import 'package:sport_log/settings.dart';
 
 abstract class Routes {
@@ -92,6 +94,9 @@ abstract class Routes {
   static const String trackingSettings = '/cardio/tracking_settings';
   static const String tracking = '/cardio/tracking';
   static const String expeditionTracking = '/cardio/expedition_tracking';
+  // wod
+  static const String wodOverview = '/wod/overview';
+  static const String wodEdit = '/wod/edit';
   // diary
   static const String diaryOverview = '/diary/overview';
   static const String diaryEdit = '/diary/edit';
@@ -316,6 +321,12 @@ abstract class Routes {
                   trackingSettings: arg,
                 )
               : const CardioExpeditionTrackingPage.attach();
+        }),
+    // wod
+    Routes.wodOverview: (_) => _checkUserId(WodOverviewPage.new),
+    Routes.wodEdit: (context) => _checkUserId(() {
+          final wod = ModalRoute.of(context)?.settings.arguments as Wod?;
+          return WodEditPage(wod: wod);
         }),
     // diary
     Routes.diaryOverview: (_) => _checkUserId(DiaryOverviewPage.new),

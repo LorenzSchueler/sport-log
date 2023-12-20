@@ -89,6 +89,16 @@ abstract class TableAccessor<T extends AtomicEntity> {
   String commentFilter(String? comment) =>
       commentFilterOfTable(tableName, comment);
 
+  static String descriptionFilterOfTable(
+    String tableName,
+    String? description,
+  ) =>
+      description == null || description.isEmpty
+          ? ''
+          : "$tableName.${Columns.description} like '%$description%'";
+  String descriptionFilter(String? description) =>
+      descriptionFilterOfTable(tableName, description);
+
   static String withTrackOfTable(String tableName) =>
       "$tableName.${Columns.track} is not null";
   String get withTrack => withTrackOfTable(tableName);

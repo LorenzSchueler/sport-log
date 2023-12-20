@@ -23,6 +23,7 @@ enum SessionsPageTab {
     "Cardio",
     "cardio sessions",
   ),
+  wod(Routes.wodOverview, AppIcons.sports, "Wod", "wods"),
   diary(Routes.diaryOverview, AppIcons.calendar, "Diary", "diary entries");
 
   const SessionsPageTab(this.route, this.icon, this.label, this.entryName);

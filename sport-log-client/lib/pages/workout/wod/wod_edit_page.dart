@@ -1,62 +1,61 @@
 import 'package:flutter/material.dart';
-import 'package:sport_log/data_provider/data_providers/diary_data_provider.dart';
+import 'package:sport_log/data_provider/data_providers/wod_data_provider.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
-import 'package:sport_log/helpers/validation.dart';
-import 'package:sport_log/models/diary/diary.dart';
+import 'package:sport_log/models/wod/wod.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/dialogs.dart';
 import 'package:sport_log/widgets/input_fields/edit_tile.dart';
 import 'package:sport_log/widgets/picker/datetime_picker.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
 
-class DiaryEditPage extends StatefulWidget {
-  const DiaryEditPage({this.diary, super.key});
+class WodEditPage extends StatefulWidget {
+  const WodEditPage({this.wod, super.key});
 
-  final Diary? diary;
-  bool get isNew => diary == null;
+  final Wod? wod;
+  bool get isNew => wod == null;
 
   @override
-  State<DiaryEditPage> createState() => _DiaryEditPageState();
+  State<WodEditPage> createState() => _WodEditPageState();
 }
 
-class _DiaryEditPageState extends State<DiaryEditPage> {
+class _WodEditPageState extends State<WodEditPage> {
   final _formKey = GlobalKey<FormState>();
-  final _dataProvider = DiaryDataProvider();
+  final _dataProvider = WodDataProvider();
 
-  late final Diary _diary = widget.diary?.clone() ?? Diary.defaultValue();
+  late final Wod _wod = widget.wod?.clone() ?? Wod.defaultValue();
 
-  Future<void> _saveDiary() async {
+  Future<void> _saveWod() async {
     final result = widget.isNew
-        ? await _dataProvider.createSingle(_diary)
-        : await _dataProvider.updateSingle(_diary);
+        ? await _dataProvider.createSingle(_wod)
+        : await _dataProvider.updateSingle(_wod);
     if (mounted) {
       if (result.isSuccess) {
         Navigator.pop(context);
       } else {
         await showMessageDialog(
           context: context,
-          title: "${widget.isNew ? 'Creating' : 'Updating'} Diary Entry Failed",
+          title: "${widget.isNew ? 'Creating' : 'Updating'} Wod Failed",
           text: result.failure.toString(),
         );
       }
     }
   }
 
-  Future<void> _deleteDiary() async {
-    final delete = await showDeleteWarningDialog(context, "Diary Entry");
+  Future<void> _deleteWod() async {
+    final delete = await showDeleteWarningDialog(context, "Wod");
     if (!delete) {
       return;
     }
     if (!widget.isNew) {
-      final result = await _dataProvider.deleteSingle(_diary);
+      final result = await _dataProvider.deleteSingle(_wod);
       if (mounted) {
         if (result.isSuccess) {
           Navigator.pop(context);
         } else {
           await showMessageDialog(
             context: context,
-            title: "Deleting Diary Entry Failed",
+            title: "Deleting Wod Failed",
             text: result.failure.toString(),
           );
         }
@@ -71,17 +70,17 @@ class _DiaryEditPageState extends State<DiaryEditPage> {
     return DiscardWarningOnPop(
       child: Scaffold(
         appBar: AppBar(
-          title: Text("${widget.isNew ? 'Create' : 'Edit'} Diary Entry"),
+          title: Text("${widget.isNew ? 'Create' : 'Edit'} Wod"),
           actions: [
             IconButton(
-              onPressed: _deleteDiary,
+              onPressed: _deleteWod,
               icon: const Icon(AppIcons.delete),
             ),
             IconButton(
               onPressed: _formKey.currentContext != null &&
                       _formKey.currentState!.validate() &&
-                      _diary.isValidBeforeSanitation()
-                  ? _saveDiary
+                      _wod.isValidBeforeSanitation()
+                  ? _saveWod
                   : null,
               icon: const Icon(AppIcons.save),
             ),
@@ -96,50 +95,31 @@ class _DiaryEditPageState extends State<DiaryEditPage> {
                 EditTile(
                   leading: AppIcons.calendar,
                   caption: "Date",
-                  child: Text(_diary.date.humanDate),
+                  child: Text(_wod.date.humanDate),
                   onTap: () async {
                     final date = await showDatePickerWithDefaults(
                       context: context,
-                      initialDate: _diary.date,
+                      initialDate: _wod.date,
                     );
                     if (mounted && date != null) {
                       setState(() {
-                        _diary.date = date;
+                        _wod.date = date;
                       });
                     }
                   },
                 ),
-                TextFormField(
-                  decoration: const InputDecoration(
-                    icon: Icon(AppIcons.weight),
-                    labelText: "Bodyweight",
-                  ),
-                  initialValue: _diary.bodyweight?.toStringAsFixed(1),
-                  validator: (weight) => weight == null || weight.isEmpty
-                      ? null
-                      : Validator.validateDoubleGtZero(weight),
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                  keyboardType: TextInputType.number,
-                  onChanged: (bodyweight) => setState(() {
-                    if (bodyweight.isEmpty) {
-                      _diary.bodyweight = null;
-                    } else if (Validator.validateDoubleGtZero(bodyweight) ==
-                        null) {
-                      _diary.bodyweight = double.parse(bodyweight);
-                    }
-                  }),
-                ),
                 Expanded(
                   child: TextFormField(
                     decoration: const InputDecoration(
-                      icon: Icon(AppIcons.comment),
-                      labelText: "Comments",
+                      icon: Icon(AppIcons.notes),
+                      labelText: "Description",
                     ),
-                    initialValue: _diary.comments,
+                    initialValue: _wod.description,
                     keyboardType: TextInputType.multiline,
                     maxLines: null,
-                    onChanged: (comments) => setState(() {
-                      _diary.comments = comments.isEmpty ? null : comments;
+                    onChanged: (description) => setState(() {
+                      _wod.description =
+                          description.isEmpty ? null : description;
                     }),
                   ),
                 ),

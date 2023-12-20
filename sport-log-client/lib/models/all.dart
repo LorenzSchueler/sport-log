@@ -1,7 +1,7 @@
 export 'account_data/account_data.dart';
 export 'action/all.dart';
 export 'cardio/all.dart';
-export 'diary/all.dart';
+export 'diary/diary.dart';
 export 'entity_interfaces.dart';
 export 'metcon/all.dart';
 export 'movement/all.dart';

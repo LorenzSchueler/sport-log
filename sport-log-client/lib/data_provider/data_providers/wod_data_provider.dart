@@ -20,4 +20,12 @@ class WodDataProvider extends EntityDataProvider<Wod> {
 
   @override
   List<Wod> getFromAccountData(AccountData accountData) => accountData.wods;
+
+  Future<List<Wod>> getByTimerangeAndDescription({
+    required DateTime? from,
+    required DateTime? until,
+    required String? description,
+  }) async {
+    return table.getByTimerangeAndDescription(from, until, description);
+  }
 }

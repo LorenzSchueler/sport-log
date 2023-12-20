@@ -3,6 +3,7 @@ import 'package:sport_log/data_provider/data_providers/cardio_data_provider.dart
 import 'package:sport_log/data_provider/data_providers/diary_data_provider.dart';
 import 'package:sport_log/data_provider/data_providers/metcon_data_provider.dart';
 import 'package:sport_log/data_provider/data_providers/strength_data_provider.dart';
+import 'package:sport_log/data_provider/data_providers/wod_data_provider.dart';
 import 'package:sport_log/database/database.dart';
 import 'package:sport_log/models/all.dart';
 
@@ -13,6 +14,7 @@ class TimelineDataProvider extends DataProvider<TimelineUnion> {
       _instance!._strengthDataProvider.addListener(_instance!.notifyListeners);
       _instance!._metconDataProvider.addListener(_instance!.notifyListeners);
       _instance!._cardioDataProvider.addListener(_instance!.notifyListeners);
+      _instance!._wodDataProvider.addListener(_instance!.notifyListeners);
       _instance!._diaryDataProvider.addListener(_instance!.notifyListeners);
     }
     return _instance!;
@@ -25,6 +27,7 @@ class TimelineDataProvider extends DataProvider<TimelineUnion> {
   final _strengthDataProvider = StrengthSessionDescriptionDataProvider();
   final _metconDataProvider = MetconSessionDescriptionDataProvider();
   final _cardioDataProvider = CardioSessionDescriptionDataProvider();
+  final _wodDataProvider = WodDataProvider();
   final _diaryDataProvider = DiaryDataProvider();
 
   @override
@@ -45,6 +48,7 @@ class TimelineDataProvider extends DataProvider<TimelineUnion> {
             await _strengthDataProvider.getNonDeleted(),
         metconSessionsDescription: await _metconDataProvider.getNonDeleted(),
         cardioSessionsDescription: await _cardioDataProvider.getNonDeleted(),
+        wods: await _wodDataProvider.getNonDeleted(),
         diaries: await _diaryDataProvider.getNonDeleted(),
       );
 
@@ -79,6 +83,13 @@ class TimelineDataProvider extends DataProvider<TimelineUnion> {
                 movement: movementOrMetcon?.movement,
                 comment: comment,
               ),
+        wods: movementOrMetcon != null
+            ? []
+            : await _wodDataProvider.getByTimerangeAndDescription(
+                from: from,
+                until: until,
+                description: comment,
+              ),
         diaries: movementOrMetcon != null
             ? []
             : await _diaryDataProvider.getByTimerangeAndComment(
@@ -92,11 +103,13 @@ class TimelineDataProvider extends DataProvider<TimelineUnion> {
     required List<StrengthSessionDescription> strengthSessionsDescription,
     required List<MetconSessionDescription> metconSessionsDescription,
     required List<CardioSessionDescription> cardioSessionsDescription,
+    required List<Wod> wods,
     required List<Diary> diaries,
   }) =>
       strengthSessionsDescription.map(TimelineUnion.strengthSession).toList()
         ..addAll(metconSessionsDescription.map(TimelineUnion.metconSession))
         ..addAll(cardioSessionsDescription.map(TimelineUnion.cardioSession))
+        ..addAll(wods.map(TimelineUnion.wod))
         ..addAll(diaries.map(TimelineUnion.diary))
         ..sort((a, b) => b.datetime.compareTo(a.datetime));
 

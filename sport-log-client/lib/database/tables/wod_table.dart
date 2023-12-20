@@ -38,4 +38,22 @@ class WodTable extends TableAccessor<Wod> {
     );
     return records.map(serde.fromDbRecord).toList();
   }
+
+  Future<List<Wod>> getByTimerangeAndDescription(
+    DateTime? from,
+    DateTime? until,
+    String? description,
+  ) async {
+    final records = await database.query(
+      tableName,
+      where: TableAccessor.combineFilter([
+        notDeleted,
+        fromFilter(from, dateOnly: true),
+        untilFilter(until, dateOnly: true),
+        descriptionFilter(description),
+      ]),
+      orderBy: orderByDate,
+    );
+    return records.map(serde.fromDbRecord).toList();
+  }
 }
