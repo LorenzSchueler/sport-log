@@ -34,7 +34,7 @@ dependencies:
   device_info_plus: ^9.0.0
   file_picker: ^6.0.0
   fixnum: ^1.0.0 # used for ids (in web ints go only up to 2^53-1)
-  fl_chart: ^0.64.0
+  fl_chart: ^0.65.0
   flutter:
     sdk: flutter
   flutter_blue_plus: ^1.7.5
@@ -57,15 +57,16 @@ dependencies:
       ref: develop
   logger: ^2.0.1
   mapbox_api: #^1.0.0
+    # http 1.1
     git:
       url: https://github.com/LorenzSchueler/mapbox-api
   mapbox_maps_flutter: #^0.4.3
     # onTap Point and ScreenCoordinate
     git:
       url: https://github.com/LorenzSchueler/mapbox-maps-flutter
-  mapbox_search: ^4.1.0-beta.3
+  mapbox_search: ^4.2.0
   open_file: ^3.3.1
-  package_info_plus: ^4.0.0
+  package_info_plus: ^5.0.1
   path_provider: ^2.0.10
   pedometer: #^3.0.0
     # callback for every step
