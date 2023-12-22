@@ -44,6 +44,8 @@ import 'package:sport_log/pages/workout/strength_sessions/strength_details_page.
 import 'package:sport_log/pages/workout/strength_sessions/strength_edit_page.dart';
 import 'package:sport_log/pages/workout/strength_sessions/strength_overview_page.dart';
 import 'package:sport_log/pages/workout/timeline/timeline_page.dart';
+import 'package:sport_log/pages/workout/wod/wod_edit_page.dart';
+import 'package:sport_log/pages/workout/wod/wod_overview_page.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
 
@@ -112,6 +114,7 @@ Finder navItem(String text) => find.ancestor(
 final strengthNavItem = navItem("Strength");
 final metconNavItem = navItem("Metcon");
 final cardioNavItem = navItem("Cardio");
+final wodNavItem = navItem("Wod");
 final diaryNavItem = navItem("Diary");
 
 Finder drawerItem(String text) => find.ancestor(
@@ -358,15 +361,26 @@ void main() {
     await screenshot(tester, "route_upload");
     await backDiscardChanges(tester);
 
+    // go to wod overview
+    await tap(tester, wodNavItem);
+    expect(find.byType(WodOverviewPage), findsOneWidget);
+    await screenshot(tester, "wod_overview");
+
+    // go to wod session edit
+    await tap(tester, find.byType(WodCard).first);
+    expect(find.byType(WodEditPage), findsOneWidget);
+    await screenshot(tester, "wod_edit");
+    await backDiscardChanges(tester);
+
     // go to diary overview
     await tap(tester, diaryNavItem);
     expect(find.byType(DiaryOverviewPage), findsOneWidget);
     await screenshot(tester, "diary_overview");
 
     // go to diary session edit
-    await tap(tester, addFab);
-    await screenshot(tester, "diary_edit");
+    await tap(tester, find.byType(DiaryCard).first);
     expect(find.byType(DiaryEditPage), findsOneWidget);
+    await screenshot(tester, "diary_edit");
     await backDiscardChanges(tester);
 
     // open drawer

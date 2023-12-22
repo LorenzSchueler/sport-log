@@ -75,7 +75,7 @@ curl -u $AP_USERNAME:$AP_PASSWORD -X POST "$BASE_URL/v0.3/ap/action" \
     -d @../test-data/action.json
 
 step "run user setup"
-entities=(diary strength_session strength_set metcon_session route cardio_session platform_credential action_rule action_event)
+entities=(diary wod strength_session strength_set metcon_session route cardio_session platform_credential action_rule action_event)
 for entity in "${entities[@]}"; do
     cat ../test-data/$entity.json | \
     sed "s/2023-07-04/$(date +%Y-%m-%d)/g" | \

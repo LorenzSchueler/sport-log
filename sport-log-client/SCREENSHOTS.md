@@ -29,29 +29,33 @@
   <tr>
   </tr>
     <td><img src="screenshots/route_upload.png" height="350"></td>
+    <td><img src="screenshots/wod_overview.png" height="350"></td>
+    <td><img src="screenshots/wod_edit.png" height="350"></td>
     <td><img src="screenshots/diary_overview.png" height="350"></td>
     <td><img src="screenshots/diary_edit.png" height="350"></td>
-    <td><img src="screenshots/movement_overview.png" height="350"></td>
-    <td><img src="screenshots/movement_edit.png" height="350"></td>
   <tr>
   </tr>
+    <td><img src="screenshots/drawer.png" height="350"></td>
+    <td><img src="screenshots/movement_overview.png" height="350"></td>
+    <td><img src="screenshots/movement_edit.png" height="350"></td>
     <td><img src="screenshots/timer.png" height="350"></td>
+    <td><img src="screenshots/heart_rate.png" height="350"></td>
+  <tr>
+  </tr>
     <td><img src="screenshots/map_styles.png" height="350"></td>
     <td><img src="screenshots/map.png" height="350"></td>
     <td><img src="screenshots/map_satellite.png" height="350"></td>
     <td><img src="screenshots/offline_maps.png" height="350"></td>
+    <td><img src="screenshots/platform_overview.png" height="350"></td>
   <tr>
   </tr>
-    <td><img src="screenshots/heart_rate.png" height="350"></td>
-    <td><img src="screenshots/platform_overview.png" height="350"></td>
     <td><img src="screenshots/action_provider_overview.png" height="350"></td>
     <td><img src="screenshots/action_rule_edit.png" height="350"></td>
     <td><img src="screenshots/action_event_edit.png" height="350"></td>
-  <tr>
-  </tr>
     <td><img src="screenshots/settings.png" height="350"></td>
     <td><img src="screenshots/about.png" height="350"></td>
-    <td><img src="screenshots/drawer.png" height="350"></td>
+  <tr>
+  </tr>
     <td><img src="screenshots/landing.png" height="350"></td>
     <td><img src="screenshots/login.png" height="350"></td>
   </tr>
