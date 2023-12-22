@@ -12,6 +12,7 @@ import 'package:sport_log/helpers/heart_rate_utils.dart';
 import 'package:sport_log/helpers/location_utils.dart';
 import 'package:sport_log/helpers/map_controller.dart';
 import 'package:sport_log/helpers/step_count_utils.dart';
+import 'package:sport_log/helpers/stopwatch.dart';
 import 'package:sport_log/helpers/tracking_ui_utils.dart';
 import 'package:sport_log/models/cardio/all.dart';
 import 'package:sport_log/pages/workout/cardio/tracking_settings.dart';
@@ -78,7 +79,7 @@ class TrackingUtils extends ChangeNotifier {
   TrackingMode _trackingMode = TrackingMode.notStarted;
   TrackingMode get mode => _trackingMode;
 
-  final Stopwatch _stopwatch = Stopwatch();
+  final StopwatchX _stopwatch = StopwatchX();
   Duration get currentDuration => _stopwatch.elapsed;
 
   String _locationInfo = "no data";
