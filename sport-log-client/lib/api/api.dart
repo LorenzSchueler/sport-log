@@ -138,6 +138,8 @@ extension RequestExtension on Request {
       return await fn();
     } on SocketException {
       return Failure(ApiError(ApiErrorType.serverUnreachable, null));
+    } on HttpException {
+      return Failure(ApiError(ApiErrorType.serverUnreachable, null));
     } on OSError catch (error, stackTrace) {
       if (error.message.contains("Software caused connection abort")) {
         return Failure(ApiError(ApiErrorType.serverUnreachable, null));
