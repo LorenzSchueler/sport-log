@@ -35,7 +35,7 @@ class RoutePlanningUtils {
   static final _logger = Logger("RoutePlanningUtils");
 
   // Remove parts that are too far from the marked points and replace them with straight line.
-  static List<Position> _adjustTrack(
+  static void _snapIfClose(
     List<Position> track,
     List<Position> markedPositions,
   ) {
@@ -44,19 +44,24 @@ class RoutePlanningUtils {
     for (final markedPos in markedPositions) {
       var (distance, index) = markedPos.minDistanceTo(track.slice(searchStart));
       if (index == null) {
-        // no nearest point found - keep track as is
+        // track is empty
         break;
       }
       index += searchStart;
       if (distance < _maxDistance) {
         if (deleteBetween) {
+          // the last markedPos had no matching point but this one has
+          // create straight line to current matching point by removing everything in between
           track.removeRange(searchStart, index);
           searchStart += 1;
           deleteBetween = false;
         } else {
+          // the last markedPos and the current one have both a matching points so just advance the search window
           searchStart = index + 1;
         }
       } else {
+        // since position matching to last markedPos there is no point withing max distance to current markedPos
+        // insert markedPos and start delete window
         track.insert(searchStart, markedPos);
         searchStart += 1;
         deleteBetween = true;
@@ -65,11 +70,9 @@ class RoutePlanningUtils {
     if (deleteBetween) {
       track.removeRange(searchStart, track.length);
     }
-
-    return track;
   }
 
-  static List<Position> _setDistances(List<Position> track) {
+  static void _setDistances(List<Position> track) {
     if (track.isNotEmpty) {
       track[0].distance = 0;
     }
@@ -77,7 +80,6 @@ class RoutePlanningUtils {
       track[i].distance = track[i - 1].distance +
           track[i - 1].latLng.distanceTo(track[i].latLng);
     }
-    return track;
   }
 
   static Future<List<Position>> _responseToTrack(
@@ -163,8 +165,8 @@ class RoutePlanningUtils {
     Future<double?> Function(LatLng)? getElevation,
   ) async {
     if (snapMode == SnapMode.neverSnap) {
-      var track = markedPositions.clone();
-      track = _setDistances(track);
+      final track = markedPositions.clone();
+      _setDistances(track);
       return Success(track);
     }
 
@@ -182,9 +184,9 @@ class RoutePlanningUtils {
     if (response.routes != null && response.routes!.isNotEmpty) {
       final track = await _responseToTrack(response, getElevation);
       if (snapMode == SnapMode.snapIfClose) {
-        var adjustedTrack = _adjustTrack(track, markedPositions);
-        adjustedTrack = _setDistances(track);
-        return Success(adjustedTrack);
+        _snapIfClose(track, markedPositions);
+        _setDistances(track);
+        return Success(track);
       } else {
         // snapMode == SnapMode.alwaysSnap
         return Success(track);

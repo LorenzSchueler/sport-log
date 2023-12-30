@@ -89,7 +89,9 @@ class TrackingUtils extends ChangeNotifier {
   String _heartRateInfo = "no data";
   String get heartRateInfo => _heartRateInfo;
 
+  static const _refreshInterval = Duration(seconds: 1);
   Timer? _refreshTimer;
+  static const _autosaveInterval = Duration(minutes: 1);
   Timer? _autosaveTimer;
 
   final TrackingUiUtils _trackingUiUtils;
@@ -123,10 +125,9 @@ class TrackingUtils extends ChangeNotifier {
 
   Future<void> onMapCreated(MapController mapController) async {
     await _trackingUiUtils.onMapCreated(mapController);
-    _refreshTimer =
-        Timer.periodic(const Duration(seconds: 1), (_) => _refresh());
+    _refreshTimer = Timer.periodic(_refreshInterval, (_) => _refresh());
     _autosaveTimer = Timer.periodic(
-      const Duration(minutes: 1),
+      _autosaveInterval,
       (_) => _autoSaveCardioSession(),
     );
     await _locationUtils.startLocationStream(
