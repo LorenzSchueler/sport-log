@@ -132,6 +132,12 @@ class _RouteEditPageState extends State<RouteEditPage> {
         }
       }
     } else if (mounted) {
+      setState(() {
+        _route
+          ..track = []
+          ..setDistance()
+          ..setAscentDescent();
+      });
       await _mapController?.updateRouteLine(_line, null);
     }
   }
