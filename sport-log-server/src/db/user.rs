@@ -6,8 +6,8 @@ use axum::http::StatusCode;
 use chrono::{DateTime, Utc};
 use diesel::{prelude::*, result::Error};
 use rand_core::OsRng;
+use sport_log_derive::*;
 use sport_log_types::{schema::user, User, UserId};
-use sport_log_types_derive::*;
 
 use crate::{auth::AuthUser, db::*};
 

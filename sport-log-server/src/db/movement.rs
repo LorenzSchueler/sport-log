@@ -1,11 +1,11 @@
 use axum::http::StatusCode;
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
+use sport_log_derive::*;
 use sport_log_types::{
     schema::{movement, movement_muscle},
     Movement, MovementId, MovementMuscle, MovementMuscleId, UserId,
 };
-use sport_log_types_derive::*;
 
 use crate::{auth::*, db::*};
 

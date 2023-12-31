@@ -2,12 +2,12 @@ use argon2::{password_hash::SaltString, PasswordHash, PasswordHasher, PasswordVe
 use chrono::{DateTime, Utc};
 use diesel::{prelude::*, result::Error};
 use rand_core::OsRng;
+use sport_log_derive::*;
 use sport_log_types::{
     schema::{action, action_event, action_provider, action_rule, platform_credential},
     Action, ActionEvent, ActionEventId, ActionProviderId, ActionRuleId, CreatableActionRule,
     DeletableActionEvent, ExecutableActionEvent, UserId,
 };
-use sport_log_types_derive::*;
 
 use crate::{auth::*, db::*};
 

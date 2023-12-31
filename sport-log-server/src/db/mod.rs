@@ -122,7 +122,7 @@ pub trait ModifiableDb: Db {
 ///
 /// This trait can be automatically derived by adding `#[derive(Create)]` to your struct.
 ///
-/// For restrictions on the types for derive to work please see [`sport_log_types_derive::Create`].
+/// For restrictions on the types for derive to work please see [`sport_log_derive::Create`].
 pub trait Create: Db {
     fn create(value: &Self::Type, db: &mut PgConnection) -> QueryResult<usize>;
 
@@ -135,7 +135,7 @@ pub trait Create: Db {
 ///
 /// This trait can be automatically derived by adding `#[derive(GetById)]` to your struct.
 ///
-/// For restrictions on the types for derive to work please see [`sport_log_types_derive::GetById`].
+/// For restrictions on the types for derive to work please see [`sport_log_derive::GetById`].
 pub trait GetById: Db {
     fn get_by_id(id: Self::Id, db: &mut PgConnection) -> QueryResult<Self::Type>;
 }
@@ -146,7 +146,7 @@ pub trait GetById: Db {
 ///
 /// This trait can be automatically derived by adding `#[derive(GetByIds)]` to your struct.
 ///
-/// For restrictions on the types for derive to work please see [`sport_log_types_derive::GetByIds`].
+/// For restrictions on the types for derive to work please see [`sport_log_derive::GetByIds`].
 pub trait GetByIds: Db {
     fn get_by_ids(ids: &[Self::Id], db: &mut PgConnection) -> QueryResult<Vec<Self::Type>>;
 }
@@ -157,7 +157,7 @@ pub trait GetByIds: Db {
 ///
 /// This trait can be automatically derived by adding `#[derive(GetByUser)]` to your struct.
 ///
-/// For restrictions on the types for derive to work please see [`sport_log_types_derive::GetByUser`].
+/// For restrictions on the types for derive to work please see [`sport_log_derive::GetByUser`].
 pub trait GetByUser: Db {
     fn get_by_user(user_id: UserId, db: &mut PgConnection) -> QueryResult<Vec<Self::Type>>;
 }
@@ -168,7 +168,7 @@ pub trait GetByUser: Db {
 ///
 /// This trait can be automatically derived by adding `#[derive(GetByUserTimespan)]` to your struct.
 ///
-/// For restrictions on the types for derive to work please see [`sport_log_types_derive::GetByUserTimespan`].
+/// For restrictions on the types for derive to work please see [`sport_log_derive::GetByUserTimespan`].
 pub trait GetByUserTimespan: Db {
     fn get_by_user_and_timespan(
         user_id: UserId,
@@ -183,7 +183,7 @@ pub trait GetByUserTimespan: Db {
 ///
 /// This trait can be automatically derived by adding `#[derive(GetByUserSync)]` to your struct.
 ///
-/// For restrictions on the types for derive to work please see [`sport_log_types_derive::GetByUserSync`].
+/// For restrictions on the types for derive to work please see [`sport_log_derive::GetByUserSync`].
 pub trait GetByUserSync: Db {
     fn get_by_user_and_last_sync(
         user_id: UserId,
@@ -198,7 +198,7 @@ pub trait GetByUserSync: Db {
 ///
 /// This trait can be automatically derived by adding `#[derive(GetBySync)]` to your struct.
 ///
-/// For restrictions on the types for derive to work please see [`sport_log_types_derive::GetBySync`].
+/// For restrictions on the types for derive to work please see [`sport_log_derive::GetBySync`].
 pub trait GetBySync: Db {
     fn get_by_last_sync(
         last_sync: DateTime<Utc>,
@@ -212,7 +212,7 @@ pub trait GetBySync: Db {
 ///
 /// This trait can be automatically derived by adding `#[derive(GetAll)]` to your struct.
 ///
-/// For restrictions on the types for derive to work please see [`sport_log_types_derive::GetAll`].
+/// For restrictions on the types for derive to work please see [`sport_log_derive::GetAll`].
 pub trait GetAll: Db {
     fn get_all(db: &mut PgConnection) -> QueryResult<Vec<Self::Type>>;
 }
@@ -223,7 +223,7 @@ pub trait GetAll: Db {
 ///
 /// This trait can be automatically derived by adding `#[derive(Update)]` to your struct.
 ///
-/// For restrictions on the types for derive to work please see [`sport_log_types_derive::Update`].
+/// For restrictions on the types for derive to work please see [`sport_log_derive::Update`].
 pub trait Update: Db {
     fn update(value: &Self::Type, db: &mut PgConnection) -> QueryResult<usize>;
 
@@ -240,7 +240,7 @@ pub trait Update: Db {
 ///
 /// This trait can be automatically derived by adding `#[derive(HardDelete)]` to your struct.
 ///
-/// For restrictions on the types for derive to work please see [`sport_log_types_derive::HardDelete`].
+/// For restrictions on the types for derive to work please see [`sport_log_derive::HardDelete`].
 pub trait HardDelete: Db {
     fn hard_delete(last_change: DateTime<Utc>, db: &mut PgConnection) -> QueryResult<usize>;
 }

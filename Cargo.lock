@@ -1890,6 +1890,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "sport-log-derive"
+version = "0.1.0"
+dependencies = [
+ "Inflector",
+ "proc-macro2",
+ "quote",
+ "syn 2.0.41",
+]
+
+[[package]]
 name = "sport-log-scheduler"
 version = "0.1.0"
 dependencies = [
@@ -1923,8 +1933,8 @@ dependencies = [
  "rand_core",
  "serde",
  "serde_json",
+ "sport-log-derive",
  "sport-log-types",
- "sport-log-types-derive",
  "tokio",
  "toml 0.8.8",
  "tower",
@@ -1943,17 +1953,7 @@ dependencies = [
  "diesel-derive-enum",
  "http 1.0.0",
  "serde",
- "sport-log-types-derive",
-]
-
-[[package]]
-name = "sport-log-types-derive"
-version = "0.1.0"
-dependencies = [
- "Inflector",
- "proc-macro2",
- "quote",
- "syn 2.0.41",
+ "sport-log-derive",
 ]
 
 [[package]]

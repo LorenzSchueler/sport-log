@@ -6,7 +6,7 @@ default-run = "sport-log-server"
 
 [dependencies]
 sport-log-types = { path = "../sport-log-types", features = ["db"] }
-sport-log-types-derive = { path = "../sport-log-types-derive" }
+sport-log-derive = { path = "../sport-log-derive" }
 
 tokio = { version = "1.9", features = ["full"] }
 axum = { version = "0.7", features = ["macros"] }

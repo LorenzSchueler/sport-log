@@ -4,8 +4,9 @@
 
 <h1 align="center">Sport Log</h1>
   
-![](https://img.shields.io/github/actions/workflow/status/LorenzSchueler/sport-log/rust.yml?branch=master&label=Rust%20CI)
-![](https://img.shields.io/github/actions/workflow/status/LorenzSchueler/sport-log/flutter.yml?branch=master&label=Flutter%20CI)
+![](https://img.shields.io/github/actions/workflow/status/LorenzSchueler/sport-log/rust.yml?branch=main&label=Rust%20CI)
+![](https://img.shields.io/github/actions/workflow/status/LorenzSchueler/sport-log/flutter.yml?branch=main&label=Flutter%20CI)
+![](https://img.shields.io/github/actions/workflow/status/LorenzSchueler/sport-log/sql.yml?branch=main&label=SQL%20CI)
 ![](https://img.shields.io/github/license/LorenzSchueler/sport-log)
 ![](https://img.shields.io/github/contributors/LorenzSchueler/sport-log)
 
@@ -50,13 +51,13 @@ The server and action providers as well as helper tools are structured as follow
 
 - [migrations](migrations) SQL files and methods for server database
 - [sport-log-server](sport-log-server) central server backend
-- [sport-log-types](sport-log-types) rust types for use in all rust crates
-- [sport-log-types-derive](sport-log-types-derive) rust macros used in [sport-log-types](sport-log-types) and [sport-log-server](sport-log-server)
+- [sport-log-types](sport-log-types) rust types used in all rust crates
+- [sport-log-derive](sport-log-derive) rust macros used in [sport-log-types](sport-log-types) and [sport-log-server](sport-log-server)
 - [sport-log-scheduler](sport-log-scheduler) responsible for creating action events from action rules, deleting old action events and for garbage collection
 - [sport-log-ap-utils](sport-log-ap-utils) helper functions for rust action providers
 - [sport-log-action-provider-sportstracker](sport-log-action-provider-sportstracker) fetches new cardio sessions from sportstracker
 - [sport-log-action-provider-wodify-login](sport-log-action-provider-wodify-login) reserves spots in wodify classes
-- [sport-log-action-provider-wodify-wod](sport-log-action-provider-wodify-wod) fetches and saves the wod from wodify
+- [sport-log-action-provider-wodify-wod](sport-log-action-provider-wodify-wod) fetches and saves the wod description and result from wodify
 
 The flutter app lives in [sport-log-client](sport-log-client)
 

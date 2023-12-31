@@ -2,9 +2,9 @@ use chrono::NaiveDate;
 #[cfg(feature = "db")]
 use diesel::{deserialize::FromSqlRow, expression::AsExpression, prelude::*, sql_types::BigInt};
 use serde::{Deserialize, Serialize};
-use sport_log_types_derive::IdString;
+use sport_log_derive::IdString;
 #[cfg(feature = "db")]
-use sport_log_types_derive::{IdFromSql, IdToSql};
+use sport_log_derive::{IdFromSql, IdToSql};
 
 #[cfg(feature = "db")]
 use crate::{

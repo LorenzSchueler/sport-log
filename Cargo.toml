@@ -1,7 +1,7 @@
 [workspace]
 members = [
     "sport-log-server",
-    "sport-log-types-derive",
+    "sport-log-derive",
     "sport-log-types",
     "sport-log-scheduler",
     "sport-log-ap-utils",

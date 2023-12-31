@@ -1,11 +1,11 @@
 use axum::http::StatusCode;
 use chrono::{DateTime, Utc};
 use diesel::{prelude::*, PgConnection, QueryResult};
+use sport_log_derive::*;
 use sport_log_types::{
     schema::{strength_session, strength_set},
     StrengthSessionId, StrengthSet, UserId,
 };
-use sport_log_types_derive::*;
 
 use crate::{auth::*, db::*};
 

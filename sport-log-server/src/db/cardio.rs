@@ -1,6 +1,6 @@
 use diesel::{prelude::*, PgConnection, QueryResult};
+use sport_log_derive::*;
 use sport_log_types::{schema::cardio_session, UserId};
-use sport_log_types_derive::*;
 
 use crate::db::*;
 

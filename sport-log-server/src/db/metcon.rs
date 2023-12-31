@@ -1,11 +1,11 @@
 use axum::http::StatusCode;
 use chrono::{DateTime, Utc};
 use diesel::{prelude::*, PgConnection, QueryResult};
+use sport_log_derive::*;
 use sport_log_types::{
     schema::{metcon, metcon_movement},
     Metcon, MetconId, MetconMovement, MetconMovementId, UserId,
 };
-use sport_log_types_derive::*;
 
 use crate::{auth::*, db::*};
 

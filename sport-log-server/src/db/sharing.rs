@@ -1,4 +1,4 @@
-use sport_log_types_derive::*;
+use sport_log_derive::*;
 
 #[derive(Db, ModifiableDb, Create, GetById, GetByIds, Update, HardDelete)]
 pub struct GroupDb;
