@@ -366,37 +366,43 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
                         Defaults.sizedBox.vertical.normal,
                       ],
                     ),
-                    _similarSessions == null
-                        ? SliverToBoxAdapter(
-                            child: FilledButton(
-                              onPressed: _findSimilarSessions,
-                              child: const Text("Find Similar Cardio Sessions"),
-                            ),
-                          )
-                        : _similarSessions!.isEmpty
+                    Builder(
+                      builder: (context) {
+                        // load when compare tab opened for first time
+                        if (_similarSessions == null) {
+                          _findSimilarSessions();
+                        }
+                        return _similarSessions == null
                             ? const SliverToBoxAdapter(
-                                child: Center(
-                                  child: Text(
-                                    "No similar Cardio Sessions found.",
-                                    style: TextStyle(fontSize: 20),
-                                  ),
-                                ),
+                                child:
+                                    Center(child: CircularProgressIndicator()),
                               )
-                            : SliverList.separated(
-                                itemCount: _similarSessions!.length,
-                                itemBuilder: (_, index) {
-                                  final session = _similarSessions![index];
-                                  return _SimilarCardioSessionCard(
-                                    session: session,
-                                    sessionAnnotation:
-                                        _similarSessionAnnotations[session],
-                                    onShow: () => _showSession(session),
-                                    onHide: () => _hideSession(session),
+                            : _similarSessions!.isEmpty
+                                ? const SliverToBoxAdapter(
+                                    child: Center(
+                                      child: Text(
+                                        "No similar Cardio Sessions found.",
+                                        style: TextStyle(fontSize: 20),
+                                      ),
+                                    ),
+                                  )
+                                : SliverList.separated(
+                                    itemCount: _similarSessions!.length,
+                                    itemBuilder: (_, index) {
+                                      final session = _similarSessions![index];
+                                      return _SimilarCardioSessionCard(
+                                        session: session,
+                                        sessionAnnotation:
+                                            _similarSessionAnnotations[session],
+                                        onShow: () => _showSession(session),
+                                        onHide: () => _hideSession(session),
+                                      );
+                                    },
+                                    separatorBuilder: (_, __) =>
+                                        Defaults.sizedBox.vertical.normal,
                                   );
-                                },
-                                separatorBuilder: (_, __) =>
-                                    Defaults.sizedBox.vertical.normal,
-                              ),
+                      },
+                    ),
                   ],
                 ),
               ),
