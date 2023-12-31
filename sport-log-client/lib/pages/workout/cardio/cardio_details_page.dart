@@ -353,38 +353,52 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
                     : const NoTrackPlaceholder(),
               ),
             if (fullscreen.isOff && _tabController.index == 2)
-              ConstrainedBox(
-                constraints: const BoxConstraints(maxHeight: 250),
-                child: _similarSessions == null
-                    ? FilledButton(
-                        onPressed: _findSimilarSessions,
-                        child: const Text("Find Similar Cardio Sessions"),
-                      )
-                    : _similarSessions!.isEmpty
-                        ? Padding(
-                            padding: Defaults.edgeInsets.normal,
-                            child: const Text(
-                              "No similar Cardio Sessions found.",
-                              style: TextStyle(fontSize: 20),
+              Container(
+                height: 250,
+                padding: Defaults.edgeInsets.normal,
+                child: CustomScrollView(
+                  slivers: [
+                    SliverList.list(
+                      children: [
+                        _SimilarCardioSessionCard.current(
+                          session: _cardioSessionDescription.cardioSession,
+                        ),
+                        Defaults.sizedBox.vertical.normal,
+                      ],
+                    ),
+                    _similarSessions == null
+                        ? SliverToBoxAdapter(
+                            child: FilledButton(
+                              onPressed: _findSimilarSessions,
+                              child: const Text("Find Similar Cardio Sessions"),
                             ),
                           )
-                        : ListView.separated(
-                            padding: Defaults.edgeInsets.normal,
-                            shrinkWrap: true,
-                            itemCount: _similarSessions!.length,
-                            itemBuilder: (_, index) {
-                              final session = _similarSessions![index];
-                              return _SimilarCardioSessionCard(
-                                session: session,
-                                sessionAnnotation:
-                                    _similarSessionAnnotations[session],
-                                onShow: () => _showSession(session),
-                                onHide: () => _hideSession(session),
-                              );
-                            },
-                            separatorBuilder: (_, __) =>
-                                Defaults.sizedBox.vertical.normal,
-                          ),
+                        : _similarSessions!.isEmpty
+                            ? const SliverToBoxAdapter(
+                                child: Center(
+                                  child: Text(
+                                    "No similar Cardio Sessions found.",
+                                    style: TextStyle(fontSize: 20),
+                                  ),
+                                ),
+                              )
+                            : SliverList.separated(
+                                itemCount: _similarSessions!.length,
+                                itemBuilder: (_, index) {
+                                  final session = _similarSessions![index];
+                                  return _SimilarCardioSessionCard(
+                                    session: session,
+                                    sessionAnnotation:
+                                        _similarSessionAnnotations[session],
+                                    onShow: () => _showSession(session),
+                                    onHide: () => _hideSession(session),
+                                  );
+                                },
+                                separatorBuilder: (_, __) =>
+                                    Defaults.sizedBox.vertical.normal,
+                              ),
+                  ],
+                ),
               ),
           ],
         ),
@@ -503,14 +517,22 @@ class _SimilarCardioSessionCard extends StatelessWidget {
   const _SimilarCardioSessionCard({
     required this.session,
     required this.sessionAnnotation,
-    required this.onShow,
-    required this.onHide,
-  });
+    required void Function() this.onShow,
+    required void Function() this.onHide,
+  }) : isCurrent = false;
+
+  const _SimilarCardioSessionCard.current({
+    required this.session,
+  })  : sessionAnnotation = null,
+        onShow = null,
+        onHide = null,
+        isCurrent = true;
 
   final CardioSession session;
   final _SimilarSessionAnnotation? sessionAnnotation;
-  final void Function() onShow;
-  final void Function() onHide;
+  final void Function()? onShow;
+  final void Function()? onHide;
+  final bool isCurrent;
 
   @override
   Widget build(BuildContext context) {
@@ -541,15 +563,26 @@ class _SimilarCardioSessionCard extends StatelessWidget {
               ),
             ),
             Defaults.sizedBox.horizontal.big,
-            sessionAnnotation != null
-                ? Icon(AppIcons.route, color: sessionAnnotation!.color)
-                : const SizedBox(width: 24),
-            sessionAnnotation == null
-                ? IconButton(onPressed: onShow, icon: const Icon(AppIcons.add))
-                : IconButton(
-                    onPressed: onHide,
-                    icon: const Icon(AppIcons.remove),
-                  ),
+            ...isCurrent
+                ? [
+                    Icon(AppIcons.route, color: Defaults.mapbox.trackLineColor),
+                    const SizedBox(width: 48),
+                  ]
+                : sessionAnnotation != null
+                    ? [
+                        Icon(AppIcons.route, color: sessionAnnotation!.color),
+                        IconButton(
+                          onPressed: onHide,
+                          icon: const Icon(AppIcons.remove),
+                        ),
+                      ]
+                    : [
+                        const SizedBox(width: 24),
+                        IconButton(
+                          onPressed: onShow,
+                          icon: const Icon(AppIcons.add),
+                        ),
+                      ],
           ],
         ),
       ),
