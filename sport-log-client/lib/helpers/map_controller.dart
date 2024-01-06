@@ -9,10 +9,6 @@ import 'package:sport_log/helpers/pointer.dart';
 import 'package:sport_log/models/cardio/position.dart';
 import 'package:synchronized/synchronized.dart';
 
-const double _markerRadius = 8;
-const double _gpsMarkerRadius = 20;
-const double _noGpsMarkerRadius = 50;
-
 class MapController {
   MapController._(
     this.__controller,
@@ -71,6 +67,11 @@ class MapController {
   final MountedWrapper<PointAnnotationManager> __pointManager;
   PointAnnotationManager? get _pointManager => __pointManager.ifMounted;
   final _lock = Lock();
+
+  static const double _markerRadius = 8;
+  static const double _gpsMarkerRadius = 20;
+  static const double _noGpsMarkerRadius = 50;
+  static const String _exaggerationProperty = "exaggeration";
 
   Future<LatLng?> get center async {
     final latLngMap = (await _controller?.getCameraState())?.center;
@@ -389,12 +390,13 @@ class MapController {
     await setZoom((await zoom)!); // TODO remove if removeLayer works reliably
   }
 
-  Future<bool?> hillshadeEnabled(String layerId) => _layerExists(layerId);
+  Future<bool> hillshadeEnabled(String layerId) async =>
+      (await _layerExists(layerId)) ?? false;
 
   Future<void> enableTerrain(String sourceId, double initPitch) async {
     await _addTerrainSource(sourceId);
     await _setStyleTerrainProperty("source", sourceId);
-    await _setStyleTerrainProperty("exaggeration", 1);
+    await _setStyleTerrainProperty(_exaggerationProperty, 1);
     final currentPitch = await pitch;
     if (currentPitch != null) {
       await _animatePitchBy(initPitch - currentPitch);
@@ -402,19 +404,17 @@ class MapController {
   }
 
   Future<void> disableTerrain() async {
-    await _setStyleTerrainProperty("exaggeration", 0);
+    await _setStyleTerrainProperty(_exaggerationProperty, 0);
     final currentPitch = await pitch;
     if (currentPitch != null) {
       await _animatePitchBy(-currentPitch);
     }
   }
 
-  Future<bool?> terrainEnabled() async {
-    final exaggeration = await _getStyleTerrainProperty("exaggeration");
-    if (exaggeration == null) {
-      return null;
-    }
-    return ![null, 0.0].contains(double.tryParse(exaggeration.toString()));
+  Future<bool> terrainEnabled() async {
+    final exaggeration = await _getStyleTerrainProperty(_exaggerationProperty);
+    return exaggeration != null &&
+        ![null, 0.0].contains(double.tryParse(exaggeration.toString()));
   }
 
   Future<bool?> _sourceExists(String sourceId) async =>

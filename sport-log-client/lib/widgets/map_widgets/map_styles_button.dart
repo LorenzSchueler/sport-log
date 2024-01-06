@@ -107,7 +107,7 @@ class _MapStylesBottomSheetState extends State<MapStylesBottomSheet> {
     final hasHillshade = await widget.mapController
         .hillshadeEnabled(_HillshadeOption._hillshadeLayerId);
     final hasTerrain = await widget.mapController.terrainEnabled();
-    if (style == null || hasHillshade == null || hasTerrain == null) {
+    if (style == null) {
       return;
     }
     setState(() {
