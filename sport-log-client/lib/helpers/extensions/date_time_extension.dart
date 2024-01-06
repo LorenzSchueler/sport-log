@@ -81,6 +81,16 @@ extension DateTimeExtension on DateTime {
   String get humanDateTime => "$humanDate at $hourMinute";
 
   /// examples:
+  /// Today at 01:02,
+  /// Yesterday,
+  /// Tomorrow,
+  /// Monday,
+  /// 01. February,
+  /// 01. February 2022,
+  String get humanTodayTimeOrDate =>
+      isOnDay(DateTime.now()) ? humanDateTime : humanDate;
+
+  /// examples:
   /// Today,
   /// Yesterday,
   /// Tomorrow,
