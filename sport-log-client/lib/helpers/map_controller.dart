@@ -414,7 +414,7 @@ class MapController {
     if (exaggeration == null) {
       return null;
     }
-    return ![null, 0.0].contains(double.tryParse(exaggeration));
+    return ![null, 0.0].contains(double.tryParse(exaggeration.toString()));
   }
 
   Future<bool?> _sourceExists(String sourceId) async =>
@@ -432,7 +432,7 @@ class MapController {
   Future<void> _removeLayer(String layerId) async =>
       await _controller?.style.removeStyleLayer(layerId);
 
-  Future<String?> _getStyleTerrainProperty(String key) async =>
+  Future<Object?> _getStyleTerrainProperty(String key) async =>
       (await _controller?.style.getStyleTerrainProperty(key))?.value;
 
   Future<void> _setStyleTerrainProperty(String key, Object value) async =>

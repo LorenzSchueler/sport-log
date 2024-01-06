@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' hide Settings;
 import 'package:sport_log/app.dart';
 import 'package:sport_log/config.dart';
 import 'package:sport_log/data_provider/sync.dart';
@@ -19,6 +20,7 @@ import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/dialogs/new_credentials_dialog.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
+// ignore: long-method
 Stream<double> initialize() async* {
   WidgetsFlutterBinding.ensureInitialized();
   if (!Config.isWeb) {
@@ -62,12 +64,14 @@ Stream<double> initialize() async* {
     await Settings.instance.setExpeditionData(null);
   }
   yield 0.7;
+  MapboxOptions.setAccessToken(Config.instance.accessToken);
+  yield 0.8;
   if (Config.isWindows || Config.isLinux) {
     sqfliteFfiInit();
     databaseFactory = databaseFactoryFfi;
   }
   await AppDatabase.init();
-  yield 0.8;
+  yield 0.9;
   await Sync.instance.init();
   yield 1.0;
 }

@@ -155,7 +155,7 @@ class _MapStylesBottomSheetState extends State<MapStylesBottomSheet> {
                 label: Text("Outdoor"),
               ),
               ButtonSegment(
-                value: MapboxStyles.MAPBOX_STREETS,
+                value: MapboxStyles.STANDARD,
                 icon: Icon(AppIcons.car),
                 label: Text("Street"),
               ),

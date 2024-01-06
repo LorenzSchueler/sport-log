@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart' hide Route;
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' hide Settings;
 import 'package:provider/provider.dart';
-import 'package:sport_log/config.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/lat_lng.dart';
 import 'package:sport_log/helpers/map_controller.dart';
@@ -113,8 +112,6 @@ class _MapboxMapWrapperState extends State<MapboxMapWrapper> {
     return Stack(
       children: [
         MapWidget(
-          resourceOptions:
-              ResourceOptions(accessToken: Config.instance.accessToken),
           styleUri: widget.initStyleUri,
           cameraOptions: (widget.initialCameraPosition ??
                   context.read<Settings>().lastMapPosition)

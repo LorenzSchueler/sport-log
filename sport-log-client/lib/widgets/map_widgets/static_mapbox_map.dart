@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' hide Settings;
 import 'package:provider/provider.dart';
-import 'package:sport_log/config.dart';
 import 'package:sport_log/helpers/lat_lng.dart';
 import 'package:sport_log/helpers/map_controller.dart';
 import 'package:sport_log/settings.dart';
@@ -28,8 +27,6 @@ class StaticMapboxMap extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MapWidget(
-      resourceOptions:
-          ResourceOptions(accessToken: Config.instance.accessToken),
       styleUri: MapboxStyles.OUTDOORS,
       cameraOptions: context.read<Settings>().lastMapPosition.toCameraOptions(),
       onMapCreated: (mapboxMap) async {
