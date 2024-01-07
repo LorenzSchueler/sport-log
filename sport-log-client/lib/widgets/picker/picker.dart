@@ -37,22 +37,36 @@ class Picker<T, C> extends StatelessWidget {
   Widget build(BuildContext context) {
     return Dialog(
       clipBehavior: Clip.antiAlias,
-      child: ListView.separated(
-        itemBuilder: (context, index) {
-          final item = items[index];
-          return ListTile(
-            title: Text(title(item)),
-            subtitle: subtitle != null ? Text(subtitle!.call(item)) : null,
-            selected: selectedItem != null
-                ? compareWith(item) == compareWith(selectedItem as T)
-                : false,
-            onTap: () => Navigator.pop(context, item),
-          );
-        },
-        itemCount: items.length,
-        separatorBuilder: (context, _) => const Divider(height: 0),
-        shrinkWrap: true,
-      ),
+      child: items.isEmpty
+          ? ListTile(
+              title: Row(
+                children: [
+                  const Text("Nothing found."),
+                  const Spacer(),
+                  FilledButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text("OK"),
+                  ),
+                ],
+              ),
+            )
+          : ListView.separated(
+              itemBuilder: (context, index) {
+                final item = items[index];
+                return ListTile(
+                  title: Text(title(item)),
+                  subtitle:
+                      subtitle != null ? Text(subtitle!.call(item)) : null,
+                  selected: selectedItem != null
+                      ? compareWith(item) == compareWith(selectedItem as T)
+                      : false,
+                  onTap: () => Navigator.pop(context, item),
+                );
+              },
+              itemCount: items.length,
+              separatorBuilder: (context, _) => const Divider(height: 0),
+              shrinkWrap: true,
+            ),
     );
   }
 }
