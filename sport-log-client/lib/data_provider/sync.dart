@@ -159,8 +159,12 @@ class Sync extends ChangeNotifier {
       _logger.d("sync already enabled");
       return;
     }
-    _logger.i("starting synchronization timer");
-    _syncTimer = Timer.periodic(Settings.instance.syncInterval, (_) => sync());
+    // TODO
+    // periodic sync is currently disabled because it causes problems
+    // sometimes cardio sessions are cut of when they get synchronized during tracking
+    //
+    //_logger.i("starting synchronization timer");
+    //_syncTimer = Timer.periodic(Settings.instance.syncInterval, (_) => sync());
     if (Settings.instance.lastSync == null) {
       await sync(); // wait to make sure movement 1 and metcon 1 exist
     } else {

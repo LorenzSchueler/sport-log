@@ -13,7 +13,6 @@ import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/dialogs.dart';
 import 'package:sport_log/widgets/input_fields/duration_input.dart';
 import 'package:sport_log/widgets/input_fields/edit_tile.dart';
-import 'package:sport_log/widgets/input_fields/int_input.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
 import 'package:sport_log/widgets/provider_consumer.dart';
@@ -238,21 +237,25 @@ class SettingsPage extends StatelessWidget {
                   ),
                 ],
                 if (settings.syncEnabled) ...[
-                  EditTile(
-                    leading: AppIcons.timeInterval,
-                    caption: "Synchronization Interval (min)",
-                    child: IntInput(
-                      initialValue: settings.syncInterval.inMinutes,
-                      minValue: 1,
-                      maxValue: null,
-                      onUpdate: (syncInterval) async {
-                        await settings
-                            .setSyncInterval(Duration(minutes: syncInterval));
-                        Sync.instance.stopSync();
-                        await Sync.instance.startSync();
-                      },
-                    ),
-                  ),
+                  // TODO
+                  // periodic sync is currently disabled because it causes problems
+                  // sometimes cardio sessions are cut of when they get synchronized during tracking
+                  //
+                  //EditTile(
+                  //leading: AppIcons.timeInterval,
+                  //caption: "Synchronization Interval (min)",
+                  //child: IntInput(
+                  //initialValue: settings.syncInterval.inMinutes,
+                  //minValue: 1,
+                  //maxValue: null,
+                  //onUpdate: (syncInterval) async {
+                  //await settings
+                  //.setSyncInterval(Duration(minutes: syncInterval));
+                  //Sync.instance.stopSync();
+                  //await Sync.instance.startSync();
+                  //},
+                  //),
+                  //),
                   EditTile.Switch(
                     leading: AppIcons.systemUpdate,
                     caption: "Check for Updates",
