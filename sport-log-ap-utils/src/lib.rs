@@ -11,7 +11,7 @@ use sport_log_types::{
     Action, ActionEventId, ActionId, ActionProvider, ActionProviderId, ExecutableActionEvent,
     Platform, PlatformId,
 };
-use tracing::{error, info};
+use tracing::{debug, error, info};
 
 #[allow(clippy::too_many_arguments)]
 pub async fn setup(
@@ -138,6 +138,7 @@ pub async fn setup(
         StatusCode::CONFLICT => info!("action already exists\nsetup successful"),
         status => error!("an error occurred (status {})", status),
     }
+
     Ok(())
 }
 
@@ -164,6 +165,9 @@ pub async fn get_events(
         .await?
         .json()
         .await?;
+
+    debug!("got {} executable action events", exec_action_events.len());
+
     Ok(exec_action_events)
 }
 
@@ -174,11 +178,18 @@ pub async fn disable_events(
     password: &str,
     action_event_ids: &[ActionEventId],
 ) -> Result<(), Error> {
+    debug!(
+        "disabling {} action events: {:?}",
+        action_event_ids.len(),
+        action_event_ids
+    );
+
     client
         .delete(route_max_version(base_url, AP_ACTION_EVENT, None))
         .basic_auth(name, Some(&password))
         .json(action_event_ids)
         .send()
         .await?;
+
     Ok(())
 }

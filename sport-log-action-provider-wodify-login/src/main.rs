@@ -191,8 +191,6 @@ async fn login(mode: Mode) -> Result<()> {
     )
     .await?;
 
-    debug!("got {} executable action events", exec_action_events.len());
-
     if exec_action_events.is_empty() {
         return Ok(());
     }
@@ -249,12 +247,6 @@ async fn login(mode: Mode) -> Result<()> {
             }
         }
     }
-
-    debug!(
-        "disabling {} action events: {:?}",
-        disable_action_event_ids.len(),
-        disable_action_event_ids
-    );
 
     if !disable_action_event_ids.is_empty() {
         disable_events(

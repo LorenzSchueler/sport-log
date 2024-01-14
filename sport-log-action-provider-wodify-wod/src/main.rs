@@ -192,8 +192,6 @@ async fn get_wod(mode: Mode) -> Result<()> {
     )
     .await?;
 
-    debug!("got {} executable action events", exec_action_events.len());
-
     if exec_action_events.is_empty() {
         return Ok(());
     }
@@ -255,16 +253,14 @@ async fn get_wod(mode: Mode) -> Result<()> {
             Ok(action_event_id) => disable_action_event_ids.push(action_event_id),
             Err(error) => {
                 info!("{error}");
-                disable_action_event_ids.push(error.action_event_id());
+                if let UserError::ResultNotFound(_) = error {
+                    info!("trying again on next invocation");
+                } else {
+                    disable_action_event_ids.push(error.action_event_id());
+                }
             }
         }
     }
-
-    debug!(
-        "disabling {} action events: {:?}",
-        disable_action_event_ids.len(),
-        disable_action_event_ids
-    );
 
     if !disable_action_event_ids.is_empty() {
         disable_events(

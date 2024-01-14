@@ -224,8 +224,6 @@ async fn fetch() -> Result<()> {
     )
     .await?;
 
-    debug!("got {} executable action events", exec_action_events.len());
-
     let mut tasks: Vec<JoinHandle<Result<UserResult<ActionEventId>>>> = vec![];
     for exec_action_event in exec_action_events {
         let client = client.clone();
@@ -350,12 +348,6 @@ async fn fetch() -> Result<()> {
             }
         }
     }
-
-    debug!(
-        "disabling {} action events: {:?}",
-        delete_action_event_ids.len(),
-        delete_action_event_ids
-    );
 
     if !delete_action_event_ids.is_empty() {
         disable_events(
