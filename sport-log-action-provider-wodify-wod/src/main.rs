@@ -335,7 +335,11 @@ async fn try_create_wod(
             exec_action_event.action_event_id,
         )));
     };
-    let wod = wod.find(By::ClassName("component_show_wrapper")).await?;
+    let wod = wod
+        .find(By::Id(
+            "AthleteTheme_wtLayoutNormal_block_wtMainContent_WOD_UI_wt9_block_wtWODComponentsList",
+        ))
+        .await?;
 
     let name = wod
         .find(By::ClassName("component_name"))
