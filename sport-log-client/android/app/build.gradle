@@ -82,7 +82,11 @@ android {
 
     buildTypes {
         release {
-            signingConfig signingConfigs.release
+            if (System.getenv("CI")) {
+                signingConfig signingConfigs.debug
+            } else {
+                signingConfig signingConfigs.release
+            }
         }
     }
 
