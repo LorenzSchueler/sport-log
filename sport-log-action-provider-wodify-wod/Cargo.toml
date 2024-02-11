@@ -21,7 +21,7 @@ thiserror = "1"
 lazy_static = "1.4.0"
 tracing = "0.1.26"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
-sysinfo = "0.29.11"
+sysinfo = "0.30"
 regex = "1.10.2"
 clap = { version = "4.4.11", features = ["derive"] }
 

@@ -13,7 +13,7 @@ use reqwest::{Client, Error as ReqwestError};
 use serde::Deserialize;
 use sport_log_ap_utils::{disable_events, get_events, setup as setup_db};
 use sport_log_types::{ActionEventId, ExecutableActionEvent};
-use sysinfo::{ProcessExt, System, SystemExt};
+use sysinfo::System;
 use thirtyfour::{error::WebDriverError, prelude::*, WebDriver};
 use thiserror::Error;
 use tokio::{process::Command, task::JoinError, time};

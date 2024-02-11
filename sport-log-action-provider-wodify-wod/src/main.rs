@@ -18,7 +18,7 @@ use sport_log_types::{
     uri::{route_max_version, WOD},
     ActionEventId, ExecutableActionEvent, Wod, WodId,
 };
-use sysinfo::{ProcessExt, System, SystemExt};
+use sysinfo::System;
 use thirtyfour::{error::WebDriverError, prelude::*, WebDriver};
 use thiserror::Error;
 use tokio::{process::Command, task::JoinError, time};
@@ -390,7 +390,7 @@ async fn try_create_wod(
         "{name}\n{content}\n\nResult: {result} {}{}",
         if rx { "RX" } else { "Scaled" },
         if !comments.is_empty() {
-            "\nComments: ".to_owned() + &comments
+            "\nComments: ".to_owned() + comments.as_str()
         } else {
             String::new()
         }
@@ -428,7 +428,7 @@ async fn try_create_wod(
 }
 
 fn parse_inner_html(inner_html: &str) -> String {
-    //static re: LazyCell<Regex> = LazyCell::new(|| Regex::new(r"</*.+?>").unwrap());
+    //static re: LazyCell<Regex> = LazyCell::new(|| Regex::new(r"</*.+?>").unwrap()); // TODO needs LazyCell stabilization
     let content = inner_html
         .replace("<br>", "\n")
         .replace("<p>", "\n")
