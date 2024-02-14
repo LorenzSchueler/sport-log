@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' hide Settings;
+import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart'
+    hide Settings, Visibility;
 import 'package:provider/provider.dart';
 import 'package:sport_log/helpers/lat_lng.dart';
 import 'package:sport_log/helpers/map_controller.dart';
@@ -48,17 +49,19 @@ class ElevationMap extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Offstage(
-      child: SizedBox(
-        height: 1,
-        width: 1,
-        child: StaticMapboxMap(
-          onMapCreated: (mapController) async {
-            await mapController.setZoom(15);
-            await mapController.enableTerrain("elevation-terrain-source", 0);
-            onMapCreated(ElevationMapController(mapController));
-          },
-        ),
+    // TODO avoid rendering
+    // currently only works when rendered
+    // it worked for some time when wrapped in Offstage but then stopped reporting elevation
+    // also does not work when wrapped in Visibility(visible: false) or Opacity(opacity: 0)
+    return SizedBox(
+      height: 1,
+      width: 1,
+      child: StaticMapboxMap(
+        onMapCreated: (mapController) async {
+          await mapController.setZoom(15);
+          await mapController.enableTerrain("elevation-terrain-source", 0);
+          onMapCreated(ElevationMapController(mapController));
+        },
       ),
     );
   }
