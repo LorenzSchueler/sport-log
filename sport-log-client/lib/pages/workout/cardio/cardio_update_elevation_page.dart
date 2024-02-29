@@ -61,8 +61,7 @@ class _CardioUpdateElevationPageState extends State<CardioUpdateElevationPage> {
   Future<void> _updateElevation() async {
     final track = _cardioSessionDescription.cardioSession.track;
     if (track != null) {
-      for (var i = 0; i < track.length; i++) {
-        final pos = track[i];
+      for (final (i, pos) in track.indexed) {
         final elevation =
             await _elevationMapController?.getElevation(pos.latLng);
         if (elevation != null) {

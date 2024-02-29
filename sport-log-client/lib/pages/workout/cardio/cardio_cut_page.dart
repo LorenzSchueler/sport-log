@@ -134,7 +134,7 @@ class _CardioCutPageState extends State<CardioCutPage> {
                             context: context,
                             initialDuration: _cutStartDuration,
                           );
-                          if (mounted && duration != null) {
+                          if (context.mounted && duration != null) {
                             if (duration > _cutEndDuration) {
                               await showMessageDialog(
                                 context: context,
@@ -158,7 +158,7 @@ class _CardioCutPageState extends State<CardioCutPage> {
                             context: context,
                             initialDuration: _cutEndDuration,
                           );
-                          if (mounted && duration != null) {
+                          if (context.mounted && duration != null) {
                             if (duration < _cutStartDuration) {
                               await showMessageDialog(
                                 context: context,

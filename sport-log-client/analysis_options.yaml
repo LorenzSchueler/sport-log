@@ -27,7 +27,6 @@ linter:
     avoid_dynamic_calls: true
     avoid_final_parameters: true
     avoid_redundant_argument_values: true
-    avoid_returning_null_for_future: true
     avoid_returning_this: true
     avoid_slow_async_io: true
     avoid_type_to_string: true

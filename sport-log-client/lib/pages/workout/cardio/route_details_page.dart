@@ -73,8 +73,8 @@ class _RouteDetailsPageState extends State<RouteDetailsPage>
     await _mapController?.removeAllMarkers();
     await _mapController?.removeAllLabels();
     if (_route.markedPositions != null) {
-      for (var i = 0; i < _route.markedPositions!.length; i++) {
-        final latLng = _route.markedPositions![i].latLng;
+      for (final (i, pos) in _route.markedPositions!.indexed) {
+        final latLng = pos.latLng;
         await _mapController?.addRouteMarker(latLng);
         await _mapController?.addLabel(latLng, "${i + 1}");
       }

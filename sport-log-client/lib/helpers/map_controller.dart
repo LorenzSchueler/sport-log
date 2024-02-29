@@ -21,40 +21,29 @@ class MapController {
     MapboxMap mapboxMap,
     BuildContext context,
   ) async {
-    final MountedWrapper<MapboxMap> controller;
-    final MountedWrapper<PolylineAnnotationManager> lineManager;
-    if (context.mounted) {
-      controller = MountedWrapper(mapboxMap, context);
-      lineManager = MountedWrapper(
-        await mapboxMap.annotations.createPolylineAnnotationManager(),
-        context,
-      );
-    } else {
+    if (!context.mounted) {
       return null;
     }
-    final MountedWrapper<CircleAnnotationManager> circleManager;
-    if (context.mounted) {
-      circleManager = MountedWrapper(
-        await mapboxMap.annotations.createCircleAnnotationManager(),
-        context,
-      );
-    } else {
+    final lineManager =
+        await mapboxMap.annotations.createPolylineAnnotationManager();
+    if (!context.mounted) {
       return null;
     }
-    final MountedWrapper<PointAnnotationManager> pointManager;
-    if (context.mounted) {
-      pointManager = MountedWrapper(
-        await mapboxMap.annotations.createPointAnnotationManager(),
-        context,
-      );
-    } else {
+    final circleManager =
+        await mapboxMap.annotations.createCircleAnnotationManager();
+    if (!context.mounted) {
+      return null;
+    }
+    final pointManager =
+        await mapboxMap.annotations.createPointAnnotationManager();
+    if (!context.mounted) {
       return null;
     }
     return MapController._(
-      controller,
-      lineManager,
-      circleManager,
-      pointManager,
+      MountedWrapper(mapboxMap, context),
+      MountedWrapper(lineManager, context),
+      MountedWrapper(circleManager, context),
+      MountedWrapper(pointManager, context),
     );
   }
 
