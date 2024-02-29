@@ -35,8 +35,12 @@ jobs:
     steps:
     - name: checkout
       uses: actions/checkout@v4
+    - name: install rust
+      uses: dtolnay/rust-toolchain@stable
+      with:
+        components: clippy
     - name: cargo clippy
-      run: cargo clippy --all-features
+      run: cargo clippy --all-features --examples --tests -- --deny warnings
     
   doc:
     name: doc
@@ -135,7 +139,7 @@ jobs:
         debug_address = \"0.0.0.0:8001\"
         " > sport-log-server.toml
     - name: cargo test
-      run: cargo test
+      run: cargo test --all-features
 
   test-end-to-end:
     name: test-end-to-end
