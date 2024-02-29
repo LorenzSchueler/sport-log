@@ -98,10 +98,10 @@ dependency_overrides:
 dev_dependencies:
   build_runner: ^2.1.0 # json
     # dart run build_runner build --delete-conflicting-outputs
-  dart_code_linter: #^1.1.1
-    git: 
-      url: https://github.com/bancolombia/dart-code-linter
-      ref: 8dffeffe04c7aa7f46980e416418ce41aee104a7
+  #dart_code_linter: ^1.1.2
+    #git: 
+    #  url: https://github.com/bancolombia/dart-code-linter
+    #  ref: 8dffeffe04c7aa7f46980e416418ce41aee104a7
     # dart run dart_code_linter:metrics analyze lib
     # dart run dart_code_linter:metrics check-unnecessary-nullable lib
     # dart run dart_code_linter:metrics check-unused-files lib
