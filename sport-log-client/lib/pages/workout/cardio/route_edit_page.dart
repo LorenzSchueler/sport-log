@@ -105,7 +105,11 @@ class _RouteEditPageState extends State<RouteEditPage> {
     }
   }
 
-  Future<void> _updateLine() async {
+  Future<void> _updateLine({bool init = false}) async {
+    if (init) {
+      await _mapController?.updateRouteLine(_line, _route.track);
+      return;
+    }
     if (_route.markedPositions!.length >= 2) {
       if (mounted) {
         setState(() => _isSearching = true);
@@ -223,7 +227,7 @@ class _RouteEditPageState extends State<RouteEditPage> {
       padded: true,
     );
     await _updatePoints();
-    await _updateLine();
+    await _updateLine(init: true);
   }
 
   void _onElevationMapCreated(ElevationMapController mapController) =>
