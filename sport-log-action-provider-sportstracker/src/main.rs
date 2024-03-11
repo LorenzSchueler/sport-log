@@ -1,6 +1,6 @@
 use std::{env, fs, process, result::Result as StdResult};
 
-use chrono::{DateTime, Duration, NaiveDateTime, Utc};
+use chrono::{DateTime, Duration};
 use clap::Parser;
 use lazy_static::lazy_static;
 use rand::Rng;
@@ -203,7 +203,7 @@ async fn setup() -> Result<()> {
         PLATFORM_NAME,
         true,
         &[("fetch", "Fetch and save new workouts.")],
-        Duration::hours(168),
+        Duration::try_hours(168).unwrap(),
         Duration::zero(),
     )
     .await?;
@@ -219,8 +219,8 @@ async fn fetch() -> Result<()> {
         &CONFIG.server_url,
         NAME,
         &CONFIG.password,
-        Duration::hours(0),
-        Duration::hours(1) + Duration::minutes(1),
+        Duration::try_hours(0).unwrap(),
+        Duration::try_hours(1).unwrap() + Duration::try_minutes(1).unwrap(),
     )
     .await?;
 
@@ -418,10 +418,7 @@ fn try_into_cardio_session(
         user_id: exec_action_event.user_id,
         movement_id,
         cardio_type,
-        datetime: DateTime::from_naive_utc_and_offset(
-            NaiveDateTime::from_timestamp_opt(workout_stats.start_time as i64 / 1000, 0).unwrap(),
-            Utc,
-        ),
+        datetime: DateTime::from_timestamp(workout_stats.start_time as i64 / 1000, 0).unwrap(),
         distance: Some(workout_stats.total_distance as i32),
         ascent: Some(workout_stats.total_ascent as i32),
         descent: Some(workout_stats.total_descent as i32),

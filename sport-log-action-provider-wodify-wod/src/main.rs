@@ -171,8 +171,8 @@ async fn setup() -> Result<()> {
             "Metcon",
             "Fetch and save the metcon description and results for the current day.",
         )],
-        Duration::hours(168),
-        Duration::hours(24),
+        Duration::try_hours(168).unwrap(),
+        Duration::try_hours(24).unwrap(),
     )
     .await?;
 
@@ -187,7 +187,7 @@ async fn get_wod(mode: Mode) -> Result<()> {
         &CONFIG.server_url,
         NAME,
         &CONFIG.password,
-        Duration::days(-1),
+        Duration::try_days(-1).unwrap(),
         Duration::zero(),
     )
     .await?;

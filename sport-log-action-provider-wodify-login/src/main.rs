@@ -170,7 +170,7 @@ async fn setup() -> Result<()> {
             ("Yoga", "Reserve a spot in a Yoga class."),
             ("Swim WOD", "Reserve a spot in a Swim class."),
         ],
-        Duration::hours(168),
+        Duration::try_hours(168).unwrap(),
         Duration::zero(),
     )
     .await?;
@@ -187,7 +187,7 @@ async fn login(mode: Mode) -> Result<()> {
         NAME,
         &CONFIG.password,
         Duration::zero(),
-        Duration::days(1) + Duration::minutes(2),
+        Duration::try_days(1).unwrap() + Duration::try_minutes(2).unwrap(),
     )
     .await?;
 
@@ -313,7 +313,9 @@ async fn wodify_login(
         .goto("https://app.wodify.com/Schedule/CalendarListViewEntry.aspx")
         .await?;
 
-    if let Ok(duration) = (exec_action_event.datetime - Duration::days(1) - Utc::now()).to_std() {
+    if let Ok(duration) =
+        (exec_action_event.datetime - Duration::try_days(1).unwrap() - Utc::now()).to_std()
+    {
         time::sleep(duration).await;
     }
     info!("ready"); // info for timing purposes

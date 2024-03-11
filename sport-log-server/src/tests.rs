@@ -534,7 +534,7 @@ async fn ap_as_user_ap_auth() {
         id: ActionEventId(rnd()),
         user_id: TEST_USER.id,
         action_id: TEST_ACTION.id,
-        datetime: Utc::now() + Duration::days(1),
+        datetime: Utc::now() + Duration::try_days(1).unwrap(),
         arguments: None,
         enabled: true,
         deleted: false,
@@ -560,7 +560,7 @@ async fn ap_as_user_ap_auth_no_event() {
         id: ActionEventId(rnd()),
         user_id: TEST_USER.id,
         action_id: TEST_ACTION.id,
-        datetime: Utc::now() + Duration::days(1),
+        datetime: Utc::now() + Duration::try_days(1).unwrap(),
         arguments: None,
         enabled: false,
         deleted: false,
@@ -572,7 +572,7 @@ async fn ap_as_user_ap_auth_no_event() {
         id: ActionEventId(rnd()),
         user_id: TEST_USER.id,
         action_id: TEST_ACTION.id,
-        datetime: Utc::now() + Duration::days(1),
+        datetime: Utc::now() + Duration::try_days(1).unwrap(),
         arguments: None,
         enabled: true,
         deleted: true,
@@ -599,7 +599,7 @@ async fn ap_as_user_ap_auth_wrong_credentials() {
         id: ActionEventId(rnd()),
         user_id: TEST_USER.id,
         action_id: TEST_ACTION.id,
-        datetime: Utc::now() + Duration::days(1),
+        datetime: Utc::now() + Duration::try_days(1).unwrap(),
         arguments: None,
         enabled: true,
         deleted: false,
@@ -624,7 +624,7 @@ async fn ap_as_user_ap_auth_without_credentials() {
         id: ActionEventId(rnd()),
         user_id: TEST_USER.id,
         action_id: TEST_ACTION.id,
-        datetime: Utc::now() + Duration::days(1),
+        datetime: Utc::now() + Duration::try_days(1).unwrap(),
         arguments: None,
         enabled: true,
         deleted: false,
@@ -924,7 +924,7 @@ async fn get_account_data() {
     assert!(account_data.diaries.is_empty());
 
     // get updates - check new diary
-    let now = Utc::now() - Duration::seconds(1); // TODO
+    let now = Utc::now() - Duration::try_seconds(1).unwrap(); // TODO
     DiaryDb::create(&TEST_DIARY, &mut db_pool.get().unwrap()).unwrap();
     let (status, account_data) = inner(&mut router, Some(&now)).await;
 
@@ -940,7 +940,7 @@ async fn get_account_data() {
     assert!(account_data.diaries.is_empty());
 
     // get updates - check updated diary
-    let now = Utc::now() - Duration::seconds(1); // TODO
+    let now = Utc::now() - Duration::try_seconds(1).unwrap(); // TODO
     DiaryDb::update(&TEST_DIARY, &mut db_pool.get().unwrap()).unwrap();
     let (status, account_data) = inner(&mut router, Some(&now)).await;
 

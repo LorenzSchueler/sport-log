@@ -167,7 +167,7 @@ fn datetimes_for_rule_from_start(
     mut start: DateTime<Utc>,
 ) -> Vec<DateTime<Utc>> {
     if start.time() > creatable_action_rule.time.time() {
-        start += Duration::days(1);
+        start += Duration::try_days(1).unwrap();
     }
     let first_datetime = DateTime::from_naive_utc_and_offset(
         start
@@ -183,8 +183,11 @@ fn datetimes_for_rule_from_start(
 
     let mut datetimes = vec![];
     for weeks in 0.. {
-        let datetime = first_datetime + Duration::weeks(weeks);
-        if datetime <= start + Duration::milliseconds(creatable_action_rule.create_before as i64) {
+        let datetime = first_datetime + Duration::try_weeks(weeks).unwrap();
+        if datetime
+            <= start
+                + Duration::try_milliseconds(creatable_action_rule.create_before as i64).unwrap()
+        {
             datetimes.push(datetime);
         } else {
             break;
@@ -216,7 +219,7 @@ fn delete_action_events(client: &Client, config: &Config) -> Result<(), ReqwestE
     for deletable_action_event in deletable_action_events {
         if Utc::now()
             >= deletable_action_event.datetime
-                + Duration::milliseconds(deletable_action_event.delete_after as i64)
+                + Duration::try_milliseconds(deletable_action_event.delete_after as i64).unwrap()
         {
             action_event_ids.push(deletable_action_event.action_event_id);
         }
@@ -254,8 +257,9 @@ fn garbage_collection(client: &Client, config: &Config) -> Result<(), ReqwestErr
                 ADM_GARBAGE_COLLECTION,
                 Some(&[(
                     "last_change",
-                    &(Utc::now() - Duration::days(config.garbage_collection_min_days as i64))
-                        .to_string(),
+                    &(Utc::now()
+                        - Duration::try_days(config.garbage_collection_min_days as i64).unwrap())
+                    .to_string(),
                 )]),
             ))
             .basic_auth(ADMIN_USERNAME, Some(&config.admin_password))
@@ -289,7 +293,7 @@ mod tests {
             weekday: Weekday::Monday,
             time: datetime("2000-01-01T12:00:00"),
             arguments: None,
-            create_before: Duration::days(14).num_milliseconds() as i32,
+            create_before: Duration::try_days(14).unwrap().num_milliseconds() as i32,
         };
 
         // next day and in 8 days
