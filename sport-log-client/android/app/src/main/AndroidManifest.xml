@@ -42,13 +42,20 @@
             <data android:scheme="https" />
         </intent>
     </queries>
-    <application android:label="Sport Log" android:name="${applicationName}"
+    <application
+        android:label="Sport Log"
+        android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
-        <activity android:name=".MainActivity" android:exported="true"
-            android:launchMode="singleTop" android:theme="@style/LaunchTheme"
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:launchMode="singleTop"
+            android:theme="@style/LaunchTheme"
             android:showWhenLocked="true"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
-            android:hardwareAccelerated="true" android:windowSoftInputMode="adjustResize">
+            android:hardwareAccelerated="true"
+            android:windowSoftInputMode="adjustResize"
+            android:enableOnBackInvokedCallback="true">
             <!-- Specifies an Android theme to apply to this Activity as soon as
                  the Android process has started. This theme is visible to the user
                  while the Flutter UI initializes. After that, this theme continues
