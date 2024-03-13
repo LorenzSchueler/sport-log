@@ -71,30 +71,30 @@ fn main() -> ExitCode {
     let config_file = match fs::read_to_string(CONFIG_FILE) {
         Ok(file) => file,
         Err(error) => {
-            error!("failed to read {}: {}", CONFIG_FILE, error);
+            error!("failed to read {CONFIG_FILE}: {error}");
             return ExitCode::FAILURE;
         }
     };
     let config = match toml::from_str(&config_file) {
         Ok(config) => config,
         Err(error) => {
-            error!("failed to parse {}: {}", CONFIG_FILE, error);
+            error!("failed to parse {CONFIG_FILE}: {error}");
             return ExitCode::FAILURE;
         }
     };
 
     let client = Client::new();
     if let Err(error) = create_action_events(&client, &config) {
-        error!("failed to create new action events: {}", error);
+        error!("failed to create new action events: {error}");
         return ExitCode::FAILURE;
     };
     if let Err(error) = delete_action_events(&client, &config) {
-        error!("failed to delete old action events: {}", error);
+        error!("failed to delete old action events: {error}");
         return ExitCode::FAILURE;
     }
 
     if let Err(error) = garbage_collection(&client, &config) {
-        error!("failed to run garbage collection: {}", error);
+        error!("failed to run garbage collection: {error}");
         return ExitCode::FAILURE;
     }
 
@@ -137,7 +137,7 @@ fn create_action_events(client: &Client, config: &Config) -> Result<(), ReqwestE
     }
 
     info!("creating {} new action events", action_events.len());
-    debug!("{:#?}", action_events);
+    debug!("{action_events:#?}");
 
     client
         .post(route_max_version(
@@ -223,7 +223,7 @@ fn delete_action_events(client: &Client, config: &Config) -> Result<(), ReqwestE
     }
 
     info!("deleting {} action events", action_event_ids.len());
-    debug!("{:#?}", action_event_ids);
+    debug!("{action_event_ids:#?}");
 
     client
         .delete(route_max_version(

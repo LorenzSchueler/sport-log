@@ -168,26 +168,26 @@ async fn main() -> ExitCode {
     let config_file = match fs::read_to_string(CONFIG_FILE) {
         Ok(file) => file,
         Err(error) => {
-            error!("failed to read {}: {}", CONFIG_FILE, error);
+            error!("failed to read {CONFIG_FILE}: {error}");
             return ExitCode::FAILURE;
         }
     };
     let config = match toml::from_str(&config_file) {
         Ok(config) => config,
         Err(error) => {
-            error!("failed to parse {}: {}", CONFIG_FILE, error);
+            error!("failed to parse {CONFIG_FILE}: {error}");
             return ExitCode::FAILURE;
         }
     };
 
     if args.setup {
         if let Err(error) = setup(&config).await {
-            warn!("setup failed: {}", error);
+            warn!("setup failed: {error}");
         }
     } else {
         #[allow(clippy::collapsible_else_if)]
         if let Err(error) = fetch(&config).await {
-            warn!("fetching session failed: {}", error);
+            warn!("fetching session failed: {error}");
         }
     }
 

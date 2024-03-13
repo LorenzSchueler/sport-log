@@ -66,7 +66,7 @@ pub async fn setup(
             response.json::<Platform>().await?.id // this will always fail and return the error
         }
         status => {
-            error!("an error occurred (status {})", status);
+            error!("an error occurred (status {status})");
             response.json::<Platform>().await?.id // this will always fail and return the error
         }
     };
@@ -108,7 +108,7 @@ pub async fn setup(
             response.json::<ActionProvider>().await?.id // this will always fail and return the error
         }
         status => {
-            error!("an error occurred (status {})", status);
+            error!("an error occurred (status {status})");
             response.json::<ActionProvider>().await?.id // this will always fail and return the error
         }
     };
@@ -136,7 +136,7 @@ pub async fn setup(
     {
         StatusCode::OK => info!("action created\nsetup successful"),
         StatusCode::CONFLICT => info!("action already exists\nsetup successful"),
-        status => error!("an error occurred (status {})", status),
+        status => error!("an error occurred (status {status})"),
     }
 
     Ok(())

@@ -106,16 +106,16 @@ async fn main() -> ExitCode {
 
     let config = match get_config().await {
         Ok(config) => Box::leak(Box::new(config)),
-        Err(err) => {
-            error!("{}", err);
+        Err(error) => {
+            error!("{error}");
             return ExitCode::FAILURE;
         }
     };
 
     let db_pool = match get_db_pool(config) {
         Ok(db_pool) => db_pool,
-        Err(err) => {
-            error!("{}", err);
+        Err(error) => {
+            error!("{error}");
             return ExitCode::FAILURE;
         }
     };
@@ -124,8 +124,8 @@ async fn main() -> ExitCode {
 
     let router = router::get_router(state);
 
-    if let Err(err) = run_server(router, config).await {
-        error!("{}", err);
+    if let Err(error) = run_server(router, config).await {
+        error!("{error}");
         return ExitCode::FAILURE;
     }
 

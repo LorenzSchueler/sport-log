@@ -186,7 +186,7 @@ pub fn get_router(state: AppState) -> Router {
                     |error: ServerErrorsFailureClass, _latency: Duration, _span: &Span| match error
                     {
                         ServerErrorsFailureClass::StatusCode(status) => {
-                            warn!("{}", status);
+                            warn!("{status}");
                         }
                         ServerErrorsFailureClass::Error(error) => {
                             warn!("an error occurred: {error}");
