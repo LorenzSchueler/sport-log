@@ -1,14 +1,13 @@
 use std::{
     env, fs,
     io::Error as IoError,
-    process::{self, Stdio},
+    process::{ExitCode, Stdio},
     result::Result as StdResult,
     time::Duration as StdDuration,
 };
 
 use chrono::{DateTime, Duration, Local, Utc};
 use clap::Parser;
-use lazy_static::lazy_static;
 use reqwest::{Client, Error as ReqwestError};
 use serde::Deserialize;
 use sport_log_ap_utils::{disable_events, get_events, setup as setup_db};
@@ -78,22 +77,6 @@ struct Config {
     server_url: String,
 }
 
-lazy_static! {
-    static ref CONFIG: Config = match fs::read_to_string(CONFIG_FILE) {
-        Ok(file) => match toml::from_str(&file) {
-            Ok(config) => config,
-            Err(error) => {
-                error!("failed to parse {}: {}", CONFIG_FILE, error);
-                process::exit(1);
-            }
-        },
-        Err(error) => {
-            error!("failed to read {}: {}", CONFIG_FILE, error);
-            process::exit(1);
-        }
-    };
-}
-
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
 enum Mode {
     Headless,
@@ -114,7 +97,7 @@ struct Args {
 }
 
 #[tokio::main]
-async fn main() {
+async fn main() -> ExitCode {
     if env::var("RUST_LOG").is_err() {
         if cfg!(debug_assertions) {
             env::set_var(
@@ -136,8 +119,23 @@ async fn main() {
 
     let args = Args::parse();
 
+    let config_file = match fs::read_to_string(CONFIG_FILE) {
+        Ok(file) => file,
+        Err(error) => {
+            error!("failed to read {}: {}", CONFIG_FILE, error);
+            return ExitCode::FAILURE;
+        }
+    };
+    let config = match toml::from_str(&config_file) {
+        Ok(config) => config,
+        Err(error) => {
+            error!("failed to parse {}: {}", CONFIG_FILE, error);
+            return ExitCode::FAILURE;
+        }
+    };
+
     if args.setup {
-        if let Err(error) = setup().await {
+        if let Err(error) = setup(&config).await {
             warn!("setup failed: {}", error);
         }
     } else {
@@ -146,17 +144,19 @@ async fn main() {
         } else {
             Mode::Headless
         };
-        if let Err(error) = login(mode).await {
+        if let Err(error) = login(&config, mode).await {
             warn!("login failed: {}", error);
         }
     }
+
+    ExitCode::SUCCESS
 }
 
-async fn setup() -> Result<()> {
+async fn setup(config: &Config) -> Result<()> {
     setup_db(
-        &CONFIG.server_url,
+        &config.server_url,
         NAME,
-        &CONFIG.password,
+        &config.password,
         DESCRIPTION,
         PLATFORM_NAME,
         true,
@@ -178,14 +178,14 @@ async fn setup() -> Result<()> {
     Ok(())
 }
 
-async fn login(mode: Mode) -> Result<()> {
+async fn login(config: &Config, mode: Mode) -> Result<()> {
     let client = Client::new();
 
     let exec_action_events = get_events(
         &client,
-        &CONFIG.server_url,
+        &config.server_url,
         NAME,
-        &CONFIG.password,
+        &config.password,
         Duration::zero(),
         Duration::try_days(1).unwrap() + Duration::try_minutes(2).unwrap(),
     )
@@ -251,9 +251,9 @@ async fn login(mode: Mode) -> Result<()> {
     if !disable_action_event_ids.is_empty() {
         disable_events(
             &client,
-            &CONFIG.server_url,
+            &config.server_url,
             NAME,
-            &CONFIG.password,
+            &config.password,
             &disable_action_event_ids,
         )
         .await?;

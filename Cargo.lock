@@ -1668,7 +1668,6 @@ version = "0.1.0"
 dependencies = [
  "chrono",
  "clap",
- "lazy_static",
  "rand",
  "reqwest",
  "serde",
@@ -1687,7 +1686,6 @@ version = "0.1.0"
 dependencies = [
  "chrono",
  "clap",
- "lazy_static",
  "reqwest",
  "serde",
  "sport-log-ap-utils",
@@ -1707,7 +1705,6 @@ version = "0.1.0"
 dependencies = [
  "chrono",
  "clap",
- "lazy_static",
  "rand",
  "regex",
  "reqwest",

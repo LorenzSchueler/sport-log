@@ -19,7 +19,7 @@
 //!
 //! The config file must be called `sport-log-scheduler.toml` and must be deserializable to a [`Config`].
 
-use std::{env, fs};
+use std::{env, fs, process::ExitCode};
 
 use chrono::{DateTime, Datelike, Days, Duration, Utc};
 use rand::Rng;
@@ -48,13 +48,13 @@ pub const CONFIG_FILE: &str = "sport-log-scheduler.toml";
 /// `garbage_collection_min_days` is the number of days for which an entry has to been deleted and not changed in order to get hard deleted.
 /// If set to `0` garbage collection is disabled.
 #[derive(Deserialize)]
-pub struct Config {
-    pub admin_password: String,
-    pub server_url: String,
-    pub garbage_collection_min_days: u32,
+struct Config {
+    admin_password: String,
+    server_url: String,
+    garbage_collection_min_days: u32,
 }
 
-fn main() {
+fn main() -> ExitCode {
     if env::var("RUST_LOG").is_err() {
         if cfg!(debug_assertions) {
             env::set_var("RUST_LOG", "warn,sport_log_scheduler=debug");
@@ -68,40 +68,37 @@ fn main() {
         .with_env_filter(EnvFilter::from_default_env())
         .init();
 
-    let config: Config = match fs::read_to_string(CONFIG_FILE) {
-        Ok(file) => match toml::from_str(&file) {
-            Ok(config) => config,
-            Err(error) => {
-                error!("Failed to parse {}: {}", CONFIG_FILE, error);
-                return;
-            }
-        },
+    let config_file = match fs::read_to_string(CONFIG_FILE) {
+        Ok(file) => file,
         Err(error) => {
-            error!("Failed to read {}: {}", CONFIG_FILE, error);
-            return;
+            error!("failed to read {}: {}", CONFIG_FILE, error);
+            return ExitCode::FAILURE;
+        }
+    };
+    let config = match toml::from_str(&config_file) {
+        Ok(config) => config,
+        Err(error) => {
+            error!("failed to parse {}: {}", CONFIG_FILE, error);
+            return ExitCode::FAILURE;
         }
     };
 
     let client = Client::new();
     if let Err(error) = create_action_events(&client, &config) {
-        error!(
-            "while creating new action events an error occurred: {}",
-            error
-        );
-    }
+        error!("failed to create new action events: {}", error);
+        return ExitCode::FAILURE;
+    };
     if let Err(error) = delete_action_events(&client, &config) {
-        error!(
-            "while deleting old action events an error occurred: {}",
-            error
-        );
+        error!("failed to delete old action events: {}", error);
+        return ExitCode::FAILURE;
     }
 
     if let Err(error) = garbage_collection(&client, &config) {
-        error!(
-            "while running garbage collection an error occurred: {}",
-            error
-        );
+        error!("failed to run garbage collection: {}", error);
+        return ExitCode::FAILURE;
     }
+
+    ExitCode::SUCCESS
 }
 
 fn create_action_events(client: &Client, config: &Config) -> Result<(), ReqwestError> {

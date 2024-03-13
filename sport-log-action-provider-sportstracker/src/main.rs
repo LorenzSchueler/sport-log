@@ -1,8 +1,7 @@
-use std::{env, fs, process, result::Result as StdResult};
+use std::{env, fs, process::ExitCode, result::Result as StdResult};
 
 use chrono::{DateTime, Duration};
 use clap::Parser;
-use lazy_static::lazy_static;
 use rand::Rng;
 use reqwest::{Client, Error as ReqwestError};
 use serde::Deserialize;
@@ -62,26 +61,10 @@ type UserResult<T> = StdResult<T, UserError>;
 /// `admin_password` is the password for the admin endpoints.
 ///
 /// `base_url` is the left part of the URL (everything before `/<version>/...`)
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Clone)]
 struct Config {
     password: String,
     server_url: String,
-}
-
-lazy_static! {
-    static ref CONFIG: Config = match fs::read_to_string(CONFIG_FILE) {
-        Ok(file) => match toml::from_str(&file) {
-            Ok(config) => config,
-            Err(error) => {
-                error!("failed to parse {}: {}", CONFIG_FILE, error);
-                process::exit(1);
-            }
-        },
-        Err(error) => {
-            error!("failed to read {}: {}", CONFIG_FILE, error);
-            process::exit(1);
-        }
-    };
 }
 
 #[derive(Deserialize, Debug)]
@@ -160,7 +143,7 @@ struct Args {
 }
 
 #[tokio::main]
-async fn main() {
+async fn main() -> ExitCode {
     if env::var("RUST_LOG").is_err() {
         if cfg!(debug_assertions) {
             env::set_var(
@@ -182,23 +165,40 @@ async fn main() {
 
     let args = Args::parse();
 
+    let config_file = match fs::read_to_string(CONFIG_FILE) {
+        Ok(file) => file,
+        Err(error) => {
+            error!("failed to read {}: {}", CONFIG_FILE, error);
+            return ExitCode::FAILURE;
+        }
+    };
+    let config = match toml::from_str(&config_file) {
+        Ok(config) => config,
+        Err(error) => {
+            error!("failed to parse {}: {}", CONFIG_FILE, error);
+            return ExitCode::FAILURE;
+        }
+    };
+
     if args.setup {
-        if let Err(error) = setup().await {
+        if let Err(error) = setup(&config).await {
             warn!("setup failed: {}", error);
         }
     } else {
         #[allow(clippy::collapsible_else_if)]
-        if let Err(error) = fetch().await {
+        if let Err(error) = fetch(&config).await {
             warn!("fetching session failed: {}", error);
         }
     }
+
+    ExitCode::SUCCESS
 }
 
-async fn setup() -> Result<()> {
+async fn setup(config: &Config) -> Result<()> {
     setup_db(
-        &CONFIG.server_url,
+        &config.server_url,
         NAME,
-        &CONFIG.password,
+        &config.password,
         DESCRIPTION,
         PLATFORM_NAME,
         true,
@@ -211,14 +211,14 @@ async fn setup() -> Result<()> {
     Ok(())
 }
 
-async fn fetch() -> Result<()> {
+async fn fetch(config: &Config) -> Result<()> {
     let client = Client::new();
 
     let exec_action_events = get_events(
         &client,
-        &CONFIG.server_url,
+        &config.server_url,
         NAME,
-        &CONFIG.password,
+        &config.password,
         Duration::try_hours(0).unwrap(),
         Duration::try_hours(1).unwrap() + Duration::try_minutes(1).unwrap(),
     )
@@ -227,7 +227,7 @@ async fn fetch() -> Result<()> {
     let mut tasks: Vec<JoinHandle<Result<UserResult<ActionEventId>>>> = vec![];
     for exec_action_event in exec_action_events {
         let client = client.clone();
-
+        let config: Config = config.clone();
         tasks.push(tokio::spawn(async move {
             debug!("processing {:#?}", exec_action_event);
 
@@ -256,8 +256,8 @@ async fn fetch() -> Result<()> {
             let workout_keys = get_workout_keys(&client, &token).await?;
 
             let movements: Vec<Movement> = client
-                .get(route_max_version(&CONFIG.server_url, MOVEMENT, None))
-                .basic_auth(NAME, Some(&CONFIG.password))
+                .get(route_max_version(&config.server_url, MOVEMENT, None))
+                .basic_auth(NAME, Some(&config.password))
                 .header(ID_HEADER, exec_action_event.user_id.0)
                 .send()
                 .await?
@@ -290,11 +290,11 @@ async fn fetch() -> Result<()> {
                 // all cardio sessions of user with same datetime
                 let conflicting_cardio_sessions: Vec<CardioSession> = client
                     .get(route_max_version(
-                        &CONFIG.server_url,
+                        &config.server_url,
                         CARDIO_SESSION,
                         Some(&[("start", datetime.as_str()), ("end", datetime.as_str())]),
                     ))
-                    .basic_auth(NAME, Some(&CONFIG.password))
+                    .basic_auth(NAME, Some(&config.password))
                     .header(ID_HEADER, exec_action_event.user_id.0)
                     .send()
                     .await?
@@ -313,8 +313,8 @@ async fn fetch() -> Result<()> {
                 }
 
                 let response = client
-                    .post(route_max_version(&CONFIG.server_url, CARDIO_SESSION, None))
-                    .basic_auth(NAME, Some(&CONFIG.password))
+                    .post(route_max_version(&config.server_url, CARDIO_SESSION, None))
+                    .basic_auth(NAME, Some(&config.password))
                     .header(ID_HEADER, exec_action_event.user_id.0)
                     .json(&cardio_session)
                     .send()
@@ -352,9 +352,9 @@ async fn fetch() -> Result<()> {
     if !delete_action_event_ids.is_empty() {
         disable_events(
             &client,
-            &CONFIG.server_url,
+            &config.server_url,
             NAME,
-            &CONFIG.password,
+            &config.password,
             &delete_action_event_ids,
         )
         .await?;

@@ -91,7 +91,7 @@ where
 {
     fn on_acquire(&self, conn: &mut C) -> Result<(), E> {
         conn.begin_test_transaction()
-            .expect("Failed to start test transaction");
+            .expect("failed to start test transaction");
 
         Ok(())
     }

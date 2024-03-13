@@ -13,7 +13,7 @@
 //! The config must be deserializable to [`Config`].
 //! The name of the config file is specified in [`CONFIG_FILE`].
 
-use std::env;
+use std::{env, process::ExitCode};
 
 use axum::Router;
 use diesel::{
@@ -62,8 +62,8 @@ fn tracing_setup() {
 async fn get_config() -> Result<Config, String> {
     let config_file = fs::read_to_string(CONFIG_FILE)
         .await
-        .map_err(|err| format!("failed to read config file: {err}"))?;
-    toml::from_str(&config_file).map_err(|err| format!("failed to parse config file: {err}"))
+        .map_err(|err| format!("failed to read {CONFIG_FILE}: {err}"))?;
+    toml::from_str(&config_file).map_err(|err| format!("failed to parse {CONFIG_FILE}: {err}"))
 }
 
 fn get_db_pool(config: &Config) -> Result<DbPool, String> {
@@ -101,14 +101,14 @@ async fn run_server(router: Router, config: &Config) -> Result<(), String> {
 }
 
 #[tokio::main]
-async fn main() {
+async fn main() -> ExitCode {
     tracing_setup();
 
     let config = match get_config().await {
         Ok(config) => Box::leak(Box::new(config)),
         Err(err) => {
             error!("{}", err);
-            return;
+            return ExitCode::FAILURE;
         }
     };
 
@@ -116,7 +116,7 @@ async fn main() {
         Ok(db_pool) => db_pool,
         Err(err) => {
             error!("{}", err);
-            return;
+            return ExitCode::FAILURE;
         }
     };
 
@@ -126,5 +126,8 @@ async fn main() {
 
     if let Err(err) = run_server(router, config).await {
         error!("{}", err);
+        return ExitCode::FAILURE;
     }
+
+    ExitCode::SUCCESS
 }

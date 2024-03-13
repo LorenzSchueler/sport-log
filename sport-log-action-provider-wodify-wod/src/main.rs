@@ -1,14 +1,13 @@
 use std::{
     env, fs,
     io::Error as IoError,
-    process::{self, Stdio},
+    process::{ExitCode, Stdio},
     result::Result as StdResult,
     time::Duration as StdDuration,
 };
 
 use chrono::Duration;
 use clap::Parser;
-use lazy_static::lazy_static;
 use rand::Rng;
 use regex::Regex;
 use reqwest::{Client, Error as ReqwestError, StatusCode};
@@ -82,26 +81,10 @@ type UserResult<T> = StdResult<T, UserError>;
 /// `admin_password` is the password for the admin endpoints.
 ///
 /// `server_url` is the left part of the URL (everything before `/<version>/...`)
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Clone)]
 struct Config {
     password: String,
     server_url: String,
-}
-
-lazy_static! {
-    static ref CONFIG: Config = match fs::read_to_string(CONFIG_FILE) {
-        Ok(file) => match toml::from_str(&file) {
-            Ok(config) => config,
-            Err(error) => {
-                error!("failed to parse {}: {}", CONFIG_FILE, error);
-                process::exit(1);
-            }
-        },
-        Err(error) => {
-            error!("failed to read {}: {}", CONFIG_FILE, error);
-            process::exit(1);
-        }
-    };
 }
 
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
@@ -124,7 +107,7 @@ struct Args {
 }
 
 #[tokio::main]
-async fn main() {
+async fn main() -> ExitCode {
     if env::var("RUST_LOG").is_err() {
         if cfg!(debug_assertions) {
             env::set_var(
@@ -143,8 +126,23 @@ async fn main() {
 
     let args = Args::parse();
 
+    let config_file = match fs::read_to_string(CONFIG_FILE) {
+        Ok(file) => file,
+        Err(error) => {
+            error!("failed to read {}: {}", CONFIG_FILE, error);
+            return ExitCode::FAILURE;
+        }
+    };
+    let config = match toml::from_str(&config_file) {
+        Ok(config) => config,
+        Err(error) => {
+            error!("failed to parse {}: {}", CONFIG_FILE, error);
+            return ExitCode::FAILURE;
+        }
+    };
+
     if args.setup {
-        if let Err(error) = setup().await {
+        if let Err(error) = setup(&config).await {
             warn!("setup failed: {}", error);
         }
     } else {
@@ -153,17 +151,19 @@ async fn main() {
         } else {
             Mode::Headless
         };
-        if let Err(error) = get_wod(mode).await {
+        if let Err(error) = get_wod(&config, mode).await {
             warn!("fetching wod failed: {}", error);
         }
     }
+
+    ExitCode::SUCCESS
 }
 
-async fn setup() -> Result<()> {
+async fn setup(config: &Config) -> Result<()> {
     setup_db(
-        &CONFIG.server_url,
+        &config.server_url,
         NAME,
-        &CONFIG.password,
+        &config.password,
         DESCRIPTION,
         PLATFORM_NAME,
         true,
@@ -179,14 +179,14 @@ async fn setup() -> Result<()> {
     Ok(())
 }
 
-async fn get_wod(mode: Mode) -> Result<()> {
+async fn get_wod(config: &Config, mode: Mode) -> Result<()> {
     let client = Client::new();
 
     let exec_action_events = get_events(
         &client,
-        &CONFIG.server_url,
+        &config.server_url,
         NAME,
-        &CONFIG.password,
+        &config.password,
         Duration::try_days(-1).unwrap(),
         Duration::zero(),
     )
@@ -216,7 +216,7 @@ async fn get_wod(mode: Mode) -> Result<()> {
     for exec_action_event in exec_action_events {
         let caps = caps.clone();
         let client = client.clone();
-
+        let config = config.clone();
         tasks.push(tokio::spawn(async move {
             debug!("processing: {:#?}", exec_action_event);
 
@@ -231,6 +231,7 @@ async fn get_wod(mode: Mode) -> Result<()> {
             let driver = WebDriver::new(WEBDRIVER_ADDRESS, caps).await?;
 
             let result = try_create_wod(
+                &config,
                 &driver,
                 &client,
                 username,
@@ -265,9 +266,9 @@ async fn get_wod(mode: Mode) -> Result<()> {
     if !disable_action_event_ids.is_empty() {
         disable_events(
             &client,
-            &CONFIG.server_url,
+            &config.server_url,
             NAME,
-            &CONFIG.password,
+            &config.password,
             &disable_action_event_ids,
         )
         .await?;
@@ -280,6 +281,7 @@ async fn get_wod(mode: Mode) -> Result<()> {
 }
 
 async fn try_create_wod(
+    config: &Config,
     driver: &WebDriver,
     client: &Client,
     username: &str,
@@ -405,8 +407,8 @@ async fn try_create_wod(
     };
 
     let response = client
-        .post(route_max_version(&CONFIG.server_url, WOD, None))
-        .basic_auth(NAME, Some(&CONFIG.password))
+        .post(route_max_version(&config.server_url, WOD, None))
+        .basic_auth(NAME, Some(&config.password))
         .header(ID_HEADER, exec_action_event.user_id.0)
         .json(&wod)
         .send()
