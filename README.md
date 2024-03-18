@@ -1,5 +1,8 @@
 <p align="center">
-  <img src="icon.png" height="100" align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="icon-dark.png">
+    <img src="icon.png" height="100">
+  </picture>
 </p>
 
 <h1 align="center">Sport Log</h1>
