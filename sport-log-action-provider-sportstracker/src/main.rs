@@ -9,14 +9,12 @@ use sport_log_ap_utils::{disable_events, get_events, setup as setup_db};
 use sport_log_types::{
     uri::{route_max_version, CARDIO_SESSION, MOVEMENT},
     ActionEventId, CardioSession, CardioSessionId, CardioType, ExecutableActionEvent, Movement,
-    Position,
+    Position, ID_HEADER,
 };
 use thiserror::Error;
 use tokio::task::{JoinError, JoinHandle};
 use tracing::{debug, error, info, warn};
 use tracing_subscriber::EnvFilter;
-
-const ID_HEADER: &str = "id"; // TODO use ID_HEADER from sport-log-types
 
 const CONFIG_FILE: &str = "sport-log-action-provider-sportstracker.toml";
 const NAME: &str = "sportstracker-fetch";
