@@ -43,6 +43,7 @@ impl UserDb {
 }
 
 /// Same as trait [`Update`] but with mutable references
+#[allow(clippy::multiple_inherent_impl)]
 impl UserDb {
     pub fn update(user: &mut <Self as Db>::Type, db: &mut PgConnection) -> QueryResult<usize> {
         let salt = SaltString::generate(&mut OsRng);
@@ -76,6 +77,7 @@ impl CheckUserId for UserDb {
     }
 }
 
+#[allow(clippy::multiple_inherent_impl)]
 impl UserDb {
     pub fn auth(username: &str, password: &str, db: &mut PgConnection) -> QueryResult<UserId> {
         let (user_id, password_hash): (UserId, String) = user::table

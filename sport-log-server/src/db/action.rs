@@ -61,6 +61,7 @@ impl ActionProviderDb {
     }
 }
 
+#[allow(clippy::multiple_inherent_impl)]
 impl ActionProviderDb {
     pub fn auth(
         name: &str,
