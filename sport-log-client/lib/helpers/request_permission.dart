@@ -17,3 +17,27 @@ abstract class PermissionRequest {
     return true;
   }
 }
+
+abstract class Request {
+  // Repeatedly request until check either returns true or the user chooses to ignore the request.
+  //
+  // Returns whether check returned true.
+  static Future<bool> request({
+    required String title,
+    required String text,
+    required Future<bool> Function() check,
+    required Future<void> Function()? change,
+  }) async {
+    while (!await check()) {
+      final serviceSettings = await showRequiredDialog(
+        title: title,
+        text: text,
+      );
+      if (serviceSettings.isIgnore) {
+        return false;
+      }
+      await change?.call();
+    }
+    return true;
+  }
+}

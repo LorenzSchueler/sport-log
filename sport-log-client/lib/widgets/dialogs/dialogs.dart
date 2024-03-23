@@ -107,7 +107,7 @@ enum ServiceSettings {
   bool get isIgnore => this == ServiceSettings.ignore;
 }
 
-Future<ServiceSettings> showServiceRequiredDialog({
+Future<ServiceSettings> showRequiredDialog({
   required String title,
   required String text,
 }) async {

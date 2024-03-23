@@ -9,7 +9,6 @@ import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:polar/polar.dart';
 import 'package:sport_log/helpers/request_permission.dart';
-import 'package:sport_log/widgets/dialogs/dialogs.dart';
 
 class HeartRateUtils extends ChangeNotifier {
   static final _polar = Polar();
@@ -79,25 +78,24 @@ class HeartRateUtils extends ChangeNotifier {
     }
   }
 
-  Future<bool> enableBluetooth() async {
-    while (true) {
-      try {
-        await FlutterBluePlus.turnOn();
-        return true;
-      } on FlutterBluePlusException catch (e) {
-        if (e.code == FbpErrorCode.timeout.index) {
-          final serviceSettings = await showServiceRequiredDialog(
-            title: "Bluetooth Required",
-            text: "Please enable bluetooth manually.",
-          );
-          if (serviceSettings.isIgnore) {
-            return false;
+  Future<bool> enableBluetooth() {
+    return Request.request(
+      title: "Bluetooth Required",
+      text: "Please enable bluetooth.",
+      check: () async =>
+          (await FlutterBluePlus.adapterState.first) ==
+          BluetoothAdapterState.on,
+      change: () async {
+        try {
+          await FlutterBluePlus.turnOn();
+        } on FlutterBluePlusException catch (e) {
+          if (e.code != FbpErrorCode.userRejected.index &&
+              e.code != FbpErrorCode.timeout.index) {
+            rethrow;
           }
-        } else {
-          rethrow;
         }
-      }
-    }
+      },
+    );
   }
 
   // ignore: long-method
