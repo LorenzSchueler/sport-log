@@ -28,20 +28,20 @@ environment:
 # versions available, run `flutter pub outdated`.
 dependencies:
   audio_session: ^0.1.16
-  audioplayers: ^5.0.0
+  audioplayers: ^6.0.0
   awesome_notifications: ^0.8.2
   collection: ^1.16.0
-  device_info_plus: ^9.0.0
-  file_picker: ^6.0.0
+  device_info_plus: ^10.1.0
+  file_picker: ^8.0.0+1
   fixnum: ^1.0.0 # used for ids (in web ints go only up to 2^53-1)
-  fl_chart: ^0.66.0
+  fl_chart: ^0.67.0
   flutter:
     sdk: flutter
   flutter_blue_plus: ^1.7.5
   flutter_foreground_task: ^6.0.0+1
   flutter_localizations:
     sdk: flutter
-  flutter_tts: ^3.6.3
+  flutter_tts: ^4.0.2
   fluttertoast: ^8.0.8
   gpx: ^2.1.1
   hive_flutter: ^1.1.0
@@ -66,7 +66,7 @@ dependencies:
       url: https://github.com/LorenzSchueler/mapbox-maps-flutter
   mapbox_search: ^4.2.0
   open_file: ^3.3.1
-  package_info_plus: ^5.0.1
+  package_info_plus: ^7.0.0
   path_provider: ^2.0.10
   pedometer: #^3.0.0
     # callback for every step
@@ -83,7 +83,7 @@ dependencies:
   synchronized: ^3.0.0+3
   url_launcher: ^6.0.20
   validators: ^3.0.0
-  wakelock: ^0.6.1+2
+  wakelock_plus: ^1.2.2
   yaml: ^3.1.0
 
 dependency_overrides:
@@ -93,7 +93,6 @@ dependency_overrides:
       url: https://github.com/LorenzSchueler/flutterlocation
       path: packages/location_android
       ref: develop
-  win32: ^4.0.0
 
 dev_dependencies:
   build_runner: ^2.1.0 # json

@@ -4,7 +4,7 @@ import 'dart:math';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_log/defaults.dart';
-import 'package:wakelock/wakelock.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 
 enum TimerType {
   timer,
@@ -90,12 +90,12 @@ class TimerUtils {
       const Duration(seconds: 1),
       (Timer t) => _tickCallback(),
     );
-    Wakelock.enable();
+    WakelockPlus.enable();
   }
 
   final _player = AudioPlayer();
-  static const _audioCtx = AudioContext(
-    android: AudioContextAndroid(
+  static final _audioCtx = AudioContext(
+    android: const AudioContextAndroid(
       usageType: AndroidUsageType.alarm,
       audioFocus: AndroidAudioFocus.gainTransientMayDuck,
     ),
@@ -115,7 +115,7 @@ class TimerUtils {
 
   void dispose() {
     _timer.cancel();
-    Wakelock.disable();
+    WakelockPlus.disable();
   }
 
   void stopTimer() {
