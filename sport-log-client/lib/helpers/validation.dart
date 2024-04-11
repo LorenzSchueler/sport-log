@@ -1,7 +1,7 @@
 import 'package:sport_log/helpers/logger.dart';
-import 'package:validators/validators.dart';
+import 'package:string_validator/string_validator.dart';
 
-final _logger = Logger('VALIDATION');
+final _logger = Logger("VALIDATION");
 
 bool validate(bool val, String message) {
   if (!val) {
@@ -11,28 +11,16 @@ bool validate(bool val, String message) {
   return true;
 }
 
-extension Case on String {
-  bool isUpperCase() {
-    final ascii = codeUnitAt(0);
-    return ascii >= 65 && ascii <= 90;
-  }
-
-  bool isLowerCase() {
-    final ascii = codeUnitAt(0);
-    return ascii >= 97 && ascii <= 122;
-  }
-
-  bool isDigit() {
-    final ascii = codeUnitAt(0);
-    return ascii >= 48 && ascii <= 57;
-  }
-}
-
 abstract final class Validator {
   static String? validateUrl(String? url) {
     if (url == null || url.isEmpty) {
       return "URL must not be empty.";
-    } else if (!isURL(url, protocols: ["http", "https"])) {
+    } else if (!isURL(url, {
+      "protocols": ["http", "https"],
+      "require_tld": true,
+      "require_protocol": true,
+      "allow_underscores": true,
+    })) {
       return "URL is invalid.";
     } else {
       return null;
@@ -44,7 +32,7 @@ abstract final class Validator {
       return "Username must not be empty.";
     } else if (username.length < 2) {
       return "Username must at least be 2 characters long.";
-    } else if (username.contains(':')) {
+    } else if (username.contains(":")) {
       return "Username must not contain ':'.";
     } else {
       return null;
@@ -58,9 +46,9 @@ abstract final class Validator {
     } else if (password.length < 8) {
       return "Password must be at least 8 characters long.";
     } else if (!(password.runes
-            .any((c) => String.fromCharCode(c).isLowerCase()) &&
-        password.runes.any((c) => String.fromCharCode(c).isUpperCase()) &&
-        password.runes.any((c) => String.fromCharCode(c).isDigit()))) {
+            .any((c) => isLowercase(String.fromCharCode(c))) &&
+        password.runes.any((c) => isUppercase(String.fromCharCode(c))) &&
+        password.runes.any((c) => isNumeric(String.fromCharCode(c))))) {
       return "Password must contain at least one lower case and one upper case character and one number.";
     } else {
       return null;
