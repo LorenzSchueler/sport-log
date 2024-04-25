@@ -39,12 +39,11 @@ class Split {
     required this.tempo,
   });
 
-  static List<Split> computeAll(List<Position>? track) {
+  static List<Split> computeAll(List<Position>? track, int splitDistance) {
     if (track == null || track.isEmpty) {
       return [];
     }
 
-    const splitDistance = 1000; // m
     final splits = <Split>[];
     var lastDistance = 0;
     var lastTime = Duration.zero;

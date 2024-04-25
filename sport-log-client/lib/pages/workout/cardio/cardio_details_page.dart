@@ -13,6 +13,7 @@ import 'package:sport_log/helpers/page_return.dart';
 import 'package:sport_log/helpers/pointer.dart';
 import 'package:sport_log/helpers/search.dart';
 import 'package:sport_log/helpers/splits.dart';
+import 'package:sport_log/helpers/validation.dart';
 import 'package:sport_log/models/cardio/cardio_session.dart';
 import 'package:sport_log/models/cardio/cardio_session_description.dart';
 import 'package:sport_log/models/cardio/position.dart';
@@ -203,9 +204,11 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
     });
   }
 
-  void _computeSplits() {
-    final splits =
-        Split.computeAll(_cardioSessionDescription.cardioSession.track);
+  void _computeSplits(int distance) {
+    final splits = Split.computeAll(
+      _cardioSessionDescription.cardioSession.track,
+      distance,
+    );
 
     setState(() {
       _splits = splits;
@@ -322,7 +325,7 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
                     // load when compare tab opened for first time
                     if (_splits == null) {
                       // delay until build finished because setState can not be called during build
-                      Future.delayed(Duration.zero, _computeSplits);
+                      Future.delayed(Duration.zero, () => _computeSplits(1000));
                     }
                     return _splits == null
                         ? const Center(child: CircularProgressIndicator())
@@ -333,7 +336,45 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
                                   style: TextStyle(fontSize: 20),
                                 ),
                               )
-                            : _SplitsTable(splits: _splits!);
+                            : SingleChildScrollView(
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    SizedBox(
+                                      width: 100,
+                                      child: TextFormField(
+                                        initialValue: "1.000",
+                                        keyboardType: TextInputType.number,
+                                        validator: (distance) => distance ==
+                                                    null ||
+                                                distance.isEmpty
+                                            ? null
+                                            : Validator.validateDoubleGtZero(
+                                                distance,
+                                              ),
+                                        autovalidateMode:
+                                            AutovalidateMode.onUserInteraction,
+                                        onChanged: (distance) {
+                                          if (distance.isNotEmpty &&
+                                              Validator.validateDoubleGtZero(
+                                                    distance,
+                                                  ) ==
+                                                  null) {
+                                            final meters =
+                                                (double.parse(distance) * 1000)
+                                                    .round();
+                                            _computeSplits(meters);
+                                          }
+                                        },
+                                        decoration: const InputDecoration(
+                                          labelText: "Distance (km)",
+                                        ),
+                                      ),
+                                    ),
+                                    _SplitsTable(splits: _splits!),
+                                  ],
+                                ),
+                              );
                   },
                 ),
               ),
@@ -561,9 +602,20 @@ class _SplitsTable extends StatelessWidget {
 
   final List<Split> splits;
 
-  TableRow row(String value1, String value2, String value3, String value4) {
+  TableRow row(
+    String value0,
+    String value1,
+    String value2,
+    String value3,
+    String value4,
+  ) {
     return TableRow(
       children: [
+        Align(
+          alignment: Alignment.centerRight,
+          child: Text(value0),
+        ),
+        Container(),
         Align(
           alignment: Alignment.centerRight,
           child: Text(value1),
@@ -589,28 +641,25 @@ class _SplitsTable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Table(
-        columnWidths: const {
-          0: IntrinsicColumnWidth(),
-          1: FlexColumnWidth(),
-          2: IntrinsicColumnWidth(),
-          3: FlexColumnWidth(),
-          4: IntrinsicColumnWidth(),
-          5: FlexColumnWidth(),
-          6: IntrinsicColumnWidth(),
-        },
-        children: [
-          row("Distance", "Duration", "Speed", "Tempo"),
-          for (final split in splits)
-            row(
-              "${split.startDistance / 1000} - ${split.endDistance / 1000} km",
-              "${split.duration.formatM99S} min",
-              "${split.speed.toStringAsFixed(1)} km/h",
-              "${split.tempo.formatM99S} min/km",
-            ),
-        ],
-      ),
+    return Table(
+      defaultColumnWidth: const IntrinsicColumnWidth(),
+      columnWidths: const {
+        1: FlexColumnWidth(),
+        3: FlexColumnWidth(2),
+        5: FlexColumnWidth(2),
+        7: FlexColumnWidth(2),
+      },
+      children: [
+        row("#", "Distance", "Time", "Speed", "Tempo"),
+        for (final (i, split) in splits.indexed)
+          row(
+            "${i + 1}",
+            "${(split.endDistance / 1000).toStringAsFixed(3)} km",
+            split.endDuration.formatHms,
+            "${split.speed.toStringAsFixed(1)} km/h",
+            "${split.tempo.formatM99S} min/km",
+          ),
+      ],
     );
   }
 }
