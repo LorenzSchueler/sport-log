@@ -48,6 +48,60 @@ class CardioDetailsPage extends StatefulWidget {
   State<CardioDetailsPage> createState() => _CardioDetailsPageState();
 }
 
+class Split {
+  factory Split({
+    required int startDistance,
+    required int endDistance,
+    required Duration startDuration,
+    required Duration endDuration,
+  }) {
+    final distance = endDistance - startDistance;
+    final duration = endDuration - startDuration;
+    final speed = ((endDistance - startDistance) / 1000) /
+        (duration.inMilliseconds / 1000 / 3600);
+    final tempo = Duration(
+      milliseconds:
+          (duration.inMilliseconds / ((endDistance - startDistance) / 1000))
+              .round(),
+    );
+    return Split._(
+      startDistance: startDistance,
+      endDistance: endDistance,
+      startDuration: startDuration,
+      endDuration: endDuration,
+      distance: distance,
+      duration: duration,
+      speed: speed,
+      tempo: tempo,
+    );
+  }
+
+  Split._({
+    required this.startDistance,
+    required this.endDistance,
+    required this.startDuration,
+    required this.endDuration,
+    required this.distance,
+    required this.duration,
+    required this.speed,
+    required this.tempo,
+  });
+
+  // distance in m
+  final int startDistance;
+  // distance in m
+  final int endDistance;
+  // distance in m
+  final int distance;
+  final Duration startDuration;
+  final Duration endDuration;
+  final Duration duration;
+  // speed in km/h
+  final double speed;
+  // tempo per km
+  final Duration tempo;
+}
+
 class _CardioDetailsPageState extends State<CardioDetailsPage>
     with SingleTickerProviderStateMixin {
   final _dataProvider = CardioSessionDescriptionDataProvider();
@@ -98,9 +152,11 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
 
   List<CardioSession>? _similarSessions;
 
+  List<Split>? _splits;
+
   MapController? _mapController;
   late final TabController _tabController =
-      TabController(length: 3, vsync: this)..addListener(() => setState(() {}));
+      TabController(length: 4, vsync: this)..addListener(() => setState(() {}));
 
   final NullablePointer<PolylineAnnotation> _trackLine =
       NullablePointer.nullPointer();
@@ -200,6 +256,58 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
     });
   }
 
+  void _computeSplits() {
+    final track = _cardioSessionDescription.cardioSession.track;
+    if (track == null) {
+      setState(() {
+        _splits = [];
+      });
+      return;
+    }
+
+    const splitDistance = 1000; // m
+    final splits = <Split>[];
+    var lastDistance = 0;
+    var lastTime = Duration.zero;
+
+    for (var i = 0; i < track.length - 1; i++) {
+      if ((track[i].distance / splitDistance).floor() <
+          (track[i + 1].distance / splitDistance).floor()) {
+        final pos1 = track[i];
+        final pos2 = track[i + 1];
+        final newDistance =
+            (pos2.distance / splitDistance).floor() * splitDistance;
+        final distanceDiff = pos2.distance - pos1.distance;
+        final weight1 = (newDistance - pos1.distance) / distanceDiff;
+        final weight2 = (pos2.distance - newDistance) / distanceDiff;
+        final newTime = pos1.time * weight1 + pos2.time * weight2;
+
+        splits.add(
+          Split(
+            startDistance: lastDistance,
+            endDistance: newDistance,
+            startDuration: lastTime,
+            endDuration: newTime,
+          ),
+        );
+        lastDistance = newDistance;
+        lastTime = newTime;
+      }
+    }
+    splits.add(
+      Split(
+        startDistance: lastDistance,
+        endDistance: track[track.length - 1].distance.round(),
+        startDuration: lastTime,
+        endDuration: track[track.length - 1].time,
+      ),
+    );
+
+    setState(() {
+      _splits = splits;
+    });
+  }
+
   Future<void> _showSession(CardioSession session) async {
     final color =
         Color((Random().nextDouble() * 0xFFFFFF).toInt()).withOpacity(1);
@@ -273,7 +381,8 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
                 controller: _tabController,
                 indicatorColor: Theme.of(context).colorScheme.primary,
                 tabs: const [
-                  Tab(text: "Stats", icon: Icon(AppIcons.numberedList)),
+                  Tab(text: "Stats", icon: Icon(AppIcons.bulletedList)),
+                  Tab(text: "Splits", icon: Icon(AppIcons.numberedList)),
                   Tab(text: "Chart", icon: Icon(AppIcons.chart)),
                   Tab(text: "Compare", icon: Icon(AppIcons.compare)),
                 ],
@@ -301,6 +410,95 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
                 ),
               ),
             if (fullscreen.isOff && _tabController.index == 1)
+              Container(
+                height: 250,
+                padding: Defaults.edgeInsets.normal,
+                child: Builder(
+                  builder: (context) {
+                    // load when compare tab opened for first time
+                    if (_splits == null) {
+                      // delay until build finished because setState can not be called during build
+                      Future.delayed(Duration.zero, _computeSplits);
+                    }
+                    return _splits == null
+                        ? Center(child: CircularProgressIndicator())
+                        : _splits!.isEmpty
+                            ? Center(
+                                child: Text(
+                                  "No Splits available.",
+                                  style: TextStyle(fontSize: 20),
+                                ),
+                              )
+                            : SingleChildScrollView(
+                                child: Table(
+                                columnWidths: {
+                                  0: IntrinsicColumnWidth(),
+                                  1: FlexColumnWidth(),
+                                  2: IntrinsicColumnWidth(),
+                                  3: FlexColumnWidth(),
+                                  4: IntrinsicColumnWidth(),
+                                  5: FlexColumnWidth(),
+                                  6: IntrinsicColumnWidth(),
+                                },
+                                children: [
+                                  TableRow(
+                                    children: [
+                                      Align(
+                                        alignment: Alignment.centerRight,
+                                        child: Text("Distance"),
+                                      ),
+                                      Container(),
+                                      Align(
+                                        alignment: Alignment.centerRight,
+                                        child: Text("Duration"),
+                                      ),
+                                      Container(),
+                                      Align(
+                                        alignment: Alignment.centerRight,
+                                        child: Text("Speed"),
+                                      ),
+                                      Container(),
+                                      Align(
+                                        alignment: Alignment.centerRight,
+                                        child: Text("Tempo"),
+                                      ),
+                                    ],
+                                  ),
+                                  for (final split in _splits!)
+                                    TableRow(
+                                      children: [
+                                        Align(
+                                          alignment: Alignment.centerRight,
+                                          child: Text(
+                                            "${split.startDistance / 1000} - ${split.endDistance / 1000} km",
+                                          ),
+                                        ),
+                                        Container(),
+                                        Text(
+                                          "${split.duration.formatM99S} min",
+                                        ),
+                                        Container(),
+                                        Align(
+                                          alignment: Alignment.centerRight,
+                                          child: Text(
+                                            "${split.speed.toStringAsFixed(1)} km/h",
+                                          ),
+                                        ),
+                                        Container(),
+                                        Align(
+                                          alignment: Alignment.centerRight,
+                                          child: Text(
+                                            "${split.tempo.formatM99S} min/km",
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                ],
+                              ));
+                  },
+                ),
+              ),
+            if (fullscreen.isOff && _tabController.index == 2)
               SizedBox(
                 height: 250,
                 child: _cardioSessionDescription.cardioSession.track != null
@@ -352,7 +550,7 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
                       )
                     : const NoTrackPlaceholder(),
               ),
-            if (fullscreen.isOff && _tabController.index == 2)
+            if (fullscreen.isOff && _tabController.index == 3)
               Container(
                 height: 250,
                 padding: Defaults.edgeInsets.normal,
