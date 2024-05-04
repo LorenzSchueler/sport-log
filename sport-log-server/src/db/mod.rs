@@ -52,23 +52,27 @@ pub fn build_hasher() -> Argon2<'static> {
     );
 }
 
-/// Wrapper around incoming json data for which the access permissions for the [`AuthUserOrAP`], [`AuthAP`] or [`AuthAdmin`] have not been checked.
+/// Wrapper around incoming json data for which the access permissions for the
+/// [`AuthUserOrAP`], [`AuthAP`] or [`AuthAdmin`] have not been checked.
 ///
 /// The data can be retrieved by using the appropriate verification function.
 #[derive(Debug, Deserialize)]
 #[serde(transparent)]
 pub struct Unverified<T>(pub(super) T);
 
-/// Wrapper around an incoming id for which the access permissions for the [`AuthUserOrAP`], [`AuthAP`] or [`AuthAdmin`] have not been checked.
+/// Wrapper around an incoming id for which the access permissions for the
+/// [`AuthUserOrAP`], [`AuthAP`] or [`AuthAdmin`] have not been checked.
 ///
 /// The id can be retrieved by using the appropriate verification function.
 #[derive(Debug, Clone, Deserialize)]
 #[serde(transparent)]
 pub struct UnverifiedId<I>(pub(super) I);
 
-/// Wrapper around multiple incoming ids for which the access permissions for the [`AuthUserOrAP`], [`AuthAP`] or [`AuthAdmin`] have not been checked.
+/// Wrapper around multiple incoming ids for which the access permissions for
+/// the [`AuthUserOrAP`], [`AuthAP`] or [`AuthAdmin`] have not been checked.
 ///
-/// The ids type can be retrieved by using the appropriate verification function.
+/// The ids type can be retrieved by using the appropriate verification
+/// function.
 #[derive(Debug, Clone, Deserialize)]
 #[serde(transparent)]
 pub struct UnverifiedIds<I>(pub(super) Vec<I>);
@@ -120,9 +124,11 @@ pub trait ModifiableDb: Db {
 ///
 /// ### Deriving
 ///
-/// This trait can be automatically derived by adding `#[derive(Create)]` to your struct.
+/// This trait can be automatically derived by adding `#[derive(Create)]` to
+/// your struct.
 ///
-/// For restrictions on the types for derive to work please see [`sport_log_derive::Create`].
+/// For restrictions on the types for derive to work please see
+/// [`sport_log_derive::Create`].
 pub trait Create: Db {
     fn create(value: &Self::Type, db: &mut PgConnection) -> QueryResult<usize>;
 
@@ -133,42 +139,38 @@ pub trait Create: Db {
 ///
 /// ### Deriving
 ///
-/// This trait can be automatically derived by adding `#[derive(GetById)]` to your struct.
+/// This trait can be automatically derived by adding `#[derive(GetById)]` to
+/// your struct.
 ///
-/// For restrictions on the types for derive to work please see [`sport_log_derive::GetById`].
+/// For restrictions on the types for derive to work please see
+/// [`sport_log_derive::GetById`].
 pub trait GetById: Db {
     fn get_by_id(id: Self::Id, db: &mut PgConnection) -> QueryResult<Self::Type>;
-}
-
-/// A type for which entries can be retrieved by id from the database.
-///
-/// ### Deriving
-///
-/// This trait can be automatically derived by adding `#[derive(GetByIds)]` to your struct.
-///
-/// For restrictions on the types for derive to work please see [`sport_log_derive::GetByIds`].
-pub trait GetByIds: Db {
-    fn get_by_ids(ids: &[Self::Id], db: &mut PgConnection) -> QueryResult<Vec<Self::Type>>;
 }
 
 /// A type for which entries can be retrieved by user from the database.
 ///
 /// ### Deriving
 ///
-/// This trait can be automatically derived by adding `#[derive(GetByUser)]` to your struct.
+/// This trait can be automatically derived by adding `#[derive(GetByUser)]` to
+/// your struct.
 ///
-/// For restrictions on the types for derive to work please see [`sport_log_derive::GetByUser`].
+/// For restrictions on the types for derive to work please see
+/// [`sport_log_derive::GetByUser`].
 pub trait GetByUser: Db {
     fn get_by_user(user_id: UserId, db: &mut PgConnection) -> QueryResult<Vec<Self::Type>>;
 }
 
-/// A type for which entries can be retrieved by user and the timespan from the database.
+/// A type for which entries can be retrieved by user and the timespan from the
+/// database.
 ///
 /// ### Deriving
 ///
-/// This trait can be automatically derived by adding `#[derive(GetByUserTimespan)]` to your struct.
+/// This trait can be automatically derived by adding
+/// `#[derive(GetByUserTimespan)]` to your struct.
 ///
-/// For restrictions on the types for derive to work please see [`sport_log_derive::GetByUserTimespan`].
+/// For restrictions on the types for derive to work please see
+/// [`sport_log_derive::GetByUserTimespan`].
 pub trait GetByUserTimespan: Db {
     fn get_by_user_and_timespan(
         user_id: UserId,
@@ -177,13 +179,16 @@ pub trait GetByUserTimespan: Db {
     ) -> QueryResult<Vec<Self::Type>>;
 }
 
-/// A type for which entries can be retrieved by user and the timestamp of the last synchronization from the database.
+/// A type for which entries can be retrieved by user and the timestamp of the
+/// last synchronization from the database.
 ///
 /// ### Deriving
 ///
-/// This trait can be automatically derived by adding `#[derive(GetByUserSync)]` to your struct.
+/// This trait can be automatically derived by adding `#[derive(GetByUserSync)]`
+/// to your struct.
 ///
-/// For restrictions on the types for derive to work please see [`sport_log_derive::GetByUserSync`].
+/// For restrictions on the types for derive to work please see
+/// [`sport_log_derive::GetByUserSync`].
 pub trait GetByUserSync: Db {
     fn get_by_user_and_last_sync(
         user_id: UserId,
@@ -192,13 +197,16 @@ pub trait GetByUserSync: Db {
     ) -> QueryResult<Vec<Self::Type>>;
 }
 
-/// A type for which entries can be retrieved by the timestamp of the last synchronization from the database.
+/// A type for which entries can be retrieved by the timestamp of the last
+/// synchronization from the database.
 ///
 /// ### Deriving
 ///
-/// This trait can be automatically derived by adding `#[derive(GetBySync)]` to your struct.
+/// This trait can be automatically derived by adding `#[derive(GetBySync)]` to
+/// your struct.
 ///
-/// For restrictions on the types for derive to work please see [`sport_log_derive::GetBySync`].
+/// For restrictions on the types for derive to work please see
+/// [`sport_log_derive::GetBySync`].
 pub trait GetBySync: Db {
     fn get_by_last_sync(
         last_sync: DateTime<Utc>,
@@ -210,9 +218,11 @@ pub trait GetBySync: Db {
 ///
 /// ### Deriving
 ///
-/// This trait can be automatically derived by adding `#[derive(GetAll)]` to your struct.
+/// This trait can be automatically derived by adding `#[derive(GetAll)]` to
+/// your struct.
 ///
-/// For restrictions on the types for derive to work please see [`sport_log_derive::GetAll`].
+/// For restrictions on the types for derive to work please see
+/// [`sport_log_derive::GetAll`].
 pub trait GetAll: Db {
     fn get_all(db: &mut PgConnection) -> QueryResult<Vec<Self::Type>>;
 }
@@ -221,9 +231,11 @@ pub trait GetAll: Db {
 ///
 /// ### Deriving
 ///
-/// This trait can be automatically derived by adding `#[derive(Update)]` to your struct.
+/// This trait can be automatically derived by adding `#[derive(Update)]` to
+/// your struct.
 ///
-/// For restrictions on the types for derive to work please see [`sport_log_derive::Update`].
+/// For restrictions on the types for derive to work please see
+/// [`sport_log_derive::Update`].
 pub trait Update: Db {
     fn update(value: &Self::Type, db: &mut PgConnection) -> QueryResult<usize>;
 
@@ -232,15 +244,20 @@ pub trait Update: Db {
 
 /// A type for which all soft deleted entities can be hard deleted.
 ///
-/// This is only intended for garbage collection triggered by `sport_log_scheduler`.
+/// This is only intended for garbage collection triggered by
+/// `sport_log_scheduler`.
 ///
-/// The function [`hard_delete`](HardDelete::hard_delete) will permanently delete all entities that are already soft deleted and which have not been changed since `last_change`.
+/// The function [`hard_delete`](HardDelete::hard_delete) will permanently
+/// delete all entities that are already soft deleted and which have not been
+/// changed since `last_change`.
 ///
 /// ### Deriving
 ///
-/// This trait can be automatically derived by adding `#[derive(HardDelete)]` to your struct.
+/// This trait can be automatically derived by adding `#[derive(HardDelete)]` to
+/// your struct.
 ///
-/// For restrictions on the types for derive to work please see [`sport_log_derive::HardDelete`].
+/// For restrictions on the types for derive to work please see
+/// [`sport_log_derive::HardDelete`].
 pub trait HardDelete: Db {
     fn hard_delete(last_change: DateTime<Utc>, db: &mut PgConnection) -> QueryResult<usize>;
 }
@@ -249,12 +266,15 @@ pub trait HardDelete: Db {
 ///
 /// ### Deriving
 ///
-/// This trait can be automatically derived by adding `#[derive(CheckUserId)]` to your struct if the struct has a field `user_id` of type [`UserId`].
+/// This trait can be automatically derived by adding `#[derive(CheckUserId)]`
+/// to your struct if the struct has a field `user_id` of type [`UserId`].
 pub trait CheckUserId: Db {
-    /// Check if the entry with id `id` in the database belongs to the [`User`](sport_log_types::User) with `user_id`.
+    /// Check if the entry with id `id` in the database belongs to the
+    /// [`User`](sport_log_types::User) with `user_id`.
     fn check_user_id(id: Self::Id, user_id: UserId, db: &mut PgConnection) -> QueryResult<bool>;
 
-    /// Check if the entries with an id in `ids` in the database belong to the [`User`](sport_log_types::User) with `user_id`.
+    /// Check if the entries with an id in `ids` in the database belong to the
+    /// [`User`](sport_log_types::User) with `user_id`.
     fn check_user_ids(
         ids: &[Self::Id],
         user_id: UserId,
@@ -264,16 +284,11 @@ pub trait CheckUserId: Db {
 
 /// A type which can be checked if it belongs to a User or is public.
 pub trait CheckOptionalUserId: Db {
-    /// Check if the entry with id `id` in the database belongs to the [`User`](sport_log_types::User) with `user_id` or is public (`user_id` is None).
+    /// Check if the entry with id `id` in the database belongs to the
+    /// [`User`](sport_log_types::User) with `user_id` or is public (`user_id`
+    /// is None).
     fn check_optional_user_id(
         id: Self::Id,
-        user_id: UserId,
-        db: &mut PgConnection,
-    ) -> QueryResult<bool>;
-
-    /// Check if the entries with an id in `ids` in the database belong to the [`User`](sport_log_types::User) with `user_id` or are public (`user_id` is None).
-    fn check_optional_user_ids(
-        ids: &[Self::Id],
         user_id: UserId,
         db: &mut PgConnection,
     ) -> QueryResult<bool>;
@@ -417,12 +432,6 @@ pub trait VerifyMultipleForUserOrAPWithoutDb {
     type Type;
 
     fn verify_user_ap_without_db(self, auth: AuthUserOrAP) -> Result<Vec<Self::Type>, StatusCode>;
-}
-
-pub trait VerifyForActionProviderWithDb {
-    type Type;
-
-    fn verify_ap(self, auth: AuthAP, db: &mut PgConnection) -> Result<Self::Type, StatusCode>;
 }
 
 pub trait VerifyForActionProviderWithoutDb {

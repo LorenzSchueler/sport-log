@@ -38,7 +38,8 @@ impl Identifiers {
 /// This macro only works if the following conditions are satisfied:
 ///
 /// - the corresponding table has the same name like this type but in snake_case
-/// - there is a type called `New[ThisTypeName]` that implements `diesel::prelude::Insertable` for this table
+/// - there is a type called `New[ThisTypeName]` that implements
+///   `diesel::prelude::Insertable` for this table
 #[proc_macro_derive(Create)]
 pub fn create_derive(input: TokenStream) -> TokenStream {
     let ast: syn::DeriveInput = syn::parse(input).unwrap();
@@ -49,22 +50,12 @@ pub fn create_derive(input: TokenStream) -> TokenStream {
 ///
 /// This macro only works if the following conditions are satisfied:
 /// - the corresponding table has the same name like this type but in snake_case
-/// - there is a type called `[ThisTypeName]Id` which is the primary key of the table.
+/// - there is a type called `[ThisTypeName]Id` which is the primary key of the
+///   table.
 #[proc_macro_derive(GetById)]
 pub fn get_by_id_derive(input: TokenStream) -> TokenStream {
     let ast: syn::DeriveInput = syn::parse(input).unwrap();
     impl_get_by_id(&ast.ident)
-}
-
-/// Derives `sport_log_types::GetByIds`.
-///
-/// This macro only works if the following conditions are satisfied:
-/// - the corresponding table has the same name like this type but in snake_case
-/// - there is a type called `[ThisTypeName]Id` which is the primary key of the table.
-#[proc_macro_derive(GetByIds)]
-pub fn get_by_ids_derive(input: TokenStream) -> TokenStream {
-    let ast: syn::DeriveInput = syn::parse(input).unwrap();
-    impl_get_by_ids(&ast.ident)
 }
 
 /// Derives `sport_log_types::GetByUser`.
@@ -138,7 +129,8 @@ pub fn update_derive(input: TokenStream) -> TokenStream {
 ///
 /// This macro only works if the following conditions are satisfied:
 /// - the corresponding table has the same name like this type but in snake_case
-/// - the table has the columns `deleted` ([`bool`]) and `last_change` (`chrono::DateTime`)
+/// - the table has the columns `deleted` ([`bool`]) and `last_change`
+///   (`chrono::DateTime`)
 #[proc_macro_derive(HardDelete)]
 pub fn hard_delete_derive(input: TokenStream) -> TokenStream {
     let ast: syn::DeriveInput = syn::parse(input).unwrap();
@@ -262,7 +254,8 @@ pub fn unverified_inner_int_to_sql(input: TokenStream) -> TokenStream {
     impl_id_to_sql(&ast.ident)
 }
 
-/// Derives `diesel::types::IdFromSql<diesel::sql_types::BigInt, diesel::pg::Pg>`.
+/// Derives `diesel::types::IdFromSql<diesel::sql_types::BigInt,
+/// diesel::pg::Pg>`.
 ///
 /// This macro only works if the type is a one tuple struct of i64.
 #[proc_macro_derive(IdFromSql)]

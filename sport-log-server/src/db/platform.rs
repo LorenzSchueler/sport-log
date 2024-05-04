@@ -23,7 +23,6 @@ pub struct PlatformDb;
     VerifyIdForUser,
     Create,
     GetById,
-    GetByIds,
     GetByUser,
     GetByUserSync,
     Update,

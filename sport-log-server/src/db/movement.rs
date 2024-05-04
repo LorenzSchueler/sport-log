@@ -17,7 +17,6 @@ use crate::{auth::*, db::*};
     VerifyIdUnchecked,
     Create,
     GetById,
-    GetByIds,
     Update,
     HardDelete,
     CheckOptionalUserId,
@@ -151,10 +150,10 @@ impl VerifyMultipleForUserOrAPWithoutDb for Unverified<Vec<Movement>> {
     }
 }
 
-#[derive(Db, VerifyIdForAdmin, GetById, GetByIds, GetAll)]
+#[derive(Db, VerifyIdForAdmin, GetById, GetAll)]
 pub struct MuscleGroupDb;
 
-#[derive(Db, ModifiableDb, Create, GetById, GetByIds, Update, HardDelete)]
+#[derive(Db, ModifiableDb, Create, GetById, Update, HardDelete)]
 pub struct MovementMuscleDb;
 
 impl VerifyIdForUserOrAP for UnverifiedId<MovementMuscleId> {
@@ -349,22 +348,5 @@ impl CheckOptionalUserId for MovementMuscleDb {
             .get_result(db)
             .optional()
             .map(|eq| eq.unwrap_or(false))
-    }
-
-    fn check_optional_user_ids(
-        ids: &[Self::Id],
-        user_id: UserId,
-        db: &mut PgConnection,
-    ) -> QueryResult<bool> {
-        movement_muscle::table
-            .inner_join(movement::table)
-            .filter(movement_muscle::columns::id.eq_any(ids))
-            .select(
-                movement::columns::user_id
-                    .is_not_distinct_from(user_id)
-                    .or(movement::columns::user_id.is_null()),
-            )
-            .get_results(db)
-            .map(|eqs: Vec<bool>| eqs.into_iter().all(|eq| eq))
     }
 }

@@ -11,7 +11,7 @@ use sport_log_types::{schema::user, User, UserId};
 
 use crate::{auth::AuthUser, db::*};
 
-#[derive(Db, GetById, GetByIds, VerifyUnchecked, VerifyForAdminWithoutDb)]
+#[derive(Db, GetById, VerifyUnchecked, VerifyForAdminWithoutDb)]
 pub struct UserDb;
 
 /// Same as trait [`Create`] but with mutable references

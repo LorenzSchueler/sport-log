@@ -10,15 +10,7 @@ use sport_log_types::{
 use crate::{auth::*, db::*};
 
 #[derive(
-    Db,
-    DbWithUserId,
-    ModifiableDb,
-    Create,
-    GetById,
-    GetByIds,
-    Update,
-    HardDelete,
-    CheckOptionalUserId,
+    Db, DbWithUserId, ModifiableDb, Create, GetById, Update, HardDelete, CheckOptionalUserId,
 )]
 pub struct MetconDb;
 
@@ -139,7 +131,7 @@ impl VerifyMultipleForUserOrAPWithoutDb for Unverified<Vec<Metcon>> {
     }
 }
 
-#[derive(Db, ModifiableDb, Create, GetById, GetByIds, Update, HardDelete)]
+#[derive(Db, ModifiableDb, Create, GetById, Update, HardDelete)]
 pub struct MetconMovementDb;
 
 impl GetByUser for MetconMovementDb {
@@ -230,23 +222,6 @@ impl CheckOptionalUserId for MetconMovementDb {
             .get_result(db)
             .optional()
             .map(|eq| eq.unwrap_or(false))
-    }
-
-    fn check_optional_user_ids(
-        ids: &[Self::Id],
-        user_id: UserId,
-        db: &mut PgConnection,
-    ) -> QueryResult<bool> {
-        metcon_movement::table
-            .inner_join(metcon::table)
-            .filter(metcon_movement::columns::id.eq_any(ids))
-            .select(
-                metcon::columns::user_id
-                    .is_not_distinct_from(user_id)
-                    .or(metcon::columns::user_id.is_null()),
-            )
-            .get_results(db)
-            .map(|eqs: Vec<bool>| eqs.into_iter().all(|eq| eq))
     }
 }
 
@@ -362,7 +337,6 @@ impl VerifyMultipleForUserOrAPCreate for Unverified<Vec<MetconMovement>> {
     VerifyIdForUserOrAP,
     Create,
     GetById,
-    GetByIds,
     GetByUser,
     GetByUserTimespan,
     GetByUserSync,

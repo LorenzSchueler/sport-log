@@ -152,23 +152,6 @@ pub(crate) fn impl_get_by_id(db_type: &Ident) -> TokenStream {
     .into()
 }
 
-pub(crate) fn impl_get_by_ids(db_type: &Ident) -> TokenStream {
-    quote! {
-        use diesel::prelude::*;
-
-        impl crate::db::GetByIds for crate::db::#db_type {
-            fn get_by_ids(ids: &[Self::Id], db: &mut PgConnection) -> QueryResult<Vec<Self::Type>> {
-                use crate::db::Db;
-                Self::table()
-                    .filter(Self::id_column().eq_any(ids))
-                    .select(Self::Type::as_select())
-                    .get_results(db)
-            }
-        }
-    }
-    .into()
-}
-
 pub(crate) fn impl_get_by_user(db_type: &Ident) -> TokenStream {
     quote! {
         use diesel::prelude::*;
@@ -379,22 +362,6 @@ pub(crate) fn impl_check_optional_user_id(db_type: &Ident) -> TokenStream {
                     .get_result(db)
                     .optional()
                     .map(|eq| eq.unwrap_or(false))
-            }
-
-            fn check_optional_user_ids(
-                ids: &[Self::Id],
-                user_id: sport_log_types::UserId,
-                db: &mut PgConnection,
-            ) -> QueryResult<bool> {
-                use crate::db::Db;
-                Self::table()
-                    .filter(Self::id_column().eq_any(ids))
-                    .select(Self::user_id_column()
-                        .is_not_distinct_from(user_id)
-                        .or(Self::user_id_column().is_null())
-                    )
-                    .get_results(db)
-                    .map(|eqs: Vec<bool>| eqs.into_iter().all(|eq| eq))
             }
         }
 

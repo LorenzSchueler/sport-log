@@ -17,7 +17,6 @@ use crate::{auth::*, db::*};
     VerifyIdForUserOrAP,
     Create,
     GetById,
-    GetByIds,
     GetByUser,
     GetByUserTimespan,
     GetByUserSync,
@@ -29,7 +28,7 @@ use crate::{auth::*, db::*};
 )]
 pub struct StrengthSessionDb;
 
-#[derive(Db, ModifiableDb, VerifyIdForUserOrAP, Create, GetById, GetByIds, Update, HardDelete)]
+#[derive(Db, ModifiableDb, VerifyIdForUserOrAP, Create, GetById, Update, HardDelete)]
 pub struct StrengthSetDb;
 
 impl GetByUser for StrengthSetDb {
@@ -181,5 +180,5 @@ impl VerifyMultipleForUserOrAPCreate for Unverified<Vec<StrengthSet>> {
     }
 }
 
-#[derive(Db, VerifyIdForAdmin, GetById, GetByIds, GetAll)]
+#[derive(Db, VerifyIdForAdmin, GetById, GetAll)]
 pub struct EormDb;
