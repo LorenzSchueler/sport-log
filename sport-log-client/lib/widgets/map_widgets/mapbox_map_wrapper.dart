@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart' hide Route;
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' hide Settings;
 import 'package:provider/provider.dart';
@@ -112,6 +114,10 @@ class _MapboxMapWrapperState extends State<MapboxMapWrapper> {
     return Stack(
       children: [
         MapWidget(
+          // TODO remove when fixed: https://github.com/mapbox/mapbox-maps-flutter/issues/439
+          gestureRecognizers: const {
+            Factory<EagerGestureRecognizer>(EagerGestureRecognizer.new),
+          },
           styleUri: widget.initStyleUri,
           cameraOptions: (widget.initialCameraPosition ??
                   context.read<Settings>().lastMapPosition)
