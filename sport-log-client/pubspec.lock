@@ -706,12 +706,11 @@ packages:
   mapbox_maps_flutter:
     dependency: "direct main"
     description:
-      path: "."
-      ref: HEAD
-      resolved-ref: "909ac0bf34cc5c16d066b25874a84159f2dcbe7c"
-      url: "https://github.com/LorenzSchueler/mapbox-maps-flutter"
-    source: git
-    version: "1.0.0-beta.3"
+      name: mapbox_maps_flutter
+      sha256: "0e360ec94b8a976ce88cd01fdc038c10c0b23a4806447b6bce30019469a1c41c"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.0-beta.1"
   mapbox_search:
     dependency: "direct main"
     description:

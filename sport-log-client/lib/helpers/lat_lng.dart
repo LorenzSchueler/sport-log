@@ -7,9 +7,11 @@ import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 class LatLng {
   const LatLng({required this.lat, required this.lng});
 
-  factory LatLng.fromMap(Map<String?, dynamic> map) {
-    final coordinates = map["coordinates"] as List;
-    return LatLng(lat: coordinates[1] as double, lng: coordinates[0] as double);
+  factory LatLng.fromPoint(Point point) {
+    return LatLng(
+      lat: point.coordinates.lat as double,
+      lng: point.coordinates.lng as double,
+    );
   }
 
   final double lat;
@@ -17,10 +19,9 @@ class LatLng {
 
   Position _toPosition() => Position(lng, lat);
 
-  Map<String, dynamic> toJsonPoint() =>
-      Point(coordinates: _toPosition()).toJson();
+  Point toPoint() => Point(coordinates: _toPosition());
 
-  CameraOptions toCameraOptions() => CameraOptions(center: toJsonPoint());
+  CameraOptions toCameraOptionsCenter() => CameraOptions(center: toPoint());
 
   @override
   String toString() {
@@ -133,11 +134,9 @@ extension LatLngIterExtension on Iterable<LatLng> {
     );
   }
 
-  Map<String, dynamic> toGeoJsonLineString() {
-    return LineString(
-      coordinates: map((latLng) => latLng._toPosition()).toList(),
-    ).toJson();
-  }
+  LineString toLineString() => LineString(
+        coordinates: map((latLng) => latLng._toPosition()).toList(),
+      );
 }
 
 class LatLngZoom {
@@ -147,7 +146,7 @@ class LatLngZoom {
   final double zoom;
 
   CameraOptions toCameraOptions() =>
-      CameraOptions(center: latLng.toJsonPoint(), zoom: zoom);
+      CameraOptions(center: latLng.toPoint(), zoom: zoom);
 }
 
 class LatLngBounds {
@@ -195,18 +194,20 @@ class LatLngBounds {
   }
 
   CoordinateBounds toCoordinateBounds() => CoordinateBounds(
-        southwest: southwest.toJsonPoint(),
-        northeast: northeast.toJsonPoint(),
+        southwest: southwest.toPoint(),
+        northeast: northeast.toPoint(),
         infiniteBounds: false,
       );
 
-  Map<String, dynamic> toGeoJsonLineString() => [
-        northeast,
-        LatLng(lat: northeast.lat, lng: southwest.lng),
-        southwest,
-        LatLng(lat: southwest.lat, lng: northeast.lng),
-        northeast,
-      ].toGeoJsonLineString();
+  LineString toLineString() => LineString(
+        coordinates: [
+          northeast._toPosition(),
+          LatLng(lat: northeast.lat, lng: southwest.lng)._toPosition(),
+          southwest._toPosition(),
+          LatLng(lat: southwest.lat, lng: northeast.lng)._toPosition(),
+          northeast._toPosition(),
+        ],
+      );
 
   LatLng get center {
     final north = northeast.lat;

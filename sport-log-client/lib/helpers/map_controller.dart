@@ -63,11 +63,11 @@ class MapController {
   static const String _exaggerationProperty = "exaggeration";
 
   Future<LatLng?> get center async {
-    final latLngMap = (await _controller?.getCameraState())?.center;
-    if (latLngMap == null) {
+    final point = (await _controller?.getCameraState())?.center;
+    if (point == null) {
       return null;
     }
-    return LatLng.fromMap(latLngMap);
+    return LatLng.fromPoint(point);
   }
 
   Future<double?> get zoom async => (await _controller?.getCameraState())?.zoom;
@@ -77,7 +77,7 @@ class MapController {
     if (state == null) {
       return null;
     }
-    return LatLngZoom(latLng: LatLng.fromMap(state.center), zoom: state.zoom);
+    return LatLngZoom(latLng: LatLng.fromPoint(state.center), zoom: state.zoom);
   }
 
   Future<double?> get pitch async =>
@@ -89,18 +89,18 @@ class MapController {
   Future<LatLng?> _screenCoordToLatLng(
     ScreenCoordinate screenCoordinate,
   ) async {
-    final latLngMap = await _controller?.coordinateForPixel(screenCoordinate);
-    if (latLngMap == null) {
+    final point = await _controller?.coordinateForPixel(screenCoordinate);
+    if (point == null) {
       return null;
     }
-    return LatLng.fromMap(latLngMap);
+    return LatLng.fromPoint(point);
   }
 
   Future<void> animateCenter(LatLng center) async =>
-      await _controller?.flyTo(center.toCameraOptions(), null);
+      await _controller?.flyTo(center.toCameraOptionsCenter(), null);
 
   Future<void> setCenter(LatLng center) async =>
-      await _controller?.setCamera(center.toCameraOptions());
+      await _controller?.setCamera(center.toCameraOptionsCenter());
 
   Future<void> setZoom(double zoom) async =>
       await _controller?.setCamera(CameraOptions(zoom: zoom));
@@ -114,7 +114,7 @@ class MapController {
     if (_controller == null) {
       return;
     }
-    await _controller?.setCamera(CameraOptions(center: center.toJsonPoint()));
+    await _controller?.setCamera(center.toCameraOptionsCenter());
 
     final screenCorner =
         await _screenCoordToLatLng(ScreenCoordinate(x: 0, y: 0));
@@ -160,7 +160,7 @@ class MapController {
   Future<PolylineAnnotation?> addBoundingBoxLine(LatLngBounds bounds) async =>
       await _lineManager?.create(
         PolylineAnnotationOptions(
-          geometry: bounds.toGeoJsonLineString(),
+          geometry: bounds.toLineString(),
           lineWidth: 2,
           lineColor: _colorToInt(Defaults.mapbox.trackLineColor),
         ),
@@ -174,7 +174,7 @@ class MapController {
       if (line.isNull && bounds != null) {
         line.object = await addBoundingBoxLine(bounds);
       } else if (line.isNotNull && bounds != null) {
-        line.object!.geometry = bounds.toGeoJsonLineString();
+        line.object!.geometry = bounds.toLineString();
         await _lineManager?.update(line.object!);
       } else if (line.isNotNull && bounds == null) {
         await _lineManager?.delete(line.object!);
@@ -189,7 +189,7 @@ class MapController {
   ) async =>
       await _lineManager?.create(
         PolylineAnnotationOptions(
-          geometry: route.map((p) => p.latLng).toGeoJsonLineString(),
+          geometry: route.map((p) => p.latLng).toLineString(),
           lineWidth: 2,
           lineColor: _colorToInt(color),
         ),
@@ -204,8 +204,7 @@ class MapController {
       if (line.isNull && track != null) {
         line.object = await addLine(track, color);
       } else if (line.isNotNull && track != null) {
-        line.object!.geometry =
-            track.map((p) => p.latLng).toGeoJsonLineString();
+        line.object!.geometry = track.map((p) => p.latLng).toLineString();
         await _lineManager?.update(line.object!);
       } else if (line.isNotNull && track == null) {
         await removeLine(line.object!);
@@ -242,13 +241,13 @@ class MapController {
     final color = _colorToInt(const Color.fromARGB(0xFF, 0, 0x60, 0xA0));
     return (await _circleManager?.createMulti([
       CircleAnnotationOptions(
-        geometry: latLng.toJsonPoint(),
+        geometry: latLng.toPoint(),
         circleRadius: _markerRadius,
         circleColor: color,
         circleOpacity: 0.5,
       ),
       CircleAnnotationOptions(
-        geometry: latLng.toJsonPoint(),
+        geometry: latLng.toPoint(),
         circleRadius: isGps ? _gpsMarkerRadius : _noGpsMarkerRadius,
         circleColor: color,
         circleOpacity: 0.3,
@@ -266,9 +265,8 @@ class MapController {
       if (circles.isNull && latLng != null) {
         circles.object = await addCurrentLocationMarker(latLng, isGps);
       } else if (circles.isNotNull && latLng != null) {
-        circles.object = circles.object!
-            .map((c) => c..geometry = latLng.toJsonPoint())
-            .toList();
+        circles.object =
+            circles.object!.map((c) => c..geometry = latLng.toPoint()).toList();
         circles.object![1].circleRadius =
             isGps ? _gpsMarkerRadius : _noGpsMarkerRadius;
         for (final circle in circles.object!) {
@@ -286,7 +284,7 @@ class MapController {
   Future<CircleAnnotation?> addMarker(LatLng latLng, Color color) async =>
       await _circleManager?.create(
         CircleAnnotationOptions(
-          geometry: latLng.toJsonPoint(),
+          geometry: latLng.toPoint(),
           circleRadius: _markerRadius,
           circleColor: _colorToInt(color),
           circleOpacity: 0.5,
@@ -302,7 +300,7 @@ class MapController {
       if (circle.isNull && latLng != null) {
         circle.object = await addMarker(latLng, color);
       } else if (circle.isNotNull && latLng != null) {
-        circle.object!.geometry = latLng.toJsonPoint();
+        circle.object!.geometry = latLng.toPoint();
         await _circleManager?.update(circle.object!);
       } else if (circle.isNotNull && latLng == null) {
         await _circleManager?.delete(circle.object!);
@@ -337,7 +335,7 @@ class MapController {
   ) async =>
       await _pointManager?.create(
         PointAnnotationOptions(
-          geometry: latLng.toJsonPoint(),
+          geometry: latLng.toPoint(),
           textField: label,
           textOffset: [0, 1],
         ),
@@ -487,7 +485,7 @@ class ElevationMapController {
     await _mapController.setCenter(latLng);
     double? elevation;
     for (var attempt = 0; attempt < 8; attempt++) {
-      elevation = await _controller?.getElevation(latLng.toJsonPoint());
+      elevation = await _controller?.getElevation(latLng.toPoint());
       if (elevation != null) {
         break;
       }

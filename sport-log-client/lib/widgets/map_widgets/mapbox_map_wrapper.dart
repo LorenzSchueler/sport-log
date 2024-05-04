@@ -128,10 +128,10 @@ class _MapboxMapWrapperState extends State<MapboxMapWrapper> {
               await Settings.instance.setLastMapPosition(lastMapPosition);
             }
           },
-          onTapListener: (_, point) =>
-              widget.onTap?.call(LatLng.fromMap(point)),
-          onLongTapListener: (_, point) =>
-              widget.onLongTap?.call(LatLng.fromMap(point)),
+          onTapListener: (MapContentGestureContext gestureContext) =>
+              widget.onTap?.call(LatLng.fromPoint(gestureContext.point)),
+          onLongTapListener: (gestureContext) =>
+              widget.onLongTap?.call(LatLng.fromPoint(gestureContext.point)),
         ),
         if (_mapController != null && widget.showOverlays)
           Positioned(
