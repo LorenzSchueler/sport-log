@@ -5,9 +5,9 @@ import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:collection/collection.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:gpx/gpx.dart';
-import 'package:result_type/result_type.dart';
 import 'package:sport_log/helpers/lat_lng.dart';
 import 'package:sport_log/helpers/notification_controller.dart';
+import 'package:sport_log/helpers/result.dart';
 import 'package:sport_log/helpers/write_to_file.dart';
 import 'package:sport_log/models/cardio/position.dart';
 
@@ -16,7 +16,7 @@ Result<List<Position>, String> gpxToTrack(String gpxString) {
   try {
     gpx = GpxReader().fromString(gpxString);
   } on StateError {
-    return Failure("Parsing file failed. This file is not valid GPX.");
+    return Err("Parsing file failed. This file is not valid GPX.");
   }
   final points =
       gpx.trks.map((t) => t.trksegs).flattened.map((t) => t.trkpts).flattened;
@@ -45,7 +45,7 @@ Result<List<Position>, String> gpxToTrack(String gpxString) {
       ),
     );
   }
-  return Success(track);
+  return Ok(track);
 }
 
 String trackToGpx(List<Position> track, {DateTime? startTime}) {
@@ -110,7 +110,7 @@ Future<Result<List<Position>, String>?> loadTrackFromGpxFile() async {
   try {
     gpxString = await file.readAsString();
   } catch (e) {
-    return Failure(e.toString());
+    return Err(e.toString());
   }
   return gpxToTrack(gpxString);
 }

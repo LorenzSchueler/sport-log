@@ -229,13 +229,13 @@ class _LoginPageState extends State<LoginPage> {
         : await Account.login(_serverUrl, _user.username, _user.password);
     if (mounted) {
       setState(() => _loginPending = false);
-      if (result.isSuccess) {
+      if (result.isOk) {
         await Navigator.of(context).newBase(Routes.timelineOverview);
       } else {
         await showMessageDialog(
           context: context,
           title: "An Error Occurred",
-          text: result.failure.toString(),
+          text: result.err.toString(),
         );
       }
     }

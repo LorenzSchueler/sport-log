@@ -1,5 +1,5 @@
-import 'package:result_type/result_type.dart';
 import 'package:sport_log/api/api.dart';
+import 'package:sport_log/helpers/result.dart';
 import 'package:sport_log/models/action/all.dart';
 
 class ActionProviderApi extends Api<ActionProvider> {
@@ -17,20 +17,18 @@ class ActionProviderApi extends Api<ActionProvider> {
   final route = '/action_provider';
 
   @override
-  Future<ApiResult<void>> postSingle(ActionProvider object) async =>
-      Success(null);
+  Future<ApiResult<void>> postSingle(ActionProvider object) async => Ok(null);
 
   @override
   Future<ApiResult<void>> postMultiple(List<ActionProvider> objects) async =>
-      Success(null);
+      Ok(null);
 
   @override
-  Future<ApiResult<void>> putSingle(ActionProvider object) async =>
-      Success(null);
+  Future<ApiResult<void>> putSingle(ActionProvider object) async => Ok(null);
 
   @override
   Future<ApiResult<void>> putMultiple(List<ActionProvider> objects) async =>
-      Success(null);
+      Ok(null);
 }
 
 class ActionApi extends Api<Action> {
@@ -47,18 +45,16 @@ class ActionApi extends Api<Action> {
   final route = '/action';
 
   @override
-  Future<ApiResult<void>> postSingle(Action object) async => Success(null);
+  Future<ApiResult<void>> postSingle(Action object) async => Ok(null);
 
   @override
-  Future<ApiResult<void>> postMultiple(List<Action> objects) async =>
-      Success(null);
+  Future<ApiResult<void>> postMultiple(List<Action> objects) async => Ok(null);
 
   @override
-  Future<ApiResult<void>> putSingle(Action object) async => Success(null);
+  Future<ApiResult<void>> putSingle(Action object) async => Ok(null);
 
   @override
-  Future<ApiResult<void>> putMultiple(List<Action> objects) async =>
-      Success(null);
+  Future<ApiResult<void>> putMultiple(List<Action> objects) async => Ok(null);
 }
 
 class ActionRuleApi extends Api<ActionRule> {

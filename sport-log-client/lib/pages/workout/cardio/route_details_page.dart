@@ -88,13 +88,13 @@ class _RouteDetailsPageState extends State<RouteDetailsPage>
     }
     final result = await _dataProvider.deleteSingle(_route);
     if (mounted) {
-      if (result.isSuccess) {
+      if (result.isOk) {
         Navigator.pop(context);
       } else {
         await showMessageDialog(
           context: context,
           title: "Deleting Route Failed",
-          text: result.failure.toString(),
+          text: result.err.toString(),
         );
       }
     }

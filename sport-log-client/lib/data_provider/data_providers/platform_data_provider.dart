@@ -5,6 +5,7 @@ import 'package:sport_log/data_provider/data_providers/action_data_provider.dart
 import 'package:sport_log/database/database.dart';
 import 'package:sport_log/database/table_accessor.dart';
 import 'package:sport_log/database/tables/platform_tables.dart';
+import 'package:sport_log/helpers/result.dart';
 import 'package:sport_log/models/account_data/account_data.dart';
 import 'package:sport_log/models/platform/all.dart';
 import 'package:sport_log/models/platform/platform_description.dart';
@@ -74,7 +75,7 @@ class PlatformDescriptionDataProvider
   @override
   Future<DbResult> createSingle(PlatformDescription object) async {
     if (object.platformCredential == null) {
-      return DbResult.success();
+      return Ok(null);
     }
     return _platformCredentialDataProvider
         .createSingle(object.platformCredential!);
@@ -83,7 +84,7 @@ class PlatformDescriptionDataProvider
   @override
   Future<DbResult> updateSingle(PlatformDescription object) async {
     if (object.platformCredential == null) {
-      return DbResult.success();
+      return Ok(null);
     }
     return _platformCredentialDataProvider
         .updateSingle(object.platformCredential!);
@@ -92,7 +93,7 @@ class PlatformDescriptionDataProvider
   @override
   Future<DbResult> deleteSingle(PlatformDescription object) async {
     if (object.platformCredential == null) {
-      return DbResult.success();
+      return Ok(null);
     }
     return _platformCredentialDataProvider
         .deleteSingle(object.platformCredential!);

@@ -1,10 +1,10 @@
-import 'package:result_type/result_type.dart';
 import 'package:sport_log/api/accessors/user_api.dart';
 import 'package:sport_log/api/api.dart';
 import 'package:sport_log/data_provider/sync.dart';
 import 'package:sport_log/database/database.dart';
 import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/helpers/logger.dart';
+import 'package:sport_log/helpers/result.dart';
 import 'package:sport_log/models/metcon/metcon_description.dart';
 import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/models/user/user.dart';
@@ -53,8 +53,7 @@ abstract final class Account {
     assert(!Settings.instance.accountCreated);
 
     await Settings.instance.setServerUrl(serverUrl);
-    final result = await UserApi().postSingle(user);
-    if (result.isSuccess) {
+    return UserApi().postSingle(user).onOkAsync((_) async {
       await Settings.instance.setUser(user);
       await Settings.instance.setAccountCreated(true);
       // serverUrl already set
@@ -63,12 +62,8 @@ abstract final class Account {
 
       // because the id of entities is not changed, registering as a different user on the same server will fail unless the old user is deleted first
       await Sync.instance.startSync();
-
-      return Success(null);
-    } else {
-      // keep new serverUrl
-      return Failure(result.failure);
-    }
+    });
+    // on error keep new serverUrl
 
     // result: user exits, account created, userId of old db data updated
   }
@@ -86,9 +81,7 @@ abstract final class Account {
     // the user may have created an account
 
     await Settings.instance.setServerUrl(serverUrl);
-    final result = await UserApi().getSingle(username, password);
-    if (result.isSuccess) {
-      final user = result.success;
+    return UserApi().getSingle(username, password).mapAsync((user) async {
       await Settings.instance.setUser(user);
       await Settings.instance.setAccountCreated(true);
       // serverUrl already set
@@ -98,11 +91,9 @@ abstract final class Account {
       // because the id of entities is not changed, logging in as a different user on the same server will fail unless the old user is deleted first
       await Sync.instance.startSync();
 
-      return Success(user);
-    } else {
-      // keep new serverUrl
-      return Failure(result.failure);
-    }
+      return user;
+    });
+    // on error keep new serverUrl
 
     // result: user exits, account created, userId of old db data updated
   }
@@ -123,7 +114,7 @@ abstract final class Account {
     final user = Settings.instance.user!;
     if (username == null && password == null && email == null) {
       // nothing to change
-      return Success(user);
+      return Ok(user);
     }
     if (username != null) {
       user.username = username;
@@ -134,14 +125,10 @@ abstract final class Account {
     if (email != null) {
       user.email = email;
     }
-    final result = await UserApi().putSingle(user);
-    if (result.isSuccess) {
+    return UserApi().putSingle(user).mapAsync((_) async {
       await Settings.instance.setUser(user);
-
-      return Success(user);
-    } else {
-      return Failure(result.failure);
-    }
+      return user;
+    });
 
     // result: no state change
   }
@@ -197,8 +184,7 @@ abstract final class Account {
     assert(Settings.instance.accountCreated);
 
     Sync.instance.stopSync();
-    final result = await UserApi().deleteSingle();
-    if (result.isSuccess) {
+    return UserApi().deleteSingle().onOkAsync((_) async {
       await Settings.instance.setUser(null);
       await Settings.instance.setAccountCreated(false);
       // keep serverUrl as is
@@ -210,11 +196,7 @@ abstract final class Account {
       MetconDescription.defaultMetconDescription = null;
 
       await AppDatabase.reset();
-
-      return Success(null);
-    } else {
-      return Failure(result.failure);
-    }
+    });
 
     // result: user does not exist, no account created
     // now we are in the same state as in the initial app start
@@ -232,8 +214,8 @@ abstract final class Account {
     // check if current user is able to login
     final result = await UserApi()
         .getSingle(Settings.instance.username!, Settings.instance.password!);
-    if (result.isFailure) {
-      return Failure(result.failure);
+    if (result.isErr) {
+      return result;
     }
 
     Sync.instance.stopSync();
@@ -246,7 +228,7 @@ abstract final class Account {
     await AppDatabase.reset();
 
     await Sync.instance.startSync();
-    return Success(null);
+    return Ok(null);
 
     // result: no state change
   }

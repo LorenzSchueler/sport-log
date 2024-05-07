@@ -139,7 +139,7 @@ abstract class TableAccessor<T extends AtomicEntity> {
   }
 
   Future<DbResult> deleteSingle(Int64 id, {bool isSynchronized = false}) async {
-    return DbResult.catchError(() async {
+    return DbResultExt.catchError(() async {
       final changes = await database.update(
         tableName,
         {
@@ -152,7 +152,7 @@ abstract class TableAccessor<T extends AtomicEntity> {
         ]),
         whereArgs: [id.toInt()],
       );
-      return DbResult.fromBool(changes == 1);
+      return DbResultExt.fromBool(changes == 1);
     });
   }
 
@@ -160,7 +160,7 @@ abstract class TableAccessor<T extends AtomicEntity> {
     List<T> objects, {
     bool isSynchronized = false,
   }) async {
-    return DbResult.catchError(() async {
+    return DbResultExt.catchError(() async {
       final batch = database.batch();
       for (final object in objects) {
         batch.update(
@@ -179,12 +179,14 @@ abstract class TableAccessor<T extends AtomicEntity> {
       }
       final changesList =
           (await batch.commit(continueOnError: false)).cast<int>();
-      return DbResult.fromBool(eq(changesList, List.filled(objects.length, 1)));
+      return DbResultExt.fromBool(
+        eq(changesList, List.filled(objects.length, 1)),
+      );
     });
   }
 
   Future<DbResult> updateSingle(T object, {bool isSynchronized = false}) async {
-    return DbResult.catchError(() async {
+    return DbResultExt.catchError(() async {
       final changes = await database.update(
         tableName,
         {
@@ -197,7 +199,7 @@ abstract class TableAccessor<T extends AtomicEntity> {
         ]),
         whereArgs: [object.id.toInt()],
       );
-      return DbResult.fromBool(changes == 1);
+      return DbResultExt.fromBool(changes == 1);
     });
   }
 
@@ -205,7 +207,7 @@ abstract class TableAccessor<T extends AtomicEntity> {
     List<T> objects, {
     bool isSynchronized = false,
   }) async {
-    return DbResult.catchError(() async {
+    return DbResultExt.catchError(() async {
       final batch = database.batch();
       for (final object in objects) {
         batch.update(
@@ -224,19 +226,19 @@ abstract class TableAccessor<T extends AtomicEntity> {
       }
       final changesList =
           (await batch.commit(continueOnError: false)).cast<int>();
-      return DbResult.fromBool(
+      return DbResultExt.fromBool(
         eq(changesList, List.filled(objects.length, 1)),
       );
     });
   }
 
   Future<DbResult> createSingle(T object, {bool isSynchronized = false}) async {
-    return DbResult.catchError(() async {
+    return DbResultExt.catchError(() async {
       final id = await database.insert(tableName, {
         ...serde.toDbRecord(object),
         if (isSynchronized) Columns.syncStatus: SyncStatus.synchronized.index,
       });
-      return DbResult.fromBool(id == object.id.toInt());
+      return DbResultExt.fromBool(id == object.id.toInt());
     });
   }
 
@@ -244,7 +246,7 @@ abstract class TableAccessor<T extends AtomicEntity> {
     List<T> objects, {
     bool isSynchronized = false,
   }) async {
-    return DbResult.catchError(() async {
+    return DbResultExt.catchError(() async {
       final batch = database.batch();
       for (final object in objects) {
         batch.insert(tableName, {
@@ -253,7 +255,7 @@ abstract class TableAccessor<T extends AtomicEntity> {
         });
       }
       final idList = (await batch.commit(continueOnError: false)).cast<int>();
-      return DbResult.fromBool(
+      return DbResultExt.fromBool(
         eq(idList, objects.map((e) => e.id.toInt()).toList()),
       );
     });
@@ -312,7 +314,7 @@ abstract class TableAccessor<T extends AtomicEntity> {
     List<T> objects, {
     required bool synchronized,
   }) async {
-    return DbResult.catchError(() async {
+    return DbResultExt.catchError(() async {
       final batch = database.batch();
       for (final object in objects) {
         // changes coming from server win over local changes
@@ -326,7 +328,7 @@ abstract class TableAccessor<T extends AtomicEntity> {
         );
       }
       final idList = (await batch.commit(continueOnError: false)).cast<int>();
-      return DbResult.fromBool(
+      return DbResultExt.fromBool(
         eq(idList, objects.map((e) => e.id.toInt()).toList()),
       );
     });

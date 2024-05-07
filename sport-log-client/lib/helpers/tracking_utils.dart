@@ -174,13 +174,13 @@ class TrackingUtils extends ChangeNotifier {
         ? await _dataProvider.updateSingle(cardioSessionDescription)
         : await _dataProvider.createSingle(cardioSessionDescription);
     if (context.mounted) {
-      if (result.isSuccess) {
+      if (result.isOk) {
         onSuccess();
       } else {
         await showMessageDialog(
           context: context,
           title: "Saving Cardio Session Failed",
-          text: result.failure.toString(),
+          text: result.err.toString(),
         );
       }
     }
@@ -207,11 +207,11 @@ class TrackingUtils extends ChangeNotifier {
     if (_isSaved) {
       final result =
           await _dataProvider.deleteSingle(_cardioSessionDescription);
-      if (context.mounted && result.isFailure) {
+      if (context.mounted && result.isErr) {
         await showMessageDialog(
           context: context,
           title: "Deleting Cardio Session Failed",
-          text: result.failure.toString(),
+          text: result.err.toString(),
         );
       }
     }

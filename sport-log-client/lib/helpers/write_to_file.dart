@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:path_provider/path_provider.dart';
 import 'package:sport_log/config.dart';
 import 'package:sport_log/helpers/logger.dart';
+import 'package:sport_log/helpers/result.dart';
 
 final _logger = Logger("WriteToFile");
 
@@ -46,12 +47,10 @@ Future<String?> writeToFile({
   return file.path;
 }
 
-/// Writes content to file `filename` in cache directory.
+/// Writes content to file `filename` in cache directory and returns the path to the file.
 ///
 /// If the file already exists it will be overwritten.
-///
-/// If successful it returns the path to the file.
-Future<String?> writeBytesToFile({
+Future<Result<String, void>> writeBytesToFile({
   required Uint8List content,
   required String filename,
   required String fileExtension,
@@ -70,7 +69,7 @@ Future<String?> writeBytesToFile({
       error: error,
       stackTrace: stackTrace,
     );
-    return null;
+    return Err(null);
   }
-  return file.path;
+  return Ok(file.path);
 }

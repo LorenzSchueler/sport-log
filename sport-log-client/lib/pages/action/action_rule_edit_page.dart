@@ -38,13 +38,13 @@ class _ActionRuleEditPageState extends State<ActionRuleEditPage> {
         ? await _dataProvider.createSingle(_actionRule)
         : await _dataProvider.updateSingle(_actionRule);
     if (mounted) {
-      if (result.isSuccess) {
+      if (result.isOk) {
         Navigator.pop(context);
       } else {
         await showMessageDialog(
           context: context,
           title: "${widget.isNew ? 'Creating' : 'Updating'} Action Rule Failed",
-          text: result.failure.toString(),
+          text: result.err.toString(),
         );
       }
     }
@@ -58,13 +58,13 @@ class _ActionRuleEditPageState extends State<ActionRuleEditPage> {
     if (!widget.isNew) {
       final result = await _dataProvider.deleteSingle(_actionRule);
       if (mounted) {
-        if (result.isSuccess) {
+        if (result.isOk) {
           Navigator.pop(context);
         } else {
           await showMessageDialog(
             context: context,
             title: "Deleting Action Rule Failed",
-            text: result.failure.toString(),
+            text: result.err.toString(),
           );
         }
       }

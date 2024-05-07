@@ -42,7 +42,7 @@ class _MetconSessionEditPageState extends State<MetconSessionEditPage> {
         ? await _dataProvider.createSingle(_metconSessionDescription)
         : await _dataProvider.updateSingle(_metconSessionDescription);
     if (mounted) {
-      if (result.isSuccess) {
+      if (result.isOk) {
         Navigator.pop(
           context,
           // needed for return to details page
@@ -53,7 +53,7 @@ class _MetconSessionEditPageState extends State<MetconSessionEditPage> {
           context: context,
           title:
               "${widget.isNew ? 'Creating' : 'Updating'} Metcon Session Failed",
-          text: result.failure.toString(),
+          text: result.err.toString(),
         );
       }
     }
@@ -68,7 +68,7 @@ class _MetconSessionEditPageState extends State<MetconSessionEditPage> {
       final result =
           await _dataProvider.deleteSingle(_metconSessionDescription);
       if (mounted) {
-        if (result.isSuccess) {
+        if (result.isOk) {
           Navigator.pop(
             context,
             // needed for return to details page
@@ -78,7 +78,7 @@ class _MetconSessionEditPageState extends State<MetconSessionEditPage> {
           await showMessageDialog(
             context: context,
             title: "Deleting Metcon Session Failed",
-            text: result.failure.toString(),
+            text: result.err.toString(),
           );
         }
       }

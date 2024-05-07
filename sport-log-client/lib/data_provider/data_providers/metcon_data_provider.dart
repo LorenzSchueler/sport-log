@@ -116,7 +116,7 @@ class MetconDescriptionDataProvider extends DataProvider<MetconDescription> {
     assert(object.isValid());
     final result =
         await _metconDataProvider.createSingle(object.metcon, notify: false);
-    if (result.isFailure) {
+    if (result.isErr) {
       return result;
     }
     return _metconMovementDataProvider.createMultiple(
@@ -131,7 +131,7 @@ class MetconDescriptionDataProvider extends DataProvider<MetconDescription> {
 
     var result =
         await _metconDataProvider.updateSingle(object.metcon, notify: false);
-    if (result.isFailure) {
+    if (result.isErr) {
       return result;
     }
 
@@ -150,7 +150,7 @@ class MetconDescriptionDataProvider extends DataProvider<MetconDescription> {
       oldMMovements,
       notify: false,
     );
-    if (result.isFailure) {
+    if (result.isErr) {
       return result;
     }
     return _metconMovementDataProvider.createMultiple(newMMovements);
@@ -162,7 +162,7 @@ class MetconDescriptionDataProvider extends DataProvider<MetconDescription> {
       object.moves.map((e) => e.metconMovement).toList(),
       notify: false,
     );
-    if (result.isFailure) {
+    if (result.isErr) {
       return result;
     }
     return _metconDataProvider.deleteSingle(object.metcon);

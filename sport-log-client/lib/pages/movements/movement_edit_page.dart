@@ -48,7 +48,7 @@ class _MovementEditPageState extends State<MovementEditPage> {
     final result = widget.isNew
         ? await _dataProvider.createSingle(_movementDescription.movement)
         : await _dataProvider.updateSingle(_movementDescription.movement);
-    if (result.isSuccess) {
+    if (result.isOk) {
       Movement.defaultMovement ??= _movementDescription.movement;
       if (mounted) {
         Navigator.pop(context);
@@ -57,7 +57,7 @@ class _MovementEditPageState extends State<MovementEditPage> {
       await showMessageDialog(
         context: context,
         title: "${widget.isNew ? 'Creating' : 'Updating'} Movement Failed",
-        text: result.failure.toString(),
+        text: result.err.toString(),
       );
     }
   }
@@ -73,13 +73,13 @@ class _MovementEditPageState extends State<MovementEditPage> {
       final result =
           await _dataProvider.deleteSingle(_movementDescription.movement);
       if (mounted) {
-        if (result.isSuccess) {
+        if (result.isOk) {
           Navigator.pop(context);
         } else {
           await showMessageDialog(
             context: context,
             title: "Deleting Movement Failed",
-            text: result.failure.toString(),
+            text: result.err.toString(),
           );
         }
       }

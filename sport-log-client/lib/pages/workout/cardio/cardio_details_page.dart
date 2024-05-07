@@ -161,13 +161,13 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
     }
     final result = await _dataProvider.deleteSingle(_cardioSessionDescription);
     if (mounted) {
-      if (result.isSuccess) {
+      if (result.isOk) {
         Navigator.pop(context);
       } else {
         await showMessageDialog(
           context: context,
           title: "Deleting Cardio Session Failed",
-          text: result.failure.toString(),
+          text: result.err.toString(),
         );
       }
     }

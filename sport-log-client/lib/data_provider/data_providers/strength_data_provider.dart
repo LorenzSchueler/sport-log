@@ -87,7 +87,7 @@ class StrengthSessionDescriptionDataProvider
     assert(object.isValid());
     final result = await _strengthSessionDataProvider
         .createSingle(object.session, notify: false);
-    if (result.isFailure) {
+    if (result.isErr) {
       return result;
     }
     return _strengthSetDataProvider.createMultiple(object.sets);
@@ -102,7 +102,7 @@ class StrengthSessionDescriptionDataProvider
       object.session,
       notify: false,
     );
-    if (result.isFailure) {
+    if (result.isErr) {
       return result;
     }
 
@@ -121,7 +121,7 @@ class StrengthSessionDescriptionDataProvider
       oldSets,
       notify: false,
     );
-    if (result.isFailure) {
+    if (result.isErr) {
       return result;
     }
     return _strengthSetDataProvider.createMultiple(newSets);
@@ -133,7 +133,7 @@ class StrengthSessionDescriptionDataProvider
       object.sets,
       notify: false,
     );
-    if (result.isFailure) {
+    if (result.isErr) {
       return result;
     }
     return _strengthSessionDataProvider.deleteSingle(object.session);

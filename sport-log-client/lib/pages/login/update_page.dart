@@ -23,17 +23,15 @@ class UpdatePage extends StatelessWidget {
         text: "Internet required.",
       ),
     );
-    if (updateDownloadResult.isSuccess) {
-      final filename = updateDownloadResult.success;
-      if (filename != null) {
-        if (await PermissionRequest.request(
-              Permission.manageExternalStorage,
-            ) &&
-            await PermissionRequest.request(
-              Permission.requestInstallPackages,
-            )) {
-          await OpenFile.open(filename);
-        }
+    if (updateDownloadResult.isOk) {
+      final filename = updateDownloadResult.ok;
+      if (await PermissionRequest.request(
+            Permission.manageExternalStorage,
+          ) &&
+          await PermissionRequest.request(
+            Permission.requestInstallPackages,
+          )) {
+        await OpenFile.open(filename);
       }
     } else if (context.mounted) {
       Navigator.pop(context);

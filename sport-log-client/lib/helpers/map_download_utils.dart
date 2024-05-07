@@ -45,7 +45,7 @@ class MapDownloadUtils extends ChangeNotifier {
 
   //Future<void> _onMapDownload(DownloadRegionStatus status) async {
   //if (!_disposed) {
-  //if (status.runtimeType == Success) {
+  //if (status.runtimeType.isOk) {
   //_progress = null;
   //await _updateRegions();
   //notifyListeners();

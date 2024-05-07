@@ -7,9 +7,9 @@ import 'package:fixnum/fixnum.dart';
 import 'package:http/http.dart';
 import 'package:http/io_client.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:result_type/result_type.dart';
 import 'package:sport_log/config.dart';
 import 'package:sport_log/helpers/logger.dart';
+import 'package:sport_log/helpers/result.dart';
 import 'package:sport_log/models/error_message.dart';
 import 'package:sport_log/settings.dart';
 
@@ -91,22 +91,21 @@ extension _ToApiResult on StreamedResponse {
     return switch (statusCode) {
       200 => fromJson != null
           ? json != null
-              ? Success(fromJson(json))
+              ? Ok(fromJson(json))
               // expected non empty body
-              : Failure(ApiError(ApiErrorType.badJson, statusCode))
-          : Success(null),
+              : Err(ApiError(ApiErrorType.badJson, statusCode))
+          : Ok(null),
       204 => fromJson == null
-          ? Success(null)
+          ? Ok(null)
           // expected non empty body and status 200
-          : Failure(ApiError(ApiErrorType.badJson, statusCode)),
-      400 => Failure(ApiError(ApiErrorType.badRequest, statusCode, json)),
-      401 => Failure(ApiError(ApiErrorType.unauthorized, statusCode, json)),
-      403 => Failure(ApiError(ApiErrorType.forbidden, statusCode, json)),
-      404 => Failure(ApiError(ApiErrorType.notFound, statusCode, json)),
-      409 => Failure(ApiError(ApiErrorType.conflict, statusCode, json)),
-      500 =>
-        Failure(ApiError(ApiErrorType.internalServerError, statusCode, json)),
-      _ => Failure(ApiError(ApiErrorType.unknownServerError, statusCode, json)),
+          : Err(ApiError(ApiErrorType.badJson, statusCode)),
+      400 => Err(ApiError(ApiErrorType.badRequest, statusCode, json)),
+      401 => Err(ApiError(ApiErrorType.unauthorized, statusCode, json)),
+      403 => Err(ApiError(ApiErrorType.forbidden, statusCode, json)),
+      404 => Err(ApiError(ApiErrorType.notFound, statusCode, json)),
+      409 => Err(ApiError(ApiErrorType.conflict, statusCode, json)),
+      500 => Err(ApiError(ApiErrorType.internalServerError, statusCode, json)),
+      _ => Err(ApiError(ApiErrorType.unknownServerError, statusCode, json)),
     };
   }
 
@@ -114,15 +113,15 @@ extension _ToApiResult on StreamedResponse {
     _logResponse(this, null);
     final rawBody = await stream.toBytes();
     return switch (statusCode) {
-      200 => Success(rawBody),
-      204 => Failure(ApiError(ApiErrorType.badJson, statusCode)),
-      400 => Failure(ApiError(ApiErrorType.badRequest, statusCode)),
-      401 => Failure(ApiError(ApiErrorType.unauthorized, statusCode)),
-      403 => Failure(ApiError(ApiErrorType.forbidden, statusCode)),
-      404 => Failure(ApiError(ApiErrorType.notFound, statusCode)),
-      409 => Failure(ApiError(ApiErrorType.conflict, statusCode)),
-      500 => Failure(ApiError(ApiErrorType.internalServerError, statusCode)),
-      _ => Failure(ApiError(ApiErrorType.unknownServerError, statusCode)),
+      200 => Ok(rawBody),
+      204 => Err(ApiError(ApiErrorType.badJson, statusCode)),
+      400 => Err(ApiError(ApiErrorType.badRequest, statusCode)),
+      401 => Err(ApiError(ApiErrorType.unauthorized, statusCode)),
+      403 => Err(ApiError(ApiErrorType.forbidden, statusCode)),
+      404 => Err(ApiError(ApiErrorType.notFound, statusCode)),
+      409 => Err(ApiError(ApiErrorType.conflict, statusCode)),
+      500 => Err(ApiError(ApiErrorType.internalServerError, statusCode)),
+      _ => Err(ApiError(ApiErrorType.unknownServerError, statusCode)),
     };
   }
 }
@@ -137,12 +136,12 @@ extension RequestExtension on Request {
     try {
       return await fn();
     } on SocketException {
-      return Failure(ApiError(ApiErrorType.serverUnreachable, null));
+      return Err(ApiError(ApiErrorType.serverUnreachable, null));
     } on HttpException {
-      return Failure(ApiError(ApiErrorType.serverUnreachable, null));
+      return Err(ApiError(ApiErrorType.serverUnreachable, null));
     } on OSError catch (error, stackTrace) {
       if (error.message.contains("Software caused connection abort")) {
-        return Failure(ApiError(ApiErrorType.serverUnreachable, null));
+        return Err(ApiError(ApiErrorType.serverUnreachable, null));
       } else {
         _logger.e(
           "unknown error",
@@ -150,10 +149,10 @@ extension RequestExtension on Request {
           caughtBy: "RequestExtension._handlerError",
           stackTrace: stackTrace,
         );
-        return Failure(ApiError(ApiErrorType.unknownRequestError, null));
+        return Err(ApiError(ApiErrorType.unknownRequestError, null));
       }
     } on TypeError {
-      return Failure(ApiError(ApiErrorType.badJson, null));
+      return Err(ApiError(ApiErrorType.badJson, null));
     } catch (error, stackTrace) {
       _logger.e(
         "unknown error",
@@ -161,7 +160,7 @@ extension RequestExtension on Request {
         caughtBy: "RequestExtension._handlerError",
         stackTrace: stackTrace,
       );
-      return Failure(ApiError(ApiErrorType.unknownRequestError, null));
+      return Err(ApiError(ApiErrorType.unknownRequestError, null));
     }
   }
 
@@ -171,14 +170,13 @@ extension RequestExtension on Request {
         return response.toApiResult(null);
       });
 
-  Future<ApiResult<T>> toApiResultWithValue<T>(T Function(Object) fromJson) =>
+  Future<ApiResult<T>> toApiResultWithValue<T extends Object>(
+    T Function(Object) fromJson,
+  ) =>
       _handleError(() async {
         _logRequest(this);
         final response = await _client.send(this);
-        final result = await response.toApiResult(fromJson);
-        return result.isSuccess
-            ? Success(result.success as T)
-            : Failure(result.failure);
+        return response.toApiResult(fromJson).mapAsync((success) => success!);
       });
 
   Future<ApiResult<Uint8List>> toBytes() => _handleError(() async {
@@ -222,7 +220,7 @@ abstract class Api<T extends JsonSerializable> {
 
   Future<ApiResult<void>> postMultiple(List<T> objects) async {
     if (objects.isEmpty) {
-      return Success(null);
+      return Ok(null);
     }
     return (Request("post", _uri)
           ..headers.addAll(ApiHeaders.basicAuthContentTypeJson)
@@ -237,7 +235,7 @@ abstract class Api<T extends JsonSerializable> {
 
   Future<ApiResult<void>> putMultiple(List<T> objects) async {
     if (objects.isEmpty) {
-      return Success(null);
+      return Ok(null);
     }
     return (Request("put", _uri)
           ..headers.addAll(ApiHeaders.basicAuthContentTypeJson)

@@ -78,7 +78,7 @@ class _StrengthEditPageState extends State<StrengthEditPage> {
         ? await _dataProvider.createSingle(_strengthSessionDescription)
         : await _dataProvider.updateSingle(_strengthSessionDescription);
     if (mounted) {
-      if (result.isSuccess) {
+      if (result.isOk) {
         Navigator.pop(
           context,
           // needed for return to details page
@@ -89,7 +89,7 @@ class _StrengthEditPageState extends State<StrengthEditPage> {
           context: context,
           title:
               "${widget.isNew ? 'Creating' : 'Updating'} Strength Session Failed",
-          text: result.failure.toString(),
+          text: result.err.toString(),
         );
       }
     }
@@ -104,7 +104,7 @@ class _StrengthEditPageState extends State<StrengthEditPage> {
       final result =
           await _dataProvider.deleteSingle(_strengthSessionDescription);
       if (mounted) {
-        if (result.isSuccess) {
+        if (result.isOk) {
           Navigator.pop(
             context,
             // needed for return to details page
@@ -114,7 +114,7 @@ class _StrengthEditPageState extends State<StrengthEditPage> {
           await showMessageDialog(
             context: context,
             title: "Deleting Strength Session Failed",
-            text: result.failure.toString(),
+            text: result.err.toString(),
           );
         }
       }

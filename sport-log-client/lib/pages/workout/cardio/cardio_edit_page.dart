@@ -92,7 +92,7 @@ class _CardioEditPageState extends State<CardioEditPage> {
         ? await _dataProvider.createSingle(_cardioSessionDescription)
         : await _dataProvider.updateSingle(_cardioSessionDescription);
     if (mounted) {
-      if (result.isSuccess) {
+      if (result.isOk) {
         Navigator.pop(
           context,
           // needed for cardio details page
@@ -103,7 +103,7 @@ class _CardioEditPageState extends State<CardioEditPage> {
           context: context,
           title:
               "${widget.isNew ? 'Creating' : 'Updating'} Cardio Session Failed",
-          text: result.failure.toString(),
+          text: result.err.toString(),
         );
       }
     }
@@ -118,7 +118,7 @@ class _CardioEditPageState extends State<CardioEditPage> {
       final result =
           await _dataProvider.deleteSingle(_cardioSessionDescription);
       if (mounted) {
-        if (result.isSuccess) {
+        if (result.isOk) {
           Navigator.pop(
             context,
             // needed for cardio details page
@@ -128,7 +128,7 @@ class _CardioEditPageState extends State<CardioEditPage> {
           await showMessageDialog(
             context: context,
             title: "Deleting Cardio Session Failed",
-            text: result.failure.toString(),
+            text: result.err.toString(),
           );
         }
       }
@@ -216,7 +216,7 @@ class _CardioEditPageState extends State<CardioEditPage> {
     final result =
         await CardioSessionDataProvider().createSingle(combinedSession);
     if (mounted) {
-      if (result.isSuccess) {
+      if (result.isOk) {
         Navigator.pop(
           context,
           ReturnObject.created(
@@ -227,7 +227,7 @@ class _CardioEditPageState extends State<CardioEditPage> {
         await showMessageDialog(
           context: context,
           title: "Combining Cardio Sessions Failed",
-          text: result.failure.toString(),
+          text: result.err.toString(),
         );
       }
     }

@@ -1,4 +1,3 @@
-import 'package:result_type/result_type.dart';
 import 'package:sport_log/config.dart';
 import 'package:sport_log/database/table.dart';
 import 'package:sport_log/database/table_accessor.dart';
@@ -11,6 +10,7 @@ import 'package:sport_log/database/tables/platform_tables.dart';
 import 'package:sport_log/database/tables/strength_tables.dart';
 import 'package:sport_log/database/tables/wod_table.dart';
 import 'package:sport_log/helpers/logger.dart';
+import 'package:sport_log/helpers/result.dart';
 import 'package:sqflite/sqflite.dart';
 
 final _logger = Logger('DB');
@@ -66,32 +66,19 @@ class DbError {
   }
 }
 
-class DbResult {
-  DbResult.fromDbException(DatabaseException exception)
-      : this.failure(DbError.fromDbException(exception));
+typedef DbResult = Result<void, DbError>;
 
-  DbResult.failure(DbError dbError) : result = Failure(dbError);
-
-  DbResult.success() : result = Success(null);
-
-  DbResult.fromBool(bool condition)
-      : result = condition ? Success(null) : Failure(DbError.unknown(null));
-
-  Result<void, DbError> result;
+extension DbResultExt on Result<void, DbError> {
+  static DbResult fromBool(bool condition) =>
+      condition ? Ok(null) : Err(DbError.unknown(null));
 
   static Future<DbResult> catchError(Future<DbResult> Function() fn) async {
     try {
       return await fn();
     } on DatabaseException catch (e) {
-      return DbResult.fromDbException(e);
+      return Err(DbError.fromDbException(e));
     }
   }
-
-  bool get isSuccess => result.isSuccess;
-
-  bool get isFailure => result.isFailure;
-
-  DbError get failure => result.failure;
 }
 
 abstract final class AppDatabase {

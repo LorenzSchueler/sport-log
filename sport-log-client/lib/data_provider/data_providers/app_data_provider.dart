@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
-import 'package:result_type/result_type.dart';
 import 'package:sport_log/api/accessors/app_api.dart';
 import 'package:sport_log/data_provider/data_provider.dart';
+import 'package:sport_log/helpers/result.dart';
 import 'package:sport_log/helpers/write_to_file.dart';
 import 'package:sport_log/models/server_version/server_version.dart';
 
@@ -16,39 +16,23 @@ class AppDataProvider {
 
   Future<Result<UpdateInfo, void>> getUpdateInfo({
     VoidCallback? onNoInternet,
-  }) async {
-    final result = await api.getUpdateInfo();
+  }) =>
+      api.getUpdateInfo().mapErrAsync(
+            (err) => DataProvider.handleApiError(err, onNoInternet),
+          );
 
-    if (result.isFailure) {
-      await DataProvider.handleApiError(
-        result.failure,
-        onNoInternet,
-      );
-      return Failure(null);
-    } else {
-      return result;
-    }
-  }
-
-  Future<Result<String?, void>> downloadUpdate({
+  Future<Result<String, void>> downloadUpdate({
     VoidCallback? onNoInternet,
-  }) async {
-    final result = await api.downloadUpdate();
-
-    if (result.isFailure) {
-      await DataProvider.handleApiError(
-        result.failure,
-        onNoInternet,
-      );
-      return Failure(null);
-    } else {
-      final bytes = result.success;
-      final filename = await writeBytesToFile(
-        content: bytes,
-        filename: "app",
-        fileExtension: "apk",
-      );
-      return Success(filename);
-    }
-  }
+  }) =>
+      api
+          .downloadUpdate()
+          .onErrAsync((err) => DataProvider.handleApiError(err, onNoInternet))
+          .nullErr()
+          .flatMapAsync(
+            (bytes) => writeBytesToFile(
+              content: bytes,
+              filename: "app",
+              fileExtension: "apk",
+            ), // filename
+          );
 }

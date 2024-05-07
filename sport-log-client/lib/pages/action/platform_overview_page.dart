@@ -216,11 +216,11 @@ class _PlatformCredentialDialogState extends State<PlatformCredentialDialog> {
         ? await _dataProvider.createSingle(platformDescription)
         : await _dataProvider.updateSingle(platformDescription);
     if (mounted) {
-      if (result.isFailure) {
+      if (result.isErr) {
         await showMessageDialog(
           context: context,
           title: "${widget.isNew ? 'Creating' : 'Updating'} Credentials Failed",
-          text: result.failure.toString(),
+          text: result.err.toString(),
         );
       } else {
         Navigator.pop(context);
@@ -236,13 +236,13 @@ class _PlatformCredentialDialogState extends State<PlatformCredentialDialog> {
     if (!widget.isNew) {
       final result = await _dataProvider.deleteSingle(platformDescription);
       if (mounted) {
-        if (result.isSuccess) {
+        if (result.isOk) {
           Navigator.pop(context);
         } else {
           await showMessageDialog(
             context: context,
             title: "Deleting Credentials Failed",
-            text: result.failure.toString(),
+            text: result.err.toString(),
           );
         }
       }

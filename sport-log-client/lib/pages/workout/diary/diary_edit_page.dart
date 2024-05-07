@@ -31,13 +31,13 @@ class _DiaryEditPageState extends State<DiaryEditPage> {
         ? await _dataProvider.createSingle(_diary)
         : await _dataProvider.updateSingle(_diary);
     if (mounted) {
-      if (result.isSuccess) {
+      if (result.isOk) {
         Navigator.pop(context);
       } else {
         await showMessageDialog(
           context: context,
           title: "${widget.isNew ? 'Creating' : 'Updating'} Diary Entry Failed",
-          text: result.failure.toString(),
+          text: result.err.toString(),
         );
       }
     }
@@ -51,13 +51,13 @@ class _DiaryEditPageState extends State<DiaryEditPage> {
     if (!widget.isNew) {
       final result = await _dataProvider.deleteSingle(_diary);
       if (mounted) {
-        if (result.isSuccess) {
+        if (result.isOk) {
           Navigator.pop(context);
         } else {
           await showMessageDialog(
             context: context,
             title: "Deleting Diary Entry Failed",
-            text: result.failure.toString(),
+            text: result.err.toString(),
           );
         }
       }

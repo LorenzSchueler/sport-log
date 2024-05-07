@@ -41,7 +41,7 @@ class _MetconEditPageState extends State<MetconEditPage> {
     final result = widget.isNew
         ? await _dataProvider.createSingle(_metconDescription)
         : await _dataProvider.updateSingle(_metconDescription);
-    if (result.isSuccess) {
+    if (result.isOk) {
       MetconDescription.defaultMetconDescription ??= _metconDescription;
       if (mounted) {
         Navigator.pop(
@@ -54,7 +54,7 @@ class _MetconEditPageState extends State<MetconEditPage> {
       await showMessageDialog(
         context: context,
         title: "${widget.isNew ? 'Creating' : 'Updating'} Metcon Failed",
-        text: result.failure.toString(),
+        text: result.err.toString(),
       );
     }
   }
@@ -69,7 +69,7 @@ class _MetconEditPageState extends State<MetconEditPage> {
       assert(!_metconDescription.hasReference);
       final result = await _dataProvider.deleteSingle(_metconDescription);
       if (mounted) {
-        if (result.isSuccess) {
+        if (result.isOk) {
           Navigator.pop(
             context,
             // needed for return to details page
@@ -79,7 +79,7 @@ class _MetconEditPageState extends State<MetconEditPage> {
           await showMessageDialog(
             context: context,
             title: "Deleting Metcon Failed",
-            text: result.failure.toString(),
+            text: result.err.toString(),
           );
         }
       }

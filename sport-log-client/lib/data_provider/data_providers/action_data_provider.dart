@@ -125,7 +125,7 @@ class ActionProviderDescriptionDataProvider
     assert(object.isValid());
     final result = await _actionRuleDataProvider
         .createMultiple(object.actionRules, notify: false);
-    if (result.isFailure) {
+    if (result.isErr) {
       return result;
     }
     return _actionEventDataProvider.createMultiple(object.actionEvents);

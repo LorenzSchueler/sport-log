@@ -38,14 +38,14 @@ class _ActionEventEditPageState extends State<ActionEventEditPage> {
         ? await _dataProvider.createSingle(_actionEvent)
         : await _dataProvider.updateSingle(_actionEvent);
     if (mounted) {
-      if (result.isSuccess) {
+      if (result.isOk) {
         Navigator.pop(context);
       } else {
         await showMessageDialog(
           context: context,
           title:
               "${widget.isNew ? 'Creating' : 'Updating'} Action Event Failed",
-          text: result.failure.toString(),
+          text: result.err.toString(),
         );
       }
     }
@@ -59,13 +59,13 @@ class _ActionEventEditPageState extends State<ActionEventEditPage> {
     if (!widget.isNew) {
       final result = await _dataProvider.deleteSingle(_actionEvent);
       if (mounted) {
-        if (result.isSuccess) {
+        if (result.isOk) {
           Navigator.pop(context);
         } else {
           await showMessageDialog(
             context: context,
             title: "Deleting Action Event Failed",
-            text: result.failure.toString(),
+            text: result.err.toString(),
           );
         }
       }

@@ -34,13 +34,13 @@ class _RouteUploadPageState extends State<RouteUploadPage> {
   Future<void> _saveRoute() async {
     final result = await _dataProvider.createSingle(_route);
     if (mounted) {
-      if (result.isSuccess) {
+      if (result.isOk) {
         Navigator.pop(context);
       } else {
         await showMessageDialog(
           context: context,
           title: "Creating Route Failed",
-          text: result.failure.toString(),
+          text: result.err.toString(),
         );
       }
     }
@@ -124,16 +124,16 @@ class _RouteUploadPageState extends State<RouteUploadPage> {
   Future<void> _loadFile() async {
     final track = await loadTrackFromGpxFile();
     if (mounted && track != null) {
-      if (track.isFailure) {
+      if (track.isErr) {
         await showMessageDialog(
           context: context,
           title: "An Error Occurred",
-          text: track.failure,
+          text: track.err,
         );
       } else {
         setState(() {
           _route
-            ..track = track.success
+            ..track = track.ok
             ..setDistance()
             ..setAscentDescent();
         });

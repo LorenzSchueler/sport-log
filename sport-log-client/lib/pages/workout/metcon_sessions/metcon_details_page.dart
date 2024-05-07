@@ -33,13 +33,13 @@ class _MetconDetailsPageState extends State<MetconDetailsPage> {
     assert(!_metconDescription.hasReference);
     final result = await _dataProvider.deleteSingle(_metconDescription);
     if (mounted) {
-      if (result.isSuccess) {
+      if (result.isOk) {
         Navigator.pop(context);
       } else {
         await showMessageDialog(
           context: context,
           title: "Deleting Metcon Failed",
-          text: result.failure.toString(),
+          text: result.err.toString(),
         );
       }
     }

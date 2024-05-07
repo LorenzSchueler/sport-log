@@ -63,8 +63,8 @@ class Sync extends ChangeNotifier {
     if (_serverVersion == null) {
       final serverVersionResult = await ServerVersionDataProvider()
           .getServerVersion(onNoInternet: onNoInternet);
-      if (serverVersionResult.isSuccess) {
-        _serverVersion = serverVersionResult.success;
+      if (serverVersionResult.isOk) {
+        _serverVersion = serverVersionResult.ok;
         if (!_serverVersion!.compatibleWithClientApiVersion()) {
           final context = App.globalContext;
           if (context.mounted) {
@@ -121,11 +121,11 @@ class Sync extends ChangeNotifier {
   Future<void> update(VoidCallback? onNoInternet) async {
     final updateInfoResult =
         await AppDataProvider().getUpdateInfo(onNoInternet: onNoInternet);
-    // ignore failure
-    if (updateInfoResult.isFailure) {
+    // ignore err
+    if (updateInfoResult.isErr) {
       return;
     }
-    final updateInfo = updateInfoResult.success;
+    final updateInfo = updateInfoResult.ok;
     if (!updateInfo.newVersion) {
       return;
     }

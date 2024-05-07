@@ -30,13 +30,13 @@ class _WodEditPageState extends State<WodEditPage> {
         ? await _dataProvider.createSingle(_wod)
         : await _dataProvider.updateSingle(_wod);
     if (mounted) {
-      if (result.isSuccess) {
+      if (result.isOk) {
         Navigator.pop(context);
       } else {
         await showMessageDialog(
           context: context,
           title: "${widget.isNew ? 'Creating' : 'Updating'} Wod Failed",
-          text: result.failure.toString(),
+          text: result.err.toString(),
         );
       }
     }
@@ -50,13 +50,13 @@ class _WodEditPageState extends State<WodEditPage> {
     if (!widget.isNew) {
       final result = await _dataProvider.deleteSingle(_wod);
       if (mounted) {
-        if (result.isSuccess) {
+        if (result.isOk) {
           Navigator.pop(context);
         } else {
           await showMessageDialog(
             context: context,
             title: "Deleting Wod Failed",
-            text: result.failure.toString(),
+            text: result.err.toString(),
           );
         }
       }

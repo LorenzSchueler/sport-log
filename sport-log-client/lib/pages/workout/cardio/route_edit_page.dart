@@ -57,7 +57,7 @@ class _RouteEditPageState extends State<RouteEditPage> {
         ? await _dataProvider.createSingle(_route.clone())
         : await _dataProvider.updateSingle(_route.clone());
     if (mounted) {
-      if (result.isSuccess) {
+      if (result.isOk) {
         Navigator.pop(
           context,
           // needed for route details page
@@ -67,7 +67,7 @@ class _RouteEditPageState extends State<RouteEditPage> {
         await showMessageDialog(
           context: context,
           title: "${widget.isNew ? 'Creating' : 'Updating'} Route Failed",
-          text: result.failure.toString(),
+          text: result.err.toString(),
         );
       }
     }
@@ -81,7 +81,7 @@ class _RouteEditPageState extends State<RouteEditPage> {
     if (!widget.isNew) {
       final result = await _dataProvider.deleteSingle(_route);
       if (mounted) {
-        if (result.isSuccess) {
+        if (result.isOk) {
           Navigator.pop(
             context,
             // needed for route details page
@@ -91,7 +91,7 @@ class _RouteEditPageState extends State<RouteEditPage> {
           await showMessageDialog(
             context: context,
             title: "Deleting Route Failed",
-            text: result.failure.toString(),
+            text: result.err.toString(),
           );
         }
       }
@@ -123,12 +123,12 @@ class _RouteEditPageState extends State<RouteEditPage> {
       );
       if (mounted) {
         setState(() => _isSearching = false);
-        if (track.isFailure) {
-          showSimpleToast(context, track.failure.message);
+        if (track.isErr) {
+          showSimpleToast(context, track.err.message);
         } else {
           setState(() {
             _route
-              ..track = track.success
+              ..track = track.ok
               ..setDistance()
               ..setAscentDescent();
           });

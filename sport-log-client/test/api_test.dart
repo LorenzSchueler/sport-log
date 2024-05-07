@@ -13,25 +13,25 @@ import 'package:sport_log/settings.dart';
 void testUser(User user, User updatedUser) {
   group('User', () {
     test('create', () async {
-      assert((await UserApi().postSingle(user)).isSuccess);
+      assert((await UserApi().postSingle(user)).isOk);
     });
     test('get', () async {
       assert(
-        (await UserApi().getSingle(user.username, user.password)).isSuccess,
+        (await UserApi().getSingle(user.username, user.password)).isOk,
       );
     });
     test('update', () async {
-      assert((await UserApi().putSingle(updatedUser)).isSuccess);
+      assert((await UserApi().putSingle(updatedUser)).isOk);
     });
     test('delete', () async {
-      assert((await UserApi().deleteSingle()).isSuccess);
+      assert((await UserApi().deleteSingle()).isOk);
     });
   });
 }
 
 void testAction() {
   test('get action providers', () async {
-    assert((await ActionProviderApi().getMultiple()).isSuccess);
+    assert((await ActionProviderApi().getMultiple()).isOk);
   });
 }
 
@@ -46,21 +46,21 @@ void testDiary() {
     );
 
     test('create', () async {
-      assert((await DiaryApi().postSingle(diary)).isSuccess);
+      assert((await DiaryApi().postSingle(diary)).isOk);
     });
     test('get', () async {
-      assert((await DiaryApi().getSingle(diary.id)).isSuccess);
+      assert((await DiaryApi().getSingle(diary.id)).isOk);
     });
     test('get multiple', () async {
-      assert((await DiaryApi().getMultiple()).isSuccess);
+      assert((await DiaryApi().getMultiple()).isOk);
     });
     test('update', () async {
       assert(
-        (await DiaryApi().putSingle(diary..date = DateTime.now())).isSuccess,
+        (await DiaryApi().putSingle(diary..date = DateTime.now())).isOk,
       );
     });
     test('set deleted', () async {
-      assert((await DiaryApi().putSingle(diary..deleted = true)).isSuccess);
+      assert((await DiaryApi().putSingle(diary..deleted = true)).isOk);
     });
   });
 }
@@ -78,28 +78,28 @@ void testStrengthSession() {
 
     test('create', () async {
       assert(
-        (await StrengthSessionApi().postSingle(strengthSession)).isSuccess,
+        (await StrengthSessionApi().postSingle(strengthSession)).isOk,
       );
     });
     test('get', () async {
       assert(
-        (await StrengthSessionApi().getSingle(strengthSession.id)).isSuccess,
+        (await StrengthSessionApi().getSingle(strengthSession.id)).isOk,
       );
     });
     test('get multiple', () async {
-      assert((await StrengthSessionApi().getMultiple()).isSuccess);
+      assert((await StrengthSessionApi().getMultiple()).isOk);
     });
     test('update', () async {
       assert(
         (await StrengthSessionApi()
                 .putSingle(strengthSession..comments = 'comments'))
-            .isSuccess,
+            .isOk,
       );
     });
     test('set deleted', () async {
       assert(
         (await StrengthSessionApi().putSingle(strengthSession..deleted = true))
-            .isSuccess,
+            .isOk,
       );
     });
   });
@@ -118,23 +118,23 @@ void testActionRule() {
     );
 
     test('create', () async {
-      assert((await ActionRuleApi().postSingle(actionRule)).isSuccess);
+      assert((await ActionRuleApi().postSingle(actionRule)).isOk);
     });
     test('get', () async {
-      assert((await ActionRuleApi().getSingle(actionRule.id)).isSuccess);
+      assert((await ActionRuleApi().getSingle(actionRule.id)).isOk);
     });
     test('get multiple', () async {
-      assert((await ActionRuleApi().getMultiple()).isSuccess);
+      assert((await ActionRuleApi().getMultiple()).isOk);
     });
     test('update', () async {
       assert(
         (await ActionRuleApi().putSingle(actionRule..time = DateTime.now()))
-            .isSuccess,
+            .isOk,
       );
     });
     test('set deleted', () async {
       assert(
-        (await ActionRuleApi().putSingle(actionRule..deleted = true)).isSuccess,
+        (await ActionRuleApi().putSingle(actionRule..deleted = true)).isOk,
       );
     });
   });
@@ -153,12 +153,12 @@ Future<void> main() async {
     );
 
     setUpAll(() async {
-      assert((await UserApi().postSingle(sampleUser)).isSuccess);
+      assert((await UserApi().postSingle(sampleUser)).isOk);
       await Settings.instance.setUser(sampleUser);
     });
 
     tearDownAll(() async {
-      assert((await UserApi().deleteSingle()).isSuccess);
+      assert((await UserApi().deleteSingle()).isOk);
     });
 
     testAction();

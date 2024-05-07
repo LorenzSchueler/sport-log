@@ -63,11 +63,11 @@ class SettingsPage extends StatelessWidget {
     final validated = Validator.validateUsername(username);
     if (validated == null) {
       final result = await Account.editUser(username: username);
-      if (context.mounted && result.isFailure) {
+      if (context.mounted && result.isErr) {
         await showMessageDialog(
           context: context,
           title: "Changing Username Failed",
-          text: result.failure.toString(),
+          text: result.err.toString(),
         );
       }
     } else {
@@ -83,11 +83,11 @@ class SettingsPage extends StatelessWidget {
     final validated = Validator.validatePassword(password);
     if (validated == null) {
       final result = await Account.editUser(password: password);
-      if (context.mounted && result.isFailure) {
+      if (context.mounted && result.isErr) {
         await showMessageDialog(
           context: context,
           title: "Changing Password Failed",
-          text: result.failure.toString(),
+          text: result.err.toString(),
         );
       }
     } else {
@@ -103,11 +103,11 @@ class SettingsPage extends StatelessWidget {
     final validated = Validator.validateEmail(email);
     if (validated == null) {
       final result = await Account.editUser(email: email);
-      if (context.mounted && result.isFailure) {
+      if (context.mounted && result.isErr) {
         await showMessageDialog(
           context: context,
           title: "Changing Email Failed",
-          text: result.failure.toString(),
+          text: result.err.toString(),
         );
       }
     } else {
@@ -127,11 +127,11 @@ class SettingsPage extends StatelessWidget {
     );
     if (approved) {
       final result = await Account.newInitSync();
-      if (context.mounted && result.isFailure) {
+      if (context.mounted && result.isErr) {
         await showMessageDialog(
           context: context,
           title: "An Error Occurred",
-          text: result.failure.toString(),
+          text: result.err.toString(),
         );
       }
     }
@@ -163,11 +163,11 @@ class SettingsPage extends StatelessWidget {
       final result = await Account.delete();
       final context = App.globalContext; // other context is no longer mounted
       if (context.mounted) {
-        if (result.isFailure) {
+        if (result.isErr) {
           await showMessageDialog(
             context: context,
             title: "An Error Occurred",
-            text: result.failure.toString(),
+            text: result.err.toString(),
           );
         } else {
           await Navigator.of(context).newBase(Routes.landing);

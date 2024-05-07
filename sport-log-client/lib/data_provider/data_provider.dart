@@ -17,6 +17,7 @@ import 'package:sport_log/database/database.dart';
 import 'package:sport_log/database/table_accessor.dart';
 import 'package:sport_log/helpers/account.dart';
 import 'package:sport_log/helpers/logger.dart';
+import 'package:sport_log/helpers/result.dart';
 import 'package:sport_log/models/account_data/account_data.dart';
 import 'package:sport_log/models/entity_interfaces.dart';
 import 'package:sport_log/settings.dart';
@@ -111,7 +112,7 @@ abstract class EntityDataProvider<T extends AtomicEntity>
     object.sanitize();
     assert(object.isValid());
     final result = await table.createSingle(object);
-    if (result.isSuccess && notify && !_disposed) {
+    if (result.isOk && notify && !_disposed) {
       notifyListeners();
     }
     return result;
@@ -122,7 +123,7 @@ abstract class EntityDataProvider<T extends AtomicEntity>
     object.sanitize();
     assert(object.isValid());
     final result = await table.updateSingle(object);
-    if (result.isSuccess && notify && !_disposed) {
+    if (result.isOk && notify && !_disposed) {
       notifyListeners();
     }
     return result;
@@ -131,7 +132,7 @@ abstract class EntityDataProvider<T extends AtomicEntity>
   @override
   Future<DbResult> deleteSingle(T object, {bool notify = true}) async {
     final result = await table.deleteSingle(object.id);
-    if (result.isSuccess && notify && !_disposed) {
+    if (result.isOk && notify && !_disposed) {
       notifyListeners();
     }
     return result;
@@ -147,7 +148,7 @@ abstract class EntityDataProvider<T extends AtomicEntity>
     }
     assert(objects.every((object) => object.isValid()));
     final result = await table.createMultiple(objects);
-    if (result.isSuccess && notify && !_disposed) {
+    if (result.isOk && notify && !_disposed) {
       notifyListeners();
     }
     return result;
@@ -160,7 +161,7 @@ abstract class EntityDataProvider<T extends AtomicEntity>
     }
     assert(objects.every((object) => object.isValid()));
     final result = await table.updateMultiple(objects);
-    if (result.isSuccess && notify && !_disposed) {
+    if (result.isOk && notify && !_disposed) {
       notifyListeners();
     }
     return result;
@@ -169,7 +170,7 @@ abstract class EntityDataProvider<T extends AtomicEntity>
   /// used in compound data providers impl of deleteSingle
   Future<DbResult> deleteMultiple(List<T> objects, {bool notify = true}) async {
     final result = await table.deleteMultiple(objects);
-    if (result.isSuccess && notify && !_disposed) {
+    if (result.isOk && notify && !_disposed) {
       notifyListeners();
     }
     return result;
@@ -189,7 +190,7 @@ abstract class EntityDataProvider<T extends AtomicEntity>
           // check if this record causes a conflict
           final result = await fnSingle(record);
           // if record causes conflict delete it
-          if (result.isFailure) {
+          if (result.isErr) {
             _logger.d("hard deleting record $record");
             await table.hardDeleteSingle(record.id);
           }
@@ -206,18 +207,14 @@ abstract class EntityDataProvider<T extends AtomicEntity>
     Future<ApiResult<void>> Function(T) fnSingle,
     List<T> records,
     VoidCallback? onNoInternet,
-  ) async {
-    final result = await fnMultiple(records);
-    if (result.isFailure) {
-      final conflictResolution =
-          await DataProvider.handleApiError(result.failure, onNoInternet);
-      return conflictResolution != null
-          ? await _resolveConflict(conflictResolution, fnSingle, records)
-          : false;
-    } else {
-      return true;
-    }
-  }
+  ) =>
+      fnMultiple(records).mapAsync((_) => true).unwrapOrElseAsync((err) async {
+        final conflictResolution =
+            await DataProvider.handleApiError(err, onNoInternet);
+        return conflictResolution != null
+            ? await _resolveConflict(conflictResolution, fnSingle, records)
+            : false;
+      });
 
   Future<bool> _pushUpdatedToServer(VoidCallback? onNoInternet) async {
     final recordsToUpdate = await table.getWithSyncStatus(SyncStatus.updated);
@@ -265,13 +262,13 @@ abstract class EntityDataProvider<T extends AtomicEntity>
     }
     final result =
         await table.upsertMultiple(objects, synchronized: synchronized);
-    if (result.isFailure) {
-      await DataProvider._handleDbError(result.failure);
+    if (result.isErr) {
+      await DataProvider._handleDbError(result.err);
     }
-    if (result.isSuccess && notify && !_disposed) {
+    if (result.isOk && notify && !_disposed) {
       notifyListeners();
     }
-    return result.isSuccess;
+    return result.isOk;
   }
 
   static Future<bool> upSync({required VoidCallback? onNoInternet}) async {
@@ -287,14 +284,14 @@ abstract class EntityDataProvider<T extends AtomicEntity>
   static Future<bool> downSync({required VoidCallback? onNoInternet}) async {
     final accountDataResult =
         await AccountDataApi().get(Settings.instance.lastSync);
-    if (accountDataResult.isFailure) {
+    if (accountDataResult.isErr) {
       await DataProvider.handleApiError(
-        accountDataResult.failure,
+        accountDataResult.err,
         onNoInternet,
       );
       return false;
     } else {
-      final accountData = accountDataResult.success;
+      final accountData = accountDataResult.ok;
       if (accountData.user != null) {
         await Account.updateUserFromDownSync(accountData.user!);
       }

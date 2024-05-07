@@ -3,10 +3,10 @@ import 'dart:math';
 
 import 'package:collection/collection.dart';
 import 'package:mapbox_api/mapbox_api.dart';
-import 'package:result_type/result_type.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/lat_lng.dart';
 import 'package:sport_log/helpers/logger.dart';
+import 'package:sport_log/helpers/result.dart';
 import 'package:sport_log/models/cardio/position.dart';
 import 'package:sport_log/models/clone_extensions.dart';
 
@@ -167,7 +167,7 @@ class RoutePlanningUtils {
     if (snapMode == SnapMode.neverSnap) {
       final track = markedPositions.clone();
       _setDistances(track);
-      return Success(track);
+      return Ok(track);
     }
 
     DirectionsApiResponse response;
@@ -179,17 +179,17 @@ class RoutePlanningUtils {
             markedPositions.map((e) => [e.latitude, e.longitude]).toList(),
       );
     } on SocketException {
-      return Failure(RoutePlanningError.noInternet);
+      return Err(RoutePlanningError.noInternet);
     }
     if (response.routes != null && response.routes!.isNotEmpty) {
       final track = await _responseToTrack(response, getElevation);
       if (snapMode == SnapMode.snapIfClose) {
         _snapIfClose(track, markedPositions);
         _setDistances(track);
-        return Success(track);
+        return Ok(track);
       } else {
         // snapMode == SnapMode.alwaysSnap
-        return Success(track);
+        return Ok(track);
       }
     } else {
       _logger.e(
@@ -197,7 +197,7 @@ class RoutePlanningUtils {
         error: response.error,
         caughtBy: "RoutePlanningUtils.matchLocations",
       );
-      return Failure(RoutePlanningError.mapboxApiError);
+      return Err(RoutePlanningError.mapboxApiError);
     }
   }
 }
