@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' hide Settings;
 import 'package:sport_log/app.dart';
@@ -12,7 +11,6 @@ import 'package:sport_log/data_provider/sync.dart';
 import 'package:sport_log/database/database.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/global_error_handler.dart';
-import 'package:sport_log/helpers/expedition_task_handler.dart';
 import 'package:sport_log/helpers/notification_controller.dart';
 import 'package:sport_log/pages/login/welcome_screen.dart';
 import 'package:sport_log/settings.dart';
@@ -48,24 +46,8 @@ Stream<double> initialize() async* {
     onActionReceivedMethod: NotificationController.onActionReceivedMethod,
   );
   yield 0.6;
-  FlutterForegroundTask.init(
-    androidNotificationOptions: AndroidNotificationOptions(
-      channelId: "expedition_channel",
-      channelName: "Expedition Notifications",
-      channelImportance: NotificationChannelImportance.HIGH,
-      priority: NotificationPriority.HIGH,
-    ),
-    iosNotificationOptions: const IOSNotificationOptions(),
-    foregroundTaskOptions: ForegroundTaskOptions(
-      interval: ExpeditionTaskHandler.eventInterval.inMilliseconds,
-    ),
-  );
-  if (!await FlutterForegroundTask.isRunningService) {
-    await Settings.instance.setExpeditionData(null);
-  }
-  yield 0.7;
   MapboxOptions.setAccessToken(Config.instance.accessToken);
-  yield 0.8;
+  yield 0.7;
   if (Config.isWindows || Config.isLinux) {
     sqfliteFfiInit();
     databaseFactory = databaseFactoryFfi;

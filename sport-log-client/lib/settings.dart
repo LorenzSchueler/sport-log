@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:sport_log/config.dart';
 import 'package:sport_log/defaults.dart';
-import 'package:sport_log/helpers/expedition_tracking_utils.dart';
 import 'package:sport_log/helpers/lat_lng.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/user/user.dart';
@@ -41,7 +40,6 @@ class Settings extends ChangeNotifier {
   static const String _email = "email";
   static const String _lastMapPosition = "lastMapPosition";
   static const String _lastGpsLatLng = "lastGpsLatLng";
-  static const String _expeditionData = "expeditionData";
   static const String _developer = "developer";
 
   static const Duration _defaultSyncInterval = Duration(minutes: 5);
@@ -52,8 +50,7 @@ class Settings extends ChangeNotifier {
       ..registerAdapter(LatLngAdapter())
       ..registerAdapter(CameraPositionAdapter())
       ..registerAdapter(TimeOfDayAdapter())
-      ..registerAdapter(Int64Adapter())
-      ..registerAdapter(ExpeditionDataAdapter());
+      ..registerAdapter(Int64Adapter());
     _storage ??= await Hive.openBox(Config.hiveBoxName);
     await _setDefaults(override: override);
   }
@@ -114,9 +111,6 @@ class Settings extends ChangeNotifier {
     if (!_contains(_lastGpsLatLng) || override) {
       await _storage!.put(_lastGpsLatLng, Defaults.mapbox.cameraPosition);
     }
-    if (!_contains(_expeditionData) || override) {
-      await _storage!.put(_expeditionData, null);
-    }
     if (!_contains(_developer) || override) {
       await _storage!.put(_developer, false);
     }
@@ -150,9 +144,6 @@ class Settings extends ChangeNotifier {
   LatLngZoom _getLatLngZoom(String key) => _storage!.get(key)! as LatLngZoom;
 
   Int64? _getInt64Optional(String key) => _storage!.get(key) as Int64?;
-
-  ExpeditionData? _getExpeditionDataOptional(String key) =>
-      _storage!.get(key) as ExpeditionData?;
 
   Future<void> _put(String key, Object? value) async {
     await _storage!.put(key, value);
@@ -256,12 +247,6 @@ class Settings extends ChangeNotifier {
 
   Future<void> setLastGpsLatLng(LatLng latLng) => _put(_lastGpsLatLng, latLng);
 
-  ExpeditionData? get expeditionData =>
-      _getExpeditionDataOptional(_expeditionData);
-
-  Future<void> setExpeditionData(ExpeditionData? expeditionData) =>
-      _put(_expeditionData, expeditionData);
-
   bool get developerMode => _getBool(_developer);
 
   Future<void> setDeveloperMode(bool developerMode) =>
@@ -347,25 +332,5 @@ class Int64Adapter extends TypeAdapter<Int64> {
   @override
   void write(BinaryWriter writer, Int64 obj) {
     writer.writeString(obj.toString());
-  }
-}
-
-class ExpeditionDataAdapter extends TypeAdapter<ExpeditionData> {
-  @override
-  final int typeId = 5;
-
-  @override
-  ExpeditionData read(BinaryReader reader) {
-    return ExpeditionData(
-      cardioId: reader.read() as Int64,
-      trackingTimes: reader.readList().cast<TimeOfDay>(),
-    );
-  }
-
-  @override
-  void write(BinaryWriter writer, ExpeditionData obj) {
-    writer
-      ..write(obj.cardioId)
-      ..writeList(obj.trackingTimes);
   }
 }

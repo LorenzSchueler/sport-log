@@ -5,12 +5,10 @@ import 'package:sport_log/pages/workout/cardio/audio_feedback_config.dart';
 import 'package:sport_log/pages/workout/cardio/tracking_settings.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/app_icons.dart';
-import 'package:sport_log/widgets/dialogs/dialogs.dart';
 import 'package:sport_log/widgets/input_fields/double_input.dart';
 import 'package:sport_log/widgets/input_fields/duration_input.dart';
 import 'package:sport_log/widgets/input_fields/edit_tile.dart';
 import 'package:sport_log/widgets/input_fields/int_input.dart';
-import 'package:sport_log/widgets/picker/datetime_picker.dart';
 import 'package:sport_log/widgets/picker/picker.dart';
 import 'package:sport_log/widgets/provider_consumer.dart';
 import 'package:sport_log/widgets/snackbar.dart';
@@ -124,186 +122,106 @@ class CardioTrackingSettingsPage extends StatelessWidget {
                     ),
                   ),
               ],
-              if (false)
-                // ignore: dead_code
-                EditTile.Switch(
-                  leading: AppIcons.mountains,
-                  trailing: AppIcons.info,
-                  caption: "Expedition Mode",
-                  value: trackingSettings.expeditionMode,
-                  onChanged: (expeditionMode) =>
-                      trackingSettings.expeditionMode = expeditionMode,
-                  onTrailingTap: () => showMessageDialog(
-                    context: context,
-                    title: "Expedition Tracking",
-                    text:
-                        "Expedition tracking allows to track the location for a long time without draining the battery too much.\nThe location will be determined only at the defined tracking times. Once the location is found or if the location is not found within 5 minutes, tracking is suspended until the next tracking time. Notice however, that checking whether a new location is needed is done only every 15 minutes. This means that the location fix can be up to 15 + 5 minutes delayed.\nIf the app is closed tracking continues, however if the app is killed, tracking stops.",
+              EditTile.Switch(
+                leading: Icons.record_voice_over_rounded,
+                caption: "Audio Feedback",
+                value: trackingSettings.audioFeedback != null,
+                onChanged: (feedback) => trackingSettings.audioFeedback =
+                    feedback ? AudioFeedbackConfig() : null,
+              ),
+              if (trackingSettings.audioFeedback != null) ...[
+                Padding(
+                  // 24 icon + 15 padding
+                  padding: const EdgeInsets.only(left: 24 + 15),
+                  child: EditTile(
+                    unboundedHeight: true,
+                    leading: null,
+                    caption: "Interval Type",
+                    child: SegmentedButton(
+                      segments: const [
+                        ButtonSegment(
+                          value: IntervalType.distance,
+                          label: Text("Distance"),
+                        ),
+                        ButtonSegment(
+                          value: IntervalType.time,
+                          label: Text("Time"),
+                        ),
+                      ],
+                      selected: {
+                        trackingSettings.audioFeedback!.intervalType,
+                      },
+                      onSelectionChanged: (selected) => trackingSettings
+                          .audioFeedback!.intervalType = selected.first,
+                      showSelectedIcon: false,
+                    ),
                   ),
                 ),
-              if (trackingSettings.expeditionMode)
+                Padding(
+                  // 24 icon + 15 padding
+                  padding: const EdgeInsets.only(left: 24 + 15),
+                  child: trackingSettings.audioFeedback!.intervalType.isDistance
+                      ? EditTile(
+                          leading: null,
+                          caption: "Interval (km)",
+                          child: DoubleInput(
+                            // update if rounded to 100m
+                            key: ValueKey(
+                              trackingSettings.audioFeedback!.interval,
+                            ),
+                            onUpdate: (interval) =>
+                                trackingSettings.audioFeedback!.interval =
+                                    (interval * 10).round() *
+                                        100, // rounded to 100m
+                            initialValue:
+                                trackingSettings.audioFeedback!.interval /
+                                    1000.0,
+                            minValue: 0.1,
+                            maxValue: null,
+                          ),
+                        )
+                      : EditTile(
+                          leading: null,
+                          caption: "Interval",
+                          child: DurationInput(
+                            onUpdate: (interval) => trackingSettings
+                                .audioFeedback!.interval = interval.inSeconds,
+                            initialDuration: Duration(
+                              seconds: trackingSettings.audioFeedback!.interval,
+                            ),
+                            minDuration: const Duration(seconds: 10),
+                          ),
+                        ),
+                ),
                 Padding(
                   // 24 icon + 15 padding
                   padding: const EdgeInsets.only(left: 24 + 15),
                   child: EditTile(
                     leading: null,
-                    caption: "Tracking Times",
+                    caption: "Metrics",
                     unboundedHeight: true,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        ListView.builder(
-                          physics: const NeverScrollableScrollPhysics(),
-                          shrinkWrap: true,
-                          itemCount:
-                              trackingSettings.expeditionTrackingTimes!.length,
-                          itemBuilder: (context, index) => Row(
-                            children: [
-                              Text(
-                                trackingSettings.expeditionTrackingTimes!
-                                    .elementAt(index)
-                                    .formatHm,
-                              ),
-                              Defaults.sizedBox.horizontal.normal,
-                              IconButton(
-                                onPressed: () =>
-                                    trackingSettings.removeTrackingTime(index),
-                                icon: const Icon(AppIcons.close),
-                                padding: EdgeInsets.zero,
-                                constraints: const BoxConstraints(),
-                                style: const ButtonStyle(
-                                  tapTargetSize:
-                                      MaterialTapTargetSize.shrinkWrap,
-                                ),
-                                iconSize: 24,
-                              ),
-                            ],
-                          ),
-                        ),
-                        ElevatedButton.icon(
-                          icon: const Icon(AppIcons.add),
-                          label: const Text("Tracking Time"),
-                          // ignore: prefer-extracting-callbacks
-                          onPressed: () async {
-                            final time = await showScrollableTimePicker(
-                              context: context,
-                              initialTime: null,
-                            );
-                            if (time != null) {
-                              trackingSettings.addTrackingTime(
-                                TimeOfDay.fromDateTime(time),
-                              );
-                            }
-                          },
-                        ),
-                      ],
+                    child: ListView.builder(
+                      physics: const NeverScrollableScrollPhysics(),
+                      shrinkWrap: true,
+                      itemCount: trackingSettings.audioFeedback!.metrics.length,
+                      itemBuilder: (context, index) {
+                        final metric =
+                            trackingSettings.audioFeedback!.metrics[index];
+                        return Row(
+                          children: [
+                            DefaultSwitch(
+                              value: metric.isEnabled,
+                              onChanged: (enabled) =>
+                                  metric.isEnabled = enabled,
+                            ),
+                            Defaults.sizedBox.horizontal.normal,
+                            Text(metric.name),
+                          ],
+                        );
+                      },
                     ),
                   ),
                 ),
-              if (!trackingSettings.expeditionMode) ...[
-                EditTile.Switch(
-                  leading: Icons.record_voice_over_rounded,
-                  caption: "Audio Feedback",
-                  value: trackingSettings.audioFeedback != null,
-                  onChanged: (feedback) => trackingSettings.audioFeedback =
-                      feedback ? AudioFeedbackConfig() : null,
-                ),
-                if (trackingSettings.audioFeedback != null) ...[
-                  Padding(
-                    // 24 icon + 15 padding
-                    padding: const EdgeInsets.only(left: 24 + 15),
-                    child: EditTile(
-                      unboundedHeight: true,
-                      leading: null,
-                      caption: "Interval Type",
-                      child: SegmentedButton(
-                        segments: const [
-                          ButtonSegment(
-                            value: IntervalType.distance,
-                            label: Text("Distance"),
-                          ),
-                          ButtonSegment(
-                            value: IntervalType.time,
-                            label: Text("Time"),
-                          ),
-                        ],
-                        selected: {
-                          trackingSettings.audioFeedback!.intervalType,
-                        },
-                        onSelectionChanged: (selected) => trackingSettings
-                            .audioFeedback!.intervalType = selected.first,
-                        showSelectedIcon: false,
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    // 24 icon + 15 padding
-                    padding: const EdgeInsets.only(left: 24 + 15),
-                    child: trackingSettings
-                            .audioFeedback!.intervalType.isDistance
-                        ? EditTile(
-                            leading: null,
-                            caption: "Interval (km)",
-                            child: DoubleInput(
-                              // update if rounded to 100m
-                              key: ValueKey(
-                                trackingSettings.audioFeedback!.interval,
-                              ),
-                              onUpdate: (interval) =>
-                                  trackingSettings.audioFeedback!.interval =
-                                      (interval * 10).round() *
-                                          100, // rounded to 100m
-                              initialValue:
-                                  trackingSettings.audioFeedback!.interval /
-                                      1000.0,
-                              minValue: 0.1,
-                              maxValue: null,
-                            ),
-                          )
-                        : EditTile(
-                            leading: null,
-                            caption: "Interval",
-                            child: DurationInput(
-                              onUpdate: (interval) => trackingSettings
-                                  .audioFeedback!.interval = interval.inSeconds,
-                              initialDuration: Duration(
-                                seconds:
-                                    trackingSettings.audioFeedback!.interval,
-                              ),
-                              minDuration: const Duration(seconds: 10),
-                            ),
-                          ),
-                  ),
-                  Padding(
-                    // 24 icon + 15 padding
-                    padding: const EdgeInsets.only(left: 24 + 15),
-                    child: EditTile(
-                      leading: null,
-                      caption: "Metrics",
-                      unboundedHeight: true,
-                      child: ListView.builder(
-                        physics: const NeverScrollableScrollPhysics(),
-                        shrinkWrap: true,
-                        itemCount:
-                            trackingSettings.audioFeedback!.metrics.length,
-                        itemBuilder: (context, index) {
-                          final metric =
-                              trackingSettings.audioFeedback!.metrics[index];
-                          return Row(
-                            children: [
-                              DefaultSwitch(
-                                value: metric.isEnabled,
-                                onChanged: (enabled) =>
-                                    metric.isEnabled = enabled,
-                              ),
-                              Defaults.sizedBox.horizontal.normal,
-                              Text(metric.name),
-                            ],
-                          );
-                        },
-                      ),
-                    ),
-                  ),
-                ],
                 trackingSettings.heartRateUtils.devices.isEmpty
                     ? EditTile(
                         leading: AppIcons.heartbeat,
@@ -349,21 +267,12 @@ class CardioTrackingSettingsPage extends StatelessWidget {
                       ),
               ],
               FilledButton(
-                onPressed:
-                    trackingSettings.expeditionTrackingTimes?.isNotEmpty ?? true
-                        ? () => Navigator.pushNamed(
-                              context,
-                              trackingSettings.expeditionMode
-                                  ? Routes.expeditionTracking
-                                  : Routes.tracking,
-                              arguments: trackingSettings,
-                            )
-                        : null,
-                child: Text(
-                  trackingSettings.expeditionTrackingTimes?.isNotEmpty ?? true
-                      ? "OK"
-                      : "Tracking Times required",
+                onPressed: () => Navigator.pushNamed(
+                  context,
+                  Routes.tracking,
+                  arguments: trackingSettings,
                 ),
+                child: const Text("OK"),
               ),
             ],
           ),
