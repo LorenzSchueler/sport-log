@@ -111,6 +111,7 @@ class _OfflineMapsPageState extends State<OfflineMapsPage> {
                         showSetNorthButton: false,
                         showCurrentLocationButton: false,
                         showCenterLocationButton: false,
+                        showAddLocationButton: false,
                         onMapCreated: _onMapCreated,
                         onLongTap: (latLng) => _point1 == null
                             ? _updatePoint1(latLng)

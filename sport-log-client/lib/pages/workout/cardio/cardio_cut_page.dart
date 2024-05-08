@@ -115,6 +115,7 @@ class _CardioCutPageState extends State<CardioCutPage> {
                   showSetNorthButton: true,
                   showCurrentLocationButton: false,
                   showCenterLocationButton: false,
+                  showAddLocationButton: false,
                   onMapCreated: _onMapCreated,
                 ),
               ),

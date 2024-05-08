@@ -5,14 +5,19 @@ import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' hide Settings;
 import 'package:provider/provider.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/lat_lng.dart';
+import 'package:sport_log/helpers/location_utils.dart';
 import 'package:sport_log/helpers/map_controller.dart';
+import 'package:sport_log/helpers/pointer.dart';
+import 'package:sport_log/models/cardio/route.dart';
 import 'package:sport_log/settings.dart';
+import 'package:sport_log/widgets/map_widgets/add_location_button.dart';
 import 'package:sport_log/widgets/map_widgets/current_location_button.dart';
 import 'package:sport_log/widgets/map_widgets/map_styles_button.dart';
 import 'package:sport_log/widgets/map_widgets/select_route_button.dart';
 import 'package:sport_log/widgets/map_widgets/set_north_button.dart';
 import 'package:sport_log/widgets/map_widgets/toggle_center_location_button.dart';
 import 'package:sport_log/widgets/map_widgets/toggle_fullscreen_button.dart';
+import 'package:sport_log/widgets/provider_consumer.dart';
 
 class MapboxMapWrapper extends StatefulWidget {
   const MapboxMapWrapper({
@@ -22,6 +27,7 @@ class MapboxMapWrapper extends StatefulWidget {
     required this.showSetNorthButton,
     required this.showCurrentLocationButton,
     required this.showCenterLocationButton,
+    required this.showAddLocationButton,
     this.showOverlays = true,
     this.buttonTopOffset = 0,
     this.scaleAtTop = false,
@@ -46,6 +52,7 @@ class MapboxMapWrapper extends StatefulWidget {
   final bool showSetNorthButton;
   final bool showCurrentLocationButton;
   final bool showCenterLocationButton;
+  final bool showAddLocationButton;
   final bool showOverlays;
   final int buttonTopOffset;
   final bool scaleAtTop;
@@ -74,8 +81,15 @@ class MapboxMapWrapper extends StatefulWidget {
 
 class _MapboxMapWrapperState extends State<MapboxMapWrapper> {
   MapController? _mapController;
+  final LocationUtils _locationUtils = LocationUtils();
 
   bool _centerLocation = true;
+  Route? _selectedRoute;
+
+  final NullablePointer<List<CircleAnnotation>> _currentLocationMarker =
+      NullablePointer.nullPointer();
+  final NullablePointer<PolylineAnnotation> _line =
+      NullablePointer.nullPointer();
 
   @override
   void didUpdateWidget(MapboxMapWrapper old) {
@@ -106,6 +120,22 @@ class _MapboxMapWrapperState extends State<MapboxMapWrapper> {
     widget.onMapCreated?.call(mapController);
     if (mounted) {
       setState(() {});
+    }
+  }
+
+  Future<void> updateRoute(Route? route) async {
+    final changed = _selectedRoute != null && route != null;
+    if (mounted) {
+      setState(() => _selectedRoute = route);
+    }
+    await _mapController?.updateRouteLine(_line, _selectedRoute?.track);
+    // do not change bounds if the current position was added to the route
+    if (!changed) {
+      await _mapController?.setBoundsFromTracks(
+        _selectedRoute?.track,
+        null,
+        padded: true,
+      );
     }
   }
 
@@ -154,7 +184,10 @@ class _MapboxMapWrapperState extends State<MapboxMapWrapper> {
                   Defaults.sizedBox.vertical.normal,
                 ],
                 if (widget.showSelectRouteButton) ...[
-                  SelectRouteButton(mapController: _mapController!),
+                  SelectRouteButton(
+                    selectedRoute: _selectedRoute,
+                    updateRoute: updateRoute,
+                  ),
                   Defaults.sizedBox.vertical.normal,
                 ],
                 if (widget.showSetNorthButton) ...[
@@ -164,19 +197,36 @@ class _MapboxMapWrapperState extends State<MapboxMapWrapper> {
                 if (widget.showCurrentLocationButton) ...[
                   CurrentLocationButton(
                     mapController: _mapController!,
+                    locationUtils: _locationUtils,
                     centerLocation: _centerLocation,
+                    currentLocationMarker: _currentLocationMarker,
                   ),
                   Defaults.sizedBox.vertical.normal,
                 ],
                 if (widget.showCenterLocationButton) ...[
                   ToggleCenterLocationButton(
-                    onToggle: (centerLocation) {
-                      setState(() => _centerLocation = centerLocation);
-                      widget.onCenterLocationToggle?.call(centerLocation);
+                    centerLocation: _centerLocation,
+                    onToggle: () {
+                      setState(() => _centerLocation = !_centerLocation);
+                      widget.onCenterLocationToggle?.call(_centerLocation);
                     },
                   ),
                   Defaults.sizedBox.vertical.normal,
                 ],
+                ProviderConsumer.value(
+                  // Consumer to detect enabled change
+                  value: _locationUtils,
+                  builder: (context, locationUtils, _) =>
+                      widget.showAddLocationButton &&
+                              _selectedRoute != null &&
+                              _locationUtils.enabled
+                          ? AddLocationButton(
+                              route: _selectedRoute!,
+                              updateRoute: updateRoute,
+                              locationUtils: _locationUtils,
+                            )
+                          : Container(),
+                ),
               ],
             ),
           ),

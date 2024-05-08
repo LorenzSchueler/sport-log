@@ -277,6 +277,7 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
                       showSetNorthButton: true,
                       showCurrentLocationButton: false,
                       showCenterLocationButton: false,
+                      showAddLocationButton: false,
                       scaleAtTop: fullscreen.isOff,
                       onFullscreenToggle: fullscreen.setState,
                       onMapCreated: _onMapCreated,

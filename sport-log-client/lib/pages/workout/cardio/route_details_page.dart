@@ -153,6 +153,7 @@ class _RouteDetailsPageState extends State<RouteDetailsPage>
                       showSetNorthButton: true,
                       showCurrentLocationButton: false,
                       showCenterLocationButton: false,
+                      showAddLocationButton: false,
                       onFullscreenToggle: fullscreen.setState,
                       scaleAtTop: fullscreen.isOff,
                       onMapCreated: _onMapCreated,

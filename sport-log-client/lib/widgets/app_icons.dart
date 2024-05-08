@@ -89,6 +89,7 @@ abstract final class AppIcons {
   static const IconData car = Icons.directions_car_rounded;
   static const IconData satellite = Icons.satellite_rounded;
   static const IconData location = Icons.location_on;
+  static const IconData addLocation = Icons.add_location_alt_outlined;
   static const IconData myLocation = Icons.my_location_rounded;
   static const IconData myLocationDisabled = Icons.location_disabled_rounded;
   static const IconData battery = Icons.battery_std_rounded;

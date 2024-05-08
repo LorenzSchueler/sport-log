@@ -270,6 +270,7 @@ class _RouteEditPageState extends State<RouteEditPage> {
                         showSetNorthButton: true,
                         showCurrentLocationButton: false,
                         showCenterLocationButton: false,
+                        showAddLocationButton: false,
                         scaleAtTop: true,
                         onMapCreated: _onMapCreated,
                         onLongTap: _extendLine,

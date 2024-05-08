@@ -82,6 +82,7 @@ class _RouteUploadPageState extends State<RouteUploadPage> {
                 showSetNorthButton: true,
                 showCurrentLocationButton: false,
                 showCenterLocationButton: false,
+                showAddLocationButton: false,
                 onMapCreated: _onMapCreated,
               ),
             ),

@@ -303,6 +303,7 @@ class _CardioEditPageState extends State<CardioEditPage> {
                   showSetNorthButton: true,
                   showCurrentLocationButton: false,
                   showCenterLocationButton: false,
+                  showAddLocationButton: false,
                   onMapCreated: _onMapCreated,
                 ),
               ),

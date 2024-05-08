@@ -93,6 +93,7 @@ class MapPage extends StatelessWidget {
                   showSetNorthButton: true,
                   showCurrentLocationButton: true,
                   showCenterLocationButton: true,
+                  showAddLocationButton: true,
                   showOverlays: showOverlays.isOn,
                   buttonTopOffset: 100,
                   onMapCreated: searchUtils.setMapController,
