@@ -212,7 +212,7 @@ class RegionCard extends StatelessWidget {
           child: Text(
             "", // DateTime.parse(region.metadata["datetime"] as String).humanDate,
             style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                  color: Theme.of(context).colorScheme.background,
+                  color: Theme.of(context).colorScheme.surface,
                 ),
           ),
         ),

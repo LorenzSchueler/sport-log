@@ -98,7 +98,6 @@ class InitAppWrapperState extends State<InitAppWrapper> {
         ? const App()
         : MaterialApp(
             debugShowCheckedModeBanner: false,
-            theme: AppTheme.lightTheme,
             darkTheme: AppTheme.darkTheme,
             themeMode: ThemeMode.dark,
             navigatorKey: navigatorKey,

@@ -4,7 +4,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 void showSimpleToast(BuildContext context, String text) {
   Fluttertoast.showToast(
     msg: text,
-    backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
+    backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
     textColor: Theme.of(context).colorScheme.onSurfaceVariant,
   );
 }

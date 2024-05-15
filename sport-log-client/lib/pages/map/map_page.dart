@@ -76,7 +76,7 @@ class MapPage extends StatelessWidget {
                         ),
                       ),
                     ],
-                    foregroundColor: Theme.of(context).colorScheme.background,
+                    foregroundColor: Theme.of(context).colorScheme.surface,
                     backgroundColor: _searchBackgroundColor,
                     elevation: 0,
                   )

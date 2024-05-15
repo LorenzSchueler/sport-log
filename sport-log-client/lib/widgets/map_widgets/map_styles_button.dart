@@ -92,8 +92,8 @@ class _MapStylesBottomSheetState extends State<MapStylesBottomSheet> {
       "mapbox://styles/hi-ker/cloa9i53h011s01qsdf867pcy";
 
   final style = ButtonStyle(
-    shape: MaterialStateProperty.all(const CircleBorder()),
-    padding: MaterialStateProperty.all(const EdgeInsets.all(10)),
+    shape: WidgetStateProperty.all(const CircleBorder()),
+    padding: WidgetStateProperty.all(const EdgeInsets.all(10)),
   );
 
   @override

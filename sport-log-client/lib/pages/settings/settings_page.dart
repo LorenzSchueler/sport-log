@@ -324,7 +324,7 @@ class SettingsPage extends StatelessWidget {
                             const BoxConstraints(minWidth: double.infinity),
                         child: ElevatedButton(
                           style: ButtonStyle(
-                            foregroundColor: MaterialStateProperty.all(
+                            foregroundColor: WidgetStateProperty.all(
                               Theme.of(context).colorScheme.errorContainer,
                             ),
                           ),
@@ -343,7 +343,7 @@ class SettingsPage extends StatelessWidget {
                           Expanded(
                             child: ElevatedButton(
                               style: ButtonStyle(
-                                foregroundColor: MaterialStateProperty.all(
+                                foregroundColor: WidgetStateProperty.all(
                                   Theme.of(context).colorScheme.error,
                                 ),
                               ),
@@ -357,7 +357,7 @@ class SettingsPage extends StatelessWidget {
                           Expanded(
                             child: ElevatedButton(
                               style: ButtonStyle(
-                                foregroundColor: MaterialStateProperty.all(
+                                foregroundColor: WidgetStateProperty.all(
                                   Theme.of(context).colorScheme.error,
                                 ),
                               ),

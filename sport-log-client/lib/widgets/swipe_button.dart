@@ -62,7 +62,7 @@ class SwipeButtonState extends State<SwipeButton>
               height: widget.height,
               decoration: BoxDecoration(
                 color: widget.backgroundColor ??
-                    Theme.of(context).colorScheme.surfaceVariant,
+                    Theme.of(context).colorScheme.surfaceContainerHighest,
                 borderRadius: widget.borderRadius,
               ),
             ),
@@ -93,7 +93,7 @@ class SwipeButtonState extends State<SwipeButton>
                             .filledButtonTheme
                             .style!
                             .textStyle!
-                            .resolve({MaterialState.focused})!.copyWith(
+                            .resolve({WidgetState.focused})!.copyWith(
                           color: Colors.black,
                         ),
                       ),

@@ -20,7 +20,7 @@ class MainDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final onBackgroundColor = Theme.of(context).colorScheme.onBackground;
+    final onBackgroundColor = Theme.of(context).colorScheme.onSurface;
     return SafeArea(
       child: Drawer(
         child: Consumer<Settings>(

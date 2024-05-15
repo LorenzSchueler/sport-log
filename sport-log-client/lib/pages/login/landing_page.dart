@@ -41,8 +41,8 @@ class LandingPage extends StatelessWidget {
               Navigator.of(context).newBase(Routes.timelineOverview);
             },
             style: ButtonStyle(
-              backgroundColor: MaterialStateProperty.all(
-                Theme.of(context).colorScheme.onBackground,
+              backgroundColor: WidgetStateProperty.all(
+                Theme.of(context).colorScheme.onSurface,
               ),
             ),
             child: const Text("Use Without Account"),

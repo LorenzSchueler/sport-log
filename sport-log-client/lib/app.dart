@@ -33,7 +33,6 @@ class App extends StatelessWidget {
                   : Routes.landing,
           navigatorKey: navigatorKey,
           debugShowCheckedModeBanner: false,
-          theme: AppTheme.lightTheme,
           darkTheme: AppTheme.darkTheme,
           themeMode: ThemeMode.dark,
           localizationsDelegates: const [

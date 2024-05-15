@@ -136,7 +136,7 @@ class _CardioUpdateElevationPageState extends State<CardioUpdateElevationPage> {
                             label: const Text("Cancel"),
                             onPressed: () => _return(apply: false),
                             style: ButtonStyle(
-                              backgroundColor: MaterialStatePropertyAll(
+                              backgroundColor: WidgetStatePropertyAll(
                                 Theme.of(context).colorScheme.error,
                               ),
                             ),
@@ -149,7 +149,7 @@ class _CardioUpdateElevationPageState extends State<CardioUpdateElevationPage> {
                             label: const Text("Apply"),
                             onPressed: () => _return(apply: true),
                             style: ButtonStyle(
-                              backgroundColor: MaterialStatePropertyAll(
+                              backgroundColor: WidgetStatePropertyAll(
                                 Theme.of(context).colorScheme.errorContainer,
                               ),
                             ),
