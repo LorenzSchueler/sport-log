@@ -455,6 +455,54 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  geolocator:
+    dependency: "direct main"
+    description:
+      name: geolocator
+      sha256: "149876cc5207a0f5daf4fdd3bfcf0a0f27258b3fe95108fa084f527ad0568f1b"
+      url: "https://pub.dev"
+    source: hosted
+    version: "12.0.0"
+  geolocator_android:
+    dependency: transitive
+    description:
+      name: geolocator_android
+      sha256: "00c7177a95823dd3ee35ef42fd8666cd27d219ae14cea472ac76a21dff43000b"
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.6.0"
+  geolocator_apple:
+    dependency: transitive
+    description:
+      name: geolocator_apple
+      sha256: bc2aca02423ad429cb0556121f56e60360a2b7d694c8570301d06ea0c00732fd
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.3.7"
+  geolocator_platform_interface:
+    dependency: transitive
+    description:
+      name: geolocator_platform_interface
+      sha256: c6005787efe9e27cb0f6b50230c217e6f0ef8e1e7a8b854efb4f46489e502603
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.2.3"
+  geolocator_web:
+    dependency: transitive
+    description:
+      name: geolocator_web
+      sha256: "7a22f400d831f924a89d931ba126a10e6b8b437f31e6b9311320435f3e1571bd"
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.0.0"
+  geolocator_windows:
+    dependency: transitive
+    description:
+      name: geolocator_windows
+      sha256: "53da08937d07c24b0d9952eb57a3b474e29aae2abf9dd717f7e1230995f13f0e"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.2.3"
   geotypes:
     dependency: transitive
     description:
@@ -628,56 +676,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.0.0"
-  location:
-    dependency: "direct main"
-    description:
-      path: "packages/location"
-      ref: develop
-      resolved-ref: f265e45aeed5a8c0f59ea2ea1ccc1f8bf9c4962a
-      url: "https://github.com/LorenzSchueler/flutterlocation"
-    source: git
-    version: "5.0.0-dev.9"
-  location_android:
-    dependency: "direct overridden"
-    description:
-      path: "packages/location_android"
-      ref: develop
-      resolved-ref: f265e45aeed5a8c0f59ea2ea1ccc1f8bf9c4962a
-      url: "https://github.com/LorenzSchueler/flutterlocation"
-    source: git
-    version: "5.0.0-dev.4"
-  location_ios:
-    dependency: transitive
-    description:
-      name: location_ios
-      sha256: e185ea4b5d753438c00b7e30d06151debab852a57564323c2efa2a022ea5e333
-      url: "https://pub.dev"
-    source: hosted
-    version: "5.0.0-dev.4"
-  location_macos:
-    dependency: transitive
-    description:
-      name: location_macos
-      sha256: fe85f76c3fcc9a2ac1c376e474f5a39b85274ea53276c014d747bc79d5255f33
-      url: "https://pub.dev"
-    source: hosted
-    version: "5.0.0-dev.3"
-  location_platform_interface:
-    dependency: transitive
-    description:
-      name: location_platform_interface
-      sha256: "65517009fcae4cb48aacc82d494f7eadaf14b997adcda424a51a49c6ed2abee9"
-      url: "https://pub.dev"
-    source: hosted
-    version: "5.0.0-dev.3"
-  location_web:
-    dependency: transitive
-    description:
-      name: location_web
-      sha256: "939c17414790f53aa5940168b0d70d2dd32852756fe3369a7976076fdad31df5"
-      url: "https://pub.dev"
-    source: hosted
-    version: "5.0.0-dev.3"
   logger:
     dependency: "direct main"
     description:

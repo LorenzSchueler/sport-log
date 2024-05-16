@@ -13,6 +13,7 @@
     <!-- location background mode -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
     <!-- location background mode and gpx export - necessary for notification but not for foreground
     service -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />

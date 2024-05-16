@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:location/location.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:sport_log/app.dart';
 import 'package:sport_log/helpers/gps_position.dart';
@@ -11,10 +11,22 @@ import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/dialogs/dialogs.dart';
 
 class LocationUtils extends ChangeNotifier {
-  StreamSubscription<LocationData>? _locationSubscription;
+  StreamSubscription<Position>? _locationSubscription;
   GpsPosition? _lastLocation;
 
   bool _disposed = false;
+
+  static final _settings = AndroidSettings(
+    forceLocationManager: true,
+    foregroundNotificationConfig: const ForegroundNotificationConfig(
+      notificationTitle: "Tracking",
+      notificationText: "GPS tracking is active",
+      color: Colors.red,
+      notificationIcon: AndroidResource(name: "notification_icon"),
+      setOngoing: true,
+      enableWakeLock: true,
+    ),
+  );
 
   @override
   void dispose() {
@@ -47,12 +59,27 @@ class LocationUtils extends ChangeNotifier {
     }
     // request permission but continue even if not granted
     await PermissionRequest.request(Permission.notification);
+    // can request precise location - if not granted the use has to do it in settings in next step
+    await Geolocator.requestPermission();
+    if (!await Request.request(
+      title: "Precise Location Required",
+      text: "Please allow precise location.",
+      check: () async =>
+          (await Geolocator.getLocationAccuracy()) ==
+          LocationAccuracyStatus.precise,
+      change: Geolocator.openAppSettings,
+    )) {
+      return false;
+    }
+    if (!await Request.request(
+      title: "GPS Required",
+      text: "Please enable GPS.",
+      check: Geolocator.isLocationServiceEnabled,
+      change: Geolocator.openLocationSettings,
+    )) {
+      return false;
+    }
     return true;
-  }
-
-  static Future<void> enableGPS() async {
-    await setLocationSettings(useGooglePlayServices: false);
-    await getLocation();
   }
 
   Future<bool> startLocationStream({
@@ -71,12 +98,11 @@ class LocationUtils extends ChangeNotifier {
       }
     }
 
-    await setLocationSettings(useGooglePlayServices: false);
-    await _updateNotification(null);
     _locationSubscription =
-        onLocationChanged(inBackground: inBackground).listen((locationData) {
+        Geolocator.getPositionStream(locationSettings: _settings)
+            .listen((Position position) {
       _onLocationUpdate(
-        GpsPosition.fromLocationData(locationData),
+        GpsPosition.fromGeolocatorPosition(position),
         onLocationUpdate,
       );
     });
@@ -84,23 +110,10 @@ class LocationUtils extends ChangeNotifier {
     return true;
   }
 
-  Future<void> _updateNotification(GpsPosition? position) {
-    return updateBackgroundNotification(
-      title: "Tracking",
-      subtitle: position == null
-          ? "GPS tracking is active"
-          : "[${position.latitude.toStringAsFixed(5)}, ${position.longitude.toStringAsFixed(5)}] ~ ${position.accuracy.round()} m (${position.satellites} satellites)",
-      color: Colors.red,
-      iconName: "notification_icon",
-      onTapBringToFront: true,
-    );
-  }
-
   Future<void> _onLocationUpdate(
     GpsPosition position,
     void Function(GpsPosition) onLocationUpdate,
   ) async {
-    await _updateNotification(position);
     _lastLocation = position;
     onLocationUpdate(position);
     notifyListeners();

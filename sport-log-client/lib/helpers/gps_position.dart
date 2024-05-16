@@ -1,4 +1,4 @@
-import 'package:location/location.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:sport_log/helpers/lat_lng.dart';
 
 class GpsPosition {
@@ -10,12 +10,14 @@ class GpsPosition {
     required this.satellites,
   });
 
-  GpsPosition.fromLocationData(LocationData locationData)
-      : latitude = locationData.latitude!,
-        longitude = locationData.longitude!,
-        elevation = locationData.altitude ?? 0,
-        accuracy = locationData.accuracy ?? 0,
-        satellites = locationData.satellites ?? 0;
+  GpsPosition.fromGeolocatorPosition(Position locationData)
+      : latitude = locationData.latitude,
+        longitude = locationData.longitude,
+        elevation = locationData.altitude,
+        accuracy = locationData.accuracy,
+        satellites = (locationData is AndroidPosition)
+            ? locationData.satellitesUsedInFix.toInt()
+            : 0;
 
   final double latitude;
   final double longitude;
