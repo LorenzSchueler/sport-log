@@ -33,19 +33,19 @@ The client has an own database in order to allow offline use. It synchronizes wi
 ## 🥕 Features
 
 - 🔓 open source and add free
-- 🛈 open REST API
-- 🔁 auto synchronization and multi device support while still allowing offline use
-- 🏋️ track your strength metrics (input of sets and reps)
-- 💯 track your metcons (enter scores for predefined or user defined workouts)
-- 🏃 GPS tracking for outdoor activities (supports 👣 step counting and 💓 heart rate tracking)
+- 🛈 open REST API (server) & export of all data as SQLite DB (client)
+- 🔁 auto synchronization & multi device support & offline support
+- 🏋️ track strength metrics (input of sets and reps)
+- 💯 track metcons (enter scores for predefined or user defined workouts)
+- 🏃 GPS tracking for outdoor activities (supports tracking 👣 cadence & 💓 heart rate and 🗣️ voice feedback & 🥁 metronome)
 - 🏞 plan routes in advance and use them when tracking (also supports import/ export as GPX)
 - 📝 add diary entries
-- 📊 statistics about workouts including 🏅 records, 📈 charts over time and much more
+- 📊 statistics about workouts including 🏅 records, 📈 charts, splits and much more
 - 🚴 create new movements
 - 🗺️ map with different styles (⛺ outdoor, 🚗 street, 🛰️ satellite) support for 🌍 3D and ⛰️ hill shading
 - 💾 download offline maps (*not yet supported*)
 - ⏱️ timer with different modes (timer, interval, stopwatch)
-- 🗓️ schedule task to be executed by action providers
+- 🗓️ schedule task to be executed by action providers on server
 
 ## 🏛 Project Structure
 
