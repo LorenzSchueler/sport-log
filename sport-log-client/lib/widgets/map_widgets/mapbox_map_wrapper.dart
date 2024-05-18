@@ -30,7 +30,6 @@ class MapboxMapWrapper extends StatefulWidget {
     required this.showAddLocationButton,
     this.showOverlays = true,
     this.buttonTopOffset = 0,
-    this.scaleAtTop = false,
     this.onFullscreenToggle,
     this.onCenterLocationToggle,
     this.initStyleUri = MapboxStyles.OUTDOORS,
@@ -55,7 +54,6 @@ class MapboxMapWrapper extends StatefulWidget {
   final bool showAddLocationButton;
   final bool showOverlays;
   final int buttonTopOffset;
-  final bool scaleAtTop;
 
   final void Function(bool)? onFullscreenToggle;
   final void Function(bool)? onCenterLocationToggle;
@@ -105,12 +103,10 @@ class _MapboxMapWrapperState extends State<MapboxMapWrapper> {
       scrollEnabled: widget.scrollGesturesEnabled,
       pitchEnabled: widget.pitchGestureEnabled,
     );
-    await _mapController?.setScaleBarSettings(
-      position: widget.scaleAtTop
-          ? OrnamentPosition.TOP_LEFT
-          : OrnamentPosition.BOTTOM_RIGHT,
-    );
-    await _mapController?.hideAttribution();
+    await _mapController?.showScaleBar();
+    await _mapController?.styleAttribution();
+    //await _mapController?.hideAttribution();
+    //await _mapController?.hideLogo();
     await _mapController?.hideCompass();
   }
 

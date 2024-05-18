@@ -271,7 +271,6 @@ class _RouteEditPageState extends State<RouteEditPage> {
                         showCurrentLocationButton: false,
                         showCenterLocationButton: false,
                         showAddLocationButton: false,
-                        scaleAtTop: true,
                         onMapCreated: _onMapCreated,
                         onLongTap: _extendLine,
                       ),
@@ -287,14 +286,17 @@ class _RouteEditPageState extends State<RouteEditPage> {
                         ),
                       Align(
                         alignment: Alignment.bottomCenter,
-                        child: IconButton(
-                          onPressed: fullscreen.toggle,
-                          iconSize: 50,
-                          icon: Icon(
-                            fullscreen.isOn
-                                ? AppIcons.arrowUp
-                                : AppIcons.arrowDown,
-                            color: Colors.black,
+                        child: Padding(
+                          padding: const EdgeInsets.only(bottom: 10),
+                          child: IconButton(
+                            onPressed: fullscreen.toggle,
+                            iconSize: 50,
+                            icon: Icon(
+                              fullscreen.isOn
+                                  ? AppIcons.arrowUp
+                                  : AppIcons.arrowDown,
+                              color: Colors.black,
+                            ),
                           ),
                         ),
                       ),

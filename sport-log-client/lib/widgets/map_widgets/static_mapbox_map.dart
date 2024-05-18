@@ -20,8 +20,10 @@ class StaticMapboxMap extends StatelessWidget {
 
   Future<void> _onMapCreated(MapController mapController) async {
     await mapController.disableAllGestures();
-    await mapController.setScaleBarSettings();
-    await mapController.hideAttribution();
+    await mapController.showScaleBar();
+    await mapController.styleAttribution();
+    //await mapController.hideAttribution();
+    //await mapController.hideLogo();
     onMapCreated?.call(mapController);
   }
 

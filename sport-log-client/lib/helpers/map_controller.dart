@@ -425,20 +425,24 @@ class MapController {
   Future<void> _setStyleTerrainProperty(String key, Object value) async =>
       await _controller?.style.setStyleTerrainProperty(key, value);
 
-  Future<void> hideAttribution() async =>
-      await _controller?.attribution.updateSettings(
-        AttributionSettings(iconColor: 0x00000000, clickable: false),
-      );
+  Future<void> styleAttribution() async => await _controller?.attribution
+      .updateSettings(AttributionSettings(iconColor: 0x60000000));
+
+  Future<void> hideAttribution() async => await _controller?.attribution
+      .updateSettings(AttributionSettings(enabled: false));
+
+  Future<void> hideLogo() async =>
+      await _controller?.logo.updateSettings(LogoSettings(enabled: false));
 
   Future<void> hideCompass() async => await _controller?.compass
       .updateSettings(CompassSettings(enabled: false));
 
-  Future<void> setScaleBarSettings({
-    OrnamentPosition position = OrnamentPosition.BOTTOM_RIGHT,
-    bool enabled = true,
-  }) async =>
+  Future<void> showScaleBar() async =>
       await _controller?.scaleBar.updateSettings(
-        ScaleBarSettings(position: position, enabled: enabled),
+        ScaleBarSettings(
+          enabled: true,
+          position: OrnamentPosition.BOTTOM_RIGHT,
+        ),
       );
 
   Future<void> setGestureSettings({
