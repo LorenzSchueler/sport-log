@@ -197,11 +197,11 @@ class _RouteDetailsPageState extends State<RouteDetailsPage>
 
   Future<void> _exportFile() async {
     final file = await saveTrackAsGpx(_route.track ?? []);
-    if (mounted && file != null) {
+    if (mounted && file.isOk) {
       await showMessageDialog(
         context: context,
         title: "Track Exported",
-        text: "file: $file",
+        text: "file: ${file.ok}",
       );
     }
   }

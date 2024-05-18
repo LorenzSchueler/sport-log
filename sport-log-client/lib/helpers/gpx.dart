@@ -65,7 +65,7 @@ String trackToGpx(List<Position> track, {DateTime? startTime}) {
   return GpxWriter().asString(gpx);
 }
 
-Future<String?> saveTrackAsGpx(
+Future<Result<String, void>> saveTrackAsGpx(
   List<Position> track, {
   DateTime? startTime,
 }) async {
@@ -74,7 +74,7 @@ Future<String?> saveTrackAsGpx(
     filename: "track",
     fileExtension: "gpx",
   );
-  if (file != null) {
+  if (file.isOk) {
     if (!await AwesomeNotifications().isNotificationAllowed()) {
       await AwesomeNotifications().requestPermissionToSendNotifications();
     }
@@ -83,9 +83,9 @@ Future<String?> saveTrackAsGpx(
         content: NotificationContent(
           id: Random.secure().nextInt(1 << 31),
           channelKey: NotificationController.fileChannel,
-          title: "Route GPX export",
-          body: file,
-          payload: {"file": file},
+          title: "Track Exported",
+          body: file.ok,
+          payload: {"file": file.ok},
         ),
         actionButtons: [
           NotificationActionButton(

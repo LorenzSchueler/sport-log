@@ -495,11 +495,11 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
       _cardioSessionDescription.cardioSession.track ?? [],
       startTime: _cardioSessionDescription.cardioSession.datetime,
     );
-    if (mounted && file != null) {
+    if (mounted && file.isOk) {
       await showMessageDialog(
         context: context,
         title: "Track Exported",
-        text: "file: $file",
+        text: "file: ${file.ok}",
       );
     }
   }

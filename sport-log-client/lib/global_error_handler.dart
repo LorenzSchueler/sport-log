@@ -55,8 +55,8 @@ class GlobalErrorHandler {
       fileExtension: "log",
       append: true,
     );
-    if (file != null) {
-      _logger.i("error written to file $file");
+    if (file.isOk) {
+      _logger.i("error written to file ${file.ok}");
     } else {
       _logger.w("writing error logs failed");
     }

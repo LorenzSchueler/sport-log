@@ -8,12 +8,28 @@ import 'package:sport_log/helpers/result.dart';
 
 final _logger = Logger("WriteToFile");
 
-/// Writes content to file `filename` in downloads directory.
+File _nextFile(
+  String dir,
+  String filename,
+  String fileExtension,
+) {
+  var file = File("$dir/$filename.$fileExtension");
+  var index = 1;
+  while (file.existsSync()) {
+    file = File("$dir/$filename($index).$fileExtension");
+    index++;
+  }
+  return file;
+}
+
+/// Writes content to file `filename.fileExtension` in downloads directory.
+///
+/// If the file already exits (and `append` is false) it writes to `filename(1).fileExtension` and so on.
 ///
 /// The file must be either a new file or must have been created with sport-log.
 ///
 /// If successful it returns the path to the file.
-Future<String?> writeToFile({
+Future<Result<String, void>> writeToFile({
   required String content,
   required String filename,
   required String fileExtension,
@@ -21,15 +37,10 @@ Future<String?> writeToFile({
 }) async {
   final dir = Config.isAndroid
       ? '/storage/emulated/0/Download'
-      : (await getDownloadsDirectory())!;
-  var file = File("$dir/$filename.$fileExtension");
-  if (!append) {
-    var index = 1;
-    while (file.existsSync()) {
-      file = File("$dir/$filename($index).$fileExtension");
-      index++;
-    }
-  }
+      : (await getDownloadsDirectory())!.path;
+  final file = append
+      ? File("$dir/$filename.$fileExtension")
+      : _nextFile(dir, filename, fileExtension);
   try {
     await file.writeAsString(
       content,
@@ -42,9 +53,9 @@ Future<String?> writeToFile({
       error: error,
       stackTrace: stackTrace,
     );
-    return null;
+    return Err(null);
   }
-  return file.path;
+  return Ok(file.path);
 }
 
 /// Writes content to file `filename` in cache directory and returns the path to the file.
