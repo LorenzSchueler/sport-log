@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart' hide Route;
+import 'package:metronome/metronome.dart';
 import 'package:provider/provider.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/bool_toggle.dart';
@@ -9,6 +10,7 @@ import 'package:sport_log/helpers/tracking_utils.dart';
 import 'package:sport_log/pages/workout/cardio/cardio_value_unit_description_table.dart';
 import 'package:sport_log/pages/workout/cardio/tracking_settings.dart';
 import 'package:sport_log/settings.dart';
+import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/map_widgets/mapbox_map_wrapper.dart';
 import 'package:sport_log/widgets/map_widgets/static_mapbox_map.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
@@ -80,21 +82,31 @@ class CardioTrackingPage extends StatelessWidget {
                       ],
                     ),
                   Expanded(
-                    child: MapboxMapWrapper(
-                      showFullscreenButton: true,
-                      showMapStylesButton: true,
-                      showSelectRouteButton: false,
-                      showSetNorthButton: true,
-                      showCurrentLocationButton: false,
-                      showCenterLocationButton: true,
-                      showAddLocationButton: false,
-                      onFullscreenToggle: fullscreen.setState,
-                      onCenterLocationToggle: trackingUtils.setCenterLocation,
-                      initialCameraPosition: LatLngZoom(
-                        latLng: context.read<Settings>().lastGpsLatLng,
-                        zoom: 15,
-                      ),
-                      onMapCreated: trackingUtils.onMapCreated,
+                    child: Stack(
+                      children: [
+                        MapboxMapWrapper(
+                          showFullscreenButton: true,
+                          showMapStylesButton: true,
+                          showSelectRouteButton: false,
+                          showSetNorthButton: true,
+                          showCurrentLocationButton: false,
+                          showCenterLocationButton: true,
+                          showAddLocationButton: false,
+                          onFullscreenToggle: fullscreen.setState,
+                          onCenterLocationToggle:
+                              trackingUtils.setCenterLocation,
+                          initialCameraPosition: LatLngZoom(
+                            latLng: context.read<Settings>().lastGpsLatLng,
+                            zoom: 15,
+                          ),
+                          onMapCreated: trackingUtils.onMapCreated,
+                        ),
+                        const Positioned(
+                          top: 15,
+                          left: 15,
+                          child: _CadenceButton(),
+                        ),
+                      ],
                     ),
                   ),
                   ElevationMap(
@@ -132,6 +144,87 @@ class CardioTrackingPage extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+class _CadenceButton extends StatefulWidget {
+  const _CadenceButton();
+
+  @override
+  State<_CadenceButton> createState() => _CadenceButtonState();
+}
+
+enum MetronomeAdjustment { increase, decrease, stop }
+
+class _CadenceButtonState extends State<_CadenceButton> {
+  int _cadence = 180;
+  bool _isPlaying = false;
+  final Metronome _metronome = Metronome()
+    ..init(Defaults.assets.beepMetronomeFile, bpm: 180);
+
+  @override
+  void dispose() {
+    _metronome.destroy();
+    super.dispose();
+  }
+
+  void startTimer() {
+    _metronome.play(_cadence);
+    setState(() => _isPlaying = true);
+  }
+
+  void adjustTimer(MetronomeAdjustment change) {
+    switch (change) {
+      case MetronomeAdjustment.stop:
+        setState(() => _isPlaying = false);
+        _metronome.stop();
+        break;
+      case MetronomeAdjustment.increase:
+        setState(() => _cadence += 1);
+        _metronome.setBPM(_cadence);
+        break;
+      case MetronomeAdjustment.decrease:
+        if (_cadence > 1) {
+          setState(() => _cadence -= 1);
+          _metronome.setBPM(_cadence);
+        }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return _isPlaying
+        ? SegmentedButton<MetronomeAdjustment>(
+            segments: [
+              ButtonSegment(
+                value: MetronomeAdjustment.stop,
+                label: Text("$_cadence rpm"),
+                icon: const Icon(AppIcons.close),
+              ),
+              const ButtonSegment(
+                value: MetronomeAdjustment.increase,
+                icon: Icon(AppIcons.add),
+              ),
+              const ButtonSegment(
+                value: MetronomeAdjustment.decrease,
+                icon: Icon(AppIcons.remove),
+              ),
+            ],
+            selected: const {},
+            emptySelectionAllowed: true,
+            onSelectionChanged: (selected) => adjustTimer(selected.first),
+            style: ButtonStyle(
+              backgroundColor: WidgetStatePropertyAll(
+                Theme.of(context).colorScheme.primary,
+              ),
+              foregroundColor: const WidgetStatePropertyAll(Colors.black),
+            ),
+          )
+        : IconButton.filled(
+            onPressed: startTimer,
+            icon: const Icon(AppIcons.gauge),
+            color: Colors.black,
+          );
   }
 }
 

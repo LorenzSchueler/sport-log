@@ -63,4 +63,5 @@ class _Assets {
 
   final beepLong = AssetSource('audio/beep_long.mp3'); // 0.99s
   final beepShort = AssetSource('audio/beep_short.mp3'); // 0.39s
+  final beepMetronomeFile = 'assets/audio/beep_metronome.wav'; // 0.21s
 }

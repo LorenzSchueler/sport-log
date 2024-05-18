@@ -38,6 +38,7 @@ dependencies:
       url: https://github.com/LorenzSchueler/mapbox-api
   mapbox_maps_flutter: ^2.0.0-rc.1
   mapbox_search: ^4.2.0
+  metronome: ^1.1.1+1
   open_file: ^3.3.1
   package_info_plus: ^8.0.0
   path_provider: ^2.0.10
@@ -92,6 +93,7 @@ flutter:
     - sport-log-client.yaml
     - assets/audio/beep_long.mp3
     - assets/audio/beep_short.mp3
+    - assets/audio/beep_metronome.wav
 
   uses-material-design: true
 
