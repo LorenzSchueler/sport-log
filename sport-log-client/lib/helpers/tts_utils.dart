@@ -2,10 +2,26 @@ import 'package:audio_session/audio_session.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 
 class TtsUtils {
+  /// TtsUtils creates unawaited future in factory.
+  ///
+  /// Therefore, it should not be used directly in order to allow the future to complete before the first use.
   factory TtsUtils() {
     final instance = TtsUtils._();
-    instance._tts.setVoice({"name": "en-US-language", "locale": "en-US"});
-    instance._tts.awaitSpeakCompletion(true);
+
+    Future(() async {
+      if (await instance._tts.getDefaultEngine == null) {
+        final engines = (await instance._tts.getEngines) as List;
+        if (engines.isNotEmpty) {
+          await instance._tts.setEngine(engines[0] as String);
+        }
+      }
+
+      await instance._tts.setVoice({
+        "name": "en-US-language",
+        "locale": "en-US",
+      }); // ignored if not available
+      await instance._tts.awaitSpeakCompletion(true);
+    });
 
     // ignore: prefer-async-await
     AudioSession.instance.then((session) {
