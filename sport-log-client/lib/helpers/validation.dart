@@ -15,7 +15,7 @@ abstract final class Validator {
   static String? validateUrl(String? url) {
     if (url == null || url.isEmpty) {
       return "URL must not be empty.";
-    } else if (!isURL(url, {
+    } else if (!url.isURL({
       "protocols": ["http", "https"],
       "require_tld": true,
       "require_protocol": true,
@@ -46,9 +46,9 @@ abstract final class Validator {
     } else if (password.length < 8) {
       return "Password must be at least 8 characters long.";
     } else if (!(password.runes
-            .any((c) => isLowercase(String.fromCharCode(c))) &&
-        password.runes.any((c) => isUppercase(String.fromCharCode(c))) &&
-        password.runes.any((c) => isNumeric(String.fromCharCode(c))))) {
+            .any((c) => String.fromCharCode(c).isLowercase) &&
+        password.runes.any((c) => String.fromCharCode(c).isUppercase) &&
+        password.runes.any((c) => String.fromCharCode(c).isNumeric))) {
       return "Password must contain at least one lower case and one upper case character and one number.";
     } else {
       return null;

@@ -52,7 +52,7 @@ dependencies:
   provider: ^6.0.2
   sqflite: ^2.0.3
   sqflite_common_ffi: ^2.1.1
-  string_validator: ^1.0.2
+  string_validator: ^1.1.0
   synchronized: ^3.0.0+3
   url_launcher: ^6.0.20
   wakelock_plus: ^1.2.2
