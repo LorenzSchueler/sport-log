@@ -1,12 +1,20 @@
+import 'dart:io';
+import 'dart:math';
+
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:sport_log/app.dart';
+import 'package:sport_log/config.dart';
 import 'package:sport_log/data_provider/sync.dart';
 import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/account.dart';
 import 'package:sport_log/helpers/bool_toggle.dart';
 import 'package:sport_log/helpers/extensions/navigator_extension.dart';
+import 'package:sport_log/helpers/notification_controller.dart';
+import 'package:sport_log/helpers/write_to_file.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/app_icons.dart';
@@ -172,6 +180,47 @@ class SettingsPage extends StatelessWidget {
         } else {
           await Navigator.of(context).newBase(Routes.landing);
         }
+      }
+    }
+  }
+
+  Future<void> _exportDb(BuildContext context) async {
+    final dbPath = File(
+      "${(await getApplicationDocumentsDirectory()).parent.path}/databases/${Config.databaseName}",
+    );
+    final data = await dbPath.readAsBytes();
+    final file = await writeBytesToFileInDownloads(
+      content: data,
+      filename: "sport-log",
+      fileExtension: "sqlite",
+    );
+    if (file.isOk) {
+      if (!await AwesomeNotifications().isNotificationAllowed()) {
+        await AwesomeNotifications().requestPermissionToSendNotifications();
+      }
+      if (await AwesomeNotifications().isNotificationAllowed()) {
+        await AwesomeNotifications().createNotification(
+          content: NotificationContent(
+            id: Random.secure().nextInt(1 << 31),
+            channelKey: NotificationController.fileChannel,
+            title: "Database Exported",
+            body: file.ok,
+            payload: {"file": file.ok},
+          ),
+          actionButtons: [
+            NotificationActionButton(
+              key: NotificationController.openFileAction,
+              label: "Open",
+            ),
+          ],
+        );
+      }
+      if (context.mounted) {
+        await showMessageDialog(
+          context: context,
+          title: "Database Exported",
+          text: file.ok,
+        );
       }
     }
   }
@@ -435,6 +484,19 @@ class SettingsPage extends StatelessWidget {
                   leading: AppIcons.developerMode,
                   value: settings.developerMode,
                   onChanged: settings.setDeveloperMode,
+                ),
+                const Divider(),
+                const CaptionTile(caption: "Export"),
+                EditTile(
+                  leading: AppIcons.upload,
+                  child: ConstrainedBox(
+                    constraints:
+                        const BoxConstraints(minWidth: double.infinity),
+                    child: ElevatedButton(
+                      child: const Text('Export'),
+                      onPressed: () => _exportDb(context),
+                    ),
+                  ),
                 ),
                 const Divider(),
                 const CaptionTile(caption: "About"),

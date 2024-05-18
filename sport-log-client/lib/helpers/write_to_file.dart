@@ -58,6 +58,39 @@ Future<Result<String, void>> writeToFile({
   return Ok(file.path);
 }
 
+/// Writes content to file `filename.fileExtension` in downloads directory.
+///
+/// If the file already exits it writes to `filename(1).fileExtension` and so on.
+///
+/// The file must be either a new file or must have been created with sport-log.
+///
+/// If successful it returns the path to the file.
+Future<Result<String, void>> writeBytesToFileInDownloads({
+  required Uint8List content,
+  required String filename,
+  required String fileExtension,
+}) async {
+  final dir = Config.isAndroid
+      ? '/storage/emulated/0/Download'
+      : (await getDownloadsDirectory())!.path;
+  final file = _nextFile(dir, filename, fileExtension);
+  try {
+    await file.writeAsBytes(
+      content,
+      flush: true,
+      mode: FileMode.writeOnly,
+    );
+  } on FileSystemException catch (error, stackTrace) {
+    _logger.w(
+      "writing file $file failed",
+      error: error,
+      stackTrace: stackTrace,
+    );
+    return Err(null);
+  }
+  return Ok(file.path);
+}
+
 /// Writes content to file `filename` in cache directory and returns the path to the file.
 ///
 /// If the file already exists it will be overwritten.
