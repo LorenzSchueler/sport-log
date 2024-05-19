@@ -21,24 +21,25 @@ class AddLocationButton extends StatelessWidget {
   final _dataProvider = RouteDataProvider();
 
   Future<void> addLocationToRoute() async {
-    final pos = locationUtils.lastLocation;
-    if (pos == null) {
+    final gpsPos = locationUtils.lastLocation;
+    if (gpsPos == null) {
       return;
     }
+    route.markedPositions ??= [];
+    final pos = Position(
+      latitude: gpsPos.latitude,
+      longitude: gpsPos.longitude,
+      elevation: gpsPos.elevation,
+      distance: 0,
+      time: Duration.zero,
+    );
+    route.markedPositions!.add(pos..distance = 0);
     route.track ??= [];
     final distance = route.track!.isEmpty
         ? 0.0
         : route.track!.last.distance +
-            route.track!.last.latLng.distanceTo(pos.latLng);
-    route.track!.add(
-      Position(
-        latitude: pos.latitude,
-        longitude: pos.longitude,
-        elevation: pos.elevation,
-        distance: distance,
-        time: Duration.zero,
-      ),
-    );
+            route.track!.last.latLng.distanceTo(gpsPos.latLng);
+    route.track!.add(pos..distance = distance);
     route.setDistance();
     await _dataProvider.updateSingle(route);
     updateRoute(route);
