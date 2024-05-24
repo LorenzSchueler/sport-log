@@ -28,14 +28,14 @@ pub async fn adm_create_action_providers(
         UnverifiedSingleOrVec::Single(action_provider) => {
             let mut action_provider = action_provider.verify_adm(auth)?;
             check_password(&action_provider.password)?;
-            ActionProviderDb::create(&mut action_provider, &mut db)
+            ActionProviderDb::create(&mut action_provider, &mut db).await
         }
         UnverifiedSingleOrVec::Vec(action_providers) => {
             let mut action_providers = action_providers.verify_adm(auth)?;
             for action_provider in &action_providers {
                 check_password(&action_provider.password)?;
             }
-            ActionProviderDb::create_multiple(&mut action_providers, &mut db)
+            ActionProviderDb::create_multiple(&mut action_providers, &mut db).await
         }
     }
     .map(|_| StatusCode::OK)
@@ -59,6 +59,7 @@ pub async fn ap_create_action_provider(
     let mut action_provider = action_provider.verify_unchecked()?;
     check_password(&action_provider.password)?;
     ActionProviderDb::create(&mut action_provider, &mut db)
+        .await
         .map(|_| StatusCode::OK)
         .map_err(Into::into)
 }
@@ -71,9 +72,11 @@ pub async fn adm_get_action_providers(
     match id {
         Some(id) => {
             let action_provider_id = id.verify_adm(auth)?;
-            ActionProviderDb::get_by_id(action_provider_id, &mut db).map(|a| vec![a])
+            ActionProviderDb::get_by_id(action_provider_id, &mut db)
+                .await
+                .map(|a| vec![a])
         }
-        None => ActionProviderDb::get_all(&mut db),
+        None => ActionProviderDb::get_all(&mut db).await,
     }
     .map(Json)
     .map_err(Into::into)
@@ -84,6 +87,7 @@ pub async fn ap_get_action_provider(
     mut db: DbConn,
 ) -> HandlerResult<Json<ActionProvider>> {
     ActionProviderDb::get_by_id(*auth, &mut db)
+        .await
         .map(Json)
         .map_err(Into::into)
 }
@@ -96,9 +100,11 @@ pub async fn get_action_providers(
     match id {
         Some(id) => {
             let action_provider_id = id.verify_unchecked()?;
-            ActionProviderDb::get_by_id(action_provider_id, &mut db).map(|a| vec![a])
+            ActionProviderDb::get_by_id(action_provider_id, &mut db)
+                .await
+                .map(|a| vec![a])
         }
-        None => ActionProviderDb::get_all(&mut db),
+        None => ActionProviderDb::get_all(&mut db).await,
     }
     .map(Json)
     .map_err(Into::into)
@@ -112,11 +118,11 @@ pub async fn ap_create_actions(
     match actions {
         UnverifiedSingleOrVec::Single(action) => {
             let action = action.verify_ap_without_db(auth)?;
-            ActionDb::create(&action, &mut db)
+            ActionDb::create(&action, &mut db).await
         }
         UnverifiedSingleOrVec::Vec(actions) => {
             let actions = actions.verify_ap_without_db(auth)?;
-            ActionDb::create_multiple(&actions, &mut db)
+            ActionDb::create_multiple(&actions, &mut db).await
         }
     }
     .map(|_| StatusCode::OK)
@@ -130,10 +136,12 @@ pub async fn ap_get_actions(
 ) -> HandlerResult<Json<Vec<Action>>> {
     match id {
         Some(id) => {
-            let action_id = id.verify_ap(auth, &mut db)?;
-            ActionDb::get_by_id(action_id, &mut db).map(|a| vec![a])
+            let action_id = id.verify_ap(auth, &mut db).await?;
+            ActionDb::get_by_id(action_id, &mut db)
+                .await
+                .map(|a| vec![a])
         }
-        None => ActionDb::get_by_action_provider(*auth, &mut db),
+        None => ActionDb::get_by_action_provider(*auth, &mut db).await,
     }
     .map(Json)
     .map_err(Into::into)
@@ -147,9 +155,11 @@ pub async fn get_actions(
     match id {
         Some(id) => {
             let action_id = id.verify_unchecked()?;
-            ActionDb::get_by_id(action_id, &mut db).map(|a| vec![a])
+            ActionDb::get_by_id(action_id, &mut db)
+                .await
+                .map(|a| vec![a])
         }
-        None => ActionDb::get_all(&mut db),
+        None => ActionDb::get_all(&mut db).await,
     }
     .map(Json)
     .map_err(Into::into)
@@ -163,11 +173,11 @@ pub async fn create_action_rules(
     match action_rules {
         UnverifiedSingleOrVec::Single(action_rule) => {
             let action_rule = action_rule.verify_user_without_db(auth)?;
-            ActionRuleDb::create(&action_rule, &mut db)
+            ActionRuleDb::create(&action_rule, &mut db).await
         }
         UnverifiedSingleOrVec::Vec(action_rules) => {
             let action_rules = action_rules.verify_user_without_db(auth)?;
-            ActionRuleDb::create_multiple(&action_rules, &mut db)
+            ActionRuleDb::create_multiple(&action_rules, &mut db).await
         }
     }
     .map(|_| StatusCode::OK)
@@ -181,10 +191,12 @@ pub async fn get_action_rules(
 ) -> HandlerResult<Json<Vec<ActionRule>>> {
     match id {
         Some(id) => {
-            let action_rule_id = id.verify_user(auth, &mut db)?;
-            ActionRuleDb::get_by_id(action_rule_id, &mut db).map(|a| vec![a])
+            let action_rule_id = id.verify_user(auth, &mut db).await?;
+            ActionRuleDb::get_by_id(action_rule_id, &mut db)
+                .await
+                .map(|a| vec![a])
         }
-        None => ActionRuleDb::get_by_user(*auth, &mut db),
+        None => ActionRuleDb::get_by_user(*auth, &mut db).await,
     }
     .map(Json)
     .map_err(Into::into)
@@ -198,11 +210,11 @@ pub async fn update_action_rules(
     match action_rules {
         UnverifiedSingleOrVec::Single(action_rule) => {
             let action_rule = action_rule.verify_user_without_db(auth)?;
-            ActionRuleDb::update(&action_rule, &mut db)
+            ActionRuleDb::update(&action_rule, &mut db).await
         }
         UnverifiedSingleOrVec::Vec(action_rules) => {
-            let action_rules = action_rules.verify_user(auth, &mut db)?;
-            ActionRuleDb::update_multiple(&action_rules, &mut db)
+            let action_rules = action_rules.verify_user(auth, &mut db).await?;
+            ActionRuleDb::update_multiple(&action_rules, &mut db).await
         }
     }
     .map(|_| StatusCode::OK)
@@ -217,11 +229,11 @@ pub async fn create_action_events(
     match action_events {
         UnverifiedSingleOrVec::Single(action_event) => {
             let action_event = action_event.verify_user_without_db(auth)?;
-            ActionEventDb::create(&action_event, &mut db)
+            ActionEventDb::create(&action_event, &mut db).await
         }
         UnverifiedSingleOrVec::Vec(action_events) => {
             let action_events = action_events.verify_user_without_db(auth)?;
-            ActionEventDb::create_multiple(&action_events, &mut db)
+            ActionEventDb::create_multiple(&action_events, &mut db).await
         }
     }
     .map(|_| StatusCode::OK)
@@ -236,11 +248,11 @@ pub async fn adm_create_action_events(
     match action_events {
         UnverifiedSingleOrVec::Single(action_event) => {
             let action_event = action_event.verify_adm(auth)?;
-            ActionEventDb::create(&action_event, &mut db)
+            ActionEventDb::create(&action_event, &mut db).await
         }
         UnverifiedSingleOrVec::Vec(action_events) => {
             let action_events = action_events.verify_adm(auth)?;
-            ActionEventDb::create_multiple_ignore_conflict(action_events, &mut db)
+            ActionEventDb::create_multiple_ignore_conflict(action_events, &mut db).await
         }
     }
     .map(|_| StatusCode::OK)
@@ -254,10 +266,12 @@ pub async fn get_action_events(
 ) -> HandlerResult<Json<Vec<ActionEvent>>> {
     match id {
         Some(id) => {
-            let action_event_id = id.verify_user(auth, &mut db)?;
-            ActionEventDb::get_by_id(action_event_id, &mut db).map(|a| vec![a])
+            let action_event_id = id.verify_user(auth, &mut db).await?;
+            ActionEventDb::get_by_id(action_event_id, &mut db)
+                .await
+                .map(|a| vec![a])
         }
-        None => ActionEventDb::get_by_user(*auth, &mut db),
+        None => ActionEventDb::get_by_user(*auth, &mut db).await,
     }
     .map(Json)
     .map_err(Into::into)
@@ -270,12 +284,12 @@ pub async fn update_action_events(
 ) -> HandlerResult<StatusCode> {
     match action_events {
         UnverifiedSingleOrVec::Single(action_event) => {
-            let action_event = action_event.verify_user(auth, &mut db)?;
-            ActionEventDb::update(&action_event, &mut db)
+            let action_event = action_event.verify_user(auth, &mut db).await?;
+            ActionEventDb::update(&action_event, &mut db).await
         }
         UnverifiedSingleOrVec::Vec(action_events) => {
-            let action_events = action_events.verify_user(auth, &mut db)?;
-            ActionEventDb::update_multiple(&action_events, &mut db)
+            let action_events = action_events.verify_user(auth, &mut db).await?;
+            ActionEventDb::update_multiple(&action_events, &mut db).await
         }
     }
     .map(|_| StatusCode::OK)
@@ -290,11 +304,11 @@ pub async fn adm_update_action_events(
     match action_events {
         UnverifiedSingleOrVec::Single(action_event) => {
             let action_event = action_event.verify_adm(auth)?;
-            ActionEventDb::update(&action_event, &mut db)
+            ActionEventDb::update(&action_event, &mut db).await
         }
         UnverifiedSingleOrVec::Vec(action_events) => {
             let action_events = action_events.verify_adm(auth)?;
-            ActionEventDb::update_multiple(&action_events, &mut db)
+            ActionEventDb::update_multiple(&action_events, &mut db).await
         }
     }
     .map(|_| StatusCode::OK)
@@ -307,9 +321,12 @@ pub async fn ap_disable_action_events(
     Json(ids): Json<UnverifiedIds<ActionEventId>>,
 ) -> HandlerResult<StatusCode> {
     ActionEventDb::disable_multiple(
-        ids.verify_ap(auth, &mut db).map_err(HandlerError::from)?,
+        ids.verify_ap(auth, &mut db)
+            .await
+            .map_err(HandlerError::from)?,
         &mut db,
     )
+    .await
     .map(|_| StatusCode::OK)
     .map_err(Into::into)
 }
@@ -320,6 +337,7 @@ pub async fn adm_delete_action_events(
     Json(ids): Json<UnverifiedIds<ActionEventId>>,
 ) -> HandlerResult<StatusCode> {
     ActionEventDb::delete_multiple(ids.verify_adm(auth)?, &mut db)
+        .await
         .map(|_| StatusCode::OK)
         .map_err(Into::into)
 }
@@ -329,6 +347,7 @@ pub async fn adm_get_creatable_action_rules(
     mut db: DbConn,
 ) -> HandlerResult<Json<Vec<CreatableActionRule>>> {
     CreatableActionRuleDb::get_all(&mut db)
+        .await
         .map(Json)
         .map_err(Into::into)
 }
@@ -343,8 +362,9 @@ pub async fn ap_get_executable_action_events(
             ExecutableActionEventDb::get_ordered_by_action_provider_and_timespan(
                 *auth, start, end, &mut db,
             )
+            .await
         }
-        (None, None) => ExecutableActionEventDb::get_by_action_provider(*auth, &mut db),
+        (None, None) => ExecutableActionEventDb::get_by_action_provider(*auth, &mut db).await,
         _ => {
             return Err(HandlerError::from((
                 StatusCode::BAD_REQUEST,
@@ -364,6 +384,7 @@ pub async fn adm_get_deletable_action_events(
     mut db: DbConn,
 ) -> HandlerResult<Json<Vec<DeletableActionEvent>>> {
     DeletableActionEventDb::get_all(&mut db)
+        .await
         .map(Json)
         .map_err(Into::into)
 }

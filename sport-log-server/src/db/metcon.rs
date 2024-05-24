@@ -1,6 +1,7 @@
 use axum::http::StatusCode;
 use chrono::{DateTime, Utc};
-use diesel::{prelude::*, PgConnection, QueryResult};
+use diesel::{prelude::*, QueryResult};
+use diesel_async::{AsyncPgConnection, RunQueryDsl};
 use sport_log_derive::*;
 use sport_log_types::{
     schema::{metcon, metcon_movement},
@@ -14,8 +15,12 @@ use crate::{auth::*, db::*};
 )]
 pub struct MetconDb;
 
+#[async_trait]
 impl GetByUser for MetconDb {
-    fn get_by_user(user_id: UserId, db: &mut PgConnection) -> QueryResult<Vec<<Self as Db>::Type>> {
+    async fn get_by_user(
+        user_id: UserId,
+        db: &mut AsyncPgConnection,
+    ) -> QueryResult<Vec<<Self as Db>::Type>> {
         metcon::table
             .filter(
                 metcon::columns::user_id
@@ -24,14 +29,16 @@ impl GetByUser for MetconDb {
             )
             .select(Metcon::as_select())
             .get_results(db)
+            .await
     }
 }
 
+#[async_trait]
 impl GetByUserSync for MetconDb {
-    fn get_by_user_and_last_sync(
+    async fn get_by_user_and_last_sync(
         user_id: UserId,
         last_sync: DateTime<Utc>,
-        db: &mut PgConnection,
+        db: &mut AsyncPgConnection,
     ) -> QueryResult<Vec<<Self as Db>::Type>>
     where
         Self: Sized,
@@ -45,18 +52,23 @@ impl GetByUserSync for MetconDb {
             .filter(metcon::columns::last_change.ge(last_sync))
             .select(Metcon::as_select())
             .get_results(db)
+            .await
     }
 }
 
+#[async_trait]
 impl VerifyIdForUserOrAP for UnverifiedId<MetconId> {
     type Id = MetconId;
 
-    fn verify_user_ap(
+    async fn verify_user_ap(
         self,
         auth: AuthUserOrAP,
-        db: &mut PgConnection,
+        db: &mut AsyncPgConnection,
     ) -> Result<Self::Id, StatusCode> {
-        if MetconDb::check_optional_user_id(self.0, *auth, db).map_err(|_| StatusCode::FORBIDDEN)? {
+        if MetconDb::check_optional_user_id(self.0, *auth, db)
+            .await
+            .map_err(|_| StatusCode::FORBIDDEN)?
+        {
             Ok(self.0)
         } else {
             Err(StatusCode::FORBIDDEN)
@@ -64,17 +76,19 @@ impl VerifyIdForUserOrAP for UnverifiedId<MetconId> {
     }
 }
 
+#[async_trait]
 impl VerifyForUserOrAPWithDb for Unverified<Metcon> {
     type Type = Metcon;
 
-    fn verify_user_ap(
+    async fn verify_user_ap(
         self,
         auth: AuthUserOrAP,
-        db: &mut PgConnection,
+        db: &mut AsyncPgConnection,
     ) -> Result<Self::Type, StatusCode> {
         let metcon = self.0;
         if metcon.user_id == Some(*auth)
             && MetconDb::check_user_id(metcon.id, *auth, db)
+                .await
                 .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
         {
             Ok(metcon)
@@ -84,18 +98,20 @@ impl VerifyForUserOrAPWithDb for Unverified<Metcon> {
     }
 }
 
+#[async_trait]
 impl VerifyMultipleForUserOrAPWithDb for Unverified<Vec<Metcon>> {
     type Type = Metcon;
 
-    fn verify_user_ap(
+    async fn verify_user_ap(
         self,
         auth: AuthUserOrAP,
-        db: &mut PgConnection,
+        db: &mut AsyncPgConnection,
     ) -> Result<Vec<Self::Type>, StatusCode> {
         let metcons = self.0;
         let metcon_ids: Vec<_> = metcons.iter().map(|metcon| metcon.id).collect();
         if metcons.iter().all(|metcon| metcon.user_id == Some(*auth))
             && MetconDb::check_user_ids(&metcon_ids, *auth, db)
+                .await
                 .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
         {
             Ok(metcons)
@@ -134,8 +150,12 @@ impl VerifyMultipleForUserOrAPWithoutDb for Unverified<Vec<Metcon>> {
 #[derive(Db, ModifiableDb, Create, GetById, Update, HardDelete)]
 pub struct MetconMovementDb;
 
+#[async_trait]
 impl GetByUser for MetconMovementDb {
-    fn get_by_user(user_id: UserId, db: &mut PgConnection) -> QueryResult<Vec<<Self as Db>::Type>> {
+    async fn get_by_user(
+        user_id: UserId,
+        db: &mut AsyncPgConnection,
+    ) -> QueryResult<Vec<<Self as Db>::Type>> {
         metcon_movement::table
             .filter(
                 metcon_movement::columns::metcon_id.eq_any(
@@ -150,14 +170,16 @@ impl GetByUser for MetconMovementDb {
             )
             .select(MetconMovement::as_select())
             .get_results(db)
+            .await
     }
 }
 
+#[async_trait]
 impl GetByUserSync for MetconMovementDb {
-    fn get_by_user_and_last_sync(
+    async fn get_by_user_and_last_sync(
         user_id: UserId,
         last_sync: DateTime<Utc>,
-        db: &mut PgConnection,
+        db: &mut AsyncPgConnection,
     ) -> QueryResult<Vec<<Self as Db>::Type>>
     where
         Self: Sized,
@@ -177,39 +199,48 @@ impl GetByUserSync for MetconMovementDb {
             .filter(metcon_movement::columns::last_change.ge(last_sync))
             .select(MetconMovement::as_select())
             .get_results(db)
+            .await
     }
 }
 
+#[async_trait]
 impl CheckUserId for MetconMovementDb {
-    fn check_user_id(id: Self::Id, user_id: UserId, db: &mut PgConnection) -> QueryResult<bool> {
+    async fn check_user_id(
+        id: Self::Id,
+        user_id: UserId,
+        db: &mut AsyncPgConnection,
+    ) -> QueryResult<bool> {
         metcon_movement::table
             .inner_join(metcon::table)
             .filter(metcon_movement::columns::id.eq(id))
             .select(metcon::columns::user_id.is_not_distinct_from(user_id))
             .get_result(db)
+            .await
             .optional()
             .map(|eq| eq.unwrap_or(false))
     }
 
-    fn check_user_ids(
+    async fn check_user_ids(
         ids: &[Self::Id],
         user_id: UserId,
-        db: &mut PgConnection,
+        db: &mut AsyncPgConnection,
     ) -> QueryResult<bool> {
         metcon_movement::table
             .inner_join(metcon::table)
             .filter(metcon_movement::columns::id.eq_any(ids))
             .select(metcon::columns::user_id.is_not_distinct_from(user_id))
             .get_results(db)
+            .await
             .map(|eqs: Vec<bool>| eqs.into_iter().all(|eq| eq))
     }
 }
 
+#[async_trait]
 impl CheckOptionalUserId for MetconMovementDb {
-    fn check_optional_user_id(
+    async fn check_optional_user_id(
         id: Self::Id,
         user_id: UserId,
-        db: &mut PgConnection,
+        db: &mut AsyncPgConnection,
     ) -> QueryResult<bool> {
         metcon_movement::table
             .inner_join(metcon::table)
@@ -220,20 +251,23 @@ impl CheckOptionalUserId for MetconMovementDb {
                     .or(metcon::columns::user_id.is_null()),
             )
             .get_result(db)
+            .await
             .optional()
             .map(|eq| eq.unwrap_or(false))
     }
 }
 
+#[async_trait]
 impl VerifyIdForUserOrAP for UnverifiedId<MetconMovementId> {
     type Id = MetconMovementId;
 
-    fn verify_user_ap(
+    async fn verify_user_ap(
         self,
         auth: AuthUserOrAP,
-        db: &mut PgConnection,
+        db: &mut AsyncPgConnection,
     ) -> Result<Self::Id, StatusCode> {
         if MetconMovementDb::check_optional_user_id(self.0, *auth, db)
+            .await
             .map_err(|_| StatusCode::FORBIDDEN)?
         {
             Ok(self.0)
@@ -243,16 +277,18 @@ impl VerifyIdForUserOrAP for UnverifiedId<MetconMovementId> {
     }
 }
 
+#[async_trait]
 impl VerifyForUserOrAPWithDb for Unverified<MetconMovement> {
     type Type = MetconMovement;
 
-    fn verify_user_ap(
+    async fn verify_user_ap(
         self,
         auth: AuthUserOrAP,
-        db: &mut PgConnection,
+        db: &mut AsyncPgConnection,
     ) -> Result<Self::Type, StatusCode> {
         let metcon_movement = self.0;
         if MetconMovementDb::check_user_id(metcon_movement.id, *auth, db)
+            .await
             .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
         {
             Ok(metcon_movement)
@@ -262,13 +298,14 @@ impl VerifyForUserOrAPWithDb for Unverified<MetconMovement> {
     }
 }
 
+#[async_trait]
 impl VerifyMultipleForUserOrAPWithDb for Unverified<Vec<MetconMovement>> {
     type Type = MetconMovement;
 
-    fn verify_user_ap(
+    async fn verify_user_ap(
         self,
         auth: AuthUserOrAP,
-        db: &mut PgConnection,
+        db: &mut AsyncPgConnection,
     ) -> Result<Vec<Self::Type>, StatusCode> {
         let metcon_movements = self.0;
         let metcon_movement_ids: Vec<_> = metcon_movements
@@ -276,6 +313,7 @@ impl VerifyMultipleForUserOrAPWithDb for Unverified<Vec<MetconMovement>> {
             .map(|metcon_movement| metcon_movement.id)
             .collect();
         if MetconMovementDb::check_user_ids(&metcon_movement_ids, *auth, db)
+            .await
             .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
         {
             Ok(metcon_movements)
@@ -285,16 +323,18 @@ impl VerifyMultipleForUserOrAPWithDb for Unverified<Vec<MetconMovement>> {
     }
 }
 
+#[async_trait]
 impl VerifyForUserOrAPCreate for Unverified<MetconMovement> {
     type Type = MetconMovement;
 
-    fn verify_user_ap_create(
+    async fn verify_user_ap_create(
         self,
         auth: AuthUserOrAP,
-        db: &mut PgConnection,
+        db: &mut AsyncPgConnection,
     ) -> Result<Self::Type, StatusCode> {
         let metcon_movement = self.0;
         if MetconDb::check_user_id(metcon_movement.metcon_id, *auth, db)
+            .await
             .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
         {
             Ok(metcon_movement)
@@ -304,13 +344,14 @@ impl VerifyForUserOrAPCreate for Unverified<MetconMovement> {
     }
 }
 
+#[async_trait]
 impl VerifyMultipleForUserOrAPCreate for Unverified<Vec<MetconMovement>> {
     type Type = MetconMovement;
 
-    fn verify_user_ap_create(
+    async fn verify_user_ap_create(
         self,
         auth: AuthUserOrAP,
-        db: &mut PgConnection,
+        db: &mut AsyncPgConnection,
     ) -> Result<Vec<Self::Type>, StatusCode> {
         let metcon_movements = self.0;
         let mut metcon_ids: Vec<_> = metcon_movements
@@ -320,6 +361,7 @@ impl VerifyMultipleForUserOrAPCreate for Unverified<Vec<MetconMovement>> {
         metcon_ids.sort_unstable();
         metcon_ids.dedup();
         if MetconDb::check_user_ids(&metcon_ids, *auth, db)
+            .await
             .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
         {
             Ok(metcon_movements)

@@ -11,7 +11,13 @@ use axum::{
 };
 use base64::{engine::general_purpose::STANDARD, Engine};
 use chrono::{DateTime, Duration, Utc};
-use diesel::r2d2::{ConnectionManager, CustomizeConnection, Pool};
+use diesel_async::{
+    pooled_connection::{
+        deadpool::{Hook, Pool},
+        AsyncDieselConnectionManager,
+    },
+    AsyncConnection, AsyncPgConnection,
+};
 use flate2::write::GzDecoder;
 use hyper::header::CONTENT_ENCODING;
 use lazy_static::lazy_static;
@@ -82,26 +88,22 @@ lazy_static! {
     };
 }
 
-#[derive(Debug, Clone, Copy)]
-pub struct TestConnectionCustomizer;
-
-impl<C, E> CustomizeConnection<C, E> for TestConnectionCustomizer
-where
-    C: diesel::Connection,
-{
-    fn on_acquire(&self, conn: &mut C) -> Result<(), E> {
-        conn.begin_test_transaction()
-            .expect("failed to start test transaction");
-
-        Ok(())
-    }
-}
-
 fn get_test_db_pool(config: &Config) -> DbPool {
-    Pool::builder()
-        .connection_customizer(Box::new(TestConnectionCustomizer))
+    let db_config = AsyncDieselConnectionManager::<AsyncPgConnection>::new(&config.database_url);
+
+    Pool::builder(db_config)
+        .post_create(Hook::AsyncFn(Box::new(
+            |conn: &mut AsyncPgConnection, _| {
+                Box::pin(async {
+                    conn.begin_test_transaction()
+                        .await
+                        .expect("Failed to start test transaction");
+                    Ok(())
+                })
+            },
+        )))
         .max_size(1)
-        .build(ConnectionManager::new(&config.database_url))
+        .build()
         .unwrap()
 }
 
@@ -126,13 +128,19 @@ async fn init() -> (Router, DbPool, &'static Config) {
 
     let router = router::get_router(state);
 
-    let mut db = db_pool.get().unwrap();
+    let mut db = db_pool.get().await.unwrap();
 
-    UserDb::create(&mut TEST_USER.clone(), &mut db).unwrap();
-    UserDb::create(&mut TEST_USER2.clone(), &mut db).unwrap();
-    PlatformDb::create(&TEST_PLATFORM, &mut db).unwrap();
-    ActionProviderDb::create(&mut TEST_AP.clone(), &mut db).unwrap();
-    ActionDb::create(&TEST_ACTION, &mut db).unwrap();
+    UserDb::create(&mut TEST_USER.clone(), &mut db)
+        .await
+        .unwrap();
+    UserDb::create(&mut TEST_USER2.clone(), &mut db)
+        .await
+        .unwrap();
+    PlatformDb::create(&TEST_PLATFORM, &mut db).await.unwrap();
+    ActionProviderDb::create(&mut TEST_AP.clone(), &mut db)
+        .await
+        .unwrap();
+    ActionDb::create(&TEST_ACTION, &mut db).await.unwrap();
 
     (router, db_pool, config)
 }
@@ -208,7 +216,8 @@ async fn auth(router: &mut Router, route: &str, username: &str, password: &str) 
     assert_json(&response);
 }
 
-/// Use a get request to make sure that the authentication with wrong credentials does not succeed.
+/// Use a get request to make sure that the authentication with wrong
+/// credentials does not succeed.
 async fn auth_wrong_credentials(router: &mut Router, route: &str, username: &str) {
     let header = auth_header(username, "wrong password");
     let response = request(
@@ -237,7 +246,8 @@ async fn auth_wrong_credentials(router: &mut Router, route: &str, username: &str
     assert_json(&response);
 }
 
-/// Use a get request to make sure that the authentication without credentials does not succeed.
+/// Use a get request to make sure that the authentication without credentials
+/// does not succeed.
 async fn auth_without_credentials(router: &mut Router, route: &str) {
     let response = request(router, Request::get(route).body(Body::empty()).unwrap()).await;
 
@@ -262,7 +272,8 @@ async fn auth_as(router: &mut Router, route: &str, username: &str, id: i64, pass
     assert_json(&response);
 }
 
-/// Use a get request to make sure that the authentication as a user does not succeed.
+/// Use a get request to make sure that the authentication as a user does not
+/// succeed.
 async fn auth_as_not_allowed(
     router: &mut Router,
     route: &str,
@@ -541,7 +552,9 @@ async fn ap_as_user_ap_auth() {
         enabled: true,
         deleted: false,
     };
-    ActionEventDb::create(&action_event, &mut db_pool.get().unwrap()).unwrap();
+    ActionEventDb::create(&action_event, &mut db_pool.get().await.unwrap())
+        .await
+        .unwrap();
 
     auth_as(
         &mut router,
@@ -567,7 +580,9 @@ async fn ap_as_user_ap_auth_no_event() {
         enabled: false,
         deleted: false,
     };
-    ActionEventDb::create(&action_event1, &mut db_pool.get().unwrap()).unwrap();
+    ActionEventDb::create(&action_event1, &mut db_pool.get().await.unwrap())
+        .await
+        .unwrap();
 
     // create deleted ActionEvent
     let action_event2 = ActionEvent {
@@ -579,7 +594,9 @@ async fn ap_as_user_ap_auth_no_event() {
         enabled: true,
         deleted: true,
     };
-    ActionEventDb::create(&action_event2, &mut db_pool.get().unwrap()).unwrap();
+    ActionEventDb::create(&action_event2, &mut db_pool.get().await.unwrap())
+        .await
+        .unwrap();
 
     //  check that ap has no access
     auth_as_not_allowed(
@@ -606,7 +623,9 @@ async fn ap_as_user_ap_auth_wrong_credentials() {
         enabled: true,
         deleted: false,
     };
-    ActionEventDb::create(&action_event, &mut db_pool.get().unwrap()).unwrap();
+    ActionEventDb::create(&action_event, &mut db_pool.get().await.unwrap())
+        .await
+        .unwrap();
 
     auth_as_wrong_credentials(
         &mut router,
@@ -631,7 +650,9 @@ async fn ap_as_user_ap_auth_without_credentials() {
         enabled: true,
         deleted: false,
     };
-    ActionEventDb::create(&action_event, &mut db_pool.get().unwrap()).unwrap();
+    ActionEventDb::create(&action_event, &mut db_pool.get().await.unwrap())
+        .await
+        .unwrap();
 
     auth_as_without_credentials(
         &mut router,
@@ -722,7 +743,9 @@ async fn foreign_create() {
 async fn own_get() {
     let (mut router, db_pool, _) = init().await;
 
-    DiaryDb::create(&TEST_DIARY, &mut db_pool.get().unwrap()).unwrap();
+    DiaryDb::create(&TEST_DIARY, &mut db_pool.get().await.unwrap())
+        .await
+        .unwrap();
 
     // check that get works for same user
     let header = auth_header(&TEST_USER.username, &TEST_USER.password);
@@ -750,7 +773,9 @@ async fn own_get() {
 async fn own_get_gzip() {
     let (mut router, db_pool, _) = init().await;
 
-    DiaryDb::create(&TEST_DIARY, &mut db_pool.get().unwrap()).unwrap();
+    DiaryDb::create(&TEST_DIARY, &mut db_pool.get().await.unwrap())
+        .await
+        .unwrap();
 
     // check that get works for same user
     let header = auth_header(&TEST_USER.username, &TEST_USER.password);
@@ -805,7 +830,9 @@ async fn own_get_non_existing() {
 async fn foreign_get() {
     let (mut router, db_pool, _) = init().await;
 
-    DiaryDb::create(&TEST_DIARY, &mut db_pool.get().unwrap()).unwrap();
+    DiaryDb::create(&TEST_DIARY, &mut db_pool.get().await.unwrap())
+        .await
+        .unwrap();
 
     // check that get does not work for other user
     let header = auth_header(&TEST_USER2.username, &TEST_USER2.password);
@@ -829,7 +856,9 @@ async fn foreign_get() {
 async fn own_update() {
     let (mut router, db_pool, _) = init().await;
 
-    DiaryDb::create(&TEST_DIARY, &mut db_pool.get().unwrap()).unwrap();
+    DiaryDb::create(&TEST_DIARY, &mut db_pool.get().await.unwrap())
+        .await
+        .unwrap();
 
     // check that update works for same user
     let header = auth_header(&TEST_USER.username, &TEST_USER.password);
@@ -868,7 +897,9 @@ async fn own_update_non_existing() {
 async fn foreign_update() {
     let (mut router, db_pool, _) = init().await;
 
-    DiaryDb::create(&TEST_DIARY, &mut db_pool.get().unwrap()).unwrap();
+    DiaryDb::create(&TEST_DIARY, &mut db_pool.get().await.unwrap())
+        .await
+        .unwrap();
 
     // check that update does not work for other user
     let header = auth_header(&TEST_USER2.username, &TEST_USER2.password);
@@ -927,7 +958,9 @@ async fn get_account_data() {
 
     // get updates - check new diary
     let now = Utc::now() - Duration::try_seconds(1).unwrap(); // TODO
-    DiaryDb::create(&TEST_DIARY, &mut db_pool.get().unwrap()).unwrap();
+    DiaryDb::create(&TEST_DIARY, &mut db_pool.get().await.unwrap())
+        .await
+        .unwrap();
     let (status, account_data) = inner(&mut router, Some(&now)).await;
 
     assert_eq!(status, StatusCode::OK);
@@ -943,7 +976,9 @@ async fn get_account_data() {
 
     // get updates - check updated diary
     let now = Utc::now() - Duration::try_seconds(1).unwrap(); // TODO
-    DiaryDb::update(&TEST_DIARY, &mut db_pool.get().unwrap()).unwrap();
+    DiaryDb::update(&TEST_DIARY, &mut db_pool.get().await.unwrap())
+        .await
+        .unwrap();
     let (status, account_data) = inner(&mut router, Some(&now)).await;
 
     assert_eq!(status, StatusCode::OK);

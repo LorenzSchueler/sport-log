@@ -5,6 +5,7 @@ use argon2::{
 use axum::http::StatusCode;
 use chrono::{DateTime, Utc};
 use diesel::{prelude::*, result::Error};
+use diesel_async::{AsyncPgConnection, RunQueryDsl};
 use rand_core::OsRng;
 use sport_log_derive::*;
 use sport_log_types::{schema::user, User, UserId};
@@ -16,19 +17,25 @@ pub struct UserDb;
 
 /// Same as trait [`Create`] but with mutable references
 impl UserDb {
-    pub fn create(user: &mut <Self as Db>::Type, db: &mut PgConnection) -> QueryResult<usize> {
+    pub async fn create(
+        user: &mut <Self as Db>::Type,
+        db: &mut AsyncPgConnection,
+    ) -> QueryResult<usize> {
         let salt = SaltString::generate(&mut OsRng);
         user.password = build_hasher()
             .hash_password(user.password.as_bytes(), &salt)
             .map_err(|_| Error::RollbackTransaction)? // this should not happen but prevents panic
             .to_string();
 
-        diesel::insert_into(user::table).values(&*user).execute(db)
+        diesel::insert_into(user::table)
+            .values(&*user)
+            .execute(db)
+            .await
     }
 
-    pub fn create_multiple(
+    pub async fn create_multiple(
         users: &mut [<Self as Db>::Type],
-        db: &mut PgConnection,
+        db: &mut AsyncPgConnection,
     ) -> QueryResult<usize> {
         for user in &mut *users {
             let salt = SaltString::generate(&mut OsRng);
@@ -38,14 +45,20 @@ impl UserDb {
                 .to_string();
         }
 
-        diesel::insert_into(user::table).values(&*users).execute(db)
+        diesel::insert_into(user::table)
+            .values(&*users)
+            .execute(db)
+            .await
     }
 }
 
 /// Same as trait [`Update`] but with mutable references
 #[allow(clippy::multiple_inherent_impl)]
 impl UserDb {
-    pub fn update(user: &mut <Self as Db>::Type, db: &mut PgConnection) -> QueryResult<usize> {
+    pub async fn update(
+        user: &mut <Self as Db>::Type,
+        db: &mut AsyncPgConnection,
+    ) -> QueryResult<usize> {
         let salt = SaltString::generate(&mut OsRng);
         user.password = build_hasher()
             .hash_password(user.password.as_bytes(), &salt)
@@ -55,23 +68,30 @@ impl UserDb {
         diesel::update(user::table.find(user.id))
             .set(&*user)
             .execute(db)
+            .await
     }
 }
 
+#[async_trait]
 impl CheckUserId for UserDb {
-    fn check_user_id(id: Self::Id, user_id: UserId, db: &mut PgConnection) -> QueryResult<bool> {
+    async fn check_user_id(
+        id: Self::Id,
+        user_id: UserId,
+        db: &mut AsyncPgConnection,
+    ) -> QueryResult<bool> {
         user::table
             .filter(user::columns::id.eq(id))
             .select(user::columns::id.eq(user_id))
             .get_result(db)
+            .await
             .optional()
             .map(|eq| eq.unwrap_or(false))
     }
 
-    fn check_user_ids(
+    async fn check_user_ids(
         _ids: &[Self::Id],
         _user_id: UserId,
-        _db: &mut PgConnection,
+        _db: &mut AsyncPgConnection,
     ) -> QueryResult<bool> {
         Ok(false) // it is not allowed to request data for multiple users
     }
@@ -79,11 +99,16 @@ impl CheckUserId for UserDb {
 
 #[allow(clippy::multiple_inherent_impl)]
 impl UserDb {
-    pub fn auth(username: &str, password: &str, db: &mut PgConnection) -> QueryResult<UserId> {
+    pub async fn auth(
+        username: &str,
+        password: &str,
+        db: &mut AsyncPgConnection,
+    ) -> QueryResult<UserId> {
         let (user_id, password_hash): (UserId, String) = user::table
             .filter(user::columns::username.eq(username))
             .select((user::columns::id, user::columns::password))
-            .get_result(db)?;
+            .get_result(db)
+            .await?;
 
         let password_hash = PasswordHash::new(password_hash.as_str())
             .expect("invalid password hash stored in database");
@@ -97,31 +122,38 @@ impl UserDb {
         }
     }
 
-    pub fn get_by_id_and_last_sync(
+    pub async fn get_by_id_and_last_sync(
         user_id: UserId,
         last_sync: DateTime<Utc>,
-        db: &mut PgConnection,
+        db: &mut AsyncPgConnection,
     ) -> QueryResult<Option<User>> {
         user::table
             .filter(user::columns::id.eq(user_id))
             .filter(user::columns::last_change.ge(last_sync))
             .select(User::as_select())
             .get_result(db)
+            .await
             .optional()
     }
 
-    pub fn delete(user_id: UserId, db: &mut PgConnection) -> QueryResult<usize> {
-        diesel::delete(user::table.find(user_id)).execute(db)
+    pub async fn delete(user_id: UserId, db: &mut AsyncPgConnection) -> QueryResult<usize> {
+        diesel::delete(user::table.find(user_id)).execute(db).await
     }
 }
 
+#[async_trait]
 impl VerifyForUserWithDb for Unverified<User> {
     type Type = User;
 
-    fn verify_user(self, auth: AuthUser, db: &mut PgConnection) -> Result<Self::Type, StatusCode> {
+    async fn verify_user(
+        self,
+        auth: AuthUser,
+        db: &mut AsyncPgConnection,
+    ) -> Result<Self::Type, StatusCode> {
         let user = self.0;
         if user.id == *auth
             && UserDb::check_user_id(user.id, *auth, db)
+                .await
                 .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
         {
             Ok(user)

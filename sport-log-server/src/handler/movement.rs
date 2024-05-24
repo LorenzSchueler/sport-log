@@ -16,11 +16,11 @@ pub async fn create_movements(
     match movements {
         UnverifiedSingleOrVec::Single(movement) => {
             let movement = movement.verify_user_ap_without_db(auth)?;
-            MovementDb::create(&movement, &mut db)
+            MovementDb::create(&movement, &mut db).await
         }
         UnverifiedSingleOrVec::Vec(movements) => {
             let movements = movements.verify_user_ap_without_db(auth)?;
-            MovementDb::create_multiple(&movements, &mut db)
+            MovementDb::create_multiple(&movements, &mut db).await
         }
     }
     .map(|_| StatusCode::OK)
@@ -34,10 +34,12 @@ pub async fn get_movements(
 ) -> HandlerResult<Json<Vec<Movement>>> {
     match id {
         Some(id) => {
-            let movement_id = id.verify_user_ap(auth, &mut db)?;
-            MovementDb::get_by_id(movement_id, &mut db).map(|m| vec![m])
+            let movement_id = id.verify_user_ap(auth, &mut db).await?;
+            MovementDb::get_by_id(movement_id, &mut db)
+                .await
+                .map(|m| vec![m])
         }
-        None => MovementDb::get_by_user(*auth, &mut db),
+        None => MovementDb::get_by_user(*auth, &mut db).await,
     }
     .map(Json)
     .map_err(Into::into)
@@ -51,11 +53,11 @@ pub async fn update_movements(
     match movements {
         UnverifiedSingleOrVec::Single(movement) => {
             let movement = movement.verify_user_ap_without_db(auth)?;
-            MovementDb::update(&movement, &mut db)
+            MovementDb::update(&movement, &mut db).await
         }
         UnverifiedSingleOrVec::Vec(movements) => {
-            let movements = movements.verify_user_ap(auth, &mut db)?;
-            MovementDb::update_multiple(&movements, &mut db)
+            let movements = movements.verify_user_ap(auth, &mut db).await?;
+            MovementDb::update_multiple(&movements, &mut db).await
         }
     }
     .map(|_| StatusCode::OK)

@@ -23,7 +23,7 @@ pub(crate) fn impl_db(
                 sport_log_types::schema::#value_name::table
             }
 
-            fn id_column() -> <Self::Table as Table>::PrimaryKey {
+            fn id_column() -> <Self::Table as diesel::query_source::Table>::PrimaryKey {
                 sport_log_types::schema::#value_name::columns::id
             }
         }
@@ -114,21 +114,28 @@ pub(crate) fn impl_modifiable_db(
 
 pub(crate) fn impl_create(db_type: &Ident) -> TokenStream {
     quote! {
-        use diesel::prelude::*;
-
+        #[async_trait::async_trait]
         impl crate::db::Create for crate::db::#db_type {
-            fn create(value: &Self::Type, db: &mut PgConnection) -> QueryResult<usize> {
+            async fn create(value: &Self::Type, db: &mut diesel_async::AsyncPgConnection) -> diesel::result::QueryResult<usize> {
                 use crate::db::Db;
+                use diesel_async::RunQueryDsl;
+                use diesel::prelude::*;
+
                 diesel::insert_into(Self::table())
                     .values(value)
                     .execute(db)
+                    .await
             }
 
-            fn create_multiple(values: &[Self::Type], db: &mut PgConnection) -> QueryResult<usize> {
+            async fn create_multiple(values: &[Self::Type], db: &mut diesel_async::AsyncPgConnection) -> diesel::result::QueryResult<usize> {
                 use crate::db::Db;
+                use diesel_async::RunQueryDsl;
+                use diesel::prelude::*;
+
                 diesel::insert_into(Self::table())
                     .values(values)
                     .execute(db)
+                    .await
             }
         }
     }
@@ -137,15 +144,18 @@ pub(crate) fn impl_create(db_type: &Ident) -> TokenStream {
 
 pub(crate) fn impl_get_by_id(db_type: &Ident) -> TokenStream {
     quote! {
-        use diesel::prelude::*;
-
+        #[async_trait::async_trait]
         impl crate::db::GetById for crate::db::#db_type {
-            fn get_by_id(id: Self::Id, db: &mut PgConnection) -> QueryResult<Self::Type> {
+            async fn get_by_id(id: Self::Id, db: &mut diesel_async::AsyncPgConnection) -> diesel::result::QueryResult<Self::Type> {
                 use crate::db::Db;
+                use diesel_async::RunQueryDsl;
+                use diesel::prelude::*;
+
                 Self::table()
                     .find(id)
                     .select(Self::Type::as_select())
                     .get_result(db)
+                    .await
             }
         }
     }
@@ -154,15 +164,18 @@ pub(crate) fn impl_get_by_id(db_type: &Ident) -> TokenStream {
 
 pub(crate) fn impl_get_by_user(db_type: &Ident) -> TokenStream {
     quote! {
-        use diesel::prelude::*;
-
+        #[async_trait::async_trait]
         impl crate::db::GetByUser for crate::db::#db_type {
-            fn get_by_user(user_id: sport_log_types::UserId, db: &mut PgConnection) -> QueryResult<Vec<Self::Type>> {
+            async fn get_by_user(user_id: sport_log_types::UserId, db: &mut diesel_async::AsyncPgConnection) -> diesel::result::QueryResult<Vec<Self::Type>> {
                 use crate::db::{Db, DbWithUserId};
+                use diesel_async::RunQueryDsl;
+                use diesel::prelude::*;
+
                 Self::table()
                     .filter(Self::user_id_column().eq(user_id))
                     .select(Self::Type::as_select())
                     .get_results(db)
+                    .await
             }
         }
     }
@@ -171,15 +184,17 @@ pub(crate) fn impl_get_by_user(db_type: &Ident) -> TokenStream {
 
 pub(crate) fn impl_get_by_user_and_timespan(db_type: &Ident) -> TokenStream {
     quote! {
-        use diesel::prelude::*;
-
+        #[async_trait::async_trait]
         impl crate::db::GetByUserTimespan for crate::db::#db_type {
-            fn get_by_user_and_timespan(
+            async fn get_by_user_and_timespan(
                 user_id: sport_log_types::UserId,
                 timespan: crate::db::Timespan,
-                db: &mut PgConnection
-            ) -> QueryResult<Vec<Self::Type>> {
+                db: &mut diesel_async::AsyncPgConnection
+            ) -> diesel::result::QueryResult<Vec<Self::Type>> {
                 use crate::db::{Db, DbWithUserId, DbWithDateTime};
+                use diesel_async::RunQueryDsl;
+                use diesel::prelude::*;
+
                 let filter_user = Self::table()
                     .filter(Self::user_id_column().eq(user_id));
                 match timespan {
@@ -188,23 +203,27 @@ pub(crate) fn impl_get_by_user_and_timespan(db_type: &Ident) -> TokenStream {
                             .filter(Self::datetime_column().between(start, end))
                             .select(Self::Type::as_select())
                             .get_results(db)
+                            .await
                     },
                     crate::db::Timespan::Start(start) => {
                         filter_user
                             .filter(Self::datetime_column().ge(start))
                             .select(Self::Type::as_select())
                             .get_results(db)
+                            .await
                     },
                     crate::db::Timespan::End(end) => {
                         filter_user
                             .filter(Self::datetime_column().le(end))
                             .select(Self::Type::as_select())
                             .get_results(db)
+                            .await
                     }
                     crate::db::Timespan::All => {
                         filter_user
                             .select(Self::Type::as_select())
                             .get_results(db)
+                            .await
                     }
                 }
             }
@@ -215,20 +234,23 @@ pub(crate) fn impl_get_by_user_and_timespan(db_type: &Ident) -> TokenStream {
 
 pub(crate) fn impl_get_by_user_and_last_sync(db_type: &Ident) -> TokenStream {
     quote! {
-        use diesel::prelude::*;
-
+        #[async_trait::async_trait]
         impl crate::db::GetByUserSync for crate::db::#db_type {
-            fn get_by_user_and_last_sync(
+            async fn get_by_user_and_last_sync(
                 user_id: sport_log_types::UserId,
                 last_sync: chrono::DateTime<chrono::Utc>,
-                db: &mut PgConnection
-            ) -> QueryResult<Vec<Self::Type>> {
+                db: &mut diesel_async::AsyncPgConnection
+            ) -> diesel::result::QueryResult<Vec<Self::Type>> {
                 use crate::db::{Db, DbWithUserId, ModifiableDb};
+                use diesel_async::RunQueryDsl;
+                use diesel::prelude::*;
+
                 Self::table()
                     .filter(Self::user_id_column().eq(user_id))
                     .filter(Self::last_change_column().ge(last_sync))
                     .select(Self::Type::as_select())
                     .get_results(db)
+                    .await
             }
         }
     }
@@ -237,15 +259,18 @@ pub(crate) fn impl_get_by_user_and_last_sync(db_type: &Ident) -> TokenStream {
 
 pub(crate) fn impl_get_by_last_sync(db_type: &Ident) -> TokenStream {
     quote! {
-        use diesel::prelude::*;
-
+        #[async_trait::async_trait]
         impl crate::db::GetBySync for crate::db::#db_type {
-            fn get_by_last_sync(last_sync: chrono::DateTime<chrono::Utc>, db: &mut PgConnection) -> QueryResult<Vec<Self::Type>> {
+            async fn get_by_last_sync(last_sync: chrono::DateTime<chrono::Utc>, db: &mut diesel_async::AsyncPgConnection) -> diesel::result::QueryResult<Vec<Self::Type>> {
                 use crate::db::{Db, ModifiableDb};
+                use diesel_async::RunQueryDsl;
+                use diesel::prelude::*;
+
                 Self::table()
                     .filter(Self::last_change_column().ge(last_sync))
                     .select(Self::Type::as_select())
                     .get_results(db)
+                    .await
             }
         }
     }
@@ -254,12 +279,14 @@ pub(crate) fn impl_get_by_last_sync(db_type: &Ident) -> TokenStream {
 
 pub(crate) fn impl_get_all(db_type: &Ident) -> TokenStream {
     quote! {
-        use diesel::prelude::*;
-
+        #[async_trait::async_trait]
         impl crate::db::GetAll for crate::db::#db_type {
-            fn get_all(db: &mut PgConnection) -> QueryResult<Vec<Self::Type>> {
+            async fn get_all(db: &mut diesel_async::AsyncPgConnection) -> diesel::result::QueryResult<Vec<Self::Type>> {
                 use crate::db::Db;
-                Self::table().select(Self::Type::as_select()).load(db)
+                use diesel_async::RunQueryDsl;
+                use diesel::prelude::*;
+
+                Self::table().select(Self::Type::as_select()).load(db).await
             }
         }
     }
@@ -268,28 +295,35 @@ pub(crate) fn impl_get_all(db_type: &Ident) -> TokenStream {
 
 pub(crate) fn impl_update(db_type: &Ident) -> TokenStream {
     quote! {
-        use diesel::prelude::*;
-
+        #[async_trait::async_trait]
         impl crate::db::Update for crate::db::#db_type {
-            fn update(value: &Self::Type, db: &mut PgConnection) -> QueryResult<usize> {
+            async fn update(value: &Self::Type, db: &mut diesel_async::AsyncPgConnection) -> diesel::result::QueryResult<usize> {
                 use crate::db::Db;
+                use diesel_async::RunQueryDsl;
+                use diesel::prelude::*;
+
                 diesel::update(Self::table().find(value.id))
                     .set(value)
                     .execute(db)
+                    .await
             }
 
-            fn update_multiple(values: &[Self::Type], db: &mut PgConnection) -> QueryResult<usize> {
+            async fn update_multiple(values: &[Self::Type], db: &mut diesel_async::AsyncPgConnection) -> diesel::result::QueryResult<usize> {
                 use crate::db::Db;
-                db.transaction(|db| {
-                    let len = values.len();
+                use diesel_async::{RunQueryDsl, AsyncConnection, scoped_futures::ScopedFutureExt};
+                use diesel::prelude::*;
+
+                let len = values.len();
+                db.transaction(|db| async move {
                     for value in values {
                         diesel::update(Self::table().find(value.id))
                             .set(value)
-                            .execute(db)?;
+                            .execute(db)
+                            .await?;
                     }
 
                     Ok(len)
-                })
+                }.scope_boxed()).await
             }
         }
     }
@@ -298,16 +332,19 @@ pub(crate) fn impl_update(db_type: &Ident) -> TokenStream {
 
 pub(crate) fn impl_hard_delete(db_type: &Ident) -> TokenStream {
     quote! {
-        use diesel::prelude::*;
-
+        #[async_trait::async_trait]
         impl crate::db::HardDelete for crate::db::#db_type {
-            fn hard_delete(last_change: chrono::DateTime<chrono::Utc>, db: &mut PgConnection) -> QueryResult<usize> {
+            async fn hard_delete(last_change: chrono::DateTime<chrono::Utc>, db: &mut diesel_async::AsyncPgConnection) -> diesel::result::QueryResult<usize> {
                 use crate::db::{Db, ModifiableDb};
+                use diesel_async::RunQueryDsl;
+                use diesel::prelude::*;
+
                 diesel::delete(
                     Self::table()
                         .filter(Self::deleted_column().eq(true))
                         .filter(Self::last_change_column().le(last_change))
                 ).execute(db)
+                .await
             }
         }
     }
@@ -316,29 +353,36 @@ pub(crate) fn impl_hard_delete(db_type: &Ident) -> TokenStream {
 
 pub(crate) fn impl_check_user_id(db_type: &Ident) -> TokenStream {
     quote! {
-        use diesel::prelude::*;
-
+        #[async_trait::async_trait]
         impl crate::db::CheckUserId for crate::db::#db_type {
-            fn check_user_id(id: Self::Id, user_id: sport_log_types::UserId, db: &mut PgConnection) -> QueryResult<bool> {
+            async fn check_user_id(id: Self::Id, user_id: sport_log_types::UserId, db: &mut diesel_async::AsyncPgConnection) -> diesel::result::QueryResult<bool> {
                 use crate::db::{Db, DbWithUserId};
+                use diesel_async::RunQueryDsl;
+                use diesel::prelude::*;
+
                 Self::table()
                     .filter(Self::id_column().eq(id))
                     .select(Self::user_id_column().eq(user_id))
                     .get_result(db)
+                    .await
                     .optional()
                     .map(|eq| eq.unwrap_or(false))
             }
 
-            fn check_user_ids(
+            async fn check_user_ids(
                 ids: &[Self::Id],
                 user_id: sport_log_types::UserId,
-                db: &mut PgConnection,
-            ) -> QueryResult<bool> {
+                db: &mut diesel_async::AsyncPgConnection,
+            ) -> diesel::result::QueryResult<bool> {
                 use crate::db::{Db, DbWithUserId};
+                use diesel_async::RunQueryDsl;
+                use diesel::prelude::*;
+
                 Self::table()
                     .filter(Self::id_column().eq_any(ids))
                     .select(Self::user_id_column().eq(user_id))
                     .get_results(db)
+                    .await
                     .map(|eqs: Vec<bool>| eqs.into_iter().all(|eq| eq))
             }
         }
@@ -348,11 +392,13 @@ pub(crate) fn impl_check_user_id(db_type: &Ident) -> TokenStream {
 
 pub(crate) fn impl_check_optional_user_id(db_type: &Ident) -> TokenStream {
     quote! {
-        use diesel::prelude::*;
-
+        #[async_trait::async_trait]
         impl crate::db::CheckOptionalUserId for crate::db::#db_type {
-            fn check_optional_user_id(id: Self::Id, user_id: sport_log_types::UserId, db: &mut PgConnection) -> QueryResult<bool> {
+            async fn check_optional_user_id(id: Self::Id, user_id: sport_log_types::UserId, db: &mut diesel_async::AsyncPgConnection) -> diesel::result::QueryResult<bool> {
                 use crate::db::{Db, DbWithUserId};
+                use diesel_async::RunQueryDsl;
+                use diesel::prelude::*;
+
                 Self::table()
                     .filter(Self::id_column().eq(id))
                     .select(Self::user_id_column()
@@ -360,32 +406,42 @@ pub(crate) fn impl_check_optional_user_id(db_type: &Ident) -> TokenStream {
                         .or(Self::user_id_column().is_null())
                     )
                     .get_result(db)
+                    .await
                     .optional()
                     .map(|eq| eq.unwrap_or(false))
             }
         }
 
+        #[async_trait::async_trait]
         impl crate::db::CheckUserId for crate::db::#db_type {
-            fn check_user_id(id: Self::Id, user_id: sport_log_types::UserId, db: &mut PgConnection) -> QueryResult<bool> {
+            async fn check_user_id(id: Self::Id, user_id: sport_log_types::UserId, db: &mut diesel_async::AsyncPgConnection) -> diesel::result::QueryResult<bool> {
                 use crate::db::Db;
+                use diesel_async::RunQueryDsl;
+                use diesel::prelude::*;
+
                 Self::table()
                     .filter(Self::id_column().eq(id))
                     .select(Self::user_id_column().is_not_distinct_from(user_id))
                     .get_result(db)
+                    .await
                     .optional()
                     .map(|eq| eq.unwrap_or(false))
             }
 
-            fn check_user_ids(
+            async fn check_user_ids(
                 ids: &[Self::Id],
                 user_id: sport_log_types::UserId,
-                db: &mut PgConnection,
-            ) -> QueryResult<bool> {
+                db: &mut diesel_async::AsyncPgConnection,
+            ) -> diesel::result::QueryResult<bool> {
                 use crate::db::Db;
+                use diesel_async::RunQueryDsl;
+                use diesel::prelude::*;
+
                 Self::table()
                     .filter(Self::id_column().eq_any(ids))
                     .select(Self::user_id_column().is_not_distinct_from(user_id))
                     .get_results(db)
+                    .await
                     .map(|eqs: Vec<bool>| eqs.into_iter().all(|eq| eq))
             }
         }
@@ -395,29 +451,36 @@ pub(crate) fn impl_check_optional_user_id(db_type: &Ident) -> TokenStream {
 
 pub(crate) fn impl_check_ap_id(db_type: &Ident) -> TokenStream {
     quote! {
-        use diesel::prelude::*;
-
+        #[async_trait::async_trait]
         impl crate::db::CheckAPId for crate::db::#db_type {
-            fn check_ap_id(id: Self::Id, ap_id: ActionProviderId, db: &mut PgConnection) -> QueryResult<bool> {
+            async fn check_ap_id(id: Self::Id, ap_id: ActionProviderId, db: &mut diesel_async::AsyncPgConnection) -> diesel::result::QueryResult<bool> {
                 use crate::db::{Db, DbWithApId};
+                use diesel_async::RunQueryDsl;
+                use diesel::prelude::*;
+
                 Self::table()
                     .filter(Self::id_column().eq(id))
                     .select(Self::ap_id_column().eq(ap_id))
                     .get_result(db)
+                    .await
                     .optional()
                     .map(|eq| eq.unwrap_or(false))
             }
 
-            fn check_ap_ids(
+            async fn check_ap_ids(
                 ids: &[Self::Id],
                 ap_id: ActionProviderId,
-                db: &mut PgConnection,
-            ) -> QueryResult<bool> {
+                db: &mut diesel_async::AsyncPgConnection,
+            ) -> diesel::result::QueryResult<bool> {
                 use crate::db::Db;
+                use diesel_async::RunQueryDsl;
+                use diesel::prelude::*;
+
                 Self::table()
                     .filter(Self::id_column().eq_any(ids))
                     .select(Self::ap_id_column().eq(ap_id))
                     .get_results(db)
+                    .await
                     .map(|eqs: Vec<bool>| eqs.into_iter().all(|eq| eq))
             }
         }
@@ -427,17 +490,19 @@ pub(crate) fn impl_check_ap_id(db_type: &Ident) -> TokenStream {
 
 pub(crate) fn impl_verify_id_for_user(db_type: &Ident) -> TokenStream {
     quote! {
+        #[async_trait::async_trait]
         impl crate::db::VerifyIdForUser for crate::db::UnverifiedId<<#db_type as crate::db::Db>::Id> {
             type Id = <#db_type as crate::db::Db>::Id;
 
-            fn verify_user(
+            async fn verify_user(
                 self,
                 auth: crate::auth::AuthUser,
-                db: &mut diesel::pg::PgConnection,
+                db: &mut diesel_async::AsyncPgConnection,
             ) -> Result<Self::Id, axum::http::StatusCode> {
                 use crate::db::CheckUserId;
 
                 if crate::db::#db_type::check_user_id(self.0, *auth, db)
+                    .await
                     .map_err(|_| axum::http::StatusCode::INTERNAL_SERVER_ERROR)?
                 {
                     Ok(self.0)
@@ -452,16 +517,19 @@ pub(crate) fn impl_verify_id_for_user(db_type: &Ident) -> TokenStream {
 
 pub(crate) fn impl_verify_id_for_user_or_ap(db_type: &Ident) -> TokenStream {
     quote! {
+        #[async_trait::async_trait]
         impl crate::db::VerifyIdForUserOrAP for crate::db::UnverifiedId<<#db_type as crate::db::Db>::Id> {
             type Id = <#db_type as crate::db::Db>::Id;
-            fn verify_user_ap(
+
+            async fn verify_user_ap(
                 self,
                 auth: crate::auth::AuthUserOrAP,
-                db: &mut diesel::pg::PgConnection,
+                db: &mut diesel_async::AsyncPgConnection,
             ) -> Result<Self::Id, axum::http::StatusCode> {
                 use crate::db::CheckUserId;
 
                 if crate::db::#db_type::check_user_id(self.0, *auth, db)
+                    .await
                     .map_err(|_| axum::http::StatusCode::INTERNAL_SERVER_ERROR)?
                 {
                     Ok(self.0)
@@ -476,17 +544,19 @@ pub(crate) fn impl_verify_id_for_user_or_ap(db_type: &Ident) -> TokenStream {
 
 pub(crate) fn impl_verify_id_for_action_provider(db_type: &Ident) -> TokenStream {
     quote! {
+        #[async_trait::async_trait]
         impl crate::db::VerifyIdForActionProvider for crate::db::UnverifiedId<<#db_type as crate::db::Db>::Id> {
             type Id = <#db_type as crate::db::Db>::Id;
 
-            fn verify_ap(
+            async fn verify_ap(
                 self,
                 auth: crate::auth::AuthAP,
-                db: &mut diesel::pg::PgConnection,
+                db: &mut diesel_async::AsyncPgConnection,
             ) -> Result<Self::Id, axum::http::StatusCode> {
                 use crate::db::CheckAPId;
 
                 if crate::db::#db_type::check_ap_id(self.0, *auth, db)
+                    .await
                     .map_err(|_| axum::http::StatusCode::INTERNAL_SERVER_ERROR)?
                 {
                     Ok(self.0)
@@ -501,17 +571,19 @@ pub(crate) fn impl_verify_id_for_action_provider(db_type: &Ident) -> TokenStream
 
 pub(crate) fn impl_verify_ids_for_action_provider(db_type: &Ident) -> TokenStream {
     quote! {
+        #[async_trait::async_trait]
         impl crate::db::VerifyIdsForActionProvider for crate::db::UnverifiedIds<<#db_type as crate::db::Db>::Id> {
             type Id = <#db_type as crate::db::Db>::Id;
 
-            fn verify_ap(
+            async fn verify_ap(
                 self,
                 auth: crate::auth::AuthAP,
-                db: &mut diesel::pg::PgConnection,
+                db: &mut diesel_async::AsyncPgConnection,
             ) -> Result<Vec<Self::Id>, axum::http::StatusCode> {
                 use crate::db::CheckAPId;
 
                 if crate::db::#db_type::check_ap_ids(&self.0, *auth, db)
+                    .await
                     .map_err(|_| axum::http::StatusCode::INTERNAL_SERVER_ERROR)?
                 {
                     Ok(self.0)
@@ -573,19 +645,21 @@ pub(crate) fn impl_verify_id_unchecked(db_type: &Ident) -> TokenStream {
 
 pub(crate) fn impl_verify_for_user_with_db(db_type: &Ident) -> TokenStream {
     quote! {
+        #[async_trait::async_trait]
         impl crate::db::VerifyForUserWithDb for crate::db::Unverified<<#db_type as crate::db::Db>::Type> {
             type Type = <#db_type as crate::db::Db>::Type;
 
-            fn verify_user(
+            async fn verify_user(
                 self,
                 auth: crate::auth::AuthUser,
-                db: &mut diesel::pg::PgConnection,
+                db: &mut diesel_async::AsyncPgConnection,
             ) -> Result<Self::Type, axum::http::StatusCode> {
                 use crate::db::CheckUserId;
 
                 let value = self.0;
                 if value.user_id == *auth
                     && crate::db::#db_type::check_user_id(value.id, *auth, db)
+                    .await
                     .map_err(|_| axum::http::StatusCode::INTERNAL_SERVER_ERROR)?
                 {
                     Ok(value)
@@ -595,13 +669,14 @@ pub(crate) fn impl_verify_for_user_with_db(db_type: &Ident) -> TokenStream {
             }
         }
 
+        #[async_trait::async_trait]
         impl crate::db::VerifyMultipleForUserWithDb for crate::db::Unverified<Vec<<#db_type as crate::db::Db>::Type>> {
             type Type = <#db_type as crate::db::Db>::Type;
 
-            fn verify_user(
+            async fn verify_user(
                 self,
                 auth: crate::auth::AuthUser,
-                db: &mut diesel::pg::PgConnection,
+                db: &mut diesel_async::AsyncPgConnection,
             ) -> Result<Vec<Self::Type>, axum::http::StatusCode> {
                 use crate::db::CheckUserId;
 
@@ -609,6 +684,7 @@ pub(crate) fn impl_verify_for_user_with_db(db_type: &Ident) -> TokenStream {
                 let ids: Vec<_> = values.iter().map(|value| value.id).collect();
                 if values.iter().all(|value| value.user_id == *auth)
                     && crate::db::#db_type::check_user_ids(&ids, *auth, db)
+                    .await
                     .map_err(|_| axum::http::StatusCode::INTERNAL_SERVER_ERROR)?
                 {
                     Ok(values)
@@ -623,19 +699,21 @@ pub(crate) fn impl_verify_for_user_with_db(db_type: &Ident) -> TokenStream {
 
 pub(crate) fn impl_verify_for_user_or_ap_with_db(db_type: &Ident) -> TokenStream {
     quote! {
+        #[async_trait::async_trait]
         impl crate::db::VerifyForUserOrAPWithDb for crate::db::Unverified<<#db_type as crate::db::Db>::Type> {
             type Type = <#db_type as crate::db::Db>::Type;
 
-            fn verify_user_ap(
+            async fn verify_user_ap(
                 self,
                 auth: crate::auth::AuthUserOrAP,
-                db: &mut diesel::pg::PgConnection,
+                db: &mut diesel_async::AsyncPgConnection,
             ) -> Result<Self::Type, axum::http::StatusCode> {
                 use crate::db::CheckUserId;
 
                 let value = self.0;
                 if value.user_id == *auth
                     && crate::db::#db_type::check_user_id(value.id, *auth, db)
+                    .await
                     .map_err(|_| axum::http::StatusCode::INTERNAL_SERVER_ERROR)?
                 {
                     Ok(value)
@@ -645,13 +723,14 @@ pub(crate) fn impl_verify_for_user_or_ap_with_db(db_type: &Ident) -> TokenStream
             }
         }
 
+        #[async_trait::async_trait]
         impl crate::db::VerifyMultipleForUserOrAPWithDb for crate::db::Unverified<Vec<<#db_type as crate::db::Db>::Type>> {
             type Type = <#db_type as crate::db::Db>::Type;
 
-            fn verify_user_ap(
+            async fn verify_user_ap(
                 self,
                 auth: crate::auth::AuthUserOrAP,
-                db: &mut diesel::pg::PgConnection,
+                db: &mut diesel_async::AsyncPgConnection,
             ) -> Result<Vec<Self::Type>, axum::http::StatusCode> {
                 use crate::db::CheckUserId;
 
@@ -659,6 +738,7 @@ pub(crate) fn impl_verify_for_user_or_ap_with_db(db_type: &Ident) -> TokenStream
                 let ids: Vec<_> = values.iter().map(|value| value.id).collect();
                 if values.iter().all(|value| value.user_id == *auth)
                     && crate::db::#db_type::check_user_ids(&ids, *auth, db)
+                    .await
                     .map_err(|_| axum::http::StatusCode::INTERNAL_SERVER_ERROR)?
                 {
                     Ok(values)
@@ -747,19 +827,21 @@ pub(crate) fn impl_verify_for_user_or_ap_without_db(db_type: &Ident) -> TokenStr
 
 pub(crate) fn impl_verify_for_action_provider_with_db(db_type: &Ident) -> TokenStream {
     quote! {
+        #[async_trait::async_trait]
         impl crate::db::VerifyForActionProviderWithDb for crate::db::Unverified<<#db_type as crate::db::Db>::Type> {
             type Type = <#db_type as crate::db::Db>::Type;
 
-            fn verify_ap(
+            async fn verify_ap(
                 self,
                 auth: crate::auth::AuthAP,
-                db: &mut diesel::pg::PgConnection,
+                db: &mut diesel_async::AsyncPgConnection,
             ) -> Result<Self::Type, axum::http::StatusCode> {
                 use crate::db::CheckAPId;
 
                 let value = self.0;
                 if value.action_provider_id == *auth
                     && crate::db::#db_type::check_ap_id(value.id, *auth, db)
+                    .await
                     .map_err(|_| axum::http::StatusCode::INTERNAL_SERVER_ERROR)?
                 {
                     Ok(value)

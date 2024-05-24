@@ -55,9 +55,9 @@ where
         let State(AppState { config, db_pool }) =
             State::<AppState>::from_request_parts(parts, state).await?;
 
-        let mut db = db_pool.get()?;
+        let mut db = db_pool.get().await?;
 
-        if let Ok(id) = UserDb::auth(username, password, &mut db) {
+        if let Ok(id) = UserDb::auth(username, password, &mut db).await {
             return Ok(Self(id));
         }
 
@@ -117,14 +117,15 @@ where
         let State(AppState { config, db_pool }) =
             State::<AppState>::from_request_parts(parts, state).await?;
 
-        let mut db = db_pool.get()?;
+        let mut db = db_pool.get().await?;
 
-        if let Ok(id) = UserDb::auth(username, password, &mut db) {
+        if let Ok(id) = UserDb::auth(username, password, &mut db).await {
             return Ok(Self(id));
         }
 
         let user_id = parse_id_header(parts, UserId)?;
-        if let Ok(auth) = ActionProviderDb::auth_as_user(username, password, user_id, &mut db) {
+        if let Ok(auth) = ActionProviderDb::auth_as_user(username, password, user_id, &mut db).await
+        {
             match auth {
                 AuthApForUser::Allowed(_) => return Ok(Self(user_id)),
                 AuthApForUser::Forbidden => return Err(StatusCode::FORBIDDEN.into()),
@@ -182,9 +183,9 @@ where
         let State(AppState { config, db_pool }) =
             State::<AppState>::from_request_parts(parts, state).await?;
 
-        let mut db = db_pool.get()?;
+        let mut db = db_pool.get().await?;
 
-        if let Ok(id) = ActionProviderDb::auth(username, password, &mut db) {
+        if let Ok(id) = ActionProviderDb::auth(username, password, &mut db).await {
             return Ok(Self(id));
         }
 
