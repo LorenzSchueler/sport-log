@@ -44,9 +44,11 @@ pub struct MovementId(pub i64);
 
 /// [`Movement`]
 ///
-/// Movements can be predefined (`user_id` is [`None`]) or can be user-defined (`user_id` contains the id of the user).
+/// Movements can be predefined (`user_id` is [`None`]) or can be user-defined (`user_id` contains
+/// the id of the user).
 ///
-/// `categories` decides whether the Movement can be used in Cardio or Strength Sessions or both. For Metcons the `categories` does not matter.
+/// `categories` decides whether the Movement can be used in Cardio or Strength Sessions or both.
+/// For Metcons the `categories` does not matter.
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "db",

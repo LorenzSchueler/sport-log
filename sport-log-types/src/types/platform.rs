@@ -27,11 +27,14 @@ use crate::{types::IdString, UserId};
 )]
 pub struct PlatformId(pub i64);
 
-/// A representation for an external resource for which [`ActionProvider`](crate::ActionProvider) can provide [`Actions`](crate::Action).
+/// A representation for an external resource for which [`ActionProvider`](crate::ActionProvider)
+/// can provide [`Actions`](crate::Action).
 ///
-/// `credential` is true if the external resource is only useable with credentials which the [`User`](crate::User) has to supply as [`PlatformCredential`].
+/// `credential` is true if the external resource is only useable with credentials which the
+/// [`User`](crate::User) has to supply as [`PlatformCredential`].
 ///
-/// If `credential` is false the resource can be accessed without credentials. (This is f.ex. the case if the data if fetched from public websites or only data from **Sport Log** is used.)
+/// If `credential` is false the resource can be accessed without credentials. (This is f.ex. the
+/// case if the data if fetched from public websites or only data from **Sport Log** is used.)
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "db",

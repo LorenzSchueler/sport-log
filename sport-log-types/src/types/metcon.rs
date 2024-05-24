@@ -52,13 +52,16 @@ pub struct MetconId(pub i64);
 
 /// [`Metcon`] acts like a template for a [`MetconSession`].
 ///
-/// Metcons can be predefined (`user_id` is [`None`]) or can be user-defined (`user_id` contains the id of the user).
+/// Metcons can be predefined (`user_id` is [`None`]) or can be user-defined (`user_id` contains the
+/// id of the user).
 ///
 /// If `metcon_type` is [`MetconType::Amrap`] `rounds` should be `None` and `timecap` should be set.
 ///
-/// If `metcon_type` is [`MetconType::Emom`] rounds and timecap should be set (rounds determines how many rounds should be performed and `timecap`/`rounds` determines how long each round takes).
+/// If `metcon_type` is [`MetconType::Emom`] rounds and timecap should be set (rounds determines how
+/// many rounds should be performed and `timecap`/`rounds` determines how long each round takes).
 ///
-/// If `metcon_type` is [`MetconType::ForTime`] `rounds` should be set and `timecap` can be None or have a value.
+/// If `metcon_type` is [`MetconType::ForTime`] `rounds` should be set and `timecap` can be None or
+/// have a value.
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "db",

@@ -1,23 +1,30 @@
 //! **Sport Log Scheduler** is responsible for scheduling [`ActionEvents`](ActionEvent).
 //!
-//! **Sport Log Scheduler** creates [`ActionEvents`](sport_log_types::ActionEvent) from [`ActionRules`](sport_log_types::ActionRule)
-//! and deletes old [`ActionEvents`](sport_log_types::ActionEvent).
+//! **Sport Log Scheduler** creates [`ActionEvents`](sport_log_types::ActionEvent) from
+//! [`ActionRules`](sport_log_types::ActionRule) and deletes old
+//! [`ActionEvents`](sport_log_types::ActionEvent).
 //!
-//! [`ActionEvents`](sport_log_types::ActionEvent) are only created from enabled [`ActionRules`](sport_log_types::ActionRule).
+//! [`ActionEvents`](sport_log_types::ActionEvent) are only created from enabled
+//! [`ActionRules`](sport_log_types::ActionRule).
 //!
-//! The timespan they are created before their `datetime` is determined by the `create_before` field of the corresponding [`Action`](sport_log_types::Action).
+//! The timespan they are created before their `datetime` is determined by the `create_before` field
+//! of the corresponding [`Action`](sport_log_types::Action).
 //!
-//! Similarly the timespan they are deleted after their `datetime` is determined by the `delete_after` field of the corresponding [`Action`](sport_log_types::Action).
+//! Similarly the timespan they are deleted after their `datetime` is determined by the
+//! `delete_after` field of the corresponding [`Action`](sport_log_types::Action).
 //!
-//! However most [`ActionProvider`](sport_log_types::ActionProvider) will delete a [`ActionEvents`](sport_log_types::ActionEvent) directly after execution.
+//! However most [`ActionProvider`](sport_log_types::ActionProvider) will delete a
+//! [`ActionEvents`](sport_log_types::ActionEvent) directly after execution.
 //!
 //! # Usage
 //!
-//! The **Sport Log Scheduler** has do be executed periodically, preferably as a cron job every hour.
+//! The **Sport Log Scheduler** has do be executed periodically, preferably as a cron job every
+//! hour.
 //!
 //! # Config
 //!
-//! The config file must be called `sport-log-scheduler.toml` and must be deserializable to a [`Config`].
+//! The config file must be called `sport-log-scheduler.toml` and must be deserializable to a
+//! [`Config`].
 
 use std::{env, fs, process::ExitCode};
 
@@ -45,8 +52,8 @@ pub const CONFIG_FILE: &str = "sport-log-scheduler.toml";
 ///
 /// `server_url` is the left part of the URL (everything before `/<version>/...`)
 ///
-/// `garbage_collection_min_days` is the number of days for which an entry has to been deleted and not changed in order to get hard deleted.
-/// If set to `0` garbage collection is disabled.
+/// `garbage_collection_min_days` is the number of days for which an entry has to been deleted and
+/// not changed in order to get hard deleted. If set to `0` garbage collection is disabled.
 #[derive(Deserialize)]
 struct Config {
     admin_password: String,

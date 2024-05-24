@@ -38,8 +38,8 @@ impl Identifiers {
 /// This macro only works if the following conditions are satisfied:
 ///
 /// - the corresponding table has the same name like this type but in snake_case
-/// - there is a type called `New[ThisTypeName]` that implements
-///   `diesel::prelude::Insertable` for this table
+/// - there is a type called `New[ThisTypeName]` that implements `diesel::prelude::Insertable` for
+///   this table
 #[proc_macro_derive(Create)]
 pub fn create_derive(input: TokenStream) -> TokenStream {
     let ast: syn::DeriveInput = syn::parse(input).unwrap();
@@ -50,8 +50,7 @@ pub fn create_derive(input: TokenStream) -> TokenStream {
 ///
 /// This macro only works if the following conditions are satisfied:
 /// - the corresponding table has the same name like this type but in snake_case
-/// - there is a type called `[ThisTypeName]Id` which is the primary key of the
-///   table.
+/// - there is a type called `[ThisTypeName]Id` which is the primary key of the table.
 #[proc_macro_derive(GetById)]
 pub fn get_by_id_derive(input: TokenStream) -> TokenStream {
     let ast: syn::DeriveInput = syn::parse(input).unwrap();
@@ -129,8 +128,7 @@ pub fn update_derive(input: TokenStream) -> TokenStream {
 ///
 /// This macro only works if the following conditions are satisfied:
 /// - the corresponding table has the same name like this type but in snake_case
-/// - the table has the columns `deleted` ([`bool`]) and `last_change`
-///   (`chrono::DateTime`)
+/// - the table has the columns `deleted` ([`bool`]) and `last_change` (`chrono::DateTime`)
 #[proc_macro_derive(HardDelete)]
 pub fn hard_delete_derive(input: TokenStream) -> TokenStream {
     let ast: syn::DeriveInput = syn::parse(input).unwrap();

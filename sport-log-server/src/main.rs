@@ -1,12 +1,14 @@
 //! Central server for **Sport Log**.
 //!
-//! **Sport Log Server** is a multi-user server backend which stores user data and provides synchronization.
+//! **Sport Log Server** is a multi-user server backend which stores user data and provides
+//! synchronization.
 //!
 //! # Usage
 //!
 //! **Sport Log Server** should be started at system startup, preferably as a systemd service.
-//! It is highly recommended to use an HTTP server like apache or nginx and configure it as a reverse proxy.
-//! Make sure only connections via HTTPS are allowed, otherwise you data will be send in clear text.
+//! It is highly recommended to use an HTTP server like apache or nginx and configure it as a
+//! reverse proxy. Make sure only connections via HTTPS are allowed, otherwise you data will be send
+//! in clear text.
 //!
 //! # Config
 //!

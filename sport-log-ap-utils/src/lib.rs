@@ -105,11 +105,13 @@ pub async fn setup(
         }
         StatusCode::FORBIDDEN => {
             error!("action provider self registration disabled");
-            response.json::<ActionProvider>().await?.id // this will always fail and return the error
+            // this will always fail and return the error
+            response.json::<ActionProvider>().await?.id
         }
         status => {
             error!("an error occurred (status {status})");
-            response.json::<ActionProvider>().await?.id // this will always fail and return the error
+            // this will always fail and return the error
+            response.json::<ActionProvider>().await?.id
         }
     };
 

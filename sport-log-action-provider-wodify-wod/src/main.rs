@@ -428,7 +428,8 @@ async fn try_create_wod(
 }
 
 fn parse_inner_html(inner_html: &str) -> String {
-    //static re: LazyCell<Regex> = LazyCell::new(|| Regex::new(r"</*.+?>").unwrap()); // TODO needs LazyCell stabilization
+    //static re: LazyCell<Regex> = LazyCell::new(|| Regex::new(r"</*.+?>").unwrap()); // TODO needs
+    // LazyCell stabilization
     let content = inner_html
         .replace("<br>", "\n")
         .replace("<p>", "\n")
