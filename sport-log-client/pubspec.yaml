@@ -36,7 +36,9 @@ dependencies:
     # http 1.1
     git:
       url: https://github.com/LorenzSchueler/mapbox-api
-  mapbox_maps_flutter: ^2.0.0-rc.1
+  mapbox_maps_flutter: #^2.0.0-rc.1
+    git:
+      url: https://github.com/LorenzSchueler/mapbox-maps-flutter
   mapbox_search: ^4.2.0
   metronome: ^1.1.1+1
   open_file: ^3.3.1
