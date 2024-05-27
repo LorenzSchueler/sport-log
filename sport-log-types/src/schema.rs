@@ -1,29 +1,139 @@
 // @generated automatically by Diesel CLI.
 
 pub mod sql_types {
-    #[derive(diesel::sql_types::SqlType)]
-    #[diesel(postgres_type(name = "cardio_type"))]
+    //https://github.com/diesel-rs/diesel/blob/db6730c9a79135728ec4f87fabdb745d71cb4578/diesel_derives/src/sql_type.rs
+    use std::sync::atomic::{AtomicU32, Ordering};
+
+    use diesel::pg::PgTypeMetadata;
+
+    pub static CUSTOM_TYPES: [&(&str, AtomicU32, AtomicU32); 6] = [
+        &CARDIO_TYPE,
+        &DISTANCE_UNIT,
+        &METCON_TYPE,
+        &MOVEMENT_DIMENSION,
+        &POSITION,
+        &WEEKDAY,
+    ];
+
     pub struct CardioType;
 
-    #[derive(diesel::sql_types::SqlType)]
-    #[diesel(postgres_type(name = "distance_unit"))]
+    static CARDIO_TYPE: (&str, AtomicU32, AtomicU32) =
+        ("cardio_type", AtomicU32::new(0), AtomicU32::new(0));
+
+    impl diesel::sql_types::SqlType for CardioType {
+        type IsNull = diesel::sql_types::is_nullable::NotNull;
+    }
+
+    impl diesel::sql_types::SingleValue for CardioType {}
+
+    impl diesel::sql_types::HasSqlType<CardioType> for diesel::pg::Pg {
+        fn metadata(_: &mut Self::MetadataLookup) -> PgTypeMetadata {
+            PgTypeMetadata::new(
+                CARDIO_TYPE.1.load(Ordering::Acquire),
+                CARDIO_TYPE.2.load(Ordering::Acquire),
+            )
+        }
+    }
+
     pub struct DistanceUnit;
 
-    #[derive(diesel::sql_types::SqlType)]
-    #[diesel(postgres_type(name = "metcon_type"))]
+    static DISTANCE_UNIT: (&str, AtomicU32, AtomicU32) =
+        ("distance_unit", AtomicU32::new(0), AtomicU32::new(0));
+
+    impl diesel::sql_types::SqlType for DistanceUnit {
+        type IsNull = diesel::sql_types::is_nullable::NotNull;
+    }
+
+    impl diesel::sql_types::SingleValue for DistanceUnit {}
+
+    impl diesel::sql_types::HasSqlType<DistanceUnit> for diesel::pg::Pg {
+        fn metadata(_: &mut Self::MetadataLookup) -> PgTypeMetadata {
+            PgTypeMetadata::new(
+                DISTANCE_UNIT.1.load(Ordering::Acquire),
+                DISTANCE_UNIT.2.load(Ordering::Acquire),
+            )
+        }
+    }
+
     pub struct MetconType;
 
-    #[derive(diesel::sql_types::SqlType)]
-    #[diesel(postgres_type(name = "movement_dimension"))]
+    static METCON_TYPE: (&str, AtomicU32, AtomicU32) =
+        ("metcon_type", AtomicU32::new(0), AtomicU32::new(0));
+
+    impl diesel::sql_types::SqlType for MetconType {
+        type IsNull = diesel::sql_types::is_nullable::NotNull;
+    }
+
+    impl diesel::sql_types::SingleValue for MetconType {}
+
+    impl diesel::sql_types::HasSqlType<MetconType> for diesel::pg::Pg {
+        fn metadata(_: &mut Self::MetadataLookup) -> PgTypeMetadata {
+            PgTypeMetadata::new(
+                METCON_TYPE.1.load(Ordering::Acquire),
+                METCON_TYPE.2.load(Ordering::Acquire),
+            )
+        }
+    }
+
     pub struct MovementDimension;
 
-    #[derive(diesel::sql_types::SqlType)]
-    #[diesel(postgres_type(name = "position"))]
+    static MOVEMENT_DIMENSION: (&str, AtomicU32, AtomicU32) =
+        ("movement_dimension", AtomicU32::new(0), AtomicU32::new(0));
+
+    impl diesel::sql_types::SqlType for MovementDimension {
+        type IsNull = diesel::sql_types::is_nullable::NotNull;
+    }
+
+    impl diesel::sql_types::SingleValue for MovementDimension {}
+
+    impl diesel::sql_types::HasSqlType<MovementDimension> for diesel::pg::Pg {
+        fn metadata(_: &mut Self::MetadataLookup) -> PgTypeMetadata {
+            PgTypeMetadata::new(
+                MOVEMENT_DIMENSION.1.load(Ordering::Acquire),
+                MOVEMENT_DIMENSION.2.load(Ordering::Acquire),
+            )
+        }
+    }
+
     pub struct Position;
 
-    #[derive(diesel::sql_types::SqlType)]
-    #[diesel(postgres_type(name = "weekday"))]
+    static POSITION: (&str, AtomicU32, AtomicU32) =
+        ("position", AtomicU32::new(0), AtomicU32::new(0));
+
+    impl diesel::sql_types::SqlType for Position {
+        type IsNull = diesel::sql_types::is_nullable::NotNull;
+    }
+
+    impl diesel::sql_types::SingleValue for Position {}
+
+    impl diesel::sql_types::HasSqlType<Position> for diesel::pg::Pg {
+        fn metadata(_: &mut Self::MetadataLookup) -> PgTypeMetadata {
+            PgTypeMetadata::new(
+                POSITION.1.load(Ordering::Acquire),
+                POSITION.2.load(Ordering::Acquire),
+            )
+        }
+    }
+
     pub struct Weekday;
+
+    static WEEKDAY: (&str, AtomicU32, AtomicU32) =
+        ("weekday", AtomicU32::new(0), AtomicU32::new(0));
+
+    impl diesel::sql_types::SqlType for Weekday {
+        type IsNull = diesel::sql_types::is_nullable::NotNull;
+    }
+
+    impl diesel::sql_types::SingleValue for Weekday {}
+
+    impl diesel::sql_types::HasSqlType<Weekday> for diesel::pg::Pg {
+        fn metadata(_: &mut Self::MetadataLookup) -> PgTypeMetadata {
+            PgTypeMetadata::new(
+                WEEKDAY.1.load(Ordering::Acquire),
+                WEEKDAY.2.load(Ordering::Acquire),
+            )
+        }
+    }
 }
 
 diesel::table! {

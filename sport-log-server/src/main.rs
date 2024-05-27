@@ -15,23 +15,27 @@
 //! The config must be deserializable to [`Config`].
 //! The name of the config file is specified in [`CONFIG_FILE`].
 
-use std::{env, process::ExitCode};
+use std::{env, process::ExitCode, sync::atomic::Ordering};
 
 use axum::Router;
-use diesel::Connection;
+use diesel::{
+    sql_types::{Oid, Text},
+    Connection, QueryableByName,
+};
 use diesel_async::{
     async_connection_wrapper::AsyncConnectionWrapper,
     pooled_connection::{deadpool::Pool, AsyncDieselConnectionManager},
-    AsyncPgConnection,
+    AsyncPgConnection, RunQueryDsl,
 };
 use diesel_migrations::{EmbeddedMigrations, HarnessWithOutput, MigrationHarness};
+use sport_log_types::schema::sql_types::CUSTOM_TYPES;
 use tokio::fs;
 use tracing::{error, info};
 use tracing_subscriber::EnvFilter;
 
 use crate::{
     config::Config,
-    state::{AppState, DbPool},
+    state::{AppState, DbConn, DbPool},
 };
 
 mod auth;
@@ -70,6 +74,26 @@ async fn get_config() -> Result<Config, String> {
     toml::from_str(&config_file).map_err(|err| format!("failed to parse {CONFIG_FILE}: {err}"))
 }
 
+async fn cache_custom_type_oids(conn: &mut DbConn) {
+    #[derive(QueryableByName)]
+    struct TypeId {
+        #[diesel(sql_type = Oid)]
+        pub oid: u32,
+        #[diesel(sql_type = Oid)]
+        pub array_oid: u32,
+    }
+
+    for (name, oid, array_oid) in CUSTOM_TYPES {
+        let type_id: TypeId = diesel::sql_query(
+        r#"SELECT "pg_type"."oid" AS oid, "pg_type"."typarray" AS array_oid FROM "pg_type" WHERE typname = $1;"#,
+        )
+            .bind::<Text, _>(name)
+            .load(conn).await.unwrap().pop().unwrap();
+        oid.store(type_id.oid, Ordering::Release);
+        array_oid.store(type_id.array_oid, Ordering::Release);
+    }
+}
+
 async fn get_db_pool(config: &Config) -> Result<DbPool, String> {
     let db_config = AsyncDieselConnectionManager::<AsyncPgConnection>::new(&config.database_url);
     let pool = Pool::builder(db_config)
@@ -92,6 +116,11 @@ async fn get_db_pool(config: &Config) -> Result<DbPool, String> {
     .map_err(|err| format!("failed to run database migrations: {err}"))??;
 
     info!("database is up to date");
+
+    info!("looking up oids of custom types");
+    let mut conn = pool.get().await.unwrap();
+
+    cache_custom_type_oids(&mut conn).await;
 
     Ok(pool)
 }
