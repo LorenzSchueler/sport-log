@@ -217,157 +217,157 @@ jobs:
         set -e
 
         echo -e "GET $BASE_URL/version"
-        curl -f "$BASE_URL/version"
+        curl -s -f "$BASE_URL/version"
 
         # adm routes
         echo -e "\n\nPOST $BASE_URL/v0.3/adm/platform"
-        curl -f -u admin:$ADMIN_PASSWORD -X POST "$BASE_URL/v0.3/adm/platform" \
+        curl -s -f -u admin:$ADMIN_PASSWORD -X POST "$BASE_URL/v0.3/adm/platform" \
             -H 'Content-Type: application/json' \
             -d @platform.json
         echo -e "\n\nGET $BASE_URL/v0.3/adm/platform"
-        curl -f -u admin:$ADMIN_PASSWORD "$BASE_URL/v0.3/adm/platform" \
+        curl -s -f -u admin:$ADMIN_PASSWORD "$BASE_URL/v0.3/adm/platform" \
             -H 'Accept: application/json'
         echo -e "\n\nPUT $BASE_URL/v0.3/adm/platform"
-        curl -f -u admin:$ADMIN_PASSWORD -X PUT "$BASE_URL/v0.3/adm/platform" \
+        curl -s -f -u admin:$ADMIN_PASSWORD -X PUT "$BASE_URL/v0.3/adm/platform" \
             -H 'Content-Type: application/json' \
             -d @platform.json
 
         echo -e "\n\nPOST $BASE_URL/v0.3/adm/action_provider"
-        curl -f -u admin:$ADMIN_PASSWORD -X POST "$BASE_URL/v0.3/adm/action_provider" \
+        curl -s -f -u admin:$ADMIN_PASSWORD -X POST "$BASE_URL/v0.3/adm/action_provider" \
             -H 'Content-Type: application/json' \
             -d @action_provider.json
         echo -e "\n\nGET $BASE_URL/v0.3/adm/action_provider"
-        curl -f -u admin:$ADMIN_PASSWORD "$BASE_URL/v0.3/adm/action_provider" \
+        curl -s -f -u admin:$ADMIN_PASSWORD "$BASE_URL/v0.3/adm/action_provider" \
             -H 'Accept: application/json'
 
         # create action so that action events can be created
         echo -e "\n\nPOST $BASE_URL/v0.3/ap/action"
-        curl -f -u admin:$ADMIN_PASSWORD -X POST "$BASE_URL/v0.3/ap/action" \
+        curl -s -f -u admin:$ADMIN_PASSWORD -X POST "$BASE_URL/v0.3/ap/action" \
             -H 'Content-Type: application/json' \
             -H 'id: 2432838314050000638' \
             -d @action.json
 
         echo -e "\n\nPOST $BASE_URL/v0.3/adm/user"
-        curl -f -u admin:$ADMIN_PASSWORD -X POST "$BASE_URL/v0.3/adm/user" \
+        curl -s -f -u admin:$ADMIN_PASSWORD -X POST "$BASE_URL/v0.3/adm/user" \
             -H 'Content-Type: application/json' \
             -d @user.json
 
         echo -e "\n\nPOST $BASE_URL/v0.3/adm/action_event"
-        curl -f -u admin:$ADMIN_PASSWORD -X POST "$BASE_URL/v0.3/adm/action_event" \
+        curl -s -f -u admin:$ADMIN_PASSWORD -X POST "$BASE_URL/v0.3/adm/action_event" \
             -H 'Content-Type: application/json' \
             -d @action_event.json
         echo -e "\n\nPUT $BASE_URL/v0.3/adm/action_event"
-        curl -f -u admin:$ADMIN_PASSWORD -X PUT "$BASE_URL/v0.3/adm/action_event" \
+        curl -s -f -u admin:$ADMIN_PASSWORD -X PUT "$BASE_URL/v0.3/adm/action_event" \
             -H 'Content-Type: application/json' \
             -d @action_event.json
         echo -e "\n\nDELETE $BASE_URL/v0.3/adm/action_event"
-        curl -f -u admin:$ADMIN_PASSWORD -X DELETE "$BASE_URL/v0.3/adm/action_event" \
+        curl -s -f -u admin:$ADMIN_PASSWORD -X DELETE "$BASE_URL/v0.3/adm/action_event" \
             -H 'Content-Type: application/json' \
             -d '[]'
 
         echo -e "\n\nGET $BASE_URL/v0.3/adm/creatable_action_rule"
-        curl -f -u admin:$ADMIN_PASSWORD "$BASE_URL/v0.3/adm/creatable_action_rule" \
+        curl -s -f -u admin:$ADMIN_PASSWORD "$BASE_URL/v0.3/adm/creatable_action_rule" \
             -H 'Accept: application/json'
         echo -e "\n\nGET $BASE_URL/v0.3/adm/deletable_action_event"
-        curl -f -u admin:$ADMIN_PASSWORD "$BASE_URL/v0.3/adm/deletable_action_event" \
+        curl -s -f -u admin:$ADMIN_PASSWORD "$BASE_URL/v0.3/adm/deletable_action_event" \
             -H 'Accept: application/json'
 
         # delete platform (and cascading also actions, ...) so they can be created again
         echo -e "\n\nPUT $BASE_URL/v0.3/adm/platform"
         cat platform.json | sed "s/\"deleted\": false/\"deleted\": true/g" | \
-        curl -f -u admin:$ADMIN_PASSWORD -X PUT "$BASE_URL/v0.3/adm/platform" \
+        curl -s -f -u admin:$ADMIN_PASSWORD -X PUT "$BASE_URL/v0.3/adm/platform" \
             -H 'Content-Type: application/json' \
             -d @-
 
         # delete user so it can be created again
         echo -e "\n\nDELETE $BASE_URL/v0.3/user"
-        curl -f -u admin:$ADMIN_PASSWORD -X DELETE "$BASE_URL/v0.3/user" \
+        curl -s -f -u admin:$ADMIN_PASSWORD -X DELETE "$BASE_URL/v0.3/user" \
             -H 'Content-Type: application/json' \
             -H 'id: 0'
 
         echo -e "\n\nDELETE $BASE_URL/v0.3/adm/garbage_collection?last_change=$(date --utc -d +1minute '+%Y-%m-%dT%H:%M:%SZ')"
-        curl -f -u admin:$ADMIN_PASSWORD -X DELETE "$BASE_URL/v0.3/adm/garbage_collection?last_change=$(date --utc -d +1minute '+%Y-%m-%dT%H:%M:%SZ')"
+        curl -s -f -u admin:$ADMIN_PASSWORD -X DELETE "$BASE_URL/v0.3/adm/garbage_collection?last_change=$(date --utc -d +1minute '+%Y-%m-%dT%H:%M:%SZ')"
 
         # ap routes
         # create platform and ap requires ap self auth
         entities=(platform action_provider)
         for entity in "${entities[@]}"; do
             echo -e "\n\nPOST $BASE_URL/v0.3/ap/$entity"
-            curl -f -X POST "$BASE_URL/v0.3/ap/$entity" \
+            curl -s -f -X POST "$BASE_URL/v0.3/ap/$entity" \
                 -H 'Content-Type: application/json' \
                 -d @$entity.json
             echo -e "\n\nGET $BASE_URL/v0.3/ap/$entity" \
-            curl -f -u $AP_USERNAME:$AP_PASSWORD "$BASE_URL/v0.3/ap/$entity" \
+            curl -s -f -u $AP_USERNAME:$AP_PASSWORD "$BASE_URL/v0.3/ap/$entity" \
                 -H 'Accept: application/json'
         done
 
         echo -e "\n\nPOST $BASE_URL/v0.3/ap/action"
-        curl -f -u $AP_USERNAME:$AP_PASSWORD -X POST "$BASE_URL/v0.3/ap/action" \
+        curl -s -f -u $AP_USERNAME:$AP_PASSWORD -X POST "$BASE_URL/v0.3/ap/action" \
             -H 'Content-Type: application/json' \
             -d @action.json
         echo -e "\n\nGET $BASE_URL/v0.3/ap/action"
-        curl -f -u $AP_USERNAME:$AP_PASSWORD "$BASE_URL/v0.3/ap/action" \
+        curl -s -f -u $AP_USERNAME:$AP_PASSWORD "$BASE_URL/v0.3/ap/action" \
             -H 'Accept: application/json'
 
         echo -e "\n\nDELETE $BASE_URL/v0.3/ap/action_event"
-        curl -f -u $AP_USERNAME:$AP_PASSWORD -X DELETE "$BASE_URL/v0.3/ap/action_event" \
+        curl -s -f -u $AP_USERNAME:$AP_PASSWORD -X DELETE "$BASE_URL/v0.3/ap/action_event" \
             -H 'Content-Type: application/json' \
             -d '[]'
 
         echo -e "\n\nGET $BASE_URL/v0.3/ap/executable_action_event"
-        curl -f -u $AP_USERNAME:$AP_PASSWORD "$BASE_URL/v0.3/ap/executable_action_event" \
+        curl -s -f -u $AP_USERNAME:$AP_PASSWORD "$BASE_URL/v0.3/ap/executable_action_event" \
             -H 'Accept: application/json'
 
         # user routes
         # create user requires user self auth
         echo -e "\n\nPOST $BASE_URL/v0.3/user"
-        curl -f -X POST "$BASE_URL/v0.3/user" \
+        curl -s -f -X POST "$BASE_URL/v0.3/user" \
             -H 'Content-Type: application/json' \
             -d @user.json
         echo -e "\n\nGET $BASE_URL/v0.3/user"
-        curl -f -u $USERNAME:$PASSWORD "$BASE_URL/v0.3/user" \
+        curl -s -f -u $USERNAME:$PASSWORD "$BASE_URL/v0.3/user" \
             -H 'Accept: application/json' 
         echo -e "\n\nPUT $BASE_URL/v0.3/user"
-        curl -f -u $USERNAME:$PASSWORD -X PUT "$BASE_URL/v0.3/user" \
+        curl -s -f -u $USERNAME:$PASSWORD -X PUT "$BASE_URL/v0.3/user" \
             -H 'Content-Type: application/json' \
             -d @user.json
 
         # get_app_info and download_app not tested
 
         echo -e "\n\nGET $BASE_URL/v0.3/account_data"
-        curl -f -u $USERNAME:$PASSWORD "$BASE_URL/v0.3/account_data" \
+        curl -s -f -u $USERNAME:$PASSWORD "$BASE_URL/v0.3/account_data" \
             -H 'Accept: application/json' 
         
         entities=(movement diary strength_session strength_set metcon metcon_movement metcon_session route cardio_session platform_credential action_rule action_event)
         for entity in "${entities[@]}"; do
             echo -e "\n\nPOST $BASE_URL/v0.3/$entity"
-            curl -f -u $USERNAME:$PASSWORD -X POST "$BASE_URL/v0.3/$entity" \
+            curl -s -f -u $USERNAME:$PASSWORD -X POST "$BASE_URL/v0.3/$entity" \
                 -H 'Content-Type: application/json' \
                 -d @$entity.json
             echo -e "\n\nGET $BASE_URL/v0.3/$entity"
-            curl -f -u $USERNAME:$PASSWORD "$BASE_URL/v0.3/$entity" \
+            curl -s -f -u $USERNAME:$PASSWORD "$BASE_URL/v0.3/$entity" \
                 -H 'Accept: application/json' 
             echo -e "\n\nPUT $BASE_URL/v0.3/$entity"
-            curl -f -u $USERNAME:$PASSWORD -X PUT "$BASE_URL/v0.3/$entity" \
+            curl -s -f -u $USERNAME:$PASSWORD -X PUT "$BASE_URL/v0.3/$entity" \
                 -H 'Content-Type: application/json' \
                 -d @$entity.json
         done
 
         echo -e "\n\nGET $BASE_URL/v0.3/platform"
-        curl -f -u $USERNAME:$PASSWORD "$BASE_URL/v0.3/platform" \
+        curl -s -f -u $USERNAME:$PASSWORD "$BASE_URL/v0.3/platform" \
             -H 'Accept: application/json' 
         echo -e "\n\nGET $BASE_URL/v0.3/action_provider"
-        curl -f -u $USERNAME:$PASSWORD "$BASE_URL/v0.3/action_provider" \
+        curl -s -f -u $USERNAME:$PASSWORD "$BASE_URL/v0.3/action_provider" \
             -H 'Accept: application/json' 
         echo -e "\n\nGET $BASE_URL/v0.3/action"
-        curl -f -u $USERNAME:$PASSWORD "$BASE_URL/v0.3/action" \
+        curl -s -f -u $USERNAME:$PASSWORD "$BASE_URL/v0.3/action" \
             -H 'Accept: application/json' 
         echo -e "\n\nGET $BASE_URL/v0.3/eorm"
-        curl -f -u $USERNAME:$PASSWORD "$BASE_URL/v0.3/eorm" \
+        curl -s -f -u $USERNAME:$PASSWORD "$BASE_URL/v0.3/eorm" \
             -H 'Accept: application/json' 
 
         echo -e "\n\nDELETE $BASE_URL/v0.3/user"
-        curl -f -u $USERNAME:$PASSWORD -X DELETE "$BASE_URL/v0.3/user"
+        curl -s -f -u $USERNAME:$PASSWORD -X DELETE "$BASE_URL/v0.3/user"
 
   deps:
     name: unused deps

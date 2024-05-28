@@ -35,17 +35,17 @@ sleep 2
 cd ../sport-log-client
 
 step "delete user if exits"
-curl -u $USERNAME:$PASSWORD -X DELETE "$BASE_URL/v0.3/user"
+curl -s -u $USERNAME:$PASSWORD -X DELETE "$BASE_URL/v0.3/user"
 
 step "create user"
 # requires user self auth
-curl -X POST "$BASE_URL/v0.3/user" \
+curl -s -X POST "$BASE_URL/v0.3/user" \
     -H 'Accept: application/json' \
     -H 'Content-Type: application/json' \
     -d @../test-data/user.json
 
 step "check git ref"
-NEW_VERSION=$(curl -s -u $USERNAME:$PASSWORD "$BASE_URL/v0.3/app/info?git_ref=$GIT_REF")
+NEW_VERSION=$(curl -s -s -u $USERNAME:$PASSWORD "$BASE_URL/v0.3/app/info?git_ref=$GIT_REF")
 if [ "$NEW_VERSION" = '{"new_version":false}' ]; then
     echo "git ref up to date"
 else
@@ -64,12 +64,12 @@ step "run ap setup"
 # requires ap self auth
 entities=(platform action_provider)
 for entity in "${entities[@]}"; do
-    curl -X POST "$BASE_URL/v0.3/ap/$entity" \
+    curl -s -X POST "$BASE_URL/v0.3/ap/$entity" \
         -H 'Accept: application/json' \
         -H 'Content-Type: application/json' \
         -d @../test-data/$entity.json
 done
-curl -u $AP_USERNAME:$AP_PASSWORD -X POST "$BASE_URL/v0.3/ap/action" \
+curl -s -u $AP_USERNAME:$AP_PASSWORD -X POST "$BASE_URL/v0.3/ap/action" \
     -H 'Accept: application/json' \
     -H 'Content-Type: application/json' \
     -d @../test-data/action.json
@@ -81,7 +81,7 @@ for entity in "${entities[@]}"; do
     sed "s/2023-07-04/$(date +%Y-%m-%d)/g" | \
     sed "s/2023-07-05/$(date -d +1day +%Y-%m-%d)/g" | \
     sed "s/2023-07-02/$(date -d -2day +%Y-%m-%d)/g" | \
-    curl -u $USERNAME:$PASSWORD -X POST "$BASE_URL/v0.3/$entity" \
+    curl -s -u $USERNAME:$PASSWORD -X POST "$BASE_URL/v0.3/$entity" \
         -H 'Accept: application/json' \
         -H 'Content-Type: application/json' \
         -d @-
@@ -118,7 +118,7 @@ kill $EMULATOR_PID
 sleep 5
 
 step "run teardown (delete user)"
-curl -u $USERNAME:$PASSWORD -X DELETE "$BASE_URL/v0.3/user"
+curl -s -u $USERNAME:$PASSWORD -X DELETE "$BASE_URL/v0.3/user"
 
 step "terminate server"
 kill $SERVER_PID
