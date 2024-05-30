@@ -13,7 +13,7 @@ use hyper::{
     HeaderMap,
 };
 use serde::{ser::SerializeStruct, Deserialize, Serialize};
-use tracing::info;
+use tracing::{info, warn};
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "snake_case")]
@@ -98,7 +98,8 @@ impl From<TypedHeaderRejection> for HandlerError {
 }
 
 impl From<PoolError> for HandlerError {
-    fn from(_: PoolError) -> Self {
+    fn from(error: PoolError) -> Self {
+        warn!("{error:?}");
         HandlerError {
             status: StatusCode::INTERNAL_SERVER_ERROR,
             message: None,
@@ -109,7 +110,7 @@ impl From<PoolError> for HandlerError {
 
 impl From<DieselError> for HandlerError {
     fn from(error: DieselError) -> Self {
-        match error {
+        match &error {
             DieselError::NotFound => HandlerError::from(StatusCode::NOT_FOUND),
             DieselError::DatabaseError(db_error, db_error_info) => match db_error {
                 DatabaseErrorKind::UniqueViolation => HandlerError {
@@ -158,15 +159,21 @@ impl From<DieselError> for HandlerError {
                     },
                     headers: None,
                 },
-                _ => HandlerError {
-                    status: StatusCode::INTERNAL_SERVER_ERROR,
-                    message: Some(ErrorMessage::Other {
-                        error: db_error_info.message().to_owned(),
-                    }),
-                    headers: None,
-                },
+                kind => {
+                    warn!("{error:?} (kind: {kind:?})");
+                    HandlerError {
+                        status: StatusCode::INTERNAL_SERVER_ERROR,
+                        message: Some(ErrorMessage::Other {
+                            error: db_error_info.message().to_owned(),
+                        }),
+                        headers: None,
+                    }
+                }
             },
-            _ => HandlerError::from(StatusCode::INTERNAL_SERVER_ERROR),
+            error => {
+                warn!("{error:?}");
+                HandlerError::from(StatusCode::INTERNAL_SERVER_ERROR)
+            }
         }
     }
 }
@@ -180,7 +187,7 @@ impl From<Infallible> for HandlerError {
 impl IntoResponse for HandlerError {
     fn into_response(self) -> Response {
         if let Some(message) = &self.message {
-            info!("{:?}", message);
+            info!("{message:?}");
         }
         if let Some(header) = &self.headers {
             (self.status, header.to_owned(), Json(self)).into_response()
