@@ -125,7 +125,7 @@ jobs:
       working-directory: sport-log-types
       run: |
         diesel database setup # --locked-schema TODO
-        git restore src/schema.rs # patch src/schema.rs src/schema.patch TODO
+        patch src/schema.rs src/schema.patch # TODO
     - name: create sport-log-server.toml file
       working-directory: sport-log-server
       run: |
@@ -191,7 +191,7 @@ jobs:
       working-directory: sport-log-types
       run: |
         diesel database setup # --locked-schema TODO
-        git restore src/schema.rs # patch src/schema.rs src/schema.patch TODO
+        patch src/schema.rs src/schema.patch # TODO
     - name: create sport-log-server.toml file
       working-directory: sport-log-server
       run: |
