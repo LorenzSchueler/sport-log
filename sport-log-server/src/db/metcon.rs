@@ -39,10 +39,7 @@ impl GetByUserSync for MetconDb {
         user_id: UserId,
         last_sync: DateTime<Utc>,
         db: &mut AsyncPgConnection,
-    ) -> QueryResult<Vec<<Self as Db>::Type>>
-    where
-        Self: Sized,
-    {
+    ) -> QueryResult<Vec<<Self as Db>::Type>> {
         metcon::table
             .filter(
                 metcon::columns::user_id
@@ -180,10 +177,7 @@ impl GetByUserSync for MetconMovementDb {
         user_id: UserId,
         last_sync: DateTime<Utc>,
         db: &mut AsyncPgConnection,
-    ) -> QueryResult<Vec<<Self as Db>::Type>>
-    where
-        Self: Sized,
-    {
+    ) -> QueryResult<Vec<<Self as Db>::Type>> {
         metcon_movement::table
             .filter(
                 metcon_movement::columns::metcon_id.eq_any(

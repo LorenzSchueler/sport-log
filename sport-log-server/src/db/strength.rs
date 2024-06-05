@@ -58,10 +58,7 @@ impl GetByUserSync for StrengthSetDb {
         user_id: UserId,
         last_sync: DateTime<Utc>,
         db: &mut AsyncPgConnection,
-    ) -> QueryResult<Vec<<Self as Db>::Type>>
-    where
-        Self: Sized,
-    {
+    ) -> QueryResult<Vec<<Self as Db>::Type>> {
         strength_set::table
             .filter(
                 strength_set::columns::strength_session_id.eq_any(

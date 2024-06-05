@@ -49,10 +49,7 @@ impl GetByUserSync for MovementDb {
         user_id: UserId,
         last_sync: chrono::DateTime<chrono::Utc>,
         db: &mut AsyncPgConnection,
-    ) -> QueryResult<Vec<<Self as Db>::Type>>
-    where
-        Self: Sized,
-    {
+    ) -> QueryResult<Vec<<Self as Db>::Type>> {
         movement::table
             .filter(
                 movement::columns::user_id
@@ -314,10 +311,7 @@ impl GetByUserSync for MovementMuscleDb {
         user_id: UserId,
         last_sync: DateTime<Utc>,
         db: &mut AsyncPgConnection,
-    ) -> QueryResult<Vec<<Self as Db>::Type>>
-    where
-        Self: Sized,
-    {
+    ) -> QueryResult<Vec<<Self as Db>::Type>> {
         movement_muscle::table
             .filter(
                 movement_muscle::columns::movement_id.eq_any(
