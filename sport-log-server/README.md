@@ -43,7 +43,7 @@
         as second entry (after entry for user postgres) to `/etc/postgresql/<pg_version>/main/pg_hba.conf`
     *   reload postgres config
         ```bash
-        sudo service postgresql reload
+        sudo systemctl reload postgresql
         ```
 
 ## Run server
@@ -55,7 +55,9 @@ cargo run --release
 ## Connect to database with psql
 
 ```bash
-psql -h localhost -U sport_admin -d sport_log
+psql -U sport_admin -d sport_log
+# or
+sudo -u postgres psql -d sport_log
 ```
 
 ## Backup database
@@ -63,6 +65,36 @@ psql -h localhost -U sport_admin -d sport_log
 ```bash
 pg_dump --dbname=postgres://sport_admin:<password>@localhost/sport_log --data-only --inserts > sport-log_$(date +%Y-%m-%d).dump.sql
 ```
+
+## Restore database
+
+1. [Setup](README.md#setup-1) step 2 and 5 if necessary
+2. delete all data from db (default data created by `diesel database setup`) so that there are no conflicts when dumped data is inserted. Each table must be deleted twice in order to hard delete the data.
+    ```bash
+    sudo -u postgres psql -d sport_log
+    sport_log=# delete from movement;
+    sport_log=# delete from movement;
+    sport_log=# delete from metcon_movement;
+    sport_log=# delete from metcon_movement;
+    sport_log=# delete from metcon;
+    sport_log=# delete from metcon;
+    sport_log=# delete from eorm;
+    sport_log=# delete from eorm;
+    ```
+3. disable trigger `check_strength_session_exists_trigger` (TODO)
+    ```bash
+    sudo -u postgres psql -d sport_log
+    sport_log=# alter table strength_set_archive disable trigger check_strength_session_exists_trigger;
+    ```
+4. import database dump (but leave table `__diesel_schema_migrations` as is)
+    ```bash
+    cat sport-log.dump.sql | awk '!/public.__diesel_schema_migrations/' | sudo -u postgres psql -d sport_log --single-transaction --set=ON_ERROR_STOP=1
+    ```
+5. enable trigger `check_strength_session_exists_trigger` again (TODO)
+    ```bash
+    sudo -u postgres psql -d sport_log
+    sport_log=# alter table strength_set_archive enable trigger check_strength_session_exists_trigger;
+    ```
 
 ## Change database password
 
@@ -112,34 +144,34 @@ cd sport-log-types && diesel database reset --locked-schema
 
 ## SystemD service
 
-- check status of systemd deamon
+- check status
 
     ```bash
-    systemctl status sport-log-server.service
+    systemctl status sport-log-server
     ```
 
-- start/ stop/ restart systemd deamon
+- start/ stop/ restart
 
     ```bash
-    systemctl start sport-log-server.service
-    ```
-
-    ```bash
-    systemctl stop sport-log-server.service
+    systemctl start sport-log-server
     ```
 
     ```bash
-    systemctl restart sport-log-server.service
+    systemctl stop sport-log-server
+    ```
+
+    ```bash
+    systemctl restart sport-log-server
     ```
 
 - enable/ disable start of service at startup
 
     ```bash
-    systemctl enable sport-log-server.service
+    systemctl enable sport-log-server
     ```
 
     ```bash
-    systemctl disable sport-log-server.service
+    systemctl disable sport-log-server
     ```
 
 - show logging entries
@@ -158,7 +190,7 @@ refer to [synchronization](../SYNCHRONIZATION.md)
 # generate password hash - be careful not to add a newline at the end of the password
 argon2 $(pwgen 16 1) -id -e
 # log in to postgres
-psql -h localhost -U sport_admin -d sport_log
+sudo -u postgres psql -d sport_log
 # set new password
 sport_log=> update "user" set password = '<password hash>' where username = '<username>';
 ```
