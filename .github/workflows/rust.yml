@@ -59,7 +59,7 @@ jobs:
       run: cargo doc --no-deps --all-features
 
   build:
-    name: check
+    name: build
     runs-on: ubuntu-latest
 
     steps:
@@ -69,16 +69,16 @@ jobs:
       uses: dtolnay/rust-toolchain@stable
     - name: load cache
       uses: Swatinem/rust-cache@v2
-    - name: cargo check
+    - name: cargo build
       # build every crate on its own to make sure enabled features from other crates do not mask missing dependencies
-      run: cargo check --manifest-path sport-log-action-provider-sportstracker/Cargo.toml &&
-           cargo check --manifest-path sport-log-action-provider-wodify-login/Cargo.toml &&
-           cargo check --manifest-path sport-log-action-provider-wodify-wod/Cargo.toml &&
-           cargo check --manifest-path sport-log-ap-utils/Cargo.toml &&
-           cargo check --manifest-path sport-log-scheduler/Cargo.toml &&
-           cargo check --manifest-path sport-log-server/Cargo.toml &&
-           cargo check --manifest-path sport-log-types/Cargo.toml &&
-           cargo check --manifest-path sport-log-derive/Cargo.toml
+      run: cargo build --manifest-path sport-log-action-provider-sportstracker/Cargo.toml &&
+           cargo build --manifest-path sport-log-action-provider-wodify-login/Cargo.toml &&
+           cargo build --manifest-path sport-log-action-provider-wodify-wod/Cargo.toml &&
+           cargo build --manifest-path sport-log-ap-utils/Cargo.toml &&
+           cargo build --manifest-path sport-log-scheduler/Cargo.toml &&
+           cargo build --manifest-path sport-log-server/Cargo.toml &&
+           cargo build --manifest-path sport-log-types/Cargo.toml &&
+           cargo build --manifest-path sport-log-derive/Cargo.toml
 
   test:
     name: test
