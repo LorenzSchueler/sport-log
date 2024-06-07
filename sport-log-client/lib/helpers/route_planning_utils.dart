@@ -60,7 +60,7 @@ class RoutePlanningUtils {
           searchStart = index + 1;
         }
       } else {
-        // since position matching to last markedPos there is no point withing max distance to current markedPos
+        // since position matching to last markedPos there is no point within max distance to current markedPos
         // insert markedPos and start delete window
         track.insert(searchStart, markedPos);
         searchStart += 1;

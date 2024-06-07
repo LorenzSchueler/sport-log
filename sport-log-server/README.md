@@ -140,7 +140,7 @@ cd sport-log-types && diesel database reset --locked-schema
 
 ### On Update
 1. [Setup](README.md#setup-1) step 2
-2. restart systemd deamon
+2. restart systemd daemon
 
 ## SystemD service
 
