@@ -138,42 +138,26 @@ abstract class TableAccessor<T extends AtomicEntity> {
     return changes == 1;
   }
 
-  Future<DbResult> deleteSingle(Int64 id, {bool isSynchronized = false}) async {
+  Future<DbResult> deleteSingle(Int64 id) async {
     return DbResultExt.catchError(() async {
       final changes = await database.update(
         tableName,
-        {
-          Columns.deleted: 1,
-          if (isSynchronized) Columns.syncStatus: SyncStatus.synchronized.index,
-        },
-        where: combineFilter([
-          notDeleted,
-          '${Columns.id} = ?',
-        ]),
+        {Columns.deleted: 1},
+        where: combineFilter([notDeleted, '${Columns.id} = ?']),
         whereArgs: [id.toInt()],
       );
       return DbResultExt.fromBool(changes == 1);
     });
   }
 
-  Future<DbResult> deleteMultiple(
-    List<T> objects, {
-    bool isSynchronized = false,
-  }) async {
+  Future<DbResult> deleteMultiple(List<T> objects) async {
     return DbResultExt.catchError(() async {
       final batch = database.batch();
       for (final object in objects) {
         batch.update(
           tableName,
-          {
-            Columns.deleted: 1,
-            if (isSynchronized)
-              Columns.syncStatus: SyncStatus.synchronized.index,
-          },
-          where: combineFilter([
-            notDeleted,
-            '${Columns.id} = ?',
-          ]),
+          {Columns.deleted: 1},
+          where: combineFilter([notDeleted, '${Columns.id} = ?']),
           whereArgs: [object.id.toInt()],
         );
       }
@@ -185,42 +169,26 @@ abstract class TableAccessor<T extends AtomicEntity> {
     });
   }
 
-  Future<DbResult> updateSingle(T object, {bool isSynchronized = false}) async {
+  Future<DbResult> updateSingle(T object) async {
     return DbResultExt.catchError(() async {
       final changes = await database.update(
         tableName,
-        {
-          ...serde.toDbRecord(object),
-          if (isSynchronized) Columns.syncStatus: SyncStatus.synchronized.index,
-        },
-        where: combineFilter([
-          notDeleted,
-          '${Columns.id} = ?',
-        ]),
+        {...serde.toDbRecord(object)},
+        where: combineFilter([notDeleted, '${Columns.id} = ?']),
         whereArgs: [object.id.toInt()],
       );
       return DbResultExt.fromBool(changes == 1);
     });
   }
 
-  Future<DbResult> updateMultiple(
-    List<T> objects, {
-    bool isSynchronized = false,
-  }) async {
+  Future<DbResult> updateMultiple(List<T> objects) async {
     return DbResultExt.catchError(() async {
       final batch = database.batch();
       for (final object in objects) {
         batch.update(
           tableName,
-          {
-            ...serde.toDbRecord(object),
-            if (isSynchronized)
-              Columns.syncStatus: SyncStatus.synchronized.index,
-          },
-          where: combineFilter([
-            notDeleted,
-            '${Columns.id} = ?',
-          ]),
+          {...serde.toDbRecord(object)},
+          where: combineFilter([notDeleted, '${Columns.id} = ?']),
           whereArgs: [object.id.toInt()],
         );
       }
@@ -232,27 +200,19 @@ abstract class TableAccessor<T extends AtomicEntity> {
     });
   }
 
-  Future<DbResult> createSingle(T object, {bool isSynchronized = false}) async {
+  Future<DbResult> createSingle(T object) async {
     return DbResultExt.catchError(() async {
-      final id = await database.insert(tableName, {
-        ...serde.toDbRecord(object),
-        if (isSynchronized) Columns.syncStatus: SyncStatus.synchronized.index,
-      });
+      final id =
+          await database.insert(tableName, {...serde.toDbRecord(object)});
       return DbResultExt.fromBool(id == object.id.toInt());
     });
   }
 
-  Future<DbResult> createMultiple(
-    List<T> objects, {
-    bool isSynchronized = false,
-  }) async {
+  Future<DbResult> createMultiple(List<T> objects) async {
     return DbResultExt.catchError(() async {
       final batch = database.batch();
       for (final object in objects) {
-        batch.insert(tableName, {
-          ...serde.toDbRecord(object),
-          if (isSynchronized) Columns.syncStatus: SyncStatus.synchronized.index,
-        });
+        batch.insert(tableName, {...serde.toDbRecord(object)});
       }
       final idList = (await batch.commit(continueOnError: false)).cast<int>();
       return DbResultExt.fromBool(
