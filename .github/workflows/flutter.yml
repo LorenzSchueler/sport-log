@@ -73,7 +73,7 @@ jobs:
       working-directory: sport-log-client
       run: |
         cp sport-log-client.yaml.template sport-log-client.yaml
-        flutter build apk --release \
+        flutter build apk --debug \
             --flavor production \
             --target-platform android-arm64 \
             --split-per-abi \
