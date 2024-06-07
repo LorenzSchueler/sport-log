@@ -47,8 +47,10 @@ jobs:
       run: |
         sudo apt-get update -y
         sudo apt-get install libpq-dev postgresql-client-common postgresql
+    - name: install cargo binstall
+      uses: cargo-bins/cargo-binstall@main
     - name: install diesel_cli
-      run: cargo install diesel_cli --no-default-features --features postgres
+      run: cargo binstall diesel_cli --no-confirm # --no-default-features --features postgres
     - name: create .env file
       working-directory: sport-log-types
       run: echo "DATABASE_URL=postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@localhost/$POSTGRES_DB" > .env
