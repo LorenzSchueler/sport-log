@@ -79,7 +79,7 @@ class MapboxMapWrapper extends StatefulWidget {
 
 class _MapboxMapWrapperState extends State<MapboxMapWrapper> {
   MapController? _mapController;
-  final LocationUtils _locationUtils = LocationUtils();
+  final LocationUtils _locationUtils = LocationUtils(inBackground: false);
 
   bool _centerLocation = true;
   Route? _selectedRoute;

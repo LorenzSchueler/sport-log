@@ -11,21 +11,27 @@ import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/dialogs/dialogs.dart';
 
 class LocationUtils extends ChangeNotifier {
+  LocationUtils({required this.inBackground});
+
+  final bool inBackground;
+
   StreamSubscription<Position>? _locationSubscription;
   GpsPosition? _lastLocation;
 
   bool _disposed = false;
 
-  static final _settings = AndroidSettings(
+  late final _settings = AndroidSettings(
     forceLocationManager: true,
-    foregroundNotificationConfig: const ForegroundNotificationConfig(
-      notificationTitle: "Tracking",
-      notificationText: "GPS tracking is active",
-      color: Colors.red,
-      notificationIcon: AndroidResource(name: "notification_icon"),
-      setOngoing: true,
-      enableWakeLock: true,
-    ),
+    foregroundNotificationConfig: inBackground
+        ? const ForegroundNotificationConfig(
+            notificationTitle: "Tracking",
+            notificationText: "GPS tracking is active",
+            color: Colors.red,
+            notificationIcon: AndroidResource(name: "notification_icon"),
+            setOngoing: true,
+            enableWakeLock: true,
+          )
+        : null,
   );
 
   @override
