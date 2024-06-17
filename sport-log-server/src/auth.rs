@@ -141,6 +141,7 @@ where
 }
 
 pub enum AuthApForUser {
+    #[allow(dead_code)]
     Allowed(ActionProviderId),
     Forbidden,
 }
