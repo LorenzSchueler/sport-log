@@ -46,7 +46,7 @@ class CardioOverviewPage extends StatelessWidget {
               ),
           recordAccessor: (_) => () async {},
           loggerName: "CardioSessionsPage",
-        )..init(),
+        ),
         builder: (_, dataProvider, __) => Scaffold(
           appBar: AppBar(
             title: dataProvider.isSearch

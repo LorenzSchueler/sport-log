@@ -33,7 +33,7 @@ class RouteOverviewPage extends StatelessWidget {
               (_, __, ___, search) => dataProvider.getByName(search),
           recordAccessor: (_) => () async {},
           loggerName: "RoutePage",
-        )..init(),
+        ),
         builder: (_, dataProvider, __) => Scaffold(
           appBar: AppBar(
             title: dataProvider.isSearch

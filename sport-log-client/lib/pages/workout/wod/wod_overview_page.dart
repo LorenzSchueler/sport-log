@@ -33,7 +33,7 @@ class WodOverviewPage extends StatelessWidget {
               ),
           recordAccessor: (_) => () async {},
           loggerName: "WodPage",
-        )..init(),
+        ),
         builder: (_, dataProvider, __) => Scaffold(
           appBar: AppBar(
             title: dataProvider.isSearch

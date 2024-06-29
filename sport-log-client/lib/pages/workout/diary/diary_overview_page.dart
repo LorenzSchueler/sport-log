@@ -36,7 +36,7 @@ class DiaryOverviewPage extends StatelessWidget {
                   ),
           recordAccessor: (_) => () async {},
           loggerName: "DiaryPage",
-        )..init(),
+        ),
         builder: (_, dataProvider, __) => Scaffold(
           appBar: AppBar(
             title: dataProvider.isSearch

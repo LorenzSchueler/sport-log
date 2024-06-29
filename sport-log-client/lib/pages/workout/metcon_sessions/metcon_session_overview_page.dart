@@ -41,7 +41,7 @@ class MetconSessionOverviewPage extends StatelessWidget {
           recordAccessor: (dataProvider) =>
               () => dataProvider.getMetconRecords(),
           loggerName: "MetconSessionsPage",
-        )..init(),
+        ),
         builder: (_, dataProvider, __) => Scaffold(
           appBar: AppBar(
             title: dataProvider.isSearch

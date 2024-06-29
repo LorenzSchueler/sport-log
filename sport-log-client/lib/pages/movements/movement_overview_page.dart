@@ -28,7 +28,7 @@ class MovementOverviewPage extends StatelessWidget {
               (_, __, ___, search) => dataProvider.getByName(search),
           recordAccessor: (_) => () async {},
           loggerName: "MovementsPage",
-        )..init(),
+        ),
         builder: (_, dataProvider, __) => Scaffold(
           appBar: AppBar(
             title: dataProvider.isSearch

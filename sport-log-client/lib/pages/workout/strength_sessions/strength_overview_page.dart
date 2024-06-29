@@ -42,7 +42,7 @@ class StrengthOverviewPage extends StatelessWidget {
           recordAccessor: (dataProvider) =>
               () => dataProvider.getStrengthRecords(),
           loggerName: "StrengthSessionsPage",
-        )..init(),
+        ),
         builder: (_, dataProvider, __) => Scaffold(
           appBar: AppBar(
             title: dataProvider.isSearch

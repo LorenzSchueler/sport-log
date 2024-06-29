@@ -28,7 +28,7 @@ class PlatformOverviewPage extends StatelessWidget {
               (_, __, ___, ____) => dataProvider.getNonDeleted(),
           recordAccessor: (_) => () async {},
           loggerName: "PlatformOverviewPage",
-        )..init(),
+        ),
         builder: (_, dataProvider, __) => Scaffold(
           appBar: AppBar(title: const Text("Server Actions")),
           body: SyncRefreshIndicator(

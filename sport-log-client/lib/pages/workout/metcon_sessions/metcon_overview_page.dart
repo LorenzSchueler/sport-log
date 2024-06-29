@@ -29,7 +29,7 @@ class MetconOverviewPage extends StatelessWidget {
               (_, __, ___, search) => dataProvider.getByMetconName(search),
           recordAccessor: (_) => () async {},
           loggerName: "MetconsPage",
-        )..init(),
+        ),
         builder: (_, dataProvider, __) => Scaffold(
           appBar: AppBar(
             title: dataProvider.isSearch

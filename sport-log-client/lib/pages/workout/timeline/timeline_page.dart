@@ -41,7 +41,7 @@ class TimelinePage extends StatelessWidget {
                   ),
           recordAccessor: (dataProvider) => () => dataProvider.getRecords(),
           loggerName: "TimelinePage",
-        )..init(),
+        ),
         builder: (_, dataProvider, __) => Scaffold(
           appBar: AppBar(
             title: dataProvider.isSearch

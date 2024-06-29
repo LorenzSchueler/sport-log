@@ -3,9 +3,29 @@ import 'package:sport_log/data_provider/data_provider.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_state.dart';
 
+typedef EntityAccessor<T, S, D>
+    = Future<List<T>> Function(DateTime?, DateTime?, S?, String?) Function(D);
+typedef RecordAccessor<R, D> = Future<R> Function() Function(D);
+
 class OverviewDataProvider<T, R, D extends DataProvider<T>, S>
     extends ChangeNotifier {
-  OverviewDataProvider({
+  factory OverviewDataProvider({
+    required D dataProvider,
+    required EntityAccessor<T, S, D> entityAccessor,
+    required RecordAccessor<R, D> recordAccessor,
+    required String loggerName,
+  }) {
+    final instance = OverviewDataProvider._(
+      dataProvider: dataProvider,
+      entityAccessor: entityAccessor,
+      recordAccessor: recordAccessor,
+      loggerName: loggerName,
+    );
+    instance._dataProvider.addListener(instance._update);
+    instance._update(); // just trigger update; do not wait for it
+    return instance;
+  }
+  OverviewDataProvider._({
     required D dataProvider,
     required this.entityAccessor,
     required this.recordAccessor,
@@ -15,9 +35,9 @@ class OverviewDataProvider<T, R, D extends DataProvider<T>, S>
 
   final Logger _logger;
   final D _dataProvider;
-  final Future<List<T>> Function(DateTime?, DateTime?, S?, String?) Function(D)
-      entityAccessor;
-  final Future<R> Function() Function(D) recordAccessor;
+
+  final EntityAccessor<T, S, D> entityAccessor;
+  final RecordAccessor<R, D> recordAccessor;
 
   DateFilterState _dateFilter = DateFilterState.init;
   DateFilterState get dateFilter => _dateFilter;
@@ -56,11 +76,6 @@ class OverviewDataProvider<T, R, D extends DataProvider<T>, S>
   bool get isLoading => _isLoading;
 
   bool _disposed = false;
-
-  void init() {
-    _dataProvider.addListener(_update);
-    _update();
-  }
 
   @override
   void dispose() {
