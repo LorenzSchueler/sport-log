@@ -49,7 +49,7 @@ class _MovementEditPageState extends State<MovementEditPage> {
         ? await _dataProvider.createSingle(_movementDescription.movement)
         : await _dataProvider.updateSingle(_movementDescription.movement);
     if (result.isOk) {
-      Movement.defaultMovement ??= _movementDescription.movement;
+      await _dataProvider.setDefaultMovement();
       if (mounted) {
         Navigator.pop(context);
       }

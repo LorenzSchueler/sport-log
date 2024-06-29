@@ -175,6 +175,19 @@ class MetconDescriptionDataProvider extends DataProvider<MetconDescription> {
     );
   }
 
+  Future<void> setDefaultMetconDescription() async {
+    final metcon = await _metconDataProvider.table.getDefaultMetcon();
+    if (metcon == null) {
+      return;
+    }
+    final metconDescription = MetconDescription(
+      metcon: metcon,
+      moves: await _getMmdByMetcon(metcon),
+      hasReference: await _metconSessionDataProvider.existsByMetcon(metcon),
+    );
+    MetconDescription.defaultMetconDescription = metconDescription;
+  }
+
   Future<List<MetconMovementDescription>> _getMmdByMetcon(Metcon metcon) async {
     final metconMovements =
         await _metconMovementDataProvider.getByMetcon(metcon);

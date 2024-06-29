@@ -33,6 +33,19 @@ class MovementTable extends TableAccessor<Movement> {
     ],
   );
 
+  Future<Movement?> getDefaultMovement() async {
+    final result = await database.query(
+      tableName,
+      where: TableAccessor.combineFilter([
+        notDeleted,
+        TableAccessor.cardioOnlyOfTable(true),
+      ]),
+      orderBy: "abs($tableName.${Columns.id})",
+      limit: 1,
+    );
+    return result.isEmpty ? null : serde.fromDbRecord(result.first);
+  }
+
   Future<List<Movement>> getByCardioAndDistance({
     bool cardioOnly = false,
     bool distanceOnly = false,

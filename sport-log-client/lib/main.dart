@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:awesome_notifications/awesome_notifications.dart';
-import 'package:fixnum/fixnum.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -15,8 +14,6 @@ import 'package:sport_log/database/database.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/global_error_handler.dart';
 import 'package:sport_log/helpers/notification_controller.dart';
-import 'package:sport_log/models/metcon/metcon_description.dart';
-import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/pages/login/welcome_screen.dart';
 import 'package:sport_log/settings.dart';
 import 'package:sport_log/theme.dart';
@@ -58,10 +55,8 @@ Stream<double> initialize() async* {
     databaseFactory = databaseFactoryFfi;
   }
   await AppDatabase.init();
-  // set default movement/ metcon if already available in case sync is not enabled but data exists
-  Movement.defaultMovement ??= await MovementDataProvider().getById(Int64(1));
-  MetconDescription.defaultMetconDescription ??=
-      await MetconDescriptionDataProvider().getById(Int64(1));
+  await MovementDataProvider().setDefaultMovement();
+  await MetconDescriptionDataProvider().setDefaultMetconDescription();
   yield 0.9;
   await Sync.instance.init();
   yield 1.0;

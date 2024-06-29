@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:fixnum/fixnum.dart';
 import 'package:flutter/widgets.dart';
 import 'package:sport_log/app.dart';
 import 'package:sport_log/config.dart';
@@ -10,8 +9,6 @@ import 'package:sport_log/data_provider/data_providers/metcon_data_provider.dart
 import 'package:sport_log/data_provider/data_providers/movement_data_provider.dart';
 import 'package:sport_log/data_provider/data_providers/server_version_data_provider.dart';
 import 'package:sport_log/helpers/logger.dart';
-import 'package:sport_log/models/metcon/metcon_description.dart';
-import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/models/server_version/server_version.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/settings.dart';
@@ -167,12 +164,11 @@ class Sync extends ChangeNotifier {
     //_syncTimer = Timer.periodic(Settings.instance.syncInterval, (_) => sync());
     if (Settings.instance.lastSync == null) {
       await sync(); // wait to make sure movement 1 and metcon 1 exist
+      await MovementDataProvider().setDefaultMovement();
+      await MetconDescriptionDataProvider().setDefaultMetconDescription();
     } else {
       unawaited(sync()); // let sync finish later
     }
-    Movement.defaultMovement ??= await MovementDataProvider().getById(Int64(1));
-    MetconDescription.defaultMetconDescription ??=
-        await MetconDescriptionDataProvider().getById(Int64(1));
   }
 
   void stopSync() {

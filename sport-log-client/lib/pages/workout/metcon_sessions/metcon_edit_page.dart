@@ -42,7 +42,7 @@ class _MetconEditPageState extends State<MetconEditPage> {
         ? await _dataProvider.createSingle(_metconDescription)
         : await _dataProvider.updateSingle(_metconDescription);
     if (result.isOk) {
-      MetconDescription.defaultMetconDescription ??= _metconDescription;
+      await _dataProvider.setDefaultMetconDescription();
       if (mounted) {
         Navigator.pop(
           context,

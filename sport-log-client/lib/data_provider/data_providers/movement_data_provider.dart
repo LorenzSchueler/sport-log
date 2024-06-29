@@ -24,6 +24,13 @@ class MovementDataProvider extends EntityDataProvider<Movement> {
   List<Movement> getFromAccountData(AccountData accountData) =>
       accountData.movements;
 
+  Future<void> setDefaultMovement() async {
+    final movement = await table.getDefaultMovement();
+    if (movement != null) {
+      Movement.defaultMovement = movement;
+    }
+  }
+
   Future<List<Movement>> getByName(
     String? name, {
     bool cardioOnly = false,

@@ -48,6 +48,16 @@ class MetconTable extends TableAccessor<Metcon> {
     );
     return records.map(serde.fromDbRecord).toList();
   }
+
+  Future<Metcon?> getDefaultMetcon() async {
+    final result = await database.query(
+      tableName,
+      where: notDeleted,
+      orderBy: "abs($tableName.${Columns.id})",
+      limit: 1,
+    );
+    return result.isEmpty ? null : serde.fromDbRecord(result.first);
+  }
 }
 
 class MetconMovementTable extends TableAccessor<MetconMovement> {
