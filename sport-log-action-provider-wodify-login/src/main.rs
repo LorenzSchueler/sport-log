@@ -46,8 +46,12 @@ type Result<T> = StdResult<T, Error>;
 enum UserError {
     #[error("can not log in: no credentials provided")]
     NoCredential(ActionEventId),
-    #[error("can not log in: login failed")]
-    LoginFailed(ActionEventId),
+    #[error("can not log in: invalid credentials")]
+    InvalidCredential(ActionEventId),
+    #[error("can not log in: captcha required")]
+    CaptchaRequired(ActionEventId),
+    #[error("can not log in: unknown error")]
+    UnknownLoginError(ActionEventId),
     #[error("{1} class at {2} not found within timeout")]
     ClassNotFound(ActionEventId, String, DateTime<Utc>),
 }
@@ -56,7 +60,9 @@ impl UserError {
     fn action_event_id(&self) -> ActionEventId {
         match self {
             Self::NoCredential(action_event_id)
-            | Self::LoginFailed(action_event_id)
+            | Self::InvalidCredential(action_event_id)
+            | Self::CaptchaRequired(action_event_id)
+            | Self::UnknownLoginError(action_event_id)
             | Self::ClassNotFound(action_event_id, ..) => *action_event_id,
         }
     }
@@ -302,11 +308,28 @@ async fn wodify_login(
 
     time::sleep(StdDuration::from_secs(5)).await;
 
+    if let Ok(feedback) = driver.find(By::ClassName("feedback-message-text")).await {
+        if feedback.inner_html().await? == "Invalid email or password." {
+            return Ok(Err(UserError::InvalidCredential(
+                exec_action_event.action_event_id,
+            )));
+        }
+    }
+
+    if let Ok(button) = driver.find(By::Id("recaptcha-verify-button")).await {
+        if button.is_clickable().await? {
+            return Ok(Err(UserError::CaptchaRequired(
+                exec_action_event.action_event_id,
+            )));
+        }
+    }
+
     if driver.find(By::LinkText("Logout")).await.is_err() {
-        return Ok(Err(UserError::LoginFailed(
+        return Ok(Err(UserError::UnknownLoginError(
             exec_action_event.action_event_id,
         )));
     }
+
     debug!("login successful");
 
     driver
