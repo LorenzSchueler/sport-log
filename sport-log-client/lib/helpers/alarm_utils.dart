@@ -13,6 +13,7 @@ class AlarmUtils {
   DateTime? _lastAlarm;
 
   final _tts = TtsUtils();
+  bool get noTts => _routeAlarmDistance != null && !_tts.ttsEngineFound;
 
   static const _movingWhenPausedAlarmDistance = 50;
   static const _minAlarmInterval = Duration(minutes: 1);

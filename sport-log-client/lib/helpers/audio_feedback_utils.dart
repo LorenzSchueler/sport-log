@@ -14,6 +14,7 @@ class AudioFeedbackUtils {
   Timer? _audioFeedbackTimer;
 
   final _tts = TtsUtils();
+  bool get noTts => _audioFeedbackConfig != null && !_tts.ttsEngineFound;
 
   void setCallbacks(
     CardioSession Function() getCardioSession,
