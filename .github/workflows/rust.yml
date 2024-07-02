@@ -119,10 +119,8 @@ jobs:
       run: |
         sudo apt-get update -y
         sudo apt-get install libpq-dev postgresql-client-common postgresql
-    - name: install cargo binstall
-      uses: cargo-bins/cargo-binstall@main
     - name: install diesel_cli
-      run: cargo binstall diesel_cli --no-confirm # --no-default-features --features postgres
+      run: cargo install diesel_cli --no-default-features --features postgres
     - name: setup database
       working-directory: sport-log-types
       run: |
@@ -187,10 +185,8 @@ jobs:
       run: |
         sudo apt-get update -y
         sudo apt-get install libpq-dev postgresql-client-common postgresql
-    - name: install cargo binstall
-      uses: cargo-bins/cargo-binstall@main
     - name: install diesel_cli
-      run: cargo binstall diesel_cli --no-confirm # --no-default-features --features postgres
+      run: cargo install diesel_cli --no-default-features --features postgres
     - name: setup database
       working-directory: sport-log-types
       run: |
