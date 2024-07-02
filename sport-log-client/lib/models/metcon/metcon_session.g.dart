@@ -11,9 +11,10 @@ MetconSession _$MetconSessionFromJson(Map<String, dynamic> json) =>
       id: const IdConverter().fromJson(json['id'] as String),
       metconId: const IdConverter().fromJson(json['metcon_id'] as String),
       datetime: const DateTimeConverter().fromJson(json['datetime'] as String),
-      time: const OptionalDurationConverter().fromJson(json['time'] as int?),
-      rounds: json['rounds'] as int?,
-      reps: json['reps'] as int?,
+      time: const OptionalDurationConverter()
+          .fromJson((json['time'] as num?)?.toInt()),
+      rounds: (json['rounds'] as num?)?.toInt(),
+      reps: (json['reps'] as num?)?.toInt(),
       rx: json['rx'] as bool,
       comments: json['comments'] as String?,
       deleted: json['deleted'] as bool,

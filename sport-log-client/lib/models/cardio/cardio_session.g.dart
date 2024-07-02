@@ -12,18 +12,19 @@ CardioSession _$CardioSessionFromJson(Map<String, dynamic> json) =>
       movementId: const IdConverter().fromJson(json['movement_id'] as String),
       cardioType: $enumDecode(_$CardioTypeEnumMap, json['cardio_type']),
       datetime: const DateTimeConverter().fromJson(json['datetime'] as String),
-      distance: json['distance'] as int?,
-      ascent: json['ascent'] as int?,
-      descent: json['descent'] as int?,
-      time: const OptionalDurationConverter().fromJson(json['time'] as int?),
-      calories: json['calories'] as int?,
+      distance: (json['distance'] as num?)?.toInt(),
+      ascent: (json['ascent'] as num?)?.toInt(),
+      descent: (json['descent'] as num?)?.toInt(),
+      time: const OptionalDurationConverter()
+          .fromJson((json['time'] as num?)?.toInt()),
+      calories: (json['calories'] as num?)?.toInt(),
       track: (json['track'] as List<dynamic>?)
           ?.map((e) => Position.fromJson(e as Map<String, dynamic>))
           .toList(),
-      avgCadence: json['avg_cadence'] as int?,
+      avgCadence: (json['avg_cadence'] as num?)?.toInt(),
       cadence: const OptionalDurationListConverter()
           .fromJson(json['cadence'] as List?),
-      avgHeartRate: json['avg_heart_rate'] as int?,
+      avgHeartRate: (json['avg_heart_rate'] as num?)?.toInt(),
       heartRate: const OptionalDurationListConverter()
           .fromJson(json['heart_rate'] as List?),
       routeId:

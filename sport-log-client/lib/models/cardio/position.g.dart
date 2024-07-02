@@ -11,7 +11,7 @@ Position _$PositionFromJson(Map<String, dynamic> json) => Position(
       latitude: (json['la'] as num).toDouble(),
       elevation: (json['e'] as num).toDouble(),
       distance: (json['d'] as num).toDouble(),
-      time: const DurationConverter().fromJson(json['t'] as int),
+      time: const DurationConverter().fromJson((json['t'] as num).toInt()),
     );
 
 Map<String, dynamic> _$PositionToJson(Position instance) => <String, dynamic>{

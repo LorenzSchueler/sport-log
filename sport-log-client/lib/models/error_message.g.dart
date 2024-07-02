@@ -7,7 +7,7 @@ part of 'error_message.dart';
 // **************************************************************************
 
 HandlerError _$HandlerErrorFromJson(Map<String, dynamic> json) => HandlerError(
-      status: json['status'] as int,
+      status: (json['status'] as num).toInt(),
       message: json['message'] == null
           ? null
           : ErrorMessage.fromJson(json['message'] as Map<String, dynamic>),

@@ -11,8 +11,8 @@ MetconMovement _$MetconMovementFromJson(Map<String, dynamic> json) =>
       id: const IdConverter().fromJson(json['id'] as String),
       metconId: const IdConverter().fromJson(json['metcon_id'] as String),
       movementId: const IdConverter().fromJson(json['movement_id'] as String),
-      movementNumber: json['movement_number'] as int,
-      count: json['count'] as int,
+      movementNumber: (json['movement_number'] as num).toInt(),
+      count: (json['count'] as num).toInt(),
       maleWeight: (json['male_weight'] as num?)?.toDouble(),
       femaleWeight: (json['female_weight'] as num?)?.toDouble(),
       distanceUnit:

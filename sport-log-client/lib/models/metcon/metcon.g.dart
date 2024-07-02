@@ -11,9 +11,9 @@ Metcon _$MetconFromJson(Map<String, dynamic> json) => Metcon._(
       userId: const OptionalIdConverter().fromJson(json['user_id'] as String?),
       name: json['name'] as String,
       metconType: $enumDecode(_$MetconTypeEnumMap, json['metcon_type']),
-      rounds: json['rounds'] as int?,
-      timecap:
-          const OptionalDurationConverter().fromJson(json['timecap'] as int?),
+      rounds: (json['rounds'] as num?)?.toInt(),
+      timecap: const OptionalDurationConverter()
+          .fromJson((json['timecap'] as num?)?.toInt()),
       description: json['description'] as String?,
       deleted: json['deleted'] as bool,
     );

@@ -9,9 +9,9 @@ part of 'route.dart';
 Route _$RouteFromJson(Map<String, dynamic> json) => Route(
       id: const IdConverter().fromJson(json['id'] as String),
       name: json['name'] as String,
-      distance: json['distance'] as int?,
-      ascent: json['ascent'] as int?,
-      descent: json['descent'] as int?,
+      distance: (json['distance'] as num?)?.toInt(),
+      ascent: (json['ascent'] as num?)?.toInt(),
+      descent: (json['descent'] as num?)?.toInt(),
       track: (json['track'] as List<dynamic>?)
           ?.map((e) => Position.fromJson(e as Map<String, dynamic>))
           .toList(),
