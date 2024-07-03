@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' hide Settings;
 import 'package:sport_log/defaults.dart';
+import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/lat_lng.dart';
 import 'package:sport_log/helpers/map_controller.dart';
 import 'package:sport_log/helpers/map_download_utils.dart';
@@ -33,39 +34,36 @@ class _OfflineMapsPageState extends State<OfflineMapsPage> {
   final NullablePointer<PolylineAnnotation> _boundingBoxLine =
       NullablePointer.nullPointer();
 
-  Future<void> _onMapCreated(MapController mapController) async {
+  void _onMapCreated(MapController mapController) {
     _mapController = mapController;
   }
 
-  MapDownloadUtils createMapDownloadUtils() {
-    return MapDownloadUtils(
-      // ignore: prefer-extracting-callbacks
-      onSuccess: () async {
-        await _updatePoint2(null);
-        await _updatePoint1(null);
-        if (mounted) {
-          await showMessageDialog(
-            context: context,
-            title: "Download Successful",
-            text: "Map region has been saved and can be used offline.",
-          );
-        }
-      },
-      onError: () async {
-        await showMessageDialog(
-          context: context,
-          title: "Download Failed",
-          text: "Internet required.",
-        );
-      },
-    );
+  Future<void> onSuccess() async {
+    await _updatePoint2(null);
+    await _updatePoint1(null);
+    if (mounted) {
+      await showMessageDialog(
+        context: context,
+        title: "Download Successful",
+        text: "Map region has been saved and can be used offline.",
+      );
+    }
   }
 
-  // ignore: avoid-unused-parameters
+  Future<void> onError(String message) async {
+    if (mounted) {
+      await showMessageDialog(
+        context: context,
+        title: "Download Failed",
+        text: message,
+      );
+    }
+  }
+
   Future<void> _downloadMap(MapDownloadUtils mapDownloadUtils) async {
     if (_point1 != null && _point2 != null) {
-      //final bounds = [_point1!, _point2!].latLngBounds!;
-      //await mapDownloadUtils.downloadRegion(bounds); TODO map download
+      final bounds = [_point1!, _point2!].latLngBounds!;
+      await mapDownloadUtils.downloadRegion(bounds);
     } else {
       await showMessageDialog(
         context: context,
@@ -95,47 +93,49 @@ class _OfflineMapsPageState extends State<OfflineMapsPage> {
       child: Scaffold(
         appBar: AppBar(title: const Text("Offline Maps")),
         drawer: const MainDrawer(selectedRoute: Routes.offlineMaps),
-        body: ProviderConsumer<MapDownloadUtils>(
-          create: (_) => createMapDownloadUtils(),
-          builder: (context, mapDownloadUtils, _) {
-            return Column(
+        body: Column(
+          children: [
+            Stack(
               children: [
-                Stack(
-                  children: [
-                    SizedBox(
-                      height: 400,
-                      child: MapboxMapWrapper(
-                        showFullscreenButton: false,
-                        showMapStylesButton: false,
-                        showSelectRouteButton: false,
-                        showSetNorthButton: false,
-                        showCurrentLocationButton: false,
-                        showCenterLocationButton: false,
-                        showAddLocationButton: false,
-                        onMapCreated: _onMapCreated,
-                        onLongTap: (latLng) => _point1 == null
-                            ? _updatePoint1(latLng)
-                            : _updatePoint2(latLng),
-                        rotateGesturesEnabled: false,
-                      ),
-                    ),
-                    Positioned(
-                      bottom: 10,
-                      right: 10,
-                      child: FloatingActionButton.small(
-                        heroTag: null,
-                        child: const Icon(AppIcons.undo),
-                        onPressed: () => _point2 != null
-                            ? _updatePoint2(null)
-                            : _updatePoint1(null),
-                      ),
-                    ),
-                  ],
+                SizedBox(
+                  height: 400,
+                  child: MapboxMapWrapper(
+                    showFullscreenButton: false,
+                    showMapStylesButton: false,
+                    showSelectRouteButton: false,
+                    showSetNorthButton: false,
+                    showCurrentLocationButton: false,
+                    showCenterLocationButton: false,
+                    showAddLocationButton: false,
+                    onMapCreated: _onMapCreated,
+                    onLongTap: (latLng) => _point1 == null
+                        ? _updatePoint1(latLng)
+                        : _updatePoint2(latLng),
+                    rotateGesturesEnabled: false,
+                  ),
                 ),
-                Expanded(
-                  child: Padding(
-                    padding: Defaults.edgeInsets.normal,
-                    child: Column(
+                Positioned(
+                  bottom: 10,
+                  right: 10,
+                  child: FloatingActionButton.small(
+                    heroTag: null,
+                    child: const Icon(AppIcons.undo),
+                    onPressed: () => _point2 != null
+                        ? _updatePoint2(null)
+                        : _updatePoint1(null),
+                  ),
+                ),
+              ],
+            ),
+            Expanded(
+              child: Padding(
+                padding: Defaults.edgeInsets.normal,
+                child: ProviderConsumer<MapDownloadUtils>(
+                  create: (_) =>
+                      MapDownloadUtils(onSuccess: onSuccess, onError: onError)
+                        ..init(),
+                  builder: (context, mapDownloadUtils, _) {
+                    return Column(
                       children: [
                         mapDownloadUtils.progress == null
                             ? SizedBox(
@@ -154,22 +154,24 @@ class _OfflineMapsPageState extends State<OfflineMapsPage> {
                         Expanded(
                           child: ListView.separated(
                             itemBuilder: (_, index) => RegionCard(
-                              //region: mapDownloadUtils.regions[index],
+                              region: mapDownloadUtils.regions[index],
                               mapDownloadUtils: mapDownloadUtils,
-                              //key: ValueKey(mapDownloadUtils.regions[index].id),
+                              key: ValueKey(
+                                mapDownloadUtils.regions[index].tileRegion.id,
+                              ),
                             ),
                             separatorBuilder: (_, __) =>
                                 Defaults.sizedBox.vertical.normal,
-                            itemCount: 0, //mapDownloadUtils.regions.length,
+                            itemCount: mapDownloadUtils.regions.length,
                           ),
                         ),
                       ],
-                    ),
-                  ),
+                    );
+                  },
                 ),
-              ],
-            );
-          },
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -178,24 +180,20 @@ class _OfflineMapsPageState extends State<OfflineMapsPage> {
 
 class RegionCard extends StatelessWidget {
   const RegionCard({
-    //required this.region,
+    required this.region,
     required this.mapDownloadUtils,
     super.key,
   });
 
-  //final OfflineRegion region;
+  final OfflineRegion region;
   final MapDownloadUtils mapDownloadUtils;
 
-  // ignore: avoid-unused-parameters
   Future<void> _onMapCreated(MapController mapController) async {
-    //await mapController.setBoundsX(
-    //region.definition.bounds,
-    //padded: true,
-    //);
-    //await mapController.addBoundingBoxLine([
-    //region.definition.bounds.northeast,
-    //region.definition.bounds.southwest
-    //].latLngBounds);
+    final bounds = LatLngBounds.fromList(
+      (region.metadata["bounds"]! as List).cast<double>(),
+    );
+    await mapController.setBoundsX(bounds, padded: true);
+    await mapController.addBoundingBoxLine(bounds);
   }
 
   @override
@@ -210,7 +208,7 @@ class RegionCard extends StatelessWidget {
           top: 10,
           left: 10,
           child: Text(
-            "", // DateTime.parse(region.metadata["datetime"] as String).humanDate,
+            DateTime.parse(region.metadata["datetime"]! as String).humanDate,
             style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                   color: Theme.of(context).colorScheme.surface,
                 ),
@@ -222,7 +220,7 @@ class RegionCard extends StatelessWidget {
           child: FloatingActionButton.small(
             heroTag: null,
             child: const Icon(AppIcons.delete),
-            onPressed: () {}, //=> mapDownloadUtils.deleteRegion(region),
+            onPressed: () => mapDownloadUtils.deleteRegion(region.tileRegion),
           ),
         ),
       ],

@@ -152,6 +152,13 @@ class LatLngZoom {
 class LatLngBounds {
   LatLngBounds({required this.northeast, required this.southwest});
 
+  // List of [lat1, lng1, lat2, lng2] like the one produced by `LatLngBounds.toList()`.
+  factory LatLngBounds.fromList(List<double> l) {
+    final northeast = LatLng(lat: l[0], lng: l[1]);
+    final southwest = LatLng(lat: l[2], lng: l[3]);
+    return LatLngBounds(northeast: northeast, southwest: southwest);
+  }
+
   LatLng northeast;
   LatLng southwest;
 
@@ -193,11 +200,19 @@ class LatLngBounds {
     );
   }
 
-  CoordinateBounds toCoordinateBounds() => CoordinateBounds(
-        southwest: southwest.toPoint(),
-        northeast: northeast.toPoint(),
-        infiniteBounds: false,
+  Polygon toPolygon() => Polygon(
+        coordinates: [
+          [
+            northeast._toPosition(),
+            LatLng(lat: northeast.lat, lng: southwest.lng)._toPosition(),
+            southwest._toPosition(),
+            LatLng(lat: southwest.lat, lng: northeast.lng)._toPosition(),
+          ]
+        ],
       );
+
+  List<double> toList() =>
+      [northeast.lat, northeast.lng, southwest.lat, southwest.lng];
 
   LineString toLineString() => LineString(
         coordinates: [

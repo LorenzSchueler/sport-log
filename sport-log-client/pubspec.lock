@@ -305,14 +305,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "7.0.0"
-  enum_to_string:
-    dependency: transitive
-    description:
-      name: enum_to_string
-      sha256: bd9e83a33b754cb43a75b36a9af2a0b92a757bfd9847d2621ca0b1bed45f8e7a
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.0.1"
   equatable:
     dependency: transitive
     description:
@@ -706,10 +698,10 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: e51e498480d65a13988d7cab258d3adc74216516
+      resolved-ref: "841c53ccc4edf9c6b87f77cecf79b9afdf6f76e8"
       url: "https://github.com/LorenzSchueler/mapbox-maps-flutter"
     source: git
-    version: "2.0.0-rc.1"
+    version: "2.1.0-rc.1"
   mapbox_search:
     dependency: "direct main"
     description:
