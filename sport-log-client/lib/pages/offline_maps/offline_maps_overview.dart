@@ -68,7 +68,7 @@ class _OfflineMapsPageState extends State<OfflineMapsPage> {
       await showMessageDialog(
         context: context,
         title: "Usage",
-        text: "Please mark 2 points by long pressing on the map.",
+        text: "Mark 2 points by long pressing on the map.",
       );
     }
   }
@@ -114,17 +114,18 @@ class _OfflineMapsPageState extends State<OfflineMapsPage> {
                     rotateGesturesEnabled: false,
                   ),
                 ),
-                Positioned(
-                  bottom: 10,
-                  right: 10,
-                  child: FloatingActionButton.small(
-                    heroTag: null,
-                    child: const Icon(AppIcons.undo),
-                    onPressed: () => _point2 != null
-                        ? _updatePoint2(null)
-                        : _updatePoint1(null),
+                if (_point1 != null)
+                  Positioned(
+                    bottom: 10,
+                    right: 10,
+                    child: FloatingActionButton.small(
+                      heroTag: null,
+                      onPressed: () => _point2 != null
+                          ? _updatePoint2(null)
+                          : _updatePoint1(null),
+                      child: const Icon(AppIcons.undo),
+                    ),
                   ),
-                ),
               ],
             ),
             Expanded(
@@ -143,6 +144,14 @@ class _OfflineMapsPageState extends State<OfflineMapsPage> {
                                 child: FilledButton.icon(
                                   icon: const Icon(AppIcons.download),
                                   label: const Text("Download"),
+                                  style: _point1 == null || _point2 == null
+                                      ? ButtonStyle(
+                                          backgroundColor:
+                                              WidgetStatePropertyAll(
+                                            Theme.of(context).disabledColor,
+                                          ),
+                                        )
+                                      : null,
                                   onPressed: () =>
                                       _downloadMap(mapDownloadUtils),
                                 ),
@@ -207,11 +216,24 @@ class RegionCard extends StatelessWidget {
         Positioned(
           top: 10,
           left: 10,
-          child: Text(
-            DateTime.parse(region.metadata["datetime"]! as String).humanDate,
-            style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                  color: Theme.of(context).colorScheme.surface,
-                ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                DateTime.parse(region.metadata["datetime"]! as String)
+                    .humanDate,
+                style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                      color: Theme.of(context).colorScheme.surface,
+                    ),
+              ),
+              Text(
+                "${region.tileRegion.completedResourceCount} Tiles / ${(region.tileRegion.completedResourceSize / 1000000).round()} MB",
+                style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                      color: Theme.of(context).colorScheme.surface,
+                    ),
+              ),
+            ],
           ),
         ),
         Positioned(
