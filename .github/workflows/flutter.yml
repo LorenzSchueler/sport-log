@@ -119,6 +119,9 @@ jobs:
         sudo apt-get install libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev
     - name: enable linux build
       run: flutter config --enable-linux-desktop
+    - name: flutter pub get
+      working-directory: sport-log-client
+      run: flutter pub get
     - name: flutter build linux
       working-directory: sport-log-client
       run: |
