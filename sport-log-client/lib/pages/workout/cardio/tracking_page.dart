@@ -1,11 +1,11 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart' hide Route;
-import 'package:metronome/metronome.dart';
 import 'package:provider/provider.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/bool_toggle.dart';
 import 'package:sport_log/helpers/lat_lng.dart';
+import 'package:sport_log/helpers/metronome_utils.dart';
 import 'package:sport_log/helpers/tracking_utils.dart';
 import 'package:sport_log/pages/workout/cardio/cardio_value_unit_description_table.dart';
 import 'package:sport_log/pages/workout/cardio/tracking_settings.dart';
@@ -101,7 +101,7 @@ class CardioTrackingPage extends StatelessWidget {
                           ),
                           onMapCreated: trackingUtils.onMapCreated,
                         ),
-                        const Positioned(
+                        Positioned(
                           top: 15,
                           left: 15,
                           child: _CadenceButton(),
@@ -147,84 +147,45 @@ class CardioTrackingPage extends StatelessWidget {
   }
 }
 
-class _CadenceButton extends StatefulWidget {
-  const _CadenceButton();
-
-  @override
-  State<_CadenceButton> createState() => _CadenceButtonState();
-}
-
-enum MetronomeAdjustment { increase, decrease, stop }
-
-class _CadenceButtonState extends State<_CadenceButton> {
-  int _cadence = 180;
-  bool _isPlaying = false;
-  final Metronome _metronome = Metronome()
-    ..init(Defaults.assets.beepMetronomeFile, bpm: 180);
-
-  @override
-  void dispose() {
-    _metronome.destroy();
-    super.dispose();
-  }
-
-  void startTimer() {
-    _metronome.play(_cadence);
-    setState(() => _isPlaying = true);
-  }
-
-  void adjustTimer(MetronomeAdjustment change) {
-    switch (change) {
-      case MetronomeAdjustment.stop:
-        setState(() => _isPlaying = false);
-        _metronome.stop();
-        break;
-      case MetronomeAdjustment.increase:
-        setState(() => _cadence += 1);
-        _metronome.setBPM(_cadence);
-        break;
-      case MetronomeAdjustment.decrease:
-        if (_cadence > 1) {
-          setState(() => _cadence -= 1);
-          _metronome.setBPM(_cadence);
-        }
-    }
-  }
-
+class _CadenceButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return _isPlaying
-        ? SegmentedButton<MetronomeAdjustment>(
-            segments: [
-              ButtonSegment(
-                value: MetronomeAdjustment.stop,
-                label: Text("$_cadence rpm"),
-                icon: const Icon(AppIcons.close),
+    return ProviderConsumer(
+      create: (_) => MetronomeUtils(),
+      builder: (context, metronomeUtils, _) => metronomeUtils.isPlaying
+          ? SegmentedButton<MetronomeAdjustment>(
+              segments: [
+                ButtonSegment(
+                  value: MetronomeAdjustment.stop,
+                  label: Text("${metronomeUtils.cadence} rpm"),
+                  icon: const Icon(AppIcons.close),
+                ),
+                const ButtonSegment(
+                  value: MetronomeAdjustment.increase,
+                  icon: Icon(AppIcons.add),
+                ),
+                const ButtonSegment(
+                  value: MetronomeAdjustment.decrease,
+                  icon: Icon(AppIcons.remove),
+                ),
+              ],
+              selected: const {},
+              emptySelectionAllowed: true,
+              onSelectionChanged: (selected) =>
+                  metronomeUtils.adjustTimer(selected.first),
+              style: ButtonStyle(
+                backgroundColor: WidgetStatePropertyAll(
+                  Theme.of(context).colorScheme.primary,
+                ),
+                foregroundColor: const WidgetStatePropertyAll(Colors.black),
               ),
-              const ButtonSegment(
-                value: MetronomeAdjustment.increase,
-                icon: Icon(AppIcons.add),
-              ),
-              const ButtonSegment(
-                value: MetronomeAdjustment.decrease,
-                icon: Icon(AppIcons.remove),
-              ),
-            ],
-            selected: const {},
-            emptySelectionAllowed: true,
-            onSelectionChanged: (selected) => adjustTimer(selected.first),
-            style: ButtonStyle(
-              backgroundColor: WidgetStatePropertyAll(
-                Theme.of(context).colorScheme.primary,
-              ),
-              foregroundColor: const WidgetStatePropertyAll(Colors.black),
+            )
+          : IconButton.filled(
+              onPressed: metronomeUtils.startTimer,
+              icon: const Icon(AppIcons.gauge),
+              color: Colors.black,
             ),
-          )
-        : IconButton.filled(
-            onPressed: startTimer,
-            icon: const Icon(AppIcons.gauge),
-            color: Colors.black,
-          );
+    );
   }
 }
 
