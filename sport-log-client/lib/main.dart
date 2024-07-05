@@ -14,6 +14,7 @@ import 'package:sport_log/database/database.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/global_error_handler.dart';
 import 'package:sport_log/helpers/notification_controller.dart';
+import 'package:sport_log/helpers/tts_utils.dart';
 import 'package:sport_log/pages/login/welcome_screen.dart';
 import 'package:sport_log/settings.dart';
 import 'package:sport_log/theme.dart';
@@ -49,6 +50,7 @@ Stream<double> initialize() async* {
   );
   yield 0.6;
   MapboxOptions.setAccessToken(Config.instance.accessToken);
+  await TtsUtils.init();
   yield 0.7;
   if (Config.isWindows || Config.isLinux) {
     sqfliteFfiInit();

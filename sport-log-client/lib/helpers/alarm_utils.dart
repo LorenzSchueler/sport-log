@@ -12,8 +12,7 @@ class AlarmUtils {
   bool _movingWhenPausedAlarmFired = false;
   DateTime? _lastAlarm;
 
-  final _tts = TtsUtils();
-  bool get noTts => _routeAlarmDistance != null && !_tts.ttsEngineFound;
+  bool get noTts => _routeAlarmDistance != null && !TtsUtils.ttsEngineFound;
 
   static const _movingWhenPausedAlarmDistance = 50;
   static const _minAlarmInterval = Duration(minutes: 1);
@@ -41,7 +40,7 @@ class AlarmUtils {
       final distance = position.distanceTo(lastPosition);
       if (distance > _movingWhenPausedAlarmDistance) {
         _movingWhenPausedAlarmFired = true;
-        await _tts.speak(
+        await TtsUtils.speak(
           "You more than $_movingWhenPausedAlarmDistance meters from the position where you paused recording. You may want to resume recording.",
         );
       }
@@ -56,7 +55,9 @@ class AlarmUtils {
       final (distance, index) = position.minDistanceTo(_getTrack());
       if (distance > _routeAlarmDistance! && index != null) {
         _lastAlarm = DateTime.now();
-        await _tts.speak("You are off route by ${distance.round()} meters.");
+        await TtsUtils.speak(
+          "You are off route by ${distance.round()} meters.",
+        );
       }
     }
   }

@@ -13,8 +13,7 @@ class AudioFeedbackUtils {
   final AudioFeedbackConfig? _audioFeedbackConfig;
   Timer? _audioFeedbackTimer;
 
-  final _tts = TtsUtils();
-  bool get noTts => _audioFeedbackConfig != null && !_tts.ttsEngineFound;
+  bool get noTts => _audioFeedbackConfig != null && !TtsUtils.ttsEngineFound;
 
   void setCallbacks(
     CardioSession Function() getCardioSession,
@@ -72,5 +71,5 @@ class AudioFeedbackUtils {
     AudioFeedbackConfig config,
     CardioSession session,
   ) =>
-      _tts.speak(config.text(session));
+      TtsUtils.speak(config.text(session));
 }
