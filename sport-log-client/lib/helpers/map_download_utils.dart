@@ -22,7 +22,7 @@ class MapDownloadUtils extends ChangeNotifier {
   final Future<void> Function()? onSuccess;
   final Future<void> Function(String)? onError;
 
-  late final TileStore _tileStore;
+  static late final TileStore _tileStore;
 
   List<OfflineRegion> _regions = [];
   List<OfflineRegion> get regions => _regions;
@@ -41,10 +41,11 @@ class MapDownloadUtils extends ChangeNotifier {
 
   bool _disposed = false;
 
-  Future<void> init() async {
+  static Future<void> globalInit() async {
     _tileStore = await TileStore.createDefault();
-    await _updateRegions();
   }
+
+  Future<void> init() => _updateRegions();
 
   @override
   void dispose() {

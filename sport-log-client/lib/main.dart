@@ -13,6 +13,7 @@ import 'package:sport_log/data_provider/sync.dart';
 import 'package:sport_log/database/database.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/global_error_handler.dart';
+import 'package:sport_log/helpers/map_download_utils.dart';
 import 'package:sport_log/helpers/notification_controller.dart';
 import 'package:sport_log/helpers/tts_utils.dart';
 import 'package:sport_log/pages/login/welcome_screen.dart';
@@ -50,6 +51,7 @@ Stream<double> initialize() async* {
   );
   yield 0.6;
   MapboxOptions.setAccessToken(Config.instance.accessToken);
+  await MapDownloadUtils.globalInit();
   await TtsUtils.init();
   yield 0.7;
   if (Config.isWindows || Config.isLinux) {
