@@ -4,6 +4,32 @@ import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/map_controller.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 
+enum MapStyle {
+  outdoor(MapboxStyles.OUTDOORS),
+  street(MapboxStyles.STANDARD),
+  // based on mapbox SATELLITE_STREETS
+  // road network - surface: road-street
+  //     opacity: 0.5
+  // road network - surface: road-minor
+  //     color: hsl(35, 80%, 48%)
+  //     opacity: 1
+  //     width: 2
+  //     dash-array: 5, 2
+  // road network - surface: road-minor-case
+  //     color: hsl(35, 80%, 0%)
+  // walking, cycling, etc - surface - road-path
+  //     color: hsl(35, 80%, 48%)
+  //     opacity: 1
+  //     width: 2
+  //     dash-array: 2, 1
+  satelliteStreetsWithPaths(
+    "mapbox://styles/hi-ker/cloa9i53h011s01qsdf867pcy",
+  );
+
+  const MapStyle(this.url);
+  final String url;
+}
+
 class MapStylesButton extends StatelessWidget {
   const MapStylesButton({required this.mapController, super.key});
 
@@ -71,25 +97,7 @@ class _TerrainOption extends _MapOption {
 
 class _MapStylesBottomSheetState extends State<MapStylesBottomSheet> {
   Set<_MapOption> _options = {};
-  String _style = MapboxStyles.OUTDOORS;
-
-  // based on mapbox SATELLITE_STREETS
-  // road network - surface: road-street
-  //     opacity: 0.5
-  // road network - surface: road-minor
-  //     color: hsl(35, 80%, 48%)
-  //     opacity: 1
-  //     width: 2
-  //     dash-array: 5, 2
-  // road network - surface: road-minor-case
-  //     color: hsl(35, 80%, 0%)
-  // walking, cycling, etc - surface - road-path
-  //     color: hsl(35, 80%, 48%)
-  //     opacity: 1
-  //     width: 2
-  //     dash-array: 2, 1
-  static const String satelliteStreetsWithPaths =
-      "mapbox://styles/hi-ker/cloa9i53h011s01qsdf867pcy";
+  MapStyle _style = MapStyle.outdoor;
 
   final style = ButtonStyle(
     shape: WidgetStateProperty.all(const CircleBorder()),
@@ -110,19 +118,23 @@ class _MapStylesBottomSheetState extends State<MapStylesBottomSheet> {
     if (style == null) {
       return;
     }
-    setState(() {
-      _style = style;
-      _options = {
-        if (hasHillshade) const _HillshadeOption(),
-        if (hasTerrain) const _TerrainOption(),
-      };
-    });
+    if (mounted) {
+      setState(() {
+        _style = MapStyle.values.firstWhere((s) => s.url == style);
+        _options = {
+          if (hasHillshade) const _HillshadeOption(),
+          if (hasTerrain) const _TerrainOption(),
+        };
+      });
+    }
   }
 
-  Future<void> _setStyle(Set<String> style) async {
+  Future<void> _setStyle(Set<MapStyle> style) async {
     await _setOptions({}); // disable all options
-    await widget.mapController.setStyle(style.first);
-    setState(() => _style = style.first);
+    await widget.mapController.setStyle(style.first.url);
+    if (mounted) {
+      setState(() => _style = style.first);
+    }
   }
 
   Future<void> _setOptions(Set<_MapOption> options) async {
@@ -150,17 +162,17 @@ class _MapStylesBottomSheetState extends State<MapStylesBottomSheet> {
           SegmentedButton(
             segments: const [
               ButtonSegment(
-                value: MapboxStyles.OUTDOORS,
+                value: MapStyle.outdoor,
                 icon: Icon(AppIcons.mountains),
                 label: Text("Outdoor"),
               ),
               ButtonSegment(
-                value: MapboxStyles.STANDARD,
+                value: MapStyle.street,
                 icon: Icon(AppIcons.car),
                 label: Text("Street"),
               ),
               ButtonSegment(
-                value: satelliteStreetsWithPaths,
+                value: MapStyle.satelliteStreetsWithPaths,
                 icon: Icon(AppIcons.satellite),
                 label: Text("Satellite"),
               ),

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:sport_log/helpers/lat_lng.dart';
+import 'package:sport_log/widgets/map_widgets/map_styles_button.dart';
 
 class OfflineRegion {
   OfflineRegion(this.tileRegion, this.metadata);
@@ -81,7 +82,7 @@ class MapDownloadUtils extends ChangeNotifier {
       geometry: bounds.toPolygon().toJson(),
       descriptorsOptions: [
         TilesetDescriptorOptions(
-          styleURI: MapboxStyles.OUTDOORS,
+          styleURI: MapStyle.outdoor.url,
           minZoom: 0,
           maxZoom: _maxZoom,
         ),
@@ -91,6 +92,7 @@ class MapDownloadUtils extends ChangeNotifier {
       metadata: {
         "datetime": DateTime.now().toIso8601String(),
         "bounds": bounds.toList(), // .toPolygon().toJson() causes crash
+        "style": MapStyle.outdoor.name,
         "minZoom": 0,
         "maxZoom": _maxZoom,
       },
