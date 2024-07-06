@@ -43,7 +43,7 @@ The client has an own database in order to allow offline use. It synchronizes wi
 - 📊 statistics about workouts including 🏅 records, 📈 charts, splits and much more
 - 🚴 create new movements
 - 🗺️ map with different styles (⛺ outdoor, 🚗 street, 🛰️ satellite) support for 🌍 3D and ⛰️ hill shading
-- 💾 download offline maps (*not yet supported*)
+- 💾 download offline maps
 - ⏱️ timer with different modes (timer, interval, stopwatch)
 - 🗓️ schedule task to be executed by action providers on server
 
