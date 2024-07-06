@@ -27,6 +27,13 @@ class MapDownloadUtils extends ChangeNotifier {
   List<OfflineRegion> _regions = [];
   List<OfflineRegion> get regions => _regions;
 
+  int _maxZoom = 14;
+  int get maxZoom => _maxZoom;
+  set maxZoom(int maxZoom) {
+    _maxZoom = maxZoom;
+    notifyListeners();
+  }
+
   int get _nextId =>
       (_regions
               .map((region) => int.tryParse(region.tileRegion.id))
@@ -75,8 +82,8 @@ class MapDownloadUtils extends ChangeNotifier {
       descriptorsOptions: [
         TilesetDescriptorOptions(
           styleURI: MapboxStyles.OUTDOORS,
-          minZoom: 6,
-          maxZoom: 14, // 16 uses too many tiles
+          minZoom: 0,
+          maxZoom: _maxZoom,
         ),
       ],
       acceptExpired: true,
@@ -84,6 +91,8 @@ class MapDownloadUtils extends ChangeNotifier {
       metadata: {
         "datetime": DateTime.now().toIso8601String(),
         "bounds": bounds.toList(), // .toPolygon().toJson() causes crash
+        "minZoom": 0,
+        "maxZoom": _maxZoom,
       },
     );
 
@@ -101,7 +110,8 @@ class MapDownloadUtils extends ChangeNotifier {
       _progress = null;
       notifyListeners();
       await onError?.call(
-        "Maximum tile count exceeded. Delete other offline regions or choose a smaller region.",
+        "Maximum tile count exceeded. "
+        "Delete other offline regions or choose a smaller region or decrease the max zoom level.",
       );
       return;
     }

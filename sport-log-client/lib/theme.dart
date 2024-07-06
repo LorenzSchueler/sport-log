@@ -83,6 +83,9 @@ class AppTheme {
             states.contains(WidgetState.selected) ? _colorScheme.primary : null,
       ),
     ),
+    sliderTheme: SliderThemeData(
+      overlayShape: SliderComponentShape.noOverlay,
+    ),
     // input decoration for InputDecorator, TextField, and TextFormField
     inputDecorationTheme: InputDecorationTheme(
       contentPadding: const EdgeInsets.symmetric(vertical: 5),

@@ -139,22 +139,37 @@ class _OfflineMapsPageState extends State<OfflineMapsPage> {
                     return Column(
                       children: [
                         mapDownloadUtils.progress == null
-                            ? SizedBox(
-                                width: double.infinity,
-                                child: FilledButton.icon(
-                                  icon: const Icon(AppIcons.download),
-                                  label: const Text("Download"),
-                                  style: _point1 == null || _point2 == null
-                                      ? ButtonStyle(
-                                          backgroundColor:
-                                              WidgetStatePropertyAll(
-                                            Theme.of(context).disabledColor,
-                                          ),
-                                        )
-                                      : null,
-                                  onPressed: () =>
-                                      _downloadMap(mapDownloadUtils),
-                                ),
+                            ? Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Text("Max Zoom"),
+                                  Slider(
+                                    value: mapDownloadUtils.maxZoom.toDouble(),
+                                    label: mapDownloadUtils.maxZoom.toString(),
+                                    max: 16,
+                                    divisions: 16,
+                                    onChanged: (zoom) {
+                                      mapDownloadUtils.maxZoom = zoom.round();
+                                    },
+                                  ),
+                                  SizedBox(
+                                    width: double.infinity,
+                                    child: FilledButton.icon(
+                                      icon: const Icon(AppIcons.download),
+                                      label: const Text("Download"),
+                                      style: _point1 == null || _point2 == null
+                                          ? ButtonStyle(
+                                              backgroundColor:
+                                                  WidgetStatePropertyAll(
+                                                Theme.of(context).disabledColor,
+                                              ),
+                                            )
+                                          : null,
+                                      onPressed: () =>
+                                          _downloadMap(mapDownloadUtils),
+                                    ),
+                                  ),
+                                ],
                               )
                             : LinearProgressIndicator(
                                 value: mapDownloadUtils.progress,
@@ -229,6 +244,12 @@ class RegionCard extends StatelessWidget {
               ),
               Text(
                 "${region.tileRegion.completedResourceCount} Tiles / ${(region.tileRegion.completedResourceSize / 1000000).round()} MB",
+                style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                      color: Theme.of(context).colorScheme.surface,
+                    ),
+              ),
+              Text(
+                "Zoom ${region.metadata["minZoom"]} - ${region.metadata["maxZoom"]}",
                 style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                       color: Theme.of(context).colorScheme.surface,
                     ),
