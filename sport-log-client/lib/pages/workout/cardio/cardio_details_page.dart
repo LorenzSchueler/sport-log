@@ -199,9 +199,11 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
   Future<void> _findSimilarSessions() async {
     final similarSessions = await _sessionDataProvider
         .getSimilarCardioSessions(_cardioSessionDescription);
-    setState(() {
-      _similarSessions = similarSessions;
-    });
+    if (mounted) {
+      setState(() {
+        _similarSessions = similarSessions;
+      });
+    }
   }
 
   void _computeSplits(int distance) {
@@ -228,14 +230,18 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
           touchMarker: NullablePointer.nullPointer(),
         ),
       );
-      setState(() {});
+      if (mounted) {
+        setState(() {});
+      }
     }
   }
 
-  void _hideSession(CardioSession session) {
+  Future<void> _hideSession(CardioSession session) async {
     final line = _similarSessionAnnotations.remove(session)!.trackLine;
-    _mapController?.removeLine(line);
-    setState(() {});
+    await _mapController?.removeLine(line);
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   @override

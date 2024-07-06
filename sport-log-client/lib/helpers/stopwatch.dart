@@ -1,7 +1,7 @@
 /// Replacement for [Stopwatch] because it ticks to slow when not in foreground (https://github.com/flutter/flutter/issues/44719).
 class StopwatchX {
   bool _isRunning = false;
-  late DateTime _lastResumeTime;
+  DateTime _lastResumeTime = DateTime.now(); // gets overwritten anyway
   Duration _lastStopDuration = Duration.zero;
 
   Duration get elapsed => _isRunning

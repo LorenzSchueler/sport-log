@@ -7,12 +7,9 @@ import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 class LatLng {
   const LatLng({required this.lat, required this.lng});
 
-  factory LatLng.fromPoint(Point point) {
-    return LatLng(
-      lat: point.coordinates.lat as double,
-      lng: point.coordinates.lng as double,
-    );
-  }
+  LatLng.fromPoint(Point point)
+      : lat = point.coordinates.lat as double,
+        lng = point.coordinates.lng as double;
 
   final double lat;
   final double lng;
@@ -153,11 +150,9 @@ class LatLngBounds {
   LatLngBounds({required this.northeast, required this.southwest});
 
   // List of [lat1, lng1, lat2, lng2] like the one produced by `LatLngBounds.toList()`.
-  factory LatLngBounds.fromList(List<double> l) {
-    final northeast = LatLng(lat: l[0], lng: l[1]);
-    final southwest = LatLng(lat: l[2], lng: l[3]);
-    return LatLngBounds(northeast: northeast, southwest: southwest);
-  }
+  LatLngBounds.fromList(List<double> l)
+      : northeast = LatLng(lat: l[0], lng: l[1]),
+        southwest = LatLng(lat: l[2], lng: l[3]);
 
   LatLng northeast;
   LatLng southwest;

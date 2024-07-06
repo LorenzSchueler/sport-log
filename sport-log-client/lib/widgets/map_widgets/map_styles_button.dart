@@ -144,7 +144,9 @@ class _MapStylesBottomSheetState extends State<MapStylesBottomSheet> {
     for (final option in options.difference(_options)) {
       await option.enable(widget.mapController);
     }
-    setState(() => _options = options);
+    if (mounted) {
+      setState(() => _options = options);
+    }
   }
 
   @override
