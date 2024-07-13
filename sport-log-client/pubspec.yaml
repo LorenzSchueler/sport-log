@@ -32,13 +32,10 @@ dependencies:
   json_annotation: ^4.4.0
   latlong2: ^0.9.0
   logger: ^2.0.1
-  mapbox_api: #^1.0.0
-    # http 1.1
+  mapbox_api_pro: ^1.0.0
+  mapbox_maps_flutter: #^2.1.0
     git:
-      url: https://github.com/LorenzSchueler/mapbox-api
-  mapbox_maps_flutter: #^2.1.0-rc.1
-    git:
-      url: https://github.com/LorenzSchueler/mapbox-maps-flutter
+      url: https://github.com/mapbox/mapbox-maps-flutter
   mapbox_search: ^4.2.0
   metronome: ^1.1.1+1
   open_file: ^3.3.1

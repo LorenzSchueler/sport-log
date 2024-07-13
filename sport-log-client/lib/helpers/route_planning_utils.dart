@@ -2,7 +2,7 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:collection/collection.dart';
-import 'package:mapbox_api/mapbox_api.dart';
+import 'package:mapbox_api_pro/mapbox_api_pro.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/lat_lng.dart';
 import 'package:sport_log/helpers/logger.dart';
