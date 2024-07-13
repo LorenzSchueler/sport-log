@@ -17,7 +17,6 @@ mod diary_wod;
 mod metcon;
 mod movement;
 mod platform;
-mod sharing;
 mod strength;
 mod user;
 
@@ -29,7 +28,6 @@ pub use diary_wod::*;
 pub use metcon::*;
 pub use movement::*;
 pub use platform::*;
-pub use sharing::*;
 pub use strength::*;
 pub use user::*;
 
@@ -123,14 +121,6 @@ pub trait ModifiableDb: Db {
 }
 
 /// A type for which a new database entry can be created.
-///
-/// ### Deriving
-///
-/// This trait can be automatically derived by adding `#[derive(Create)]` to
-/// your struct.
-///
-/// For restrictions on the types for derive to work please see
-/// [`sport_log_derive::Create`].
 #[async_trait]
 pub trait Create: Db {
     async fn create(value: &Self::Type, db: &mut AsyncPgConnection) -> QueryResult<usize>;
@@ -142,28 +132,12 @@ pub trait Create: Db {
 }
 
 /// A type for which an entry can be retrieved by id from the database.
-///
-/// ### Deriving
-///
-/// This trait can be automatically derived by adding `#[derive(GetById)]` to
-/// your struct.
-///
-/// For restrictions on the types for derive to work please see
-/// [`sport_log_derive::GetById`].
 #[async_trait]
 pub trait GetById: Db {
     async fn get_by_id(id: Self::Id, db: &mut AsyncPgConnection) -> QueryResult<Self::Type>;
 }
 
 /// A type for which entries can be retrieved by user from the database.
-///
-/// ### Deriving
-///
-/// This trait can be automatically derived by adding `#[derive(GetByUser)]` to
-/// your struct.
-///
-/// For restrictions on the types for derive to work please see
-/// [`sport_log_derive::GetByUser`].
 #[async_trait]
 pub trait GetByUser: Db {
     async fn get_by_user(
@@ -174,14 +148,6 @@ pub trait GetByUser: Db {
 
 /// A type for which entries can be retrieved by user and the timespan from the
 /// database.
-///
-/// ### Deriving
-///
-/// This trait can be automatically derived by adding
-/// `#[derive(GetByUserTimespan)]` to your struct.
-///
-/// For restrictions on the types for derive to work please see
-/// [`sport_log_derive::GetByUserTimespan`].
 #[async_trait]
 pub trait GetByUserTimespan: Db {
     async fn get_by_user_and_timespan(
@@ -193,14 +159,6 @@ pub trait GetByUserTimespan: Db {
 
 /// A type for which entries can be retrieved by user and the timestamp of the
 /// last synchronization from the database.
-///
-/// ### Deriving
-///
-/// This trait can be automatically derived by adding `#[derive(GetByUserSync)]`
-/// to your struct.
-///
-/// For restrictions on the types for derive to work please see
-/// [`sport_log_derive::GetByUserSync`].
 #[async_trait]
 pub trait GetByUserSync: Db {
     async fn get_by_user_and_last_sync(
@@ -212,14 +170,6 @@ pub trait GetByUserSync: Db {
 
 /// A type for which entries can be retrieved by the timestamp of the last
 /// synchronization from the database.
-///
-/// ### Deriving
-///
-/// This trait can be automatically derived by adding `#[derive(GetBySync)]` to
-/// your struct.
-///
-/// For restrictions on the types for derive to work please see
-/// [`sport_log_derive::GetBySync`].
 #[async_trait]
 pub trait GetBySync: Db {
     async fn get_by_last_sync(
@@ -229,28 +179,12 @@ pub trait GetBySync: Db {
 }
 
 /// A type for which all entries can be retrieved from the database.
-///
-/// ### Deriving
-///
-/// This trait can be automatically derived by adding `#[derive(GetAll)]` to
-/// your struct.
-///
-/// For restrictions on the types for derive to work please see
-/// [`sport_log_derive::GetAll`].
 #[async_trait]
 pub trait GetAll: Db {
     async fn get_all(db: &mut AsyncPgConnection) -> QueryResult<Vec<Self::Type>>;
 }
 
 /// A type which can be used to update an entry in the database.
-///
-/// ### Deriving
-///
-/// This trait can be automatically derived by adding `#[derive(Update)]` to
-/// your struct.
-///
-/// For restrictions on the types for derive to work please see
-/// [`sport_log_derive::Update`].
 #[async_trait]
 pub trait Update: Db {
     async fn update(value: &Self::Type, db: &mut AsyncPgConnection) -> QueryResult<usize>;
@@ -269,14 +203,6 @@ pub trait Update: Db {
 /// The function [`hard_delete`](HardDelete::hard_delete) will permanently
 /// delete all entities that are already soft deleted and which have not been
 /// changed since `last_change`.
-///
-/// ### Deriving
-///
-/// This trait can be automatically derived by adding `#[derive(HardDelete)]` to
-/// your struct.
-///
-/// For restrictions on the types for derive to work please see
-/// [`sport_log_derive::HardDelete`].
 #[async_trait]
 pub trait HardDelete: Db {
     async fn hard_delete(
@@ -286,11 +212,6 @@ pub trait HardDelete: Db {
 }
 
 /// A type which can be checked if it belongs to a User.
-///
-/// ### Deriving
-///
-/// This trait can be automatically derived by adding `#[derive(CheckUserId)]`
-/// to your struct if the struct has a field `user_id` of type [`UserId`].
 #[async_trait]
 pub trait CheckUserId: Db {
     /// Check if the entry with id `id` in the database belongs to the
@@ -488,6 +409,28 @@ pub trait VerifyMultipleForUserOrAPWithoutDb {
     type Type;
 
     fn verify_user_ap_without_db(self, auth: AuthUserOrAP) -> Result<Vec<Self::Type>, StatusCode>;
+}
+
+#[async_trait]
+pub trait VerifyForActionProviderWithDb {
+    type Type;
+
+    async fn verify_ap(
+        self,
+        auth: AuthAP,
+        db: &mut AsyncPgConnection,
+    ) -> Result<Self::Type, StatusCode>;
+}
+
+#[async_trait]
+pub trait VerifyMultipleForActionProviderWithDb {
+    type Type;
+
+    async fn verify_ap(
+        self,
+        auth: AuthAP,
+        db: &mut AsyncPgConnection,
+    ) -> Result<Vec<Self::Type>, StatusCode>;
 }
 
 pub trait VerifyForActionProviderWithoutDb {

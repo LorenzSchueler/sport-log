@@ -1,5 +1,6 @@
 use axum::http::StatusCode;
 use chrono::{DateTime, Utc};
+use derive_deftly::Deftly;
 use diesel::{prelude::*, QueryResult};
 use diesel_async::{AsyncPgConnection, RunQueryDsl};
 use sport_log_derive::*;
@@ -10,9 +11,8 @@ use sport_log_types::{
 
 use crate::{auth::*, db::*};
 
-#[derive(
-    Db, DbWithUserId, ModifiableDb, Create, GetById, Update, HardDelete, CheckOptionalUserId,
-)]
+#[derive(Db, DbWithUserId, ModifiableDb, Deftly)]
+#[derive_deftly(Create, GetById, Update, HardDelete, CheckOptionalUserId)]
 pub struct MetconDb;
 
 #[async_trait]
@@ -144,7 +144,8 @@ impl VerifyMultipleForUserOrAPWithoutDb for Unverified<Vec<Metcon>> {
     }
 }
 
-#[derive(Db, ModifiableDb, Create, GetById, Update, HardDelete)]
+#[derive(Db, ModifiableDb, Deftly)]
+#[derive_deftly(Create, GetById, Update, HardDelete)]
 pub struct MetconMovementDb;
 
 #[async_trait]
@@ -365,11 +366,8 @@ impl VerifyMultipleForUserOrAPCreate for Unverified<Vec<MetconMovement>> {
     }
 }
 
-#[derive(
-    Db,
-    DbWithUserId,
-    DbWithDateTime,
-    ModifiableDb,
+#[derive(Db, DbWithUserId, DbWithDateTime, ModifiableDb, Deftly)]
+#[derive_deftly(
     VerifyIdForUserOrAP,
     Create,
     GetById,
@@ -380,6 +378,6 @@ impl VerifyMultipleForUserOrAPCreate for Unverified<Vec<MetconMovement>> {
     HardDelete,
     CheckUserId,
     VerifyForUserOrAPWithDb,
-    VerifyForUserOrAPWithoutDb,
+    VerifyForUserOrAPWithoutDb
 )]
 pub struct MetconSessionDb;

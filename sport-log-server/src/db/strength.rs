@@ -1,5 +1,6 @@
 use axum::http::StatusCode;
 use chrono::{DateTime, Utc};
+use derive_deftly::Deftly;
 use diesel::{prelude::*, QueryResult};
 use diesel_async::{AsyncPgConnection, RunQueryDsl};
 use sport_log_derive::*;
@@ -10,11 +11,8 @@ use sport_log_types::{
 
 use crate::{auth::*, db::*};
 
-#[derive(
-    Db,
-    DbWithUserId,
-    DbWithDateTime,
-    ModifiableDb,
+#[derive(Db, DbWithUserId, DbWithDateTime, ModifiableDb, Deftly)]
+#[derive_deftly(
     VerifyIdForUserOrAP,
     Create,
     GetById,
@@ -25,11 +23,12 @@ use crate::{auth::*, db::*};
     HardDelete,
     CheckUserId,
     VerifyForUserOrAPWithDb,
-    VerifyForUserOrAPWithoutDb,
+    VerifyForUserOrAPWithoutDb
 )]
 pub struct StrengthSessionDb;
 
-#[derive(Db, ModifiableDb, VerifyIdForUserOrAP, Create, GetById, Update, HardDelete)]
+#[derive(Db, ModifiableDb, Deftly)]
+#[derive_deftly(VerifyIdForUserOrAP, Create, GetById, Update, HardDelete)]
 pub struct StrengthSetDb;
 
 #[async_trait]
@@ -200,5 +199,6 @@ impl VerifyMultipleForUserOrAPCreate for Unverified<Vec<StrengthSet>> {
     }
 }
 
-#[derive(Db, VerifyIdForAdmin, GetById, GetAll)]
+#[derive(Db, Deftly)]
+#[derive_deftly(VerifyIdForAdmin, GetById, GetAll)]
 pub struct EormDb;

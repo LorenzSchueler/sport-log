@@ -20,8 +20,8 @@ tower-http = { version = "0.5", features = [
     "compression-gzip",
     "decompression-gzip",
 ] }
-diesel = { version = "2" }
-diesel-async = { version = "0.4.1", features = [
+diesel = { version = "2.2.0" }
+diesel-async = { git = "https://github.com/weiznich/diesel_async", features = [
     "postgres",
     "deadpool",
     "async-connection-wrapper",
@@ -34,6 +34,7 @@ toml = "0.8"
 chrono = { version = "0.4", features = ["serde"] }
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+derive-deftly = "0.14.0"
 
 [dev-dependencies]
 mime = "0.3"

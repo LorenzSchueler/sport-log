@@ -1,5 +1,6 @@
 use argon2::{password_hash::SaltString, PasswordHash, PasswordHasher, PasswordVerifier};
 use chrono::{DateTime, Utc};
+use derive_deftly::Deftly;
 use diesel::{prelude::*, result::Error};
 use diesel_async::RunQueryDsl;
 use rand_core::OsRng;
@@ -12,9 +13,8 @@ use sport_log_types::{
 
 use crate::{auth::*, db::*};
 
-#[derive(
-    Db,
-    ModifiableDb,
+#[derive(Db, ModifiableDb, Deftly)]
+#[derive_deftly(
     VerifyIdForAdmin,
     VerifyIdUnchecked,
     GetById,
@@ -22,7 +22,7 @@ use crate::{auth::*, db::*};
     GetBySync,
     HardDelete,
     VerifyForAdminWithoutDb,
-    VerifyUnchecked,
+    VerifyUnchecked
 )]
 pub struct ActionProviderDb;
 
@@ -135,19 +135,19 @@ impl ActionProviderDb {
     }
 }
 
-#[derive(
-    Db,
-    DbWithApId,
-    ModifiableDb,
+#[derive(Db, DbWithApId, ModifiableDb, Deftly)]
+#[derive_deftly(
     VerifyIdUnchecked,
     VerifyIdForActionProvider,
     Create,
     GetById,
     GetAll,
     GetBySync,
+    Update,
     HardDelete,
     CheckAPId,
-    VerifyForActionProviderWithoutDb,
+    VerifyForActionProviderWithDb,
+    VerifyForActionProviderWithoutDb
 )]
 pub struct ActionDb;
 
@@ -164,10 +164,8 @@ impl ActionDb {
     }
 }
 
-#[derive(
-    Db,
-    DbWithUserId,
-    ModifiableDb,
+#[derive(Db, DbWithUserId, ModifiableDb, Deftly)]
+#[derive_deftly(
     VerifyIdForUser,
     Create,
     GetById,
@@ -177,14 +175,12 @@ impl ActionDb {
     HardDelete,
     CheckUserId,
     VerifyForUserWithDb,
-    VerifyForUserWithoutDb,
+    VerifyForUserWithoutDb
 )]
 pub struct ActionRuleDb;
 
-#[derive(
-    Db,
-    DbWithUserId,
-    ModifiableDb,
+#[derive(Db, DbWithUserId, ModifiableDb, Deftly)]
+#[derive_deftly(
     VerifyIdForUser,
     VerifyIdForActionProvider,
     VerifyIdsForActionProvider,
@@ -199,7 +195,7 @@ pub struct ActionRuleDb;
     CheckUserId,
     VerifyForUserWithDb,
     VerifyForUserWithoutDb,
-    VerifyForAdminWithoutDb,
+    VerifyForAdminWithoutDb
 )]
 pub struct ActionEventDb;
 

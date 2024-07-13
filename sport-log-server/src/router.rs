@@ -66,7 +66,12 @@ pub fn get_router(state: AppState) -> Router {
             AP_ACTION_PROVIDER,
             post(ap_create_action_provider).get(ap_get_action_provider),
         )
-        .route(AP_ACTION, post(ap_create_actions).get(ap_get_actions))
+        .route(
+            AP_ACTION,
+            post(ap_create_actions)
+                .get(ap_get_actions)
+                .put(ap_update_actions),
+        )
         .route(AP_ACTION_EVENT, delete(ap_disable_action_events))
         .route(
             AP_EXECUTABLE_ACTION_EVENT,

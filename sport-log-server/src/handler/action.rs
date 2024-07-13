@@ -147,6 +147,25 @@ pub async fn ap_get_actions(
     .map_err(Into::into)
 }
 
+pub async fn ap_update_actions(
+    auth: AuthAP,
+    mut db: DbConn,
+    Json(actions): Json<UnverifiedSingleOrVec<Action>>,
+) -> HandlerResult<StatusCode> {
+    match actions {
+        UnverifiedSingleOrVec::Single(action) => {
+            let action = action.verify_ap(auth, &mut db).await?;
+            ActionDb::update(&action, &mut db).await
+        }
+        UnverifiedSingleOrVec::Vec(actions) => {
+            let actions = actions.verify_ap(auth, &mut db).await?;
+            ActionDb::update_multiple(&actions, &mut db).await
+        }
+    }
+    .map(|_| StatusCode::OK)
+    .map_err(Into::into)
+}
+
 pub async fn get_actions(
     _auth: AuthUser,
     Query(IdOption { id }): Query<IdOption<UnverifiedId<ActionId>>>,

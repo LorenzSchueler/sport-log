@@ -1,5 +1,6 @@
 use axum::http::StatusCode;
 use chrono::{DateTime, Utc};
+use derive_deftly::Deftly;
 use diesel::prelude::*;
 use diesel_async::RunQueryDsl;
 use sport_log_derive::*;
@@ -10,10 +11,8 @@ use sport_log_types::{
 
 use crate::{auth::*, db::*};
 
-#[derive(
-    Db,
-    DbWithUserId,
-    ModifiableDb,
+#[derive(Db, DbWithUserId, ModifiableDb, Deftly)]
+#[derive_deftly(
     VerifyIdForAdmin,
     VerifyIdUnchecked,
     Create,
@@ -21,7 +20,7 @@ use crate::{auth::*, db::*};
     Update,
     HardDelete,
     CheckOptionalUserId,
-    VerifyForAdminWithoutDb,
+    VerifyForAdminWithoutDb
 )]
 pub struct MovementDb;
 
@@ -161,10 +160,12 @@ impl VerifyMultipleForUserOrAPWithoutDb for Unverified<Vec<Movement>> {
     }
 }
 
-#[derive(Db, VerifyIdForAdmin, GetById, GetAll)]
+#[derive(Db, Deftly)]
+#[derive_deftly(VerifyIdForAdmin, GetById, GetAll)]
 pub struct MuscleGroupDb;
 
-#[derive(Db, ModifiableDb, Create, GetById, Update, HardDelete)]
+#[derive(Db, ModifiableDb, Deftly)]
+#[derive_deftly(Create, GetById, Update, HardDelete)]
 pub struct MovementMuscleDb;
 
 #[async_trait]

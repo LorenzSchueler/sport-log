@@ -1,8 +1,8 @@
+use derive_deftly::Deftly;
 use sport_log_derive::*;
 
-#[derive(
-    Db,
-    ModifiableDb,
+#[derive(Db, ModifiableDb, Deftly)]
+#[derive_deftly(
     VerifyIdForAdmin,
     VerifyIdUnchecked,
     Create,
@@ -12,14 +12,12 @@ use sport_log_derive::*;
     Update,
     HardDelete,
     VerifyForAdminWithoutDb,
-    VerifyUnchecked,
+    VerifyUnchecked
 )]
 pub struct PlatformDb;
 
-#[derive(
-    Db,
-    ModifiableDb,
-    DbWithUserId,
+#[derive(Db, ModifiableDb, DbWithUserId, Deftly)]
+#[derive_deftly(
     VerifyIdForUser,
     Create,
     GetById,
@@ -29,6 +27,6 @@ pub struct PlatformDb;
     HardDelete,
     CheckUserId,
     VerifyForUserWithDb,
-    VerifyForUserWithoutDb,
+    VerifyForUserWithoutDb
 )]
 pub struct PlatformCredentialDb;

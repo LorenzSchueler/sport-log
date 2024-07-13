@@ -1,3 +1,4 @@
+use derive_deftly::Deftly;
 use diesel::{prelude::*, QueryResult};
 use diesel_async::{AsyncPgConnection, RunQueryDsl};
 use sport_log_derive::*;
@@ -5,10 +6,8 @@ use sport_log_types::{schema::cardio_session, UserId};
 
 use crate::db::*;
 
-#[derive(
-    Db,
-    DbWithUserId,
-    ModifiableDb,
+#[derive(Db, DbWithUserId, ModifiableDb, Deftly)]
+#[derive_deftly(
     VerifyIdForUserOrAP,
     Create,
     GetById,
@@ -18,15 +17,12 @@ use crate::db::*;
     HardDelete,
     CheckUserId,
     VerifyForUserOrAPWithDb,
-    VerifyForUserOrAPWithoutDb,
+    VerifyForUserOrAPWithoutDb
 )]
 pub struct RouteDb;
 
-#[derive(
-    Db,
-    DbWithUserId,
-    DbWithDateTime,
-    ModifiableDb,
+#[derive(Db, DbWithUserId, DbWithDateTime, ModifiableDb, Deftly)]
+#[derive_deftly(
     VerifyIdForUserOrAP,
     Create,
     GetById,
@@ -36,7 +32,7 @@ pub struct RouteDb;
     Update,
     HardDelete,
     VerifyForUserOrAPWithDb,
-    VerifyForUserOrAPWithoutDb,
+    VerifyForUserOrAPWithoutDb
 )]
 pub struct CardioSessionDb;
 

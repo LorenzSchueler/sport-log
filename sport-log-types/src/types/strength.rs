@@ -1,10 +1,8 @@
 use chrono::{DateTime, Utc};
+use derive_deftly::Deftly;
 #[cfg(feature = "db")]
 use diesel::{deserialize::FromSqlRow, expression::AsExpression, prelude::*, sql_types::BigInt};
 use serde::{Deserialize, Serialize};
-use sport_log_derive::IdString;
-#[cfg(feature = "db")]
-use sport_log_derive::{IdFromSql, IdToSql};
 
 #[cfg(feature = "db")]
 use crate::{
@@ -13,11 +11,13 @@ use crate::{
 };
 use crate::{types::IdString, MovementId, UserId};
 
-#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, IdString)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Deftly)]
+#[derive_deftly(IdString)]
 #[serde(try_from = "IdString", into = "IdString")]
 #[cfg_attr(
     feature = "db",
-    derive(Hash, FromSqlRow, AsExpression, IdToSql, IdFromSql),
+    derive(Hash, FromSqlRow, AsExpression),
+    derive_deftly(IdToSql, IdFromSql),
     diesel(sql_type = BigInt)
 )]
 pub struct StrengthSessionId(pub i64);
@@ -47,11 +47,13 @@ pub struct StrengthSession {
     pub deleted: bool,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, IdString)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, Deftly)]
+#[derive_deftly(IdString)]
 #[serde(try_from = "IdString", into = "IdString")]
 #[cfg_attr(
     feature = "db",
-    derive(Hash, FromSqlRow, AsExpression, IdToSql, IdFromSql),
+    derive(Hash, FromSqlRow, AsExpression),
+    derive_deftly(IdToSql, IdFromSql),
     diesel(sql_type = BigInt)
 )]
 pub struct StrengthSetId(pub i64);
@@ -79,11 +81,13 @@ pub struct StrengthSet {
     pub deleted: bool,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, IdString)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, Deftly)]
+#[derive_deftly(IdString)]
 #[serde(try_from = "IdString", into = "IdString")]
 #[cfg_attr(
     feature = "db",
-    derive(Hash, FromSqlRow, AsExpression, IdToSql, IdFromSql),
+    derive(Hash, FromSqlRow, AsExpression),
+    derive_deftly(IdToSql, IdFromSql),
     diesel(sql_type = BigInt)
 )]
 pub struct EormId(pub i64);

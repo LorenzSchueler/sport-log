@@ -1,9 +1,8 @@
+use derive_deftly::Deftly;
 use sport_log_derive::*;
 
-#[derive(
-    Db,
-    DbWithUserId,
-    ModifiableDb,
+#[derive(Db, DbWithUserId, ModifiableDb, Deftly)]
+#[derive_deftly(
     VerifyIdForUserOrAP,
     Create,
     GetById,
@@ -13,14 +12,12 @@ use sport_log_derive::*;
     HardDelete,
     CheckUserId,
     VerifyForUserOrAPWithDb,
-    VerifyForUserOrAPWithoutDb,
+    VerifyForUserOrAPWithoutDb
 )]
 pub struct DiaryDb;
 
-#[derive(
-    Db,
-    DbWithUserId,
-    ModifiableDb,
+#[derive(Db, DbWithUserId, ModifiableDb, Deftly)]
+#[derive_deftly(
     VerifyIdForUserOrAP,
     Create,
     GetById,
@@ -30,6 +27,6 @@ pub struct DiaryDb;
     HardDelete,
     CheckUserId,
     VerifyForUserOrAPWithDb,
-    VerifyForUserOrAPWithoutDb,
+    VerifyForUserOrAPWithoutDb
 )]
 pub struct WodDb;

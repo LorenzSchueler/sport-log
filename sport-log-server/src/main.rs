@@ -38,6 +38,8 @@ use crate::{
     state::{AppState, DbConn, DbPool},
 };
 
+#[macro_use]
+mod macros;
 mod auth;
 mod config;
 mod db;

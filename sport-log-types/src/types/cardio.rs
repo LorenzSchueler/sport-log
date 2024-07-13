@@ -1,4 +1,5 @@
 use chrono::{DateTime, Utc};
+use derive_deftly::Deftly;
 #[cfg(feature = "db")]
 use diesel::{
     backend::Backend,
@@ -12,9 +13,6 @@ use diesel::{
 #[cfg(feature = "db")]
 use diesel_derive_enum::DbEnum;
 use serde::{Deserialize, Serialize};
-use sport_log_derive::IdString;
-#[cfg(feature = "db")]
-use sport_log_derive::{IdFromSql, IdToSql};
 
 #[cfg(feature = "db")]
 use crate::{
@@ -94,11 +92,13 @@ impl FromSql<crate::schema::sql_types::Position, Pg> for Position {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, IdString)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, Deftly)]
+#[derive_deftly(IdString)]
 #[serde(try_from = "IdString", into = "IdString")]
 #[cfg_attr(
     feature = "db",
-    derive(Hash, FromSqlRow, AsExpression, IdToSql, IdFromSql),
+    derive(Hash, FromSqlRow, AsExpression),
+    derive_deftly(IdToSql, IdFromSql),
     diesel(sql_type = BigInt)
 )]
 pub struct RouteId(pub i64);
@@ -133,11 +133,13 @@ pub struct Route {
     pub deleted: bool,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, IdString)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, Deftly)]
+#[derive_deftly(IdString)]
 #[serde(try_from = "IdString", into = "IdString")]
 #[cfg_attr(
     feature = "db",
-    derive(Hash, FromSqlRow, AsExpression, IdToSql, IdFromSql),
+    derive(Hash, FromSqlRow, AsExpression),
+    derive_deftly(IdToSql, IdFromSql),
     diesel(sql_type = BigInt)
 )]
 pub struct CardioSessionId(pub i64);

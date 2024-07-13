@@ -4,6 +4,7 @@ use argon2::{
 };
 use axum::http::StatusCode;
 use chrono::{DateTime, Utc};
+use derive_deftly::Deftly;
 use diesel::{prelude::*, result::Error};
 use diesel_async::{AsyncPgConnection, RunQueryDsl};
 use rand_core::OsRng;
@@ -12,7 +13,8 @@ use sport_log_types::{schema::user, User, UserId};
 
 use crate::{auth::AuthUser, db::*};
 
-#[derive(Db, GetById, VerifyUnchecked, VerifyForAdminWithoutDb)]
+#[derive(Db, Deftly)]
+#[derive_deftly(GetById, VerifyUnchecked, VerifyForAdminWithoutDb)]
 pub struct UserDb;
 
 /// Same as trait [`Create`] but with mutable references

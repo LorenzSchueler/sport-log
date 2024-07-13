@@ -31,12 +31,6 @@ pub async fn adm_do_garbage_collection(
     MetconSessionDb::hard_delete(last_change, &mut db).await?;
     RouteDb::hard_delete(last_change, &mut db).await?;
     CardioSessionDb::hard_delete(last_change, &mut db).await?;
-    GroupDb::hard_delete(last_change, &mut db).await?;
-    GroupUserDb::hard_delete(last_change, &mut db).await?;
-    SharedDiaryDb::hard_delete(last_change, &mut db).await?;
-    SharedStrengthSessionDb::hard_delete(last_change, &mut db).await?;
-    SharedMetconSessionDb::hard_delete(last_change, &mut db).await?;
-    SharedCardioSessionDb::hard_delete(last_change, &mut db).await?;
 
     Ok(StatusCode::OK)
 }
