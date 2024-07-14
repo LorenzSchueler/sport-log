@@ -1,4 +1,3 @@
-use chrono::{DateTime, Utc};
 use diesel::QueryResult;
 use diesel_async::AsyncPgConnection;
 use sport_log_types::{AccountData, UserId};
@@ -17,7 +16,6 @@ impl AccountDataDb {
             diaries: DiaryDb::get_by_user(user_id, db).await?,
             wods: WodDb::get_by_user(user_id, db).await?,
             movements: MovementDb::get_by_user(user_id, db).await?,
-            movement_muscles: MovementMuscleDb::get_by_user(user_id, db).await?,
             strength_sessions: StrengthSessionDb::get_by_user(user_id, db).await?,
             strength_sets: StrengthSetDb::get_by_user(user_id, db).await?,
             metcons: MetconDb::get_by_user(user_id, db).await?,
@@ -34,38 +32,30 @@ impl AccountDataDb {
         })
     }
 
-    pub async fn get_by_user_and_last_sync(
+    pub async fn get_by_user_and_epoch(
         user_id: UserId,
-        last_sync: DateTime<Utc>,
+        epoch: i64,
         db: &mut AsyncPgConnection,
     ) -> QueryResult<AccountData> {
         Ok(AccountData {
-            user: UserDb::get_by_id_and_last_sync(user_id, last_sync, db).await?,
-            diaries: DiaryDb::get_by_user_and_last_sync(user_id, last_sync, db).await?,
-            wods: WodDb::get_by_user_and_last_sync(user_id, last_sync, db).await?,
-            movements: MovementDb::get_by_user_and_last_sync(user_id, last_sync, db).await?,
-            movement_muscles: MovementMuscleDb::get_by_user_and_last_sync(user_id, last_sync, db)
+            user: UserDb::get_by_id_and_epoch(user_id, epoch, db).await?,
+            diaries: DiaryDb::get_by_user_and_epoch(user_id, epoch, db).await?,
+            wods: WodDb::get_by_user_and_epoch(user_id, epoch, db).await?,
+            movements: MovementDb::get_by_user_and_epoch(user_id, epoch, db).await?,
+            strength_sessions: StrengthSessionDb::get_by_user_and_epoch(user_id, epoch, db).await?,
+            strength_sets: StrengthSetDb::get_by_user_and_epoch(user_id, epoch, db).await?,
+            metcons: MetconDb::get_by_user_and_epoch(user_id, epoch, db).await?,
+            metcon_sessions: MetconSessionDb::get_by_user_and_epoch(user_id, epoch, db).await?,
+            metcon_movements: MetconMovementDb::get_by_user_and_epoch(user_id, epoch, db).await?,
+            cardio_sessions: CardioSessionDb::get_by_user_and_epoch(user_id, epoch, db).await?,
+            routes: RouteDb::get_by_user_and_epoch(user_id, epoch, db).await?,
+            platforms: PlatformDb::get_by_epoch(epoch, db).await?,
+            platform_credentials: PlatformCredentialDb::get_by_user_and_epoch(user_id, epoch, db)
                 .await?,
-            strength_sessions: StrengthSessionDb::get_by_user_and_last_sync(user_id, last_sync, db)
-                .await?,
-            strength_sets: StrengthSetDb::get_by_user_and_last_sync(user_id, last_sync, db).await?,
-            metcons: MetconDb::get_by_user_and_last_sync(user_id, last_sync, db).await?,
-            metcon_sessions: MetconSessionDb::get_by_user_and_last_sync(user_id, last_sync, db)
-                .await?,
-            metcon_movements: MetconMovementDb::get_by_user_and_last_sync(user_id, last_sync, db)
-                .await?,
-            cardio_sessions: CardioSessionDb::get_by_user_and_last_sync(user_id, last_sync, db)
-                .await?,
-            routes: RouteDb::get_by_user_and_last_sync(user_id, last_sync, db).await?,
-            platforms: PlatformDb::get_by_last_sync(last_sync, db).await?,
-            platform_credentials: PlatformCredentialDb::get_by_user_and_last_sync(
-                user_id, last_sync, db,
-            )
-            .await?,
-            action_providers: ActionProviderDb::get_by_last_sync(last_sync, db).await?,
-            actions: ActionDb::get_by_last_sync(last_sync, db).await?,
-            action_rules: ActionRuleDb::get_by_user_and_last_sync(user_id, last_sync, db).await?,
-            action_events: ActionEventDb::get_by_user_and_last_sync(user_id, last_sync, db).await?,
+            action_providers: ActionProviderDb::get_by_epoch(epoch, db).await?,
+            actions: ActionDb::get_by_epoch(epoch, db).await?,
+            action_rules: ActionRuleDb::get_by_user_and_epoch(user_id, epoch, db).await?,
+            action_events: ActionEventDb::get_by_user_and_epoch(user_id, epoch, db).await?,
         })
     }
 }

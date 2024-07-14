@@ -260,7 +260,7 @@ fn garbage_collection(client: &Client, config: &Config) -> Result<(), ReqwestErr
                 &config.server_url,
                 ADM_GARBAGE_COLLECTION,
                 Some(&[(
-                    "last_change",
+                    "epoch",
                     &(Utc::now()
                         - Duration::try_days(config.garbage_collection_min_days as i64).unwrap())
                     .to_string(),

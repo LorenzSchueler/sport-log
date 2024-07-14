@@ -37,7 +37,7 @@ diesel::table! {
         description -> Nullable<Text>,
         create_before -> Int4,
         delete_after -> Int4,
-        last_change -> Timestamptz,
+        epoch -> Int8,
         deleted -> Bool,
     }
 }
@@ -52,7 +52,7 @@ diesel::table! {
         datetime -> Timestamptz,
         arguments -> Nullable<Text>,
         enabled -> Bool,
-        last_change -> Timestamptz,
+        epoch -> Int8,
         deleted -> Bool,
     }
 }
@@ -68,7 +68,7 @@ diesel::table! {
         password -> Varchar,
         platform_id -> Int8,
         description -> Nullable<Text>,
-        last_change -> Timestamptz,
+        epoch -> Int8,
         deleted -> Bool,
     }
 }
@@ -85,7 +85,7 @@ diesel::table! {
         time -> Timestamptz,
         arguments -> Nullable<Text>,
         enabled -> Bool,
-        last_change -> Timestamptz,
+        epoch -> Int8,
         deleted -> Bool,
     }
 }
@@ -113,7 +113,7 @@ diesel::table! {
         heart_rate -> Nullable<Array<Int4>>,
         route_id -> Nullable<Int8>,
         comments -> Nullable<Text>,
-        last_change -> Timestamptz,
+        epoch -> Int8,
         deleted -> Bool,
     }
 }
@@ -127,7 +127,7 @@ diesel::table! {
         date -> Date,
         bodyweight -> Nullable<Float4>,
         comments -> Nullable<Text>,
-        last_change -> Timestamptz,
+        epoch -> Int8,
         deleted -> Bool,
     }
 }
@@ -144,30 +144,6 @@ diesel::table! {
 
 diesel::table! {
     use diesel::sql_types::*;
-
-    group (id) {
-        id -> Int8,
-        #[max_length = 80]
-        name -> Varchar,
-        last_change -> Timestamptz,
-        deleted -> Bool,
-    }
-}
-
-diesel::table! {
-    use diesel::sql_types::*;
-
-    group_user (id) {
-        id -> Int8,
-        group_id -> Int8,
-        user_id -> Int8,
-        last_change -> Timestamptz,
-        deleted -> Bool,
-    }
-}
-
-diesel::table! {
-    use diesel::sql_types::*;
     use super::sql_types::MetconType;
 
     metcon (id) {
@@ -179,7 +155,7 @@ diesel::table! {
         rounds -> Nullable<Int4>,
         timecap -> Nullable<Int4>,
         description -> Nullable<Text>,
-        last_change -> Timestamptz,
+        epoch -> Int8,
         deleted -> Bool,
     }
 }
@@ -190,6 +166,7 @@ diesel::table! {
 
     metcon_movement (id) {
         id -> Int8,
+        user_id -> Nullable<Int8>,
         metcon_id -> Int8,
         movement_id -> Int8,
         distance_unit -> Nullable<DistanceUnit>,
@@ -197,7 +174,7 @@ diesel::table! {
         count -> Int4,
         male_weight -> Nullable<Float4>,
         female_weight -> Nullable<Float4>,
-        last_change -> Timestamptz,
+        epoch -> Int8,
         deleted -> Bool,
     }
 }
@@ -215,7 +192,7 @@ diesel::table! {
         reps -> Nullable<Int4>,
         rx -> Bool,
         comments -> Nullable<Text>,
-        last_change -> Timestamptz,
+        epoch -> Int8,
         deleted -> Bool,
     }
 }
@@ -232,31 +209,8 @@ diesel::table! {
         description -> Nullable<Text>,
         movement_dimension -> MovementDimension,
         cardio -> Bool,
-        last_change -> Timestamptz,
+        epoch -> Int8,
         deleted -> Bool,
-    }
-}
-
-diesel::table! {
-    use diesel::sql_types::*;
-
-    movement_muscle (id) {
-        id -> Int8,
-        movement_id -> Int8,
-        muscle_group_id -> Int8,
-        last_change -> Timestamptz,
-        deleted -> Bool,
-    }
-}
-
-diesel::table! {
-    use diesel::sql_types::*;
-
-    muscle_group (id) {
-        id -> Int8,
-        #[max_length = 80]
-        name -> Varchar,
-        description -> Nullable<Text>,
     }
 }
 
@@ -268,7 +222,7 @@ diesel::table! {
         #[max_length = 80]
         name -> Varchar,
         credential -> Bool,
-        last_change -> Timestamptz,
+        epoch -> Int8,
         deleted -> Bool,
     }
 }
@@ -284,7 +238,7 @@ diesel::table! {
         username -> Varchar,
         #[max_length = 80]
         password -> Varchar,
-        last_change -> Timestamptz,
+        epoch -> Int8,
         deleted -> Bool,
     }
 }
@@ -303,55 +257,7 @@ diesel::table! {
         descent -> Nullable<Int4>,
         track -> Nullable<Array<Position>>,
         marked_positions -> Nullable<Array<Position>>,
-        last_change -> Timestamptz,
-        deleted -> Bool,
-    }
-}
-
-diesel::table! {
-    use diesel::sql_types::*;
-
-    shared_cardio_session (id) {
-        id -> Int8,
-        group_id -> Int8,
-        cardio_session_id -> Int8,
-        last_change -> Timestamptz,
-        deleted -> Bool,
-    }
-}
-
-diesel::table! {
-    use diesel::sql_types::*;
-
-    shared_diary (id) {
-        id -> Int8,
-        group_id -> Int8,
-        diary_id -> Int8,
-        last_change -> Timestamptz,
-        deleted -> Bool,
-    }
-}
-
-diesel::table! {
-    use diesel::sql_types::*;
-
-    shared_metcon_session (id) {
-        id -> Int8,
-        group_id -> Int8,
-        metcon_session_id -> Int8,
-        last_change -> Timestamptz,
-        deleted -> Bool,
-    }
-}
-
-diesel::table! {
-    use diesel::sql_types::*;
-
-    shared_strength_session (id) {
-        id -> Int8,
-        group_id -> Int8,
-        strength_session_id -> Int8,
-        last_change -> Timestamptz,
+        epoch -> Int8,
         deleted -> Bool,
     }
 }
@@ -366,7 +272,7 @@ diesel::table! {
         movement_id -> Int8,
         interval -> Nullable<Int4>,
         comments -> Nullable<Text>,
-        last_change -> Timestamptz,
+        epoch -> Int8,
         deleted -> Bool,
     }
 }
@@ -376,11 +282,12 @@ diesel::table! {
 
     strength_set (id) {
         id -> Int8,
+        user_id -> Int8,
         strength_session_id -> Int8,
         set_number -> Int4,
         count -> Int4,
         weight -> Nullable<Float4>,
-        last_change -> Timestamptz,
+        epoch -> Int8,
         deleted -> Bool,
     }
 }
@@ -396,7 +303,7 @@ diesel::table! {
         password -> Varchar,
         #[max_length = 80]
         email -> Varchar,
-        last_change -> Timestamptz,
+        epoch -> Int8,
     }
 }
 
@@ -408,7 +315,7 @@ diesel::table! {
         user_id -> Int8,
         date -> Date,
         description -> Nullable<Text>,
-        last_change -> Timestamptz,
+        epoch -> Int8,
         deleted -> Bool,
     }
 }
@@ -423,30 +330,20 @@ diesel::joinable!(cardio_session -> movement (movement_id));
 diesel::joinable!(cardio_session -> route (route_id));
 diesel::joinable!(cardio_session -> user (user_id));
 diesel::joinable!(diary -> user (user_id));
-diesel::joinable!(group_user -> group (group_id));
-diesel::joinable!(group_user -> user (user_id));
 diesel::joinable!(metcon -> user (user_id));
 diesel::joinable!(metcon_movement -> metcon (metcon_id));
 diesel::joinable!(metcon_movement -> movement (movement_id));
+diesel::joinable!(metcon_movement -> user (user_id));
 diesel::joinable!(metcon_session -> metcon (metcon_id));
 diesel::joinable!(metcon_session -> user (user_id));
 diesel::joinable!(movement -> user (user_id));
-diesel::joinable!(movement_muscle -> movement (movement_id));
-diesel::joinable!(movement_muscle -> muscle_group (muscle_group_id));
 diesel::joinable!(platform_credential -> platform (platform_id));
 diesel::joinable!(platform_credential -> user (user_id));
 diesel::joinable!(route -> user (user_id));
-diesel::joinable!(shared_cardio_session -> cardio_session (cardio_session_id));
-diesel::joinable!(shared_cardio_session -> group (group_id));
-diesel::joinable!(shared_diary -> diary (diary_id));
-diesel::joinable!(shared_diary -> group (group_id));
-diesel::joinable!(shared_metcon_session -> group (group_id));
-diesel::joinable!(shared_metcon_session -> metcon_session (metcon_session_id));
-diesel::joinable!(shared_strength_session -> group (group_id));
-diesel::joinable!(shared_strength_session -> strength_session (strength_session_id));
 diesel::joinable!(strength_session -> movement (movement_id));
 diesel::joinable!(strength_session -> user (user_id));
 diesel::joinable!(strength_set -> strength_session (strength_session_id));
+diesel::joinable!(strength_set -> user (user_id));
 diesel::joinable!(wod -> user (user_id));
 
 diesel::allow_tables_to_appear_in_same_query!(
@@ -457,21 +354,13 @@ diesel::allow_tables_to_appear_in_same_query!(
     cardio_session,
     diary,
     eorm,
-    group,
-    group_user,
     metcon,
     metcon_movement,
     metcon_session,
     movement,
-    movement_muscle,
-    muscle_group,
     platform,
     platform_credential,
     route,
-    shared_cardio_session,
-    shared_diary,
-    shared_metcon_session,
-    shared_strength_session,
     strength_session,
     strength_set,
     user,

@@ -96,11 +96,11 @@ pub(crate) fn impl_modifiable_db(
 ) -> TokenStream {
     quote! {
         impl crate::db::ModifiableDb for #db_type {
-            type LastChangeColumn = sport_log_types::schema::#value_name::columns::last_change;
+            type EpochColumn = sport_log_types::schema::#value_name::columns::epoch;
             type DeletedColumn = sport_log_types::schema::#value_name::columns::deleted;
 
-            fn last_change_column() -> Self::LastChangeColumn {
-                sport_log_types::schema::#value_name::columns::last_change
+            fn epoch_column() -> Self::EpochColumn {
+                sport_log_types::schema::#value_name::columns::epoch
             }
 
             fn deleted_column() -> Self::DeletedColumn {

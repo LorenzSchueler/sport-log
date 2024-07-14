@@ -6,10 +6,7 @@ use diesel_derive_enum::DbEnum;
 use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "db")]
-use crate::{
-    schema::{movement, movement_muscle, muscle_group},
-    User,
-};
+use crate::{schema::movement, User};
 use crate::{types::IdString, UserId};
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq)]
@@ -65,59 +62,5 @@ pub struct Movement {
     pub description: Option<String>,
     pub movement_dimension: MovementDimension,
     pub cardio: bool,
-    pub deleted: bool,
-}
-
-#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, Deftly)]
-#[derive_deftly(IdString)]
-#[serde(try_from = "IdString", into = "IdString")]
-#[cfg_attr(
-    feature = "db",
-    derive(Hash, FromSqlRow, AsExpression),
-    derive_deftly(IdToSql, IdFromSql),
-    diesel(sql_type = BigInt)
-)]
-pub struct MuscleGroupId(pub i64);
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[cfg_attr(
-    feature = "db",
-    derive(Insertable, Identifiable, Queryable, Selectable),
-    diesel(table_name = muscle_group)
-)]
-pub struct MuscleGroup {
-    pub id: MuscleGroupId,
-    pub name: String,
-    pub description: Option<String>,
-}
-
-#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, Deftly)]
-#[derive_deftly(IdString)]
-#[serde(try_from = "IdString", into = "IdString")]
-#[cfg_attr(
-    feature = "db",
-    derive(Hash, FromSqlRow, AsExpression),
-    derive_deftly(IdToSql, IdFromSql),
-    diesel(sql_type = BigInt)
-)]
-pub struct MovementMuscleId(pub i64);
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-#[cfg_attr(
-    feature = "db",
-    derive(
-        Insertable,
-        Associations,
-        Identifiable,
-        Queryable,
-        Selectable,
-        AsChangeset,
-    ),
-    diesel(table_name = movement_muscle, belongs_to(Movement), belongs_to(MuscleGroup))
-)]
-pub struct MovementMuscle {
-    pub id: MovementMuscleId,
-    pub movement_id: MovementId,
-    pub muscle_group_id: MuscleGroupId,
     pub deleted: bool,
 }

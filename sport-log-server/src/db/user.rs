@@ -3,7 +3,6 @@ use argon2::{
     PasswordVerifier,
 };
 use axum::http::StatusCode;
-use chrono::{DateTime, Utc};
 use derive_deftly::Deftly;
 use diesel::{prelude::*, result::Error};
 use diesel_async::{AsyncPgConnection, RunQueryDsl};
@@ -124,14 +123,14 @@ impl UserDb {
         }
     }
 
-    pub async fn get_by_id_and_last_sync(
+    pub async fn get_by_id_and_epoch(
         user_id: UserId,
-        last_sync: DateTime<Utc>,
+        epoch: i64,
         db: &mut AsyncPgConnection,
     ) -> QueryResult<Option<User>> {
         user::table
             .filter(user::columns::id.eq(user_id))
-            .filter(user::columns::last_change.ge(last_sync))
+            .filter(user::columns::epoch.gt(epoch))
             .select(User::as_select())
             .get_result(db)
             .await

@@ -69,6 +69,28 @@ define_derive_deftly! {
 }
 
 define_derive_deftly! {
+    GetByUserOptional:
+
+    #[async_trait::async_trait]
+    impl crate::db::GetByUser for crate::db::$ttype {
+        async fn get_by_user(
+            user_id: sport_log_types::UserId,
+            db: &mut diesel_async::AsyncPgConnection
+        ) -> diesel::result::QueryResult<Vec<Self::Type>> {
+            use crate::db::{Db, DbWithUserId};
+            use diesel_async::RunQueryDsl;
+            use diesel::prelude::*;
+
+            Self::table()
+                .filter(Self::user_id_column().eq(user_id).or(Self::user_id_column().is_null()))
+                .select(Self::Type::as_select())
+                .get_results(db)
+                .await
+        }
+    }
+}
+
+define_derive_deftly! {
     GetByUserTimespan:
 
     #[async_trait::async_trait]
@@ -118,13 +140,13 @@ define_derive_deftly! {
 }
 
 define_derive_deftly! {
-    GetByUserSync:
+    GetByUserAndEpoch:
 
     #[async_trait::async_trait]
-    impl crate::db::GetByUserSync for crate::db::$ttype {
-        async fn get_by_user_and_last_sync(
+    impl crate::db::GetByUserAndEpoch for crate::db::$ttype {
+        async fn get_by_user_and_epoch(
             user_id: sport_log_types::UserId,
-            last_sync: chrono::DateTime<chrono::Utc>,
+            epoch: i64,
             db: &mut diesel_async::AsyncPgConnection
         ) -> diesel::result::QueryResult<Vec<Self::Type>> {
             use crate::db::{Db, DbWithUserId, ModifiableDb};
@@ -133,7 +155,7 @@ define_derive_deftly! {
 
             Self::table()
                 .filter(Self::user_id_column().eq(user_id))
-                .filter(Self::last_change_column().ge(last_sync))
+                .filter(Self::epoch_column().gt(epoch))
                 .select(Self::Type::as_select())
                 .get_results(db)
                 .await
@@ -142,12 +164,36 @@ define_derive_deftly! {
 }
 
 define_derive_deftly! {
-    GetBySync:
+    GetByUserAndEpochOptional:
 
     #[async_trait::async_trait]
-    impl crate::db::GetBySync for crate::db::$ttype {
-        async fn get_by_last_sync(
-            last_sync: chrono::DateTime<chrono::Utc>,
+    impl crate::db::GetByUserAndEpoch for crate::db::$ttype {
+        async fn get_by_user_and_epoch(
+            user_id: sport_log_types::UserId,
+            epoch: i64,
+            db: &mut diesel_async::AsyncPgConnection
+        ) -> diesel::result::QueryResult<Vec<Self::Type>> {
+            use crate::db::{Db, DbWithUserId, ModifiableDb};
+            use diesel_async::RunQueryDsl;
+            use diesel::prelude::*;
+
+            Self::table()
+                .filter(Self::user_id_column().eq(user_id).or(Self::user_id_column().is_null()))
+                .filter(Self::epoch_column().gt(epoch))
+                .select(Self::Type::as_select())
+                .get_results(db)
+                .await
+        }
+    }
+}
+
+define_derive_deftly! {
+    GetByEpoch:
+
+    #[async_trait::async_trait]
+    impl crate::db::GetByEpoch for crate::db::$ttype {
+        async fn get_by_epoch(
+            epoch: i64,
             db: &mut diesel_async::AsyncPgConnection
         ) -> diesel::result::QueryResult<Vec<Self::Type>> {
             use crate::db::{Db, ModifiableDb};
@@ -155,7 +201,7 @@ define_derive_deftly! {
             use diesel::prelude::*;
 
             Self::table()
-                .filter(Self::last_change_column().ge(last_sync))
+                .filter(Self::epoch_column().gt(epoch))
                 .select(Self::Type::as_select())
                 .get_results(db)
                 .await
@@ -219,7 +265,7 @@ define_derive_deftly! {
 
     #[async_trait::async_trait]
     impl crate::db::HardDelete for crate::db::$ttype {
-        async fn hard_delete(last_change: chrono::DateTime<chrono::Utc>, db: &mut diesel_async::AsyncPgConnection) -> diesel::result::QueryResult<usize> {
+        async fn hard_delete(epoch: i64, db: &mut diesel_async::AsyncPgConnection) -> diesel::result::QueryResult<usize> {
             use crate::db::{Db, ModifiableDb};
             use diesel_async::RunQueryDsl;
             use diesel::prelude::*;
@@ -227,7 +273,7 @@ define_derive_deftly! {
             diesel::delete(
                 Self::table()
                     .filter(Self::deleted_column().eq(true))
-                    .filter(Self::last_change_column().le(last_change))
+                    .filter(Self::epoch_column().le(epoch))
             ).execute(db)
             .await
         }
@@ -409,6 +455,32 @@ define_derive_deftly! {
             use crate::db::CheckUserId;
 
             if crate::db::$ttype::check_user_id(self.0, *auth, db)
+                .await
+                .map_err(|_| axum::http::StatusCode::INTERNAL_SERVER_ERROR)?
+            {
+                Ok(self.0)
+            } else {
+                Err(axum::http::StatusCode::FORBIDDEN)
+            }
+        }
+    }
+}
+
+define_derive_deftly! {
+    VerifyIdForUserOrAPOptional:
+
+    #[async_trait::async_trait]
+    impl crate::db::VerifyIdForUserOrAP for crate::db::UnverifiedId<<$ttype as crate::db::Db>::Id> {
+        type Id = <$ttype as crate::db::Db>::Id;
+
+        async fn verify_user_ap(
+            self,
+            auth: crate::auth::AuthUserOrAP,
+            db: &mut diesel_async::AsyncPgConnection,
+        ) -> Result<Self::Id, axum::http::StatusCode> {
+            use crate::db::CheckOptionalUserId;
+
+            if crate::db::$ttype::check_optional_user_id(self.0, *auth, db)
                 .await
                 .map_err(|_| axum::http::StatusCode::INTERNAL_SERVER_ERROR)?
             {
@@ -621,6 +693,59 @@ define_derive_deftly! {
 }
 
 define_derive_deftly! {
+    VerifyForUserOrAPWithDbOptional:
+
+    #[async_trait::async_trait]
+    impl crate::db::VerifyForUserOrAPWithDb for crate::db::Unverified<<$ttype as crate::db::Db>::Type> {
+        type Type = <$ttype as crate::db::Db>::Type;
+
+        async fn verify_user_ap(
+            self,
+            auth: crate::auth::AuthUserOrAP,
+            db: &mut diesel_async::AsyncPgConnection,
+        ) -> Result<Self::Type, axum::http::StatusCode> {
+            use crate::db::CheckUserId;
+
+            let value = self.0;
+            if value.user_id == Some(*auth)
+                && crate::db::$ttype::check_user_id(value.id, *auth, db)
+                .await
+                .map_err(|_| axum::http::StatusCode::INTERNAL_SERVER_ERROR)?
+            {
+                Ok(value)
+            } else {
+                Err(axum::http::StatusCode::FORBIDDEN)
+            }
+        }
+    }
+
+    #[async_trait::async_trait]
+    impl crate::db::VerifyMultipleForUserOrAPWithDb for crate::db::Unverified<Vec<<$ttype as crate::db::Db>::Type>> {
+        type Type = <$ttype as crate::db::Db>::Type;
+
+        async fn verify_user_ap(
+            self,
+            auth: crate::auth::AuthUserOrAP,
+            db: &mut diesel_async::AsyncPgConnection,
+        ) -> Result<Vec<Self::Type>, axum::http::StatusCode> {
+            use crate::db::CheckUserId;
+
+            let values = self.0;
+            let ids: Vec<_> = values.iter().map(|value| value.id).collect();
+            if values.iter().all(|value| value.user_id == Some(*auth))
+                && crate::db::$ttype::check_user_ids(&ids, *auth, db)
+                .await
+                .map_err(|_| axum::http::StatusCode::INTERNAL_SERVER_ERROR)?
+            {
+                Ok(values)
+            } else {
+                Err(axum::http::StatusCode::FORBIDDEN)
+            }
+        }
+    }
+}
+
+define_derive_deftly! {
     VerifyForUserWithoutDb:
 
     impl crate::db::VerifyForUserWithoutDb for crate::db::Unverified<<$ttype as crate::db::Db>::Type> {
@@ -684,6 +809,42 @@ define_derive_deftly! {
         ) -> Result<Vec<Self::Type>, axum::http::StatusCode> {
             let values = self.0;
             if values.iter().all(|value| value.user_id == *auth) {
+                Ok(values)
+            } else {
+                Err(axum::http::StatusCode::FORBIDDEN)
+            }
+        }
+    }
+}
+
+define_derive_deftly! {
+    VerifyForUserOrAPWithoutDbOptional:
+
+    impl crate::db::VerifyForUserOrAPWithoutDb for crate::db::Unverified<<$ttype as crate::db::Db>::Type> {
+        type Type = <$ttype as crate::db::Db>::Type;
+
+        fn verify_user_ap_without_db(
+            self,
+            auth: crate::auth::AuthUserOrAP,
+        ) -> Result<Self::Type, axum::http::StatusCode> {
+            let value = self.0;
+            if value.user_id == Some(*auth) {
+                Ok(value)
+            } else {
+                Err(axum::http::StatusCode::FORBIDDEN)
+            }
+        }
+    }
+
+    impl crate::db::VerifyMultipleForUserOrAPWithoutDb for crate::db::Unverified<Vec<<$ttype as crate::db::Db>::Type>> {
+        type Type = <$ttype as crate::db::Db>::Type;
+
+        fn verify_user_ap_without_db(
+            self,
+            auth: crate::auth::AuthUserOrAP,
+        ) -> Result<Vec<Self::Type>, axum::http::StatusCode> {
+            let values = self.0;
+            if values.iter().all(|value| value.user_id == Some(*auth)) {
                 Ok(values)
             } else {
                 Err(axum::http::StatusCode::FORBIDDEN)

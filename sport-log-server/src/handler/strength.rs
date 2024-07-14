@@ -75,11 +75,11 @@ pub async fn create_strength_sets(
 ) -> HandlerResult<StatusCode> {
     match strength_sets {
         UnverifiedSingleOrVec::Single(strength_set) => {
-            let strength_set = strength_set.verify_user_ap_create(auth, &mut db).await?;
+            let strength_set = strength_set.verify_user_ap_without_db(auth)?;
             StrengthSetDb::create(&strength_set, &mut db).await
         }
         UnverifiedSingleOrVec::Vec(strength_sets) => {
-            let strength_sets = strength_sets.verify_user_ap_create(auth, &mut db).await?;
+            let strength_sets = strength_sets.verify_user_ap_without_db(auth)?;
             StrengthSetDb::create_multiple(&strength_sets, &mut db).await
         }
     }

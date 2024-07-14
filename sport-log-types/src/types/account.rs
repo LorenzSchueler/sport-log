@@ -11,7 +11,6 @@ pub struct AccountData {
     pub diaries: Vec<Diary>,
     pub wods: Vec<Wod>,
     pub movements: Vec<Movement>,
-    pub movement_muscles: Vec<MovementMuscle>,
     pub strength_sessions: Vec<StrengthSession>,
     pub strength_sets: Vec<StrengthSet>,
     pub metcons: Vec<Metcon>,

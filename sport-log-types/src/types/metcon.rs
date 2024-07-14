@@ -116,6 +116,8 @@ pub struct MetconMovementId(pub i64);
 )]
 pub struct MetconMovement {
     pub id: MetconMovementId,
+    #[cfg_attr(feature = "db", diesel(treat_none_as_null = true))]
+    pub user_id: Option<UserId>,
     pub metcon_id: MetconId,
     pub movement_id: MovementId,
     pub distance_unit: Option<DistanceUnit>,

@@ -113,10 +113,10 @@ pub trait DbWithDateTime: Db {
 }
 
 pub trait ModifiableDb: Db {
-    type LastChangeColumn: Column;
+    type EpochColumn: Column;
     type DeletedColumn: Column;
 
-    fn last_change_column() -> Self::LastChangeColumn;
+    fn epoch_column() -> Self::EpochColumn;
     fn deleted_column() -> Self::DeletedColumn;
 }
 
@@ -157,25 +157,22 @@ pub trait GetByUserTimespan: Db {
     ) -> QueryResult<Vec<Self::Type>>;
 }
 
-/// A type for which entries can be retrieved by user and the timestamp of the
+/// A type for which entries can be retrieved by user and the epoch of the
 /// last synchronization from the database.
 #[async_trait]
-pub trait GetByUserSync: Db {
-    async fn get_by_user_and_last_sync(
+pub trait GetByUserAndEpoch: Db {
+    async fn get_by_user_and_epoch(
         user_id: UserId,
-        last_sync: DateTime<Utc>,
+        epoch: i64,
         db: &mut AsyncPgConnection,
     ) -> QueryResult<Vec<Self::Type>>;
 }
 
-/// A type for which entries can be retrieved by the timestamp of the last
+/// A type for which entries can be retrieved by the epoch of the last
 /// synchronization from the database.
 #[async_trait]
-pub trait GetBySync: Db {
-    async fn get_by_last_sync(
-        last_sync: DateTime<Utc>,
-        db: &mut AsyncPgConnection,
-    ) -> QueryResult<Vec<Self::Type>>;
+pub trait GetByEpoch: Db {
+    async fn get_by_epoch(epoch: i64, db: &mut AsyncPgConnection) -> QueryResult<Vec<Self::Type>>;
 }
 
 /// A type for which all entries can be retrieved from the database.
@@ -202,13 +199,10 @@ pub trait Update: Db {
 ///
 /// The function [`hard_delete`](HardDelete::hard_delete) will permanently
 /// delete all entities that are already soft deleted and which have not been
-/// changed since `last_change`.
+/// changed since `epoch`.
 #[async_trait]
 pub trait HardDelete: Db {
-    async fn hard_delete(
-        last_change: DateTime<Utc>,
-        db: &mut AsyncPgConnection,
-    ) -> QueryResult<usize>;
+    async fn hard_delete(epoch: i64, db: &mut AsyncPgConnection) -> QueryResult<usize>;
 }
 
 /// A type which can be checked if it belongs to a User.
@@ -244,14 +238,19 @@ pub trait CheckOptionalUserId: Db {
     ) -> QueryResult<bool>;
 }
 
+/// A type which can be checked if it belongs to an ActionProvider.
 #[async_trait]
 pub trait CheckAPId: Db {
+    /// Check if the entry with id `id` in the database belongs to the
+    /// [`ActionProvider`](sport_log_types::ActionProvider) with `ap_id`.
     async fn check_ap_id(
         id: Self::Id,
         ap_id: ActionProviderId,
         db: &mut AsyncPgConnection,
     ) -> QueryResult<bool>;
 
+    /// Check if the entries with an id in `ids` in the database belong to the
+    /// [`ActionProvider`](sport_log_types::ActionProvider) with `ap_id`.
     async fn check_ap_ids(
         ids: &[Self::Id],
         ap_id: ActionProviderId,
@@ -371,28 +370,6 @@ pub trait VerifyMultipleForUserOrAPWithDb {
     type Type;
 
     async fn verify_user_ap(
-        self,
-        auth: AuthUserOrAP,
-        db: &mut AsyncPgConnection,
-    ) -> Result<Vec<Self::Type>, StatusCode>;
-}
-
-#[async_trait]
-pub trait VerifyForUserOrAPCreate {
-    type Type;
-
-    async fn verify_user_ap_create(
-        self,
-        auth: AuthUserOrAP,
-        db: &mut AsyncPgConnection,
-    ) -> Result<Self::Type, StatusCode>;
-}
-
-#[async_trait]
-pub trait VerifyMultipleForUserOrAPCreate {
-    type Type;
-
-    async fn verify_user_ap_create(
         self,
         auth: AuthUserOrAP,
         db: &mut AsyncPgConnection,

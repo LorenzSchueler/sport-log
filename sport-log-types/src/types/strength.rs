@@ -73,6 +73,7 @@ pub struct StrengthSetId(pub i64);
 )]
 pub struct StrengthSet {
     pub id: StrengthSetId,
+    pub user_id: UserId,
     pub strength_session_id: StrengthSessionId,
     pub set_number: i32,
     pub count: i32,

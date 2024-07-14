@@ -1,36 +1,33 @@
 use axum::{extract::Query, http::StatusCode};
-use chrono::{DateTime, Utc};
 use serde::Deserialize;
 
 use crate::{auth::AuthAdmin, db::*, error::HandlerResult, state::DbConn};
 
 #[derive(Debug, Deserialize)]
-pub struct LastChange {
-    last_change: DateTime<Utc>,
+pub struct Epoch {
+    epoch: i64,
 }
 
 pub async fn adm_do_garbage_collection(
     _auth: AuthAdmin,
-    Query(LastChange { last_change }): Query<LastChange>,
+    Query(Epoch { epoch }): Query<Epoch>,
     mut db: DbConn,
 ) -> HandlerResult<StatusCode> {
-    PlatformDb::hard_delete(last_change, &mut db).await?;
-    PlatformCredentialDb::hard_delete(last_change, &mut db).await?;
-    ActionDb::hard_delete(last_change, &mut db).await?;
-    ActionProviderDb::hard_delete(last_change, &mut db).await?;
-    ActionRuleDb::hard_delete(last_change, &mut db).await?;
-    ActionEventDb::hard_delete(last_change, &mut db).await?;
-    DiaryDb::hard_delete(last_change, &mut db).await?;
-    WodDb::hard_delete(last_change, &mut db).await?;
-    MovementDb::hard_delete(last_change, &mut db).await?;
-    MovementMuscleDb::hard_delete(last_change, &mut db).await?;
-    StrengthSessionDb::hard_delete(last_change, &mut db).await?;
-    StrengthSetDb::hard_delete(last_change, &mut db).await?;
-    MetconDb::hard_delete(last_change, &mut db).await?;
-    MetconMovementDb::hard_delete(last_change, &mut db).await?;
-    MetconSessionDb::hard_delete(last_change, &mut db).await?;
-    RouteDb::hard_delete(last_change, &mut db).await?;
-    CardioSessionDb::hard_delete(last_change, &mut db).await?;
+    PlatformDb::hard_delete(epoch, &mut db).await?;
+    PlatformCredentialDb::hard_delete(epoch, &mut db).await?;
+    ActionDb::hard_delete(epoch, &mut db).await?;
+    ActionProviderDb::hard_delete(epoch, &mut db).await?;
+    ActionRuleDb::hard_delete(epoch, &mut db).await?;
+    ActionEventDb::hard_delete(epoch, &mut db).await?;
+    DiaryDb::hard_delete(epoch, &mut db).await?;
+    WodDb::hard_delete(epoch, &mut db).await?;
+    MovementDb::hard_delete(epoch, &mut db).await?;
+    StrengthSessionDb::hard_delete(epoch, &mut db).await?;
+    StrengthSetDb::hard_delete(epoch, &mut db).await?;
+    MetconDb::hard_delete(epoch, &mut db).await?;
+    MetconSessionDb::hard_delete(epoch, &mut db).await?;
+    RouteDb::hard_delete(epoch, &mut db).await?;
+    CardioSessionDb::hard_delete(epoch, &mut db).await?;
 
     Ok(StatusCode::OK)
 }

@@ -132,13 +132,11 @@ pub async fn create_metcon_movements(
 ) -> HandlerResult<StatusCode> {
     match metcon_movements {
         UnverifiedSingleOrVec::Single(metcon_movement) => {
-            let metcon_movement = metcon_movement.verify_user_ap_create(auth, &mut db).await?;
+            let metcon_movement = metcon_movement.verify_user_ap_without_db(auth)?;
             MetconMovementDb::create(&metcon_movement, &mut db).await
         }
         UnverifiedSingleOrVec::Vec(metcon_movements) => {
-            let metcon_movements = metcon_movements
-                .verify_user_ap_create(auth, &mut db)
-                .await?;
+            let metcon_movements = metcon_movements.verify_user_ap_without_db(auth)?;
             MetconMovementDb::create_multiple(&metcon_movements, &mut db).await
         }
     }
