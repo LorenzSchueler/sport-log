@@ -97,14 +97,9 @@ pub(crate) fn impl_modifiable_db(
     quote! {
         impl crate::db::ModifiableDb for #db_type {
             type EpochColumn = sport_log_types::schema::#value_name::columns::epoch;
-            type DeletedColumn = sport_log_types::schema::#value_name::columns::deleted;
 
             fn epoch_column() -> Self::EpochColumn {
                 sport_log_types::schema::#value_name::columns::epoch
-            }
-
-            fn deleted_column() -> Self::DeletedColumn {
-                sport_log_types::schema::#value_name::columns::deleted
             }
         }
     }

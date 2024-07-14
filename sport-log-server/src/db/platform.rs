@@ -10,7 +10,6 @@ use sport_log_derive::*;
     GetById,
     GetByEpoch,
     Update,
-    HardDelete,
     VerifyForAdminWithoutDb,
     VerifyUnchecked
 )]
@@ -24,7 +23,6 @@ pub struct PlatformDb;
     GetByUser,
     GetByUserAndEpoch,
     Update,
-    HardDelete,
     CheckUserId,
     VerifyForUserWithDb,
     VerifyForUserWithoutDb

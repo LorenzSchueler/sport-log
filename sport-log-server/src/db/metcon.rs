@@ -10,7 +10,6 @@ use crate::db::*;
     GetByUserOptional,
     GetByUserAndEpochOptional,
     Update,
-    HardDelete,
     CheckOptionalUserId,
     VerifyIdForUserOrAPOptional,
     VerifyForUserOrAPWithDbOptional,
@@ -25,7 +24,6 @@ pub struct MetconDb;
     GetByUserOptional,
     GetByUserAndEpochOptional,
     Update,
-    //CheckUserId,
     CheckOptionalUserId,
     VerifyIdForUserOrAPOptional,
     VerifyForUserOrAPWithDbOptional,
@@ -42,7 +40,6 @@ pub struct MetconMovementDb;
     GetByUserTimespan,
     GetByUserAndEpoch,
     Update,
-    HardDelete,
     CheckUserId,
     VerifyForUserOrAPWithDb,
     VerifyForUserOrAPWithoutDb

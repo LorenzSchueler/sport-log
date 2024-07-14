@@ -261,26 +261,6 @@ define_derive_deftly! {
 }
 
 define_derive_deftly! {
-    HardDelete:
-
-    #[async_trait::async_trait]
-    impl crate::db::HardDelete for crate::db::$ttype {
-        async fn hard_delete(epoch: i64, db: &mut diesel_async::AsyncPgConnection) -> diesel::result::QueryResult<usize> {
-            use crate::db::{Db, ModifiableDb};
-            use diesel_async::RunQueryDsl;
-            use diesel::prelude::*;
-
-            diesel::delete(
-                Self::table()
-                    .filter(Self::deleted_column().eq(true))
-                    .filter(Self::epoch_column().le(epoch))
-            ).execute(db)
-            .await
-        }
-    }
-}
-
-define_derive_deftly! {
     CheckUserId:
 
     #[async_trait::async_trait]

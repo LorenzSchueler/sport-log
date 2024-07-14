@@ -12,7 +12,6 @@ use crate::db::*;
     GetByUserOptional,
     GetByUserAndEpochOptional,
     Update,
-    HardDelete,
     CheckOptionalUserId,
     VerifyIdForUserOrAPOptional,
     VerifyForUserOrAPWithDbOptional,

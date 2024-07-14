@@ -1,3 +1,2 @@
 admin_password = "admin-passwd"
 server_url = "http://localhost:8000"
-garbage_collection_min_days = 0

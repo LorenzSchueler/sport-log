@@ -20,7 +20,6 @@ use crate::{auth::*, db::*};
     GetById,
     GetAll,
     GetByEpoch,
-    HardDelete,
     VerifyForAdminWithoutDb,
     VerifyUnchecked
 )]
@@ -144,7 +143,6 @@ impl ActionProviderDb {
     GetAll,
     GetByEpoch,
     Update,
-    HardDelete,
     CheckAPId,
     VerifyForActionProviderWithDb,
     VerifyForActionProviderWithoutDb
@@ -172,7 +170,6 @@ impl ActionDb {
     GetByUser,
     GetByUserAndEpoch,
     Update,
-    HardDelete,
     CheckUserId,
     VerifyForUserWithDb,
     VerifyForUserWithoutDb
@@ -191,7 +188,6 @@ pub struct ActionRuleDb;
     GetByUser,
     GetByUserAndEpoch,
     Update,
-    HardDelete,
     CheckUserId,
     VerifyForUserWithDb,
     VerifyForUserWithoutDb,

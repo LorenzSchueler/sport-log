@@ -58,8 +58,6 @@ pub const MOVEMENT: &str = "/movement";
 
 const ADM: &str = "/adm";
 
-pub const ADM_GARBAGE_COLLECTION: &str = concatcp!(ADM, "/garbage_collection");
-
 pub const ADM_USER: &str = concatcp!(ADM, USER);
 
 pub const ADM_PLATFORM: &str = concatcp!(ADM, PLATFORM);

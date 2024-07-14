@@ -33,7 +33,6 @@ async fn get_version() -> Json<Version> {
 
 pub fn get_router(state: AppState) -> Router {
     let admin_router = Router::new()
-        .route(ADM_GARBAGE_COLLECTION, delete(adm_do_garbage_collection))
         .route(
             ADM_PLATFORM,
             post(adm_create_platforms)

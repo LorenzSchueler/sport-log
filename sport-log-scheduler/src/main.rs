@@ -35,7 +35,6 @@ use serde::Deserialize;
 use sport_log_types::{
     uri::{
         route_max_version, ADM_ACTION_EVENT, ADM_CREATABLE_ACTION_RULE, ADM_DELETABLE_ACTION_EVENT,
-        ADM_GARBAGE_COLLECTION,
     },
     ActionEvent, ActionEventId, CreatableActionRule, DeletableActionEvent, ADMIN_USERNAME,
 };
@@ -51,14 +50,10 @@ pub const CONFIG_FILE: &str = "sport-log-scheduler.toml";
 /// `admin_password` is the password for the admin endpoints.
 ///
 /// `server_url` is the left part of the URL (everything before `/<version>/...`)
-///
-/// `garbage_collection_min_days` is the number of days for which an entry has to been deleted and
-/// not changed in order to get hard deleted. If set to `0` garbage collection is disabled.
 #[derive(Deserialize)]
 struct Config {
     admin_password: String,
     server_url: String,
-    garbage_collection_min_days: u32,
 }
 
 fn main() -> ExitCode {
@@ -97,11 +92,6 @@ fn main() -> ExitCode {
     };
     if let Err(error) = delete_action_events(&client, &config) {
         error!("failed to delete old action events: {error}");
-        return ExitCode::FAILURE;
-    }
-
-    if let Err(error) = garbage_collection(&client, &config) {
-        error!("failed to run garbage collection: {error}");
         return ExitCode::FAILURE;
     }
 
@@ -244,34 +234,6 @@ fn delete_action_events(client: &Client, config: &Config) -> Result<(), ReqwestE
         .error_for_status()?;
 
     info!("action events have been successfully deleted");
-
-    Ok(())
-}
-
-fn garbage_collection(client: &Client, config: &Config) -> Result<(), ReqwestError> {
-    if config.garbage_collection_min_days > 0 {
-        info!(
-            "deleting if older than {} days",
-            config.garbage_collection_min_days
-        );
-
-        client
-            .delete(route_max_version(
-                &config.server_url,
-                ADM_GARBAGE_COLLECTION,
-                Some(&[(
-                    "epoch",
-                    &(Utc::now()
-                        - Duration::try_days(config.garbage_collection_min_days as i64).unwrap())
-                    .to_string(),
-                )]),
-            ))
-            .basic_auth(ADMIN_USERNAME, Some(&config.admin_password))
-            .send()?
-            .error_for_status()?;
-
-        info!("old data has been successfully deleted");
-    }
 
     Ok(())
 }

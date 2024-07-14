@@ -114,10 +114,8 @@ pub trait DbWithDateTime: Db {
 
 pub trait ModifiableDb: Db {
     type EpochColumn: Column;
-    type DeletedColumn: Column;
 
     fn epoch_column() -> Self::EpochColumn;
-    fn deleted_column() -> Self::DeletedColumn;
 }
 
 /// A type for which a new database entry can be created.
@@ -190,19 +188,6 @@ pub trait Update: Db {
         values: &[Self::Type],
         db: &mut AsyncPgConnection,
     ) -> QueryResult<usize>;
-}
-
-/// A type for which all soft deleted entities can be hard deleted.
-///
-/// This is only intended for garbage collection triggered by
-/// `sport_log_scheduler`.
-///
-/// The function [`hard_delete`](HardDelete::hard_delete) will permanently
-/// delete all entities that are already soft deleted and which have not been
-/// changed since `epoch`.
-#[async_trait]
-pub trait HardDelete: Db {
-    async fn hard_delete(epoch: i64, db: &mut AsyncPgConnection) -> QueryResult<usize>;
 }
 
 /// A type which can be checked if it belongs to a User.
