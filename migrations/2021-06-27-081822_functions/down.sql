@@ -1,11 +1,4 @@
-drop function check_movement_exists;
-drop function delete_record_movement;
-drop function archive_record_movement;
-drop function check_metcon_exists;
-drop function delete_record_metcon;
-drop function archive_record_metcon;
-drop function check_strength_session_exists;
-drop function delete_record_strength_session;
-drop function archive_record_strength_session;
 drop function archive_record;
-drop function trigger_set_timestamp;
+drop function set_epoch_for_user_in_user_table;
+drop function set_epoch_for_user;
+drop function set_epoch;

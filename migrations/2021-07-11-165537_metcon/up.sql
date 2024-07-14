@@ -9,18 +9,18 @@ create table metcon (
     rounds integer check (rounds >= 1),
     timecap integer check (timecap > 0), -- milliseconds
     description text,
-    last_change timestamptz not null default now(),
+    epoch bigint not null,
     deleted boolean not null default false
 );
 
 create unique index metcon__user_id__name__key
     on metcon (user_id, name) nulls not distinct where deleted = false;
 
-create index metcon__user_id__last_change__idx
-    on metcon (user_id, last_change) where deleted = false;
+create index metcon__user_id__epoch__idx
+    on metcon (user_id, epoch) where deleted = false;
 
-create trigger set_timestamp before update on metcon
-    for each row execute procedure trigger_set_timestamp();
+create trigger set_epoch before insert or update on metcon
+    for each row execute function set_epoch_for_user();
 
 create table metcon_archive (
     primary key (id),
@@ -31,15 +31,11 @@ create table metcon_archive (
 create trigger archive_metcon
     after insert or update of deleted or delete
     on metcon
-    for each row execute procedure archive_record_metcon();
-
-create trigger delete_metcon_archive
-    after delete
-    on metcon_archive
-    for each row execute procedure delete_record_metcon();
+    for each row execute procedure archive_record();
 
 create table metcon_movement (
     id bigint primary key,
+    user_id bigint references "user" on delete cascade,
     metcon_id bigint not null references metcon on delete cascade,
     movement_id bigint not null references movement on delete cascade,
     distance_unit distance_unit,
@@ -47,7 +43,7 @@ create table metcon_movement (
     count integer not null check (count >= 1),
     male_weight real check (male_weight > 0),
     female_weight real check (female_weight > 0),
-    last_change timestamptz not null default now(),
+    epoch bigint not null,
     deleted boolean not null default false
 );
 
@@ -55,8 +51,11 @@ create unique index metcon_movement__metcon_id__movement_number__key
     on metcon_movement (metcon_id, movement_number)     
     where deleted = false;
 
-create trigger set_timestamp before update on metcon_movement
-    for each row execute procedure trigger_set_timestamp();
+create index metcon_movement__user_id__epoch__idx
+    on metcon_movement (user_id, epoch) where deleted = false;
+
+create trigger set_epoch before insert or update on metcon_movement
+    for each row execute function set_epoch_for_user();
 
 create table metcon_movement_archive (
     primary key (id),
@@ -68,11 +67,6 @@ create trigger archive_metcon_movement
     on metcon_movement
     for each row execute procedure archive_record();
 
-create trigger check_metcon_exists_trigger
-    after insert 
-    on metcon_movement_archive
-    for each row execute procedure check_metcon_exists();
-
 create table metcon_session (
     id bigint primary key,
     user_id bigint not null references "user" on delete cascade,
@@ -83,16 +77,16 @@ create table metcon_session (
     reps integer check (reps >= 0),
     rx boolean not null default true,
     comments text,
-    last_change timestamptz not null default now(),
+    epoch bigint not null,
     deleted boolean not null default false
 );
 
-create index metcon_session__user_id__last_change__idx
-    on metcon_session (user_id, last_change)     
+create index metcon_session__user_id__epoch__idx
+    on metcon_session (user_id, epoch)     
     where deleted = false;
 
-create trigger set_timestamp before update on metcon_session
-    for each row execute procedure trigger_set_timestamp();
+create trigger set_epoch before insert or update on metcon_session
+    for each row execute function set_epoch_for_user();
 
 create table metcon_session_archive (
     primary key (id),

@@ -3,12 +3,12 @@ create table "user" (
     username varchar(80) not null check (length(username) >= 2),
     password varchar(120) not null,
     email varchar(80) not null check (length(email) >= 5),
-    last_change timestamptz not null default now()
+    epoch bigint not null
 );
 
 create unique index user__username__key on "user" (username);
 
 create unique index user__email__key on "user" (email);
 
-create trigger set_timestamp before update on "user"
-    for each row execute procedure trigger_set_timestamp();
+create trigger set_epoch before insert or update on "user"
+    for each row execute function set_epoch_for_user_in_user_table();

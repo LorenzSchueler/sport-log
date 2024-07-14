@@ -2,14 +2,14 @@ create table platform (
     id bigint primary key,
     name varchar(80) not null check (length(name) >= 2),
     credential boolean not null,
-    last_change timestamptz not null default now(),
+    epoch bigint not null,
     deleted boolean not null default false
 );
 
 create unique index platform__name__key on platform (name) where deleted = false;
 
-create trigger set_timestamp before update on platform
-    for each row execute procedure trigger_set_timestamp();
+create trigger set_epoch before insert or update on platform
+    for each row execute function set_epoch();
 
 create table platform_archive (
     primary key (id),
@@ -27,18 +27,18 @@ create table platform_credential (
     platform_id bigint not null references platform on delete cascade,
     username varchar(80) not null,
     password varchar(80) not null,
-    last_change timestamptz not null default now(),
+    epoch bigint not null,
     deleted boolean not null default false
 );
 
 create unique index platform_credential__user_id__platform_id__key
     on platform_credential (user_id, platform_id) where deleted = false;
 
-create index platform_credential__user_id__last_change__idx
-    on platform_credential (user_id, last_change) where deleted = false;
+create index platform_credential__user_id__epoch__idx
+    on platform_credential (user_id, epoch) where deleted = false;
 
-create trigger set_timestamp before update on platform_credential
-    for each row execute procedure trigger_set_timestamp();
+create trigger set_epoch before insert or update on platform_credential
+    for each row execute function set_epoch_for_user();
 
 create table platform_credential_archive (
     primary key (id),

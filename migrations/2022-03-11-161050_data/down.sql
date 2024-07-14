@@ -6,8 +6,6 @@ delete from metcon;
 delete from strength_set;
 delete from strength_session;
 delete from eorm;
-delete from movement_muscle;
-delete from muscle_group;
 delete from movement;
 delete from wod;
 delete from diary;

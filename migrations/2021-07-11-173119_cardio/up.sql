@@ -17,18 +17,18 @@ create table route (
     descent integer check (descent >= 0),
     track "position"[],
     marked_positions "position"[],
-    last_change timestamptz not null default now(),
+    epoch bigint not null,
     deleted boolean not null default false
 );
 
 create unique index route__user_id__name__key
     on route (user_id, name) where deleted = false;
 
-create index route__user_id__last_change__idx
-    on route (user_id, last_change) where deleted = false;
+create index route__user_id__epoch__idx
+    on route (user_id, epoch) where deleted = false;
 
-create trigger set_timestamp before update on route
-    for each row execute procedure trigger_set_timestamp();
+create trigger set_epoch before insert or update on route
+    for each row execute function set_epoch_for_user();
 
 create table route_archive (
     primary key (id),
@@ -59,16 +59,16 @@ create table cardio_session (
     heart_rate integer[], -- = millisecs since start
     route_id bigint references route on delete set null,
     comments text,
-    last_change timestamptz not null default now(),
+    epoch bigint not null,
     deleted boolean not null default false
 );
 
-create index cardio_session__user_id__last_change__idx
-    on cardio_session (user_id, last_change) 
+create index cardio_session__user_id__epoch__idx
+    on cardio_session (user_id, epoch) 
     where deleted = false;
 
-create trigger set_timestamp before update on cardio_session
-    for each row execute procedure trigger_set_timestamp();
+create trigger set_epoch before insert or update on cardio_session
+    for each row execute function set_epoch_for_user();
 
 create table cardio_session_archive (
     primary key (id),
