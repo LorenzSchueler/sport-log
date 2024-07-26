@@ -1,4 +1,4 @@
-use std::io::Write;
+use std::{io::Write, sync::LazyLock};
 
 use axum::{
     body::{self, Body},
@@ -20,7 +20,6 @@ use diesel_async::{
 };
 use flate2::write::GzDecoder;
 use hyper::header::CONTENT_ENCODING;
-use lazy_static::lazy_static;
 use mime::APPLICATION_JSON;
 use rand::Rng;
 use serde::de::DeserializeOwned;
@@ -42,51 +41,49 @@ use crate::{
 
 const ADMIN_PASSWORD_PLAINTEXT: &str = "admin-passwd";
 
-lazy_static! {
-    static ref TEST_USER: User = User {
-        id: UserId(123_456_789),
-        username: String::from("test-user-username-123456789"),
-        password: String::from("test-user-Password-123456789"),
-        email: String::from("test-user-email-123456789"),
-    };
-    static ref TEST_USER2: User = User {
-        id: UserId(213_456_789),
-        username: String::from("test-user2-username-213456789"),
-        password: String::from("test-user2-Password-213456789"),
-        email: String::from("test-user2-email-213456789"),
-    };
-    static ref TEST_PLATFORM: Platform = Platform {
-        id: PlatformId(123_456_789),
-        name: String::from("test-platform-123456789"),
-        credential: false,
-        deleted: false,
-    };
-    static ref TEST_AP: ActionProvider = ActionProvider {
-        id: ActionProviderId(123_456_789),
-        name: String::from("test-ap-name-123456789"),
-        password: String::from("test-ap-Password-123456789"),
-        platform_id: TEST_PLATFORM.id,
-        description: None,
-        deleted: false,
-    };
-    static ref TEST_ACTION: Action = Action {
-        id: ActionId(123_456_789),
-        name: String::from("test-action-name-123456789"),
-        action_provider_id: TEST_AP.id,
-        description: None,
-        create_before: 1,
-        delete_after: 1,
-        deleted: false,
-    };
-    static ref TEST_DIARY: Diary = Diary {
-        id: DiaryId(123_456_789),
-        user_id: TEST_USER.id,
-        date: Utc::now().date_naive(),
-        bodyweight: None,
-        comments: None,
-        deleted: false,
-    };
-}
+static TEST_USER: LazyLock<User> = LazyLock::new(|| User {
+    id: UserId(123_456_789),
+    username: String::from("test-user-username-123456789"),
+    password: String::from("test-user-Password-123456789"),
+    email: String::from("test-user-email-123456789"),
+});
+static TEST_USER2: LazyLock<User> = LazyLock::new(|| User {
+    id: UserId(213_456_789),
+    username: String::from("test-user2-username-213456789"),
+    password: String::from("test-user2-Password-213456789"),
+    email: String::from("test-user2-email-213456789"),
+});
+static TEST_PLATFORM: LazyLock<Platform> = LazyLock::new(|| Platform {
+    id: PlatformId(123_456_789),
+    name: String::from("test-platform-123456789"),
+    credential: false,
+    deleted: false,
+});
+static TEST_AP: LazyLock<ActionProvider> = LazyLock::new(|| ActionProvider {
+    id: ActionProviderId(123_456_789),
+    name: String::from("test-ap-name-123456789"),
+    password: String::from("test-ap-Password-123456789"),
+    platform_id: TEST_PLATFORM.id,
+    description: None,
+    deleted: false,
+});
+static TEST_ACTION: LazyLock<Action> = LazyLock::new(|| Action {
+    id: ActionId(123_456_789),
+    name: String::from("test-action-name-123456789"),
+    action_provider_id: TEST_AP.id,
+    description: None,
+    create_before: 1,
+    delete_after: 1,
+    deleted: false,
+});
+static TEST_DIARY: LazyLock<Diary> = LazyLock::new(|| Diary {
+    id: DiaryId(123_456_789),
+    user_id: TEST_USER.id,
+    date: Utc::now().date_naive(),
+    bodyweight: None,
+    comments: None,
+    deleted: false,
+});
 
 fn get_test_db_pool(config: &Config) -> DbPool {
     let db_config = AsyncDieselConnectionManager::<AsyncPgConnection>::new(&config.database_url);
