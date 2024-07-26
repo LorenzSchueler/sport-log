@@ -77,15 +77,15 @@ pub struct MetconId(pub i64);
 )]
 pub struct Metcon {
     pub id: MetconId,
-    #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(feature = "db", diesel(treat_none_as_null = true))]
     pub user_id: Option<UserId>,
     pub name: String,
     pub metcon_type: MetconType,
-    #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(feature = "db", diesel(treat_none_as_null = true))]
     pub rounds: Option<i32>,
-    #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(feature = "db", diesel(treat_none_as_null = true))]
     pub timecap: Option<i32>,
-    #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(feature = "db", diesel(treat_none_as_null = true))]
     pub description: Option<String>,
     pub deleted: bool,
 }
@@ -121,9 +121,9 @@ pub struct MetconMovement {
     pub distance_unit: Option<DistanceUnit>,
     pub movement_number: i32,
     pub count: i32,
-    #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(feature = "db", diesel(treat_none_as_null = true))]
     pub male_weight: Option<f32>,
-    #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(feature = "db", diesel(treat_none_as_null = true))]
     pub female_weight: Option<f32>,
     pub deleted: bool,
 }
@@ -157,14 +157,14 @@ pub struct MetconSession {
     pub user_id: UserId,
     pub metcon_id: MetconId,
     pub datetime: DateTime<Utc>,
-    #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(feature = "db", diesel(treat_none_as_null = true))]
     pub time: Option<i32>,
-    #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(feature = "db", diesel(treat_none_as_null = true))]
     pub rounds: Option<i32>,
-    #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(feature = "db", diesel(treat_none_as_null = true))]
     pub reps: Option<i32>,
     pub rx: bool,
-    #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(feature = "db", diesel(treat_none_as_null = true))]
     pub comments: Option<String>,
     pub deleted: bool,
 }

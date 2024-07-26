@@ -39,9 +39,9 @@ pub struct Diary {
     pub id: DiaryId,
     pub user_id: UserId,
     pub date: NaiveDate,
-    #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(feature = "db", diesel(treat_none_as_null = true))]
     pub bodyweight: Option<f32>,
-    #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(feature = "db", diesel(treat_none_as_null = true))]
     pub comments: Option<String>,
     pub deleted: bool,
 }
@@ -74,7 +74,7 @@ pub struct Wod {
     pub id: WodId,
     pub user_id: UserId,
     pub date: NaiveDate,
-    #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(feature = "db", diesel(treat_none_as_null = true))]
     pub description: Option<String>,
     pub deleted: bool,
 }

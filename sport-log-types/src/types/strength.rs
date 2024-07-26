@@ -40,9 +40,9 @@ pub struct StrengthSession {
     pub user_id: UserId,
     pub datetime: DateTime<Utc>,
     pub movement_id: MovementId,
-    #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(feature = "db", diesel(treat_none_as_null = true))]
     pub interval: Option<i32>,
-    #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(feature = "db", diesel(treat_none_as_null = true))]
     pub comments: Option<String>,
     pub deleted: bool,
 }
@@ -76,7 +76,7 @@ pub struct StrengthSet {
     pub strength_session_id: StrengthSessionId,
     pub set_number: i32,
     pub count: i32,
-    #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(feature = "db", diesel(treat_none_as_null = true))]
     pub weight: Option<f32>,
     pub deleted: bool,
 }

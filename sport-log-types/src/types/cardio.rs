@@ -120,15 +120,15 @@ pub struct Route {
     pub id: RouteId,
     pub user_id: UserId,
     pub name: String,
-    #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(feature = "db", diesel(treat_none_as_null = true))]
     pub distance: Option<i32>,
-    #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(feature = "db", diesel(treat_none_as_null = true))]
     pub ascent: Option<i32>,
-    #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(feature = "db", diesel(treat_none_as_null = true))]
     pub descent: Option<i32>,
-    #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(feature = "db", diesel(treat_none_as_null = true))]
     pub track: Option<Vec<Position>>,
-    #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(feature = "db", diesel(treat_none_as_null = true))]
     pub marked_positions: Option<Vec<Position>>,
     pub deleted: bool,
 }
@@ -163,29 +163,29 @@ pub struct CardioSession {
     pub movement_id: MovementId,
     pub cardio_type: CardioType,
     pub datetime: DateTime<Utc>,
-    #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(feature = "db", diesel(treat_none_as_null = true))]
     pub distance: Option<i32>,
-    #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(feature = "db", diesel(treat_none_as_null = true))]
     pub ascent: Option<i32>,
-    #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(feature = "db", diesel(treat_none_as_null = true))]
     pub descent: Option<i32>,
-    #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(feature = "db", diesel(treat_none_as_null = true))]
     pub time: Option<i32>,
-    #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(feature = "db", diesel(treat_none_as_null = true))]
     pub calories: Option<i32>,
-    #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(feature = "db", diesel(treat_none_as_null = true))]
     pub track: Option<Vec<Position>>,
-    #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(feature = "db", diesel(treat_none_as_null = true))]
     pub avg_cadence: Option<i32>,
-    #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(feature = "db", diesel(treat_none_as_null = true))]
     pub cadence: Option<Vec<i32>>,
-    #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(feature = "db", diesel(treat_none_as_null = true))]
     pub avg_heart_rate: Option<i32>,
-    #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(feature = "db", diesel(treat_none_as_null = true))]
     pub heart_rate: Option<Vec<i32>>,
-    #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(feature = "db", diesel(treat_none_as_null = true))]
     pub route_id: Option<RouteId>,
-    #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(feature = "db", diesel(treat_none_as_null = true))]
     pub comments: Option<String>,
     pub deleted: bool,
 }

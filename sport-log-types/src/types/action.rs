@@ -43,7 +43,7 @@ pub struct ActionProvider {
     pub password: String,
 
     pub platform_id: PlatformId,
-    #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(feature = "db", diesel(treat_none_as_null = true))]
     pub description: Option<String>,
     pub deleted: bool,
 }
@@ -76,7 +76,7 @@ pub struct Action {
     pub id: ActionId,
     pub name: String,
     pub action_provider_id: ActionProviderId,
-    #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(feature = "db", diesel(treat_none_as_null = true))]
     pub description: Option<String>,
     pub create_before: i32,
     pub delete_after: i32,
@@ -144,7 +144,7 @@ pub struct ActionRule {
     pub action_id: ActionId,
     pub weekday: Weekday,
     pub time: DateTime<Utc>,
-    #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(feature = "db", diesel(treat_none_as_null = true))]
     pub arguments: Option<String>,
     pub enabled: bool,
     pub deleted: bool,
@@ -179,7 +179,7 @@ pub struct ActionEvent {
     pub user_id: UserId,
     pub action_id: ActionId,
     pub datetime: DateTime<Utc>,
-    #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(feature = "db", diesel(treat_none_as_null = true))]
     pub arguments: Option<String>,
     pub enabled: bool,
     pub deleted: bool,
@@ -193,7 +193,7 @@ pub struct CreatableActionRule {
     pub action_id: ActionId,
     pub weekday: Weekday,
     pub time: DateTime<Utc>,
-    #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(feature = "db", diesel(treat_none_as_null = true))]
     pub arguments: Option<String>,
     pub create_before: i32,
 }
@@ -204,12 +204,12 @@ pub struct ExecutableActionEvent {
     pub action_event_id: ActionEventId,
     pub action_name: String,
     pub datetime: DateTime<Utc>,
-    #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(feature = "db", diesel(treat_none_as_null = true))]
     pub arguments: Option<String>,
     pub user_id: UserId,
-    #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(feature = "db", diesel(treat_none_as_null = true))]
     pub username: Option<String>,
-    #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(feature = "db", diesel(treat_none_as_null = true))]
     pub password: Option<String>,
 }
 

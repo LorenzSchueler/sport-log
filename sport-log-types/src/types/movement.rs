@@ -58,10 +58,10 @@ pub struct MovementId(pub i64);
 )]
 pub struct Movement {
     pub id: MovementId,
-    #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(feature = "db", diesel(treat_none_as_null = true))]
     pub user_id: Option<UserId>,
     pub name: String,
-    #[cfg_attr(features = "db", changeset_options(treat_none_as_null = "true"))]
+    #[cfg_attr(feature = "db", diesel(treat_none_as_null = true))]
     pub description: Option<String>,
     pub movement_dimension: MovementDimension,
     pub cardio: bool,
