@@ -6,7 +6,7 @@ use std::{
     time::Duration as StdDuration,
 };
 
-use chrono::{DateTime, Duration, Local, Utc};
+use chrono::{DateTime, Datelike, Days, Duration, Local, Utc, Weekday};
 use clap::Parser;
 use reqwest::{Client, Error as ReqwestError};
 use serde::Deserialize;
@@ -19,11 +19,11 @@ use tokio::{process::Command, task::JoinError, time};
 use tracing::{debug, error, info, warn};
 use tracing_subscriber::EnvFilter;
 
-const CONFIG_FILE: &str = "sport-log-action-provider-wodify-login.toml";
-const NAME: &str = "wodify-login";
+const CONFIG_FILE: &str = "sport-log-action-provider-boxplanner-login.toml";
+const NAME: &str = "boxplanner-login";
 const DESCRIPTION: &str =
-    "Wodify Login can reserve spots in classes. The action names correspond to the class types.";
-const PLATFORM_NAME: &str = "wodify";
+    "Boxplanner Login can reserve spots in classes. The action names correspond to the class types.";
+const PLATFORM_NAME: &str = "boxplanner";
 
 const GECKODRIVER: &str = "geckodriver";
 const WEBDRIVER_ADDRESS: &str = "http://localhost:4444/";
@@ -49,8 +49,6 @@ enum UserError {
     #[error("can not log in: invalid credentials")]
     InvalidCredential(ActionEventId),
     #[error("can not log in: captcha required")]
-    CaptchaRequired(ActionEventId),
-    #[error("can not log in: unknown error")]
     UnknownLoginError(ActionEventId),
     #[error("{1} class at {2} not found within timeout")]
     ClassNotFound(ActionEventId, String, DateTime<Utc>),
@@ -61,7 +59,6 @@ impl UserError {
         match self {
             Self::NoCredential(action_event_id)
             | Self::InvalidCredential(action_event_id)
-            | Self::CaptchaRequired(action_event_id)
             | Self::UnknownLoginError(action_event_id)
             | Self::ClassNotFound(action_event_id, ..) => *action_event_id,
         }
@@ -70,7 +67,7 @@ impl UserError {
 
 type UserResult<T> = StdResult<T, UserError>;
 
-/// The config for [`sport-log-action-provider-wodify-login`](crate).
+/// The config for [`sport-log-action-provider-boxplanner-login`](crate).
 ///
 /// The name of the config file is specified in [`CONFIG_FILE`].
 ///
@@ -89,7 +86,7 @@ enum Mode {
     Interactive,
 }
 
-/// Wodify Login Action Provider
+/// Boxplanner Login Action Provider
 #[derive(Parser, Debug)]
 #[command( about, long_about = None)]
 struct Args {
@@ -108,12 +105,12 @@ async fn main() -> ExitCode {
         if cfg!(debug_assertions) {
             env::set_var(
                 "RUST_LOG",
-                "info,sport_log_action_provider_wodify_login=debug",
+                "info,sport_log_action_provider_boxplanner_login=debug",
             );
         } else {
             env::set_var(
                 "RUST_LOG",
-                "warn,sport_log_action_provider_wodify_login=info",
+                "warn,sport_log_action_provider_boxplanner_login=info",
             );
         }
     }
@@ -166,16 +163,7 @@ async fn setup(config: &Config) -> Result<()> {
         DESCRIPTION,
         PLATFORM_NAME,
         true,
-        &[
-            ("CrossFit", "Reserve a spot in a CrossFit class."),
-            ("Weightlifting", "Reserve a spot in a Weightlifting class."),
-            ("Open Fridge", "Reserve a spot in a Open Fridge class."),
-            ("Open Gym", "Reserve a spot in a Open Gym class."),
-            ("Gymnastics", "Reserve a spot in a Gymnastics class."),
-            ("Strongmen", "Reserve a spot in a Strongmen class."),
-            ("Yoga", "Reserve a spot in a Yoga class."),
-            ("Swim WOD", "Reserve a spot in a Swim class."),
-        ],
+        &[("Weightlifting", "Reserve a spot in a Weightlifting class.")],
         Duration::try_days(7).unwrap(),
         Duration::zero(),
     )
@@ -193,7 +181,7 @@ async fn login(config: &Config, mode: Mode) -> Result<()> {
         NAME,
         &config.password,
         Duration::zero(),
-        Duration::try_days(1).unwrap() + Duration::try_minutes(2).unwrap(),
+        Duration::try_days(2).unwrap() + Duration::try_minutes(2).unwrap(),
     )
     .await?;
 
@@ -234,7 +222,8 @@ async fn login(config: &Config, mode: Mode) -> Result<()> {
 
             let driver = WebDriver::new(WEBDRIVER_ADDRESS, caps).await?;
 
-            let result = wodify_login(&driver, username, password, &exec_action_event, mode).await;
+            let result =
+                boxplanner_login(&driver, username, password, &exec_action_event, mode).await;
 
             debug!("closing browser");
             driver.quit().await?;
@@ -271,7 +260,7 @@ async fn login(config: &Config, mode: Mode) -> Result<()> {
     Ok(())
 }
 
-async fn wodify_login(
+async fn boxplanner_login(
     driver: &WebDriver,
     username: &str,
     password: &str,
@@ -283,48 +272,48 @@ async fn wodify_login(
         .with_timezone(&Local)
         .format("%-H:%M")
         .to_string();
-    let date = exec_action_event.datetime.format("%m/%d/%Y").to_string();
+    let date = exec_action_event.datetime.format("%Y%m%d").to_string();
 
     driver.delete_all_cookies().await?;
-    driver.goto("https://app.wodify.com").await?;
+    driver
+        .goto("https://www.box-planner.com/External/PublicLogin/#/Login/")
+        .await?;
 
     time::sleep(StdDuration::from_secs(3)).await;
 
     driver
-        .find(By::Id("Input_UserName"))
+        .find(By::Id("email"))
         .await?
         .send_keys(username)
         .await?;
     driver
-        .find(By::Id("Input_Password"))
+        .find(By::Id("password"))
         .await?
         .send_keys(password)
         .await?;
     driver
-        .find(By::ClassName("signin-btn"))
+        .find(By::Name("loginForm"))
+        .await?
+        .find(By::Tag("button"))
         .await?
         .click()
         .await?;
 
     time::sleep(StdDuration::from_secs(5)).await;
 
-    if let Ok(feedback) = driver.find(By::ClassName("feedback-message-text")).await {
-        if feedback.inner_html().await? == "Invalid email or password." {
+    if let Ok(feedback) = driver.find(By::ClassName("bootbox-body")).await {
+        if feedback.inner_html().await? == "Invalid user name or password" {
             return Ok(Err(UserError::InvalidCredential(
                 exec_action_event.action_event_id,
             )));
         }
     }
 
-    if let Ok(button) = driver.find(By::Id("recaptcha-verify-button")).await {
-        if button.is_clickable().await? {
-            return Ok(Err(UserError::CaptchaRequired(
-                exec_action_event.action_event_id,
-            )));
-        }
-    }
-
-    if driver.find(By::LinkText("Logout")).await.is_err() {
+    if driver
+        .find(By::ClassName("BoxPlannerIcon-CalendarMonth"))
+        .await
+        .is_err()
+    {
         return Ok(Err(UserError::UnknownLoginError(
             exec_action_event.action_event_id,
         )));
@@ -333,11 +322,38 @@ async fn wodify_login(
     debug!("login successful");
 
     driver
-        .goto("https://app.wodify.com/Schedule/CalendarListViewEntry.aspx")
+        .goto("https://www.box-planner.com/App#/Calendar")
         .await?;
 
+    time::sleep(StdDuration::from_secs(5)).await;
+
+    let current_month = exec_action_event.datetime.date_naive().month();
+    let next_week_month = exec_action_event
+        .datetime
+        .date_naive()
+        .checked_add_days(Days::new(7))
+        .unwrap()
+        .week(Weekday::Mon)
+        .first_day()
+        .month();
+
+    if current_month < next_week_month {
+        let buttons = driver
+            .find(By::Id("calcontainer"))
+            .await?
+            .find_all(By::Tag("button"))
+            .await?;
+        for button in buttons {
+            if button.inner_html().await? == "Next Month" {
+                button.click().await?;
+            }
+        }
+    }
+
+    time::sleep(StdDuration::from_secs(5)).await;
+
     if let Ok(duration) =
-        (exec_action_event.datetime - Duration::try_days(1).unwrap() - Utc::now()).to_std()
+        (exec_action_event.datetime - Duration::try_days(2).unwrap() - Utc::now()).to_std()
     {
         time::sleep(duration).await;
     }
@@ -347,53 +363,13 @@ async fn wodify_login(
         driver.refresh().await?;
         info!("reload done"); // info for timing purposes
 
-        let table = driver
-            .find(By::ClassName("TableRecords"))
-            .await?
-            .find(By::Tag("tbody"))
-            .await?;
+        let day_column = driver.find(By::Id(&date)).await?;
+        let class_spans = day_column.find_all(By::Tag("span")).await?;
+        for class in class_spans {
+            let inner = class.inner_html().await?;
+            if inner.contains(&time) && inner.contains(&exec_action_event.action_name) {
+                class.parent().await?.click().await?;
 
-        let rows = table.find_all(By::Tag("tr")).await?;
-
-        let mut start_row_number = rows.len();
-        for (i, row) in rows.iter().enumerate() {
-            if let Ok(day) = row
-                .find(By::XPath("./td[1]/span[contains(@class, \"h3\")]"))
-                .await
-            {
-                if day.inner_html().await?.contains(&date) {
-                    start_row_number = i + 1;
-                    break;
-                }
-            }
-        }
-
-        let mut end_row_number = rows.len();
-        for (i, row) in rows[start_row_number..].iter().enumerate() {
-            if row
-                .find(By::XPath("./td[1]/span[contains(@class, \"h3\")]"))
-                .await
-                .is_ok()
-            {
-                end_row_number = start_row_number + i;
-                break;
-            }
-        }
-
-        for row in &rows[start_row_number..end_row_number] {
-            let row_matches = row
-                .find(By::XPath("./td[1]/div/span"))
-                .await?
-                .attr("title")
-                .await?
-                .map_or(false, |title| {
-                    title.contains(&exec_action_event.action_name) && title.contains(&time)
-                });
-
-            if row_matches {
-                let icon = row.find(By::XPath("./td[3]/div")).await?;
-                icon.scroll_into_view().await?;
-                icon.click().await?;
                 info!("reservation for {} done", exec_action_event.datetime);
 
                 if mode == Mode::Interactive {

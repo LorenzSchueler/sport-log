@@ -3,6 +3,7 @@
 !/.vscode/launch.json.template
 .idea/
 /sport-log-action-provider-map-matching/map-matching
+/sport-log-action-provider-boxplanner-login/sport-log-action-provider-boxplanner-login.toml
 /sport-log-action-provider-sportstracker/sport-log-action-provider-sportstracker.toml
 /sport-log-action-provider-wodify-login/sport-log-action-provider-wodify-login.toml
 /sport-log-action-provider-wodify-wod/sport-log-action-provider-wodify-wod.toml

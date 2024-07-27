@@ -175,8 +175,8 @@ async fn setup(config: &Config) -> Result<()> {
             "Metcon",
             "Fetch and save the metcon description and results for the current day.",
         )],
-        Duration::try_hours(168).unwrap(),
-        Duration::try_hours(24).unwrap(),
+        Duration::try_days(7).unwrap(),
+        Duration::try_days(1).unwrap(),
     )
     .await?;
 
