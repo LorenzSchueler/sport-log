@@ -86,16 +86,6 @@ class MapController {
   Future<void> _animatePitchBy(double pitch) async =>
       _controller?.pitchBy(pitch, null);
 
-  Future<LatLng?> _screenCoordToLatLng(
-    ScreenCoordinate screenCoordinate,
-  ) async {
-    final point = await _controller?.coordinateForPixel(screenCoordinate);
-    if (point == null) {
-      return null;
-    }
-    return LatLng.fromPoint(point);
-  }
-
   Future<void> animateCenter(LatLng center) async =>
       await _controller?.flyTo(center.toCameraOptionsCenter(), null);
 
@@ -109,34 +99,18 @@ class MapController {
       await _controller?.flyTo(CameraOptions(bearing: 0), null);
 
   Future<void> setBoundsX(LatLngBounds bounds, {required bool padded}) async {
-    final paddedBounds = padded ? bounds.padded() : bounds;
-    final center = paddedBounds.center;
-    if (_controller == null) {
-      return;
-    }
-    await _controller?.setCamera(center.toCameraOptionsCenter());
-
-    final screenCorner =
-        await _screenCoordToLatLng(ScreenCoordinate(x: 0, y: 0));
-    if (screenCorner == null) {
-      return;
-    }
-    final northwest = LatLng(
-      lat: paddedBounds.northeast.lat,
-      lng: paddedBounds.southwest.lng,
+    final camera = await _controller?.cameraForCoordinatesPadding(
+      [bounds.northeast.toPoint(), bounds.southwest.toPoint()],
+      CameraOptions(),
+      padded
+          ? MbxEdgeInsets(top: 10, left: 10, bottom: 10, right: 10) // pixel
+          : null,
+      null,
+      null,
     );
-    final latRatio =
-        (center.lat - screenCorner.lat) / (center.lat - northwest.lat);
-    final lngRatio =
-        (center.lng - screenCorner.lng) / (center.lng - northwest.lng);
-    final ratio = latRatio < lngRatio ? latRatio : lngRatio;
-    final zoomAdd = log(ratio) / log(2);
-    final cameraState = await _controller?.getCameraState();
-    if (cameraState == null) {
-      return;
+    if (camera != null) {
+      await _controller?.setCamera(camera);
     }
-    await _controller
-        ?.setCamera(CameraOptions(zoom: cameraState.zoom + zoomAdd));
   }
 
   Future<void> setBoundsFromTracks(

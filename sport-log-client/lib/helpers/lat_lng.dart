@@ -176,25 +176,6 @@ class LatLngBounds {
     );
   }
 
-  LatLngBounds padded([double factor = 0.1]) {
-    var north = northeast.lat;
-    var south = southwest.lat;
-    final latDiff = north - south;
-    north += latDiff * 0.1;
-    south -= latDiff * 0.1;
-
-    var east = northeast.lng;
-    var west = southwest.lng;
-    final lngDiff = east - west;
-    east += lngDiff * factor;
-    west -= lngDiff * factor;
-
-    return LatLngBounds(
-      northeast: LatLng(lat: north, lng: east),
-      southwest: LatLng(lat: south, lng: west),
-    );
-  }
-
   Polygon toPolygon() => Polygon(
         coordinates: [
           [
