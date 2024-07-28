@@ -13,7 +13,7 @@ use sport_log_types::{schema::user, User, UserId};
 use crate::{auth::AuthUser, db::*};
 
 #[derive(Db, Deftly)]
-#[derive_deftly(GetById, VerifyUnchecked, VerifyForAdminWithoutDb)]
+#[derive_deftly(GetById, VerifyUncheckedCreate, VerifyForAdmin)]
 pub struct UserDb;
 
 /// Same as trait [`Create`] but with mutable references
@@ -143,10 +143,10 @@ impl UserDb {
 }
 
 #[async_trait]
-impl VerifyForUserWithDb for Unverified<User> {
+impl VerifyForUserUpdate for Unverified<User> {
     type Type = User;
 
-    async fn verify_user(
+    async fn verify_user_update(
         self,
         auth: AuthUser,
         db: &mut AsyncPgConnection,

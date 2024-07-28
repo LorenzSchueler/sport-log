@@ -17,11 +17,11 @@ pub async fn create_metcon_sessions(
 ) -> HandlerResult<StatusCode> {
     match metcon_sessions {
         UnverifiedSingleOrVec::Single(metcon_session) => {
-            let metcon_session = metcon_session.verify_user_ap_without_db(auth)?;
+            let metcon_session = metcon_session.verify_user_ap_create(auth)?;
             MetconSessionDb::create(&metcon_session, &mut db).await
         }
         UnverifiedSingleOrVec::Vec(metcon_sessions) => {
-            let metcon_sessions = metcon_sessions.verify_user_ap_without_db(auth)?;
+            let metcon_sessions = metcon_sessions.verify_user_ap_create(auth)?;
             MetconSessionDb::create_multiple(&metcon_sessions, &mut db).await
         }
     }
@@ -37,7 +37,7 @@ pub async fn get_metcon_sessions(
 ) -> HandlerResult<Json<Vec<MetconSession>>> {
     match id {
         Some(id) => {
-            let metcon_session_id = id.verify_user_ap(auth, &mut db).await?;
+            let metcon_session_id = id.verify_user_ap_get(auth, &mut db).await?;
             MetconSessionDb::get_by_id(metcon_session_id, &mut db)
                 .await
                 .map(|m| vec![m])
@@ -57,11 +57,11 @@ pub async fn update_metcon_sessions(
 ) -> HandlerResult<StatusCode> {
     match metcon_sessions {
         UnverifiedSingleOrVec::Single(metcon_session) => {
-            let metcon_session = metcon_session.verify_user_ap(auth, &mut db).await?;
+            let metcon_session = metcon_session.verify_user_ap_update(auth, &mut db).await?;
             MetconSessionDb::update(&metcon_session, &mut db).await
         }
         UnverifiedSingleOrVec::Vec(metcon_sessions) => {
-            let metcon_sessions = metcon_sessions.verify_user_ap(auth, &mut db).await?;
+            let metcon_sessions = metcon_sessions.verify_user_ap_update(auth, &mut db).await?;
             MetconSessionDb::update_multiple(&metcon_sessions, &mut db).await
         }
     }
@@ -76,11 +76,11 @@ pub async fn create_metcons(
 ) -> HandlerResult<StatusCode> {
     match metcons {
         UnverifiedSingleOrVec::Single(metcon) => {
-            let metcon = metcon.verify_user_ap_without_db(auth)?;
+            let metcon = metcon.verify_user_ap_create(auth)?;
             MetconDb::create(&metcon, &mut db).await
         }
         UnverifiedSingleOrVec::Vec(metcons) => {
-            let metcons = metcons.verify_user_ap_without_db(auth)?;
+            let metcons = metcons.verify_user_ap_create(auth)?;
             MetconDb::create_multiple(&metcons, &mut db).await
         }
     }
@@ -95,7 +95,7 @@ pub async fn get_metcons(
 ) -> HandlerResult<Json<Vec<Metcon>>> {
     match id {
         Some(id) => {
-            let metcon_id = id.verify_user_ap(auth, &mut db).await?;
+            let metcon_id = id.verify_user_ap_get(auth, &mut db).await?;
             MetconDb::get_by_id(metcon_id, &mut db)
                 .await
                 .map(|m| vec![m])
@@ -113,11 +113,11 @@ pub async fn update_metcons(
 ) -> HandlerResult<StatusCode> {
     match metcons {
         UnverifiedSingleOrVec::Single(metcon) => {
-            let metcon = metcon.verify_user_ap(auth, &mut db).await?;
+            let metcon = metcon.verify_user_ap_update(auth, &mut db).await?;
             MetconDb::update(&metcon, &mut db).await
         }
         UnverifiedSingleOrVec::Vec(metcons) => {
-            let metcons = metcons.verify_user_ap(auth, &mut db).await?;
+            let metcons = metcons.verify_user_ap_update(auth, &mut db).await?;
             MetconDb::update_multiple(&metcons, &mut db).await
         }
     }
@@ -132,11 +132,11 @@ pub async fn create_metcon_movements(
 ) -> HandlerResult<StatusCode> {
     match metcon_movements {
         UnverifiedSingleOrVec::Single(metcon_movement) => {
-            let metcon_movement = metcon_movement.verify_user_ap_without_db(auth)?;
+            let metcon_movement = metcon_movement.verify_user_ap_create(auth)?;
             MetconMovementDb::create(&metcon_movement, &mut db).await
         }
         UnverifiedSingleOrVec::Vec(metcon_movements) => {
-            let metcon_movements = metcon_movements.verify_user_ap_without_db(auth)?;
+            let metcon_movements = metcon_movements.verify_user_ap_create(auth)?;
             MetconMovementDb::create_multiple(&metcon_movements, &mut db).await
         }
     }
@@ -151,7 +151,7 @@ pub async fn get_metcon_movements(
 ) -> HandlerResult<Json<Vec<MetconMovement>>> {
     match id {
         Some(id) => {
-            let metcon_movement_id = id.verify_user_ap(auth, &mut db).await?;
+            let metcon_movement_id = id.verify_user_ap_get(auth, &mut db).await?;
             MetconMovementDb::get_by_id(metcon_movement_id, &mut db)
                 .await
                 .map(|m| vec![m])
@@ -169,11 +169,13 @@ pub async fn update_metcon_movements(
 ) -> HandlerResult<StatusCode> {
     match metcon_movements {
         UnverifiedSingleOrVec::Single(metcon_movement) => {
-            let metcon_movement = metcon_movement.verify_user_ap(auth, &mut db).await?;
+            let metcon_movement = metcon_movement.verify_user_ap_update(auth, &mut db).await?;
             MetconMovementDb::update(&metcon_movement, &mut db).await
         }
         UnverifiedSingleOrVec::Vec(metcon_movements) => {
-            let metcon_movements = metcon_movements.verify_user_ap(auth, &mut db).await?;
+            let metcon_movements = metcon_movements
+                .verify_user_ap_update(auth, &mut db)
+                .await?;
             MetconMovementDb::update_multiple(&metcon_movements, &mut db).await
         }
     }

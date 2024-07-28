@@ -244,10 +244,10 @@ pub trait CheckAPId: Db {
 }
 
 #[async_trait]
-pub trait VerifyIdForUser {
+pub trait VerifyForUserGet {
     type Id;
 
-    async fn verify_user(
+    async fn verify_user_get(
         self,
         auth: AuthUser,
         db: &mut AsyncPgConnection,
@@ -255,10 +255,10 @@ pub trait VerifyIdForUser {
 }
 
 #[async_trait]
-pub trait VerifyIdForUserOrAP {
+pub trait VerifyForUserOrAPGet {
     type Id;
 
-    async fn verify_user_ap(
+    async fn verify_user_ap_get(
         self,
         auth: AuthUserOrAP,
         db: &mut AsyncPgConnection,
@@ -266,10 +266,10 @@ pub trait VerifyIdForUserOrAP {
 }
 
 #[async_trait]
-pub trait VerifyIdForActionProvider {
+pub trait VerifyForActionProviderGet {
     type Id;
 
-    async fn verify_ap(
+    async fn verify_ap_get(
         self,
         auth: AuthAP,
         db: &mut AsyncPgConnection,
@@ -277,39 +277,39 @@ pub trait VerifyIdForActionProvider {
 }
 
 #[async_trait]
-pub trait VerifyIdsForActionProvider {
+pub trait VerifyForActionProviderDisable {
     type Id;
 
-    async fn verify_ap(
+    async fn verify_ap_disable(
         self,
         auth: AuthAP,
         db: &mut AsyncPgConnection,
     ) -> Result<Vec<Self::Id>, StatusCode>;
 }
 
-pub trait VerifyIdForAdmin {
+pub trait VerifyForAdminGet {
     type Id;
 
-    fn verify_adm(self, auth: AuthAdmin) -> Result<Self::Id, StatusCode>;
+    fn verify_adm_get(self, auth: AuthAdmin) -> Result<Self::Id, StatusCode>;
 }
 
-pub trait VerifyIdsForAdmin {
+pub trait VerifyForAdminDelete {
     type Id;
 
-    fn verify_adm(self, auth: AuthAdmin) -> Result<Vec<Self::Id>, StatusCode>;
+    fn verify_adm_delete(self, auth: AuthAdmin) -> Result<Vec<Self::Id>, StatusCode>;
 }
 
-pub trait VerifyIdUnchecked {
+pub trait VerifyUncheckedGet {
     type Id;
 
-    fn verify_unchecked(self) -> Result<Self::Id, StatusCode>;
+    fn verify_unchecked_get(self) -> Result<Self::Id, StatusCode>;
 }
 
 #[async_trait]
-pub trait VerifyForUserWithDb {
+pub trait VerifyForUserUpdate {
     type Type;
 
-    async fn verify_user(
+    async fn verify_user_update(
         self,
         auth: AuthUser,
         db: &mut AsyncPgConnection,
@@ -317,33 +317,33 @@ pub trait VerifyForUserWithDb {
 }
 
 #[async_trait]
-pub trait VerifyMultipleForUserWithDb {
+pub trait VerifyMultipleForUserUpdate {
     type Type;
 
-    async fn verify_user(
+    async fn verify_user_update(
         self,
         auth: AuthUser,
         db: &mut AsyncPgConnection,
     ) -> Result<Vec<Self::Type>, StatusCode>;
 }
 
-pub trait VerifyForUserWithoutDb {
+pub trait VerifyForUserCreate {
     type Type;
 
-    fn verify_user_without_db(self, auth: AuthUser) -> Result<Self::Type, StatusCode>;
+    fn verify_user_create(self, auth: AuthUser) -> Result<Self::Type, StatusCode>;
 }
 
-pub trait VerifyMultipleForUserWithoutDb {
+pub trait VerifyMultipleForUserCreate {
     type Type;
 
-    fn verify_user_without_db(self, auth: AuthUser) -> Result<Vec<Self::Type>, StatusCode>;
+    fn verify_user_create(self, auth: AuthUser) -> Result<Vec<Self::Type>, StatusCode>;
 }
 
 #[async_trait]
-pub trait VerifyForUserOrAPWithDb {
+pub trait VerifyForUserOrAPUpdate {
     type Type;
 
-    async fn verify_user_ap(
+    async fn verify_user_ap_update(
         self,
         auth: AuthUserOrAP,
         db: &mut AsyncPgConnection,
@@ -351,33 +351,33 @@ pub trait VerifyForUserOrAPWithDb {
 }
 
 #[async_trait]
-pub trait VerifyMultipleForUserOrAPWithDb {
+pub trait VerifyMultipleForUserOrAPUpdate {
     type Type;
 
-    async fn verify_user_ap(
+    async fn verify_user_ap_update(
         self,
         auth: AuthUserOrAP,
         db: &mut AsyncPgConnection,
     ) -> Result<Vec<Self::Type>, StatusCode>;
 }
 
-pub trait VerifyForUserOrAPWithoutDb {
+pub trait VerifyForUserOrAPCreate {
     type Type;
 
-    fn verify_user_ap_without_db(self, auth: AuthUserOrAP) -> Result<Self::Type, StatusCode>;
+    fn verify_user_ap_create(self, auth: AuthUserOrAP) -> Result<Self::Type, StatusCode>;
 }
 
-pub trait VerifyMultipleForUserOrAPWithoutDb {
+pub trait VerifyMultipleForUserOrAPCreate {
     type Type;
 
-    fn verify_user_ap_without_db(self, auth: AuthUserOrAP) -> Result<Vec<Self::Type>, StatusCode>;
+    fn verify_user_ap_create(self, auth: AuthUserOrAP) -> Result<Vec<Self::Type>, StatusCode>;
 }
 
 #[async_trait]
-pub trait VerifyForActionProviderWithDb {
+pub trait VerifyForActionProviderUpdate {
     type Type;
 
-    async fn verify_ap(
+    async fn verify_ap_update(
         self,
         auth: AuthAP,
         db: &mut AsyncPgConnection,
@@ -385,42 +385,42 @@ pub trait VerifyForActionProviderWithDb {
 }
 
 #[async_trait]
-pub trait VerifyMultipleForActionProviderWithDb {
+pub trait VerifyMultipleForActionProviderUpdate {
     type Type;
 
-    async fn verify_ap(
+    async fn verify_ap_update(
         self,
         auth: AuthAP,
         db: &mut AsyncPgConnection,
     ) -> Result<Vec<Self::Type>, StatusCode>;
 }
 
-pub trait VerifyForActionProviderWithoutDb {
+pub trait VerifyForActionProviderCreate {
     type Type;
 
-    fn verify_ap_without_db(self, auth: AuthAP) -> Result<Self::Type, StatusCode>;
+    fn verify_ap_create(self, auth: AuthAP) -> Result<Self::Type, StatusCode>;
 }
 
-pub trait VerifyMultipleForActionProviderWithoutDb {
+pub trait VerifyMultipleForActionProviderCreate {
     type Type;
 
-    fn verify_ap_without_db(self, auth: AuthAP) -> Result<Vec<Self::Type>, StatusCode>;
+    fn verify_ap_create(self, auth: AuthAP) -> Result<Vec<Self::Type>, StatusCode>;
 }
 
-pub trait VerifyForAdminWithoutDb {
+pub trait VerifyForAdmin {
     type Type;
 
     fn verify_adm(self, auth: AuthAdmin) -> Result<Self::Type, StatusCode>;
 }
 
-pub trait VerifyMultipleForAdminWithoutDb {
+pub trait VerifyMultipleForAdmin {
     type Type;
 
     fn verify_adm(self, auth: AuthAdmin) -> Result<Vec<Self::Type>, StatusCode>;
 }
 
-pub trait VerifyUnchecked {
+pub trait VerifyUncheckedCreate {
     type Type;
 
-    fn verify_unchecked(self) -> Result<Self::Type, StatusCode>;
+    fn verify_unchecked_create(self) -> Result<Self::Type, StatusCode>;
 }

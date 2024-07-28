@@ -395,13 +395,13 @@ define_derive_deftly! {
 }
 
 define_derive_deftly! {
-    VerifyIdForUser:
+    VerifyForUserGet:
 
     #[async_trait::async_trait]
-    impl crate::db::VerifyIdForUser for crate::db::UnverifiedId<<$ttype as crate::db::Db>::Id> {
+    impl crate::db::VerifyForUserGet for crate::db::UnverifiedId<<$ttype as crate::db::Db>::Id> {
         type Id = <$ttype as crate::db::Db>::Id;
 
-        async fn verify_user(
+        async fn verify_user_get(
             self,
             auth: crate::auth::AuthUser,
             db: &mut diesel_async::AsyncPgConnection,
@@ -421,13 +421,13 @@ define_derive_deftly! {
 }
 
 define_derive_deftly! {
-    VerifyIdForUserOrAP:
+    VerifyForUserOrAPGet:
 
     #[async_trait::async_trait]
-    impl crate::db::VerifyIdForUserOrAP for crate::db::UnverifiedId<<$ttype as crate::db::Db>::Id> {
+    impl crate::db::VerifyForUserOrAPGet for crate::db::UnverifiedId<<$ttype as crate::db::Db>::Id> {
         type Id = <$ttype as crate::db::Db>::Id;
 
-        async fn verify_user_ap(
+        async fn verify_user_ap_get(
             self,
             auth: crate::auth::AuthUserOrAP,
             db: &mut diesel_async::AsyncPgConnection,
@@ -447,13 +447,13 @@ define_derive_deftly! {
 }
 
 define_derive_deftly! {
-    VerifyIdForUserOrAPOptional:
+    VerifyForUserOrAPGetOptional:
 
     #[async_trait::async_trait]
-    impl crate::db::VerifyIdForUserOrAP for crate::db::UnverifiedId<<$ttype as crate::db::Db>::Id> {
+    impl crate::db::VerifyForUserOrAPGet for crate::db::UnverifiedId<<$ttype as crate::db::Db>::Id> {
         type Id = <$ttype as crate::db::Db>::Id;
 
-        async fn verify_user_ap(
+        async fn verify_user_ap_get(
             self,
             auth: crate::auth::AuthUserOrAP,
             db: &mut diesel_async::AsyncPgConnection,
@@ -473,13 +473,13 @@ define_derive_deftly! {
 }
 
 define_derive_deftly! {
-    VerifyIdForActionProvider:
+    VerifyForActionProviderGet:
 
     #[async_trait::async_trait]
-    impl crate::db::VerifyIdForActionProvider for crate::db::UnverifiedId<<$ttype as crate::db::Db>::Id> {
+    impl crate::db::VerifyForActionProviderGet for crate::db::UnverifiedId<<$ttype as crate::db::Db>::Id> {
         type Id = <$ttype as crate::db::Db>::Id;
 
-        async fn verify_ap(
+        async fn verify_ap_get(
             self,
             auth: crate::auth::AuthAP,
             db: &mut diesel_async::AsyncPgConnection,
@@ -499,13 +499,13 @@ define_derive_deftly! {
 }
 
 define_derive_deftly! {
-    VerifyIdsForActionProvider:
+    VerifyForActionProviderDisable:
 
     #[async_trait::async_trait]
-    impl crate::db::VerifyIdsForActionProvider for crate::db::UnverifiedIds<<$ttype as crate::db::Db>::Id> {
+    impl crate::db::VerifyForActionProviderDisable for crate::db::UnverifiedIds<<$ttype as crate::db::Db>::Id> {
         type Id = <$ttype as crate::db::Db>::Id;
 
-        async fn verify_ap(
+        async fn verify_ap_disable(
             self,
             auth: crate::auth::AuthAP,
             db: &mut diesel_async::AsyncPgConnection,
@@ -525,12 +525,12 @@ define_derive_deftly! {
 }
 
 define_derive_deftly! {
-    VerifyIdForAdmin:
+    VerifyForAdminGet:
 
-    impl crate::db::VerifyIdForAdmin for crate::db::UnverifiedId<<$ttype as crate::db::Db>::Id> {
+    impl crate::db::VerifyForAdminGet for crate::db::UnverifiedId<<$ttype as crate::db::Db>::Id> {
         type Id = <$ttype as crate::db::Db>::Id;
 
-        fn verify_adm(
+        fn verify_adm_get(
             self,
             _auth: crate::auth::AuthAdmin,
         ) -> Result<Self::Id, axum::http::StatusCode> {
@@ -540,12 +540,12 @@ define_derive_deftly! {
 }
 
 define_derive_deftly! {
-    VerifyIdsForAdmin:
+    VerifyForAdminDelete:
 
-    impl crate::db::VerifyIdsForAdmin for crate::db::UnverifiedIds<<$ttype as crate::db::Db>::Id> {
+    impl crate::db::VerifyForAdminDelete for crate::db::UnverifiedIds<<$ttype as crate::db::Db>::Id> {
         type Id = <$ttype as crate::db::Db>::Id;
 
-        fn verify_adm(
+        fn verify_adm_delete(
             self,
             _auth: crate::auth::AuthAdmin,
         ) -> Result<Vec<Self::Id>, axum::http::StatusCode> {
@@ -555,25 +555,25 @@ define_derive_deftly! {
 }
 
 define_derive_deftly! {
-    VerifyIdUnchecked:
+    VerifyUncheckedGet:
 
-    impl crate::db::VerifyIdUnchecked for crate::db::UnverifiedId<<$ttype as crate::db::Db>::Id> {
+    impl crate::db::VerifyUncheckedGet for crate::db::UnverifiedId<<$ttype as crate::db::Db>::Id> {
         type Id = <$ttype as crate::db::Db>::Id;
 
-        fn verify_unchecked(self) -> Result<Self::Id, axum::http::StatusCode> {
+        fn verify_unchecked_get(self) -> Result<Self::Id, axum::http::StatusCode> {
             Ok(self.0)
         }
     }
 }
 
 define_derive_deftly! {
-    VerifyForUserWithDb:
+    VerifyForUserUpdate:
 
     #[async_trait::async_trait]
-    impl crate::db::VerifyForUserWithDb for crate::db::Unverified<<$ttype as crate::db::Db>::Type> {
+    impl crate::db::VerifyForUserUpdate for crate::db::Unverified<<$ttype as crate::db::Db>::Type> {
         type Type = <$ttype as crate::db::Db>::Type;
 
-        async fn verify_user(
+        async fn verify_user_update(
             self,
             auth: crate::auth::AuthUser,
             db: &mut diesel_async::AsyncPgConnection,
@@ -594,10 +594,10 @@ define_derive_deftly! {
     }
 
     #[async_trait::async_trait]
-    impl crate::db::VerifyMultipleForUserWithDb for crate::db::Unverified<Vec<<$ttype as crate::db::Db>::Type>> {
+    impl crate::db::VerifyMultipleForUserUpdate for crate::db::Unverified<Vec<<$ttype as crate::db::Db>::Type>> {
         type Type = <$ttype as crate::db::Db>::Type;
 
-        async fn verify_user(
+        async fn verify_user_update(
             self,
             auth: crate::auth::AuthUser,
             db: &mut diesel_async::AsyncPgConnection,
@@ -620,13 +620,13 @@ define_derive_deftly! {
 }
 
 define_derive_deftly! {
-    VerifyForUserOrAPWithDb:
+    VerifyForUserOrAPUpdate:
 
     #[async_trait::async_trait]
-    impl crate::db::VerifyForUserOrAPWithDb for crate::db::Unverified<<$ttype as crate::db::Db>::Type> {
+    impl crate::db::VerifyForUserOrAPUpdate for crate::db::Unverified<<$ttype as crate::db::Db>::Type> {
         type Type = <$ttype as crate::db::Db>::Type;
 
-        async fn verify_user_ap(
+        async fn verify_user_ap_update(
             self,
             auth: crate::auth::AuthUserOrAP,
             db: &mut diesel_async::AsyncPgConnection,
@@ -647,10 +647,10 @@ define_derive_deftly! {
     }
 
     #[async_trait::async_trait]
-    impl crate::db::VerifyMultipleForUserOrAPWithDb for crate::db::Unverified<Vec<<$ttype as crate::db::Db>::Type>> {
+    impl crate::db::VerifyMultipleForUserOrAPUpdate for crate::db::Unverified<Vec<<$ttype as crate::db::Db>::Type>> {
         type Type = <$ttype as crate::db::Db>::Type;
 
-        async fn verify_user_ap(
+        async fn verify_user_ap_update(
             self,
             auth: crate::auth::AuthUserOrAP,
             db: &mut diesel_async::AsyncPgConnection,
@@ -673,13 +673,13 @@ define_derive_deftly! {
 }
 
 define_derive_deftly! {
-    VerifyForUserOrAPWithDbOptional:
+    VerifyForUserOrAPUpdateOptional:
 
     #[async_trait::async_trait]
-    impl crate::db::VerifyForUserOrAPWithDb for crate::db::Unverified<<$ttype as crate::db::Db>::Type> {
+    impl crate::db::VerifyForUserOrAPUpdate for crate::db::Unverified<<$ttype as crate::db::Db>::Type> {
         type Type = <$ttype as crate::db::Db>::Type;
 
-        async fn verify_user_ap(
+        async fn verify_user_ap_update(
             self,
             auth: crate::auth::AuthUserOrAP,
             db: &mut diesel_async::AsyncPgConnection,
@@ -700,10 +700,10 @@ define_derive_deftly! {
     }
 
     #[async_trait::async_trait]
-    impl crate::db::VerifyMultipleForUserOrAPWithDb for crate::db::Unverified<Vec<<$ttype as crate::db::Db>::Type>> {
+    impl crate::db::VerifyMultipleForUserOrAPUpdate for crate::db::Unverified<Vec<<$ttype as crate::db::Db>::Type>> {
         type Type = <$ttype as crate::db::Db>::Type;
 
-        async fn verify_user_ap(
+        async fn verify_user_ap_update(
             self,
             auth: crate::auth::AuthUserOrAP,
             db: &mut diesel_async::AsyncPgConnection,
@@ -726,12 +726,12 @@ define_derive_deftly! {
 }
 
 define_derive_deftly! {
-    VerifyForUserWithoutDb:
+    VerifyForUserCreate:
 
-    impl crate::db::VerifyForUserWithoutDb for crate::db::Unverified<<$ttype as crate::db::Db>::Type> {
+    impl crate::db::VerifyForUserCreate for crate::db::Unverified<<$ttype as crate::db::Db>::Type> {
         type Type = <$ttype as crate::db::Db>::Type;
 
-        fn verify_user_without_db(
+        fn verify_user_create(
             self,
             auth: crate::auth::AuthUser,
         ) -> Result<Self::Type, axum::http::StatusCode> {
@@ -744,10 +744,10 @@ define_derive_deftly! {
         }
     }
 
-    impl crate::db::VerifyMultipleForUserWithoutDb for crate::db::Unverified<Vec<<$ttype as crate::db::Db>::Type>> {
+    impl crate::db::VerifyMultipleForUserCreate for crate::db::Unverified<Vec<<$ttype as crate::db::Db>::Type>> {
         type Type = <$ttype as crate::db::Db>::Type;
 
-        fn verify_user_without_db(
+        fn verify_user_create(
             self,
             auth: crate::auth::AuthUser,
         ) -> Result<Vec<Self::Type>, axum::http::StatusCode> {
@@ -762,12 +762,12 @@ define_derive_deftly! {
 }
 
 define_derive_deftly! {
-    VerifyForUserOrAPWithoutDb:
+    VerifyForUserOrAPCreate:
 
-    impl crate::db::VerifyForUserOrAPWithoutDb for crate::db::Unverified<<$ttype as crate::db::Db>::Type> {
+    impl crate::db::VerifyForUserOrAPCreate for crate::db::Unverified<<$ttype as crate::db::Db>::Type> {
         type Type = <$ttype as crate::db::Db>::Type;
 
-        fn verify_user_ap_without_db(
+        fn verify_user_ap_create(
             self,
             auth: crate::auth::AuthUserOrAP,
         ) -> Result<Self::Type, axum::http::StatusCode> {
@@ -780,10 +780,10 @@ define_derive_deftly! {
         }
     }
 
-    impl crate::db::VerifyMultipleForUserOrAPWithoutDb for crate::db::Unverified<Vec<<$ttype as crate::db::Db>::Type>> {
+    impl crate::db::VerifyMultipleForUserOrAPCreate for crate::db::Unverified<Vec<<$ttype as crate::db::Db>::Type>> {
         type Type = <$ttype as crate::db::Db>::Type;
 
-        fn verify_user_ap_without_db(
+        fn verify_user_ap_create(
             self,
             auth: crate::auth::AuthUserOrAP,
         ) -> Result<Vec<Self::Type>, axum::http::StatusCode> {
@@ -798,12 +798,12 @@ define_derive_deftly! {
 }
 
 define_derive_deftly! {
-    VerifyForUserOrAPWithoutDbOptional:
+    VerifyForUserOrAPCreateOptional:
 
-    impl crate::db::VerifyForUserOrAPWithoutDb for crate::db::Unverified<<$ttype as crate::db::Db>::Type> {
+    impl crate::db::VerifyForUserOrAPCreate for crate::db::Unverified<<$ttype as crate::db::Db>::Type> {
         type Type = <$ttype as crate::db::Db>::Type;
 
-        fn verify_user_ap_without_db(
+        fn verify_user_ap_create(
             self,
             auth: crate::auth::AuthUserOrAP,
         ) -> Result<Self::Type, axum::http::StatusCode> {
@@ -816,10 +816,10 @@ define_derive_deftly! {
         }
     }
 
-    impl crate::db::VerifyMultipleForUserOrAPWithoutDb for crate::db::Unverified<Vec<<$ttype as crate::db::Db>::Type>> {
+    impl crate::db::VerifyMultipleForUserOrAPCreate for crate::db::Unverified<Vec<<$ttype as crate::db::Db>::Type>> {
         type Type = <$ttype as crate::db::Db>::Type;
 
-        fn verify_user_ap_without_db(
+        fn verify_user_ap_create(
             self,
             auth: crate::auth::AuthUserOrAP,
         ) -> Result<Vec<Self::Type>, axum::http::StatusCode> {
@@ -834,13 +834,13 @@ define_derive_deftly! {
 }
 
 define_derive_deftly! {
-    VerifyForActionProviderWithDb:
+    VerifyForActionProviderUpdate:
 
     #[async_trait::async_trait]
-    impl crate::db::VerifyForActionProviderWithDb for crate::db::Unverified<<$ttype as crate::db::Db>::Type> {
+    impl crate::db::VerifyForActionProviderUpdate for crate::db::Unverified<<$ttype as crate::db::Db>::Type> {
         type Type = <$ttype as crate::db::Db>::Type;
 
-        async fn verify_ap(
+        async fn verify_ap_update(
             self,
             auth: crate::auth::AuthAP,
             db: &mut diesel_async::AsyncPgConnection,
@@ -861,10 +861,10 @@ define_derive_deftly! {
     }
 
     #[async_trait::async_trait]
-    impl crate::db::VerifyMultipleForActionProviderWithDb for crate::db::Unverified<Vec<<$ttype as crate::db::Db>::Type>> {
+    impl crate::db::VerifyMultipleForActionProviderUpdate for crate::db::Unverified<Vec<<$ttype as crate::db::Db>::Type>> {
         type Type = <$ttype as crate::db::Db>::Type;
 
-        async fn verify_ap(
+        async fn verify_ap_update(
             self,
             auth: crate::auth::AuthAP,
             db: &mut diesel_async::AsyncPgConnection,
@@ -886,12 +886,12 @@ define_derive_deftly! {
 }
 
 define_derive_deftly! {
-    VerifyForActionProviderWithoutDb:
+    VerifyForActionProviderCreate:
 
-    impl crate::db::VerifyForActionProviderWithoutDb for crate::db::Unverified<<$ttype as crate::db::Db>::Type> {
+    impl crate::db::VerifyForActionProviderCreate for crate::db::Unverified<<$ttype as crate::db::Db>::Type> {
         type Type = <$ttype as crate::db::Db>::Type;
 
-        fn verify_ap_without_db(
+        fn verify_ap_create(
             self,
             auth: crate::auth::AuthAP,
         ) -> Result<Self::Type, axum::http::StatusCode> {
@@ -904,10 +904,10 @@ define_derive_deftly! {
         }
     }
 
-    impl crate::db::VerifyMultipleForActionProviderWithoutDb for crate::db::Unverified<Vec<<$ttype as crate::db::Db>::Type>> {
+    impl crate::db::VerifyMultipleForActionProviderCreate for crate::db::Unverified<Vec<<$ttype as crate::db::Db>::Type>> {
         type Type = <$ttype as crate::db::Db>::Type;
 
-        fn verify_ap_without_db(
+        fn verify_ap_create(
             self,
             auth: crate::auth::AuthAP,
         ) -> Result<Vec<Self::Type>, axum::http::StatusCode> {
@@ -922,9 +922,9 @@ define_derive_deftly! {
 }
 
 define_derive_deftly! {
-    VerifyForAdminWithoutDb:
+    VerifyForAdmin:
 
-    impl crate::db::VerifyForAdminWithoutDb for crate::db::Unverified<<$ttype as crate::db::Db>::Type> {
+    impl crate::db::VerifyForAdmin for crate::db::Unverified<<$ttype as crate::db::Db>::Type> {
         type Type = <$ttype as crate::db::Db>::Type;
 
         fn verify_adm(
@@ -935,7 +935,7 @@ define_derive_deftly! {
         }
     }
 
-    impl crate::db::VerifyMultipleForAdminWithoutDb for crate::db::Unverified<Vec<<$ttype as crate::db::Db>::Type>> {
+    impl crate::db::VerifyMultipleForAdmin for crate::db::Unverified<Vec<<$ttype as crate::db::Db>::Type>> {
         type Type = <$ttype as crate::db::Db>::Type;
 
         fn verify_adm(
@@ -948,12 +948,12 @@ define_derive_deftly! {
 }
 
 define_derive_deftly! {
-    VerifyUnchecked:
+    VerifyUncheckedCreate:
 
-    impl crate::db::VerifyUnchecked for crate::db::Unverified<<$ttype as crate::db::Db>::Type> {
+    impl crate::db::VerifyUncheckedCreate for crate::db::Unverified<<$ttype as crate::db::Db>::Type> {
         type Type = <$ttype as crate::db::Db>::Type;
 
-        fn verify_unchecked(self) -> Result<Self::Type, axum::http::StatusCode> {
+        fn verify_unchecked_create(self) -> Result<Self::Type, axum::http::StatusCode> {
             Ok(self.0)
         }
     }

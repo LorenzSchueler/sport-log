@@ -11,9 +11,9 @@ use crate::db::*;
     GetByUserAndEpochOptional,
     Update,
     CheckOptionalUserId,
-    VerifyIdForUserOrAPOptional,
-    VerifyForUserOrAPWithDbOptional,
-    VerifyForUserOrAPWithoutDbOptional
+    VerifyForUserOrAPGetOptional,
+    VerifyForUserOrAPUpdateOptional,
+    VerifyForUserOrAPCreateOptional
 )]
 pub struct MetconDb;
 
@@ -25,15 +25,15 @@ pub struct MetconDb;
     GetByUserAndEpochOptional,
     Update,
     CheckOptionalUserId,
-    VerifyIdForUserOrAPOptional,
-    VerifyForUserOrAPWithDbOptional,
-    VerifyForUserOrAPWithoutDbOptional
+    VerifyForUserOrAPGetOptional,
+    VerifyForUserOrAPUpdateOptional,
+    VerifyForUserOrAPCreateOptional
 )]
 pub struct MetconMovementDb;
 
 #[derive(Db, DbWithUserId, DbWithDateTime, ModifiableDb, Deftly)]
 #[derive_deftly(
-    VerifyIdForUserOrAP,
+    VerifyForUserOrAPGet,
     Create,
     GetById,
     GetByUser,
@@ -41,7 +41,7 @@ pub struct MetconMovementDb;
     GetByUserAndEpoch,
     Update,
     CheckUserId,
-    VerifyForUserOrAPWithDb,
-    VerifyForUserOrAPWithoutDb
+    VerifyForUserOrAPUpdate,
+    VerifyForUserOrAPCreate
 )]
 pub struct MetconSessionDb;

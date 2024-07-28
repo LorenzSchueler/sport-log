@@ -15,11 +15,11 @@ pub async fn create_routes(
 ) -> HandlerResult<StatusCode> {
     match routes {
         UnverifiedSingleOrVec::Single(route) => {
-            let route = route.verify_user_ap_without_db(auth)?;
+            let route = route.verify_user_ap_create(auth)?;
             RouteDb::create(&route, &mut db).await
         }
         UnverifiedSingleOrVec::Vec(routes) => {
-            let routes = routes.verify_user_ap_without_db(auth)?;
+            let routes = routes.verify_user_ap_create(auth)?;
             RouteDb::create_multiple(&routes, &mut db).await
         }
     }
@@ -34,7 +34,7 @@ pub async fn get_routes(
 ) -> HandlerResult<Json<Vec<Route>>> {
     match id {
         Some(id) => {
-            let route_id = id.verify_user_ap(auth, &mut db).await?;
+            let route_id = id.verify_user_ap_get(auth, &mut db).await?;
             RouteDb::get_by_id(route_id, &mut db).await.map(|r| vec![r])
         }
         None => RouteDb::get_by_user(*auth, &mut db).await,
@@ -50,11 +50,11 @@ pub async fn update_routes(
 ) -> HandlerResult<StatusCode> {
     match routes {
         UnverifiedSingleOrVec::Single(route) => {
-            let route = route.verify_user_ap(auth, &mut db).await?;
+            let route = route.verify_user_ap_update(auth, &mut db).await?;
             RouteDb::update(&route, &mut db).await
         }
         UnverifiedSingleOrVec::Vec(routes) => {
-            let routes = routes.verify_user_ap(auth, &mut db).await?;
+            let routes = routes.verify_user_ap_update(auth, &mut db).await?;
             RouteDb::update_multiple(&routes, &mut db).await
         }
     }
@@ -69,11 +69,11 @@ pub async fn create_cardio_sessions(
 ) -> HandlerResult<StatusCode> {
     match cardio_sessions {
         UnverifiedSingleOrVec::Single(cardio_session) => {
-            let cardio_session = cardio_session.verify_user_ap_without_db(auth)?;
+            let cardio_session = cardio_session.verify_user_ap_create(auth)?;
             CardioSessionDb::create(&cardio_session, &mut db).await
         }
         UnverifiedSingleOrVec::Vec(cardio_sessions) => {
-            let cardio_sessions = cardio_sessions.verify_user_ap_without_db(auth)?;
+            let cardio_sessions = cardio_sessions.verify_user_ap_create(auth)?;
             CardioSessionDb::create_multiple(&cardio_sessions, &mut db).await
         }
     }
@@ -89,7 +89,7 @@ pub async fn get_cardio_sessions(
 ) -> HandlerResult<Json<Vec<CardioSession>>> {
     match id {
         Some(id) => {
-            let cardio_session_id = id.verify_user_ap(auth, &mut db).await?;
+            let cardio_session_id = id.verify_user_ap_get(auth, &mut db).await?;
             CardioSessionDb::get_by_id(cardio_session_id, &mut db)
                 .await
                 .map(|c| vec![c])
@@ -109,11 +109,11 @@ pub async fn update_cardio_sessions(
 ) -> HandlerResult<StatusCode> {
     match cardio_sessions {
         UnverifiedSingleOrVec::Single(cardio_session) => {
-            let cardio_session = cardio_session.verify_user_ap(auth, &mut db).await?;
+            let cardio_session = cardio_session.verify_user_ap_update(auth, &mut db).await?;
             CardioSessionDb::update(&cardio_session, &mut db).await
         }
         UnverifiedSingleOrVec::Vec(cardio_sessions) => {
-            let cardio_sessions = cardio_sessions.verify_user_ap(auth, &mut db).await?;
+            let cardio_sessions = cardio_sessions.verify_user_ap_update(auth, &mut db).await?;
             CardioSessionDb::update_multiple(&cardio_sessions, &mut db).await
         }
     }

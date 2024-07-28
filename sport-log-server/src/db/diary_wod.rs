@@ -3,28 +3,28 @@ use sport_log_derive::*;
 
 #[derive(Db, DbWithUserId, ModifiableDb, Deftly)]
 #[derive_deftly(
-    VerifyIdForUserOrAP,
+    VerifyForUserOrAPGet,
     Create,
     GetById,
     GetByUser,
     GetByUserAndEpoch,
     Update,
     CheckUserId,
-    VerifyForUserOrAPWithDb,
-    VerifyForUserOrAPWithoutDb
+    VerifyForUserOrAPUpdate,
+    VerifyForUserOrAPCreate
 )]
 pub struct DiaryDb;
 
 #[derive(Db, DbWithUserId, ModifiableDb, Deftly)]
 #[derive_deftly(
-    VerifyIdForUserOrAP,
+    VerifyForUserOrAPGet,
     Create,
     GetById,
     GetByUser,
     GetByUserAndEpoch,
     Update,
     CheckUserId,
-    VerifyForUserOrAPWithDb,
-    VerifyForUserOrAPWithoutDb
+    VerifyForUserOrAPUpdate,
+    VerifyForUserOrAPCreate
 )]
 pub struct WodDb;

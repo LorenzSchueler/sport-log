@@ -3,28 +3,28 @@ use sport_log_derive::*;
 
 #[derive(Db, ModifiableDb, Deftly)]
 #[derive_deftly(
-    VerifyIdForAdmin,
-    VerifyIdUnchecked,
+    VerifyForAdminGet,
+    VerifyUncheckedGet,
     Create,
     GetAll,
     GetById,
     GetByEpoch,
     Update,
-    VerifyForAdminWithoutDb,
-    VerifyUnchecked
+    VerifyForAdmin,
+    VerifyUncheckedCreate
 )]
 pub struct PlatformDb;
 
 #[derive(Db, ModifiableDb, DbWithUserId, Deftly)]
 #[derive_deftly(
-    VerifyIdForUser,
+    VerifyForUserGet,
     Create,
     GetById,
     GetByUser,
     GetByUserAndEpoch,
     Update,
     CheckUserId,
-    VerifyForUserWithDb,
-    VerifyForUserWithoutDb
+    VerifyForUserUpdate,
+    VerifyForUserCreate
 )]
 pub struct PlatformCredentialDb;

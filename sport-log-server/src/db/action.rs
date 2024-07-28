@@ -15,13 +15,13 @@ use crate::{auth::*, db::*};
 
 #[derive(Db, ModifiableDb, Deftly)]
 #[derive_deftly(
-    VerifyIdForAdmin,
-    VerifyIdUnchecked,
+    VerifyForAdminGet,
+    VerifyUncheckedGet,
     GetById,
     GetAll,
     GetByEpoch,
-    VerifyForAdminWithoutDb,
-    VerifyUnchecked
+    VerifyForAdmin,
+    VerifyUncheckedCreate
 )]
 pub struct ActionProviderDb;
 
@@ -136,16 +136,16 @@ impl ActionProviderDb {
 
 #[derive(Db, DbWithApId, ModifiableDb, Deftly)]
 #[derive_deftly(
-    VerifyIdUnchecked,
-    VerifyIdForActionProvider,
+    VerifyUncheckedGet,
+    VerifyForActionProviderGet,
     Create,
     GetById,
     GetAll,
     GetByEpoch,
     Update,
     CheckAPId,
-    VerifyForActionProviderWithDb,
-    VerifyForActionProviderWithoutDb
+    VerifyForActionProviderUpdate,
+    VerifyForActionProviderCreate
 )]
 pub struct ActionDb;
 
@@ -164,34 +164,34 @@ impl ActionDb {
 
 #[derive(Db, DbWithUserId, ModifiableDb, Deftly)]
 #[derive_deftly(
-    VerifyIdForUser,
+    VerifyForUserGet,
     Create,
     GetById,
     GetByUser,
     GetByUserAndEpoch,
     Update,
     CheckUserId,
-    VerifyForUserWithDb,
-    VerifyForUserWithoutDb
+    VerifyForUserUpdate,
+    VerifyForUserCreate
 )]
 pub struct ActionRuleDb;
 
 #[derive(Db, DbWithUserId, ModifiableDb, Deftly)]
 #[derive_deftly(
-    VerifyIdForUser,
-    VerifyIdForActionProvider,
-    VerifyIdsForActionProvider,
-    VerifyIdForAdmin,
-    VerifyIdsForAdmin,
+    VerifyForUserGet,
+    VerifyForActionProviderGet,
+    VerifyForActionProviderDisable,
+    VerifyForAdminGet,
+    VerifyForAdminDelete,
     Create,
     GetById,
     GetByUser,
     GetByUserAndEpoch,
     Update,
     CheckUserId,
-    VerifyForUserWithDb,
-    VerifyForUserWithoutDb,
-    VerifyForAdminWithoutDb
+    VerifyForUserUpdate,
+    VerifyForUserCreate,
+    VerifyForAdmin
 )]
 pub struct ActionEventDb;
 

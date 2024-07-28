@@ -15,11 +15,11 @@ pub async fn create_movements(
 ) -> HandlerResult<StatusCode> {
     match movements {
         UnverifiedSingleOrVec::Single(movement) => {
-            let movement = movement.verify_user_ap_without_db(auth)?;
+            let movement = movement.verify_user_ap_create(auth)?;
             MovementDb::create(&movement, &mut db).await
         }
         UnverifiedSingleOrVec::Vec(movements) => {
-            let movements = movements.verify_user_ap_without_db(auth)?;
+            let movements = movements.verify_user_ap_create(auth)?;
             MovementDb::create_multiple(&movements, &mut db).await
         }
     }
@@ -34,7 +34,7 @@ pub async fn get_movements(
 ) -> HandlerResult<Json<Vec<Movement>>> {
     match id {
         Some(id) => {
-            let movement_id = id.verify_user_ap(auth, &mut db).await?;
+            let movement_id = id.verify_user_ap_get(auth, &mut db).await?;
             MovementDb::get_by_id(movement_id, &mut db)
                 .await
                 .map(|m| vec![m])
@@ -52,11 +52,11 @@ pub async fn update_movements(
 ) -> HandlerResult<StatusCode> {
     match movements {
         UnverifiedSingleOrVec::Single(movement) => {
-            let movement = movement.verify_user_ap_without_db(auth)?;
+            let movement = movement.verify_user_ap_update(auth, &mut db).await?;
             MovementDb::update(&movement, &mut db).await
         }
         UnverifiedSingleOrVec::Vec(movements) => {
-            let movements = movements.verify_user_ap(auth, &mut db).await?;
+            let movements = movements.verify_user_ap_update(auth, &mut db).await?;
             MovementDb::update_multiple(&movements, &mut db).await
         }
     }
@@ -99,7 +99,7 @@ pub async fn update_movements(
 //mut db: DbConn,
 //) -> HandlerResult<Json<MovementMuscle>> {
 //let movement_muscle_id = movement_muscle_id
-//.verify_user_ap(auth, &mut db)
+//.verify_user_ap_update(auth, &mut db)
 //.map_err(Error::from)?;
 //MovementMuscleDb::get_by_id(movement_muscle_id, &mut db)
 //.map(Json)
@@ -121,7 +121,7 @@ pub async fn update_movements(
 //Json(movement_muscle): Json<Unverified<MovementMuscle>>,
 //) -> HandlerResult<Json<MovementMuscle>> {
 //let movement_muscle = movement_muscle
-//.verify_user_ap(auth, &mut db)
+//.verify_user_ap_update(auth, &mut db)
 //.map_err(Error::from)?;
 //MovementMuscleDb::update(&movement_muscle, &mut db)
 //.map(Json)
@@ -134,7 +134,7 @@ pub async fn update_movements(
 //Json(movement_muscles): Json<UnverifiedSingleOrVec<MovementMuscle>>>,
 //) -> HandlerResult<Json<Vec<MovementMuscle>>> {
 //let movement_muscles = movement_muscles
-//.verify_user_ap(auth, &mut db)
+//.verify_user_ap_update(auth, &mut db)
 //.map_err(Error::from)?;
 //MovementMuscleDb::update_multiple(&movement_muscles, &mut db)
 //.map(Json)

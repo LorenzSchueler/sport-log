@@ -3,7 +3,7 @@ use sport_log_derive::*;
 
 #[derive(Db, DbWithUserId, DbWithDateTime, ModifiableDb, Deftly)]
 #[derive_deftly(
-    VerifyIdForUserOrAP,
+    VerifyForUserOrAPGet,
     Create,
     GetById,
     GetByUser,
@@ -11,25 +11,25 @@ use sport_log_derive::*;
     GetByUserAndEpoch,
     Update,
     CheckUserId,
-    VerifyForUserOrAPWithDb,
-    VerifyForUserOrAPWithoutDb
+    VerifyForUserOrAPUpdate,
+    VerifyForUserOrAPCreate
 )]
 pub struct StrengthSessionDb;
 
 #[derive(Db, DbWithUserId, ModifiableDb, Deftly)]
 #[derive_deftly(
-    VerifyIdForUserOrAP,
+    VerifyForUserOrAPGet,
     Create,
     GetById,
     GetByUser,
     GetByUserAndEpoch,
     Update,
     CheckUserId,
-    VerifyForUserOrAPWithDb,
-    VerifyForUserOrAPWithoutDb
+    VerifyForUserOrAPUpdate,
+    VerifyForUserOrAPCreate
 )]
 pub struct StrengthSetDb;
 
 #[derive(Db, Deftly)]
-#[derive_deftly(VerifyIdForAdmin, GetById, GetAll)]
+#[derive_deftly(VerifyForAdminGet, GetById, GetAll)]
 pub struct EormDb;

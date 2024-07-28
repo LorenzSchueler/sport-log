@@ -46,7 +46,7 @@ pub async fn create_user(
         )));
     }
 
-    let mut user = user.verify_unchecked()?;
+    let mut user = user.verify_unchecked_create()?;
     check_password(&user.password)?;
     UserDb::create(&mut user, &mut db)
         .await
@@ -66,7 +66,7 @@ pub async fn update_user(
     mut db: DbConn,
     Json(user): Json<Unverified<User>>,
 ) -> HandlerResult<StatusCode> {
-    let mut user = user.verify_user(auth, &mut db).await?;
+    let mut user = user.verify_user_update(auth, &mut db).await?;
     check_password(&user.password)?;
     UserDb::update(&mut user, &mut db)
         .await

@@ -5,17 +5,16 @@ use crate::db::*;
 
 #[derive(Db, DbWithUserId, ModifiableDb, Deftly)]
 #[derive_deftly(
-    VerifyIdForAdmin,
-    VerifyIdUnchecked,
+    VerifyForAdminGet,
     Create,
     GetById,
     GetByUserOptional,
     GetByUserAndEpochOptional,
     Update,
     CheckOptionalUserId,
-    VerifyIdForUserOrAPOptional,
-    VerifyForUserOrAPWithDbOptional,
-    VerifyForUserOrAPWithoutDbOptional,
-    VerifyForAdminWithoutDb
+    VerifyForUserOrAPGetOptional,
+    VerifyForUserOrAPUpdateOptional,
+    VerifyForUserOrAPCreateOptional,
+    VerifyForAdmin
 )]
 pub struct MovementDb;

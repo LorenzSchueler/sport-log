@@ -15,11 +15,11 @@ pub async fn create_strength_sessions(
 ) -> HandlerResult<StatusCode> {
     match strength_sessions {
         UnverifiedSingleOrVec::Single(strength_session) => {
-            let strength_session = strength_session.verify_user_ap_without_db(auth)?;
+            let strength_session = strength_session.verify_user_ap_create(auth)?;
             StrengthSessionDb::create(&strength_session, &mut db).await
         }
         UnverifiedSingleOrVec::Vec(strength_sessions) => {
-            let strength_sessions = strength_sessions.verify_user_ap_without_db(auth)?;
+            let strength_sessions = strength_sessions.verify_user_ap_create(auth)?;
             StrengthSessionDb::create_multiple(&strength_sessions, &mut db).await
         }
     }
@@ -35,7 +35,7 @@ pub async fn get_strength_sessions(
 ) -> HandlerResult<Json<Vec<StrengthSession>>> {
     match id {
         Some(id) => {
-            let strength_session_id = id.verify_user_ap(auth, &mut db).await?;
+            let strength_session_id = id.verify_user_ap_get(auth, &mut db).await?;
             StrengthSessionDb::get_by_id(strength_session_id, &mut db)
                 .await
                 .map(|s| vec![s])
@@ -56,11 +56,15 @@ pub async fn update_strength_sessions(
 ) -> HandlerResult<StatusCode> {
     match strength_sessions {
         UnverifiedSingleOrVec::Single(strength_session) => {
-            let strength_session = strength_session.verify_user_ap(auth, &mut db).await?;
+            let strength_session = strength_session
+                .verify_user_ap_update(auth, &mut db)
+                .await?;
             StrengthSessionDb::update(&strength_session, &mut db).await
         }
         UnverifiedSingleOrVec::Vec(strength_sessions) => {
-            let strength_sessions = strength_sessions.verify_user_ap(auth, &mut db).await?;
+            let strength_sessions = strength_sessions
+                .verify_user_ap_update(auth, &mut db)
+                .await?;
             StrengthSessionDb::update_multiple(&strength_sessions, &mut db).await
         }
     }
@@ -75,11 +79,11 @@ pub async fn create_strength_sets(
 ) -> HandlerResult<StatusCode> {
     match strength_sets {
         UnverifiedSingleOrVec::Single(strength_set) => {
-            let strength_set = strength_set.verify_user_ap_without_db(auth)?;
+            let strength_set = strength_set.verify_user_ap_create(auth)?;
             StrengthSetDb::create(&strength_set, &mut db).await
         }
         UnverifiedSingleOrVec::Vec(strength_sets) => {
-            let strength_sets = strength_sets.verify_user_ap_without_db(auth)?;
+            let strength_sets = strength_sets.verify_user_ap_create(auth)?;
             StrengthSetDb::create_multiple(&strength_sets, &mut db).await
         }
     }
@@ -94,7 +98,7 @@ pub async fn get_strength_sets(
 ) -> HandlerResult<Json<Vec<StrengthSet>>> {
     match id {
         Some(id) => {
-            let strength_set_id = id.verify_user_ap(auth, &mut db).await?;
+            let strength_set_id = id.verify_user_ap_get(auth, &mut db).await?;
             StrengthSetDb::get_by_id(strength_set_id, &mut db)
                 .await
                 .map(|s| vec![s])
@@ -112,11 +116,11 @@ pub async fn update_strength_sets(
 ) -> HandlerResult<StatusCode> {
     match strength_sets {
         UnverifiedSingleOrVec::Single(strength_set) => {
-            let strength_set = strength_set.verify_user_ap(auth, &mut db).await?;
+            let strength_set = strength_set.verify_user_ap_update(auth, &mut db).await?;
             StrengthSetDb::update(&strength_set, &mut db).await
         }
         UnverifiedSingleOrVec::Vec(strength_sets) => {
-            let strength_sets = strength_sets.verify_user_ap(auth, &mut db).await?;
+            let strength_sets = strength_sets.verify_user_ap_update(auth, &mut db).await?;
             StrengthSetDb::update_multiple(&strength_sets, &mut db).await
         }
     }
