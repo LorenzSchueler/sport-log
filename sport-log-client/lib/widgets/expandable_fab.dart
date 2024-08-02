@@ -99,7 +99,7 @@ class _ExpandableFabState extends State<ExpandableFab>
             icon: widget.buttons[i].icon,
             onPressed: () {
               _toggle();
-              widget.buttons[i].onPressed?.call();
+              widget.buttons[i].onPressed.call();
             },
           ),
         ),
@@ -175,12 +175,12 @@ class _ExpandingActionButton extends StatelessWidget {
 
 class ActionButton extends StatelessWidget {
   const ActionButton({
-    this.onPressed,
+    required this.onPressed,
     required this.icon,
     super.key,
   });
 
-  final VoidCallback? onPressed;
+  final VoidCallback onPressed;
   final Widget icon;
 
   @override

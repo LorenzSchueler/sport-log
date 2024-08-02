@@ -26,7 +26,7 @@ abstract class Request {
     required String title,
     required String text,
     required Future<bool> Function() check,
-    required Future<void> Function()? change,
+    required Future<void> Function() change,
   }) async {
     while (!await check()) {
       final serviceSettings = await showRequiredDialog(
@@ -36,7 +36,7 @@ abstract class Request {
       if (serviceSettings.isIgnore) {
         return false;
       }
-      await change?.call();
+      await change();
     }
     return true;
   }

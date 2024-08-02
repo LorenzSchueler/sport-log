@@ -62,7 +62,7 @@ class DistanceChartLine {
 class DistanceChart extends StatefulWidget {
   DistanceChart({
     required this.chartLines,
-    this.touchCallback,
+    required this.touchCallback,
     this.labelColor = Colors.white,
     super.key,
   })  :
@@ -94,7 +94,7 @@ class DistanceChart extends StatefulWidget {
             .max;
 
   final List<DistanceChartLine> chartLines;
-  final void Function(double? distance)? touchCallback;
+  final void Function(double? distance) touchCallback;
   final Color labelColor;
 
   final double _xInterval;
@@ -110,7 +110,7 @@ class _DistanceChartState extends State<DistanceChart> {
 
   void _onLongPress(double? xValue) {
     setState(() => _lastX = xValue);
-    widget.touchCallback?.call(xValue);
+    widget.touchCallback(xValue);
   }
 
   @override

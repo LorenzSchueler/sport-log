@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 extension DurationExtension on Duration {
@@ -275,12 +274,4 @@ extension DateTimeExtension on DateTime {
   }
 
   int get numDaysInYear => _isLeapYear ? 366 : 365;
-}
-
-extension TimeOfDayExtension on TimeOfDay {
-  bool operator <(TimeOfDay other) =>
-      hour * 60 + minute < other.hour * 60 + other.minute;
-
-  String get formatHm =>
-      DateFormat.Hm().format(DateTime(0, 0, 0, hour, minute));
 }

@@ -91,17 +91,13 @@ class LocationUtils extends ChangeNotifier {
   Future<bool> startLocationStream({
     required void Function(GpsPosition) onLocationUpdate,
     required bool inBackground,
-    // for location tracking in other isolate which can not request permissions
-    bool ignorePermissions = false,
   }) async {
     if (_locationSubscription != null) {
       return false;
     }
 
-    if (!ignorePermissions) {
-      if (!await requestPermissions()) {
-        return false;
-      }
+    if (!await requestPermissions()) {
+      return false;
     }
 
     _locationSubscription =

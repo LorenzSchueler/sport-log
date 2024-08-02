@@ -34,7 +34,7 @@ class Column {
   void references(
     String table, {
     String? column,
-    required OnAction? onDelete,
+    required OnAction onDelete,
   }) {
     _referenceTable = table;
     _referenceColumn = column;

@@ -20,8 +20,8 @@ class MapDownloadUtils extends ChangeNotifier {
     required this.onError,
   });
 
-  final Future<void> Function()? onSuccess;
-  final Future<void> Function(String)? onError;
+  final Future<void> Function() onSuccess;
+  final Future<void> Function(String) onError;
 
   static late final TileStore _tileStore;
 
@@ -111,7 +111,7 @@ class MapDownloadUtils extends ChangeNotifier {
     } on PlatformException {
       _progress = null;
       notifyListeners();
-      await onError?.call(
+      await onError(
         "Maximum tile count exceeded. "
         "Delete other offline regions or choose a smaller region or decrease the max zoom level.",
       );
@@ -123,10 +123,10 @@ class MapDownloadUtils extends ChangeNotifier {
         tileRegion.completedResourceCount < tileRegion.requiredResourceCount) {
       _error = false;
       notifyListeners();
-      await onError?.call("Some tiles could not be downloaded.");
+      await onError("Some tiles could not be downloaded.");
     } else {
       await _updateRegions();
-      await onSuccess?.call();
+      await onSuccess();
     }
   }
 
