@@ -7,7 +7,7 @@ use chrono::{DateTime, Utc};
 use diesel::{Column, QueryResult, Table};
 use diesel_async::AsyncPgConnection;
 use serde::Deserialize;
-use sport_log_types::{ActionProviderId, UserId};
+use sport_log_types::{ActionProviderId, Epoch, UserId};
 
 mod account;
 mod action;
@@ -188,6 +188,27 @@ pub trait Update: Db {
         values: &[Self::Type],
         db: &mut AsyncPgConnection,
     ) -> QueryResult<usize>;
+}
+
+/// A type for which the maximum epoch of a user can be retrieved.
+#[async_trait]
+pub trait GetEpochByUser: ModifiableDb {
+    async fn get_epoch_by_user(user_id: UserId, db: &mut AsyncPgConnection) -> QueryResult<Epoch>;
+}
+
+/// A type for which the maximum epoch of a user can be retrieved.
+#[async_trait]
+pub trait GetEpochByUserOptional: ModifiableDb {
+    async fn get_epoch_by_user_optional(
+        user_id: UserId,
+        db: &mut AsyncPgConnection,
+    ) -> QueryResult<Epoch>;
+}
+
+/// A type for which the maximum epoch of a user can be retrieved.
+#[async_trait]
+pub trait GetEpoch: ModifiableDb {
+    async fn get_epoch(db: &mut AsyncPgConnection) -> QueryResult<Epoch>;
 }
 
 /// A type which can be checked if it belongs to a User.

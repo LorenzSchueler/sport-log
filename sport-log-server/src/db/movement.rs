@@ -11,6 +11,7 @@ use crate::db::*;
     GetByUserOptional,
     GetByUserAndEpochOptional,
     Update,
+    GetEpochByUserOptional,
     CheckOptionalUserId,
     VerifyForUserOrAPGetOptional,
     VerifyForUserOrAPUpdateOptional,

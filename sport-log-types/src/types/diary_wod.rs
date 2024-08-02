@@ -17,7 +17,7 @@ use crate::{types::IdString, UserId};
 #[cfg_attr(
     feature = "db",
     derive(Hash, FromSqlRow, AsExpression),
-    derive_deftly(IdToSql, IdFromSql),
+    derive_deftly(IntoPgBigInt, FromPgBigInt),
     diesel(sql_type = BigInt)
 )]
 pub struct DiaryId(pub i64);
@@ -52,7 +52,7 @@ pub struct Diary {
 #[cfg_attr(
     feature = "db",
     derive(Hash, FromSqlRow, AsExpression),
-    derive_deftly(IdToSql, IdFromSql),
+    derive_deftly(IntoPgBigInt, FromPgBigInt),
     diesel(sql_type = BigInt)
 )]
 pub struct WodId(pub i64);

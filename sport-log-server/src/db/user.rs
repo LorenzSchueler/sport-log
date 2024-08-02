@@ -8,11 +8,11 @@ use diesel::{prelude::*, result::Error};
 use diesel_async::{AsyncPgConnection, RunQueryDsl};
 use rand_core::OsRng;
 use sport_log_derive::*;
-use sport_log_types::{schema::user, User, UserId};
+use sport_log_types::{schema::user, Epoch, User, UserId};
 
 use crate::{auth::AuthUser, db::*};
 
-#[derive(Db, Deftly)]
+#[derive(Db, ModifiableDb, Deftly)]
 #[derive_deftly(GetById, VerifyUncheckedCreate, VerifyForAdmin)]
 pub struct UserDb;
 
@@ -95,6 +95,26 @@ impl CheckUserId for UserDb {
         _db: &mut AsyncPgConnection,
     ) -> QueryResult<bool> {
         Ok(false) // it is not allowed to request data for multiple users
+    }
+}
+
+#[async_trait::async_trait]
+impl crate::db::GetEpochByUser for UserDb {
+    async fn get_epoch_by_user(
+        user_id: sport_log_types::UserId,
+        db: &mut diesel_async::AsyncPgConnection,
+    ) -> diesel::result::QueryResult<Epoch> {
+        use diesel::prelude::*;
+        use diesel_async::RunQueryDsl;
+
+        use crate::db::{Db, ModifiableDb};
+
+        Self::table()
+            .filter(Self::id_column().eq(user_id))
+            .select(diesel::dsl::max(Self::epoch_column()))
+            .get_result(db)
+            .await
+            .map(|epoch: Option<Epoch>| epoch.unwrap_or(Epoch(0)))
     }
 }
 

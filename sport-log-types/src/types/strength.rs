@@ -17,7 +17,7 @@ use crate::{types::IdString, MovementId, UserId};
 #[cfg_attr(
     feature = "db",
     derive(Hash, FromSqlRow, AsExpression),
-    derive_deftly(IdToSql, IdFromSql),
+    derive_deftly(IntoPgBigInt, FromPgBigInt),
     diesel(sql_type = BigInt)
 )]
 pub struct StrengthSessionId(pub i64);
@@ -53,7 +53,7 @@ pub struct StrengthSession {
 #[cfg_attr(
     feature = "db",
     derive(Hash, FromSqlRow, AsExpression),
-    derive_deftly(IdToSql, IdFromSql),
+    derive_deftly(IntoPgBigInt, FromPgBigInt),
     diesel(sql_type = BigInt)
 )]
 pub struct StrengthSetId(pub i64);
@@ -88,7 +88,7 @@ pub struct StrengthSet {
 #[cfg_attr(
     feature = "db",
     derive(Hash, FromSqlRow, AsExpression),
-    derive_deftly(IdToSql, IdFromSql),
+    derive_deftly(IntoPgBigInt, FromPgBigInt),
     diesel(sql_type = BigInt)
 )]
 pub struct EormId(pub i64);

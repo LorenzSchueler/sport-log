@@ -261,6 +261,76 @@ define_derive_deftly! {
 }
 
 define_derive_deftly! {
+    GetEpochByUser:
+
+    #[async_trait::async_trait]
+    impl crate::db::GetEpochByUser for crate::db::$ttype {
+        async fn get_epoch_by_user(
+            user_id: sport_log_types::UserId,
+            db: &mut diesel_async::AsyncPgConnection
+        ) -> diesel::result::QueryResult<sport_log_types::Epoch> {
+            use crate::db::{Db, DbWithUserId, ModifiableDb};
+            use diesel_async::RunQueryDsl;
+            use diesel::prelude::*;
+
+            Self::table()
+                .filter(Self::user_id_column().eq(user_id))
+                .select(diesel::dsl::max(Self::epoch_column()))
+                .get_result(db)
+                .await
+                .map(|epoch: Option<sport_log_types::Epoch>| epoch.unwrap_or(sport_log_types::Epoch(0)))
+        }
+    }
+}
+
+define_derive_deftly! {
+    GetEpochByUserOptional:
+
+    #[async_trait::async_trait]
+    impl crate::db::GetEpochByUserOptional for crate::db::$ttype {
+        async fn get_epoch_by_user_optional(
+            user_id: sport_log_types::UserId,
+            db: &mut diesel_async::AsyncPgConnection
+        ) -> diesel::result::QueryResult<sport_log_types::Epoch> {
+            use crate::db::{Db, DbWithUserId, ModifiableDb};
+            use diesel_async::RunQueryDsl;
+            use diesel::prelude::*;
+
+            Self::table()
+                .filter(Self::user_id_column()
+                        .eq(user_id)
+                        .or(Self::user_id_column().is_null()),
+                )
+                .select(diesel::dsl::max(Self::epoch_column()))
+                .get_result(db)
+                .await
+                .map(|epoch: Option<sport_log_types::Epoch>| epoch.unwrap_or(sport_log_types::Epoch(0)))
+        }
+    }
+}
+
+define_derive_deftly! {
+    GetEpoch:
+
+    #[async_trait::async_trait]
+    impl crate::db::GetEpoch for crate::db::$ttype {
+        async fn get_epoch(
+            db: &mut diesel_async::AsyncPgConnection
+        ) -> diesel::result::QueryResult<sport_log_types::Epoch> {
+            use crate::db::{Db, ModifiableDb};
+            use diesel_async::RunQueryDsl;
+            use diesel::prelude::*;
+
+            Self::table()
+                .select(diesel::dsl::max(Self::epoch_column()))
+                .get_result(db)
+                .await
+                .map(|epoch: Option<sport_log_types::Epoch>| epoch.unwrap_or(sport_log_types::Epoch(0)))
+        }
+    }
+}
+
+define_derive_deftly! {
     CheckUserId:
 
     #[async_trait::async_trait]

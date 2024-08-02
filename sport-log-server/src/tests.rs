@@ -10,7 +10,7 @@ use axum::{
     Router,
 };
 use base64::{engine::general_purpose::STANDARD, Engine};
-use chrono::{DateTime, Duration, Utc};
+use chrono::{Duration, Utc};
 use diesel_async::{
     pooled_connection::{
         deadpool::{Hook, Pool},
@@ -28,7 +28,7 @@ use sport_log_types::{
         route_max_version, ACCOUNT_DATA, ADM_PLATFORM, AP_ACTION_PROVIDER, AP_PLATFORM, DIARY, USER,
     },
     AccountData, Action, ActionEvent, ActionEventId, ActionId, ActionProvider, ActionProviderId,
-    Diary, DiaryId, Platform, PlatformId, User, UserId, ADMIN_USERNAME, ID_HEADER,
+    Diary, DiaryId, Epoch, Platform, PlatformId, User, UserId, ADMIN_USERNAME, ID_HEADER,
 };
 use tower::Service;
 
@@ -915,14 +915,11 @@ async fn foreign_update() {
 
 #[tokio::test]
 async fn get_account_data() {
-    async fn inner(
-        router: &mut Router,
-        datetime: Option<&DateTime<Utc>>,
-    ) -> (StatusCode, AccountData) {
+    async fn inner(router: &mut Router, epoch: Option<Epoch>) -> (StatusCode, AccountData) {
         let header = auth_header(&TEST_USER.username, &TEST_USER.password);
-        let datetime = datetime.map(|datetime| datetime.to_rfc3339().replace("+00:00", "Z"));
-        let datetime = datetime.as_ref();
-        let query = datetime.map(|datetime| [("last_sync", datetime.as_str())]);
+        let epoch = epoch.map(|epoch| epoch.0.to_string());
+        let epoch = epoch.as_ref();
+        let query = epoch.map(|epoch| [("epoch", epoch.as_str())]);
         let query = query.as_ref().map(<[_; 1]>::as_slice);
         let response = request(
             router,
@@ -942,41 +939,41 @@ async fn get_account_data() {
 
     // get all - check empty
     let (status, account_data) = inner(&mut router, None).await;
+    let epoch = account_data.epoch_map.diary;
 
     assert_eq!(status, StatusCode::OK);
     assert!(account_data.diaries.is_empty());
 
     // get updates - check no new data
-    let now = Utc::now();
-    let (status, account_data) = inner(&mut router, Some(&now)).await;
+    let (status, account_data) = inner(&mut router, Some(epoch)).await;
+    let epoch = account_data.epoch_map.diary;
 
     assert_eq!(status, StatusCode::OK);
     assert!(account_data.diaries.is_empty());
 
     // get updates - check new diary
-    let now = Utc::now() - Duration::try_seconds(1).unwrap(); // TODO
     DiaryDb::create(&TEST_DIARY, &mut db_pool.get().await.unwrap())
         .await
         .unwrap();
-    let (status, account_data) = inner(&mut router, Some(&now)).await;
+    let (status, account_data) = inner(&mut router, Some(epoch)).await;
+    let epoch = account_data.epoch_map.diary;
 
     assert_eq!(status, StatusCode::OK);
     assert_eq!(account_data.diaries.len(), 1);
     assert_eq!(account_data.diaries[0].id, TEST_DIARY.id);
 
     // get updates - check no new data
-    let now = Utc::now();
-    let (status, account_data) = inner(&mut router, Some(&now)).await;
+    let (status, account_data) = inner(&mut router, Some(epoch)).await;
+    let epoch = account_data.epoch_map.diary;
 
     assert_eq!(status, StatusCode::OK);
     assert!(account_data.diaries.is_empty());
 
     // get updates - check updated diary
-    let now = Utc::now() - Duration::try_seconds(1).unwrap(); // TODO
     DiaryDb::update(&TEST_DIARY, &mut db_pool.get().await.unwrap())
         .await
         .unwrap();
-    let (status, account_data) = inner(&mut router, Some(&now)).await;
+    let (status, account_data) = inner(&mut router, Some(epoch)).await;
 
     assert_eq!(status, StatusCode::OK);
     assert_eq!(account_data.diaries.len(), 1);

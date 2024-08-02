@@ -2,6 +2,27 @@ use serde::{Deserialize, Serialize};
 
 use crate::*;
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct EpochMap {
+    pub user: Epoch,
+    pub diary: Epoch,
+    pub wod: Epoch,
+    pub movement: Epoch,
+    pub strength_session: Epoch,
+    pub strength_set: Epoch,
+    pub metcon: Epoch,
+    pub metcon_session: Epoch,
+    pub metcon_movement: Epoch,
+    pub cardio_session: Epoch,
+    pub route: Epoch,
+    pub platform: Epoch,
+    pub platform_credential: Epoch,
+    pub action_provider: Epoch,
+    pub action: Epoch,
+    pub action_rule: Epoch,
+    pub action_event: Epoch,
+}
+
 /// A representation of all or recently updated data belonging to a user account.
 ///
 /// This struct is used for the `account_data` endpoints.
@@ -24,4 +45,5 @@ pub struct AccountData {
     pub actions: Vec<Action>,
     pub action_rules: Vec<ActionRule>,
     pub action_events: Vec<ActionEvent>,
+    pub epoch_map: EpochMap,
 }

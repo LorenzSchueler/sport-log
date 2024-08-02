@@ -10,6 +10,7 @@ use sport_log_derive::*;
     GetByUserTimespan,
     GetByUserAndEpoch,
     Update,
+    GetEpochByUser,
     CheckUserId,
     VerifyForUserOrAPUpdate,
     VerifyForUserOrAPCreate
@@ -23,6 +24,7 @@ pub struct StrengthSessionDb;
     GetById,
     GetByUser,
     GetByUserAndEpoch,
+    GetEpochByUser,
     Update,
     CheckUserId,
     VerifyForUserOrAPUpdate,

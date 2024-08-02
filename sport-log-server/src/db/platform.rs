@@ -10,6 +10,7 @@ use sport_log_derive::*;
     GetById,
     GetByEpoch,
     Update,
+    GetEpoch,
     VerifyForAdmin,
     VerifyUncheckedCreate
 )]
@@ -23,6 +24,7 @@ pub struct PlatformDb;
     GetByUser,
     GetByUserAndEpoch,
     Update,
+    GetEpochByUser,
     CheckUserId,
     VerifyForUserUpdate,
     VerifyForUserCreate

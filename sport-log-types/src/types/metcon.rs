@@ -45,7 +45,7 @@ pub enum DistanceUnit {
 #[cfg_attr(
     feature = "db",
     derive(Hash, FromSqlRow, AsExpression),
-    derive_deftly(IdToSql, IdFromSql),
+    derive_deftly(IntoPgBigInt, FromPgBigInt),
     diesel(sql_type = BigInt)
 )]
 pub struct MetconId(pub i64);
@@ -96,7 +96,7 @@ pub struct Metcon {
 #[cfg_attr(
     feature = "db",
     derive(Hash, FromSqlRow, AsExpression),
-    derive_deftly(IdToSql, IdFromSql),
+    derive_deftly(IntoPgBigInt, FromPgBigInt),
     diesel(sql_type = BigInt)
 )]
 pub struct MetconMovementId(pub i64);
@@ -136,7 +136,7 @@ pub struct MetconMovement {
 #[cfg_attr(
     feature = "db",
     derive(Hash, FromSqlRow, AsExpression),
-    derive_deftly(IdToSql, IdFromSql),
+    derive_deftly(IntoPgBigInt, FromPgBigInt),
     diesel(sql_type = BigInt)
 )]
 pub struct MetconSessionId(pub i64);

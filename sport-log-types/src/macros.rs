@@ -27,7 +27,7 @@ define_derive_deftly! {
     /// Derives `diesel::types::ToSql<diesel::sql_types::BigInt, diesel::pg::Pg>`.
     ///
     /// This macro only works if the type is a tuple struct with a single field of type `i64`.
-    IdToSql for struct:
+    IntoPgBigInt for struct:
 
     impl diesel::serialize::ToSql<diesel::sql_types::BigInt, diesel::pg::Pg> for $ttype {
         fn to_sql<'b>(&'b self, out: &mut diesel::serialize::Output<'b, '_, diesel::pg::Pg>) -> diesel::serialize::Result {
@@ -42,7 +42,7 @@ define_derive_deftly! {
     /// diesel::pg::Pg>`.
     ///
     /// This macro only works if the type is a tuple struct with a single field of type `i64`.
-    IdFromSql for struct:
+    FromPgBigInt for struct:
 
     impl diesel::deserialize::FromSql<diesel::sql_types::BigInt, diesel::pg::Pg> for $ttype {
         fn from_sql(bytes: <diesel::pg::Pg as diesel::backend::Backend>::RawValue<'_>) -> diesel::deserialize::Result<Self> {

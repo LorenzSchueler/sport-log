@@ -28,7 +28,7 @@ pub enum MovementDimension {
 #[cfg_attr(
     feature = "db",
     derive(Hash, FromSqlRow, AsExpression),
-    derive_deftly(IdToSql, IdFromSql),
+    derive_deftly(IntoPgBigInt, FromPgBigInt),
     diesel(sql_type = BigInt)
 )]
 pub struct MovementId(pub i64);

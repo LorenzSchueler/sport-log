@@ -19,7 +19,7 @@ use crate::{types::IdString, PlatformId, UserId};
 #[cfg_attr(
     feature = "db",
     derive(Hash, FromSqlRow, AsExpression),
-    derive_deftly(IdToSql, IdFromSql),
+    derive_deftly(IntoPgBigInt, FromPgBigInt),
     diesel(sql_type = diesel::sql_types::BigInt)
 )]
 pub struct ActionProviderId(pub i64);
@@ -54,7 +54,7 @@ pub struct ActionProvider {
 #[cfg_attr(
     feature = "db",
     derive(Hash, FromSqlRow, AsExpression),
-    derive_deftly(IdToSql, IdFromSql),
+    derive_deftly(IntoPgBigInt, FromPgBigInt),
     diesel(sql_type = diesel::sql_types::BigInt)
 )]
 pub struct ActionId(pub i64);
@@ -120,7 +120,7 @@ impl Weekday {
 #[cfg_attr(
     feature = "db",
     derive(Hash, FromSqlRow, AsExpression),
-    derive_deftly(IdToSql, IdFromSql),
+    derive_deftly(IntoPgBigInt, FromPgBigInt),
     diesel(sql_type = BigInt)
 )]
 pub struct ActionRuleId(pub i64);
@@ -156,7 +156,7 @@ pub struct ActionRule {
 #[cfg_attr(
     feature = "db",
     derive(Hash, FromSqlRow, AsExpression),
-    derive_deftly(IdToSql, IdFromSql),
+    derive_deftly(IntoPgBigInt, FromPgBigInt),
     diesel(sql_type = BigInt)
 )]
 pub struct ActionEventId(pub i64);

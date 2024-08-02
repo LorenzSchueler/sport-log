@@ -9,6 +9,7 @@ use sport_log_derive::*;
     GetByUser,
     GetByUserAndEpoch,
     Update,
+    GetEpochByUser,
     CheckUserId,
     VerifyForUserOrAPUpdate,
     VerifyForUserOrAPCreate
@@ -24,6 +25,7 @@ pub struct RouteDb;
     GetByUserTimespan,
     GetByUserAndEpoch,
     Update,
+    GetEpochByUser,
     CheckUserId,
     VerifyForUserOrAPUpdate,
     VerifyForUserOrAPCreate
