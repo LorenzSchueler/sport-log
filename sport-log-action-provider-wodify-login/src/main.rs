@@ -249,7 +249,16 @@ async fn login(config: &Config, mode: Mode) -> Result<()> {
             Ok(action_event_id) => disable_action_event_ids.push(action_event_id),
             Err(error) => {
                 info!("{error}");
-                disable_action_event_ids.push(error.action_event_id());
+                match error {
+                    UserError::NoCredential(_) | UserError::InvalidCredential(_) => {
+                        disable_action_event_ids.push(error.action_event_id());
+                    }
+                    UserError::CaptchaRequired(_)
+                    | UserError::UnknownLoginError(_)
+                    | UserError::ClassNotFound(_, _, _) => {
+                        info!("trying again on next invocation");
+                    }
+                }
             }
         }
     }
@@ -343,65 +352,63 @@ async fn wodify_login(
     }
     info!("ready"); // info for timing purposes
 
-    for _ in 0..3 {
-        driver.refresh().await?;
-        info!("reload done"); // info for timing purposes
+    driver.refresh().await?;
+    info!("reload done"); // info for timing purposes
 
-        let table = driver
-            .find(By::ClassName("TableRecords"))
-            .await?
-            .find(By::Tag("tbody"))
-            .await?;
+    let table = driver
+        .find(By::ClassName("TableRecords"))
+        .await?
+        .find(By::Tag("tbody"))
+        .await?;
 
-        let rows = table.find_all(By::Tag("tr")).await?;
+    let rows = table.find_all(By::Tag("tr")).await?;
 
-        let mut start_row_number = rows.len();
-        for (i, row) in rows.iter().enumerate() {
-            if let Ok(day) = row
-                .find(By::XPath("./td[1]/span[contains(@class, \"h3\")]"))
-                .await
-            {
-                if day.inner_html().await?.contains(&date) {
-                    start_row_number = i + 1;
-                    break;
-                }
-            }
-        }
-
-        let mut end_row_number = rows.len();
-        for (i, row) in rows[start_row_number..].iter().enumerate() {
-            if row
-                .find(By::XPath("./td[1]/span[contains(@class, \"h3\")]"))
-                .await
-                .is_ok()
-            {
-                end_row_number = start_row_number + i;
+    let mut start_row_number = rows.len();
+    for (i, row) in rows.iter().enumerate() {
+        if let Ok(day) = row
+            .find(By::XPath("./td[1]/span[contains(@class, \"h3\")]"))
+            .await
+        {
+            if day.inner_html().await?.contains(&date) {
+                start_row_number = i + 1;
                 break;
             }
         }
+    }
 
-        for row in &rows[start_row_number..end_row_number] {
-            let row_matches = row
-                .find(By::XPath("./td[1]/div/span"))
-                .await?
-                .attr("title")
-                .await?
-                .map_or(false, |title| {
-                    title.contains(&exec_action_event.action_name) && title.contains(&time)
-                });
+    let mut end_row_number = rows.len();
+    for (i, row) in rows[start_row_number..].iter().enumerate() {
+        if row
+            .find(By::XPath("./td[1]/span[contains(@class, \"h3\")]"))
+            .await
+            .is_ok()
+        {
+            end_row_number = start_row_number + i;
+            break;
+        }
+    }
 
-            if row_matches {
-                let icon = row.find(By::XPath("./td[3]/div")).await?;
-                icon.scroll_into_view().await?;
-                icon.click().await?;
-                info!("reservation for {} done", exec_action_event.datetime);
+    for row in &rows[start_row_number..end_row_number] {
+        let row_matches = row
+            .find(By::XPath("./td[1]/div/span"))
+            .await?
+            .attr("title")
+            .await?
+            .map_or(false, |title| {
+                title.contains(&exec_action_event.action_name) && title.contains(&time)
+            });
 
-                if mode == Mode::Interactive {
-                    time::sleep(StdDuration::from_secs(3)).await;
-                }
+        if row_matches {
+            let icon = row.find(By::XPath("./td[3]/div")).await?;
+            icon.scroll_into_view().await?;
+            icon.click().await?;
+            info!("reservation for {} done", exec_action_event.datetime);
 
-                return Ok(Ok(exec_action_event.action_event_id));
+            if mode == Mode::Interactive {
+                time::sleep(StdDuration::from_secs(3)).await;
             }
+
+            return Ok(Ok(exec_action_event.action_event_id));
         }
     }
 

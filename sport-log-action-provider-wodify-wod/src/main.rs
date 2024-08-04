@@ -258,10 +258,16 @@ async fn get_wod(config: &Config, mode: Mode) -> Result<()> {
             Ok(action_event_id) => disable_action_event_ids.push(action_event_id),
             Err(error) => {
                 info!("{error}");
-                if let UserError::ResultNotFound(_) = error {
-                    info!("trying again on next invocation");
-                } else {
-                    disable_action_event_ids.push(error.action_event_id());
+                match error {
+                    UserError::NoCredential(_) | UserError::InvalidCredential(_) => {
+                        disable_action_event_ids.push(error.action_event_id());
+                    }
+                    UserError::CaptchaRequired(_)
+                    | UserError::UnknownLoginError(_)
+                    | UserError::WodNotFound(_)
+                    | UserError::ResultNotFound(_) => {
+                        info!("trying again on next invocation");
+                    }
                 }
             }
         }
