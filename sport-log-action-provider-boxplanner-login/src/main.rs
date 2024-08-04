@@ -6,7 +6,7 @@ use std::{
     time::Duration as StdDuration,
 };
 
-use chrono::{DateTime, Datelike, Days, Duration, Local, Utc, Weekday};
+use chrono::{DateTime, Datelike, Duration, Local, Utc};
 use clap::Parser;
 use reqwest::{Client, Error as ReqwestError};
 use serde::Deserialize;
@@ -327,30 +327,16 @@ async fn boxplanner_login(
 
     time::sleep(StdDuration::from_secs(5)).await;
 
-    let current_month = exec_action_event.datetime.date_naive().month();
-    let next_week_month = exec_action_event
+    let current_month = Local::now().date_naive().month();
+    let event_month = exec_action_event.datetime.date_naive().month();
+    let current_weekday = Local::now().date_naive().weekday().num_days_from_monday();
+    let event_weekday = exec_action_event
         .datetime
         .date_naive()
-        .checked_add_days(Days::new(7))
-        .unwrap()
-        .week(Weekday::Mon)
-        .first_day()
-        .month();
-
-    if current_month < next_week_month {
-        let buttons = driver
-            .find(By::Id("calcontainer"))
-            .await?
-            .find_all(By::Tag("button"))
-            .await?;
-        for button in buttons {
-            if button.inner_html().await? == "Next Month" {
-                button.click().await?;
-            }
-        }
-    }
-
-    time::sleep(StdDuration::from_secs(5)).await;
+        .weekday()
+        .num_days_from_monday();
+    let needs_next_month = current_month < event_month && // event is in next month
+        current_weekday > event_weekday; // and event is on previous weekday -> next week
 
     if let Ok(duration) =
         (exec_action_event.datetime - Duration::try_days(2).unwrap() - Utc::now()).to_std()
@@ -362,6 +348,21 @@ async fn boxplanner_login(
     for _ in 0..3 {
         driver.refresh().await?;
         info!("reload done"); // info for timing purposes
+
+        if needs_next_month {
+            let buttons = driver
+                .find(By::Id("calcontainer"))
+                .await?
+                .find_all(By::Tag("button"))
+                .await?;
+            for button in buttons {
+                if button.inner_html().await? == "Next Month" {
+                    button.click().await?;
+                }
+            }
+            time::sleep(StdDuration::from_secs(5)).await;
+            info!("next month loaded"); // info for timing purposes
+        }
 
         let day_column = driver.find(By::Id(&date)).await?;
         let class_spans = day_column.find_all(By::Tag("span")).await?;
