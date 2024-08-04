@@ -28,7 +28,8 @@ use sport_log_types::{
         route_max_version, ACCOUNT_DATA, ADM_PLATFORM, AP_ACTION_PROVIDER, AP_PLATFORM, DIARY, USER,
     },
     AccountData, Action, ActionEvent, ActionEventId, ActionId, ActionProvider, ActionProviderId,
-    Diary, DiaryId, Epoch, Platform, PlatformId, User, UserId, ADMIN_USERNAME, ID_HEADER,
+    Diary, DiaryId, Epoch, EpochResponse, Platform, PlatformId, User, UserId, ADMIN_USERNAME,
+    ID_HEADER,
 };
 use tower::Service;
 
@@ -175,6 +176,29 @@ async fn request(router: &mut Router, request: Request<Body>) -> Response {
         .call(request)
         .await
         .unwrap()
+}
+
+async fn account_data_request(
+    router: &mut Router,
+    epoch: Option<Epoch>,
+) -> (StatusCode, AccountData) {
+    let header = auth_header(&TEST_USER.username, &TEST_USER.password);
+    let epoch = epoch.map(|epoch| epoch.0.to_string());
+    let epoch = epoch.as_ref();
+    let query = epoch.map(|epoch| [("epoch", epoch.as_str())]);
+    let query = query.as_ref().map(<[_; 1]>::as_slice);
+    let response = request(
+        router,
+        Request::get(route_max_version("", ACCOUNT_DATA, query))
+            .header(header.0, header.1)
+            .body(Body::empty())
+            .unwrap(),
+    )
+    .await;
+
+    let status = response.status();
+    let account_data = parse_body(response).await;
+    (status, account_data)
 }
 
 async fn parse_body<T: DeserializeOwned>(response: Response) -> T {
@@ -915,37 +939,17 @@ async fn foreign_update() {
 
 #[tokio::test]
 async fn get_account_data() {
-    async fn inner(router: &mut Router, epoch: Option<Epoch>) -> (StatusCode, AccountData) {
-        let header = auth_header(&TEST_USER.username, &TEST_USER.password);
-        let epoch = epoch.map(|epoch| epoch.0.to_string());
-        let epoch = epoch.as_ref();
-        let query = epoch.map(|epoch| [("epoch", epoch.as_str())]);
-        let query = query.as_ref().map(<[_; 1]>::as_slice);
-        let response = request(
-            router,
-            Request::get(route_max_version("", ACCOUNT_DATA, query))
-                .header(header.0, header.1)
-                .body(Body::empty())
-                .unwrap(),
-        )
-        .await;
-
-        let status = response.status();
-        let account_data = parse_body(response).await;
-        (status, account_data)
-    }
-
     let (mut router, db_pool, _) = init().await;
 
     // get all - check empty
-    let (status, account_data) = inner(&mut router, None).await;
+    let (status, account_data) = account_data_request(&mut router, None).await;
     let epoch = account_data.epoch_map.diary;
 
     assert_eq!(status, StatusCode::OK);
     assert!(account_data.diaries.is_empty());
 
     // get updates - check no new data
-    let (status, account_data) = inner(&mut router, Some(epoch)).await;
+    let (status, account_data) = account_data_request(&mut router, Some(epoch)).await;
     let epoch = account_data.epoch_map.diary;
 
     assert_eq!(status, StatusCode::OK);
@@ -955,7 +959,7 @@ async fn get_account_data() {
     DiaryDb::create(&TEST_DIARY, &mut db_pool.get().await.unwrap())
         .await
         .unwrap();
-    let (status, account_data) = inner(&mut router, Some(epoch)).await;
+    let (status, account_data) = account_data_request(&mut router, Some(epoch)).await;
     let epoch = account_data.epoch_map.diary;
 
     assert_eq!(status, StatusCode::OK);
@@ -963,7 +967,7 @@ async fn get_account_data() {
     assert_eq!(account_data.diaries[0].id, TEST_DIARY.id);
 
     // get updates - check no new data
-    let (status, account_data) = inner(&mut router, Some(epoch)).await;
+    let (status, account_data) = account_data_request(&mut router, Some(epoch)).await;
     let epoch = account_data.epoch_map.diary;
 
     assert_eq!(status, StatusCode::OK);
@@ -973,18 +977,62 @@ async fn get_account_data() {
     DiaryDb::update(&TEST_DIARY, &mut db_pool.get().await.unwrap())
         .await
         .unwrap();
-    let (status, account_data) = inner(&mut router, Some(epoch)).await;
+    let (status, account_data) = account_data_request(&mut router, Some(epoch)).await;
 
     assert_eq!(status, StatusCode::OK);
     assert_eq!(account_data.diaries.len(), 1);
     assert_eq!(account_data.diaries[0].id, TEST_DIARY.id);
 
     // get all - check diary
-    let (status, account_data) = inner(&mut router, None).await;
+    let (status, account_data) = account_data_request(&mut router, None).await;
 
     assert_eq!(status, StatusCode::OK);
     assert_eq!(account_data.diaries.len(), 1);
     assert_eq!(account_data.diaries[0].id, TEST_DIARY.id);
+}
+
+#[tokio::test]
+async fn epoch_from_create_and_update() {
+    let (mut router, _, _) = init().await;
+
+    // get account data - check empty & extract diary epoch
+    let (status, account_data) = account_data_request(&mut router, None).await;
+    let epoch = account_data.epoch_map.diary;
+
+    assert_eq!(status, StatusCode::OK);
+    assert!(account_data.diaries.is_empty());
+
+    // create new diary - check epoch increased by one
+    let header = auth_header(&TEST_USER.username, &TEST_USER.password);
+    let response = request(
+        &mut router,
+        Request::post(route_max_version("", DIARY, None))
+            .header(header.0, header.1)
+            .header(CONTENT_TYPE, APPLICATION_JSON.as_ref())
+            .body(serde_json::to_string(&TEST_DIARY as &Diary).unwrap().into())
+            .unwrap(),
+    )
+    .await;
+
+    assert_eq!(response.status(), StatusCode::OK);
+    let epoch_response: EpochResponse = parse_body(response).await;
+    assert_eq!(epoch_response.epoch, Epoch(epoch.0 + 1));
+
+    // update diary - check epoch increased again by one
+    let header = auth_header(&TEST_USER.username, &TEST_USER.password);
+    let response = request(
+        &mut router,
+        Request::put(&route_max_version("", DIARY, None))
+            .header(header.0, header.1)
+            .header(CONTENT_TYPE, APPLICATION_JSON.as_ref())
+            .body(serde_json::to_string(&TEST_DIARY as &Diary).unwrap().into())
+            .unwrap(),
+    )
+    .await;
+
+    assert_eq!(response.status(), StatusCode::OK);
+    let epoch_response: EpochResponse = parse_body(response).await;
+    assert_eq!(epoch_response.epoch, Epoch(epoch.0 + 2));
 }
 
 #[tokio::test]
