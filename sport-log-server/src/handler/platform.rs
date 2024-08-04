@@ -3,7 +3,9 @@ use axum::{
     http::StatusCode,
     Json,
 };
-use sport_log_types::{Platform, PlatformCredential, PlatformCredentialId, PlatformId};
+use sport_log_types::{
+    EpochResponse, Platform, PlatformCredential, PlatformCredentialId, PlatformId,
+};
 
 use crate::{
     auth::{AuthAdmin, AuthUser},
@@ -21,15 +23,14 @@ pub async fn adm_create_platforms(
     match platforms {
         UnverifiedSingleOrVec::Single(platform) => {
             let platform = platform.verify_adm(auth)?;
-            PlatformDb::create(&platform, &mut db).await
+            PlatformDb::create(&platform, &mut db).await?;
         }
         UnverifiedSingleOrVec::Vec(platforms) => {
             let platforms = platforms.verify_adm(auth)?;
-            PlatformDb::create_multiple(&platforms, &mut db).await
+            PlatformDb::create_multiple(&platforms, &mut db).await?;
         }
     }
-    .map(|_| StatusCode::OK)
-    .map_err(Into::into)
+    Ok(StatusCode::OK)
 }
 
 pub async fn ap_create_platform(
@@ -47,10 +48,8 @@ pub async fn ap_create_platform(
     }
 
     let platform = platform.verify_unchecked_create()?;
-    PlatformDb::create(&platform, &mut db)
-        .await
-        .map(|_| StatusCode::OK)
-        .map_err(Into::into)
+    PlatformDb::create(&platform, &mut db).await?;
+    Ok(StatusCode::OK)
 }
 
 pub async fn adm_get_platforms(
@@ -124,38 +123,37 @@ pub async fn adm_update_platforms(
     match platforms {
         UnverifiedSingleOrVec::Single(platform) => {
             let platform = platform.verify_adm(auth)?;
-            PlatformDb::update(&platform, &mut db).await
+            PlatformDb::update(&platform, &mut db).await?;
         }
         UnverifiedSingleOrVec::Vec(platforms) => {
             let platforms = platforms.verify_adm(auth)?;
-            PlatformDb::update_multiple(&platforms, &mut db).await
+            PlatformDb::update_multiple(&platforms, &mut db).await?;
         }
     }
-    .map(|_| StatusCode::OK)
-    .map_err(Into::into)
+    Ok(StatusCode::OK)
 }
 
 pub async fn create_platform_credentials(
     auth: AuthUser,
     mut db: DbConn,
     Json(platform_credentials): Json<UnverifiedSingleOrVec<PlatformCredential>>,
-) -> HandlerResult<StatusCode> {
+) -> HandlerResult<Json<EpochResponse>> {
     match platform_credentials {
         UnverifiedSingleOrVec::Single(platform_credential) => {
             let platform_credential = platform_credential
                 .verify_user_create(auth)
                 .map_err(HandlerError::from)?;
-            PlatformCredentialDb::create(&platform_credential, &mut db).await
+            PlatformCredentialDb::create(&platform_credential, &mut db).await?;
         }
         UnverifiedSingleOrVec::Vec(platform_credentials) => {
             let platform_credentials = platform_credentials
                 .verify_user_create(auth)
                 .map_err(HandlerError::from)?;
-            PlatformCredentialDb::create_multiple(&platform_credentials, &mut db).await
+            PlatformCredentialDb::create_multiple(&platform_credentials, &mut db).await?;
         }
     }
-    .map(|_| StatusCode::OK)
-    .map_err(Into::into)
+    let epoch = PlatformCredentialDb::get_epoch_by_user(*auth, &mut db).await?;
+    Ok(Json(EpochResponse { epoch }))
 }
 
 pub async fn get_platform_credentials(
@@ -180,21 +178,21 @@ pub async fn update_platform_credentials(
     auth: AuthUser,
     mut db: DbConn,
     Json(platform_credentials): Json<UnverifiedSingleOrVec<PlatformCredential>>,
-) -> HandlerResult<StatusCode> {
+) -> HandlerResult<Json<EpochResponse>> {
     match platform_credentials {
         UnverifiedSingleOrVec::Single(platform_credential) => {
             let platform_credential = platform_credential
                 .verify_user_update(auth, &mut db)
                 .await?;
-            PlatformCredentialDb::update(&platform_credential, &mut db).await
+            PlatformCredentialDb::update(&platform_credential, &mut db).await?;
         }
         UnverifiedSingleOrVec::Vec(platform_credentials) => {
             let platform_credentials = platform_credentials
                 .verify_user_update(auth, &mut db)
                 .await?;
-            PlatformCredentialDb::update_multiple(&platform_credentials, &mut db).await
+            PlatformCredentialDb::update_multiple(&platform_credentials, &mut db).await?;
         }
     }
-    .map(|_| StatusCode::OK)
-    .map_err(Into::into)
+    let epoch = PlatformCredentialDb::get_epoch_by_user(*auth, &mut db).await?;
+    Ok(Json(EpochResponse { epoch }))
 }

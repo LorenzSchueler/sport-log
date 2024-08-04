@@ -1,5 +1,7 @@
-use axum::{extract::Query, http::StatusCode, Json};
-use sport_log_types::{Eorm, StrengthSession, StrengthSessionId, StrengthSet, StrengthSetId};
+use axum::{extract::Query, Json};
+use sport_log_types::{
+    Eorm, EpochResponse, StrengthSession, StrengthSessionId, StrengthSet, StrengthSetId,
+};
 
 use crate::{
     auth::AuthUserOrAP,
@@ -12,19 +14,19 @@ pub async fn create_strength_sessions(
     auth: AuthUserOrAP,
     mut db: DbConn,
     Json(strength_sessions): Json<UnverifiedSingleOrVec<StrengthSession>>,
-) -> HandlerResult<StatusCode> {
+) -> HandlerResult<Json<EpochResponse>> {
     match strength_sessions {
         UnverifiedSingleOrVec::Single(strength_session) => {
             let strength_session = strength_session.verify_user_ap_create(auth)?;
-            StrengthSessionDb::create(&strength_session, &mut db).await
+            StrengthSessionDb::create(&strength_session, &mut db).await?;
         }
         UnverifiedSingleOrVec::Vec(strength_sessions) => {
             let strength_sessions = strength_sessions.verify_user_ap_create(auth)?;
-            StrengthSessionDb::create_multiple(&strength_sessions, &mut db).await
+            StrengthSessionDb::create_multiple(&strength_sessions, &mut db).await?;
         }
     }
-    .map(|_| StatusCode::OK)
-    .map_err(Into::into)
+    let epoch = StrengthSessionDb::get_epoch_by_user(*auth, &mut db).await?;
+    Ok(Json(EpochResponse { epoch }))
 }
 
 pub async fn get_strength_sessions(
@@ -53,42 +55,42 @@ pub async fn update_strength_sessions(
     auth: AuthUserOrAP,
     mut db: DbConn,
     Json(strength_sessions): Json<UnverifiedSingleOrVec<StrengthSession>>,
-) -> HandlerResult<StatusCode> {
+) -> HandlerResult<Json<EpochResponse>> {
     match strength_sessions {
         UnverifiedSingleOrVec::Single(strength_session) => {
             let strength_session = strength_session
                 .verify_user_ap_update(auth, &mut db)
                 .await?;
-            StrengthSessionDb::update(&strength_session, &mut db).await
+            StrengthSessionDb::update(&strength_session, &mut db).await?;
         }
         UnverifiedSingleOrVec::Vec(strength_sessions) => {
             let strength_sessions = strength_sessions
                 .verify_user_ap_update(auth, &mut db)
                 .await?;
-            StrengthSessionDb::update_multiple(&strength_sessions, &mut db).await
+            StrengthSessionDb::update_multiple(&strength_sessions, &mut db).await?;
         }
     }
-    .map(|_| StatusCode::OK)
-    .map_err(Into::into)
+    let epoch = StrengthSessionDb::get_epoch_by_user(*auth, &mut db).await?;
+    Ok(Json(EpochResponse { epoch }))
 }
 
 pub async fn create_strength_sets(
     auth: AuthUserOrAP,
     mut db: DbConn,
     Json(strength_sets): Json<UnverifiedSingleOrVec<StrengthSet>>,
-) -> HandlerResult<StatusCode> {
+) -> HandlerResult<Json<EpochResponse>> {
     match strength_sets {
         UnverifiedSingleOrVec::Single(strength_set) => {
             let strength_set = strength_set.verify_user_ap_create(auth)?;
-            StrengthSetDb::create(&strength_set, &mut db).await
+            StrengthSetDb::create(&strength_set, &mut db).await?;
         }
         UnverifiedSingleOrVec::Vec(strength_sets) => {
             let strength_sets = strength_sets.verify_user_ap_create(auth)?;
-            StrengthSetDb::create_multiple(&strength_sets, &mut db).await
+            StrengthSetDb::create_multiple(&strength_sets, &mut db).await?;
         }
     }
-    .map(|_| StatusCode::OK)
-    .map_err(Into::into)
+    let epoch = StrengthSetDb::get_epoch_by_user(*auth, &mut db).await?;
+    Ok(Json(EpochResponse { epoch }))
 }
 
 pub async fn get_strength_sets(
@@ -113,19 +115,19 @@ pub async fn update_strength_sets(
     auth: AuthUserOrAP,
     mut db: DbConn,
     Json(strength_sets): Json<UnverifiedSingleOrVec<StrengthSet>>,
-) -> HandlerResult<StatusCode> {
+) -> HandlerResult<Json<EpochResponse>> {
     match strength_sets {
         UnverifiedSingleOrVec::Single(strength_set) => {
             let strength_set = strength_set.verify_user_ap_update(auth, &mut db).await?;
-            StrengthSetDb::update(&strength_set, &mut db).await
+            StrengthSetDb::update(&strength_set, &mut db).await?;
         }
         UnverifiedSingleOrVec::Vec(strength_sets) => {
             let strength_sets = strength_sets.verify_user_ap_update(auth, &mut db).await?;
-            StrengthSetDb::update_multiple(&strength_sets, &mut db).await
+            StrengthSetDb::update_multiple(&strength_sets, &mut db).await?;
         }
     }
-    .map(|_| StatusCode::OK)
-    .map_err(Into::into)
+    let epoch = StrengthSetDb::get_epoch_by_user(*auth, &mut db).await?;
+    Ok(Json(EpochResponse { epoch }))
 }
 
 pub async fn get_eorms(_auth: AuthUserOrAP, mut db: DbConn) -> HandlerResult<Json<Vec<Eorm>>> {

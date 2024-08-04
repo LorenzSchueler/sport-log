@@ -1,5 +1,5 @@
-use axum::{extract::Query, http::StatusCode, Json};
-use sport_log_types::{Diary, DiaryId, Wod, WodId};
+use axum::{extract::Query, Json};
+use sport_log_types::{Diary, DiaryId, EpochResponse, Wod, WodId};
 
 use crate::{
     auth::AuthUserOrAP,
@@ -12,19 +12,19 @@ pub async fn create_wods(
     auth: AuthUserOrAP,
     mut db: DbConn,
     Json(wods): Json<UnverifiedSingleOrVec<Wod>>,
-) -> HandlerResult<StatusCode> {
+) -> HandlerResult<Json<EpochResponse>> {
     match wods {
         UnverifiedSingleOrVec::Single(wod) => {
             let wod = wod.verify_user_ap_create(auth)?;
-            WodDb::create(&wod, &mut db).await
+            WodDb::create(&wod, &mut db).await?;
         }
         UnverifiedSingleOrVec::Vec(wods) => {
             let wods = wods.verify_user_ap_create(auth)?;
-            WodDb::create_multiple(&wods, &mut db).await
+            WodDb::create_multiple(&wods, &mut db).await?;
         }
     }
-    .map(|_| StatusCode::OK)
-    .map_err(Into::into)
+    let epoch = WodDb::get_epoch_by_user(*auth, &mut db).await?;
+    Ok(Json(EpochResponse { epoch }))
 }
 
 pub async fn get_wods(
@@ -47,38 +47,38 @@ pub async fn update_wods(
     auth: AuthUserOrAP,
     mut db: DbConn,
     Json(wods): Json<UnverifiedSingleOrVec<Wod>>,
-) -> HandlerResult<StatusCode> {
+) -> HandlerResult<Json<EpochResponse>> {
     match wods {
         UnverifiedSingleOrVec::Single(wod) => {
             let wod = wod.verify_user_ap_update(auth, &mut db).await?;
-            WodDb::update(&wod, &mut db).await
+            WodDb::update(&wod, &mut db).await?;
         }
         UnverifiedSingleOrVec::Vec(wods) => {
             let wods = wods.verify_user_ap_update(auth, &mut db).await?;
-            WodDb::update_multiple(&wods, &mut db).await
+            WodDb::update_multiple(&wods, &mut db).await?;
         }
     }
-    .map(|_| StatusCode::OK)
-    .map_err(Into::into)
+    let epoch = WodDb::get_epoch_by_user(*auth, &mut db).await?;
+    Ok(Json(EpochResponse { epoch }))
 }
 
 pub async fn create_diaries(
     auth: AuthUserOrAP,
     mut db: DbConn,
     Json(diaries): Json<UnverifiedSingleOrVec<Diary>>,
-) -> HandlerResult<StatusCode> {
+) -> HandlerResult<Json<EpochResponse>> {
     match diaries {
         UnverifiedSingleOrVec::Single(diary) => {
             let diary = diary.verify_user_ap_create(auth)?;
-            DiaryDb::create(&diary, &mut db).await
+            DiaryDb::create(&diary, &mut db).await?;
         }
         UnverifiedSingleOrVec::Vec(diaries) => {
             let diaries = diaries.verify_user_ap_create(auth)?;
-            DiaryDb::create_multiple(&diaries, &mut db).await
+            DiaryDb::create_multiple(&diaries, &mut db).await?;
         }
     }
-    .map(|_| StatusCode::OK)
-    .map_err(Into::into)
+    let epoch = DiaryDb::get_epoch_by_user(*auth, &mut db).await?;
+    Ok(Json(EpochResponse { epoch }))
 }
 
 pub async fn get_diaries(
@@ -101,17 +101,17 @@ pub async fn update_diaries(
     auth: AuthUserOrAP,
     mut db: DbConn,
     Json(diaries): Json<UnverifiedSingleOrVec<Diary>>,
-) -> HandlerResult<StatusCode> {
+) -> HandlerResult<Json<EpochResponse>> {
     match diaries {
         UnverifiedSingleOrVec::Single(diary) => {
             let diary = diary.verify_user_ap_update(auth, &mut db).await?;
-            DiaryDb::update(&diary, &mut db).await
+            DiaryDb::update(&diary, &mut db).await?;
         }
         UnverifiedSingleOrVec::Vec(diaries) => {
             let diaries = diaries.verify_user_ap_update(auth, &mut db).await?;
-            DiaryDb::update_multiple(&diaries, &mut db).await
+            DiaryDb::update_multiple(&diaries, &mut db).await?;
         }
     }
-    .map(|_| StatusCode::OK)
-    .map_err(Into::into)
+    let epoch = DiaryDb::get_epoch_by_user(*auth, &mut db).await?;
+    Ok(Json(EpochResponse { epoch }))
 }

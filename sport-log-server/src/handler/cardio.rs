@@ -1,5 +1,5 @@
-use axum::{extract::Query, http::StatusCode, Json};
-use sport_log_types::{CardioSession, CardioSessionId, Route, RouteId};
+use axum::{extract::Query, Json};
+use sport_log_types::{CardioSession, CardioSessionId, EpochResponse, Route, RouteId};
 
 use crate::{
     auth::AuthUserOrAP,
@@ -12,19 +12,19 @@ pub async fn create_routes(
     auth: AuthUserOrAP,
     mut db: DbConn,
     Json(routes): Json<UnverifiedSingleOrVec<Route>>,
-) -> HandlerResult<StatusCode> {
+) -> HandlerResult<Json<EpochResponse>> {
     match routes {
         UnverifiedSingleOrVec::Single(route) => {
             let route = route.verify_user_ap_create(auth)?;
-            RouteDb::create(&route, &mut db).await
+            RouteDb::create(&route, &mut db).await?;
         }
         UnverifiedSingleOrVec::Vec(routes) => {
             let routes = routes.verify_user_ap_create(auth)?;
-            RouteDb::create_multiple(&routes, &mut db).await
+            RouteDb::create_multiple(&routes, &mut db).await?;
         }
     }
-    .map(|_| StatusCode::OK)
-    .map_err(Into::into)
+    let epoch = RouteDb::get_epoch_by_user(*auth, &mut db).await?;
+    Ok(Json(EpochResponse { epoch }))
 }
 
 pub async fn get_routes(
@@ -47,38 +47,38 @@ pub async fn update_routes(
     auth: AuthUserOrAP,
     mut db: DbConn,
     Json(routes): Json<UnverifiedSingleOrVec<Route>>,
-) -> HandlerResult<StatusCode> {
+) -> HandlerResult<Json<EpochResponse>> {
     match routes {
         UnverifiedSingleOrVec::Single(route) => {
             let route = route.verify_user_ap_update(auth, &mut db).await?;
-            RouteDb::update(&route, &mut db).await
+            RouteDb::update(&route, &mut db).await?;
         }
         UnverifiedSingleOrVec::Vec(routes) => {
             let routes = routes.verify_user_ap_update(auth, &mut db).await?;
-            RouteDb::update_multiple(&routes, &mut db).await
+            RouteDb::update_multiple(&routes, &mut db).await?;
         }
     }
-    .map(|_| StatusCode::OK)
-    .map_err(Into::into)
+    let epoch = RouteDb::get_epoch_by_user(*auth, &mut db).await?;
+    Ok(Json(EpochResponse { epoch }))
 }
 
 pub async fn create_cardio_sessions(
     auth: AuthUserOrAP,
     mut db: DbConn,
     Json(cardio_sessions): Json<UnverifiedSingleOrVec<CardioSession>>,
-) -> HandlerResult<StatusCode> {
+) -> HandlerResult<Json<EpochResponse>> {
     match cardio_sessions {
         UnverifiedSingleOrVec::Single(cardio_session) => {
             let cardio_session = cardio_session.verify_user_ap_create(auth)?;
-            CardioSessionDb::create(&cardio_session, &mut db).await
+            CardioSessionDb::create(&cardio_session, &mut db).await?;
         }
         UnverifiedSingleOrVec::Vec(cardio_sessions) => {
             let cardio_sessions = cardio_sessions.verify_user_ap_create(auth)?;
-            CardioSessionDb::create_multiple(&cardio_sessions, &mut db).await
+            CardioSessionDb::create_multiple(&cardio_sessions, &mut db).await?;
         }
     }
-    .map(|_| StatusCode::OK)
-    .map_err(Into::into)
+    let epoch = CardioSessionDb::get_epoch_by_user(*auth, &mut db).await?;
+    Ok(Json(EpochResponse { epoch }))
 }
 
 pub async fn get_cardio_sessions(
@@ -106,17 +106,17 @@ pub async fn update_cardio_sessions(
     auth: AuthUserOrAP,
     mut db: DbConn,
     Json(cardio_sessions): Json<UnverifiedSingleOrVec<CardioSession>>,
-) -> HandlerResult<StatusCode> {
+) -> HandlerResult<Json<EpochResponse>> {
     match cardio_sessions {
         UnverifiedSingleOrVec::Single(cardio_session) => {
             let cardio_session = cardio_session.verify_user_ap_update(auth, &mut db).await?;
-            CardioSessionDb::update(&cardio_session, &mut db).await
+            CardioSessionDb::update(&cardio_session, &mut db).await?;
         }
         UnverifiedSingleOrVec::Vec(cardio_sessions) => {
             let cardio_sessions = cardio_sessions.verify_user_ap_update(auth, &mut db).await?;
-            CardioSessionDb::update_multiple(&cardio_sessions, &mut db).await
+            CardioSessionDb::update_multiple(&cardio_sessions, &mut db).await?;
         }
     }
-    .map(|_| StatusCode::OK)
-    .map_err(Into::into)
+    let epoch = CardioSessionDb::get_epoch_by_user(*auth, &mut db).await?;
+    Ok(Json(EpochResponse { epoch }))
 }

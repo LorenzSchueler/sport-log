@@ -5,7 +5,10 @@ define_derive_deftly! {
 
     #[async_trait::async_trait]
     impl crate::db::Create for crate::db::$ttype {
-        async fn create(value: &Self::Type, db: &mut diesel_async::AsyncPgConnection) -> diesel::result::QueryResult<usize> {
+        async fn create(
+            value: &Self::Type,
+            db: &mut diesel_async::AsyncPgConnection
+        ) -> diesel::result::QueryResult<usize> {
             use crate::db::Db;
             use diesel_async::RunQueryDsl;
 
@@ -15,7 +18,10 @@ define_derive_deftly! {
                 .await
         }
 
-        async fn create_multiple(values: &[Self::Type], db: &mut diesel_async::AsyncPgConnection) -> diesel::result::QueryResult<usize> {
+        async fn create_multiple(
+            values: &[Self::Type],
+            db: &mut diesel_async::AsyncPgConnection
+        ) -> diesel::result::QueryResult<usize> {
             use crate::db::Db;
             use diesel_async::RunQueryDsl;
 
@@ -32,7 +38,10 @@ define_derive_deftly! {
 
     #[async_trait::async_trait]
     impl crate::db::GetById for crate::db::$ttype {
-        async fn get_by_id(id: Self::Id, db: &mut diesel_async::AsyncPgConnection) -> diesel::result::QueryResult<Self::Type> {
+        async fn get_by_id(
+            id: Self::Id,
+            db: &mut diesel_async::AsyncPgConnection
+        ) -> diesel::result::QueryResult<Self::Type> {
             use crate::db::Db;
             use diesel_async::RunQueryDsl;
             use diesel::prelude::*;
@@ -229,7 +238,10 @@ define_derive_deftly! {
 
     #[async_trait::async_trait]
     impl crate::db::Update for crate::db::$ttype {
-        async fn update(value: &Self::Type, db: &mut diesel_async::AsyncPgConnection) -> diesel::result::QueryResult<usize> {
+        async fn update(
+            value: &Self::Type,
+            db: &mut diesel_async::AsyncPgConnection
+        ) -> diesel::result::QueryResult<usize> {
             use crate::db::Db;
             use diesel_async::RunQueryDsl;
             use diesel::prelude::*;
@@ -240,7 +252,10 @@ define_derive_deftly! {
                 .await
         }
 
-        async fn update_multiple(values: &[Self::Type], db: &mut diesel_async::AsyncPgConnection) -> diesel::result::QueryResult<usize> {
+        async fn update_multiple(
+            values: &[Self::Type],
+            db: &mut diesel_async::AsyncPgConnection
+        ) -> diesel::result::QueryResult<usize> {
             use crate::db::Db;
             use diesel_async::{RunQueryDsl, AsyncConnection, scoped_futures::ScopedFutureExt};
             use diesel::prelude::*;
@@ -335,7 +350,11 @@ define_derive_deftly! {
 
     #[async_trait::async_trait]
     impl crate::db::CheckUserId for crate::db::$ttype {
-        async fn check_user_id(id: Self::Id, user_id: sport_log_types::UserId, db: &mut diesel_async::AsyncPgConnection) -> diesel::result::QueryResult<bool> {
+        async fn check_user_id(
+            id: Self::Id,
+            user_id: sport_log_types::UserId,
+            db: &mut diesel_async::AsyncPgConnection
+        ) -> diesel::result::QueryResult<bool> {
             use crate::db::{Db, DbWithUserId};
             use diesel_async::RunQueryDsl;
             use diesel::prelude::*;
@@ -373,7 +392,11 @@ define_derive_deftly! {
 
     #[async_trait::async_trait]
     impl crate::db::CheckOptionalUserId for crate::db::$ttype {
-        async fn check_optional_user_id(id: Self::Id, user_id: sport_log_types::UserId, db: &mut diesel_async::AsyncPgConnection) -> diesel::result::QueryResult<bool> {
+        async fn check_optional_user_id(
+            id: Self::Id,
+            user_id: sport_log_types::UserId,
+            db: &mut diesel_async::AsyncPgConnection
+        ) -> diesel::result::QueryResult<bool> {
             use crate::db::{Db, DbWithUserId};
             use diesel_async::RunQueryDsl;
             use diesel::prelude::*;
@@ -393,7 +416,11 @@ define_derive_deftly! {
 
     #[async_trait::async_trait]
     impl crate::db::CheckUserId for crate::db::$ttype {
-        async fn check_user_id(id: Self::Id, user_id: sport_log_types::UserId, db: &mut diesel_async::AsyncPgConnection) -> diesel::result::QueryResult<bool> {
+        async fn check_user_id(
+            id: Self::Id,
+            user_id: sport_log_types::UserId,
+            db: &mut diesel_async::AsyncPgConnection
+        ) -> diesel::result::QueryResult<bool> {
             use crate::db::Db;
             use diesel_async::RunQueryDsl;
             use diesel::prelude::*;
@@ -431,7 +458,11 @@ define_derive_deftly! {
 
     #[async_trait::async_trait]
     impl crate::db::CheckAPId for crate::db::$ttype {
-        async fn check_ap_id(id: Self::Id, ap_id: ActionProviderId, db: &mut diesel_async::AsyncPgConnection) -> diesel::result::QueryResult<bool> {
+        async fn check_ap_id(
+            id: Self::Id,
+            ap_id: ActionProviderId,
+            db: &mut diesel_async::AsyncPgConnection
+        ) -> diesel::result::QueryResult<bool> {
             use crate::db::{Db, DbWithApId};
             use diesel_async::RunQueryDsl;
             use diesel::prelude::*;

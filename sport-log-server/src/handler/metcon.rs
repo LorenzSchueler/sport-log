@@ -1,6 +1,7 @@
-use axum::{extract::Query, http::StatusCode, Json};
+use axum::{extract::Query, Json};
 use sport_log_types::{
-    Metcon, MetconId, MetconMovement, MetconMovementId, MetconSession, MetconSessionId,
+    EpochResponse, Metcon, MetconId, MetconMovement, MetconMovementId, MetconSession,
+    MetconSessionId,
 };
 
 use crate::{
@@ -14,19 +15,19 @@ pub async fn create_metcon_sessions(
     auth: AuthUserOrAP,
     mut db: DbConn,
     Json(metcon_sessions): Json<UnverifiedSingleOrVec<MetconSession>>,
-) -> HandlerResult<StatusCode> {
+) -> HandlerResult<Json<EpochResponse>> {
     match metcon_sessions {
         UnverifiedSingleOrVec::Single(metcon_session) => {
             let metcon_session = metcon_session.verify_user_ap_create(auth)?;
-            MetconSessionDb::create(&metcon_session, &mut db).await
+            MetconSessionDb::create(&metcon_session, &mut db).await?;
         }
         UnverifiedSingleOrVec::Vec(metcon_sessions) => {
             let metcon_sessions = metcon_sessions.verify_user_ap_create(auth)?;
-            MetconSessionDb::create_multiple(&metcon_sessions, &mut db).await
+            MetconSessionDb::create_multiple(&metcon_sessions, &mut db).await?;
         }
     }
-    .map(|_| StatusCode::OK)
-    .map_err(Into::into)
+    let epoch = MetconSessionDb::get_epoch_by_user(*auth, &mut db).await?;
+    Ok(Json(EpochResponse { epoch }))
 }
 
 pub async fn get_metcon_sessions(
@@ -54,38 +55,38 @@ pub async fn update_metcon_sessions(
     auth: AuthUserOrAP,
     mut db: DbConn,
     Json(metcon_sessions): Json<UnverifiedSingleOrVec<MetconSession>>,
-) -> HandlerResult<StatusCode> {
+) -> HandlerResult<Json<EpochResponse>> {
     match metcon_sessions {
         UnverifiedSingleOrVec::Single(metcon_session) => {
             let metcon_session = metcon_session.verify_user_ap_update(auth, &mut db).await?;
-            MetconSessionDb::update(&metcon_session, &mut db).await
+            MetconSessionDb::update(&metcon_session, &mut db).await?;
         }
         UnverifiedSingleOrVec::Vec(metcon_sessions) => {
             let metcon_sessions = metcon_sessions.verify_user_ap_update(auth, &mut db).await?;
-            MetconSessionDb::update_multiple(&metcon_sessions, &mut db).await
+            MetconSessionDb::update_multiple(&metcon_sessions, &mut db).await?;
         }
     }
-    .map(|_| StatusCode::OK)
-    .map_err(Into::into)
+    let epoch = MetconSessionDb::get_epoch_by_user(*auth, &mut db).await?;
+    Ok(Json(EpochResponse { epoch }))
 }
 
 pub async fn create_metcons(
     auth: AuthUserOrAP,
     mut db: DbConn,
     Json(metcons): Json<UnverifiedSingleOrVec<Metcon>>,
-) -> HandlerResult<StatusCode> {
+) -> HandlerResult<Json<EpochResponse>> {
     match metcons {
         UnverifiedSingleOrVec::Single(metcon) => {
             let metcon = metcon.verify_user_ap_create(auth)?;
-            MetconDb::create(&metcon, &mut db).await
+            MetconDb::create(&metcon, &mut db).await?;
         }
         UnverifiedSingleOrVec::Vec(metcons) => {
             let metcons = metcons.verify_user_ap_create(auth)?;
-            MetconDb::create_multiple(&metcons, &mut db).await
+            MetconDb::create_multiple(&metcons, &mut db).await?;
         }
     }
-    .map(|_| StatusCode::OK)
-    .map_err(Into::into)
+    let epoch = MetconDb::get_epoch_by_user_optional(*auth, &mut db).await?;
+    Ok(Json(EpochResponse { epoch }))
 }
 
 pub async fn get_metcons(
@@ -110,38 +111,38 @@ pub async fn update_metcons(
     auth: AuthUserOrAP,
     mut db: DbConn,
     Json(metcons): Json<UnverifiedSingleOrVec<Metcon>>,
-) -> HandlerResult<StatusCode> {
+) -> HandlerResult<Json<EpochResponse>> {
     match metcons {
         UnverifiedSingleOrVec::Single(metcon) => {
             let metcon = metcon.verify_user_ap_update(auth, &mut db).await?;
-            MetconDb::update(&metcon, &mut db).await
+            MetconDb::update(&metcon, &mut db).await?;
         }
         UnverifiedSingleOrVec::Vec(metcons) => {
             let metcons = metcons.verify_user_ap_update(auth, &mut db).await?;
-            MetconDb::update_multiple(&metcons, &mut db).await
+            MetconDb::update_multiple(&metcons, &mut db).await?;
         }
     }
-    .map(|_| StatusCode::OK)
-    .map_err(Into::into)
+    let epoch = MetconDb::get_epoch_by_user_optional(*auth, &mut db).await?;
+    Ok(Json(EpochResponse { epoch }))
 }
 
 pub async fn create_metcon_movements(
     auth: AuthUserOrAP,
     mut db: DbConn,
     Json(metcon_movements): Json<UnverifiedSingleOrVec<MetconMovement>>,
-) -> HandlerResult<StatusCode> {
+) -> HandlerResult<Json<EpochResponse>> {
     match metcon_movements {
         UnverifiedSingleOrVec::Single(metcon_movement) => {
             let metcon_movement = metcon_movement.verify_user_ap_create(auth)?;
-            MetconMovementDb::create(&metcon_movement, &mut db).await
+            MetconMovementDb::create(&metcon_movement, &mut db).await?;
         }
         UnverifiedSingleOrVec::Vec(metcon_movements) => {
             let metcon_movements = metcon_movements.verify_user_ap_create(auth)?;
-            MetconMovementDb::create_multiple(&metcon_movements, &mut db).await
+            MetconMovementDb::create_multiple(&metcon_movements, &mut db).await?;
         }
     }
-    .map(|_| StatusCode::OK)
-    .map_err(Into::into)
+    let epoch = MetconMovementDb::get_epoch_by_user_optional(*auth, &mut db).await?;
+    Ok(Json(EpochResponse { epoch }))
 }
 
 pub async fn get_metcon_movements(
@@ -166,19 +167,19 @@ pub async fn update_metcon_movements(
     auth: AuthUserOrAP,
     mut db: DbConn,
     Json(metcon_movements): Json<UnverifiedSingleOrVec<MetconMovement>>,
-) -> HandlerResult<StatusCode> {
+) -> HandlerResult<Json<EpochResponse>> {
     match metcon_movements {
         UnverifiedSingleOrVec::Single(metcon_movement) => {
             let metcon_movement = metcon_movement.verify_user_ap_update(auth, &mut db).await?;
-            MetconMovementDb::update(&metcon_movement, &mut db).await
+            MetconMovementDb::update(&metcon_movement, &mut db).await?;
         }
         UnverifiedSingleOrVec::Vec(metcon_movements) => {
             let metcon_movements = metcon_movements
                 .verify_user_ap_update(auth, &mut db)
                 .await?;
-            MetconMovementDb::update_multiple(&metcon_movements, &mut db).await
+            MetconMovementDb::update_multiple(&metcon_movements, &mut db).await?;
         }
     }
-    .map(|_| StatusCode::OK)
-    .map_err(Into::into)
+    let epoch = MetconMovementDb::get_epoch_by_user_optional(*auth, &mut db).await?;
+    Ok(Json(EpochResponse { epoch }))
 }

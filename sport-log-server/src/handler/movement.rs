@@ -1,5 +1,5 @@
-use axum::{extract::Query, http::StatusCode, Json};
-use sport_log_types::{Movement, MovementId};
+use axum::{extract::Query, Json};
+use sport_log_types::{EpochResponse, Movement, MovementId};
 
 use crate::{
     auth::*,
@@ -12,19 +12,19 @@ pub async fn create_movements(
     auth: AuthUserOrAP,
     mut db: DbConn,
     Json(movements): Json<UnverifiedSingleOrVec<Movement>>,
-) -> HandlerResult<StatusCode> {
+) -> HandlerResult<Json<EpochResponse>> {
     match movements {
         UnverifiedSingleOrVec::Single(movement) => {
             let movement = movement.verify_user_ap_create(auth)?;
-            MovementDb::create(&movement, &mut db).await
+            MovementDb::create(&movement, &mut db).await?;
         }
         UnverifiedSingleOrVec::Vec(movements) => {
             let movements = movements.verify_user_ap_create(auth)?;
-            MovementDb::create_multiple(&movements, &mut db).await
+            MovementDb::create_multiple(&movements, &mut db).await?;
         }
     }
-    .map(|_| StatusCode::OK)
-    .map_err(Into::into)
+    let epoch = MovementDb::get_epoch_by_user_optional(*auth, &mut db).await?;
+    Ok(Json(EpochResponse { epoch }))
 }
 
 pub async fn get_movements(
@@ -49,101 +49,17 @@ pub async fn update_movements(
     auth: AuthUserOrAP,
     mut db: DbConn,
     Json(movements): Json<UnverifiedSingleOrVec<Movement>>,
-) -> HandlerResult<StatusCode> {
+) -> HandlerResult<Json<EpochResponse>> {
     match movements {
         UnverifiedSingleOrVec::Single(movement) => {
             let movement = movement.verify_user_ap_update(auth, &mut db).await?;
-            MovementDb::update(&movement, &mut db).await
+            MovementDb::update(&movement, &mut db).await?;
         }
         UnverifiedSingleOrVec::Vec(movements) => {
             let movements = movements.verify_user_ap_update(auth, &mut db).await?;
-            MovementDb::update_multiple(&movements, &mut db).await
+            MovementDb::update_multiple(&movements, &mut db).await?;
         }
     }
-    .map(|_| StatusCode::OK)
-    .map_err(Into::into)
+    let epoch = MovementDb::get_epoch_by_user_optional(*auth, &mut db).await?;
+    Ok(Json(EpochResponse { epoch }))
 }
-
-//pub async fn create_movement_muscle(
-//auth: AuthUserOrAP,
-//mut db: DbConn,
-//Json(movement_muscle): Json<Unverified<MovementMuscle>>,
-//) -> HandlerResult<Json<MovementMuscle>> {
-//let movement_muscle = movement_muscle
-//.verify_user_ap_create(auth, &mut db)
-//.map_err(Error::from)?;
-//MovementMuscleDb::create(&movement_muscle, &mut db)
-//.map(Json)
-//.map_err(Into::into)
-//}
-
-//pub async fn create_movement_muscles(
-//auth: AuthUserOrAP,
-//mut db: DbConn,
-//Json(movement_muscles): Json<UnverifiedSingleOrVec<MovementMuscle>>>,
-//) -> HandlerResult<Json<Vec<MovementMuscle>>> {
-//let movement_muscles = movement_muscles
-//.verify_user_ap_create(auth, &mut db)
-//.map_err(|status| Error {
-//status,
-//message: None,
-//})?;
-//MovementMuscleDb::create_multiple(&movement_muscles, &mut db)
-//.map(Json)
-//.map_err(Into::into)
-//}
-
-//pub async fn get_movement_muscle(
-//auth: AuthUserOrAP,
-//Path(movement_muscle_id): Path<UnverifiedId<MovementMuscleId>>,
-//mut db: DbConn,
-//) -> HandlerResult<Json<MovementMuscle>> {
-//let movement_muscle_id = movement_muscle_id
-//.verify_user_ap_update(auth, &mut db)
-//.map_err(Error::from)?;
-//MovementMuscleDb::get_by_id(movement_muscle_id, &mut db)
-//.map(Json)
-//.map_err(Into::into)
-//}
-
-//pub async fn get_movement_muscles(
-//auth: AuthUserOrAP,
-//mut db: DbConn,
-//) -> HandlerResult<Json<Vec<MovementMuscle>>> {
-//MovementMuscleDb::get_by_user(*auth, &mut db)
-//.map(Json)
-//.map_err(Into::into)
-//}
-
-//pub async fn update_movement_muscle(
-//auth: AuthUserOrAP,
-//mut db: DbConn,
-//Json(movement_muscle): Json<Unverified<MovementMuscle>>,
-//) -> HandlerResult<Json<MovementMuscle>> {
-//let movement_muscle = movement_muscle
-//.verify_user_ap_update(auth, &mut db)
-//.map_err(Error::from)?;
-//MovementMuscleDb::update(&movement_muscle, &mut db)
-//.map(Json)
-//.map_err(Into::into)
-//}
-
-//pub async fn update_movement_muscles(
-//auth: AuthUserOrAP,
-//mut db: DbConn,
-//Json(movement_muscles): Json<UnverifiedSingleOrVec<MovementMuscle>>>,
-//) -> HandlerResult<Json<Vec<MovementMuscle>>> {
-//let movement_muscles = movement_muscles
-//.verify_user_ap_update(auth, &mut db)
-//.map_err(Error::from)?;
-//MovementMuscleDb::update_multiple(&movement_muscles, &mut db)
-//.map(Json)
-//.map_err(Into::into)
-//}
-
-//pub async fn get_muscle_groups(
-//_auth: AuthUserOrAP,
-//mut db: DbConn,
-//) -> HandlerResult<Json<Vec<MuscleGroup>>> {
-//MuscleGroupDb::get_all(&mut db).map(Json).map_err(Into::into)
-//}
