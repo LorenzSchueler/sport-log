@@ -6,6 +6,7 @@ import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
 import 'package:sport_log/models/clone_extensions.dart';
 import 'package:sport_log/models/entity_interfaces.dart';
+import 'package:sport_log/settings.dart';
 
 part 'metcon_movement.g.dart';
 
@@ -51,6 +52,9 @@ class MetconMovement extends AtomicEntity {
   @override
   @IdConverter()
   Int64 id;
+  @JsonKey(includeToJson: true, name: "user_id")
+  @IdConverter()
+  Int64 get _userId => Settings.instance.userId!;
   @IdConverter()
   Int64 metconId;
   @IdConverter()

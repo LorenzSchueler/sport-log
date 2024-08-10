@@ -1,5 +1,6 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/models/all.dart';
+import 'package:sport_log/models/epoch/epoch_map.dart';
 
 part 'account_data.g.dart';
 
@@ -23,6 +24,7 @@ class AccountData {
     required this.actions,
     required this.actionRules,
     required this.actionEvents,
+    required this.epochMap,
   });
 
   factory AccountData.fromJson(Map<String, dynamic> json) =>
@@ -45,6 +47,7 @@ class AccountData {
   List<Action> actions;
   List<ActionRule> actionRules;
   List<ActionEvent> actionEvents;
+  EpochMap epochMap;
 
   Map<String, dynamic> toJson() => _$AccountDataToJson(this);
 }

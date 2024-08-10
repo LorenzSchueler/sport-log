@@ -23,6 +23,7 @@ MetconMovement _$MetconMovementFromJson(Map<String, dynamic> json) =>
 Map<String, dynamic> _$MetconMovementToJson(MetconMovement instance) =>
     <String, dynamic>{
       'id': const IdConverter().toJson(instance.id),
+      'user_id': const IdConverter().toJson(instance._userId),
       'metcon_id': const IdConverter().toJson(instance.metconId),
       'movement_id': const IdConverter().toJson(instance.movementId),
       'movement_number': instance.movementNumber,

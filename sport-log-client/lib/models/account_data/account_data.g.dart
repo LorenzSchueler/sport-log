@@ -58,6 +58,7 @@ AccountData _$AccountDataFromJson(Map<String, dynamic> json) => AccountData(
       actionEvents: (json['action_events'] as List<dynamic>)
           .map((e) => ActionEvent.fromJson(e as Map<String, dynamic>))
           .toList(),
+      epochMap: EpochMap.fromJson(json['epoch_map'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$AccountDataToJson(AccountData instance) =>
@@ -79,4 +80,5 @@ Map<String, dynamic> _$AccountDataToJson(AccountData instance) =>
       'actions': instance.actions,
       'action_rules': instance.actionRules,
       'action_events': instance.actionEvents,
+      'epoch_map': instance.epochMap,
     };

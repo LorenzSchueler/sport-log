@@ -19,6 +19,7 @@ StrengthSet _$StrengthSetFromJson(Map<String, dynamic> json) => StrengthSet(
 Map<String, dynamic> _$StrengthSetToJson(StrengthSet instance) =>
     <String, dynamic>{
       'id': const IdConverter().toJson(instance.id),
+      'user_id': const IdConverter().toJson(instance._userId),
       'strength_session_id':
           const IdConverter().toJson(instance.strengthSessionId),
       'set_number': instance.setNumber,

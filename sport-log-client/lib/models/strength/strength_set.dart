@@ -9,6 +9,7 @@ import 'package:sport_log/models/clone_extensions.dart';
 import 'package:sport_log/models/entity_interfaces.dart';
 import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/models/strength/eorm.dart';
+import 'package:sport_log/settings.dart';
 
 part 'strength_set.g.dart';
 
@@ -29,6 +30,9 @@ class StrengthSet extends AtomicEntity {
   @override
   @IdConverter()
   Int64 id;
+  @JsonKey(includeToJson: true, name: "user_id")
+  @IdConverter()
+  Int64 get _userId => Settings.instance.userId!;
   @IdConverter()
   Int64 strengthSessionId;
   int setNumber;
