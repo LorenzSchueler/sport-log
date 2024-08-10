@@ -28,8 +28,8 @@ use sport_log_types::{
         route_max_version, ACCOUNT_DATA, ADM_PLATFORM, AP_ACTION_PROVIDER, AP_PLATFORM, DIARY, USER,
     },
     AccountData, Action, ActionEvent, ActionEventId, ActionId, ActionProvider, ActionProviderId,
-    Diary, DiaryId, Epoch, EpochResponse, Platform, PlatformId, User, UserId, ADMIN_USERNAME,
-    ID_HEADER,
+    Diary, DiaryId, Epoch, EpochMap, EpochResponse, Platform, PlatformId, User, UserId,
+    ADMIN_USERNAME, ID_HEADER,
 };
 use tower::Service;
 
@@ -180,18 +180,15 @@ async fn request(router: &mut Router, request: Request<Body>) -> Response {
 
 async fn account_data_request(
     router: &mut Router,
-    epoch: Option<Epoch>,
+    epoch_map: Option<EpochMap>,
 ) -> (StatusCode, AccountData) {
-    let header = auth_header(&TEST_USER.username, &TEST_USER.password);
-    let epoch = epoch.map(|epoch| epoch.0.to_string());
-    let epoch = epoch.as_ref();
-    let query = epoch.map(|epoch| [("epoch", epoch.as_str())]);
-    let query = query.as_ref().map(<[_; 1]>::as_slice);
+    let auth_header = auth_header(&TEST_USER.username, &TEST_USER.password);
     let response = request(
         router,
-        Request::get(route_max_version("", ACCOUNT_DATA, query))
-            .header(header.0, header.1)
-            .body(Body::empty())
+        Request::get(route_max_version("", ACCOUNT_DATA, None))
+            .header(auth_header.0, auth_header.1)
+            .header(CONTENT_TYPE, APPLICATION_JSON.as_ref())
+            .body(serde_json::to_string(&Some(epoch_map)).unwrap().into())
             .unwrap(),
     )
     .await;
@@ -943,14 +940,14 @@ async fn get_account_data() {
 
     // get all - check empty
     let (status, account_data) = account_data_request(&mut router, None).await;
-    let epoch = account_data.epoch_map.diary;
+    let epoch = account_data.epoch_map;
 
     assert_eq!(status, StatusCode::OK);
     assert!(account_data.diaries.is_empty());
 
     // get updates - check no new data
     let (status, account_data) = account_data_request(&mut router, Some(epoch)).await;
-    let epoch = account_data.epoch_map.diary;
+    let epoch = account_data.epoch_map;
 
     assert_eq!(status, StatusCode::OK);
     assert!(account_data.diaries.is_empty());
@@ -960,7 +957,7 @@ async fn get_account_data() {
         .await
         .unwrap();
     let (status, account_data) = account_data_request(&mut router, Some(epoch)).await;
-    let epoch = account_data.epoch_map.diary;
+    let epoch = account_data.epoch_map;
 
     assert_eq!(status, StatusCode::OK);
     assert_eq!(account_data.diaries.len(), 1);
@@ -968,7 +965,7 @@ async fn get_account_data() {
 
     // get updates - check no new data
     let (status, account_data) = account_data_request(&mut router, Some(epoch)).await;
-    let epoch = account_data.epoch_map.diary;
+    let epoch = account_data.epoch_map;
 
     assert_eq!(status, StatusCode::OK);
     assert!(account_data.diaries.is_empty());

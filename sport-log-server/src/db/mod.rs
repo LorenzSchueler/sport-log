@@ -161,7 +161,7 @@ pub trait GetByUserTimespan: Db {
 pub trait GetByUserAndEpoch: Db {
     async fn get_by_user_and_epoch(
         user_id: UserId,
-        epoch: i64,
+        epoch: Epoch,
         db: &mut AsyncPgConnection,
     ) -> QueryResult<Vec<Self::Type>>;
 }
@@ -170,7 +170,8 @@ pub trait GetByUserAndEpoch: Db {
 /// synchronization from the database.
 #[async_trait]
 pub trait GetByEpoch: Db {
-    async fn get_by_epoch(epoch: i64, db: &mut AsyncPgConnection) -> QueryResult<Vec<Self::Type>>;
+    async fn get_by_epoch(epoch: Epoch, db: &mut AsyncPgConnection)
+        -> QueryResult<Vec<Self::Type>>;
 }
 
 /// A type for which all entries can be retrieved from the database.

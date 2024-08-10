@@ -145,7 +145,7 @@ impl UserDb {
 
     pub async fn get_by_id_and_epoch(
         user_id: UserId,
-        epoch: i64,
+        epoch: Epoch,
         db: &mut AsyncPgConnection,
     ) -> QueryResult<Option<User>> {
         user::table

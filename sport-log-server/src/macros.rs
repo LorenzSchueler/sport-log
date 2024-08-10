@@ -155,7 +155,7 @@ define_derive_deftly! {
     impl crate::db::GetByUserAndEpoch for crate::db::$ttype {
         async fn get_by_user_and_epoch(
             user_id: sport_log_types::UserId,
-            epoch: i64,
+            epoch: sport_log_types::Epoch,
             db: &mut diesel_async::AsyncPgConnection
         ) -> diesel::result::QueryResult<Vec<Self::Type>> {
             use crate::db::{Db, DbWithUserId, ModifiableDb};
@@ -179,7 +179,7 @@ define_derive_deftly! {
     impl crate::db::GetByUserAndEpoch for crate::db::$ttype {
         async fn get_by_user_and_epoch(
             user_id: sport_log_types::UserId,
-            epoch: i64,
+            epoch: sport_log_types::Epoch,
             db: &mut diesel_async::AsyncPgConnection
         ) -> diesel::result::QueryResult<Vec<Self::Type>> {
             use crate::db::{Db, DbWithUserId, ModifiableDb};
@@ -202,7 +202,7 @@ define_derive_deftly! {
     #[async_trait::async_trait]
     impl crate::db::GetByEpoch for crate::db::$ttype {
         async fn get_by_epoch(
-            epoch: i64,
+            epoch: sport_log_types::Epoch,
             db: &mut diesel_async::AsyncPgConnection
         ) -> diesel::result::QueryResult<Vec<Self::Type>> {
             use crate::db::{Db, ModifiableDb};
