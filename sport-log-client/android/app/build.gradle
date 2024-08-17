@@ -30,7 +30,8 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     compileSdkVersion 34
-    ndkVersion flutter.ndkVersion
+    //ndkVersion flutter.ndkVersion
+    ndkVersion = "26.1.10909125"
 
     packagingOptions {
       pickFirst 'lib/x86/libc++_shared.so'
@@ -40,12 +41,12 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
 
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = '17'
     }
 
     lintOptions { 
@@ -55,6 +56,8 @@ android {
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
     }
+
+    namespace "org.sport_log.sport_log_client"
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
