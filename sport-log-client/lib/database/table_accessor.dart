@@ -270,6 +270,13 @@ abstract class TableAccessor<T extends AtomicEntity> {
     );
   }
 
+  Future<void> setAllCreated() async {
+    await database.update(
+      tableName,
+      {Columns.syncStatus: SyncStatus.created.index},
+    );
+  }
+
   Future<DbResult> upsertMultiple(
     List<T> objects, {
     required bool synchronized,

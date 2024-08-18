@@ -1,5 +1,6 @@
 import 'package:sport_log/api/accessors/user_api.dart';
 import 'package:sport_log/api/api.dart';
+import 'package:sport_log/data_provider/data_provider.dart';
 import 'package:sport_log/data_provider/sync.dart';
 import 'package:sport_log/database/database.dart';
 import 'package:sport_log/helpers/id_generation.dart';
@@ -168,9 +169,9 @@ abstract final class Account {
     await Settings.instance.setSyncEnabled(false);
     // keep syncInterval as is
     await Settings.instance.setEpochMap(null);
-    // keep db data
+    await EntityDataProvider.setAllCreated();
 
-    // result: user still exists, no account created
+    // result: user still exists, no account created, all data is set to created
     // now we are in the same state as if we had called noAccount
   }
 

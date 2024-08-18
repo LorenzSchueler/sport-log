@@ -318,6 +318,12 @@ abstract class EntityDataProvider<T extends AtomicEntity>
     }
   }
 
+  static Future<void> setAllCreated() async {
+    for (final dp in EntityDataProvider.all) {
+      await dp.table.setAllCreated();
+    }
+  }
+
   static List<EntityDataProvider> get all => [
         DiaryDataProvider(),
         WodDataProvider(),
