@@ -123,9 +123,9 @@ class MainDrawer extends StatelessWidget {
                           Text(
                             sync.isSyncing
                                 ? 'Syncing...'
-                                : settings.lastSync == null
+                                : settings.epochMap == null
                                     ? 'No syncs yet'
-                                    : 'Last sync: ${settings.lastSync!.humanTodayTimeOrDate}',
+                                    : 'Last sync: ${settings.epochMap!.lastSync.humanTodayTimeOrDate}',
                           ),
                           const Spacer(),
                           SpinningSync(

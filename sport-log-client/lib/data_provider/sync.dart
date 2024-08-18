@@ -33,7 +33,7 @@ class Sync extends ChangeNotifier {
   Future<void> init() async {
     if (Config.instance.deleteDatabase) {
       _logger.i("removing last sync");
-      await Settings.instance.setLastSync(null);
+      await Settings.instance.setEpochMap(null);
     }
     await startSync();
   }
@@ -102,10 +102,6 @@ class Sync extends ChangeNotifier {
     if (syncSuccessful) {
       syncSuccessful =
           await EntityDataProvider.upSync(onNoInternet: onNoInternet);
-      // account for time difference
-      final now = DateTime.now().add(const Duration(milliseconds: 100));
-      _logger.d("setting last sync to $now.");
-      await Settings.instance.setLastSync(now);
     }
 
     _isSyncing = false;
@@ -156,13 +152,9 @@ class Sync extends ChangeNotifier {
       _logger.d("sync already enabled");
       return;
     }
-    // TODO
-    // periodic sync is currently disabled because it causes problems
-    // sometimes cardio sessions are cut of when they get synchronized during tracking
-    //
-    //_logger.i("starting synchronization timer");
-    //_syncTimer = Timer.periodic(Settings.instance.syncInterval, (_) => sync());
-    if (Settings.instance.lastSync == null) {
+    _logger.i("starting synchronization timer");
+    _syncTimer = Timer.periodic(Settings.instance.syncInterval, (_) => sync());
+    if (Settings.instance.epochMap == null) {
       await sync(); // wait to make sure movement 1 and metcon 1 exist
       await MovementDataProvider().setDefaultMovement();
       await MetconDescriptionDataProvider().setDefaultMetconDescription();

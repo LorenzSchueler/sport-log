@@ -3,6 +3,8 @@ import 'package:sport_log/api/api.dart';
 import 'package:sport_log/data_provider/data_provider.dart';
 import 'package:sport_log/database/tables/wod_table.dart';
 import 'package:sport_log/models/account_data/account_data.dart';
+import 'package:sport_log/models/epoch/epoch_map.dart';
+import 'package:sport_log/models/epoch/epoch_result.dart';
 import 'package:sport_log/models/wod/wod.dart';
 
 class WodDataProvider extends EntityDataProvider<Wod> {
@@ -20,6 +22,11 @@ class WodDataProvider extends EntityDataProvider<Wod> {
 
   @override
   List<Wod> getFromAccountData(AccountData accountData) => accountData.wods;
+
+  @override
+  void setEpoch(EpochMap epochMap, EpochResult epochResult) {
+    epochMap.wod = epochResult.epoch;
+  }
 
   Future<List<Wod>> getByTimerangeAndDescription({
     required DateTime? from,

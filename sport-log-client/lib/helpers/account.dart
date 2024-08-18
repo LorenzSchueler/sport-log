@@ -38,7 +38,7 @@ abstract final class Account {
     // keep serverUrl
     await Settings.instance.setSyncEnabled(false);
     // keep syncInterval as is
-    await Settings.instance.setLastSync(null);
+    await Settings.instance.setEpochMap(null);
 
     // result: userId exists, user may exists, account not created
   }
@@ -167,7 +167,7 @@ abstract final class Account {
     // keep serverUrl as is
     await Settings.instance.setSyncEnabled(false);
     // keep syncInterval as is
-    await Settings.instance.setLastSync(null);
+    await Settings.instance.setEpochMap(null);
     // keep db data
 
     // result: user still exists, no account created
@@ -190,7 +190,7 @@ abstract final class Account {
       // keep serverUrl as is
       await Settings.instance.setSyncEnabled(false);
       // keep syncInterval as is
-      await Settings.instance.setLastSync(null);
+      await Settings.instance.setEpochMap(null);
 
       Movement.defaultMovement = null;
       MetconDescription.defaultMetconDescription = null;
@@ -220,7 +220,7 @@ abstract final class Account {
 
     Sync.instance.stopSync();
 
-    await Settings.instance.setLastSync(null);
+    await Settings.instance.setEpochMap(null);
 
     Movement.defaultMovement = null;
     MetconDescription.defaultMetconDescription = null;

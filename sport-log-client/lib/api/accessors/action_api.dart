@@ -1,6 +1,7 @@
 import 'package:sport_log/api/api.dart';
 import 'package:sport_log/helpers/result.dart';
 import 'package:sport_log/models/action/all.dart';
+import 'package:sport_log/models/epoch/epoch_result.dart';
 
 class ActionProviderApi extends Api<ActionProvider> {
   factory ActionProviderApi() => _instance;
@@ -17,17 +18,23 @@ class ActionProviderApi extends Api<ActionProvider> {
   final route = '/action_provider';
 
   @override
-  Future<ApiResult<void>> postSingle(ActionProvider object) async => Ok(null);
-
-  @override
-  Future<ApiResult<void>> postMultiple(List<ActionProvider> objects) async =>
+  Future<ApiResult<EpochResult?>> postSingle(ActionProvider object) async =>
       Ok(null);
 
   @override
-  Future<ApiResult<void>> putSingle(ActionProvider object) async => Ok(null);
+  Future<ApiResult<EpochResult?>> postMultiple(
+    List<ActionProvider> objects,
+  ) async =>
+      Ok(null);
 
   @override
-  Future<ApiResult<void>> putMultiple(List<ActionProvider> objects) async =>
+  Future<ApiResult<EpochResult?>> putSingle(ActionProvider object) async =>
+      Ok(null);
+
+  @override
+  Future<ApiResult<EpochResult?>> putMultiple(
+    List<ActionProvider> objects,
+  ) async =>
       Ok(null);
 }
 
@@ -45,16 +52,18 @@ class ActionApi extends Api<Action> {
   final route = '/action';
 
   @override
-  Future<ApiResult<void>> postSingle(Action object) async => Ok(null);
+  Future<ApiResult<EpochResult?>> postSingle(Action object) async => Ok(null);
 
   @override
-  Future<ApiResult<void>> postMultiple(List<Action> objects) async => Ok(null);
+  Future<ApiResult<EpochResult?>> postMultiple(List<Action> objects) async =>
+      Ok(null);
 
   @override
-  Future<ApiResult<void>> putSingle(Action object) async => Ok(null);
+  Future<ApiResult<EpochResult?>> putSingle(Action object) async => Ok(null);
 
   @override
-  Future<ApiResult<void>> putMultiple(List<Action> objects) async => Ok(null);
+  Future<ApiResult<EpochResult?>> putMultiple(List<Action> objects) async =>
+      Ok(null);
 }
 
 class ActionRuleApi extends Api<ActionRule> {

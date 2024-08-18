@@ -17,9 +17,10 @@ import 'package:sport_log/database/database.dart';
 import 'package:sport_log/database/table_accessor.dart';
 import 'package:sport_log/helpers/account.dart';
 import 'package:sport_log/helpers/logger.dart';
-import 'package:sport_log/helpers/result.dart';
 import 'package:sport_log/models/account_data/account_data.dart';
 import 'package:sport_log/models/entity_interfaces.dart';
+import 'package:sport_log/models/epoch/epoch_map.dart';
+import 'package:sport_log/models/epoch/epoch_result.dart';
 import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/dialogs/dialogs.dart';
 import 'package:sport_log/widgets/dialogs/new_credentials_dialog.dart';
@@ -98,6 +99,8 @@ abstract class EntityDataProvider<T extends AtomicEntity>
   TableAccessor<T> get table;
 
   List<T> getFromAccountData(AccountData accountData);
+
+  void setEpoch(EpochMap epochMap, EpochResult epochResult);
 
   bool _disposed = false;
 
@@ -180,7 +183,7 @@ abstract class EntityDataProvider<T extends AtomicEntity>
 
   Future<bool> _resolveConflict(
     ConflictResolution conflictResolution,
-    Future<ApiResult<void>> Function(T) fnSingle,
+    Future<ApiResult<EpochResult?>> Function(T) fnSingle,
     List<T> records,
   ) async {
     switch (conflictResolution) {
@@ -193,6 +196,9 @@ abstract class EntityDataProvider<T extends AtomicEntity>
           if (result.isErr) {
             _logger.d("hard deleting record $record");
             await table.hardDeleteSingle(record.id);
+          } else {
+            final epoch = result.ok;
+            await Settings.instance.setEpoch(setEpoch, epoch);
           }
         }
         return true; // all entries can be set to synchronized
@@ -203,54 +209,52 @@ abstract class EntityDataProvider<T extends AtomicEntity>
   }
 
   Future<bool> _pushEntriesToServer(
-    Future<ApiResult<void>> Function(List<T>) fnMultiple,
-    Future<ApiResult<void>> Function(T) fnSingle,
+    Future<ApiResult<EpochResult?>> Function(List<T>) fnMultiple,
+    Future<ApiResult<EpochResult?>> Function(T) fnSingle,
     List<T> records,
+    Future<void> Function() setSynchronized,
     VoidCallback? onNoInternet,
-  ) =>
-      fnMultiple(records).mapAsync((_) => true).unwrapOrElseAsync((err) async {
-        final conflictResolution =
-            await DataProvider.handleApiError(err, onNoInternet);
-        return conflictResolution != null
-            ? await _resolveConflict(conflictResolution, fnSingle, records)
-            : false;
-      });
+  ) async {
+    final result = await fnMultiple(records);
+    if (result.isErr) {
+      final conflictResolution =
+          await DataProvider.handleApiError(result.err, onNoInternet);
+      return conflictResolution != null
+          ? await _resolveConflict(conflictResolution, fnSingle, records)
+          : false;
+    } else {
+      final epoch = result.ok;
+      await Settings.instance.setEpoch(setEpoch, epoch);
+      await setSynchronized();
+      return true;
+    }
+  }
 
   Future<bool> _pushUpdatedToServer(VoidCallback? onNoInternet) async {
     final recordsToUpdate = await table.getWithSyncStatus(SyncStatus.updated);
-    final success = await _pushEntriesToServer(
+    return _pushEntriesToServer(
       api.putMultiple,
       api.putSingle,
       recordsToUpdate,
+      table.setAllUpdatedSynchronized,
       onNoInternet,
     );
-    if (success) {
-      await table.setAllUpdatedSynchronized();
-    }
-    return success;
   }
 
   Future<bool> _pushCreatedToServer(VoidCallback? onNoInternet) async {
     final recordsToCreate = await table.getWithSyncStatus(SyncStatus.created);
-    final success = await _pushEntriesToServer(
+    return _pushEntriesToServer(
       api.postMultiple,
       api.postSingle,
       recordsToCreate,
+      table.setAllCreatedSynchronized,
       onNoInternet,
     );
-    if (success) {
-      await table.setAllCreatedSynchronized();
-    }
-    return success;
   }
 
-  Future<bool> _pushToServer(VoidCallback? onNoInternet) async {
-    return (await Future.wait([
-      _pushUpdatedToServer(onNoInternet),
-      _pushCreatedToServer(onNoInternet),
-    ]))
-        .every((result) => result);
-  }
+  Future<bool> _pushToServer(VoidCallback? onNoInternet) async =>
+      await _pushUpdatedToServer(onNoInternet) &&
+      await _pushCreatedToServer(onNoInternet);
 
   Future<bool> _upsertMultiple(
     List<T> objects, {
@@ -288,7 +292,7 @@ abstract class EntityDataProvider<T extends AtomicEntity>
 
   static Future<bool> downSync({required VoidCallback? onNoInternet}) async {
     final accountDataResult =
-        await AccountDataApi().get(Settings.instance.lastSync);
+        await AccountDataApi().get(Settings.instance.epochMap);
     if (accountDataResult.isErr) {
       await DataProvider.handleApiError(
         accountDataResult.err,
@@ -297,6 +301,7 @@ abstract class EntityDataProvider<T extends AtomicEntity>
       return false;
     } else {
       final accountData = accountDataResult.ok;
+      await Settings.instance.setEpochMap(accountData.epochMap);
       if (accountData.user != null) {
         await Account.updateUserFromDownSync(accountData.user!);
       }

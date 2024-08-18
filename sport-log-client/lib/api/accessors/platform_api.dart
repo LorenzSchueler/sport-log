@@ -1,5 +1,6 @@
 import 'package:sport_log/api/api.dart';
 import 'package:sport_log/helpers/result.dart';
+import 'package:sport_log/models/epoch/epoch_result.dart';
 import 'package:sport_log/models/platform/all.dart';
 
 class PlatformApi extends Api<Platform> {
@@ -16,17 +17,18 @@ class PlatformApi extends Api<Platform> {
   final route = '/platform';
 
   @override
-  Future<ApiResult<void>> postSingle(Platform object) async => Ok(null);
+  Future<ApiResult<EpochResult?>> postSingle(Platform object) async => Ok(null);
 
   @override
-  Future<ApiResult<void>> postMultiple(List<Platform> objects) async =>
+  Future<ApiResult<EpochResult?>> postMultiple(List<Platform> objects) async =>
       Ok(null);
 
   @override
-  Future<ApiResult<void>> putSingle(Platform object) async => Ok(null);
+  Future<ApiResult<EpochResult?>> putSingle(Platform object) async => Ok(null);
 
   @override
-  Future<ApiResult<void>> putMultiple(List<Platform> objects) async => Ok(null);
+  Future<ApiResult<EpochResult?>> putMultiple(List<Platform> objects) async =>
+      Ok(null);
 }
 
 class PlatformCredentialApi extends Api<PlatformCredential> {

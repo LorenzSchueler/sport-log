@@ -8,6 +8,8 @@ import 'package:sport_log/database/tables/cardio_tables.dart';
 import 'package:sport_log/helpers/extensions/sort_extension.dart';
 import 'package:sport_log/models/account_data/account_data.dart';
 import 'package:sport_log/models/cardio/all.dart';
+import 'package:sport_log/models/epoch/epoch_map.dart';
+import 'package:sport_log/models/epoch/epoch_result.dart';
 import 'package:sport_log/models/movement/movement.dart';
 
 class RouteDataProvider extends EntityDataProvider<Route> {
@@ -25,6 +27,11 @@ class RouteDataProvider extends EntityDataProvider<Route> {
 
   @override
   List<Route> getFromAccountData(AccountData accountData) => accountData.routes;
+
+  @override
+  void setEpoch(EpochMap epochMap, EpochResult epochResult) {
+    epochMap.route = epochResult.epoch;
+  }
 
   Future<List<Route>> getByName(String? name) async {
     return (await table.getNonDeleted())
@@ -48,6 +55,11 @@ class CardioSessionDataProvider extends EntityDataProvider<CardioSession> {
   @override
   List<CardioSession> getFromAccountData(AccountData accountData) =>
       accountData.cardioSessions;
+
+  @override
+  void setEpoch(EpochMap epochMap, EpochResult epochResult) {
+    epochMap.cardioSession = epochResult.epoch;
+  }
 
   Future<List<CardioSession>> getSimilarCardioSessions(
     CardioSessionDescription cardioSessionDescription,

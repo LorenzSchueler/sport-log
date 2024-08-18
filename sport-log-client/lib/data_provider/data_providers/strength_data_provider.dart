@@ -7,6 +7,8 @@ import 'package:sport_log/database/database.dart';
 import 'package:sport_log/database/tables/strength_tables.dart';
 import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/models/account_data/account_data.dart';
+import 'package:sport_log/models/epoch/epoch_map.dart';
+import 'package:sport_log/models/epoch/epoch_result.dart';
 import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/models/strength/all.dart';
 import 'package:sport_log/models/strength/strength_records.dart';
@@ -28,6 +30,11 @@ class StrengthSessionDataProvider extends EntityDataProvider<StrengthSession> {
   List<StrengthSession> getFromAccountData(AccountData accountData) =>
       accountData.strengthSessions;
 
+  @override
+  void setEpoch(EpochMap epochMap, EpochResult epochResult) {
+    epochMap.strengthSession = epochResult.epoch;
+  }
+
   Future<StrengthSession?> getLastByMovement(Movement movement) =>
       table.getLastByMovement(movement);
 }
@@ -48,6 +55,11 @@ class StrengthSetDataProvider extends EntityDataProvider<StrengthSet> {
   @override
   List<StrengthSet> getFromAccountData(AccountData accountData) =>
       accountData.strengthSets;
+
+  @override
+  void setEpoch(EpochMap epochMap, EpochResult epochResult) {
+    epochMap.strengthSet = epochResult.epoch;
+  }
 
   Future<List<StrengthSet>> getByStrengthSession(
     StrengthSession strengthSession,

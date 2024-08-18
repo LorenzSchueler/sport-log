@@ -7,6 +7,8 @@ import 'package:sport_log/database/table_accessor.dart';
 import 'package:sport_log/database/tables/platform_tables.dart';
 import 'package:sport_log/helpers/result.dart';
 import 'package:sport_log/models/account_data/account_data.dart';
+import 'package:sport_log/models/epoch/epoch_map.dart';
+import 'package:sport_log/models/epoch/epoch_result.dart';
 import 'package:sport_log/models/platform/all.dart';
 import 'package:sport_log/models/platform/platform_description.dart';
 
@@ -26,6 +28,11 @@ class PlatformDataProvider extends EntityDataProvider<Platform> {
   @override
   List<Platform> getFromAccountData(AccountData accountData) =>
       accountData.platforms;
+
+  @override
+  void setEpoch(EpochMap epochMap, EpochResult epochResult) {
+    epochMap.platform = epochResult.epoch;
+  }
 }
 
 class PlatformCredentialDataProvider
@@ -45,6 +52,11 @@ class PlatformCredentialDataProvider
   @override
   List<PlatformCredential> getFromAccountData(AccountData accountData) =>
       accountData.platformCredentials;
+
+  @override
+  void setEpoch(EpochMap epochMap, EpochResult epochResult) {
+    epochMap.platformCredential = epochResult.epoch;
+  }
 
   Future<PlatformCredential?> getByPlatform(Platform platform) =>
       table.getByPlatform(platform);

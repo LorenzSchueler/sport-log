@@ -5,6 +5,8 @@ import 'package:sport_log/config.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/lat_lng.dart';
 import 'package:sport_log/helpers/logger.dart';
+import 'package:sport_log/models/epoch/epoch_map.dart';
+import 'package:sport_log/models/epoch/epoch_result.dart';
 import 'package:sport_log/models/user/user.dart';
 
 enum Units {
@@ -29,7 +31,7 @@ class Settings extends ChangeNotifier {
   static const String _syncEnabled = "syncEnabled";
   static const String _serverUrl = "serverUrl";
   static const String _syncInterval = "syncInterval";
-  static const String _lastSync = "lastSync";
+  static const String _epochMap = "epochMap";
   static const String _checkForUpdates = "checkForUpdates";
   static const String _units = "units";
   static const String _weightIncrement = "weightIncrement";
@@ -50,7 +52,8 @@ class Settings extends ChangeNotifier {
       ..registerAdapter(LatLngAdapter())
       ..registerAdapter(CameraPositionAdapter())
       ..registerAdapter(TimeOfDayAdapter())
-      ..registerAdapter(Int64Adapter());
+      ..registerAdapter(Int64Adapter())
+      ..registerAdapter(EpochMapAdapter());
     _storage ??= await Hive.openBox(Config.hiveBoxName);
     await _setDefaults(override: override);
   }
@@ -70,8 +73,8 @@ class Settings extends ChangeNotifier {
     if (!_contains(_syncInterval) || override) {
       await _storage!.put(_syncInterval, _defaultSyncInterval);
     }
-    if (!_contains(_lastSync) || override) {
-      await _storage!.put(_lastSync, null);
+    if (!_contains(_epochMap) || override) {
+      await _storage!.put(_epochMap, null);
     }
     if (!_contains(_checkForUpdates) || override) {
       await _storage!.put(_checkForUpdates, true);
@@ -135,7 +138,7 @@ class Settings extends ChangeNotifier {
 
   String? _getStringOptional(String key) => _storage!.get(key) as String?;
 
-  DateTime? _getDateTimeOptional(String key) => _storage!.get(key) as DateTime?;
+  EpochMap? _getEpochMap(String key) => _storage!.get(_epochMap) as EpochMap?;
 
   Duration _getDuration(String key) => _storage!.get(key)! as Duration;
 
@@ -171,9 +174,25 @@ class Settings extends ChangeNotifier {
   Future<void> setDefaultSyncInterval() =>
       _put(_syncInterval, _defaultSyncInterval);
 
-  DateTime? get lastSync => _getDateTimeOptional(_lastSync);
+  EpochMap? get epochMap => _getEpochMap(_epochMap);
 
-  Future<void> setLastSync(DateTime? lastSync) => _put(_lastSync, lastSync);
+  Future<void> setEpochMap(EpochMap? map) {
+    map?.lastSync = DateTime.now();
+    return _put(_epochMap, map);
+  }
+
+  Future<void> setEpoch(
+    void Function(EpochMap, EpochResult) mutator,
+    EpochResult? epoch,
+  ) async {
+    if (epoch == null || epoch.epoch <= 0) {
+      return;
+    }
+    final map = epochMap ?? EpochMap.zero();
+    mutator(map, epoch);
+    map.lastSync = DateTime.now();
+    await setEpochMap(map);
+  }
 
   bool get checkForUpdates => _getBool(_checkForUpdates);
 
@@ -332,5 +351,58 @@ class Int64Adapter extends TypeAdapter<Int64> {
   @override
   void write(BinaryWriter writer, Int64 obj) {
     writer.writeString(obj.toString());
+  }
+}
+
+class EpochMapAdapter extends TypeAdapter<EpochMap> {
+  @override
+  final typeId = 5;
+
+  @override
+  EpochMap read(BinaryReader reader) {
+    final values = reader.readList();
+    return EpochMap(
+      user: values[0] as Int64,
+      diary: values[1] as Int64,
+      wod: values[2] as Int64,
+      movement: values[3] as Int64,
+      strengthSession: values[4] as Int64,
+      strengthSet: values[5] as Int64,
+      metcon: values[6] as Int64,
+      metconSession: values[7] as Int64,
+      metconMovement: values[8] as Int64,
+      cardioSession: values[9] as Int64,
+      route: values[10] as Int64,
+      platform: values[11] as Int64,
+      platformCredential: values[12] as Int64,
+      actionProvider: values[13] as Int64,
+      action: values[14] as Int64,
+      actionRule: values[15] as Int64,
+      actionEvent: values[16] as Int64,
+    )..lastSync = values[17] as DateTime;
+  }
+
+  @override
+  void write(BinaryWriter writer, EpochMap obj) {
+    writer.writeList([
+      obj.user,
+      obj.diary,
+      obj.wod,
+      obj.movement,
+      obj.strengthSession,
+      obj.strengthSet,
+      obj.metcon,
+      obj.metconSession,
+      obj.metconMovement,
+      obj.cardioSession,
+      obj.route,
+      obj.platform,
+      obj.platformCredential,
+      obj.actionProvider,
+      obj.action,
+      obj.actionRule,
+      obj.actionEvent,
+      obj.lastSync,
+    ]);
   }
 }

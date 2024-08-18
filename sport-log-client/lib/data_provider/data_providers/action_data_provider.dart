@@ -6,6 +6,8 @@ import 'package:sport_log/database/tables/action_tables.dart';
 import 'package:sport_log/models/account_data/account_data.dart';
 import 'package:sport_log/models/action/action_provider_description.dart';
 import 'package:sport_log/models/action/all.dart';
+import 'package:sport_log/models/epoch/epoch_map.dart';
+import 'package:sport_log/models/epoch/epoch_result.dart';
 import 'package:sport_log/models/platform/platform.dart';
 
 class ActionProviderDataProvider extends EntityDataProvider<ActionProvider> {
@@ -24,6 +26,11 @@ class ActionProviderDataProvider extends EntityDataProvider<ActionProvider> {
   @override
   List<ActionProvider> getFromAccountData(AccountData accountData) =>
       accountData.actionProviders;
+
+  @override
+  void setEpoch(EpochMap epochMap, EpochResult epochResult) {
+    epochMap.actionProvider = epochResult.epoch;
+  }
 
   Future<List<ActionProvider>> getByPlatform(Platform platform) =>
       table.getByPlatform(platform);
@@ -46,6 +53,11 @@ class ActionDataProvider extends EntityDataProvider<Action> {
   List<Action> getFromAccountData(AccountData accountData) =>
       accountData.actions;
 
+  @override
+  void setEpoch(EpochMap epochMap, EpochResult epochResult) {
+    epochMap.action = epochResult.epoch;
+  }
+
   Future<List<Action>> getByActionProvider(ActionProvider actionProvider) =>
       table.getByActionProvider(actionProvider);
 }
@@ -67,6 +79,11 @@ class ActionRuleDataProvider extends EntityDataProvider<ActionRule> {
   List<ActionRule> getFromAccountData(AccountData accountData) =>
       accountData.actionRules;
 
+  @override
+  void setEpoch(EpochMap epochMap, EpochResult epochResult) {
+    epochMap.actionRule = epochResult.epoch;
+  }
+
   Future<List<ActionRule>> getByActionProvider(ActionProvider actionProvider) =>
       table.getByActionProvider(actionProvider);
 }
@@ -87,6 +104,11 @@ class ActionEventDataProvider extends EntityDataProvider<ActionEvent> {
   @override
   List<ActionEvent> getFromAccountData(AccountData accountData) =>
       accountData.actionEvents;
+
+  @override
+  void setEpoch(EpochMap epochMap, EpochResult epochResult) {
+    epochMap.actionEvent = epochResult.epoch;
+  }
 
   Future<List<ActionEvent>> getByActionProvider(
     ActionProvider actionProvider,

@@ -3,13 +3,13 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:fixnum/fixnum.dart';
 import 'package:http/http.dart';
 import 'package:http/io_client.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/config.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/helpers/result.dart';
+import 'package:sport_log/models/epoch/epoch_result.dart';
 import 'package:sport_log/models/error_message.dart';
 import 'package:sport_log/settings.dart';
 
@@ -197,50 +197,42 @@ abstract class Api<T extends JsonSerializable> {
   Uri get _uri => uriFromRoute(route);
   Map<String, dynamic> _toJson(T object) => object.toJson();
 
-  Future<ApiResult<T>> getSingle(Int64 id) =>
-      (Request("get", Uri.parse("$_uri?id=$id"))
-            ..headers.addAll(ApiHeaders.basicAuth))
+  Future<ApiResult<EpochResult?>> postSingle(T object) => (Request("post", _uri)
+            ..headers.addAll(ApiHeaders.basicAuthContentTypeJson)
+            ..body = jsonEncode(_toJson(object)))
           .toApiResultWithValue(
-        (json) => fromJson(json as Map<String, dynamic>),
+        (json) => EpochResult.fromJson((json as Map).cast()),
       );
 
-  Future<ApiResult<List<T>>> getMultiple() =>
-      (Request("get", _uri)..headers.addAll(ApiHeaders.basicAuth))
-          .toApiResultWithValue(
-        (json) => (json as List<dynamic>)
-            .cast<Map<String, dynamic>>()
-            .map(fromJson)
-            .toList(),
-      );
-
-  Future<ApiResult<void>> postSingle(T object) => (Request("post", _uri)
-        ..headers.addAll(ApiHeaders.basicAuthContentTypeJson)
-        ..body = jsonEncode(_toJson(object)))
-      .toApiResult();
-
-  Future<ApiResult<void>> postMultiple(List<T> objects) async {
+  Future<ApiResult<EpochResult?>> postMultiple(List<T> objects) async {
     if (objects.isEmpty) {
       return Ok(null);
     }
     return (Request("post", _uri)
           ..headers.addAll(ApiHeaders.basicAuthContentTypeJson)
           ..body = jsonEncode(objects.map(_toJson).toList()))
-        .toApiResult();
+        .toApiResultWithValue(
+      (json) => EpochResult.fromJson((json as Map).cast()),
+    );
   }
 
-  Future<ApiResult<void>> putSingle(T object) => (Request("put", _uri)
-        ..headers.addAll(ApiHeaders.basicAuthContentTypeJson)
-        ..body = jsonEncode(_toJson(object)))
-      .toApiResult();
+  Future<ApiResult<EpochResult?>> putSingle(T object) => (Request("put", _uri)
+            ..headers.addAll(ApiHeaders.basicAuthContentTypeJson)
+            ..body = jsonEncode(_toJson(object)))
+          .toApiResultWithValue(
+        (json) => EpochResult.fromJson((json as Map).cast()),
+      );
 
-  Future<ApiResult<void>> putMultiple(List<T> objects) async {
+  Future<ApiResult<EpochResult?>> putMultiple(List<T> objects) async {
     if (objects.isEmpty) {
       return Ok(null);
     }
     return (Request("put", _uri)
           ..headers.addAll(ApiHeaders.basicAuthContentTypeJson)
           ..body = jsonEncode(objects.map(_toJson).toList()))
-        .toApiResult();
+        .toApiResultWithValue(
+      (json) => EpochResult.fromJson((json as Map).cast()),
+    );
   }
 }
 

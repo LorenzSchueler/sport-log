@@ -8,6 +8,8 @@ import 'package:sport_log/database/tables/metcon_tables.dart';
 import 'package:sport_log/helpers/extensions/sort_extension.dart';
 import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/models/all.dart';
+import 'package:sport_log/models/epoch/epoch_map.dart';
+import 'package:sport_log/models/epoch/epoch_result.dart';
 import 'package:sport_log/models/metcon/metcon_records.dart';
 
 class MetconDataProvider extends EntityDataProvider<Metcon> {
@@ -26,6 +28,11 @@ class MetconDataProvider extends EntityDataProvider<Metcon> {
   @override
   List<Metcon> getFromAccountData(AccountData accountData) =>
       accountData.metcons;
+
+  @override
+  void setEpoch(EpochMap epochMap, EpochResult epochResult) {
+    epochMap.metcon = epochResult.epoch;
+  }
 
   Future<List<Metcon>> getByName(String? name) async {
     return (await table.getNonDeleted())
@@ -50,6 +57,11 @@ class MetconMovementDataProvider extends EntityDataProvider<MetconMovement> {
   List<MetconMovement> getFromAccountData(AccountData accountData) =>
       accountData.metconMovements;
 
+  @override
+  void setEpoch(EpochMap epochMap, EpochResult epochResult) {
+    epochMap.metconMovement = epochResult.epoch;
+  }
+
   Future<List<MetconMovement>> getByMetcon(Metcon metcon) =>
       table.getByMetcon(metcon);
 }
@@ -70,6 +82,11 @@ class MetconSessionDataProvider extends EntityDataProvider<MetconSession> {
   @override
   List<MetconSession> getFromAccountData(AccountData accountData) =>
       accountData.metconSessions;
+
+  @override
+  void setEpoch(EpochMap epochMap, EpochResult epochResult) {
+    epochMap.metconSession = epochResult.epoch;
+  }
 
   Future<bool> existsByMetcon(Metcon metcon) => table.existsByMetcon(metcon);
 

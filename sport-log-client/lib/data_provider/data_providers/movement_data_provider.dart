@@ -5,6 +5,8 @@ import 'package:sport_log/database/database.dart';
 import 'package:sport_log/database/tables/movement_table.dart';
 import 'package:sport_log/helpers/extensions/sort_extension.dart';
 import 'package:sport_log/models/account_data/account_data.dart';
+import 'package:sport_log/models/epoch/epoch_map.dart';
+import 'package:sport_log/models/epoch/epoch_result.dart';
 import 'package:sport_log/models/movement/all.dart';
 
 class MovementDataProvider extends EntityDataProvider<Movement> {
@@ -23,6 +25,11 @@ class MovementDataProvider extends EntityDataProvider<Movement> {
   @override
   List<Movement> getFromAccountData(AccountData accountData) =>
       accountData.movements;
+
+  @override
+  void setEpoch(EpochMap epochMap, EpochResult epochResult) {
+    epochMap.movement = epochResult.epoch;
+  }
 
   Future<void> setDefaultMovement() async {
     final movement = await table.getDefaultMovement();
