@@ -142,7 +142,7 @@ class Config extends JsonSerializable {
   late final flavor =
       packageName.endsWith(".dev") ? "development" : "production";
 
-  static final Version apiVersion = Version(0, 3);
+  static final Version apiVersion = Version(0, 4);
   // ignore: do_not_use_environment
   static const String gitRef = String.fromEnvironment("GIT_REF");
 

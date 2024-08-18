@@ -2,11 +2,9 @@ use const_format::concatcp;
 
 pub const VERSION: &str = "/version";
 
-pub const VERSION_0_1: &str = "0.3";
-pub const VERSION_0_2: &str = "0.3";
-pub const VERSION_0_3: &str = "0.3";
-pub const MIN_VERSION: &str = VERSION_0_3;
-pub const MAX_VERSION: &str = VERSION_0_3;
+pub const VERSION_0_4: &str = "0.4";
+pub const MIN_VERSION: &str = VERSION_0_4;
+pub const MAX_VERSION: &str = VERSION_0_4;
 
 pub fn route_max_version(address: &str, route: &str, query: Option<&[(&str, &str)]>) -> String {
     if let (Some(query), Some(false)) = (query, query.map(<[_]>::is_empty)) {
