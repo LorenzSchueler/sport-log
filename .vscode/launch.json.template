@@ -1,5 +1,16 @@
 {
     "version": "0.2.0",
+    "inputs": [
+        {
+            "id": "GIT_REF",
+            "type": "command",
+            "command": "shellCommand.execute",
+            "args": {
+                "command": "git show-ref --head --hash=7 HEAD",
+                "useFirstResult": "true",
+            }
+        }
+    ],
     "configurations": [
         {
             "name": "sport-log-client (debug)",
@@ -14,7 +25,7 @@
             ],
             "toolArgs": [
                 "--dart-define",
-                "GIT_REF=$(git show-ref --head --hash=7 HEAD)",
+                "GIT_REF=${input:GIT_REF}",
             ],
             "env": {
                 "SDK_REGISTRY_TOKEN": "<token>"
@@ -33,7 +44,7 @@
             ],
             "toolArgs": [
                 "--dart-define",
-                "GIT_REF=$(git show-ref --head --hash=7 HEAD)",
+                "GIT_REF=${input:GIT_REF}",
             ],
             "env": {
                 "SDK_REGISTRY_TOKEN": "<token>"
@@ -52,7 +63,7 @@
             ],
             "toolArgs": [
                 "--dart-define",
-                "GIT_REF=$(git show-ref --head --hash=7 HEAD)",
+                "GIT_REF=${input:GIT_REF}",
             ],
             "env": {
                 "SDK_REGISTRY_TOKEN": "<token>"
