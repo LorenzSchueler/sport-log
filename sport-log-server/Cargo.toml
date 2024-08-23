@@ -20,7 +20,7 @@ tower-http = { version = "0.5", features = [
     "compression-gzip",
     "decompression-gzip",
 ] }
-diesel = { version = "2.2.0" }
+diesel = { version = "2.2.3" }
 diesel-async = { version = "0.5", features = [
     "postgres",
     "deadpool",
