@@ -86,6 +86,9 @@ class AppTheme {
     sliderTheme: SliderThemeData(
       overlayShape: SliderComponentShape.noOverlay,
     ),
+    progressIndicatorTheme: ProgressIndicatorThemeData(
+      linearTrackColor: _colorScheme.surfaceContainerHighest,
+    ),
     // input decoration for InputDecorator, TextField, and TextFormField
     inputDecorationTheme: InputDecorationTheme(
       contentPadding: const EdgeInsets.symmetric(vertical: 5),

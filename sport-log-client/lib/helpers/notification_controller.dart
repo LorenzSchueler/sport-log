@@ -1,5 +1,5 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
-import 'package:open_file/open_file.dart';
+import 'package:open_file_plus/open_file_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:sport_log/helpers/request_permission.dart';
 

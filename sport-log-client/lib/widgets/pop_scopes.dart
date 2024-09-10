@@ -35,7 +35,7 @@ class DiscardWarningOnPop extends StatelessWidget {
   Widget build(BuildContext context) {
     return PopScope(
       canPop: false,
-      onPopInvoked: (didPop) => onPopInvoked(context, didPop),
+      onPopInvokedWithResult: (didPop, _) => onPopInvoked(context, didPop),
       child: child,
     );
   }
