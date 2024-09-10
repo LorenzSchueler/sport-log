@@ -189,7 +189,7 @@ async fn login(config: &Config, mode: Mode) -> Result<()> {
         return Ok(());
     }
 
-    for p in System::new_all().processes_by_name(GECKODRIVER) {
+    for p in System::new_all().processes_by_name(GECKODRIVER.as_ref()) {
         p.kill();
     }
 

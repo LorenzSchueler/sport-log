@@ -13,7 +13,7 @@ tokio = { version = "1.9", features = ["full"] }
 axum = { version = "0.7", features = ["macros"] }
 axum-extra = { version = "0.9", features = ["async-read-body", "typed-header"] }
 hyper = "1.0"
-tower = { version = "0.4", features = ["util"] }
+tower = { version = "0.5.0", features = ["util"] }
 tower-http = { version = "0.5", features = [
     "trace",
     "sensitive-headers",
