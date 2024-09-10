@@ -218,13 +218,13 @@ class MapController {
         geometry: latLng.toPoint(),
         circleRadius: _markerRadius,
         circleColor: color,
-        circleOpacity: 0.5,
+        circleOpacity: 0.8,
       ),
       CircleAnnotationOptions(
         geometry: latLng.toPoint(),
         circleRadius: isGps ? _gpsMarkerRadius : _noGpsMarkerRadius,
         circleColor: color,
-        circleOpacity: 0.3,
+        circleOpacity: 0.4,
       ),
     ]))
         ?.cast();

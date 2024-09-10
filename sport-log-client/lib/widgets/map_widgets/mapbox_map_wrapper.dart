@@ -81,7 +81,7 @@ class _MapboxMapWrapperState extends State<MapboxMapWrapper> {
   MapController? _mapController;
   final LocationUtils _locationUtils = LocationUtils(inBackground: false);
 
-  bool _centerLocation = true;
+  final Pointer<bool> _centerLocation = Pointer(true);
   Route? _selectedRoute;
 
   final NullablePointer<List<CircleAnnotation>> _currentLocationMarker =
@@ -201,10 +201,13 @@ class _MapboxMapWrapperState extends State<MapboxMapWrapper> {
                 ],
                 if (widget.showCenterLocationButton) ...[
                   ToggleCenterLocationButton(
-                    centerLocation: _centerLocation,
+                    centerLocation: _centerLocation.object,
                     onToggle: () {
-                      setState(() => _centerLocation = !_centerLocation);
-                      widget.onCenterLocationToggle?.call(_centerLocation);
+                      setState(
+                        () => _centerLocation.object = !_centerLocation.object,
+                      );
+                      widget.onCenterLocationToggle
+                          ?.call(_centerLocation.object);
                     },
                   ),
                   Defaults.sizedBox.vertical.normal,

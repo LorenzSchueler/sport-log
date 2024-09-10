@@ -18,7 +18,7 @@ class CurrentLocationButton extends StatelessWidget {
 
   final MapController mapController;
   final LocationUtils locationUtils;
-  final bool centerLocation;
+  final Pointer<bool> centerLocation;
   final NullablePointer<List<CircleAnnotation>> currentLocationMarker;
 
   Future<void> _toggleCurrentLocation() async {
@@ -38,7 +38,7 @@ class CurrentLocationButton extends StatelessWidget {
   }
 
   Future<void> _onLocationUpdate(GpsPosition location) async {
-    if (centerLocation) {
+    if (centerLocation.object) {
       await mapController.animateCenter(location.latLng);
     }
     await mapController.updateCurrentLocationMarker(
