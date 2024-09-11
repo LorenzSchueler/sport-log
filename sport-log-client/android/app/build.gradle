@@ -110,4 +110,7 @@ flutter {
     source '../..'
 }
 
-dependencies {}
+dependencies {
+    implementation 'org.joda:joda-convert:2.2.1'
+    implementation 'com.google.j2objc:j2objc-annotations:1.3'
+}
