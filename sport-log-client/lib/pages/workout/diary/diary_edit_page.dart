@@ -4,11 +4,13 @@ import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/validation.dart';
 import 'package:sport_log/models/diary/diary.dart';
+import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/dialogs.dart';
 import 'package:sport_log/widgets/input_fields/edit_tile.dart';
 import 'package:sport_log/widgets/picker/datetime_picker.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
+import 'package:sport_log/widgets/sync_status_button.dart';
 
 class DiaryEditPage extends StatefulWidget {
   const DiaryEditPage({this.diary, super.key});
@@ -93,6 +95,11 @@ class _DiaryEditPageState extends State<DiaryEditPage> {
             key: _formKey,
             child: Column(
               children: [
+                if (Settings.instance.developerMode)
+                  SyncStatusButton(
+                    entity: _diary,
+                    dataProvider: DiaryDataProvider(),
+                  ),
                 EditTile(
                   leading: AppIcons.calendar,
                   caption: "Date",

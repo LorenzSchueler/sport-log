@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart' hide Route;
-import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
+import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' hide Settings;
 import 'package:sport_log/data_provider/data_providers/cardio_data_provider.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
@@ -9,6 +9,7 @@ import 'package:sport_log/helpers/pointer.dart';
 import 'package:sport_log/helpers/validation.dart';
 import 'package:sport_log/models/cardio/cardio_session_description.dart';
 import 'package:sport_log/routes.dart';
+import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/dialogs.dart';
 import 'package:sport_log/widgets/input_fields/edit_tile.dart';
@@ -16,6 +17,7 @@ import 'package:sport_log/widgets/map_widgets/mapbox_map_wrapper.dart';
 import 'package:sport_log/widgets/picker/datetime_picker.dart';
 import 'package:sport_log/widgets/picker/picker.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
+import 'package:sport_log/widgets/sync_status_button.dart';
 
 class CardioEditPage extends StatefulWidget {
   const CardioEditPage({
@@ -293,6 +295,11 @@ class _CardioEditPageState extends State<CardioEditPage> {
         ),
         body: Column(
           children: [
+            if (Settings.instance.developerMode)
+              SyncStatusButton(
+                entity: _cardioSessionDescription.cardioSession,
+                dataProvider: CardioSessionDataProvider(),
+              ),
             if (_cardioSessionDescription.cardioSession.track != null)
               SizedBox(
                 height: 250,

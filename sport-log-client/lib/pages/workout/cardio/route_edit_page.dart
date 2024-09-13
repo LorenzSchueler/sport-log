@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart' hide Route;
-import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' hide Position;
+import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart'
+    hide Position, Settings;
 import 'package:sport_log/data_provider/data_providers/cardio_data_provider.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/bool_toggle.dart';
@@ -11,6 +12,7 @@ import 'package:sport_log/helpers/route_planning_utils.dart';
 import 'package:sport_log/helpers/validation.dart';
 import 'package:sport_log/models/cardio/all.dart';
 import 'package:sport_log/pages/workout/cardio/route_value_unit_description_table.dart';
+import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/dialogs.dart';
 import 'package:sport_log/widgets/map_widgets/mapbox_map_wrapper.dart';
@@ -18,6 +20,7 @@ import 'package:sport_log/widgets/map_widgets/static_mapbox_map.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
 import 'package:sport_log/widgets/provider_consumer.dart';
 import 'package:sport_log/widgets/snackbar.dart';
+import 'package:sport_log/widgets/sync_status_button.dart';
 import 'package:synchronized/synchronized.dart';
 
 class RouteEditPage extends StatefulWidget {
@@ -260,6 +263,11 @@ class _RouteEditPageState extends State<RouteEditPage> {
             key: _formKey,
             child: Column(
               children: [
+                if (fullscreen.isOff && Settings.instance.developerMode)
+                  SyncStatusButton(
+                    entity: _route,
+                    dataProvider: RouteDataProvider(),
+                  ),
                 Expanded(
                   child: Stack(
                     children: [

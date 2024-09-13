@@ -3,11 +3,13 @@ import 'package:sport_log/data_provider/data_providers/wod_data_provider.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/models/wod/wod.dart';
+import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/dialogs.dart';
 import 'package:sport_log/widgets/input_fields/edit_tile.dart';
 import 'package:sport_log/widgets/picker/datetime_picker.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
+import 'package:sport_log/widgets/sync_status_button.dart';
 
 class WodEditPage extends StatefulWidget {
   const WodEditPage({this.wod, super.key});
@@ -92,6 +94,11 @@ class _WodEditPageState extends State<WodEditPage> {
             key: _formKey,
             child: Column(
               children: [
+                if (Settings.instance.developerMode)
+                  SyncStatusButton(
+                    entity: _wod,
+                    dataProvider: WodDataProvider(),
+                  ),
                 EditTile(
                   leading: AppIcons.calendar,
                   caption: "Date",

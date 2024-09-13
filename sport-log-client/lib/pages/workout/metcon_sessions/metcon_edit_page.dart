@@ -6,6 +6,7 @@ import 'package:sport_log/helpers/validation.dart';
 import 'package:sport_log/models/metcon/all.dart';
 import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/pages/workout/set_input/new_set_input.dart';
+import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/dialogs.dart';
 import 'package:sport_log/widgets/input_fields/duration_input.dart';
@@ -13,6 +14,7 @@ import 'package:sport_log/widgets/input_fields/edit_tile.dart';
 import 'package:sport_log/widgets/input_fields/int_input.dart';
 import 'package:sport_log/widgets/picker/picker.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
+import 'package:sport_log/widgets/sync_status_button.dart';
 
 class MetconEditPage extends StatefulWidget {
   const MetconEditPage({
@@ -121,6 +123,11 @@ class _MetconEditPageState extends State<MetconEditPage> {
             key: _formKey,
             child: ListView(
               children: [
+                if (Settings.instance.developerMode)
+                  SyncStatusButton(
+                    entity: _metconDescription.metcon,
+                    dataProvider: MetconDataProvider(),
+                  ),
                 _nameInput(),
                 _descriptionInput(),
                 Defaults.sizedBox.vertical.small,

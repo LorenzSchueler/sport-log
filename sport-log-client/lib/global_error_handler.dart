@@ -51,7 +51,7 @@ class GlobalErrorHandler {
 
     final file = await writeToFile(
       content: descriptionAndStack,
-      filename: Config.debugMode ? "sport-log(debug)" : "sport-log",
+      filename: Config.debugMode ? "sport-log-debug" : "sport-log",
       fileExtension: "log",
       append: true,
     );

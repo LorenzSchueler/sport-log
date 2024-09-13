@@ -293,4 +293,26 @@ abstract class TableAccessor<T extends AtomicEntity> {
       );
     });
   }
+
+  Future<SyncStatus?> getSyncStatus(T object) async {
+    final result = await database.query(
+      tableName,
+      columns: [Columns.syncStatus],
+      where: "${Columns.id} = ?",
+      whereArgs: [object.id.toInt()],
+    );
+    return result.isEmpty
+        ? null
+        : SyncStatus.values[result.first[Columns.syncStatus]! as int];
+  }
+
+  Future<DbResult> setSyncStatus(T object, SyncStatus syncStatus) async {
+    final changes = await database.update(
+      tableName,
+      {Columns.syncStatus: syncStatus.index},
+      where: '${Columns.id} = ?',
+      whereArgs: [object.id.toInt()],
+    );
+    return DbResultExt.fromBool(changes == 1);
+  }
 }

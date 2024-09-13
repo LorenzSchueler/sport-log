@@ -5,6 +5,7 @@ import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/page_return.dart';
 import 'package:sport_log/models/all.dart';
+import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/dialogs.dart';
 import 'package:sport_log/widgets/input_fields/duration_input.dart';
@@ -13,6 +14,7 @@ import 'package:sport_log/widgets/input_fields/int_input.dart';
 import 'package:sport_log/widgets/picker/datetime_picker.dart';
 import 'package:sport_log/widgets/picker/picker.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
+import 'package:sport_log/widgets/sync_status_button.dart';
 
 class MetconSessionEditPage extends StatefulWidget {
   const MetconSessionEditPage({
@@ -118,6 +120,11 @@ class _MetconSessionEditPageState extends State<MetconSessionEditPage> {
             key: _formKey,
             child: ListView(
               children: [
+                if (Settings.instance.developerMode)
+                  SyncStatusButton(
+                    entity: _metconSessionDescription.metconSession,
+                    dataProvider: MetconSessionDataProvider(),
+                  ),
                 EditTile(
                   leading: AppIcons.notes,
                   caption: "Metcon",

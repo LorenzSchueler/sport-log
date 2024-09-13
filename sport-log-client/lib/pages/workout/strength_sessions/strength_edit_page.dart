@@ -8,6 +8,7 @@ import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/helpers/page_return.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/pages/workout/set_input/new_set_input.dart';
+import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/dialogs.dart';
 import 'package:sport_log/widgets/input_fields/duration_input.dart';
@@ -15,6 +16,7 @@ import 'package:sport_log/widgets/input_fields/edit_tile.dart';
 import 'package:sport_log/widgets/picker/datetime_picker.dart';
 import 'package:sport_log/widgets/picker/picker.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
+import 'package:sport_log/widgets/sync_status_button.dart';
 
 class StrengthEditPage extends StatefulWidget {
   const StrengthEditPage({
@@ -173,6 +175,11 @@ class _StrengthEditPageState extends State<StrengthEditPage> {
           padding: Defaults.edgeInsets.normal,
           child: Column(
             children: [
+              if (Settings.instance.developerMode)
+                SyncStatusButton(
+                  entity: _strengthSessionDescription.session,
+                  dataProvider: StrengthSessionDataProvider(),
+                ),
               _movementInput,
               _dateTimeInput,
               _intervalInput,
