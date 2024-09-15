@@ -16,6 +16,7 @@ import 'package:sport_log/pages/movements/movement_overview_page.dart';
 import 'package:sport_log/pages/offline_maps/offline_maps_overview.dart';
 import 'package:sport_log/pages/platform_not_supported_page.dart';
 import 'package:sport_log/pages/settings/about_page.dart';
+import 'package:sport_log/pages/settings/dev_status_page.dart';
 import 'package:sport_log/pages/settings/settings_page.dart';
 import 'package:sport_log/pages/timer/timer_page.dart';
 import 'package:sport_log/pages/workout/cardio/cardio_cut_page.dart';
@@ -56,6 +57,7 @@ abstract class Routes {
   static const offlineMaps = "/offline_maps";
   static const heartRate = "/heart_rate";
   static const settings = "/settings";
+  static const devStatus = "/dev_status";
   static const about = "/about";
   // platform & ap
   static const String platformOverview = '/action/platform_overview';
@@ -137,6 +139,7 @@ abstract class Routes {
     Routes.heartRate: (context) =>
         _checkUserIdAndroidIos(context, () => const HeartRatePage()),
     Routes.settings: (_) => _checkUserId(() => const SettingsPage()),
+    Routes.devStatus: (_) => _checkUserId(() => const DevStatusPage()),
     Routes.about: (_) => _checkUserId(() => const AboutPage()),
     // platform & ap
     Routes.platformOverview: (_) =>

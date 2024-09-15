@@ -280,6 +280,9 @@ abstract class EntityDataProvider<T extends AtomicEntity>
   Future<DbResult> setSyncStatus(T object, SyncStatus syncStatus) =>
       table.setSyncStatus(object, syncStatus);
 
+  Future<Map<SyncStatus, int>> getCountBySyncStatus() =>
+      table.getCountBySyncStatus();
+
   static Future<bool> upSync({required VoidCallback? onNoInternet}) async {
     // order matters => no parallel execution possible
     for (final dp in EntityDataProvider.all) {

@@ -322,4 +322,18 @@ abstract class TableAccessor<T extends AtomicEntity> {
     );
     return DbResultExt.fromBool(changes == 1);
   }
+
+  Future<Map<SyncStatus, int>> getCountBySyncStatus() async {
+    final result = await database.query(
+      tableName,
+      columns: [Columns.syncStatus, "count(${Columns.id})"],
+      where: notDeleted,
+      groupBy: Columns.syncStatus,
+    );
+    return {
+      for (final row in result)
+        SyncStatus.values[row[Columns.syncStatus]! as int]:
+            row["count(id)"]! as int,
+    };
+  }
 }

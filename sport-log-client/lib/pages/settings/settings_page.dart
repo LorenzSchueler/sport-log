@@ -482,6 +482,19 @@ class SettingsPage extends StatelessWidget {
                   value: settings.developerMode,
                   onChanged: settings.setDeveloperMode,
                 ),
+                if (settings.developerMode)
+                  EditTile(
+                    leading: AppIcons.bulletedList,
+                    child: ConstrainedBox(
+                      constraints:
+                          const BoxConstraints(minWidth: double.infinity),
+                      child: ElevatedButton(
+                        child: const Text('Dev Status'),
+                        onPressed: () =>
+                            Navigator.pushNamed(context, Routes.devStatus),
+                      ),
+                    ),
+                  ),
                 const Divider(),
                 const CaptionTile(caption: "Export"),
                 EditTile(
