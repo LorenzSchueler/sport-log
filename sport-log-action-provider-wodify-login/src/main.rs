@@ -315,7 +315,7 @@ async fn wodify_login(
         .click()
         .await?;
 
-    time::sleep(StdDuration::from_secs(5)).await;
+    time::sleep(StdDuration::from_secs(10)).await;
 
     if let Ok(feedback) = driver.find(By::ClassName("feedback-message-text")).await {
         if feedback.inner_html().await? == "Invalid email or password." {
