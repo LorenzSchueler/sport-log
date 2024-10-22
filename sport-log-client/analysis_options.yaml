@@ -40,7 +40,6 @@ linter:
     eol_at_end_of_file: true
     join_return_with_assignment: true
     leading_newlines_in_multiline_strings: true
-    no_default_cases: true
     noop_primitive_operations: true
     no_runtimeType_toString: true
     omit_local_variable_types: true

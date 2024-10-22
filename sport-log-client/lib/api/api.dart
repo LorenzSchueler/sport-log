@@ -139,18 +139,8 @@ extension RequestExtension on Request {
       return Err(ApiError(ApiErrorType.serverUnreachable, null));
     } on HttpException {
       return Err(ApiError(ApiErrorType.serverUnreachable, null));
-    } on OSError catch (error, stackTrace) {
-      if (error.message.contains("Software caused connection abort")) {
-        return Err(ApiError(ApiErrorType.serverUnreachable, null));
-      } else {
-        _logger.e(
-          "unknown error",
-          error: error,
-          caughtBy: "RequestExtension._handlerError",
-          stackTrace: stackTrace,
-        );
-        return Err(ApiError(ApiErrorType.unknownRequestError, null));
-      }
+    } on ClientException {
+      return Err(ApiError(ApiErrorType.serverUnreachable, null));
     } on TypeError {
       return Err(ApiError(ApiErrorType.badJson, null));
     } catch (error, stackTrace) {

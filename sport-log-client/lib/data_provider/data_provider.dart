@@ -59,7 +59,6 @@ abstract class DataProvider<T> extends ChangeNotifier {
         );
         _logger.d(conflictResolution);
         return conflictResolution;
-      // ignore: no_default_cases
       default:
         _logger.e(
           "api error",
