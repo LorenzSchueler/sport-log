@@ -75,6 +75,7 @@ fn none<T>() -> Option<T> {
     None
 }
 
+#[allow(clippy::result_large_err)]
 fn check_password(password: &str) -> HandlerResult<()> {
     if password.len() >= 8
         && password.chars().any(char::is_lowercase)
