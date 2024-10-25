@@ -222,50 +222,49 @@ class CardioTrackingSettingsPage extends StatelessWidget {
                     ),
                   ),
                 ),
-                trackingSettings.heartRateUtils.devices.isEmpty
-                    ? EditTile(
-                        leading: AppIcons.heartbeat,
-                        caption: "Heart Rate Monitor",
-                        child: Text(
-                          trackingSettings.heartRateUtils.isSearching
-                              ? "Searching..."
-                              : "No Device",
-                        ),
-                        onTap: () async {
-                          await trackingSettings.heartRateUtils.searchDevices();
-                          if (context.mounted &&
-                              trackingSettings.heartRateUtils.devices.isEmpty) {
-                            showSimpleToast(context, "No devices found.");
-                          }
-                        },
-                      )
-                    : EditTile(
-                        leading: AppIcons.heartbeat,
-                        caption: "Heart Rate Monitors",
-                        onTrailingTap: trackingSettings.heartRateUtils.reset,
-                        child: DropdownButtonHideUnderline(
-                          child: DropdownButton(
-                            value: trackingSettings.heartRateUtils.deviceId,
-                            items:
-                                trackingSettings.heartRateUtils.devices.entries
-                                    .map(
-                                      (d) => DropdownMenuItem(
-                                        value: d.value,
-                                        child: Text(d.key),
-                                      ),
-                                    )
-                                    .toList(),
-                            onChanged: (deviceId) {
-                              if (deviceId != null) {
-                                trackingSettings.heartRateUtils.deviceId =
-                                    deviceId;
-                              }
-                            },
-                            isDense: true,
-                          ),
+              ],
+              trackingSettings.heartRateUtils.devices.isEmpty
+                  ? EditTile(
+                      leading: AppIcons.heartbeat,
+                      caption: "Heart Rate Monitor",
+                      child: Text(
+                        trackingSettings.heartRateUtils.isSearching
+                            ? "Searching..."
+                            : "No Device",
+                      ),
+                      onTap: () async {
+                        await trackingSettings.heartRateUtils.searchDevices();
+                        if (context.mounted &&
+                            trackingSettings.heartRateUtils.devices.isEmpty) {
+                          showSimpleToast(context, "No devices found.");
+                        }
+                      },
+                    )
+                  : EditTile(
+                      leading: AppIcons.heartbeat,
+                      caption: "Heart Rate Monitors",
+                      onTrailingTap: trackingSettings.heartRateUtils.reset,
+                      child: DropdownButtonHideUnderline(
+                        child: DropdownButton(
+                          value: trackingSettings.heartRateUtils.deviceId,
+                          items: trackingSettings.heartRateUtils.devices.entries
+                              .map(
+                                (d) => DropdownMenuItem(
+                                  value: d.value,
+                                  child: Text(d.key),
+                                ),
+                              )
+                              .toList(),
+                          onChanged: (deviceId) {
+                            if (deviceId != null) {
+                              trackingSettings.heartRateUtils.deviceId =
+                                  deviceId;
+                            }
+                          },
+                          isDense: true,
                         ),
                       ),
-              ],
+                    ),
               FilledButton(
                 onPressed: () => Navigator.pushNamed(
                   context,
