@@ -141,6 +141,9 @@ extension RequestExtension on Request {
       return Err(ApiError(ApiErrorType.serverUnreachable, null));
     } on ClientException {
       return Err(ApiError(ApiErrorType.serverUnreachable, null));
+    } on FormatException {
+      // this happens if html instead of json in received. probably due to a partially received request?
+      return Err(ApiError(ApiErrorType.serverUnreachable, null));
     } on TypeError {
       return Err(ApiError(ApiErrorType.badJson, null));
     } catch (error, stackTrace) {
