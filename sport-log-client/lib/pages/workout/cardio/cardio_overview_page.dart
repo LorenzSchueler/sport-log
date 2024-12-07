@@ -164,6 +164,7 @@ class CardioOverviewPage extends StatelessWidget {
                 onPressed: () => Navigator.pushNamed(
                   context,
                   Routes.trackingSettings,
+                  arguments: dataProvider.selected,
                 ),
               ),
               ActionButton(
@@ -171,6 +172,7 @@ class CardioOverviewPage extends StatelessWidget {
                 onPressed: () => Navigator.pushNamed(
                   context,
                   Routes.cardioEdit,
+                  arguments: dataProvider.selected,
                 ),
               ),
             ],

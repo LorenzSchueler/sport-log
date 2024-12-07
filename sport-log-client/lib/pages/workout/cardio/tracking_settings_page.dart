@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart' hide Route;
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
+import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/pages/workout/cardio/audio_feedback_config.dart';
 import 'package:sport_log/pages/workout/cardio/tracking_settings.dart';
 import 'package:sport_log/routes.dart';
@@ -14,7 +15,9 @@ import 'package:sport_log/widgets/provider_consumer.dart';
 import 'package:sport_log/widgets/snackbar.dart';
 
 class CardioTrackingSettingsPage extends StatelessWidget {
-  const CardioTrackingSettingsPage({super.key});
+  const CardioTrackingSettingsPage({required this.initMovement, super.key});
+
+  final Movement initMovement;
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +26,7 @@ class CardioTrackingSettingsPage extends StatelessWidget {
       body: Padding(
         padding: Defaults.edgeInsets.normal,
         child: ProviderConsumer<TrackingSettings>(
-          create: (_) => TrackingSettings(),
+          create: (_) => TrackingSettings(initMovement),
           builder: (_, trackingSettings, __) => ListView(
             children: [
               EditTile(

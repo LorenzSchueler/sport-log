@@ -189,17 +189,27 @@ abstract class Routes {
           );
         }),
     Routes.strengthEdit: (context) => _checkUserId(() {
-          var isNew = false;
-          var arg = ModalRoute.of(context)?.settings.arguments
-              as StrengthSessionDescription?;
-          if (arg == null) {
-            arg = StrengthSessionDescription.defaultValue();
+          final arg = ModalRoute.of(context)?.settings.arguments;
+          final bool isNew;
+          final StrengthSessionDescription? strengthSessionDescription;
+          if (arg is StrengthSessionDescription) {
+            strengthSessionDescription = arg;
+            isNew = false;
+          } else if (arg is Movement) {
+            strengthSessionDescription =
+                StrengthSessionDescription.defaultValue()
+                  ?..movement = arg
+                  ..session.movementId = arg.id;
+            isNew = true;
+          } else {
+            strengthSessionDescription =
+                StrengthSessionDescription.defaultValue();
             isNew = true;
           }
-          return arg == null
+          return strengthSessionDescription == null
               ? const MovementEditPage(movementDescription: null)
               : StrengthEditPage(
-                  strengthSessionDescription: arg,
+                  strengthSessionDescription: strengthSessionDescription,
                   isNew: isNew,
                 );
         }),
@@ -273,11 +283,18 @@ abstract class Routes {
           );
         }),
     Routes.cardioEdit: (context) => _checkUserId(() {
-          var isNew = false;
-          var cardioSessionDescription = ModalRoute.of(context)
-              ?.settings
-              .arguments as CardioSessionDescription?;
-          if (cardioSessionDescription == null) {
+          final arg = ModalRoute.of(context)?.settings.arguments;
+          final bool isNew;
+          final CardioSessionDescription? cardioSessionDescription;
+          if (arg is CardioSessionDescription) {
+            cardioSessionDescription = arg;
+            isNew = false;
+          } else if (arg is Movement) {
+            cardioSessionDescription = CardioSessionDescription.defaultValue()
+              ?..movement = arg
+              ..cardioSession.movementId = arg.id;
+            isNew = true;
+          } else {
             cardioSessionDescription = CardioSessionDescription.defaultValue();
             isNew = true;
           }
@@ -304,12 +321,14 @@ abstract class Routes {
             cardioSessionDescription: cardioSessionDescription,
           );
         }),
-    Routes.trackingSettings: (context) => _checkUserIdAndroidIos(
-          context,
-          () => Movement.defaultMovement == null
+    Routes.trackingSettings: (context) => _checkUserIdAndroidIos(context, () {
+          final movement =
+              ModalRoute.of(context)?.settings.arguments as Movement? ??
+                  Movement.defaultMovement;
+          return movement == null
               ? const MovementEditPage(movementDescription: null)
-              : const CardioTrackingSettingsPage(),
-        ),
+              : CardioTrackingSettingsPage(initMovement: movement);
+        }),
     Routes.tracking: (context) => _checkUserIdAndroidIos(context, () {
           final trackingSettings =
               ModalRoute.of(context)!.settings.arguments! as TrackingSettings;

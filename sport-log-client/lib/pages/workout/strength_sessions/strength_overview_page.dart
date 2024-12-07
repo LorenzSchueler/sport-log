@@ -148,7 +148,11 @@ class StrengthOverviewPage extends StatelessWidget {
           drawer: const MainDrawer(selectedRoute: Routes.strengthOverview),
           floatingActionButton: FloatingActionButton(
             child: const Icon(AppIcons.add),
-            onPressed: () => Navigator.pushNamed(context, Routes.strengthEdit),
+            onPressed: () => Navigator.pushNamed(
+              context,
+              Routes.strengthEdit,
+              arguments: dataProvider.selected,
+            ),
           ),
         ),
       ),

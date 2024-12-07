@@ -153,8 +153,18 @@ class MetconSessionOverviewPage extends StatelessWidget {
           drawer: const MainDrawer(selectedRoute: Routes.metconOverview),
           floatingActionButton: FloatingActionButton(
             child: const Icon(AppIcons.add),
-            onPressed: () {
-              Navigator.pushNamed(context, Routes.metconSessionEdit);
+            onPressed: () async {
+              final arg = dataProvider.selected == null
+                  ? null
+                  : await MetconDescriptionDataProvider()
+                      .getByMetcon(dataProvider.selected!);
+              if (context.mounted) {
+                await Navigator.pushNamed(
+                  context,
+                  Routes.metconSessionEdit,
+                  arguments: arg,
+                );
+              }
             },
           ),
         ),

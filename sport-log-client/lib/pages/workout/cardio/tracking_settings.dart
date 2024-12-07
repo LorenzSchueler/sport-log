@@ -6,13 +6,13 @@ import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/pages/workout/cardio/audio_feedback_config.dart';
 
 class TrackingSettings extends ChangeNotifier {
-  factory TrackingSettings() {
-    final settings = TrackingSettings._();
+  factory TrackingSettings(Movement movement) {
+    final settings = TrackingSettings._(movement);
     settings.heartRateUtils.addListener(settings.notifyListeners);
     return settings;
   }
 
-  TrackingSettings._();
+  TrackingSettings._(this._movement);
 
   @override
   void dispose() {
@@ -20,7 +20,7 @@ class TrackingSettings extends ChangeNotifier {
     super.dispose();
   }
 
-  Movement _movement = Movement.defaultMovement!;
+  Movement _movement;
   Movement get movement => _movement;
   set movement(Movement movement) {
     _movement = movement;
