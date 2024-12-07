@@ -882,7 +882,7 @@ async fn own_update() {
     let header = auth_header(&TEST_USER.username, &TEST_USER.password);
     let response = request(
         &mut router,
-        Request::put(&route_max_version("", DIARY, None))
+        Request::put(route_max_version("", DIARY, None))
             .header(header.0, header.1)
             .header(CONTENT_TYPE, APPLICATION_JSON.as_ref())
             .body(serde_json::to_string(&TEST_DIARY as &Diary).unwrap().into())
@@ -900,7 +900,7 @@ async fn own_update_non_existing() {
     let header = auth_header(&TEST_USER.username, &TEST_USER.password);
     let response = request(
         &mut router,
-        Request::put(&route_max_version("", DIARY, None))
+        Request::put(route_max_version("", DIARY, None))
             .header(header.0, header.1)
             .header(CONTENT_TYPE, APPLICATION_JSON.as_ref())
             .body(serde_json::to_string(&TEST_DIARY as &Diary).unwrap().into())
@@ -923,7 +923,7 @@ async fn foreign_update() {
     let header = auth_header(&TEST_USER2.username, &TEST_USER2.password);
     let response = request(
         &mut router,
-        Request::put(&route_max_version("", DIARY, None))
+        Request::put(route_max_version("", DIARY, None))
             .header(header.0, header.1)
             .header(CONTENT_TYPE, APPLICATION_JSON.as_ref())
             .body(serde_json::to_string(&TEST_DIARY as &Diary).unwrap().into())
@@ -1019,7 +1019,7 @@ async fn epoch_from_create_and_update() {
     let header = auth_header(&TEST_USER.username, &TEST_USER.password);
     let response = request(
         &mut router,
-        Request::put(&route_max_version("", DIARY, None))
+        Request::put(route_max_version("", DIARY, None))
             .header(header.0, header.1)
             .header(CONTENT_TYPE, APPLICATION_JSON.as_ref())
             .body(serde_json::to_string(&TEST_DIARY as &Diary).unwrap().into())
@@ -1046,7 +1046,7 @@ async fn user_self_registration() {
 
     let response = request(
         &mut router,
-        Request::post(&route_max_version("", USER, None))
+        Request::post(route_max_version("", USER, None))
             .header(CONTENT_TYPE, APPLICATION_JSON.as_ref())
             .body(serde_json::to_string(&user).unwrap().into())
             .unwrap(),
@@ -1074,7 +1074,7 @@ async fn ap_self_registration() {
 
     let response = request(
         &mut router,
-        Request::post(&route_max_version("", AP_PLATFORM, None))
+        Request::post(route_max_version("", AP_PLATFORM, None))
             .header(CONTENT_TYPE, APPLICATION_JSON.as_ref())
             .body(serde_json::to_string(&platform).unwrap().into())
             .unwrap(),
@@ -1089,7 +1089,7 @@ async fn ap_self_registration() {
 
     let response = request(
         &mut router,
-        Request::get(&route_max_version("", AP_PLATFORM, None))
+        Request::get(route_max_version("", AP_PLATFORM, None))
             .body(Body::empty())
             .unwrap(),
     )
@@ -1113,7 +1113,7 @@ async fn ap_self_registration() {
 
     let response = request(
         &mut router,
-        Request::post(&route_max_version("", AP_ACTION_PROVIDER, None))
+        Request::post(route_max_version("", AP_ACTION_PROVIDER, None))
             .header(CONTENT_TYPE, APPLICATION_JSON.as_ref())
             .body(serde_json::to_string(&action_provider).unwrap().into())
             .unwrap(),
