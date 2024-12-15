@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:sport_log/helpers/lat_lng.dart';
 import 'package:sport_log/helpers/map_controller.dart';
 import 'package:sport_log/settings.dart';
+import 'package:sport_log/widgets/map_widgets/map_styles_button.dart';
 
 class StaticMapboxMap extends StatelessWidget {
   const StaticMapboxMap({
@@ -30,7 +31,7 @@ class StaticMapboxMap extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MapWidget(
-      styleUri: MapboxStyles.OUTDOORS,
+      styleUri: MapStyle.outdoor.url,
       cameraOptions: context.read<Settings>().lastMapPosition.toCameraOptions(),
       onMapCreated: (mapboxMap) async {
         final controller = await MapController.from(mapboxMap, context);

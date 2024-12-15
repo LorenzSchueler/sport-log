@@ -32,7 +32,7 @@ class MapboxMapWrapper extends StatefulWidget {
     this.buttonTopOffset = 0,
     this.onFullscreenToggle,
     this.onCenterLocationToggle,
-    this.initStyleUri = MapboxStyles.OUTDOORS,
+    this.initStyleUri = MapStyle.OUTDOOR,
     this.initialCameraPosition,
     this.onMapCreated,
     this.onTap,

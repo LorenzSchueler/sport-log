@@ -5,7 +5,10 @@ import 'package:sport_log/helpers/map_controller.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 
 enum MapStyle {
-  outdoor(MapboxStyles.OUTDOORS),
+  // based on mapbox OUTDOORS
+  // natural features - natural point label -  text field formula
+  //     coalesce(name_en, name) & "\n" & elevation_m
+  outdoor(OUTDOOR),
   street(MapboxStyles.STANDARD),
   // based on mapbox SATELLITE_STREETS
   // road network - surface: road-street
@@ -27,6 +30,8 @@ enum MapStyle {
   );
 
   const MapStyle(this.url);
+  // This is needed when a const value is required because MapStyle.outdoor.url is not const.
+  static const OUTDOOR = "mapbox://styles/hi-ker/cm4pewm54007e01sacaks9r4z";
   final String url;
 }
 
