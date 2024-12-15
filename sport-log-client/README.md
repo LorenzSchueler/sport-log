@@ -7,7 +7,6 @@
 ## Config
 
 * `cp sport-log-client/sport-log-client.yaml.template sport-log-client/sport-log-client.yaml` and insert your mapbox access token
-* to compile the project `SDK_REGISTRY_TOKEN` must be set as an env var
 
 ### Config Options
 * `access_token` (String) maxbox access token needed to create map instances
@@ -50,7 +49,6 @@ sudo apt-get install -y flatpak flatpak-builder
 flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 flatpak install --user -y flathub org.freedesktop.Platform//21.08 org.freedesktop.Sdk//21.08
 ```
-* set `SDK_REGISTRY_TOKEN` as env var
 * build linux app and install it using flatpak
 ```bash
 flutter build linux --release

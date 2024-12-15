@@ -1,4 +1,3 @@
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_log/models/diary/diary.dart';
 import 'package:sport_log/pages/workout/charts/datetime_chart.dart';
@@ -27,7 +26,7 @@ class DiaryChart extends StatelessWidget {
                     value: value,
                   );
           })
-          .whereNotNull()
+          .nonNulls
           .toList(),
       dateFilterState: dateFilterState,
       absolute: false,

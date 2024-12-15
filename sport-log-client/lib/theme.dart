@@ -46,13 +46,17 @@ class AppTheme {
     segmentedButtonTheme: SegmentedButtonThemeData(
       style: ButtonStyle(
         iconSize: const WidgetStatePropertyAll(24),
+        iconColor: WidgetStateProperty.resolveWith(
+          (states) => states.contains(WidgetState.selected)
+              ? _colorScheme.surface
+              : Colors.white,
+        ),
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        backgroundColor: WidgetStateProperty.resolveWith((states) {
-          if (states.contains(WidgetState.selected)) {
-            return _colorScheme.primary.withAlpha(200);
-          }
-          return null;
-        }),
+        backgroundColor: WidgetStateProperty.resolveWith(
+          (states) => states.contains(WidgetState.selected)
+              ? _colorScheme.primary.withAlpha(200)
+              : null,
+        ),
       ),
     ),
     iconTheme: IconThemeData(

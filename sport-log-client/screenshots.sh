@@ -18,12 +18,6 @@ error() {
     printf "\n$RED$1$NC\n"
 }
 
-step "check for mapbox token"
-if [ ! $SDK_REGISTRY_TOKEN ]; then
-    error "SDK_REGISTRY_TOKEN required"
-    exit 1
-fi
-
 step "start server"
 cd ../sport-log-server
 cargo build

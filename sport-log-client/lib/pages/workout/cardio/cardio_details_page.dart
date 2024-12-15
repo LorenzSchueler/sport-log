@@ -219,7 +219,7 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
 
   Future<void> _showSession(CardioSession session) async {
     final color =
-        Color((Random().nextDouble() * 0xFFFFFF).toInt()).withOpacity(1);
+        Color((Random().nextDouble() * 0xFFFFFF).toInt()).withAlpha(255);
     final line = await _mapController?.addLine(session.track!, color);
     if (line != null) {
       _similarSessionAnnotations.putIfAbsent(
@@ -520,7 +520,7 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
         track?.lastOrNull?.time,
         session.heartRate?.lastOrNull,
         session.cadence?.lastOrNull,
-      ].whereNotNull().maxOrNull;
+      ].nonNulls.maxOrNull;
       if (totalDuration == null) {
         // this should not happen because if there is no data the chart is also not shown
         return;

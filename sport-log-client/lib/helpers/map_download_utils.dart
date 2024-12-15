@@ -38,7 +38,7 @@ class MapDownloadUtils extends ChangeNotifier {
   int get _nextId =>
       (_regions
               .map((region) => int.tryParse(region.tileRegion.id))
-              .whereNotNull()
+              .nonNulls
               .maxOrNull ??
           0) +
       1;

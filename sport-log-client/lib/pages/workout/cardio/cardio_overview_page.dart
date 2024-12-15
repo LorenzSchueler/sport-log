@@ -308,12 +308,10 @@ class CardioStatsCard extends StatelessWidget {
             final group = groupedSessions[index];
             final movement = group.key.name;
             final number = group.value.length;
-            final distance = group.value
-                .map((s) => s.cardioSession.distance)
-                .whereNotNull()
-                .sum;
+            final distance =
+                group.value.map((s) => s.cardioSession.distance).nonNulls.sum;
             final time =
-                group.value.map((s) => s.cardioSession.time).whereNotNull().sum;
+                group.value.map((s) => s.cardioSession.time).nonNulls.sum;
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

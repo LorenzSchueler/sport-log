@@ -127,9 +127,16 @@ class MapController {
     }
   }
 
+  static int _floatToInt8(double x) {
+    return (x * 255.0).round() & 0xff;
+  }
+
   // alpha channel seems to be ignored
   int _colorToInt(Color color) =>
-      (color.alpha << 24) + (color.red << 16) + (color.green << 8) + color.blue;
+      (_floatToInt8(color.a) << 24) +
+      (_floatToInt8(color.r) << 16) +
+      (_floatToInt8(color.g) << 8) +
+      _floatToInt8(color.b);
 
   Future<PolylineAnnotation?> addBoundingBoxLine(LatLngBounds bounds) async =>
       await _lineManager?.create(
