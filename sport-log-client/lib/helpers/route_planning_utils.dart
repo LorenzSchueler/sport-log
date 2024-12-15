@@ -72,40 +72,20 @@ class RoutePlanningUtils {
     }
   }
 
-  static void _setDistances(List<Position> track) {
+  static Future<void> _setDistanceAndElevation(
+    List<Position> track,
+    Future<double?> Function(LatLng)? getElevation,
+  ) async {
     if (track.isNotEmpty) {
       track[0].distance = 0;
+      track[0].elevation = (await getElevation?.call(track[0].latLng)) ?? 0;
     }
     for (var i = 1; i < track.length; i++) {
       track[i].distance = track[i - 1].distance +
           track[i - 1].latLng.distanceTo(track[i].latLng);
+      track[i].elevation =
+          (await getElevation?.call(track[i].latLng)) ?? track[i - 1].elevation;
     }
-  }
-
-  static Future<List<Position>> _responseToTrack(
-    DirectionsApiResponse response,
-    Future<double?> Function(LatLng)? getElevation,
-  ) async {
-    final navRoute = response.routes![0];
-    final track = <Position>[];
-    final latLngs = _decodePolyline(navRoute.geometry as String);
-    for (final latLng in latLngs) {
-      final elevation = (await getElevation?.call(latLng)) ??
-          track.lastOrNull?.elevation ??
-          0;
-      track.add(
-        Position(
-          latitude: latLng.lat,
-          longitude: latLng.lng,
-          elevation: elevation,
-          distance: track.isEmpty
-              ? 0
-              : track.last.distance + track.last.latLng.distanceTo(latLng),
-          time: Duration.zero,
-        ),
-      );
-    }
-    return track;
   }
 
   // https://developers.google.com/maps/documentation/utilities/polylinealgorithm
@@ -166,38 +146,78 @@ class RoutePlanningUtils {
   ) async {
     if (snapMode == SnapMode.neverSnap) {
       final track = markedPositions.clone();
-      _setDistances(track);
+      await _setDistanceAndElevation(track, getElevation);
       return Ok(track);
     }
 
-    DirectionsApiResponse response;
-    try {
-      response = await Defaults.mapboxApi.directions.request(
-        profile: NavigationProfile.WALKING,
-        overview: NavigationOverview.FULL,
-        coordinates:
-            markedPositions.map((e) => [e.latitude, e.longitude]).toList(),
+    final latLngs = <LatLng>[];
+    const maxChunkLen = 25;
+    final chunks = ((markedPositions.length - 1) / (maxChunkLen - 1)).ceil();
+    for (var chunk = 0; chunk < chunks; chunk++) {
+      final start = chunk * (maxChunkLen - 1);
+      final markedPositionsChunk = markedPositions.slice(
+        start,
+        min(start + 25, markedPositions.length),
       );
-    } on SocketException {
-      return Err(RoutePlanningError.noInternet);
-    }
-    if (response.routes != null && response.routes!.isNotEmpty) {
-      final track = await _responseToTrack(response, getElevation);
-      if (snapMode == SnapMode.snapIfClose) {
-        _snapIfClose(track, markedPositions);
-        _setDistances(track);
-        return Ok(track);
-      } else {
-        // snapMode == SnapMode.alwaysSnap
-        return Ok(track);
+      logDebug(markedPositionsChunk.length);
+
+      DirectionsApiResponse response;
+      try {
+        response = await Defaults.mapboxApi.directions.request(
+          profile: NavigationProfile.WALKING,
+          overview: NavigationOverview.FULL,
+          coordinates: markedPositionsChunk
+              .map((e) => [e.latitude, e.longitude])
+              .toList(),
+        );
+      } on SocketException {
+        return Err(RoutePlanningError.noInternet);
       }
-    } else {
-      _logger.e(
-        "mapbox api error",
-        error: response.error,
-        caughtBy: "RoutePlanningUtils.matchLocations",
-      );
-      return Err(RoutePlanningError.mapboxApiError);
+
+      final geometry = response.routes?.elementAtOrNull(0)?.geometry;
+      if (geometry != null) {
+        var chunkLatLngs = _decodePolyline(geometry as String).slice(0);
+        if (chunk > 0 && chunkLatLngs.first == latLngs.last) {
+          chunkLatLngs = chunkLatLngs.slice(1);
+        }
+        latLngs.addAll(chunkLatLngs);
+      } else {
+        final responseError = response.error;
+        final error = responseError == null
+            ? "geometry is null"
+            : responseError is NavigationError
+                ? responseError.message
+                : responseError.toString();
+
+        logDebug(error);
+
+        _logger.e(
+          "mapbox api error",
+          error: error,
+          caughtBy: "RoutePlanningUtils.matchLocations",
+        );
+        return Err(RoutePlanningError.mapboxApiError);
+      }
     }
+
+    final track = latLngs
+        .map(
+          (latLng) => Position(
+            latitude: latLng.lat,
+            longitude: latLng.lng,
+            elevation: 0,
+            distance: 0,
+            time: Duration.zero,
+          ),
+        )
+        .toList();
+
+    if (snapMode == SnapMode.snapIfClose) {
+      _snapIfClose(track, markedPositions);
+    }
+    // for SnapMode.alwaysSnap nothing to do
+
+    await _setDistanceAndElevation(track, getElevation);
+    return Ok(track);
   }
 }

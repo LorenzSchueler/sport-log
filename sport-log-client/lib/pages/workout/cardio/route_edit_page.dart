@@ -171,14 +171,6 @@ class _RouteEditPageState extends State<RouteEditPage> {
   }
 
   Future<void> _extendLine(LatLng location) async {
-    if (_route.markedPositions!.length >= 25) {
-      await showMessageDialog(
-        context: context,
-        title: "Point Maximum Reached",
-        text: "You can only mark 25 points.",
-      );
-      return;
-    }
     final elevation = await _elevationMapController?.getElevation(location);
     if (mounted) {
       setState(() {
