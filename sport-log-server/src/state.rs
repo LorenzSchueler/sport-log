@@ -1,5 +1,4 @@
 use axum::{
-    async_trait,
     extract::{FromRef, FromRequestParts},
     http::{request::Parts, StatusCode},
 };
@@ -25,7 +24,6 @@ impl FromRef<AppState> for &'static Config {
     }
 }
 
-#[async_trait]
 impl FromRequestParts<AppState> for DbConn {
     type Rejection = StatusCode;
 

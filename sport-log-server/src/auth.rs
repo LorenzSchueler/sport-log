@@ -1,7 +1,6 @@
 use std::ops::Deref;
 
 use axum::{
-    async_trait,
     extract::{FromRef, FromRequestParts, State},
     http::{request::Parts, StatusCode},
 };
@@ -38,7 +37,6 @@ impl Deref for AuthUser {
     }
 }
 
-#[async_trait]
 impl<S> FromRequestParts<S> for AuthUser
 where
     S: Send + Sync,
@@ -100,7 +98,6 @@ impl Deref for AuthUserOrAP {
     }
 }
 
-#[async_trait]
 impl<S> FromRequestParts<S> for AuthUserOrAP
 where
     S: Send + Sync,
@@ -167,7 +164,6 @@ impl Deref for AuthAP {
     }
 }
 
-#[async_trait]
 impl<S> FromRequestParts<S> for AuthAP
 where
     S: Send + Sync,
@@ -209,7 +205,6 @@ where
 #[derive(Debug, Clone, Copy)]
 pub struct AuthAdmin;
 
-#[async_trait]
 impl<S> FromRequestParts<S> for AuthAdmin
 where
     S: Send + Sync,
