@@ -122,15 +122,22 @@ class CardioSessionTable extends TableAccessor<CardioSession> {
     return records.map(serde.fromDbRecord).toList();
   }
 
-  Future<List<(Int64, DateTime)>> getIdDatetimeByMovementWithTrack({
+  Future<List<(Int64, DateTime, String?)>>
+      getIdDatetimeCommentByMovementCommentWithTrack({
     required Movement movement,
+    required String? comment,
     required bool hasTrack,
   }) async {
     final records = await database.query(
       tableName,
-      columns: [Columns.id, Columns.datetime],
+      columns: [Columns.id, Columns.datetime, Columns.comments],
       where: TableAccessor.combineFilter(
-        [notDeleted, movementIdFilter(movement), if (hasTrack) withTrack],
+        [
+          notDeleted,
+          movementIdFilter(movement),
+          commentFilter(comment),
+          if (hasTrack) withTrack,
+        ],
       ),
       orderBy: orderByDatetime,
     );
@@ -140,6 +147,7 @@ class CardioSessionTable extends TableAccessor<CardioSession> {
           (r) => (
             Int64(r[Columns.id]! as int),
             DateTime.parse(r[Columns.datetime]! as String),
+            r[Columns.comments] as String?
           ),
         )
         .toList();

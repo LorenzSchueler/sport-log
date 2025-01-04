@@ -73,14 +73,17 @@ class CardioSessionDataProvider extends EntityDataProvider<CardioSession> {
         .toList();
   }
 
-  Future<List<(Int64, DateTime)>> getIdDatetimeByMovementWithTrack({
+  Future<List<(Int64, DateTime, String?)>>
+      getIdDatetimeCommentByMovementCommentWithTrack({
     required Movement movement,
+    required String? comment,
     required bool hasTrack,
   }) =>
-      table.getIdDatetimeByMovementWithTrack(
-        movement: movement,
-        hasTrack: hasTrack,
-      );
+          table.getIdDatetimeCommentByMovementCommentWithTrack(
+            movement: movement,
+            comment: comment,
+            hasTrack: hasTrack,
+          );
 }
 
 class CardioSessionDescriptionDataProvider

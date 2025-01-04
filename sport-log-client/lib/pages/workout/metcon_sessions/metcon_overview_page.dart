@@ -121,7 +121,7 @@ class MetconCard extends StatelessWidget {
                 metconDescription.moves
                     .map((mmd) => mmd.movement.name)
                     .join(' • '),
-                overflow: TextOverflow.ellipsis,
+                overflow: TextOverflow.fade,
               ),
             ],
           ),

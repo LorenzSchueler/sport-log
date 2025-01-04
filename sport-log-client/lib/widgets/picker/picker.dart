@@ -54,9 +54,20 @@ class Picker<T, C> extends StatelessWidget {
               itemBuilder: (context, index) {
                 final item = items[index];
                 return ListTile(
-                  title: Text(title(item)),
-                  subtitle:
-                      subtitle != null ? Text(subtitle!.call(item)) : null,
+                  title: Text(
+                    title(item),
+                    maxLines: 1,
+                    softWrap: false,
+                    overflow: TextOverflow.fade,
+                  ),
+                  subtitle: subtitle != null
+                      ? Text(
+                          subtitle!.call(item),
+                          maxLines: 1,
+                          softWrap: false,
+                          overflow: TextOverflow.fade,
+                        )
+                      : null,
                   selected: selectedItem != null
                       ? compareWith(item) == compareWith(selectedItem as T)
                       : false,
@@ -179,8 +190,20 @@ class _PickerWithSearchState<T, C> extends State<PickerWithSearch<T, C>> {
     final selectedItem = widget.selectedItem;
 
     return ListTile(
-      title: Text(widget.title(item)),
-      subtitle: subtitle != null ? Text(subtitle) : null,
+      title: Text(
+        widget.title(item),
+        maxLines: 1,
+        softWrap: false,
+        overflow: TextOverflow.fade,
+      ), //warp
+      subtitle: subtitle != null
+          ? Text(
+              subtitle,
+              maxLines: 1,
+              softWrap: false,
+              overflow: TextOverflow.fade,
+            )
+          : null,
       selected: selectedItem != null
           ? widget.compareWith(item) == widget.compareWith(selectedItem)
           : false,
@@ -368,21 +391,22 @@ Future<CardioSession?> showCardioSessionPicker({
   required BuildContext context,
 }) async {
   FocusManager.instance.primaryFocus?.unfocus();
-  final idDatetimes =
-      await CardioSessionDataProvider().getIdDatetimeByMovementWithTrack(
-    movement: movement,
-    hasTrack: hasTrack,
-  );
-  if (!context.mounted) {
-    return null;
-  }
-  final newSelected = await showDialog<(Int64, DateTime)>(
-    builder: (_) => Picker(
-      selectedItem: selected != null ? (selected.id, selected.datetime) : null,
-      items: idDatetimes,
-      compareWith: (idDatetime) => idDatetime.$1,
-      title: (_) => movement.name,
-      subtitle: (idDatetime) => idDatetime.$2.humanDateTime,
+  final newSelected = await showDialog<(Int64, DateTime, String?)>(
+    builder: (_) => PickerWithSearch(
+      selectedItem: selected != null
+          ? (selected.id, selected.datetime, selected.comments)
+          : null,
+      getByName: (name) => CardioSessionDataProvider()
+          .getIdDatetimeCommentByMovementCommentWithTrack(
+        movement: movement,
+        comment: name,
+        hasTrack: hasTrack,
+      ),
+      editRoute: null,
+      compareWith: (idDatetimeComment) => idDatetimeComment.$1,
+      title: (idDatetimeComment) => idDatetimeComment.$3 ?? "- no comments -",
+      subtitle: (idDatetimeComment) =>
+          '${movement.name} • ${idDatetimeComment.$2.humanDateTime}',
     ),
     barrierDismissible: dismissible,
     context: context,
