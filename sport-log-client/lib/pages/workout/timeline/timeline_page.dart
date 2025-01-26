@@ -104,6 +104,8 @@ class TimelinePage extends StatelessWidget {
                           itemBuilder: (context, index) => _itemCard(
                             dataProvider.entities[index],
                             dataProvider.records ?? TimelineRecords({}, {}),
+                            (movementOrMetcon) =>
+                                dataProvider.selected = movementOrMetcon,
                           ),
                           separatorBuilder: (_, __) =>
                               Defaults.sizedBox.vertical.normal,
@@ -128,18 +130,28 @@ class TimelinePage extends StatelessWidget {
     );
   }
 
-  Widget _itemCard(TimelineUnion item, TimelineRecords timelineRecords) {
+  Widget _itemCard(
+    TimelineUnion item,
+    TimelineRecords timelineRecords,
+    void Function(MovementOrMetcon) onSelected,
+  ) {
     return item.map(
       (strengthSession) => StrengthSessionCard(
         strengthSessionDescription: strengthSession,
         strengthRecords: timelineRecords.strengthRecords,
+        onSelected: (movement) =>
+            onSelected(MovementOrMetcon.movement(movement)),
       ),
       (metconSessionDescription) => MetconSessionCard(
         metconSessionDescription: metconSessionDescription,
         metconRecords: timelineRecords.metconRecords,
+        onSelected: (metcon) => onSelected(MovementOrMetcon.metcon(metcon)),
       ),
-      (cardioSession) =>
-          CardioSessionCard(cardioSessionDescription: cardioSession),
+      (cardioSession) => CardioSessionCard(
+        cardioSessionDescription: cardioSession,
+        onSelected: (movement) =>
+            onSelected(MovementOrMetcon.movement(movement)),
+      ),
       (wod) => WodCard(wod: wod),
       (diary) => DiaryCard(diary: diary),
     );

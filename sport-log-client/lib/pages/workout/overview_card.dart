@@ -10,6 +10,7 @@ class OverviewCard extends StatelessWidget {
     required this.right,
     required this.comments,
     required this.onTap,
+    required this.onLongPress,
     this.dateOnly = false,
     super.key,
   });
@@ -19,12 +20,14 @@ class OverviewCard extends StatelessWidget {
   final List<Widget> right;
   final String? comments;
   final void Function() onTap;
+  final void Function()? onLongPress;
   final bool dateOnly;
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
+      onLongPress: onLongPress,
       child: Card(
         margin: EdgeInsets.zero,
         child: Padding(

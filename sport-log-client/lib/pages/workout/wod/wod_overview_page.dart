@@ -115,9 +115,8 @@ class WodCard extends StatelessWidget {
       left: const [],
       right: const [],
       comments: wod.description,
-      onTap: () {
-        Navigator.pushNamed(context, Routes.wodEdit, arguments: wod);
-      },
+      onTap: () => Navigator.pushNamed(context, Routes.wodEdit, arguments: wod),
+      onLongPress: null,
       dateOnly: true,
     );
   }

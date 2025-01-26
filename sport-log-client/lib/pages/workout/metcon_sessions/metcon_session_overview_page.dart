@@ -130,6 +130,8 @@ class MetconSessionOverviewPage extends StatelessWidget {
                                 metconSessionDescription:
                                     dataProvider.entities[index],
                                 metconRecords: dataProvider.records ?? {},
+                                onSelected: (metcon) =>
+                                    dataProvider.selected = metcon,
                               ),
                               separatorBuilder: (_, __) =>
                                   Defaults.sizedBox.vertical.normal,
@@ -177,11 +179,13 @@ class MetconSessionCard extends StatelessWidget {
   MetconSessionCard({
     required this.metconSessionDescription,
     required MetconRecords metconRecords,
+    required this.onSelected,
     super.key,
   }) : metconRecord = metconRecords.isMetconRecord(metconSessionDescription);
 
   final MetconSessionDescription metconSessionDescription;
   final bool metconRecord;
+  final void Function(Metcon) onSelected;
 
   @override
   Widget build(BuildContext context) {
@@ -207,13 +211,13 @@ class MetconSessionCard extends StatelessWidget {
         Text(metconSessionDescription.metconSession.rx ? "Rx" : "Scaled"),
       ],
       comments: metconSessionDescription.metconSession.comments,
-      onTap: () {
-        Navigator.pushNamed(
-          context,
-          Routes.metconSessionDetails,
-          arguments: metconSessionDescription,
-        );
-      },
+      onTap: () => Navigator.pushNamed(
+        context,
+        Routes.metconSessionDetails,
+        arguments: metconSessionDescription,
+      ),
+      onLongPress: () =>
+          onSelected(metconSessionDescription.metconDescription.metcon),
     );
   }
 }

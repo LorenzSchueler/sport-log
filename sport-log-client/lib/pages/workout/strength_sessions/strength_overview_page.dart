@@ -125,6 +125,8 @@ class StrengthOverviewPage extends StatelessWidget {
                                 strengthSessionDescription:
                                     dataProvider.entities[index],
                                 strengthRecords: dataProvider.records ?? {},
+                                onSelected: (movement) =>
+                                    dataProvider.selected = movement,
                               ),
                               separatorBuilder: (_, __) =>
                                   Defaults.sizedBox.vertical.normal,
@@ -164,6 +166,7 @@ class StrengthSessionCard extends StatelessWidget {
   StrengthSessionCard({
     required this.strengthSessionDescription,
     required this.strengthRecords,
+    required this.onSelected,
     super.key,
   }) : strengthRecordTypes =
             strengthRecords.getCombinedRecordTypes(strengthSessionDescription);
@@ -171,6 +174,7 @@ class StrengthSessionCard extends StatelessWidget {
   final StrengthSessionDescription strengthSessionDescription;
   final StrengthRecords strengthRecords;
   final List<StrengthRecordType> strengthRecordTypes;
+  final void Function(Movement) onSelected;
 
   @override
   Widget build(BuildContext context) {
@@ -209,6 +213,7 @@ class StrengthSessionCard extends StatelessWidget {
         Routes.strengthDetails,
         arguments: strengthSessionDescription,
       ),
+      onLongPress: () => onSelected(strengthSessionDescription.movement),
     );
   }
 }

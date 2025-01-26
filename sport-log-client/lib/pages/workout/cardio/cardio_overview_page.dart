@@ -135,6 +135,8 @@ class CardioOverviewPage extends StatelessWidget {
                                 key: ValueKey(
                                   dataProvider.entities[index].cardioSession.id,
                                 ),
+                                onSelected: (movement) =>
+                                    dataProvider.selected = movement,
                               ),
                               separatorBuilder: (_, __) =>
                                   Defaults.sizedBox.vertical.normal,
@@ -184,9 +186,14 @@ class CardioOverviewPage extends StatelessWidget {
 }
 
 class CardioSessionCard extends StatelessWidget {
-  const CardioSessionCard({required this.cardioSessionDescription, super.key});
+  const CardioSessionCard({
+    required this.cardioSessionDescription,
+    required this.onSelected,
+    super.key,
+  });
 
   final CardioSessionDescription cardioSessionDescription;
+  final void Function(Movement) onSelected;
 
   Future<void> _onMapCreated(MapController mapController) async {
     await mapController.setBoundsFromTracks(
@@ -215,6 +222,7 @@ class CardioSessionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () => showDetails(context),
+      onLongPress: () => onSelected(cardioSessionDescription.movement),
       child: Card(
         margin: EdgeInsets.zero,
         child: Column(

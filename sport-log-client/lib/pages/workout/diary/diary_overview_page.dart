@@ -142,9 +142,9 @@ class DiaryCard extends StatelessWidget {
           ),
       ],
       comments: diary.comments,
-      onTap: () {
-        Navigator.pushNamed(context, Routes.diaryEdit, arguments: diary);
-      },
+      onTap: () =>
+          Navigator.pushNamed(context, Routes.diaryEdit, arguments: diary),
+      onLongPress: null,
       dateOnly: true,
     );
   }
