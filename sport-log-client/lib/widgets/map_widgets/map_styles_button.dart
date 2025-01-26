@@ -6,13 +6,17 @@ import 'package:sport_log/widgets/app_icons.dart';
 
 enum MapStyle {
   // based on mapbox OUTDOORS
-  // natural features - natural point label -  text field formula
+  // natural features - natural point label - text field formula
   //     coalesce(name_en, name) & "\n" & elevation_m
   outdoor(outdoorConst),
   street(MapboxStyles.STANDARD),
   // based on mapbox SATELLITE_STREETS
+  // -> eject style components street and walking to be able to edit zoom extend
+  // for all
+  //     select data - zoom extend
+  //         z12-z22 # there seems to be no data for < z12
   // road network - surface: road-street
-  //     opacity: 0.5
+  //     opacity: 0.8
   // road network - surface: road-minor
   //     color: hsl(35, 80%, 48%)
   //     opacity: 1
@@ -21,12 +25,21 @@ enum MapStyle {
   // road network - surface: road-minor-case
   //     color: hsl(35, 80%, 0%)
   // walking, cycling, etc - surface - road-path
+  // walking, cycling, etc - barriers-bridges - bridge-path
+  // walking, cycling, etc - tunnels - tunnel-path
   //     color: hsl(35, 80%, 48%)
   //     opacity: 1
   //     width: 2
   //     dash-array: 2, 1
+  // natural features - natural point label - text field formula
+  //     coalesce(name_en, name) & "\n" & elevation_m
+  // add layer terrain-v2 - contour
+  //     color: white
+  //     opacity: style with data conditions
+  //         index is 5, 10: 0.2
+  //         fallback: 0.1
   satelliteStreetsWithPaths(
-    "mapbox://styles/hi-ker/cloa9i53h011s01qsdf867pcy",
+    "mapbox://styles/hi-ker/cm6dk2zkg004x01sg2hm36puk",
   );
 
   const MapStyle(this.url);
