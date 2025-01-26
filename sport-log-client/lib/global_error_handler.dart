@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:sport_log/app.dart';
 import 'package:sport_log/config.dart';
 import 'package:sport_log/helpers/logger.dart';
@@ -40,6 +41,14 @@ class GlobalErrorHandler {
     DiagnosticsNode? diagnosticsNode,
     String? library,
   ]) async {
+    if (error is PlatformException &&
+        error.message != null &&
+        error.message!.contains(
+          "Attempt to read from field 'float S1.c.c' on a null object reference in method 'boolean S1.d.c()'",
+        )) {
+      return;
+    }
+
     final description = "git ref: ${Config.gitRef}\n"
         "time: ${DateTime.now()}\n"
         "caught by: $caughtBy\n"
