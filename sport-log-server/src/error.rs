@@ -118,7 +118,7 @@ impl From<DieselError> for HandlerError {
                     message: Some({
                         let table = db_error_info.table_name().unwrap_or("<unknown>").to_owned();
                         let constraint = db_error_info.constraint_name();
-                        if constraint.map_or(false, |constraint| constraint.ends_with("_pkey")) {
+                        if constraint.is_some_and(|constraint| constraint.ends_with("_pkey")) {
                             ErrorMessage::PrimaryKeyViolation { table }
                         } else {
                             let columns = constraint

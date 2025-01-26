@@ -394,7 +394,7 @@ async fn wodify_login(
             .await?
             .attr("title")
             .await?
-            .map_or(false, |title| {
+            .is_some_and(|title| {
                 title.contains(&exec_action_event.action_name) && title.contains(&time)
             });
 
