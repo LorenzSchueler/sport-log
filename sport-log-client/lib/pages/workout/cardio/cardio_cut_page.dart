@@ -35,8 +35,11 @@ class _CardioCutPageState extends State<CardioCutPage> {
 
   MapController? _mapController;
 
-  final NullablePointer<PolylineAnnotation> _trackLine =
-      NullablePointer.nullPointer();
+  final List<NullablePointer<PolylineAnnotation>> _trackLines = [
+    NullablePointer.nullPointer(),
+    NullablePointer.nullPointer(),
+    NullablePointer.nullPointer(),
+  ];
   final NullablePointer<PolylineAnnotation> _routeLine =
       NullablePointer.nullPointer();
   final NullablePointer<CircleAnnotation> _cutStartMarker =
@@ -46,11 +49,11 @@ class _CardioCutPageState extends State<CardioCutPage> {
 
   Future<void> _onMapCreated(MapController mapController) async {
     _mapController = mapController;
-    await _setBoundsAndLines();
-    await _updateCutLocationMarker();
+    await _setBoundsAndRoute();
+    await _updateCutMarkerAndTrack();
   }
 
-  Future<void> _setBoundsAndLines() async {
+  Future<void> _setBoundsAndRoute() async {
     await _mapController?.setBoundsFromTracks(
       _cardioSessionDescription.cardioSession.track,
       _cardioSessionDescription.route?.track,
@@ -60,17 +63,38 @@ class _CardioCutPageState extends State<CardioCutPage> {
       _routeLine,
       _cardioSessionDescription.route?.track,
     );
-    await _mapController?.updateTrackLine(
-      _trackLine,
-      _cardioSessionDescription.cardioSession.track,
-    );
   }
 
-  Future<void> _updateCutLocationMarker() async {
-    final startLatLng = _cardioSessionDescription.cardioSession.track
-        ?.firstWhereOrNull((pos) => pos.time >= _cutStartDuration)
-        ?.latLng;
-    final endLatLng = _cardioSessionDescription.cardioSession.track?.reversed
+  Future<void> _updateCutMarkerAndTrack() async {
+    final startLtEnd = _cutStartDuration < _cutEndDuration;
+    final time1 = startLtEnd ? _cutStartDuration : _cutEndDuration;
+    final time2 = startLtEnd ? _cutEndDuration : _cutStartDuration;
+
+    final track = _cardioSessionDescription.cardioSession.track;
+    final latLngs1 = track?.where((pos) => pos.time <= time1);
+    final latLngs2 =
+        track?.where((pos) => pos.time >= time1 && pos.time <= time2);
+    final latLngs3 = track?.where((pos) => pos.time >= time2);
+    const cutLineOpacity = 0.4;
+    await _mapController?.updateTrackLine(
+      _trackLines[0],
+      latLngs1,
+      lineOpacity: startLtEnd ? cutLineOpacity : null,
+    );
+    await _mapController?.updateTrackLine(
+      _trackLines[1],
+      latLngs2,
+      lineOpacity: startLtEnd ? null : cutLineOpacity,
+    );
+    await _mapController?.updateTrackLine(
+      _trackLines[2],
+      latLngs3,
+      lineOpacity: startLtEnd ? cutLineOpacity : null,
+    );
+
+    final startLatLng =
+        track?.firstWhereOrNull((pos) => pos.time >= _cutStartDuration)?.latLng;
+    final endLatLng = track?.reversed
         .firstWhereOrNull((pos) => pos.time <= _cutEndDuration)
         ?.latLng;
     await _mapController?.updateTrackMarker(_cutStartMarker, startLatLng);
@@ -78,23 +102,25 @@ class _CardioCutPageState extends State<CardioCutPage> {
   }
 
   Future<void> _cutCardioSession() async {
-    if (_cutStartDuration < _cutEndDuration) {
-      final approved = await showApproveDialog(
-        context: context,
-        title: "Cut Cardio Session",
-        text:
-            "This can not be reversed. All cut out data will be permanently lost.",
-      );
-      if (approved) {
-        _cardioSessionDescription.cardioSession
-            .cut(_cutStartDuration, _cutEndDuration);
-        if (mounted) {
-          Navigator.pop(
-            context,
-            // needed for cardio edit page
-            ReturnObject.updated(_cardioSessionDescription),
-          );
-        }
+    final approved = await showApproveDialog(
+      context: context,
+      title: "Cut Cardio Session",
+      text:
+          "This can not be reversed. All cut out data will be permanently lost.",
+    );
+    if (approved) {
+      final cutSession = _cardioSessionDescription.cardioSession
+          .cut(_cutStartDuration, _cutEndDuration);
+      if (cutSession == null) {
+        return;
+      }
+      _cardioSessionDescription.cardioSession = cutSession;
+      if (mounted) {
+        Navigator.pop(
+          context,
+          // needed for cardio edit page
+          ReturnObject.updated(_cardioSessionDescription),
+        );
       }
     }
   }
@@ -136,16 +162,8 @@ class _CardioCutPageState extends State<CardioCutPage> {
                             initialDuration: _cutStartDuration,
                           );
                           if (context.mounted && duration != null) {
-                            if (duration > _cutEndDuration) {
-                              await showMessageDialog(
-                                context: context,
-                                title: "Invalid Start Time",
-                                text: "Start time can not be after end time.",
-                              );
-                            } else {
-                              setState(() => _cutStartDuration = duration);
-                              await _updateCutLocationMarker();
-                            }
+                            setState(() => _cutStartDuration = duration);
+                            await _updateCutMarkerAndTrack();
                           }
                         },
                         child: Text(_cutStartDuration.formatHms),
@@ -160,16 +178,8 @@ class _CardioCutPageState extends State<CardioCutPage> {
                             initialDuration: _cutEndDuration,
                           );
                           if (context.mounted && duration != null) {
-                            if (duration < _cutStartDuration) {
-                              await showMessageDialog(
-                                context: context,
-                                title: "Invalid End Time",
-                                text: "End time can not be before start time.",
-                              );
-                            } else {
-                              setState(() => _cutEndDuration = duration);
-                              await _updateCutLocationMarker();
-                            }
+                            setState(() => _cutEndDuration = duration);
+                            await _updateCutMarkerAndTrack();
                           }
                         },
                         child: Text(_cutEndDuration.formatHms),

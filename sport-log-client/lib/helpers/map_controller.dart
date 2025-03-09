@@ -166,27 +166,34 @@ class MapController {
 
   Future<PolylineAnnotation?> addLine(
     Iterable<Position> route,
-    Color color,
-  ) async =>
+    Color color, {
+    double? lineOpacity,
+  }) async =>
       await _lineManager?.create(
         PolylineAnnotationOptions(
           geometry: route.map((p) => p.latLng).toLineString(),
           lineWidth: 2,
           lineColor: _colorToInt(color),
+          lineOpacity: lineOpacity,
         ),
       );
 
   Future<void> updateLine(
     NullablePointer<PolylineAnnotation> line,
     Iterable<Position>? track,
-    Color color,
-  ) async {
+    Color color, {
+    double? lineOpacity,
+  }) async {
     await _lock.synchronized(() async {
       if (line.isNull && track != null) {
-        line.object = await addLine(track, color);
+        line.object = await addLine(track, color, lineOpacity: lineOpacity);
       } else if (line.isNotNull && track != null) {
-        line.object!.geometry = track.map((p) => p.latLng).toLineString();
-        await _lineManager?.update(line.object!);
+        await removeLine(line.object!);
+        line.object = await addLine(track, color, lineOpacity: lineOpacity);
+        //line.object!.geometry = track.map((p) => p.latLng).toLineString();
+        //line.object!.lineColor = _colorToInt(color);
+        //line.object!.lineOpacity = lineOpacity;
+        //await _lineManager?.update(line.object!);
       } else if (line.isNotNull && track == null) {
         await removeLine(line.object!);
         line.setNull();
@@ -211,9 +218,15 @@ class MapController {
 
   Future<void> updateTrackLine(
     NullablePointer<PolylineAnnotation> line,
-    Iterable<Position>? track,
-  ) =>
-      updateLine(line, track, Defaults.mapbox.trackLineColor);
+    Iterable<Position>? track, {
+    double? lineOpacity,
+  }) =>
+      updateLine(
+        line,
+        track,
+        Defaults.mapbox.trackLineColor,
+        lineOpacity: lineOpacity,
+      );
 
   Future<List<CircleAnnotation>?> addCurrentLocationMarker(
     LatLng latLng,

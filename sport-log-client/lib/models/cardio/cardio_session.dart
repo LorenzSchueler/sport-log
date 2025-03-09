@@ -217,8 +217,19 @@ class CardioSession extends AtomicEntity {
         : (heartRate!.length / (time!.inMinuteFractions)).round();
   }
 
-  void cut(Duration start, Duration end) {
-    assert(start < end);
+  CardioSession? cut(Duration start, Duration end) {
+    if (end < start) {
+      if (end < time!) {
+        final endSession = clone()
+          ..cut(start, time!)
+          ..datetime = datetime.add(end);
+        cut(Duration.zero, end);
+        return combineWith(endSession)
+          ?..sanitize()
+          ..id = id;
+      }
+      return null;
+    }
     time = end - start;
     if (track != null && track!.isNotEmpty) {
       final newTrack =
@@ -260,6 +271,7 @@ class CardioSession extends AtomicEntity {
       }
       setAvgHeartRate();
     }
+    return this..sanitize();
   }
 
   // ignore: long-method
