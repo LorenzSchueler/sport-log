@@ -25,29 +25,6 @@ class DurationChartValue {
 class DurationChartLine {
   DurationChartLine._(this.chartValues, this.lineColor);
 
-  factory DurationChartLine._fromNonNormalizedDurationChartLine(
-    List<DurationChartValue> chartValues,
-    Color lineColor,
-    bool absolute,
-  ) {
-    if (chartValues.isEmpty) {
-      return DurationChartLine._([], lineColor);
-    }
-    final maxValue = chartValues.map((e) => e.value).max;
-    final minValue = absolute ? 0 : chartValues.map((e) => e.value).min;
-    final diff = maxValue - minValue;
-    for (final chartValue in chartValues) {
-      if (diff > 0) {
-        chartValue
-          ..value -= minValue
-          ..value /= diff;
-      } else {
-        chartValue.value = 0.5;
-      }
-    }
-    return DurationChartLine._(chartValues, lineColor);
-  }
-
   factory DurationChartLine.fromDurationList({
     required List<Duration>? durations,
     required Color lineColor,
@@ -103,12 +80,25 @@ class DurationChartLine {
         rawValue: value,
       );
     }
+    if (chartValues.last.value.isNaN && chartValues.length >= 2) {
+      chartValues.last.value = chartValues[chartValues.length - 2].value;
+      chartValues.last.rawValue = chartValues[chartValues.length - 2].rawValue;
+    }
     chartValues.sort((v1, v2) => v1.duration.compareTo(v2.duration));
-    return DurationChartLine._fromNonNormalizedDurationChartLine(
-      chartValues,
-      lineColor,
-      absolute,
-    );
+    // normalize
+    final maxValue = chartValues.map((e) => e.value).max;
+    final minValue = absolute ? 0 : chartValues.map((e) => e.value).min;
+    final diff = maxValue - minValue;
+    for (final chartValue in chartValues) {
+      if (diff > 0) {
+        chartValue
+          ..value -= minValue
+          ..value /= diff;
+      } else {
+        chartValue.value = 0.5;
+      }
+    }
+    return DurationChartLine._(chartValues, lineColor);
   }
 
   final List<DurationChartValue> chartValues;
