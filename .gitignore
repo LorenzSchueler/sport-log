@@ -2,7 +2,7 @@
 /.vscode/*
 !/.vscode/launch.json.template
 .idea/
-/sport-log-action-provider-map-matching/map-matching
+
 /sport-log-action-provider-boxplanner-login/sport-log-action-provider-boxplanner-login.toml
 /sport-log-action-provider-sportstracker/sport-log-action-provider-sportstracker.toml
 /sport-log-action-provider-wodify-login/sport-log-action-provider-wodify-login.toml
@@ -12,10 +12,11 @@
 /sport-log-client/sport-log-client.yaml
 /sport-log-client/build.sh
 /sport-log-client/flutter_checks.sh
-flatpak-build
-flatpak-repo
+
+/scripts
+
+/flatpak-build
+/flatpak-repo
 .flatpak-builder
+
 .env
-geckodriver
-rust_checks.sh
-upgrade.sh
