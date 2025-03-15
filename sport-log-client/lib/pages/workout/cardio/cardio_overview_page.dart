@@ -311,6 +311,7 @@ class CardioStatsCard extends StatelessWidget {
       child: Padding(
         padding: Defaults.edgeInsets.normal,
         child: ListView.separated(
+          physics: NeverScrollableScrollPhysics(),
           shrinkWrap: true,
           itemBuilder: (context, index) {
             final group = groupedSessions[index];
