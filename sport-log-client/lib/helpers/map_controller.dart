@@ -365,12 +365,29 @@ class MapController {
     );
   }
 
-  Future<void> disableHillshade(String layerId) async {
-    await _removeLayer(layerId);
+  Future<void> enableLayer(
+    String sourceId,
+    String sourceUrl,
+    String layerId, {
+    double? opacity,
+    double? minZoom,
+  }) async {
+    if (!(await _sourceExists(sourceId) ?? true)) {
+      await _addSource(RasterSource(id: sourceId, url: sourceUrl));
+    }
+    await _addLayer(
+      RasterLayer(
+        id: layerId,
+        sourceId: sourceId,
+        rasterOpacity: opacity,
+        minZoom: minZoom,
+      ),
+    );
   }
 
-  Future<bool> hillshadeEnabled(String layerId) async =>
-      (await _layerExists(layerId)) ?? false;
+  Future<void> disableLayer(String layerId) => _removeLayer(layerId);
+
+  Future<bool> layerEnabled(String layerId) => _layerExists(layerId);
 
   Future<void> enableTerrain(String sourceId, double initPitch) async {
     await _addTerrainSource(sourceId);
@@ -402,8 +419,8 @@ class MapController {
   Future<void> _addSource(Source source) async =>
       await _controller?.style.addSource(source);
 
-  Future<bool?> _layerExists(String layerId) async =>
-      await _controller?.style.styleLayerExists(layerId);
+  Future<bool> _layerExists(String layerId) async =>
+      await _controller?.style.styleLayerExists(layerId) ?? false;
 
   Future<void> _addLayer(Layer layer) async =>
       await _controller?.style.addLayer(layer);

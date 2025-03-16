@@ -82,6 +82,8 @@ abstract class _MapOption {
   Future<void> enable(MapController mapController);
 
   Future<void> disable(MapController mapController);
+
+  Future<bool> isEnabled(MapController mapController);
 }
 
 class _HillshadeOption extends _MapOption {
@@ -96,7 +98,36 @@ class _HillshadeOption extends _MapOption {
 
   @override
   Future<void> disable(MapController mapController) =>
-      mapController.disableHillshade(_hillshadeLayerId);
+      mapController.disableLayer(_hillshadeLayerId);
+
+  @override
+  Future<bool> isEnabled(MapController mapController) =>
+      mapController.layerEnabled(_hillshadeLayerId);
+}
+
+class _SlopeOption extends _MapOption {
+  const _SlopeOption();
+
+  static const _slopeSourceId = "slope-source";
+  static const _slopeSourceUrl = 'mapbox://hi-ker.central-alps-slope';
+  static const _slopeLayerId = "slope-layer";
+
+  @override
+  Future<void> enable(MapController mapController) => mapController.enableLayer(
+        _slopeSourceId,
+        _slopeSourceUrl,
+        _slopeLayerId,
+        opacity: 0.4,
+        minZoom: 10,
+      );
+
+  @override
+  Future<void> disable(MapController mapController) =>
+      mapController.disableLayer(_slopeLayerId);
+
+  @override
+  Future<bool> isEnabled(MapController mapController) =>
+      mapController.layerEnabled(_slopeLayerId);
 }
 
 class _TerrainOption extends _MapOption {
@@ -112,6 +143,10 @@ class _TerrainOption extends _MapOption {
   @override
   Future<void> disable(MapController mapController) =>
       mapController.disableTerrain();
+
+  @override
+  Future<bool> isEnabled(MapController mapController) =>
+      mapController.terrainEnabled();
 }
 
 class _MapStylesBottomSheetState extends State<MapStylesBottomSheet> {
@@ -131,9 +166,10 @@ class _MapStylesBottomSheetState extends State<MapStylesBottomSheet> {
 
   Future<void> _setCurrentState() async {
     final style = await widget.mapController.getStyle();
-    final hasHillshade = await widget.mapController
-        .hillshadeEnabled(_HillshadeOption._hillshadeLayerId);
-    final hasTerrain = await widget.mapController.terrainEnabled();
+    final hasHillshade =
+        await _HillshadeOption().isEnabled(widget.mapController);
+    final hasSlope = await _SlopeOption().isEnabled(widget.mapController);
+    final hasTerrain = await _TerrainOption().isEnabled(widget.mapController);
     if (style == null) {
       return;
     }
@@ -142,6 +178,7 @@ class _MapStylesBottomSheetState extends State<MapStylesBottomSheet> {
         _style = MapStyle.values.firstWhere((s) => s.url == style);
         _options = {
           if (hasHillshade) const _HillshadeOption(),
+          if (hasSlope) const _SlopeOption(),
           if (hasTerrain) const _TerrainOption(),
         };
       });
@@ -215,6 +252,11 @@ class _MapStylesBottomSheetState extends State<MapStylesBottomSheet> {
                 value: _HillshadeOption(),
                 icon: Icon(AppIcons.invertColors),
                 label: Text("Hillshade"),
+              ),
+              ButtonSegment(
+                value: _SlopeOption(),
+                icon: Icon(AppIcons.colorLens),
+                label: Text("Slope"),
               ),
               ButtonSegment(
                 value: _TerrainOption(),
