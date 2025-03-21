@@ -1,13 +1,13 @@
 use axum::{
+    Json,
     extract::{Query, State},
     http::StatusCode,
     response::IntoResponse,
-    Json,
 };
 use axum_extra::body::AsyncReadBody;
 use hyper::{header::CONTENT_DISPOSITION, http::HeaderValue};
 use serde::{Deserialize, Serialize};
-use tokio::fs::{read_to_string, File};
+use tokio::fs::{File, read_to_string};
 
 use crate::{
     auth::AuthUser,
@@ -103,7 +103,7 @@ pub async fn download_app(
         flavor,
     }): Query<AppOptions>,
     State(config): State<&Config>,
-) -> HandlerResult<impl IntoResponse> {
+) -> HandlerResult<impl IntoResponse + use<>> {
     let app_dir = match &config.app_dir {
         None => {
             return Err(HandlerError::from((

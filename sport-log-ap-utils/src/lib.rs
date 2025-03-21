@@ -4,12 +4,12 @@ use chrono::{Duration, SecondsFormat, Utc};
 use rand::Rng;
 use reqwest::{Client, Error, StatusCode};
 use sport_log_types::{
-    uri::{
-        route_max_version, AP_ACTION, AP_ACTION_EVENT, AP_ACTION_PROVIDER,
-        AP_EXECUTABLE_ACTION_EVENT, AP_PLATFORM,
-    },
     Action, ActionEventId, ActionId, ActionProvider, ActionProviderId, ExecutableActionEvent,
     Platform, PlatformId,
+    uri::{
+        AP_ACTION, AP_ACTION_EVENT, AP_ACTION_PROVIDER, AP_EXECUTABLE_ACTION_EVENT, AP_PLATFORM,
+        route_max_version,
+    },
 };
 use tracing::{debug, error, info};
 
@@ -27,10 +27,10 @@ pub async fn setup(
 ) -> Result<(), Error> {
     let client = Client::new();
 
-    let mut rng = rand::thread_rng();
+    let mut rng = rand::rng();
 
     let platform = Platform {
-        id: PlatformId(rng.gen()),
+        id: PlatformId(rng.random()),
         name: platform_name.to_owned(),
         credential,
         deleted: false,
@@ -72,7 +72,7 @@ pub async fn setup(
     };
 
     let action_provider = ActionProvider {
-        id: ActionProviderId(rng.gen()),
+        id: ActionProviderId(rng.random()),
         name: name.to_owned(),
         password: password.to_owned(),
         platform_id,
@@ -118,7 +118,7 @@ pub async fn setup(
     let actions: Vec<Action> = actions
         .iter()
         .map(|action| Action {
-            id: ActionId(rng.gen()),
+            id: ActionId(rng.random()),
             name: action.0.to_owned(),
             action_provider_id,
             description: Some(action.1.to_owned()),

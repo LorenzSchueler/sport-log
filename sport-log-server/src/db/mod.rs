@@ -171,7 +171,7 @@ pub trait GetByUserAndEpoch: Db {
 #[async_trait]
 pub trait GetByEpoch: Db {
     async fn get_by_epoch(epoch: Epoch, db: &mut AsyncPgConnection)
-        -> QueryResult<Vec<Self::Type>>;
+    -> QueryResult<Vec<Self::Type>>;
 }
 
 /// A type for which all entries can be retrieved from the database.

@@ -1,5 +1,5 @@
 use std::{
-    env, fs,
+    fs,
     io::Error as IoError,
     process::{ExitCode, Stdio},
     result::Result as StdResult,
@@ -13,7 +13,7 @@ use serde::Deserialize;
 use sport_log_ap_utils::{disable_events, get_events, setup as setup_db};
 use sport_log_types::{ActionEventId, ExecutableActionEvent};
 use sysinfo::System;
-use thirtyfour::{error::WebDriverError, prelude::*, WebDriver};
+use thirtyfour::{WebDriver, error::WebDriverError, prelude::*};
 use thiserror::Error;
 use tokio::{process::Command, task::JoinError, time};
 use tracing::{debug, error, info, warn};
@@ -21,8 +21,7 @@ use tracing_subscriber::EnvFilter;
 
 const CONFIG_FILE: &str = "sport-log-action-provider-boxplanner-login.toml";
 const NAME: &str = "boxplanner-login";
-const DESCRIPTION: &str =
-    "Boxplanner Login can reserve spots in classes. The action names correspond to the class types.";
+const DESCRIPTION: &str = "Boxplanner Login can reserve spots in classes. The action names correspond to the class types.";
 const PLATFORM_NAME: &str = "boxplanner";
 
 const GECKODRIVER: &str = "geckodriver";
@@ -101,23 +100,15 @@ struct Args {
 
 #[tokio::main]
 async fn main() -> ExitCode {
-    if env::var("RUST_LOG").is_err() {
-        if cfg!(debug_assertions) {
-            env::set_var(
-                "RUST_LOG",
-                "info,sport_log_action_provider_boxplanner_login=debug",
-            );
-        } else {
-            env::set_var(
-                "RUST_LOG",
-                "warn,sport_log_action_provider_boxplanner_login=info",
-            );
-        }
-    }
-
     tracing_subscriber::fmt()
         .with_writer(std::io::stderr)
-        .with_env_filter(EnvFilter::from_default_env())
+        .with_env_filter(EnvFilter::try_from_default_env().unwrap_or_else(|_| {
+            EnvFilter::new(if cfg!(debug_assertions) {
+                "info,sport_log_action_provider_boxplanner_login=debug"
+            } else {
+                "warn,sport_log_action_provider_boxplanner_login=info"
+            })
+        }))
         .init();
 
     let args = Args::parse();

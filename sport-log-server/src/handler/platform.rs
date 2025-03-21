@@ -1,7 +1,7 @@
 use axum::{
+    Json,
     extract::{Query, State},
     http::StatusCode,
-    Json,
 };
 use sport_log_types::{
     EpochResponse, Platform, PlatformCredential, PlatformCredentialId, PlatformId,

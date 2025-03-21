@@ -1,4 +1,4 @@
-use std::{env, fs, process::ExitCode, result::Result as StdResult};
+use std::{fs, process::ExitCode, result::Result as StdResult};
 
 use chrono::{DateTime, Duration};
 use clap::Parser;
@@ -7,9 +7,9 @@ use reqwest::{Client, Error as ReqwestError};
 use serde::Deserialize;
 use sport_log_ap_utils::{disable_events, get_events, setup as setup_db};
 use sport_log_types::{
-    uri::{route_max_version, CARDIO_SESSION, MOVEMENT},
-    ActionEventId, CardioSession, CardioSessionId, CardioType, ExecutableActionEvent, Movement,
-    Position, ID_HEADER,
+    ActionEventId, CardioSession, CardioSessionId, CardioType, ExecutableActionEvent, ID_HEADER,
+    Movement, Position,
+    uri::{CARDIO_SESSION, MOVEMENT, route_max_version},
 };
 use thiserror::Error;
 use tokio::task::{JoinError, JoinHandle};
@@ -142,23 +142,15 @@ struct Args {
 
 #[tokio::main]
 async fn main() -> ExitCode {
-    if env::var("RUST_LOG").is_err() {
-        if cfg!(debug_assertions) {
-            env::set_var(
-                "RUST_LOG",
-                "info,sport_log_action_provider_sportstracker=debug",
-            );
-        } else {
-            env::set_var(
-                "RUST_LOG",
-                "warn,sport_log_action_provider_sportstracker=info",
-            );
-        }
-    }
-
     tracing_subscriber::fmt()
         .with_writer(std::io::stderr)
-        .with_env_filter(EnvFilter::from_default_env())
+        .with_env_filter(EnvFilter::try_from_default_env().unwrap_or_else(|_| {
+            EnvFilter::new(if cfg!(debug_assertions) {
+                "info,sport_log_action_provider_sportstracker=debug"
+            } else {
+                "warn,sport_log_action_provider_sportstracker=info"
+            })
+        }))
         .init();
 
     let args = Args::parse();
@@ -412,7 +404,7 @@ fn try_into_cardio_session(
         .collect();
 
     Some(CardioSession {
-        id: CardioSessionId(rand::thread_rng().gen()),
+        id: CardioSessionId(rand::rng().random()),
         user_id: exec_action_event.user_id,
         movement_id,
         cardio_type,

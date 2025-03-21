@@ -8,10 +8,10 @@ use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "db")]
 use crate::{
-    schema::{metcon, metcon_movement, metcon_session},
     Movement, User,
+    schema::{metcon, metcon_movement, metcon_session},
 };
-use crate::{types::IdString, MovementId, UserId};
+use crate::{MovementId, UserId, types::IdString};
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq)]
 #[cfg_attr(

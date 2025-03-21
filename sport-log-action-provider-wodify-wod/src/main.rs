@@ -1,5 +1,5 @@
 use std::{
-    env, fs,
+    fs,
     io::Error as IoError,
     process::{ExitCode, Stdio},
     result::Result as StdResult,
@@ -14,11 +14,11 @@ use reqwest::{Client, Error as ReqwestError, StatusCode};
 use serde::Deserialize;
 use sport_log_ap_utils::{disable_events, get_events, setup as setup_db};
 use sport_log_types::{
-    uri::{route_max_version, WOD},
-    ActionEventId, ExecutableActionEvent, Wod, WodId, ID_HEADER,
+    ActionEventId, ExecutableActionEvent, ID_HEADER, Wod, WodId,
+    uri::{WOD, route_max_version},
 };
 use sysinfo::System;
-use thirtyfour::{error::WebDriverError, prelude::*, WebDriver};
+use thirtyfour::{WebDriver, error::WebDriverError, prelude::*};
 use thiserror::Error;
 use tokio::{process::Command, task::JoinError, time};
 use tracing::{debug, error, info, warn};
@@ -26,8 +26,7 @@ use tracing_subscriber::EnvFilter;
 
 const CONFIG_FILE: &str = "sport-log-action-provider-wodify-wod.toml";
 const NAME: &str = "wodify-wod";
-const DESCRIPTION: &str =
-    "Wodify Wod can fetch the Workout of the Day and save it in your wods. The action names correspond to the class type the wod should be fetched for.";
+const DESCRIPTION: &str = "Wodify Wod can fetch the Workout of the Day and save it in your wods. The action names correspond to the class type the wod should be fetched for.";
 const PLATFORM_NAME: &str = "wodify";
 
 const GECKODRIVER: &str = "geckodriver";
@@ -112,20 +111,15 @@ struct Args {
 
 #[tokio::main]
 async fn main() -> ExitCode {
-    if env::var("RUST_LOG").is_err() {
-        if cfg!(debug_assertions) {
-            env::set_var(
-                "RUST_LOG",
-                "info,sport_log_action_provider_wodify_wod=debug",
-            );
-        } else {
-            env::set_var("RUST_LOG", "warn,sport_log_action_provider_wodify_wod=info");
-        }
-    }
-
     tracing_subscriber::fmt()
         .with_writer(std::io::stderr)
-        .with_env_filter(EnvFilter::from_default_env())
+        .with_env_filter(EnvFilter::try_from_default_env().unwrap_or_else(|_| {
+            EnvFilter::new(if cfg!(debug_assertions) {
+                "info,sport_log_action_provider_wodify_wod=debug"
+            } else {
+                "warn,sport_log_action_provider_wodify_wod=info"
+            })
+        }))
         .init();
 
     let args = Args::parse();
@@ -426,7 +420,7 @@ async fn try_create_wod(
     );
 
     let wod = Wod {
-        id: WodId(rand::thread_rng().gen()),
+        id: WodId(rand::rng().random()),
         user_id: exec_action_event.user_id,
         date: action_date,
         description: Some(description),

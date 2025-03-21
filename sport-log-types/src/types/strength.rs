@@ -6,10 +6,10 @@ use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "db")]
 use crate::{
-    schema::{eorm, strength_session, strength_set},
     Movement, User,
+    schema::{eorm, strength_session, strength_set},
 };
-use crate::{types::IdString, MovementId, UserId};
+use crate::{MovementId, UserId, types::IdString};
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Deftly)]
 #[derive_deftly(IdString)]

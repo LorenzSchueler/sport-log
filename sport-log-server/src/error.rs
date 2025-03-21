@@ -1,18 +1,18 @@
 use std::convert::Infallible;
 
 use axum::{
+    Json,
     http::{HeaderValue, StatusCode},
     response::{IntoResponse, Response},
-    Json,
 };
 use axum_extra::typed_header::{TypedHeaderRejection, TypedHeaderRejectionReason};
 use diesel::result::{DatabaseErrorKind, Error as DieselError};
 use diesel_async::pooled_connection::deadpool::PoolError;
 use hyper::{
-    header::{AUTHORIZATION, WWW_AUTHENTICATE},
     HeaderMap,
+    header::{AUTHORIZATION, WWW_AUTHENTICATE},
 };
-use serde::{ser::SerializeStruct, Deserialize, Serialize};
+use serde::{Deserialize, Serialize, ser::SerializeStruct};
 use tracing::{info, warn};
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -189,10 +189,9 @@ impl IntoResponse for HandlerError {
         if let Some(message) = &self.message {
             info!("{message:?}");
         }
-        if let Some(header) = &self.headers {
-            (self.status, header.to_owned(), Json(self)).into_response()
-        } else {
-            (self.status, Json(self)).into_response()
+        match &self.headers {
+            Some(header) => (self.status, header.to_owned(), Json(self)).into_response(),
+            _ => (self.status, Json(self)).into_response(),
         }
     }
 }

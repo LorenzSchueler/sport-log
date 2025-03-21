@@ -1,10 +1,10 @@
 use axum::{
     extract::{FromRef, FromRequestParts},
-    http::{request::Parts, StatusCode},
+    http::{StatusCode, request::Parts},
 };
 use diesel_async::{
-    pooled_connection::deadpool::{Object, Pool},
     AsyncPgConnection,
+    pooled_connection::deadpool::{Object, Pool},
 };
 
 use crate::Config;

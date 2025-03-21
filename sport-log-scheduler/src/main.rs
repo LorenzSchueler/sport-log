@@ -26,17 +26,17 @@
 //! The config file must be called `sport-log-scheduler.toml` and must be deserializable to a
 //! [`Config`].
 
-use std::{env, fs, process::ExitCode};
+use std::{fs, process::ExitCode};
 
 use chrono::{DateTime, Datelike, Days, Duration, Utc};
 use rand::Rng;
-use reqwest::{blocking::Client, Error as ReqwestError};
+use reqwest::{Error as ReqwestError, blocking::Client};
 use serde::Deserialize;
 use sport_log_types::{
+    ADMIN_USERNAME, ActionEvent, ActionEventId, CreatableActionRule, DeletableActionEvent,
     uri::{
-        route_max_version, ADM_ACTION_EVENT, ADM_CREATABLE_ACTION_RULE, ADM_DELETABLE_ACTION_EVENT,
+        ADM_ACTION_EVENT, ADM_CREATABLE_ACTION_RULE, ADM_DELETABLE_ACTION_EVENT, route_max_version,
     },
-    ActionEvent, ActionEventId, CreatableActionRule, DeletableActionEvent, ADMIN_USERNAME,
 };
 use tracing::{debug, error, info};
 use tracing_subscriber::EnvFilter;
@@ -57,17 +57,15 @@ struct Config {
 }
 
 fn main() -> ExitCode {
-    if env::var("RUST_LOG").is_err() {
-        if cfg!(debug_assertions) {
-            env::set_var("RUST_LOG", "warn,sport_log_scheduler=debug");
-        } else {
-            env::set_var("RUST_LOG", "warn");
-        }
-    }
-
     tracing_subscriber::fmt()
         .with_writer(std::io::stderr)
-        .with_env_filter(EnvFilter::from_default_env())
+        .with_env_filter(EnvFilter::try_from_default_env().unwrap_or_else(|_| {
+            EnvFilter::new(if cfg!(debug_assertions) {
+                "warn,sport_log_scheduler=debug"
+            } else {
+                "warn"
+            })
+        }))
         .init();
 
     let config_file = match fs::read_to_string(CONFIG_FILE) {
@@ -116,13 +114,13 @@ fn create_action_events(client: &Client, config: &Config) -> Result<(), ReqwestE
     );
     debug!("{:#?}", creatable_action_rules);
 
-    let mut rng = rand::thread_rng();
+    let mut rng = rand::rng();
 
     let mut action_events = vec![];
     for creatable_action_rule in creatable_action_rules {
         for datetime in datetimes_for_rule(&creatable_action_rule) {
             action_events.push(ActionEvent {
-                id: ActionEventId(rng.gen()),
+                id: ActionEventId(rng.random()),
                 user_id: creatable_action_rule.user_id,
                 action_id: creatable_action_rule.action_id,
                 datetime,

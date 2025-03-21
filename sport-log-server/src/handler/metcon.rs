@@ -1,4 +1,4 @@
-use axum::{extract::Query, Json};
+use axum::{Json, extract::Query};
 use sport_log_types::{
     EpochResponse, Metcon, MetconId, MetconMovement, MetconMovementId, MetconSession,
     MetconSessionId,

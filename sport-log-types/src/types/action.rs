@@ -8,10 +8,10 @@ use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "db")]
 use crate::{
-    schema::{action, action_event, action_provider, action_rule},
     Platform, User,
+    schema::{action, action_event, action_provider, action_rule},
 };
-use crate::{types::IdString, PlatformId, UserId};
+use crate::{PlatformId, UserId, types::IdString};
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, Deftly)]
 #[derive_deftly(IdString)]

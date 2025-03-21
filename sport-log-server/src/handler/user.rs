@@ -1,11 +1,11 @@
-use axum::{extract::State, http::StatusCode, Json};
+use axum::{Json, extract::State, http::StatusCode};
 use sport_log_types::{EpochResponse, User};
 
 use crate::{
     auth::{AuthAdmin, AuthUser},
     config::Config,
     db::*,
-    handler::{check_password, ErrorMessage, HandlerError, HandlerResult, UnverifiedSingleOrVec},
+    handler::{ErrorMessage, HandlerError, HandlerResult, UnverifiedSingleOrVec, check_password},
     state::DbConn,
 };
 

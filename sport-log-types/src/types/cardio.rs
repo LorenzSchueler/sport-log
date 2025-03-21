@@ -16,10 +16,10 @@ use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "db")]
 use crate::{
-    schema::{cardio_session, route},
     Movement, User,
+    schema::{cardio_session, route},
 };
-use crate::{types::IdString, MovementId, UserId};
+use crate::{MovementId, UserId, types::IdString};
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq)]
 #[cfg_attr(

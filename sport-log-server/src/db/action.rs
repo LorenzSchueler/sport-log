@@ -1,14 +1,14 @@
-use argon2::{password_hash::SaltString, PasswordHash, PasswordHasher, PasswordVerifier};
+use argon2::{PasswordHash, PasswordHasher, PasswordVerifier, password_hash::SaltString};
 use chrono::{DateTime, Utc};
 use derive_deftly::Deftly;
 use diesel::{prelude::*, result::Error};
 use diesel_async::RunQueryDsl;
-use rand_core::OsRng;
+use rand::rngs::ThreadRng;
 use sport_log_derive::*;
 use sport_log_types::{
-    schema::{action, action_event, action_provider, action_rule, platform_credential},
     Action, ActionEvent, ActionEventId, ActionProviderId, ActionRuleId, CreatableActionRule,
     DeletableActionEvent, ExecutableActionEvent, UserId,
+    schema::{action, action_event, action_provider, action_rule, platform_credential},
 };
 
 use crate::{auth::*, db::*};
@@ -32,7 +32,7 @@ impl ActionProviderDb {
         action_provider: &mut <Self as Db>::Type,
         db: &mut AsyncPgConnection,
     ) -> QueryResult<usize> {
-        let salt = SaltString::generate(&mut OsRng);
+        let salt = SaltString::from_rng(&mut ThreadRng::default());
         action_provider.password = build_hasher()
             .hash_password(action_provider.password.as_bytes(), &salt)
             .map_err(|_| Error::RollbackTransaction)? // this should not happen but prevents panic
@@ -49,7 +49,7 @@ impl ActionProviderDb {
         db: &mut AsyncPgConnection,
     ) -> QueryResult<usize> {
         for action_provider in &mut *action_providers {
-            let salt = SaltString::generate(&mut OsRng);
+            let salt = SaltString::from_rng(&mut ThreadRng::default());
             action_provider.password = build_hasher()
                 .hash_password(action_provider.password.as_bytes(), &salt)
                 .map_err(|_| Error::RollbackTransaction)? // this should not happen but prevents panic

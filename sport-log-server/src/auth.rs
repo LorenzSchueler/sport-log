@@ -2,18 +2,18 @@ use std::ops::Deref;
 
 use axum::{
     extract::{FromRef, FromRequestParts, State},
-    http::{request::Parts, StatusCode},
+    http::{StatusCode, request::Parts},
 };
 use axum_extra::{
-    headers::{authorization::Basic, Authorization},
     TypedHeader,
+    headers::{Authorization, authorization::Basic},
 };
-use sport_log_types::{ActionProviderId, UserId, ID_HEADER};
+use sport_log_types::{ActionProviderId, ID_HEADER, UserId};
 
 use crate::{
+    AppState, Config,
     db::{ActionProviderDb, AdminDb, UserDb},
     error::HandlerError,
-    AppState, Config,
 };
 
 /// [`AuthUser`] is used as a request guard to authenticate a user.

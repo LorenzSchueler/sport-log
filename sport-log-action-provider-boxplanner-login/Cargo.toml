@@ -1,7 +1,7 @@
 [package]
 name = "sport-log-action-provider-boxplanner-login"
 version = "0.1.0"
-edition = "2021"
+edition = "2024"
 
 [dependencies]
 sport-log-types = { path = "../sport-log-types" }

@@ -1,22 +1,22 @@
 use std::{io::Write, sync::LazyLock};
 
 use axum::{
+    Router,
     body::{self, Body},
     http::{
-        header::{ACCEPT_ENCODING, AUTHORIZATION, CONTENT_TYPE},
         HeaderName, HeaderValue, Request, StatusCode,
+        header::{ACCEPT_ENCODING, AUTHORIZATION, CONTENT_TYPE},
     },
     response::Response,
-    Router,
 };
-use base64::{engine::general_purpose::STANDARD, Engine};
+use base64::{Engine, engine::general_purpose::STANDARD};
 use chrono::{Duration, Utc};
 use diesel_async::{
-    pooled_connection::{
-        deadpool::{Hook, Pool},
-        AsyncDieselConnectionManager,
-    },
     AsyncConnection, AsyncPgConnection,
+    pooled_connection::{
+        AsyncDieselConnectionManager,
+        deadpool::{Hook, Pool},
+    },
 };
 use flate2::write::GzDecoder;
 use hyper::header::CONTENT_ENCODING;
@@ -24,12 +24,12 @@ use mime::APPLICATION_JSON;
 use rand::Rng;
 use serde::de::DeserializeOwned;
 use sport_log_types::{
+    ADMIN_USERNAME, AccountData, Action, ActionEvent, ActionEventId, ActionId, ActionProvider,
+    ActionProviderId, Diary, DiaryId, Epoch, EpochMap, EpochResponse, ID_HEADER, Platform,
+    PlatformId, User, UserId,
     uri::{
-        route_max_version, ACCOUNT_DATA, ADM_PLATFORM, AP_ACTION_PROVIDER, AP_PLATFORM, DIARY, USER,
+        ACCOUNT_DATA, ADM_PLATFORM, AP_ACTION_PROVIDER, AP_PLATFORM, DIARY, USER, route_max_version,
     },
-    AccountData, Action, ActionEvent, ActionEventId, ActionId, ActionProvider, ActionProviderId,
-    Diary, DiaryId, Epoch, EpochMap, EpochResponse, Platform, PlatformId, User, UserId,
-    ADMIN_USERNAME, ID_HEADER,
 };
 use tower::Service;
 
@@ -144,7 +144,7 @@ async fn init() -> (Router, DbPool, &'static Config) {
 }
 
 fn rnd() -> i64 {
-    rand::thread_rng().gen()
+    rand::rng().random()
 }
 
 fn auth_header(username: &str, password: &str) -> (HeaderName, String) {

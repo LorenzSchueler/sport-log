@@ -15,14 +15,14 @@
 //! The config must be deserializable to [`Config`].
 //! The name of the config file is specified in [`CONFIG_FILE`].
 
-use std::{env, process::ExitCode};
+use std::process::ExitCode;
 
 use axum::Router;
 use diesel::Connection;
 use diesel_async::{
-    async_connection_wrapper::AsyncConnectionWrapper,
-    pooled_connection::{deadpool::Pool, AsyncDieselConnectionManager},
     AsyncPgConnection,
+    async_connection_wrapper::AsyncConnectionWrapper,
+    pooled_connection::{AsyncDieselConnectionManager, deadpool::Pool},
 };
 use diesel_migrations::{EmbeddedMigrations, HarnessWithOutput, MigrationHarness};
 use tokio::fs;
@@ -51,17 +51,15 @@ const CONFIG_FILE: &str = "sport-log-server.toml";
 const MIGRATIONS: EmbeddedMigrations = diesel_migrations::embed_migrations!();
 
 fn tracing_setup() {
-    if env::var("RUST_LOG").is_err() {
-        if cfg!(debug_assertions) {
-            env::set_var("RUST_LOG", "info,sport_log_server=debug");
-        } else {
-            env::set_var("RUST_LOG", "warn,sport_log_server=info");
-        }
-    }
-
     tracing_subscriber::fmt()
         .with_writer(std::io::stderr)
-        .with_env_filter(EnvFilter::from_default_env())
+        .with_env_filter(EnvFilter::try_from_default_env().unwrap_or_else(|_| {
+            EnvFilter::new(if cfg!(debug_assertions) {
+                "info,sport_log_server=debug"
+            } else {
+                "warn,sport_log_server=info"
+            })
+        }))
         .init();
 }
 

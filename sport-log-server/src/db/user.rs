@@ -1,14 +1,14 @@
 use argon2::{
-    password_hash::{PasswordHash, PasswordHasher, SaltString},
     PasswordVerifier,
+    password_hash::{PasswordHash, PasswordHasher, SaltString},
 };
 use axum::http::StatusCode;
 use derive_deftly::Deftly;
 use diesel::{prelude::*, result::Error};
 use diesel_async::{AsyncPgConnection, RunQueryDsl};
-use rand_core::OsRng;
+use rand::rngs::ThreadRng;
 use sport_log_derive::*;
-use sport_log_types::{schema::user, Epoch, User, UserId};
+use sport_log_types::{Epoch, User, UserId, schema::user};
 
 use crate::{auth::AuthUser, db::*};
 
@@ -22,7 +22,7 @@ impl UserDb {
         user: &mut <Self as Db>::Type,
         db: &mut AsyncPgConnection,
     ) -> QueryResult<usize> {
-        let salt = SaltString::generate(&mut OsRng);
+        let salt = SaltString::from_rng(&mut ThreadRng::default());
         user.password = build_hasher()
             .hash_password(user.password.as_bytes(), &salt)
             .map_err(|_| Error::RollbackTransaction)? // this should not happen but prevents panic
@@ -39,7 +39,7 @@ impl UserDb {
         db: &mut AsyncPgConnection,
     ) -> QueryResult<usize> {
         for user in &mut *users {
-            let salt = SaltString::generate(&mut OsRng);
+            let salt = SaltString::from_rng(&mut ThreadRng::default());
             user.password = build_hasher()
                 .hash_password(user.password.as_bytes(), &salt)
                 .map_err(|_| Error::RollbackTransaction)? // this should not happen but prevents panic
@@ -60,7 +60,7 @@ impl UserDb {
         user: &mut <Self as Db>::Type,
         db: &mut AsyncPgConnection,
     ) -> QueryResult<usize> {
-        let salt = SaltString::generate(&mut OsRng);
+        let salt = SaltString::from_rng(&mut ThreadRng::default());
         user.password = build_hasher()
             .hash_password(user.password.as_bytes(), &salt)
             .map_err(|_| Error::RollbackTransaction)? // this should not happen but prevents panic

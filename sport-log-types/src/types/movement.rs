@@ -6,8 +6,8 @@ use diesel_derive_enum::DbEnum;
 use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "db")]
-use crate::{schema::movement, User};
-use crate::{types::IdString, UserId};
+use crate::{User, schema::movement};
+use crate::{UserId, types::IdString};
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq)]
 #[cfg_attr(

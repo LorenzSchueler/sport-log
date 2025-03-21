@@ -1,7 +1,7 @@
 use axum::{
+    Json,
     extract::{Query, State},
     http::StatusCode,
-    Json,
 };
 use sport_log_types::{
     Action, ActionEvent, ActionEventId, ActionId, ActionProvider, ActionProviderId, ActionRule,
@@ -13,8 +13,8 @@ use crate::{
     config::Config,
     db::*,
     handler::{
-        check_password, ErrorMessage, HandlerError, HandlerResult, IdOption, TimeSpanOption,
-        UnverifiedSingleOrVec,
+        ErrorMessage, HandlerError, HandlerResult, IdOption, TimeSpanOption, UnverifiedSingleOrVec,
+        check_password,
     },
     state::DbConn,
 };
@@ -384,7 +384,7 @@ pub async fn ap_get_executable_action_events(
                     error: "'start' and 'end' must be specified either both or not at all"
                         .to_owned(),
                 },
-            )))
+            )));
         }
     }
     .map(Json)

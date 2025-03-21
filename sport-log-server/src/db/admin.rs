@@ -1,5 +1,5 @@
-use argon2::{password_hash::PasswordHash, PasswordVerifier};
-use diesel::{result::Error, QueryResult};
+use argon2::{PasswordVerifier, password_hash::PasswordHash};
+use diesel::{QueryResult, result::Error};
 use sport_log_types::ADMIN_USERNAME;
 
 use crate::db::build_hasher;

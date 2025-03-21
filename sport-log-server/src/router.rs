@@ -1,14 +1,14 @@
 use std::{iter, time::Duration};
 
 use axum::{
+    Json, Router,
     body::{Body, Bytes},
     extract::DefaultBodyLimit,
-    http::{header::AUTHORIZATION, Request, StatusCode},
+    http::{Request, StatusCode, header::AUTHORIZATION},
     response::Response,
     routing::{delete, get, post},
-    Json, Router,
 };
-use sport_log_types::{uri::*, Version};
+use sport_log_types::{Version, uri::*};
 use tower::ServiceBuilder;
 use tower_http::{
     classify::ServerErrorsFailureClass,
@@ -16,7 +16,7 @@ use tower_http::{
     sensitive_headers::SetSensitiveRequestHeadersLayer,
     trace::TraceLayer,
 };
-use tracing::{debug, trace, warn, Span};
+use tracing::{Span, debug, trace, warn};
 
 use crate::{error::HandlerError, handler::*, state::AppState};
 
