@@ -27,13 +27,13 @@ class _SpinningSyncState extends State<SpinningSync>
       vsync: this,
       duration: const Duration(seconds: 1),
     )..addStatusListener((status) {
-        if (status == AnimationStatus.completed) {
-          // repeat animation
-          if (widget.isSpinning) {
-            _controller.forward(from: 0);
-          }
+      if (status == AnimationStatus.completed) {
+        // repeat animation
+        if (widget.isSpinning) {
+          _controller.forward(from: 0);
         }
-      });
+      }
+    });
 
     if (widget.isSpinning) {
       _controller.forward();
@@ -55,10 +55,7 @@ class _SpinningSyncState extends State<SpinningSync>
       turns: _controller,
       child: IconButton(
         onPressed: widget.onPressed,
-        icon: Transform.scale(
-          scaleX: -1,
-          child: const Icon(AppIcons.sync),
-        ),
+        icon: Transform.scale(scaleX: -1, child: const Icon(AppIcons.sync)),
         color: widget.color,
       ),
     );

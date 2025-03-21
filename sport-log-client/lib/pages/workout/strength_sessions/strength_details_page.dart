@@ -54,8 +54,9 @@ class StrengthSessionDetailsPageState
     if (!delete) {
       return;
     }
-    final result =
-        await _dataProvider.deleteSingle(_strengthSessionDescription);
+    final result = await _dataProvider.deleteSingle(
+      _strengthSessionDescription,
+    );
     if (mounted) {
       if (result.isOk) {
         Navigator.pop(context);
@@ -97,10 +98,7 @@ class StrengthSessionDetailsPageState
             onPressed: _deleteStrengthSession,
             icon: const Icon(AppIcons.delete),
           ),
-          IconButton(
-            onPressed: _pushEditPage,
-            icon: const Icon(AppIcons.edit),
-          ),
+          IconButton(onPressed: _pushEditPage, icon: const Icon(AppIcons.edit)),
         ],
       ),
       body: ListView(
@@ -171,9 +169,7 @@ class _StrengthStatsCard extends StatelessWidget {
               leading: null,
               caption: "Sets",
               bigText: false,
-              child: Text(
-                '${strengthSessionDescription.sets.length} sets',
-              ),
+              child: Text('${strengthSessionDescription.sets.length} sets'),
             ),
             if (strengthSessionDescription.session.interval != null)
               EditTile(
@@ -199,58 +195,58 @@ class _StrengthStatsCard extends StatelessWidget {
     final sumVolume = stats.sumVolume;
     return switch (session.movement.dimension) {
       MovementDimension.reps => [
-          if (maxEorm != null)
-            EditTile(
-              leading: null,
-              caption: 'Max Eorm',
-              bigText: false,
-              child: Text(formatWeight(maxEorm)),
-            ),
-          if (sumVolume != null)
-            EditTile(
-              leading: null,
-              caption: 'Volume',
-              bigText: false,
-              child: Text(formatWeight(sumVolume)),
-            ),
-          if (maxWeight != null)
-            EditTile(
-              leading: null,
-              caption: 'Max Weight',
-              bigText: false,
-              child: Text(formatWeight(maxWeight)),
-            ),
+        if (maxEorm != null)
           EditTile(
             leading: null,
-            caption: 'Avg Reps',
+            caption: 'Max Eorm',
             bigText: false,
-            child: Text(stats.avgCount.toStringAsFixed(1)),
+            child: Text(formatWeight(maxEorm)),
           ),
-        ],
+        if (sumVolume != null)
+          EditTile(
+            leading: null,
+            caption: 'Volume',
+            bigText: false,
+            child: Text(formatWeight(sumVolume)),
+          ),
+        if (maxWeight != null)
+          EditTile(
+            leading: null,
+            caption: 'Max Weight',
+            bigText: false,
+            child: Text(formatWeight(maxWeight)),
+          ),
+        EditTile(
+          leading: null,
+          caption: 'Avg Reps',
+          bigText: false,
+          child: Text(stats.avgCount.toStringAsFixed(1)),
+        ),
+      ],
       MovementDimension.time => [
-          EditTile(
-            leading: null,
-            caption: 'Best Time',
-            bigText: false,
-            child: Text(Duration(milliseconds: stats.minCount).formatMsMill),
-          ),
-        ],
+        EditTile(
+          leading: null,
+          caption: 'Best Time',
+          bigText: false,
+          child: Text(Duration(milliseconds: stats.minCount).formatMsMill),
+        ),
+      ],
       MovementDimension.distance => [
-          EditTile(
-            leading: null,
-            caption: 'Best Distance',
-            bigText: false,
-            child: Text("${stats.maxCount} m"),
-          ),
-        ],
+        EditTile(
+          leading: null,
+          caption: 'Best Distance',
+          bigText: false,
+          child: Text("${stats.maxCount} m"),
+        ),
+      ],
       MovementDimension.energy => [
-          EditTile(
-            leading: null,
-            caption: 'Total Energy',
-            bigText: false,
-            child: Text('${stats.sumCount} cal'),
-          ),
-        ],
+        EditTile(
+          leading: null,
+          caption: 'Total Energy',
+          bigText: false,
+          child: Text('${stats.sumCount} cal'),
+        ),
+      ],
     };
   }
 }
@@ -272,35 +268,32 @@ class _StrengthSetsCard extends StatelessWidget {
         padding: Defaults.edgeInsets.normal,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: strengthSessionDescription.sets.mapIndexed(
-            (index, set) {
-              final recordTypes = strengthRecords.getRecordTypes(
-                set,
-                strengthSessionDescription.movement,
-              );
-              return EditTile(
-                leading: null,
-                caption: "Set ${index + 1}",
-                bigText: false,
-                child: Row(
-                  children: [
-                    Text(
-                      set.toDisplayName(
-                        strengthSessionDescription.movement.dimension,
-                        withEorm: true,
+          children:
+              strengthSessionDescription.sets.mapIndexed((index, set) {
+                final recordTypes = strengthRecords.getRecordTypes(
+                  set,
+                  strengthSessionDescription.movement,
+                );
+                return EditTile(
+                  leading: null,
+                  caption: "Set ${index + 1}",
+                  bigText: false,
+                  child: Row(
+                    children: [
+                      Text(
+                        set.toDisplayName(
+                          strengthSessionDescription.movement.dimension,
+                          withEorm: true,
+                        ),
                       ),
-                    ),
-                    if (recordTypes.isNotEmpty) ...[
-                      Defaults.sizedBox.horizontal.normal,
-                      StrengthRecordMarkers(
-                        strengthRecordTypes: recordTypes,
-                      ),
+                      if (recordTypes.isNotEmpty) ...[
+                        Defaults.sizedBox.horizontal.normal,
+                        StrengthRecordMarkers(strengthRecordTypes: recordTypes),
+                      ],
                     ],
-                  ],
-                ),
-              );
-            },
-          ).toList(),
+                  ),
+                );
+              }).toList(),
         ),
       ),
     );

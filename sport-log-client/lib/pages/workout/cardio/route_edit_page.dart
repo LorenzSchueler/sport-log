@@ -50,15 +50,17 @@ class _RouteEditPageState extends State<RouteEditPage> {
   MapController? _mapController;
   ElevationMapController? _elevationMapController;
 
-  late final Route _route = (widget.route?.clone() ?? Route.defaultValue())
-    ..track ??= []
-    ..markedPositions ??= [];
+  late final Route _route =
+      (widget.route?.clone() ?? Route.defaultValue())
+        ..track ??= []
+        ..markedPositions ??= [];
 
   Future<void> _saveRoute() async {
     // clone because sanitation makes track and markedPositions null if empty
-    final result = widget.isNew
-        ? await _dataProvider.createSingle(_route.clone())
-        : await _dataProvider.updateSingle(_route.clone());
+    final result =
+        widget.isNew
+            ? await _dataProvider.createSingle(_route.clone())
+            : await _dataProvider.updateSingle(_route.clone());
     if (mounted) {
       if (result.isOk) {
         Navigator.pop(
@@ -205,8 +207,10 @@ class _RouteEditPageState extends State<RouteEditPage> {
           _route.markedPositions!.insert(newIndex - 1, location);
         }
       } else if (oldIndex > newIndex) {
-        _route.markedPositions!
-            .insert(newIndex, _route.markedPositions!.removeAt(oldIndex));
+        _route.markedPositions!.insert(
+          newIndex,
+          _route.markedPositions!.removeAt(oldIndex),
+        );
       }
     });
 
@@ -240,134 +244,144 @@ class _RouteEditPageState extends State<RouteEditPage> {
               icon: const Icon(AppIcons.delete),
             ),
             IconButton(
-              onPressed: _formKey.currentContext != null &&
-                      _formKey.currentState!.validate() &&
-                      _route.isValidBeforeSanitation()
-                  ? _saveRoute
-                  : null,
+              onPressed:
+                  _formKey.currentContext != null &&
+                          _formKey.currentState!.validate() &&
+                          _route.isValidBeforeSanitation()
+                      ? _saveRoute
+                      : null,
               icon: const Icon(AppIcons.save),
             ),
           ],
         ),
         body: ProviderConsumer(
           create: (_) => BoolToggle.on(),
-          builder: (context, fullscreen, _) => Form(
-            key: _formKey,
-            child: Column(
-              children: [
-                if (fullscreen.isOff && Settings.instance.developerMode)
-                  SyncStatusButton(
-                    entity: _route,
-                    dataProvider: RouteDataProvider(),
-                  ),
-                Expanded(
-                  child: Stack(
-                    children: [
-                      MapboxMapWrapper(
-                        showFullscreenButton: false,
-                        showMapStylesButton: true,
-                        showSelectRouteButton: false,
-                        showSetNorthButton: true,
-                        showCurrentLocationButton: false,
-                        showCenterLocationButton: false,
-                        showAddLocationButton: false,
-                        onMapCreated: _onMapCreated,
-                        onLongTap: _extendLine,
+          builder:
+              (context, fullscreen, _) => Form(
+                key: _formKey,
+                child: Column(
+                  children: [
+                    if (fullscreen.isOff && Settings.instance.developerMode)
+                      SyncStatusButton(
+                        entity: _route,
+                        dataProvider: RouteDataProvider(),
                       ),
-                      if (_isSearching)
-                        const Align(
-                          alignment: Alignment.topCenter,
-                          child: Padding(
-                            padding: EdgeInsets.only(top: 10),
-                            child: CircularProgressIndicator(
-                              color: Colors.black45,
-                            ),
+                    Expanded(
+                      child: Stack(
+                        children: [
+                          MapboxMapWrapper(
+                            showFullscreenButton: false,
+                            showMapStylesButton: true,
+                            showSelectRouteButton: false,
+                            showSetNorthButton: true,
+                            showCurrentLocationButton: false,
+                            showCenterLocationButton: false,
+                            showAddLocationButton: false,
+                            onMapCreated: _onMapCreated,
+                            onLongTap: _extendLine,
                           ),
-                        ),
-                      Align(
-                        alignment: Alignment.bottomCenter,
-                        child: Padding(
-                          padding: const EdgeInsets.only(bottom: 10),
-                          child: IconButton(
-                            onPressed: fullscreen.toggle,
-                            iconSize: 50,
-                            icon: Icon(
-                              fullscreen.isOn
-                                  ? AppIcons.arrowUp
-                                  : AppIcons.arrowDown,
-                              color: Colors.black,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                ElevationMap(onMapCreated: _onElevationMapCreated),
-                if (fullscreen.isOff)
-                  Padding(
-                    padding: Defaults.edgeInsets.normal,
-                    child: Column(
-                      children: [
-                        SegmentedButton(
-                          segments: SnapMode.values
-                              .map(
-                                (snapMode) => ButtonSegment(
-                                  value: snapMode,
-                                  label: Text(snapMode.name),
+                          if (_isSearching)
+                            const Align(
+                              alignment: Alignment.topCenter,
+                              child: Padding(
+                                padding: EdgeInsets.only(top: 10),
+                                child: CircularProgressIndicator(
+                                  color: Colors.black45,
                                 ),
-                              )
-                              .toList(),
-                          selected: {_snapMode},
-                          showSelectedIcon: false,
-                          onSelectionChanged: (selected) {
-                            setState(() => _snapMode = selected.first);
-                            _updateLine();
-                          },
-                        ),
-                        ConstrainedBox(
-                          constraints: const BoxConstraints(maxHeight: 200),
-                          child: ReorderableListView.builder(
-                            itemBuilder: (context, index) => ListTile(
-                              key: ValueKey(index),
-                              leading: IconButton(
-                                onPressed: () => _removePoint(index),
-                                icon: const Icon(AppIcons.delete),
                               ),
-                              title: Text(
-                                "${index + 1}",
-                                style: Theme.of(context).textTheme.bodyLarge,
-                              ),
-                              trailing: const Icon(AppIcons.dragHandle),
-                              dense: true,
-                              visualDensity: VisualDensity.compact,
-                              contentPadding: const EdgeInsets.only(right: 10),
                             ),
-                            itemCount: _route.markedPositions!.length,
-                            onReorder: _switchPoints,
-                            shrinkWrap: true,
+                          Align(
+                            alignment: Alignment.bottomCenter,
+                            child: Padding(
+                              padding: const EdgeInsets.only(bottom: 10),
+                              child: IconButton(
+                                onPressed: fullscreen.toggle,
+                                iconSize: 50,
+                                icon: Icon(
+                                  fullscreen.isOn
+                                      ? AppIcons.arrowUp
+                                      : AppIcons.arrowDown,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ),
                           ),
-                        ),
-                        const Divider(),
-                        RouteValueUnitDescriptionTable(route: _route),
-                        const Divider(),
-                        TextFormField(
-                          onChanged: (name) =>
-                              setState(() => _route.name = name),
-                          initialValue: _route.name,
-                          validator: Validator.validateStringNotEmpty,
-                          autovalidateMode: AutovalidateMode.onUserInteraction,
-                          decoration: const InputDecoration(
-                            icon: Icon(AppIcons.route),
-                            labelText: "Name",
-                          ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-              ],
-            ),
-          ),
+                    ElevationMap(onMapCreated: _onElevationMapCreated),
+                    if (fullscreen.isOff)
+                      Padding(
+                        padding: Defaults.edgeInsets.normal,
+                        child: Column(
+                          children: [
+                            SegmentedButton(
+                              segments:
+                                  SnapMode.values
+                                      .map(
+                                        (snapMode) => ButtonSegment(
+                                          value: snapMode,
+                                          label: Text(snapMode.name),
+                                        ),
+                                      )
+                                      .toList(),
+                              selected: {_snapMode},
+                              showSelectedIcon: false,
+                              onSelectionChanged: (selected) {
+                                setState(() => _snapMode = selected.first);
+                                _updateLine();
+                              },
+                            ),
+                            ConstrainedBox(
+                              constraints: const BoxConstraints(maxHeight: 200),
+                              child: ReorderableListView.builder(
+                                itemBuilder:
+                                    (context, index) => ListTile(
+                                      key: ValueKey(index),
+                                      leading: IconButton(
+                                        onPressed: () => _removePoint(index),
+                                        icon: const Icon(AppIcons.delete),
+                                      ),
+                                      title: Text(
+                                        "${index + 1}",
+                                        style:
+                                            Theme.of(
+                                              context,
+                                            ).textTheme.bodyLarge,
+                                      ),
+                                      trailing: const Icon(AppIcons.dragHandle),
+                                      dense: true,
+                                      visualDensity: VisualDensity.compact,
+                                      contentPadding: const EdgeInsets.only(
+                                        right: 10,
+                                      ),
+                                    ),
+                                itemCount: _route.markedPositions!.length,
+                                onReorder: _switchPoints,
+                                shrinkWrap: true,
+                              ),
+                            ),
+                            const Divider(),
+                            RouteValueUnitDescriptionTable(route: _route),
+                            const Divider(),
+                            TextFormField(
+                              onChanged:
+                                  (name) => setState(() => _route.name = name),
+                              initialValue: _route.name,
+                              validator: Validator.validateStringNotEmpty,
+                              autovalidateMode:
+                                  AutovalidateMode.onUserInteraction,
+                              decoration: const InputDecoration(
+                                icon: Icon(AppIcons.route),
+                                labelText: "Name",
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                  ],
+                ),
+              ),
         ),
       ),
     );

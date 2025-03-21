@@ -37,13 +37,13 @@ class _MetconSessionDetailsPageState extends State<MetconSessionDetailsPage> {
   }
 
   Future<void> _loadOtherSessions() async {
-    final metconSessionDescriptions =
-        await _dataProvider.getByTimerangeAndMetconAndComment(
-      from: null,
-      until: null,
-      metcon: _metconSessionDescription.metconDescription.metcon,
-      comment: null,
-    );
+    final metconSessionDescriptions = await _dataProvider
+        .getByTimerangeAndMetconAndComment(
+          from: null,
+          until: null,
+          metcon: _metconSessionDescription.metconDescription.metcon,
+          comment: null,
+        );
     final records = await _dataProvider.getMetconRecords();
     if (mounted) {
       setState(() {
@@ -58,8 +58,9 @@ class _MetconSessionDetailsPageState extends State<MetconSessionDetailsPage> {
     if (!delete) {
       return;
     }
-    final result =
-        await _dataProvider.deleteSingle(widget.metconSessionDescription);
+    final result = await _dataProvider.deleteSingle(
+      widget.metconSessionDescription,
+    );
     if (mounted) {
       if (result.isOk) {
         Navigator.pop(context);
@@ -101,10 +102,7 @@ class _MetconSessionDetailsPageState extends State<MetconSessionDetailsPage> {
             onPressed: _deleteMetconSession,
             icon: const Icon(AppIcons.delete),
           ),
-          IconButton(
-            onPressed: _pushEditPage,
-            icon: const Icon(AppIcons.edit),
-          ),
+          IconButton(onPressed: _pushEditPage, icon: const Icon(AppIcons.edit)),
         ],
       ),
       body: ListView(

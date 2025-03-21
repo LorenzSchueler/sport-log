@@ -7,13 +7,13 @@ part of 'action_event.dart';
 // **************************************************************************
 
 ActionEvent _$ActionEventFromJson(Map<String, dynamic> json) => ActionEvent(
-      id: const IdConverter().fromJson(json['id'] as String),
-      actionId: const IdConverter().fromJson(json['action_id'] as String),
-      datetime: const DateTimeConverter().fromJson(json['datetime'] as String),
-      arguments: json['arguments'] as String?,
-      enabled: json['enabled'] as bool,
-      deleted: json['deleted'] as bool,
-    );
+  id: const IdConverter().fromJson(json['id'] as String),
+  actionId: const IdConverter().fromJson(json['action_id'] as String),
+  datetime: const DateTimeConverter().fromJson(json['datetime'] as String),
+  arguments: json['arguments'] as String?,
+  enabled: json['enabled'] as bool,
+  deleted: json['deleted'] as bool,
+);
 
 Map<String, dynamic> _$ActionEventToJson(ActionEvent instance) =>
     <String, dynamic>{

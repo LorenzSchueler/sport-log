@@ -6,11 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
-enum TimerType {
-  timer,
-  interval,
-  stopwatch,
-}
+enum TimerType { timer, interval, stopwatch }
 
 class TimerState extends ChangeNotifier {
   Duration _time = Duration.zero;
@@ -83,8 +79,9 @@ class TimerUtils {
     required this.rounds,
     required this.onTick,
     required this.onStop,
-  }) : restTime = (timerType == TimerType.interval ? restTime : null) ??
-            Duration.zero {
+  }) : restTime =
+           (timerType == TimerType.interval ? restTime : null) ??
+           Duration.zero {
     totalTime = time + this.restTime;
     _timer = Timer.periodic(
       const Duration(seconds: 1),
@@ -133,10 +130,12 @@ class TimerUtils {
       await _player.play(Defaults.assets.beepLong, ctx: _audioCtx);
     } else if (_currentTime.inSeconds > 0 && timerType == TimerType.interval) {
       final roundStart =
-          Duration(seconds: _currentTime.inSeconds % totalTime.inSeconds)
-                  .inSeconds ==
-              0;
-      final restStart = Duration(
+          Duration(
+            seconds: _currentTime.inSeconds % totalTime.inSeconds,
+          ).inSeconds ==
+          0;
+      final restStart =
+          Duration(
             seconds: (_currentTime + restTime).inSeconds % totalTime.inSeconds,
           ).inSeconds ==
           0;
@@ -149,12 +148,13 @@ class TimerUtils {
   Duration get _currentTime =>
       Duration(seconds: _timer.tick) - initialCountdown;
 
-  int get currentRound => _currentTime.isNegative || time.inSeconds == 0
-      ? 0
-      : min(
-          ((_currentTime.inSeconds + 1) / totalTime.inSeconds).ceil(),
-          rounds,
-        );
+  int get currentRound =>
+      _currentTime.isNegative || time.inSeconds == 0
+          ? 0
+          : min(
+            ((_currentTime.inSeconds + 1) / totalTime.inSeconds).ceil(),
+            rounds,
+          );
 
   Duration get displayTime {
     if (_currentTime.isNegative) {
@@ -166,9 +166,11 @@ class TimerUtils {
         case TimerType.interval:
           final roundTime = _currentTime.inSeconds % totalTime.inSeconds;
           return Duration(
-            seconds: roundTime < time.inSeconds
-                ? time.inSeconds - roundTime // round
-                : roundTime - totalTime.inSeconds, // rest
+            seconds:
+                roundTime < time.inSeconds
+                    ? time.inSeconds -
+                        roundTime // round
+                    : roundTime - totalTime.inSeconds, // rest
           );
         case TimerType.stopwatch:
           return _currentTime;

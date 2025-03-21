@@ -6,14 +6,14 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 0.4.0+10 # also change in flatpak/org.sport_log.sport_log_client.metainfo.xml
 
 environment:
-  sdk: ">=3.0.0 <4.0.0"
+  sdk: ">=3.7.0 <4.0.0"
 
 dependencies:
   audio_session: ^0.1.16
   audioplayers: ^6.0.0
   collection: ^1.16.0
   device_info_plus: ^11.1.0
-  file_picker: ^8.0.0+1
+  file_picker: ^9.1.0
   fixnum: ^1.0.0
   fl_chart: ^0.70.0
   flutter:
@@ -36,7 +36,9 @@ dependencies:
   mapbox_maps_flutter: ^2.3.0
   mapbox_search: ^4.2.0
   metronome: ^1.1.1+1
-  open_file_plus: ^3.3.1
+  open_file_plus: #^3.3.1
+    git:
+      url: https://github.com/postflow/open_file_plus.git
   package_info_plus: ^8.0.0
   path_provider: ^2.0.10
   pedometer: #^3.0.0

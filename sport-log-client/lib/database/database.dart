@@ -15,20 +15,17 @@ import 'package:sqflite/sqflite.dart';
 
 final _logger = Logger('DB');
 
-enum DbErrorCode {
-  uniqueViolation,
-  unknown,
-}
+enum DbErrorCode { uniqueViolation, unknown }
 
 class DbError {
   DbError.uniqueViolation(this.table, this.columns)
-      : dbErrorCode = DbErrorCode.uniqueViolation,
-        databaseException = null;
+    : dbErrorCode = DbErrorCode.uniqueViolation,
+      databaseException = null;
 
   DbError.unknown(this.databaseException)
-      : dbErrorCode = DbErrorCode.unknown,
-        table = null,
-        columns = null;
+    : dbErrorCode = DbErrorCode.unknown,
+      table = null,
+      columns = null;
 
   factory DbError.fromDbException(DatabaseException databaseException) {
     if (databaseException.isUniqueConstraintError()) {
@@ -59,9 +56,10 @@ class DbError {
     return switch (dbErrorCode) {
       DbErrorCode.uniqueViolation =>
         "An entry in table $table with the same values for ${columns!.join(', ')} already exists.",
-      DbErrorCode.unknown => databaseException != null
-          ? "Unknown database error: $databaseException"
-          : "Unknown database error",
+      DbErrorCode.unknown =>
+        databaseException != null
+            ? "Unknown database error: $databaseException"
+            : "Unknown database error",
     };
   }
 }
@@ -190,8 +188,9 @@ abstract final class AppDatabase {
               await _execute(db, tableSetupSql);
 
               // insert all columns of new table from old table into new table
-              final columns =
-                  tableAccessor.table.columns.map((c) => c.name).join(', ');
+              final columns = tableAccessor.table.columns
+                  .map((c) => c.name)
+                  .join(', ');
               await _execute(
                 db,
                 "insert into $newTable ($columns) select $columns from $table;",
@@ -236,21 +235,21 @@ abstract final class AppDatabase {
   }
 
   static List<TableAccessor> get _tables => [
-        DiaryTable(),
-        WodTable(),
-        MovementTable(),
-        MetconTable(),
-        MetconMovementTable(),
-        MetconSessionTable(),
-        RouteTable(),
-        CardioSessionTable(),
-        StrengthSessionTable(),
-        StrengthSetTable(),
-        PlatformTable(),
-        PlatformCredentialTable(),
-        ActionProviderTable(),
-        ActionTable(),
-        ActionRuleTable(),
-        ActionEventTable(),
-      ];
+    DiaryTable(),
+    WodTable(),
+    MovementTable(),
+    MetconTable(),
+    MetconMovementTable(),
+    MetconSessionTable(),
+    RouteTable(),
+    CardioSessionTable(),
+    StrengthSessionTable(),
+    StrengthSetTable(),
+    PlatformTable(),
+    PlatformCredentialTable(),
+    ActionProviderTable(),
+    ActionTable(),
+    ActionRuleTable(),
+    ActionEventTable(),
+  ];
 }

@@ -7,59 +7,76 @@ part of 'account_data.dart';
 // **************************************************************************
 
 AccountData _$AccountDataFromJson(Map<String, dynamic> json) => AccountData(
-      user: json['user'] == null
+  user:
+      json['user'] == null
           ? null
           : User.fromJson(json['user'] as Map<String, dynamic>),
-      diaries: (json['diaries'] as List<dynamic>)
+  diaries:
+      (json['diaries'] as List<dynamic>)
           .map((e) => Diary.fromJson(e as Map<String, dynamic>))
           .toList(),
-      wods: (json['wods'] as List<dynamic>)
+  wods:
+      (json['wods'] as List<dynamic>)
           .map((e) => Wod.fromJson(e as Map<String, dynamic>))
           .toList(),
-      movements: (json['movements'] as List<dynamic>)
+  movements:
+      (json['movements'] as List<dynamic>)
           .map((e) => Movement.fromJson(e as Map<String, dynamic>))
           .toList(),
-      strengthSessions: (json['strength_sessions'] as List<dynamic>)
+  strengthSessions:
+      (json['strength_sessions'] as List<dynamic>)
           .map((e) => StrengthSession.fromJson(e as Map<String, dynamic>))
           .toList(),
-      strengthSets: (json['strength_sets'] as List<dynamic>)
+  strengthSets:
+      (json['strength_sets'] as List<dynamic>)
           .map((e) => StrengthSet.fromJson(e as Map<String, dynamic>))
           .toList(),
-      metcons: (json['metcons'] as List<dynamic>)
+  metcons:
+      (json['metcons'] as List<dynamic>)
           .map((e) => Metcon.fromJson(e as Map<String, dynamic>))
           .toList(),
-      metconSessions: (json['metcon_sessions'] as List<dynamic>)
+  metconSessions:
+      (json['metcon_sessions'] as List<dynamic>)
           .map((e) => MetconSession.fromJson(e as Map<String, dynamic>))
           .toList(),
-      metconMovements: (json['metcon_movements'] as List<dynamic>)
+  metconMovements:
+      (json['metcon_movements'] as List<dynamic>)
           .map((e) => MetconMovement.fromJson(e as Map<String, dynamic>))
           .toList(),
-      cardioSessions: (json['cardio_sessions'] as List<dynamic>)
+  cardioSessions:
+      (json['cardio_sessions'] as List<dynamic>)
           .map((e) => CardioSession.fromJson(e as Map<String, dynamic>))
           .toList(),
-      routes: (json['routes'] as List<dynamic>)
+  routes:
+      (json['routes'] as List<dynamic>)
           .map((e) => Route.fromJson(e as Map<String, dynamic>))
           .toList(),
-      platforms: (json['platforms'] as List<dynamic>)
+  platforms:
+      (json['platforms'] as List<dynamic>)
           .map((e) => Platform.fromJson(e as Map<String, dynamic>))
           .toList(),
-      platformCredentials: (json['platform_credentials'] as List<dynamic>)
+  platformCredentials:
+      (json['platform_credentials'] as List<dynamic>)
           .map((e) => PlatformCredential.fromJson(e as Map<String, dynamic>))
           .toList(),
-      actionProviders: (json['action_providers'] as List<dynamic>)
+  actionProviders:
+      (json['action_providers'] as List<dynamic>)
           .map((e) => ActionProvider.fromJson(e as Map<String, dynamic>))
           .toList(),
-      actions: (json['actions'] as List<dynamic>)
+  actions:
+      (json['actions'] as List<dynamic>)
           .map((e) => Action.fromJson(e as Map<String, dynamic>))
           .toList(),
-      actionRules: (json['action_rules'] as List<dynamic>)
+  actionRules:
+      (json['action_rules'] as List<dynamic>)
           .map((e) => ActionRule.fromJson(e as Map<String, dynamic>))
           .toList(),
-      actionEvents: (json['action_events'] as List<dynamic>)
+  actionEvents:
+      (json['action_events'] as List<dynamic>)
           .map((e) => ActionEvent.fromJson(e as Map<String, dynamic>))
           .toList(),
-      epochMap: EpochMap.fromJson(json['epoch_map'] as Map<String, dynamic>),
-    );
+  epochMap: EpochMap.fromJson(json['epoch_map'] as Map<String, dynamic>),
+);
 
 Map<String, dynamic> _$AccountDataToJson(AccountData instance) =>
     <String, dynamic>{

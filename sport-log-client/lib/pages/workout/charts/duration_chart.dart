@@ -33,13 +33,15 @@ class DurationChartLine {
     return DurationChartLine.fromValues(
       values: durations,
       getDuration: (d) => d,
-      getGroupValue: (durations, interval) =>
-          durations.length.toDouble() / interval.inMinuteFractions,
-      getLastGroupValue: (durations, interval) =>
-          durations.length.toDouble() *
-          (interval.inMilliseconds /
-              (durations.last.inMilliseconds % interval.inMilliseconds)) /
-          interval.inMinuteFractions,
+      getGroupValue:
+          (durations, interval) =>
+              durations.length.toDouble() / interval.inMinuteFractions,
+      getLastGroupValue:
+          (durations, interval) =>
+              durations.length.toDouble() *
+              (interval.inMilliseconds /
+                  (durations.last.inMilliseconds % interval.inMilliseconds)) /
+              interval.inMinuteFractions,
       lineColor: lineColor,
       absolute: absolute,
     );
@@ -59,19 +61,19 @@ class DurationChartLine {
     }
     final totalDuration = getDuration(values.last);
     final interval = intervalMinutes(totalDuration);
-    final groupedValues = values
-        .groupListsBy(
-          (el) => groupFunction(getDuration(el), totalDuration),
-        )
-        .entries;
-    final chartValues = groupedValues.map((entry) {
-      final value = getGroupValue(entry.value, interval);
-      return DurationChartValue(
-        duration: entry.key,
-        value: value,
-        rawValue: value,
-      );
-    }).toList();
+    final groupedValues =
+        values
+            .groupListsBy((el) => groupFunction(getDuration(el), totalDuration))
+            .entries;
+    final chartValues =
+        groupedValues.map((entry) {
+          final value = getGroupValue(entry.value, interval);
+          return DurationChartValue(
+            duration: entry.key,
+            value: value,
+            rawValue: value,
+          );
+        }).toList();
     if (getLastGroupValue != null) {
       final value = getLastGroupValue(groupedValues.last.value, interval);
       chartValues.last = DurationChartValue(
@@ -122,28 +124,31 @@ class DurationChart extends StatefulWidget {
     this.touchCallback,
     this.labelColor = Colors.white,
     super.key,
-  })  : _xInterval = chartLines
-            .map(
-              (chartLine) =>
-                  max(
-                    1,
-                    (chartLine.chartValues.lastOrNull?.duration.inMinutes ??
-                            0) /
-                        6,
-                  ).ceil().toDouble() *
-                  60 *
-                  1000,
-            )
-            .max,
-        _maxX = chartLines
-            .map(
-              (chartLine) =>
-                  (chartLine.chartValues.lastOrNull?.duration.inMinutes ?? 0) *
-                  60 *
-                  1000,
-            )
-            .max
-            .toDouble();
+  }) : _xInterval =
+           chartLines
+               .map(
+                 (chartLine) =>
+                     max(
+                       1,
+                       (chartLine.chartValues.lastOrNull?.duration.inMinutes ??
+                               0) /
+                           6,
+                     ).ceil().toDouble() *
+                     60 *
+                     1000,
+               )
+               .max,
+       _maxX =
+           chartLines
+               .map(
+                 (chartLine) =>
+                     (chartLine.chartValues.lastOrNull?.duration.inMinutes ??
+                         0) *
+                     60 *
+                     1000,
+               )
+               .max
+               .toDouble();
 
   final List<DurationChartLine> chartLines;
   final void Function(Duration? x)? touchCallback;
@@ -161,8 +166,9 @@ class _DurationChartState extends State<DurationChart> {
 
   void _onLongPress(double? xValue) {
     setState(() => _lastX = xValue);
-    widget.touchCallback
-        ?.call(xValue == null ? null : Duration(milliseconds: xValue.round()));
+    widget.touchCallback?.call(
+      xValue == null ? null : Duration(milliseconds: xValue.round()),
+    );
   }
 
   @override
@@ -174,14 +180,15 @@ class _DurationChartState extends State<DurationChart> {
           lineBarsData: [
             for (final chartLine in widget.chartLines)
               LineChartBarData(
-                spots: chartLine.chartValues
-                    .map(
-                      (v) => FlSpot(
-                        v.duration.inMilliseconds.toDouble(),
-                        v.value,
-                      ),
-                    )
-                    .toList(),
+                spots:
+                    chartLine.chartValues
+                        .map(
+                          (v) => FlSpot(
+                            v.duration.inMilliseconds.toDouble(),
+                            v.value,
+                          ),
+                        )
+                        .toList(),
                 color: chartLine.lineColor,
                 dotData: const FlDotData(show: false),
                 isCurved: true,
@@ -201,14 +208,15 @@ class _DurationChartState extends State<DurationChart> {
               sideTitles: SideTitles(
                 showTitles: true,
                 interval: widget._xInterval,
-                getTitlesWidget: (value, _) => Text(
-                  value.round() % widget._xInterval.round() == 0 &&
-                          value.round() > 0 &&
-                          value.round() < widget._maxX
-                      ? Duration(milliseconds: value.round()).formatHm
-                      : "", // remove label at 0 and last value
-                  style: TextStyle(color: widget.labelColor),
-                ),
+                getTitlesWidget:
+                    (value, _) => Text(
+                      value.round() % widget._xInterval.round() == 0 &&
+                              value.round() > 0 &&
+                              value.round() < widget._maxX
+                          ? Duration(milliseconds: value.round()).formatHm
+                          : "", // remove label at 0 and last value
+                      style: TextStyle(color: widget.labelColor),
+                    ),
                 reservedSize: 20,
               ),
             ),

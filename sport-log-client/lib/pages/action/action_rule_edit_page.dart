@@ -28,15 +28,17 @@ class ActionRuleEditPage extends StatefulWidget {
 
 class _ActionRuleEditPageState extends State<ActionRuleEditPage> {
   final _dataProvider = ActionRuleDataProvider();
-  late final ActionRule _actionRule = widget.actionRule?.clone() ??
+  late final ActionRule _actionRule =
+      widget.actionRule?.clone() ??
       ActionRule.defaultValue(
         widget.actionProviderDescription.actions.first.id,
       );
 
   Future<void> _saveActionRule() async {
-    final result = widget.isNew
-        ? await _dataProvider.createSingle(_actionRule)
-        : await _dataProvider.updateSingle(_actionRule);
+    final result =
+        widget.isNew
+            ? await _dataProvider.createSingle(_actionRule)
+            : await _dataProvider.updateSingle(_actionRule);
     if (mounted) {
       if (result.isOk) {
         Navigator.pop(context);
@@ -85,9 +87,10 @@ class _ActionRuleEditPageState extends State<ActionRuleEditPage> {
               icon: const Icon(AppIcons.delete),
             ),
             IconButton(
-              onPressed: _actionRule.isValidBeforeSanitation()
-                  ? _saveActionRule
-                  : null,
+              onPressed:
+                  _actionRule.isValidBeforeSanitation()
+                      ? _saveActionRule
+                      : null,
               icon: const Icon(AppIcons.save),
             ),
           ],
@@ -108,10 +111,10 @@ class _ActionRuleEditPageState extends State<ActionRuleEditPage> {
                 onTap: () async {
                   final action = await showActionPicker(
                     actions: widget.actionProviderDescription.actions,
-                    selectedAction:
-                        widget.actionProviderDescription.actions.firstWhere(
-                      (action) => action.id == _actionRule.actionId,
-                    ),
+                    selectedAction: widget.actionProviderDescription.actions
+                        .firstWhere(
+                          (action) => action.id == _actionRule.actionId,
+                        ),
                     context: context,
                   );
                   if (mounted && action != null) {
@@ -153,9 +156,11 @@ class _ActionRuleEditPageState extends State<ActionRuleEditPage> {
                   labelText: "Arguments",
                 ),
                 initialValue: _actionRule.arguments,
-                onChanged: (arguments) => setState(() {
-                  _actionRule.arguments = arguments.isEmpty ? null : arguments;
-                }),
+                onChanged:
+                    (arguments) => setState(() {
+                      _actionRule.arguments =
+                          arguments.isEmpty ? null : arguments;
+                    }),
               ),
             ],
           ),

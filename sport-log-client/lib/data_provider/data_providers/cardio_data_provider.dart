@@ -34,8 +34,10 @@ class RouteDataProvider extends EntityDataProvider<Route> {
   }
 
   Future<List<Route>> getByName(String? name) async {
-    return (await table.getNonDeleted())
-        .fuzzySort(query: name, toString: (m) => m.name);
+    return (await table.getNonDeleted()).fuzzySort(
+      query: name,
+      toString: (m) => m.name,
+    );
   }
 }
 
@@ -74,16 +76,15 @@ class CardioSessionDataProvider extends EntityDataProvider<CardioSession> {
   }
 
   Future<List<(Int64, DateTime, String?)>>
-      getIdDatetimeCommentByMovementCommentWithTrack({
+  getIdDatetimeCommentByMovementCommentWithTrack({
     required Movement movement,
     required String? comment,
     required bool hasTrack,
-  }) =>
-          table.getIdDatetimeCommentByMovementCommentWithTrack(
-            movement: movement,
-            comment: comment,
-            hasTrack: hasTrack,
-          );
+  }) => table.getIdDatetimeCommentByMovementCommentWithTrack(
+    movement: movement,
+    comment: comment,
+    hasTrack: hasTrack,
+  );
 }
 
 class CardioSessionDescriptionDataProvider

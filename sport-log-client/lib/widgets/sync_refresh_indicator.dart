@@ -13,9 +13,8 @@ class SyncRefreshIndicator extends StatelessWidget {
     return Consumer<Sync>(
       builder: (context, sync, _) {
         return RefreshIndicator(
-          onRefresh: () => sync.sync(
-            onNoInternet: () => showNoInternetToast(context),
-          ),
+          onRefresh:
+              () => sync.sync(onNoInternet: () => showNoInternetToast(context)),
           child: child,
         );
       },

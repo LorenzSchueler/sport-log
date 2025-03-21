@@ -38,14 +38,14 @@ class _RepeatIconButtonState extends State<RepeatIconButton> {
         icon: widget.icon,
         color: widget.color,
         onPressed: widget.onClick,
-        style: ButtonStyle(
-          tapTargetSize: widget.materialTapTargetSize,
-        ),
+        style: ButtonStyle(tapTargetSize: widget.materialTapTargetSize),
       ),
-      onLongPress: () => _timer = Timer.periodic(
-        const Duration(milliseconds: 80),
-        (_) => widget.onClick?.call(),
-      ),
+      onLongPress:
+          () =>
+              _timer = Timer.periodic(
+                const Duration(milliseconds: 80),
+                (_) => widget.onClick?.call(),
+              ),
       onLongPressEnd: (_) => _timer?.cancel(),
     );
   }

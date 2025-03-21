@@ -8,8 +8,8 @@ class LatLng {
   const LatLng({required this.lat, required this.lng});
 
   LatLng.fromPoint(Point point)
-      : lat = point.coordinates.lat as double,
-        lng = point.coordinates.lng as double;
+    : lat = point.coordinates.lat as double,
+      lng = point.coordinates.lng as double;
 
   final double lat;
   final double lng;
@@ -131,9 +131,8 @@ extension LatLngIterExtension on Iterable<LatLng> {
     );
   }
 
-  LineString toLineString() => LineString(
-        coordinates: map((latLng) => latLng._toPosition()).toList(),
-      );
+  LineString toLineString() =>
+      LineString(coordinates: map((latLng) => latLng._toPosition()).toList());
 }
 
 class LatLngZoom {
@@ -151,8 +150,8 @@ class LatLngBounds {
 
   // List of [lat1, lng1, lat2, lng2] like the one produced by `LatLngBounds.toList()`.
   LatLngBounds.fromList(List<double> l)
-      : northeast = LatLng(lat: l[0], lng: l[1]),
-        southwest = LatLng(lat: l[2], lng: l[3]);
+    : northeast = LatLng(lat: l[0], lng: l[1]),
+      southwest = LatLng(lat: l[2], lng: l[3]);
 
   LatLng northeast;
   LatLng southwest;
@@ -177,28 +176,32 @@ class LatLngBounds {
   }
 
   Polygon toPolygon() => Polygon(
-        coordinates: [
-          [
-            northeast._toPosition(),
-            LatLng(lat: northeast.lat, lng: southwest.lng)._toPosition(),
-            southwest._toPosition(),
-            LatLng(lat: southwest.lat, lng: northeast.lng)._toPosition(),
-          ]
-        ],
-      );
+    coordinates: [
+      [
+        northeast._toPosition(),
+        LatLng(lat: northeast.lat, lng: southwest.lng)._toPosition(),
+        southwest._toPosition(),
+        LatLng(lat: southwest.lat, lng: northeast.lng)._toPosition(),
+      ],
+    ],
+  );
 
-  List<double> toList() =>
-      [northeast.lat, northeast.lng, southwest.lat, southwest.lng];
+  List<double> toList() => [
+    northeast.lat,
+    northeast.lng,
+    southwest.lat,
+    southwest.lng,
+  ];
 
   LineString toLineString() => LineString(
-        coordinates: [
-          northeast._toPosition(),
-          LatLng(lat: northeast.lat, lng: southwest.lng)._toPosition(),
-          southwest._toPosition(),
-          LatLng(lat: southwest.lat, lng: northeast.lng)._toPosition(),
-          northeast._toPosition(),
-        ],
-      );
+    coordinates: [
+      northeast._toPosition(),
+      LatLng(lat: northeast.lat, lng: southwest.lng)._toPosition(),
+      southwest._toPosition(),
+      LatLng(lat: southwest.lat, lng: northeast.lng)._toPosition(),
+      northeast._toPosition(),
+    ],
+  );
 
   LatLng get center {
     final north = northeast.lat;

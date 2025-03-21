@@ -30,19 +30,20 @@ class DistanceChartLine {
       return DistanceChartLine._([], lineColor, absolute);
     }
     final totalDistance = getDistance(values.last);
-    final chartValues = values
-        .groupListsBy(
-          (value) => _groupFunction(getDistance(value), totalDistance),
-        )
-        .entries
-        .map(
-          (entry) => DistanceChartValue(
-            distance: entry.key,
-            value: entry.value.map((v) => getValue(v)).average,
-          ),
-        )
-        .toList()
-      ..sort((v1, v2) => v1.distance.compareTo(v2.distance));
+    final chartValues =
+        values
+            .groupListsBy(
+              (value) => _groupFunction(getDistance(value), totalDistance),
+            )
+            .entries
+            .map(
+              (entry) => DistanceChartValue(
+                distance: entry.key,
+                value: entry.value.map((v) => getValue(v)).average,
+              ),
+            )
+            .toList()
+          ..sort((v1, v2) => v1.distance.compareTo(v2.distance));
     return DistanceChartLine._(chartValues, lineColor, absolute);
   }
 
@@ -65,33 +66,39 @@ class DistanceChart extends StatefulWidget {
     required this.touchCallback,
     this.labelColor = Colors.white,
     super.key,
-  })  :
-        // interval in m only at whole km at most 8
-        _xInterval = chartLines
-            .map(
-              (chartLine) =>
-                  max(
-                    1,
-                    (chartLine.chartValues.lastOrNull?.distance ?? 0) /
-                        8 /
-                        1000,
-                  ).ceil().toDouble() *
-                  1000,
-            )
-            .max,
-        _minY = chartLines
-            .map(
-              (chartLine) => chartLine.absolute
-                  ? 0.0
-                  : chartLine.chartValues.map((v) => v.value).minOrNull ?? 0,
-            )
-            .min,
-        _maxY = chartLines
-            .map(
-              (chartLine) =>
-                  chartLine.chartValues.map((v) => v.value).maxOrNull ?? 0,
-            )
-            .max;
+  }) : // interval in m only at whole km at most 8
+       _xInterval =
+           chartLines
+               .map(
+                 (chartLine) =>
+                     max(
+                       1,
+                       (chartLine.chartValues.lastOrNull?.distance ?? 0) /
+                           8 /
+                           1000,
+                     ).ceil().toDouble() *
+                     1000,
+               )
+               .max,
+       _minY =
+           chartLines
+               .map(
+                 (chartLine) =>
+                     chartLine.absolute
+                         ? 0.0
+                         : chartLine.chartValues
+                                 .map((v) => v.value)
+                                 .minOrNull ??
+                             0,
+               )
+               .min,
+       _maxY =
+           chartLines
+               .map(
+                 (chartLine) =>
+                     chartLine.chartValues.map((v) => v.value).maxOrNull ?? 0,
+               )
+               .max;
 
   final List<DistanceChartLine> chartLines;
   final void Function(double? distance) touchCallback;
@@ -129,9 +136,10 @@ class _DistanceChartState extends State<DistanceChart> {
           lineBarsData: [
             for (final chartLine in widget.chartLines)
               LineChartBarData(
-                spots: chartLine.chartValues
-                    .map((v) => FlSpot(v.distance, v.value))
-                    .toList(),
+                spots:
+                    chartLine.chartValues
+                        .map((v) => FlSpot(v.distance, v.value))
+                        .toList(),
                 color: chartLine.lineColor,
                 dotData: const FlDotData(show: false),
                 isCurved: true,
@@ -150,12 +158,13 @@ class _DistanceChartState extends State<DistanceChart> {
               sideTitles: SideTitles(
                 showTitles: true,
                 interval: widget._xInterval,
-                getTitlesWidget: (m, _) => Text(
-                  m.round() % widget._xInterval.round() == 0
-                      ? (m / 1000).round().toString()
-                      : "", // remove label at last value
-                  style: TextStyle(color: widget.labelColor),
-                ),
+                getTitlesWidget:
+                    (m, _) => Text(
+                      m.round() % widget._xInterval.round() == 0
+                          ? (m / 1000).round().toString()
+                          : "", // remove label at last value
+                      style: TextStyle(color: widget.labelColor),
+                    ),
                 reservedSize: 20,
               ),
             ),
@@ -163,10 +172,11 @@ class _DistanceChartState extends State<DistanceChart> {
               sideTitles: SideTitles(
                 showTitles: true,
                 reservedSize: 40,
-                getTitlesWidget: (value, _) => Text(
-                  value.round().toString(),
-                  style: TextStyle(color: widget.labelColor),
-                ),
+                getTitlesWidget:
+                    (value, _) => Text(
+                      value.round().toString(),
+                      style: TextStyle(color: widget.labelColor),
+                    ),
               ),
             ),
           ),

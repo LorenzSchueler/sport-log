@@ -5,35 +5,35 @@ import 'package:sport_log/models/strength/strength_records.dart';
 class TimelineUnion {
   TimelineUnion.strengthSession(
     StrengthSessionDescription this._strengthSessionDescription,
-  )   : _metconSessionDescription = null,
-        _cardioSessionDescription = null,
-        _wod = null,
-        _diary = null;
+  ) : _metconSessionDescription = null,
+      _cardioSessionDescription = null,
+      _wod = null,
+      _diary = null;
 
   TimelineUnion.metconSession(
     MetconSessionDescription this._metconSessionDescription,
-  )   : _strengthSessionDescription = null,
-        _cardioSessionDescription = null,
-        _wod = null,
-        _diary = null;
+  ) : _strengthSessionDescription = null,
+      _cardioSessionDescription = null,
+      _wod = null,
+      _diary = null;
 
   TimelineUnion.cardioSession(
     CardioSessionDescription this._cardioSessionDescription,
-  )   : _strengthSessionDescription = null,
-        _metconSessionDescription = null,
-        _wod = null,
-        _diary = null;
+  ) : _strengthSessionDescription = null,
+      _metconSessionDescription = null,
+      _wod = null,
+      _diary = null;
 
   TimelineUnion.wod(Wod this._wod)
-      : _strengthSessionDescription = null,
-        _metconSessionDescription = null,
-        _cardioSessionDescription = null,
-        _diary = null;
+    : _strengthSessionDescription = null,
+      _metconSessionDescription = null,
+      _cardioSessionDescription = null,
+      _diary = null;
   TimelineUnion.diary(Diary this._diary)
-      : _strengthSessionDescription = null,
-        _metconSessionDescription = null,
-        _cardioSessionDescription = null,
-        _wod = null;
+    : _strengthSessionDescription = null,
+      _metconSessionDescription = null,
+      _cardioSessionDescription = null,
+      _wod = null;
 
   final StrengthSessionDescription? _strengthSessionDescription;
   final MetconSessionDescription? _metconSessionDescription;
@@ -43,13 +43,13 @@ class TimelineUnion {
 
   DateTime get datetime {
     if (_strengthSessionDescription != null) {
-      return _strengthSessionDescription!.session.datetime;
+      return _strengthSessionDescription.session.datetime;
     } else if (_metconSessionDescription != null) {
-      return _metconSessionDescription!.metconSession.datetime;
+      return _metconSessionDescription.metconSession.datetime;
     } else if (_cardioSessionDescription != null) {
-      return _cardioSessionDescription!.cardioSession.datetime;
+      return _cardioSessionDescription.cardioSession.datetime;
     } else if (_wod != null) {
-      return _wod!.date;
+      return _wod.date;
     } else {
       return _diary!.date;
     }
@@ -63,13 +63,13 @@ class TimelineUnion {
     T Function(Diary) diaryFunction,
   ) {
     if (_strengthSessionDescription != null) {
-      return strengthFunction(_strengthSessionDescription!);
+      return strengthFunction(_strengthSessionDescription);
     } else if (_metconSessionDescription != null) {
-      return metconFunction(_metconSessionDescription!);
+      return metconFunction(_metconSessionDescription);
     } else if (_cardioSessionDescription != null) {
-      return cardioFunction(_cardioSessionDescription!);
+      return cardioFunction(_cardioSessionDescription);
     } else if (_wod != null) {
-      return wodFunction(_wod!);
+      return wodFunction(_wod);
     } else {
       return diaryFunction(_diary!);
     }

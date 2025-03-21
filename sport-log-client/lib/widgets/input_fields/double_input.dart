@@ -27,8 +27,9 @@ class DoubleInput extends StatefulWidget {
 class _DoubleInputState extends State<DoubleInput> {
   late double _value = widget.initialValue;
 
-  late final TextEditingController _textController =
-      TextEditingController(text: _value.toStringAsFixed(2));
+  late final TextEditingController _textController = TextEditingController(
+    text: _value.toStringAsFixed(2),
+  );
 
   void _setValue(double value, {required bool updateTextField}) {
     setState(() => _value = value);
@@ -65,10 +66,13 @@ class _DoubleInputState extends State<DoubleInput> {
       children: [
         RepeatIconButton(
           icon: const Icon(AppIcons.subtractBox),
-          onClick: _value - widget.stepSize < widget.minValue
-              ? null
-              : () =>
-                  _setValue(_value - widget.stepSize, updateTextField: true),
+          onClick:
+              _value - widget.stepSize < widget.minValue
+                  ? null
+                  : () => _setValue(
+                    _value - widget.stepSize,
+                    updateTextField: true,
+                  ),
           materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
         ),
         SizedBox(
@@ -103,11 +107,14 @@ class _DoubleInputState extends State<DoubleInput> {
         ),
         RepeatIconButton(
           icon: const Icon(AppIcons.addBox),
-          onClick: widget.maxValue != null &&
-                  _value + widget.stepSize > widget.maxValue!
-              ? null
-              : () =>
-                  _setValue(_value + widget.stepSize, updateTextField: true),
+          onClick:
+              widget.maxValue != null &&
+                      _value + widget.stepSize > widget.maxValue!
+                  ? null
+                  : () => _setValue(
+                    _value + widget.stepSize,
+                    updateTextField: true,
+                  ),
           materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
         ),
       ],

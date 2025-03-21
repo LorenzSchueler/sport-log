@@ -85,10 +85,7 @@ class ActionEventTable extends TableAccessor<ActionEvent> {
       tableName,
       where: TableAccessor.combineFilter([
         notDeleted,
-        '${Columns.actionId} in (select ${Columns.id} from ${Tables.action} where ${TableAccessor.combineFilter([
-              TableAccessor.notDeletedOfTable(Tables.action),
-              "${Columns.actionProviderId} = ?",
-            ])})',
+        '${Columns.actionId} in (select ${Columns.id} from ${Tables.action} where ${TableAccessor.combineFilter([TableAccessor.notDeletedOfTable(Tables.action), "${Columns.actionProviderId} = ?"])})',
       ]),
       whereArgs: [actionProvider.id.toInt()],
       orderBy: orderByDatetimeAsc,
@@ -135,10 +132,7 @@ class ActionRuleTable extends TableAccessor<ActionRule> {
       tableName,
       where: TableAccessor.combineFilter([
         notDeleted,
-        '${Columns.actionId} in (select ${Columns.id} from ${Tables.action} where ${TableAccessor.combineFilter([
-              TableAccessor.notDeletedOfTable(Tables.action),
-              "${Columns.actionProviderId} = ?",
-            ])})',
+        '${Columns.actionId} in (select ${Columns.id} from ${Tables.action} where ${TableAccessor.combineFilter([TableAccessor.notDeletedOfTable(Tables.action), "${Columns.actionProviderId} = ?"])})',
       ]),
       whereArgs: [actionProvider.id.toInt()],
       orderBy: Columns.weekday,

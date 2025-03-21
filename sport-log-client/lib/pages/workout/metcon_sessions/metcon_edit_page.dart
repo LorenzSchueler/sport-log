@@ -17,10 +17,7 @@ import 'package:sport_log/widgets/pop_scopes.dart';
 import 'package:sport_log/widgets/sync_status_button.dart';
 
 class MetconEditPage extends StatefulWidget {
-  const MetconEditPage({
-    required this.metconDescription,
-    super.key,
-  });
+  const MetconEditPage({required this.metconDescription, super.key});
 
   final MetconDescription? metconDescription;
   bool get isNew => metconDescription == null;
@@ -40,9 +37,10 @@ class _MetconEditPageState extends State<MetconEditPage> {
     if (_metconDescription.metcon.description == "") {
       setState(() => _metconDescription.metcon.description = null);
     }
-    final result = widget.isNew
-        ? await _dataProvider.createSingle(_metconDescription)
-        : await _dataProvider.updateSingle(_metconDescription);
+    final result =
+        widget.isNew
+            ? await _dataProvider.createSingle(_metconDescription)
+            : await _dataProvider.updateSingle(_metconDescription);
     if (result.isOk) {
       await _dataProvider.setDefaultMetconDescription();
       if (mounted) {
@@ -108,11 +106,12 @@ class _MetconEditPageState extends State<MetconEditPage> {
                 icon: const Icon(AppIcons.delete),
               ),
             IconButton(
-              onPressed: _formKey.currentContext != null &&
-                      _formKey.currentState!.validate() &&
-                      _metconDescription.isValidBeforeSanitation()
-                  ? _saveMetcon
-                  : null,
+              onPressed:
+                  _formKey.currentContext != null &&
+                          _formKey.currentState!.validate() &&
+                          _metconDescription.isValidBeforeSanitation()
+                      ? _saveMetcon
+                      : null,
               icon: const Icon(AppIcons.save),
             ),
           ],
@@ -149,8 +148,8 @@ class _MetconEditPageState extends State<MetconEditPage> {
   Widget _nameInput() {
     return TextFormField(
       initialValue: _metconDescription.metcon.name,
-      onChanged: (name) =>
-          setState(() => _metconDescription.metcon.name = name),
+      onChanged:
+          (name) => setState(() => _metconDescription.metcon.name = name),
       validator: Validator.validateStringNotEmpty,
       autovalidateMode: AutovalidateMode.onUserInteraction,
       textInputAction: TextInputAction.next,
@@ -170,17 +169,19 @@ class _MetconEditPageState extends State<MetconEditPage> {
         keyboardType: TextInputType.multiline,
         minLines: 1,
         maxLines: 5,
-        onChanged: (description) => setState(
-          () => _metconDescription.metcon.description = description,
-        ),
+        onChanged:
+            (description) => setState(
+              () => _metconDescription.metcon.description = description,
+            ),
         decoration: InputDecoration(
           icon: const Icon(AppIcons.notes),
           labelText: "Description",
           suffixIcon: IconButton(
             icon: const Icon(AppIcons.close),
-            onPressed: () => setState(
-              () => _metconDescription.metcon.description = null,
-            ),
+            onPressed:
+                () => setState(
+                  () => _metconDescription.metcon.description = null,
+                ),
           ),
         ),
       ),
@@ -197,14 +198,10 @@ class _MetconEditPageState extends State<MetconEditPage> {
 
   Widget _typeInput() {
     return SegmentedButton(
-      segments: MetconType.values
-          .map(
-            (md) => ButtonSegment(
-              value: md,
-              label: Text(md.name),
-            ),
-          )
-          .toList(),
+      segments:
+          MetconType.values
+              .map((md) => ButtonSegment(value: md, label: Text(md.name)))
+              .toList(),
       selected: {_metconDescription.metcon.metconType},
       showSelectedIcon: false,
       onSelectionChanged: (selected) => _setType(selected.first),
@@ -233,17 +230,17 @@ class _MetconEditPageState extends State<MetconEditPage> {
     return switch (_metconDescription.metcon.metconType) {
       MetconType.amrap => _timecapInput(caption: "Time", allowCancel: false),
       MetconType.emom => Column(
-          children: [
-            _roundsInput(),
-            _timecapInput(caption: "Total Time", allowCancel: false),
-          ],
-        ),
+        children: [
+          _roundsInput(),
+          _timecapInput(caption: "Total Time", allowCancel: false),
+        ],
+      ),
       MetconType.forTime => Column(
-          children: [
-            _roundsInput(),
-            _timecapInput(caption: "Timecap", allowCancel: true),
-          ],
-        ),
+        children: [
+          _roundsInput(),
+          _timecapInput(caption: "Timecap", allowCancel: true),
+        ],
+      ),
     };
   }
 
@@ -268,20 +265,24 @@ class _MetconEditPageState extends State<MetconEditPage> {
       leading: AppIcons.timeInterval,
       caption: caption,
       showButton: _metconDescription.metcon.timecap == null,
-      onButtonPressed: () => setState(() {
-        _metconDescription.metcon.timecap = Metcon.timecapDefaultValue;
-      }),
-      builder: () => DurationInput(
-        initialDuration: _metconDescription.metcon.timecap ??=
-            Metcon.timecapDefaultValue,
-        minDuration: const Duration(minutes: 1),
-        onUpdate: (timecap) {
-          setState(() => _metconDescription.metcon.timecap = timecap);
-        },
-      ),
-      onTrailingTap: allowCancel
-          ? () => setState(() => _metconDescription.metcon.timecap = null)
-          : null,
+      onButtonPressed:
+          () => setState(() {
+            _metconDescription.metcon.timecap = Metcon.timecapDefaultValue;
+          }),
+      builder:
+          () => DurationInput(
+            initialDuration:
+                _metconDescription.metcon.timecap ??=
+                    Metcon.timecapDefaultValue,
+            minDuration: const Duration(minutes: 1),
+            onUpdate: (timecap) {
+              setState(() => _metconDescription.metcon.timecap = timecap);
+            },
+          ),
+      onTrailingTap:
+          allowCancel
+              ? () => setState(() => _metconDescription.metcon.timecap = null)
+              : null,
     );
   }
 

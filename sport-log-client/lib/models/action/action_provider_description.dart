@@ -26,11 +26,11 @@ class ActionProviderDescription extends CompoundEntity {
 
   @override
   ActionProviderDescription clone() => ActionProviderDescription(
-        actionProvider: actionProvider.clone(),
-        actions: actions.clone(),
-        actionRules: actionRules.clone(),
-        actionEvents: actionEvents.clone(),
-      );
+    actionProvider: actionProvider.clone(),
+    actions: actions.clone(),
+    actionRules: actionRules.clone(),
+    actionEvents: actionEvents.clone(),
+  );
 
   @override
   bool isValidBeforeSanitation() {

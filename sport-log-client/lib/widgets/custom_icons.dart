@@ -33,32 +33,71 @@ class CustomIcons {
   static const _kFontFam = 'CustomIcons';
   static const String? _kFontPkg = null;
 
-  static const IconData dumbbell =
-      IconData(0xe800, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData plan =
-      IconData(0xe805, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData cw =
-      IconData(0xe806, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData dumbbell = IconData(
+    0xe800,
+    fontFamily: _kFontFam,
+    fontPackage: _kFontPkg,
+  );
+  static const IconData plan = IconData(
+    0xe805,
+    fontFamily: _kFontFam,
+    fontPackage: _kFontPkg,
+  );
+  static const IconData cw = IconData(
+    0xe806,
+    fontFamily: _kFontFam,
+    fontPackage: _kFontPkg,
+  );
   // ignore: constant_identifier_names
-  static const IconData time_interval =
-      IconData(0xe80a, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData github =
-      IconData(0xf09b, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData gauge =
-      IconData(0xf0e4, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData food =
-      IconData(0xf0f5, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData compass =
-      IconData(0xf14e, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData heartbeat =
-      IconData(0xf21e, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData weight =
-      IconData(0xf496, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData route =
-      IconData(0xf4d7, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData time_interval = IconData(
+    0xe80a,
+    fontFamily: _kFontFam,
+    fontPackage: _kFontPkg,
+  );
+  static const IconData github = IconData(
+    0xf09b,
+    fontFamily: _kFontFam,
+    fontPackage: _kFontPkg,
+  );
+  static const IconData gauge = IconData(
+    0xf0e4,
+    fontFamily: _kFontFam,
+    fontPackage: _kFontPkg,
+  );
+  static const IconData food = IconData(
+    0xf0f5,
+    fontFamily: _kFontFam,
+    fontPackage: _kFontPkg,
+  );
+  static const IconData compass = IconData(
+    0xf14e,
+    fontFamily: _kFontFam,
+    fontPackage: _kFontPkg,
+  );
+  static const IconData heartbeat = IconData(
+    0xf21e,
+    fontFamily: _kFontFam,
+    fontPackage: _kFontPkg,
+  );
+  static const IconData weight = IconData(
+    0xf496,
+    fontFamily: _kFontFam,
+    fontPackage: _kFontPkg,
+  );
+  static const IconData route = IconData(
+    0xf4d7,
+    fontFamily: _kFontFam,
+    fontPackage: _kFontPkg,
+  );
   // ignore: constant_identifier_names
-  static const IconData ruler_horizontal =
-      IconData(0xf547, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData medal =
-      IconData(0xf5a2, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData ruler_horizontal = IconData(
+    0xf547,
+    fontFamily: _kFontFam,
+    fontPackage: _kFontPkg,
+  );
+  static const IconData medal = IconData(
+    0xf5a2,
+    fontFamily: _kFontFam,
+    fontPackage: _kFontPkg,
+  );
 }

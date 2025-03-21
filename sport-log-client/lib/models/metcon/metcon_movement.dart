@@ -41,10 +41,10 @@ class MetconMovement extends AtomicEntity {
     required this.metconId,
     required this.movementId,
     required this.movementNumber,
-  })  : id = randomId(),
-        count = 1,
-        distanceUnit = DistanceUnit.m,
-        deleted = false;
+  }) : id = randomId(),
+       count = 1,
+       distanceUnit = DistanceUnit.m,
+       deleted = false;
 
   factory MetconMovement.fromJson(Map<String, dynamic> json) =>
       _$MetconMovementFromJson(json);
@@ -72,16 +72,16 @@ class MetconMovement extends AtomicEntity {
 
   @override
   MetconMovement clone() => MetconMovement(
-        id: id.clone(),
-        metconId: metconId.clone(),
-        movementId: movementId.clone(),
-        movementNumber: movementNumber,
-        count: count,
-        maleWeight: maleWeight,
-        femaleWeight: femaleWeight,
-        distanceUnit: distanceUnit,
-        deleted: deleted,
-      );
+    id: id.clone(),
+    metconId: metconId.clone(),
+    movementId: movementId.clone(),
+    movementNumber: movementNumber,
+    count: count,
+    maleWeight: maleWeight,
+    femaleWeight: femaleWeight,
+    distanceUnit: distanceUnit,
+    deleted: deleted,
+  );
 
   @override
   bool isValidBeforeSanitation() {
@@ -133,9 +133,10 @@ class DbMetconMovementSerializer extends DbSerializer<MetconMovement> {
       count: r[prefix + Columns.count]! as int,
       maleWeight: r[prefix + Columns.maleWeight] as double?,
       femaleWeight: r[prefix + Columns.femaleWeight] as double?,
-      distanceUnit: r[prefix + Columns.distanceUnit] == null
-          ? null
-          : DistanceUnit.values[r[prefix + Columns.distanceUnit]! as int],
+      distanceUnit:
+          r[prefix + Columns.distanceUnit] == null
+              ? null
+              : DistanceUnit.values[r[prefix + Columns.distanceUnit]! as int],
       deleted: r[prefix + Columns.deleted]! as int == 1,
     );
   }

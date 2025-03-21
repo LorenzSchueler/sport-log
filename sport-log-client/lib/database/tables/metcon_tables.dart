@@ -168,8 +168,7 @@ class MetconSessionTable extends TableAccessor<MetconSession> {
         "${Columns.metconId} = ?",
       ]),
       whereArgs: [metcon.id.toInt()],
-    ))
-        .isNotEmpty;
+    )).isNotEmpty;
   }
 
   Future<List<MetconSession>> getByTimerangeAndMetconAndComment({
@@ -193,24 +192,20 @@ class MetconSessionTable extends TableAccessor<MetconSession> {
   }
 
   Future<MetconRecords> getMetconRecords() async {
-    final records = await database.rawQuery(
-      """
+    final records = await database.rawQuery("""
       select 
         ${Tables.metconSession}.${Columns.metconId}, 
         min(${Tables.metconSession}.${Columns.time}) as ${Columns.time}, 
         max(${Tables.metconSession}.${Columns.rounds} * ${MetconRecord.multiplier} + ${Tables.metconSession}.${Columns.reps}) as ${Columns.roundsAndReps}
       from ${Tables.metconSession}
-      where ${TableAccessor.combineFilter([
-            notDeleted,
-            "${Tables.metconSession}.${Columns.rx} = 1",
-          ])} 
+      where ${TableAccessor.combineFilter([notDeleted, "${Tables.metconSession}.${Columns.rx} = 1"])} 
       group by ${Tables.metconSession}.${Columns.metconId}
-      """,
-    );
+      """);
     return {
       for (final record in records)
-        Int64(record[Columns.metconId]! as int):
-            MetconRecord.fromDbRecord(record),
+        Int64(record[Columns.metconId]! as int): MetconRecord.fromDbRecord(
+          record,
+        ),
     };
   }
 }

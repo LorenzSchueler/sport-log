@@ -22,11 +22,11 @@ class ActionEvent extends AtomicEntity {
   });
 
   ActionEvent.defaultValue(this.actionId)
-      : id = randomId(),
-        datetime = DateTime.now(),
-        arguments = null,
-        enabled = true,
-        deleted = false;
+    : id = randomId(),
+      datetime = DateTime.now(),
+      arguments = null,
+      enabled = true,
+      deleted = false;
 
   factory ActionEvent.fromJson(Map<String, dynamic> json) =>
       _$ActionEventFromJson(json);
@@ -51,13 +51,13 @@ class ActionEvent extends AtomicEntity {
 
   @override
   ActionEvent clone() => ActionEvent(
-        id: id.clone(),
-        actionId: actionId.clone(),
-        datetime: datetime.clone(),
-        arguments: arguments,
-        enabled: enabled,
-        deleted: deleted,
-      );
+    id: id.clone(),
+    actionId: actionId.clone(),
+    datetime: datetime.clone(),
+    arguments: arguments,
+    enabled: enabled,
+    deleted: deleted,
+  );
 
   @override
   bool isValidBeforeSanitation() {

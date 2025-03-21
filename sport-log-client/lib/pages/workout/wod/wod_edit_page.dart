@@ -28,9 +28,10 @@ class _WodEditPageState extends State<WodEditPage> {
   late final Wod _wod = widget.wod?.clone() ?? Wod.defaultValue();
 
   Future<void> _saveWod() async {
-    final result = widget.isNew
-        ? await _dataProvider.createSingle(_wod)
-        : await _dataProvider.updateSingle(_wod);
+    final result =
+        widget.isNew
+            ? await _dataProvider.createSingle(_wod)
+            : await _dataProvider.updateSingle(_wod);
     if (mounted) {
       if (result.isOk) {
         Navigator.pop(context);
@@ -79,11 +80,12 @@ class _WodEditPageState extends State<WodEditPage> {
               icon: const Icon(AppIcons.delete),
             ),
             IconButton(
-              onPressed: _formKey.currentContext != null &&
-                      _formKey.currentState!.validate() &&
-                      _wod.isValidBeforeSanitation()
-                  ? _saveWod
-                  : null,
+              onPressed:
+                  _formKey.currentContext != null &&
+                          _formKey.currentState!.validate() &&
+                          _wod.isValidBeforeSanitation()
+                      ? _saveWod
+                      : null,
               icon: const Icon(AppIcons.save),
             ),
           ],
@@ -124,10 +126,11 @@ class _WodEditPageState extends State<WodEditPage> {
                     initialValue: _wod.description,
                     keyboardType: TextInputType.multiline,
                     maxLines: null,
-                    onChanged: (description) => setState(() {
-                      _wod.description =
-                          description.isEmpty ? null : description;
-                    }),
+                    onChanged:
+                        (description) => setState(() {
+                          _wod.description =
+                              description.isEmpty ? null : description;
+                        }),
                   ),
                 ),
               ],

@@ -213,8 +213,10 @@ abstract final class Account {
     assert(Settings.instance.accountCreated);
 
     // check if current user is able to login
-    final result = await UserApi()
-        .getSingle(Settings.instance.username!, Settings.instance.password!);
+    final result = await UserApi().getSingle(
+      Settings.instance.username!,
+      Settings.instance.password!,
+    );
     if (result.isErr) {
       return result;
     }

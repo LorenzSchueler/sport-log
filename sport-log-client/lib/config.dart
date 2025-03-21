@@ -33,14 +33,20 @@ class Config extends JsonSerializable {
   // ignore: long-method
   static Future<void> init() async {
     try {
-      final map = (isTest
-              ? loadYaml(await File("./sport-log-client.yaml").readAsString())
-              : loadYaml(await rootBundle.loadString('sport-log-client.yaml')))
-          as YamlMap;
+      final map =
+          (isTest
+                  ? loadYaml(
+                    await File("./sport-log-client.yaml").readAsString(),
+                  )
+                  : loadYaml(
+                    await rootBundle.loadString('sport-log-client.yaml'),
+                  ))
+              as YamlMap;
 
-      final instance = releaseMode
-          ? map["release"]! as YamlMap
-          : profileMode
+      final instance =
+          releaseMode
+              ? map["release"]! as YamlMap
+              : profileMode
               ? map["profile"]! as YamlMap
               : map["debug"]! as YamlMap;
       _instance = Config.fromJson(instance.cast<String, dynamic>());

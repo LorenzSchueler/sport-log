@@ -49,14 +49,16 @@ class GlobalErrorHandler {
       return;
     }
 
-    final description = "git ref: ${Config.gitRef}\n"
+    final description =
+        "git ref: ${Config.gitRef}\n"
         "time: ${DateTime.now()}\n"
         "caught by: $caughtBy\n"
         "context: $diagnosticsNode\n"
         "library: $library\n\n"
         "error:\n$error";
     final descriptionAndStack =
-        "$description\n\n" "stack trace:\n$stackTrace\n\n\n";
+        "$description\n\n"
+        "stack trace:\n$stackTrace\n\n\n";
 
     final file = await writeToFile(
       content: descriptionAndStack,

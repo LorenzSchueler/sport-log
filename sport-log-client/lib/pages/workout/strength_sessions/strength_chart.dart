@@ -110,31 +110,34 @@ class _StrengthChartState extends State<StrengthChart> {
       widget.strengthSessionDescriptions.map((d) => d.stats).toList();
 
   List<_SeriesType> _getAvailableSeries() {
-    return switch (
-        widget.strengthSessionDescriptions.first.movement.dimension) {
+    return switch (widget
+        .strengthSessionDescriptions
+        .first
+        .movement
+        .dimension) {
       MovementDimension.reps => [
-          _SeriesType.maxEorm,
-          _SeriesType.maxWeight,
-          _SeriesType.avgWeight,
-          _SeriesType.maxReps,
-          _SeriesType.avgReps,
-          _SeriesType.sumVolume,
-        ],
+        _SeriesType.maxEorm,
+        _SeriesType.maxWeight,
+        _SeriesType.avgWeight,
+        _SeriesType.maxReps,
+        _SeriesType.avgReps,
+        _SeriesType.sumVolume,
+      ],
       MovementDimension.energy => [
-          _SeriesType.sumCalories,
-          _SeriesType.maxWeight,
-          _SeriesType.avgWeight,
-        ],
+        _SeriesType.sumCalories,
+        _SeriesType.maxWeight,
+        _SeriesType.avgWeight,
+      ],
       MovementDimension.distance => [
-          _SeriesType.maxDistance,
-          _SeriesType.maxWeight,
-          _SeriesType.avgWeight,
-        ],
+        _SeriesType.maxDistance,
+        _SeriesType.maxWeight,
+        _SeriesType.avgWeight,
+      ],
       MovementDimension.time => [
-          _SeriesType.minTime,
-          _SeriesType.maxWeight,
-          _SeriesType.avgWeight,
-        ],
+        _SeriesType.minTime,
+        _SeriesType.maxWeight,
+        _SeriesType.avgWeight,
+      ],
     };
   }
 
@@ -146,32 +149,35 @@ class _StrengthChartState extends State<StrengthChart> {
           child: SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: SegmentedButton(
-              segments: _availableSeries
-                  .map(
-                    (md) => ButtonSegment(
-                      value: md,
-                      label: Text(md.name),
-                    ),
-                  )
-                  .toList(),
+              segments:
+                  _availableSeries
+                      .map(
+                        (md) => ButtonSegment(value: md, label: Text(md.name)),
+                      )
+                      .toList(),
               selected: {_selectedSeries},
               showSelectedIcon: false,
-              onSelectionChanged: (selected) =>
-                  setState(() => _selectedSeries = selected.first),
+              onSelectionChanged:
+                  (selected) =>
+                      setState(() => _selectedSeries = selected.first),
             ),
           ),
         ),
         Defaults.sizedBox.vertical.normal,
         DateTimeChart(
-          chartValues: _strengthSessionStats
-              .map((s) {
-                final value = _selectedSeries.value(s);
-                return value == null
-                    ? null
-                    : DateTimeChartValue(datetime: s.datetime, value: value);
-              })
-              .nonNulls
-              .toList(),
+          chartValues:
+              _strengthSessionStats
+                  .map((s) {
+                    final value = _selectedSeries.value(s);
+                    return value == null
+                        ? null
+                        : DateTimeChartValue(
+                          datetime: s.datetime,
+                          value: value,
+                        );
+                  })
+                  .nonNulls
+                  .toList(),
           dateFilterState: widget.dateFilterState,
           absolute: _selectedSeries.yFromZero,
           formatter: _selectedSeries.formatter,

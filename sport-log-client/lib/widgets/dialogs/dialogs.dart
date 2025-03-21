@@ -26,17 +26,15 @@ class _Dialog<T> extends StatelessWidget {
     return AlertDialog(
       title: Text(title),
       content: SingleChildScrollView(child: Text(text)),
-      actions: options
-          .map(
-            (o) => TextButton(
-              onPressed: () => Navigator.pop(context, o.value),
-              child: Text(
-                o.name,
-                style: TextStyle(color: o.color),
-              ),
-            ),
-          )
-          .toList(),
+      actions:
+          options
+              .map(
+                (o) => TextButton(
+                  onPressed: () => Navigator.pop(context, o.value),
+                  child: Text(o.name, style: TextStyle(color: o.color)),
+                ),
+              )
+              .toList(),
     );
   }
 }
@@ -57,17 +55,21 @@ Future<ConflictResolution> showConflictDialog({
   return (await showDialog<ConflictResolution?>(
     context: context,
     barrierDismissible: false,
-    builder: (_) => _Dialog(
-      title: title,
-      text: text,
-      options: [
-        _DialogOption(name: "Solve manually", value: ConflictResolution.manual),
-        _DialogOption(
-          name: "Delete conflicting local changes",
-          value: ConflictResolution.automatic,
+    builder:
+        (_) => _Dialog(
+          title: title,
+          text: text,
+          options: [
+            _DialogOption(
+              name: "Solve manually",
+              value: ConflictResolution.manual,
+            ),
+            _DialogOption(
+              name: "Delete conflicting local changes",
+              value: ConflictResolution.automatic,
+            ),
+          ],
         ),
-      ],
-    ),
   ))!;
 }
 
@@ -84,17 +86,18 @@ Future<PermissionSettings> showPermissionRequiredDialog({
 }) async {
   final systemSettings = await showDialog<PermissionSettings>(
     context: App.globalContext,
-    builder: (_) => _Dialog(
-      title: "Permission Required",
-      text: text,
-      options: [
-        _DialogOption(
-          name: "Change Permissions",
-          value: PermissionSettings.change,
+    builder:
+        (_) => _Dialog(
+          title: "Permission Required",
+          text: text,
+          options: [
+            _DialogOption(
+              name: "Change Permissions",
+              value: PermissionSettings.change,
+            ),
+            _DialogOption(name: "Ignore", value: PermissionSettings.ignore),
+          ],
         ),
-        _DialogOption(name: "Ignore", value: PermissionSettings.ignore),
-      ],
-    ),
   );
   return systemSettings ?? PermissionSettings.ignore;
 }
@@ -113,14 +116,15 @@ Future<ServiceSettings> showRequiredDialog({
 }) async {
   final systemSettings = await showDialog<ServiceSettings>(
     context: App.globalContext,
-    builder: (_) => _Dialog(
-      title: title,
-      text: text,
-      options: [
-        _DialogOption(name: "Enable", value: ServiceSettings.change),
-        _DialogOption(name: "Ignore", value: ServiceSettings.ignore),
-      ],
-    ),
+    builder:
+        (_) => _Dialog(
+          title: title,
+          text: text,
+          options: [
+            _DialogOption(name: "Enable", value: ServiceSettings.change),
+            _DialogOption(name: "Ignore", value: ServiceSettings.ignore),
+          ],
+        ),
   );
   return systemSettings ?? ServiceSettings.ignore;
 }
@@ -132,22 +136,23 @@ Future<bool> showApproveDialog({
 }) async {
   final approved = await showDialog<bool>(
     context: context,
-    builder: (_) => _Dialog(
-      title: title,
-      text: text,
-      options: [
-        _DialogOption(
-          name: "Cancel",
-          value: false,
-          color: Theme.of(context).colorScheme.error,
+    builder:
+        (_) => _Dialog(
+          title: title,
+          text: text,
+          options: [
+            _DialogOption(
+              name: "Cancel",
+              value: false,
+              color: Theme.of(context).colorScheme.error,
+            ),
+            _DialogOption(
+              name: "Approve",
+              value: true,
+              color: Theme.of(context).colorScheme.errorContainer,
+            ),
+          ],
         ),
-        _DialogOption(
-          name: "Approve",
-          value: true,
-          color: Theme.of(context).colorScheme.errorContainer,
-        ),
-      ],
-    ),
   );
   return approved ?? false;
 }
@@ -155,22 +160,23 @@ Future<bool> showApproveDialog({
 Future<bool> showDiscardWarningDialog(BuildContext context) async {
   final discard = await showDialog<bool>(
     context: context,
-    builder: (_) => _Dialog(
-      title: 'Discard Changes',
-      text: 'Changes will be lost.',
-      options: [
-        _DialogOption(
-          name: "Cancel",
-          value: false,
-          color: Theme.of(context).colorScheme.error,
+    builder:
+        (_) => _Dialog(
+          title: 'Discard Changes',
+          text: 'Changes will be lost.',
+          options: [
+            _DialogOption(
+              name: "Cancel",
+              value: false,
+              color: Theme.of(context).colorScheme.error,
+            ),
+            _DialogOption(
+              name: "Discard Changes",
+              value: true,
+              color: Theme.of(context).colorScheme.errorContainer,
+            ),
+          ],
         ),
-        _DialogOption(
-          name: "Discard Changes",
-          value: true,
-          color: Theme.of(context).colorScheme.errorContainer,
-        ),
-      ],
-    ),
   );
   return discard ?? false;
 }
@@ -181,22 +187,23 @@ Future<bool> showDeleteWarningDialog(
 ) async {
   final delete = await showDialog<bool>(
     context: context,
-    builder: (_) => _Dialog(
-      title: 'Delete $entityName?',
-      text: 'This $entityName will be permanently deleted.',
-      options: [
-        _DialogOption(
-          name: "Cancel",
-          value: false,
-          color: Theme.of(context).colorScheme.error,
+    builder:
+        (_) => _Dialog(
+          title: 'Delete $entityName?',
+          text: 'This $entityName will be permanently deleted.',
+          options: [
+            _DialogOption(
+              name: "Cancel",
+              value: false,
+              color: Theme.of(context).colorScheme.error,
+            ),
+            _DialogOption(
+              name: "Delete",
+              value: true,
+              color: Theme.of(context).colorScheme.errorContainer,
+            ),
+          ],
         ),
-        _DialogOption(
-          name: "Delete",
-          value: true,
-          color: Theme.of(context).colorScheme.errorContainer,
-        ),
-      ],
-    ),
   );
   return delete ?? false;
 }
@@ -204,15 +211,16 @@ Future<bool> showDeleteWarningDialog(
 Future<bool> showUpdateDialog(BuildContext context) async {
   final update = await showDialog<bool>(
     context: context,
-    builder: (_) => _Dialog(
-      title: 'Install Update?',
-      text:
-          'An update for Sport-Log is available. Do you want to download and install it now?',
-      options: [
-        _DialogOption(name: "No", value: false),
-        _DialogOption(name: "Yes", value: true),
-      ],
-    ),
+    builder:
+        (_) => _Dialog(
+          title: 'Install Update?',
+          text:
+              'An update for Sport-Log is available. Do you want to download and install it now?',
+          options: [
+            _DialogOption(name: "No", value: false),
+            _DialogOption(name: "Yes", value: true),
+          ],
+        ),
   );
   return update ?? false;
 }
@@ -224,10 +232,11 @@ Future<void> showMessageDialog({
 }) async {
   return showDialog<void>(
     context: context,
-    builder: (_) => _Dialog(
-      title: title,
-      text: text,
-      options: [_DialogOption(name: "Ok", value: null)],
-    ),
+    builder:
+        (_) => _Dialog(
+          title: title,
+          text: text,
+          options: [_DialogOption(name: "Ok", value: null)],
+        ),
   );
 }

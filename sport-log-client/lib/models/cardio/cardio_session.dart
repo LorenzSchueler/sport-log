@@ -53,10 +53,10 @@ class CardioSession extends AtomicEntity {
   });
 
   CardioSession.defaultValue(this.movementId)
-      : id = randomId(),
-        cardioType = CardioType.training,
-        datetime = DateTime.now(),
-        deleted = false;
+    : id = randomId(),
+      cardioType = CardioType.training,
+      datetime = DateTime.now(),
+      deleted = false;
 
   factory CardioSession.fromJson(Map<String, dynamic> json) =>
       _$CardioSessionFromJson(json);
@@ -101,10 +101,16 @@ class CardioSession extends AtomicEntity {
   /// km/h
   double? currentSpeed(Duration start, Duration end) {
     if (track != null) {
-      final startIndex =
-          binarySearchSmallestGE(track!, (Position p) => p.time, start);
-      final endIndex =
-          binarySearchLargestLE(track!, (Position p) => p.time, end);
+      final startIndex = binarySearchSmallestGE(
+        track!,
+        (Position p) => p.time,
+        start,
+      );
+      final endIndex = binarySearchLargestLE(
+        track!,
+        (Position p) => p.time,
+        end,
+      );
       if (startIndex != null && endIndex != null) {
         final startPos = track![startIndex];
         final endPos = track![endIndex];
@@ -137,8 +143,11 @@ class CardioSession extends AtomicEntity {
   /// rpm
   int? currentCadence(Duration start, Duration end) {
     if (cadence != null) {
-      final startIndex =
-          binarySearchSmallestGE(cadence!, (Duration d) => d, start);
+      final startIndex = binarySearchSmallestGE(
+        cadence!,
+        (Duration d) => d,
+        start,
+      );
       final endIndex = binarySearchLargestLE(cadence!, (Duration d) => d, end);
       if (startIndex != null && endIndex != null) {
         final startCadence = cadence![startIndex];
@@ -155,10 +164,16 @@ class CardioSession extends AtomicEntity {
   /// bpm
   int? currentHeartRate(Duration start, Duration end) {
     if (heartRate != null) {
-      final startIndex =
-          binarySearchSmallestGE(heartRate!, (Duration d) => d, start);
-      final endIndex =
-          binarySearchLargestLE(heartRate!, (Duration d) => d, end);
+      final startIndex = binarySearchSmallestGE(
+        heartRate!,
+        (Duration d) => d,
+        start,
+      );
+      final endIndex = binarySearchLargestLE(
+        heartRate!,
+        (Duration d) => d,
+        end,
+      );
       if (startIndex != null && endIndex != null) {
         final startHR = heartRate![startIndex];
         final endHR = heartRate![endIndex];
@@ -206,23 +221,26 @@ class CardioSession extends AtomicEntity {
   }
 
   void setAvgCadence() {
-    avgCadence = time == null || time!.isZero || cadence == null
-        ? null
-        : (cadence!.length / time!.inMinuteFractions).round();
+    avgCadence =
+        time == null || time!.isZero || cadence == null
+            ? null
+            : (cadence!.length / time!.inMinuteFractions).round();
   }
 
   void setAvgHeartRate() {
-    avgHeartRate = time == null || time!.isZero || heartRate == null
-        ? null
-        : (heartRate!.length / (time!.inMinuteFractions)).round();
+    avgHeartRate =
+        time == null || time!.isZero || heartRate == null
+            ? null
+            : (heartRate!.length / (time!.inMinuteFractions)).round();
   }
 
   CardioSession? cut(Duration start, Duration end) {
     if (end < start) {
       if (end < time!) {
-        final endSession = clone()
-          ..cut(start, time!)
-          ..datetime = datetime.add(end);
+        final endSession =
+            clone()
+              ..cut(start, time!)
+              ..datetime = datetime.add(end);
         cut(Duration.zero, end);
         return combineWith(endSession)
           ?..sanitize()
@@ -232,18 +250,21 @@ class CardioSession extends AtomicEntity {
     }
     time = end - start;
     if (track != null && track!.isNotEmpty) {
-      final newTrack =
-          track!.where((pos) => pos.time >= start && pos.time <= end);
+      final newTrack = track!.where(
+        (pos) => pos.time >= start && pos.time <= end,
+      );
       if (newTrack.isNotEmpty) {
         final distanceOffset = newTrack.first.distance;
         final timeOffset = newTrack.first.time;
-        track = newTrack
-            .map(
-              (pos) => pos
-                ..distance -= distanceOffset
-                ..time -= timeOffset,
-            )
-            .toList();
+        track =
+            newTrack
+                .map(
+                  (pos) =>
+                      pos
+                        ..distance -= distanceOffset
+                        ..time -= timeOffset,
+                )
+                .toList();
       } else {
         track = null;
       }
@@ -261,8 +282,9 @@ class CardioSession extends AtomicEntity {
       setAvgCadence();
     }
     if (heartRate != null && heartRate!.isNotEmpty) {
-      final newHeartRate =
-          heartRate!.where((time) => time >= start && time <= end);
+      final newHeartRate = heartRate!.where(
+        (time) => time >= start && time <= end,
+      );
       if (newHeartRate.isNotEmpty) {
         final timeOffset = newHeartRate.first;
         heartRate = newHeartRate.map((time) => time - timeOffset).toList();
@@ -298,8 +320,9 @@ class CardioSession extends AtomicEntity {
       return null;
     }
 
-    final betweenTime =
-        session2.datetime.difference(session1.datetime.add(session1.time!));
+    final betweenTime = session2.datetime.difference(
+      session1.datetime.add(session1.time!),
+    );
     if (betweenTime.isNegative) {
       return null;
     }
@@ -308,36 +331,39 @@ class CardioSession extends AtomicEntity {
     final shiftTime = time1 + betweenTime;
     final shiftDistance =
         track1.last.distance + track1.last.distanceTo(track2.first);
-    final track = track1 +
+    final track =
+        track1 +
         track2.map((position) {
           position
             ..time += shiftTime
             ..distance += shiftDistance;
           return position;
         }).toList();
-    final cadence = (session1.cadence ?? []) +
+    final cadence =
+        (session1.cadence ?? []) +
         (session2.cadence?.map((time) => time + shiftTime).toList() ?? []);
-    final heartRate = (session1.heartRate ?? []) +
+    final heartRate =
+        (session1.heartRate ?? []) +
         (session2.heartRate?.map((time) => time + shiftTime).toList() ?? []);
     return CardioSession(
-      id: randomId(),
-      movementId: session1.movementId,
-      cardioType: session1.cardioType,
-      datetime: session1.datetime,
-      distance: null, // set later
-      ascent: null, // set later
-      descent: null, // set later
-      time: time,
-      calories: null,
-      track: track,
-      avgCadence: null, // set later
-      cadence: cadence,
-      avgHeartRate: null, // set later
-      heartRate: heartRate,
-      routeId: session1.routeId,
-      comments: session1.comments,
-      deleted: false,
-    )
+        id: randomId(),
+        movementId: session1.movementId,
+        cardioType: session1.cardioType,
+        datetime: session1.datetime,
+        distance: null, // set later
+        ascent: null, // set later
+        descent: null, // set later
+        time: time,
+        calories: null,
+        track: track,
+        avgCadence: null, // set later
+        cadence: cadence,
+        avgHeartRate: null, // set later
+        heartRate: heartRate,
+        routeId: session1.routeId,
+        comments: session1.comments,
+        deleted: false,
+      )
       ..setDistance()
       ..setAscentDescent()
       ..setAvgCadence()
@@ -355,24 +381,24 @@ class CardioSession extends AtomicEntity {
 
   @override
   CardioSession clone() => CardioSession(
-        id: id.clone(),
-        movementId: movementId.clone(),
-        cardioType: cardioType,
-        datetime: datetime.clone(),
-        distance: distance,
-        ascent: ascent,
-        descent: descent,
-        time: time?.clone(),
-        calories: calories,
-        track: track?.clone(),
-        avgCadence: avgCadence,
-        cadence: cadence?.clone(),
-        avgHeartRate: avgHeartRate,
-        heartRate: heartRate?.clone(),
-        routeId: routeId?.clone(),
-        comments: comments,
-        deleted: deleted,
-      );
+    id: id.clone(),
+    movementId: movementId.clone(),
+    cardioType: cardioType,
+    datetime: datetime.clone(),
+    distance: distance,
+    ascent: ascent,
+    descent: descent,
+    time: time?.clone(),
+    calories: calories,
+    track: track?.clone(),
+    avgCadence: avgCadence,
+    cadence: cadence?.clone(),
+    avgHeartRate: avgHeartRate,
+    heartRate: heartRate?.clone(),
+    routeId: routeId?.clone(),
+    comments: comments,
+    deleted: deleted,
+  );
 
   @override
   bool isValidBeforeSanitation() {
@@ -381,10 +407,7 @@ class CardioSession extends AtomicEntity {
           distance == null || distance! >= 0,
           'CardioSession: distance < 0',
         ) &&
-        validate(
-          ascent == null || ascent! >= 0,
-          'CardioSession: ascent < 0',
-        ) &&
+        validate(ascent == null || ascent! >= 0, 'CardioSession: ascent < 0') &&
         validate(
           descent == null || descent! >= 0,
           'CardioSession: descent < 0',
@@ -496,9 +519,10 @@ class DbCardioSessionSerializer extends DbSerializer<CardioSession> {
       distance: r[prefix + Columns.distance] as int?,
       ascent: r[prefix + Columns.ascent] as int?,
       descent: r[prefix + Columns.descent] as int?,
-      time: r[prefix + Columns.time] == null
-          ? null
-          : Duration(milliseconds: r[prefix + Columns.time]! as int),
+      time:
+          r[prefix + Columns.time] == null
+              ? null
+              : Duration(milliseconds: r[prefix + Columns.time]! as int),
       calories: r[prefix + Columns.calories] as int?,
       track: DbPositionListConverter.mapToDart(
         r[prefix + Columns.track] as Uint8List?,
@@ -511,9 +535,10 @@ class DbCardioSessionSerializer extends DbSerializer<CardioSession> {
       heartRate: DbDurationListConverter.mapToDart(
         r[prefix + Columns.heartRate] as Uint8List?,
       ),
-      routeId: r[prefix + Columns.routeId] == null
-          ? null
-          : Int64(r[prefix + Columns.routeId]! as int),
+      routeId:
+          r[prefix + Columns.routeId] == null
+              ? null
+              : Int64(r[prefix + Columns.routeId]! as int),
       comments: r[prefix + Columns.comments] as String?,
       deleted: r[prefix + Columns.deleted]! as int == 1,
     );

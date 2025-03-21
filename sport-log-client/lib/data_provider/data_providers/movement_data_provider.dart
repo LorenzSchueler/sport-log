@@ -46,8 +46,7 @@ class MovementDataProvider extends EntityDataProvider<Movement> {
     return (await table.getByCardioAndDistance(
       cardioOnly: cardioOnly,
       distanceOnly: distanceOnly,
-    ))
-        .fuzzySort(query: name, toString: (m) => m.name);
+    )).fuzzySort(query: name, toString: (m) => m.name);
   }
 }
 
@@ -97,7 +96,6 @@ class MovementDescriptionDataProvider
     return (await _movementDescriptionDb.getByCardioAndDistance(
       cardioOnly: cardioOnly,
       distanceOnly: distanceOnly,
-    ))
-        .fuzzySort(query: name, toString: (m) => m.movement.name);
+    )).fuzzySort(query: name, toString: (m) => m.movement.name);
   }
 }

@@ -24,7 +24,8 @@ class NewSetInput extends StatelessWidget {
     double? weight,
     double? secondWeight,
     DistanceUnit? distanceUnit,
-  ) onNewSet;
+  )
+  onNewSet;
   final bool confirmChanges;
   final MovementDimension dimension;
   final bool editWeightUnit;
@@ -39,27 +40,28 @@ class NewSetInput extends StatelessWidget {
   Widget build(BuildContext context) {
     return dimension == MovementDimension.time
         ? SetDurationInput(
-            onNewSet: (count, weight, secondWeight) =>
-                onNewSet(count, weight, secondWeight, null),
-            confirmChanges: confirmChanges,
-            initialDuration: Duration(milliseconds: initialCount),
-            editWeightUnit: editWeightUnit,
-            initialWeight: initialWeight,
-            initialSecondWeight: initialSecondWeight,
-            secondWeight: secondWeight,
-          )
+          onNewSet:
+              (count, weight, secondWeight) =>
+                  onNewSet(count, weight, secondWeight, null),
+          confirmChanges: confirmChanges,
+          initialDuration: Duration(milliseconds: initialCount),
+          editWeightUnit: editWeightUnit,
+          initialWeight: initialWeight,
+          initialSecondWeight: initialSecondWeight,
+          secondWeight: secondWeight,
+        )
         : CountWeightInput(
-            onNewSet: onNewSet,
-            confirmChanges: confirmChanges,
-            dimension: dimension,
-            distanceUnit: distanceUnit,
-            editDistanceUnit: editDistanceUnit,
-            initialCount: initialCount,
-            editWeightUnit: editWeightUnit,
-            initialWeight: initialWeight,
-            secondWeight: secondWeight,
-            initialSecondWeight: initialSecondWeight,
-          );
+          onNewSet: onNewSet,
+          confirmChanges: confirmChanges,
+          dimension: dimension,
+          distanceUnit: distanceUnit,
+          editDistanceUnit: editDistanceUnit,
+          initialCount: initialCount,
+          editWeightUnit: editWeightUnit,
+          initialWeight: initialWeight,
+          secondWeight: secondWeight,
+          initialSecondWeight: initialSecondWeight,
+        );
   }
 }
 
@@ -78,12 +80,13 @@ class SubmitSetButton extends StatelessWidget {
     return IconButton(
       icon: const Icon(AppIcons.check),
       iconSize: 40,
-      onPressed: isSubmittable
-          ? () {
-              FocusManager.instance.primaryFocus?.unfocus();
-              onSubmitted();
-            }
-          : null,
+      onPressed:
+          isSubmittable
+              ? () {
+                FocusManager.instance.primaryFocus?.unfocus();
+                onSubmitted();
+              }
+              : null,
       padding: EdgeInsets.zero,
       constraints: const BoxConstraints(),
     );

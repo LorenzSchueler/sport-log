@@ -9,10 +9,14 @@ part of 'metcon_description.dart';
 MetconDescription _$MetconDescriptionFromJson(Map<String, dynamic> json) =>
     MetconDescription(
       metcon: Metcon.fromJson(json['metcon'] as Map<String, dynamic>),
-      moves: (json['moves'] as List<dynamic>)
-          .map((e) =>
-              MetconMovementDescription.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      moves:
+          (json['moves'] as List<dynamic>)
+              .map(
+                (e) => MetconMovementDescription.fromJson(
+                  e as Map<String, dynamic>,
+                ),
+              )
+              .toList(),
       hasReference: json['has_reference'] as bool,
     );
 

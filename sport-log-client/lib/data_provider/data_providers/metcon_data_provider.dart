@@ -35,8 +35,10 @@ class MetconDataProvider extends EntityDataProvider<Metcon> {
   }
 
   Future<List<Metcon>> getByName(String? name) async {
-    return (await table.getNonDeleted())
-        .fuzzySort(query: name, toString: (m) => m.name);
+    return (await table.getNonDeleted()).fuzzySort(
+      query: name,
+      toString: (m) => m.name,
+    );
   }
 }
 
@@ -95,13 +97,12 @@ class MetconSessionDataProvider extends EntityDataProvider<MetconSession> {
     required DateTime? until,
     required Metcon? metcon,
     required String? comment,
-  }) =>
-      table.getByTimerangeAndMetconAndComment(
-        from: from,
-        until: until,
-        metcon: metcon,
-        comment: comment,
-      );
+  }) => table.getByTimerangeAndMetconAndComment(
+    from: from,
+    until: until,
+    metcon: metcon,
+    comment: comment,
+  );
 
   Future<MetconRecords> getMetconRecords() => table.getMetconRecords();
 }
@@ -111,8 +112,9 @@ class MetconDescriptionDataProvider extends DataProvider<MetconDescription> {
     if (_instance == null) {
       _instance = MetconDescriptionDataProvider._();
       _instance!._metconDataProvider.addListener(_instance!.notifyListeners);
-      _instance!._metconMovementDataProvider
-          .addListener(_instance!.notifyListeners);
+      _instance!._metconMovementDataProvider.addListener(
+        _instance!.notifyListeners,
+      );
       _instance!._movementDataProvider.addListener(_instance!.notifyListeners);
     }
     return _instance!;
@@ -131,8 +133,10 @@ class MetconDescriptionDataProvider extends DataProvider<MetconDescription> {
   Future<DbResult> createSingle(MetconDescription object) async {
     object.sanitize();
     assert(object.isValid());
-    final result =
-        await _metconDataProvider.createSingle(object.metcon, notify: false);
+    final result = await _metconDataProvider.createSingle(
+      object.metcon,
+      notify: false,
+    );
     if (result.isErr) {
       return result;
     }
@@ -146,8 +150,10 @@ class MetconDescriptionDataProvider extends DataProvider<MetconDescription> {
     object.sanitize();
     assert(object.isValid());
 
-    var result =
-        await _metconDataProvider.updateSingle(object.metcon, notify: false);
+    var result = await _metconDataProvider.updateSingle(
+      object.metcon,
+      notify: false,
+    );
     if (result.isErr) {
       return result;
     }
@@ -156,13 +162,11 @@ class MetconDescriptionDataProvider extends DataProvider<MetconDescription> {
     // Temporarily setting the movementNumber to a higher value and updating it afterwards also does not work
     // because the same problem will occur on the server side when the changes are synchronized.
     // Since this is not an EntityDataProvider this method is not used for updates coming from the server.
-    final oldMMovements =
-        await _metconMovementDataProvider.getByMetcon(object.metcon);
-    final newMMovements = object.moves
-        .map(
-          (m) => m.metconMovement..id = randomId(),
-        )
-        .toList();
+    final oldMMovements = await _metconMovementDataProvider.getByMetcon(
+      object.metcon,
+    );
+    final newMMovements =
+        object.moves.map((m) => m.metconMovement..id = randomId()).toList();
     result = await _metconMovementDataProvider.deleteMultiple(
       oldMMovements,
       notify: false,
@@ -206,8 +210,9 @@ class MetconDescriptionDataProvider extends DataProvider<MetconDescription> {
   }
 
   Future<List<MetconMovementDescription>> _getMmdByMetcon(Metcon metcon) async {
-    final metconMovements =
-        await _metconMovementDataProvider.getByMetcon(metcon);
+    final metconMovements = await _metconMovementDataProvider.getByMetcon(
+      metcon,
+    );
     return Future.wait(
       metconMovements
           .map(
@@ -259,11 +264,13 @@ class MetconSessionDescriptionDataProvider
   factory MetconSessionDescriptionDataProvider() {
     if (_instance == null) {
       _instance = MetconSessionDescriptionDataProvider._();
-      _instance!._metconSessionDataProvider
-          .addListener(_instance!.notifyListeners);
+      _instance!._metconSessionDataProvider.addListener(
+        _instance!.notifyListeners,
+      );
       _instance!._metconDataProvider.addListener(_instance!.notifyListeners);
-      _instance!._metconMovementDataProvider
-          .addListener(_instance!.notifyListeners);
+      _instance!._metconMovementDataProvider.addListener(
+        _instance!.notifyListeners,
+      );
       _instance!._movementDataProvider.addListener(_instance!.notifyListeners);
     }
     return _instance!;
@@ -297,9 +304,7 @@ class MetconSessionDescriptionDataProvider
 
   @override
   Future<List<MetconSessionDescription>> getNonDeleted() async {
-    return _mapToDescription(
-      await _metconSessionDataProvider.getNonDeleted(),
-    );
+    return _mapToDescription(await _metconSessionDataProvider.getNonDeleted());
   }
 
   Future<List<MetconSessionDescription>> getByTimerangeAndMetconAndComment({
@@ -326,8 +331,10 @@ class MetconSessionDescriptionDataProvider
           .map(
             (session) async => MetconSessionDescription(
               metconSession: session,
-              metconDescription: (await _metconDescriptionDataProvider
-                  .getById(session.metconId))!,
+              metconDescription:
+                  (await _metconDescriptionDataProvider.getById(
+                    session.metconId,
+                  ))!,
             ),
           )
           .toList(),

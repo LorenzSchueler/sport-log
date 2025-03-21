@@ -30,11 +30,11 @@ class User extends NonDeletableAtomicEntity {
 
   @override
   User clone() => User(
-        id: id.clone(),
-        username: username,
-        password: password,
-        email: email,
-      );
+    id: id.clone(),
+    username: username,
+    password: password,
+    email: email,
+  );
 
   @override
   bool isValidBeforeSanitation() {

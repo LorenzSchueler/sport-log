@@ -29,9 +29,10 @@ class _DiaryEditPageState extends State<DiaryEditPage> {
   late final Diary _diary = widget.diary?.clone() ?? Diary.defaultValue();
 
   Future<void> _saveDiary() async {
-    final result = widget.isNew
-        ? await _dataProvider.createSingle(_diary)
-        : await _dataProvider.updateSingle(_diary);
+    final result =
+        widget.isNew
+            ? await _dataProvider.createSingle(_diary)
+            : await _dataProvider.updateSingle(_diary);
     if (mounted) {
       if (result.isOk) {
         Navigator.pop(context);
@@ -80,11 +81,12 @@ class _DiaryEditPageState extends State<DiaryEditPage> {
               icon: const Icon(AppIcons.delete),
             ),
             IconButton(
-              onPressed: _formKey.currentContext != null &&
-                      _formKey.currentState!.validate() &&
-                      _diary.isValidBeforeSanitation()
-                  ? _saveDiary
-                  : null,
+              onPressed:
+                  _formKey.currentContext != null &&
+                          _formKey.currentState!.validate() &&
+                          _diary.isValidBeforeSanitation()
+                      ? _saveDiary
+                      : null,
               icon: const Icon(AppIcons.save),
             ),
           ],
@@ -122,19 +124,22 @@ class _DiaryEditPageState extends State<DiaryEditPage> {
                     labelText: "Bodyweight",
                   ),
                   initialValue: _diary.bodyweight?.toStringAsFixed(1),
-                  validator: (weight) => weight == null || weight.isEmpty
-                      ? null
-                      : Validator.validateDoubleGtZero(weight),
+                  validator:
+                      (weight) =>
+                          weight == null || weight.isEmpty
+                              ? null
+                              : Validator.validateDoubleGtZero(weight),
                   autovalidateMode: AutovalidateMode.onUserInteraction,
                   keyboardType: TextInputType.number,
-                  onChanged: (bodyweight) => setState(() {
-                    if (bodyweight.isEmpty) {
-                      _diary.bodyweight = null;
-                    } else if (Validator.validateDoubleGtZero(bodyweight) ==
-                        null) {
-                      _diary.bodyweight = double.parse(bodyweight);
-                    }
-                  }),
+                  onChanged:
+                      (bodyweight) => setState(() {
+                        if (bodyweight.isEmpty) {
+                          _diary.bodyweight = null;
+                        } else if (Validator.validateDoubleGtZero(bodyweight) ==
+                            null) {
+                          _diary.bodyweight = double.parse(bodyweight);
+                        }
+                      }),
                 ),
                 Expanded(
                   child: TextFormField(
@@ -145,9 +150,10 @@ class _DiaryEditPageState extends State<DiaryEditPage> {
                     initialValue: _diary.comments,
                     keyboardType: TextInputType.multiline,
                     maxLines: null,
-                    onChanged: (comments) => setState(() {
-                      _diary.comments = comments.isEmpty ? null : comments;
-                    }),
+                    onChanged:
+                        (comments) => setState(() {
+                          _diary.comments = comments.isEmpty ? null : comments;
+                        }),
                   ),
                 ),
               ],

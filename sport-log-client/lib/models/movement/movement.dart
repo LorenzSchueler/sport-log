@@ -51,13 +51,13 @@ class Movement extends AtomicEntity {
       _$MovementFromJson(json);
 
   Movement.defaultValue()
-      : id = randomId(),
-        isDefaultMovement = false,
-        name = '',
-        description = null,
-        cardio = true,
-        deleted = false,
-        dimension = MovementDimension.reps;
+    : id = randomId(),
+      isDefaultMovement = false,
+      name = '',
+      description = null,
+      cardio = true,
+      deleted = false,
+      dimension = MovementDimension.reps;
 
   @override
   @IdConverter()
@@ -77,7 +77,7 @@ class Movement extends AtomicEntity {
   MovementDimension dimension;
 
   static Movement?
-      _defaultMovement; // default movement that already exists in db
+  _defaultMovement; // default movement that already exists in db
   static set defaultMovement(Movement? movement) => _defaultMovement = movement;
   static Movement? get defaultMovement => _defaultMovement?.clone();
 
@@ -86,14 +86,14 @@ class Movement extends AtomicEntity {
 
   @override
   Movement clone() => Movement(
-        id: id.clone(),
-        isDefaultMovement: isDefaultMovement,
-        name: name,
-        description: description,
-        cardio: cardio,
-        deleted: deleted,
-        dimension: dimension,
-      );
+    id: id.clone(),
+    isDefaultMovement: isDefaultMovement,
+    name: name,
+    description: description,
+    cardio: cardio,
+    deleted: deleted,
+    dimension: dimension,
+  );
 
   @override
   bool isValidBeforeSanitation() {
@@ -133,14 +133,14 @@ class Movement extends AtomicEntity {
 
   @override
   int get hashCode => Object.hash(
-        id,
-        isDefaultMovement,
-        name,
-        description,
-        cardio,
-        deleted,
-        dimension,
-      );
+    id,
+    isDefaultMovement,
+    name,
+    description,
+    cardio,
+    deleted,
+    dimension,
+  );
 }
 
 class DbMovementSerializer extends DbSerializer<Movement> {

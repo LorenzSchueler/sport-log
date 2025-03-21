@@ -43,17 +43,18 @@ enum SessionsPageTab {
     required SessionsPageTab sessionsPageTab,
   }) {
     return NavigationBar(
-      destinations: SessionsPageTab.values
-          .map(
-            (tab) => NavigationDestination(
-              icon: Icon(tab.icon),
-              label: tab.label,
-            ),
-          )
-          .toList(),
+      destinations:
+          SessionsPageTab.values
+              .map(
+                (tab) => NavigationDestination(
+                  icon: Icon(tab.icon),
+                  label: tab.label,
+                ),
+              )
+              .toList(),
       selectedIndex: sessionsPageTab.index,
-      onDestinationSelected: (index) =>
-          Navigator.of(context).newBase(values[index].route),
+      onDestinationSelected:
+          (index) => Navigator.of(context).newBase(values[index].route),
     );
   }
 }

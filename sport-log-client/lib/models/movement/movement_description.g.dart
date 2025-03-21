@@ -13,8 +13,8 @@ MovementDescription _$MovementDescriptionFromJson(Map<String, dynamic> json) =>
     );
 
 Map<String, dynamic> _$MovementDescriptionToJson(
-        MovementDescription instance) =>
-    <String, dynamic>{
-      'movement': instance.movement,
-      'has_reference': instance.hasReference,
-    };
+  MovementDescription instance,
+) => <String, dynamic>{
+  'movement': instance.movement,
+  'has_reference': instance.hasReference,
+};

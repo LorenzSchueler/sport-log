@@ -28,15 +28,17 @@ class ActionEventEditPage extends StatefulWidget {
 
 class _ActionEventEditPageState extends State<ActionEventEditPage> {
   final _dataProvider = ActionEventDataProvider();
-  late final ActionEvent _actionEvent = widget.actionEvent?.clone() ??
+  late final ActionEvent _actionEvent =
+      widget.actionEvent?.clone() ??
       ActionEvent.defaultValue(
         widget.actionProviderDescription.actions.first.id,
       );
 
   Future<void> _saveActionEvent() async {
-    final result = widget.isNew
-        ? await _dataProvider.createSingle(_actionEvent)
-        : await _dataProvider.updateSingle(_actionEvent);
+    final result =
+        widget.isNew
+            ? await _dataProvider.createSingle(_actionEvent)
+            : await _dataProvider.updateSingle(_actionEvent);
     if (mounted) {
       if (result.isOk) {
         Navigator.pop(context);
@@ -86,9 +88,10 @@ class _ActionEventEditPageState extends State<ActionEventEditPage> {
               icon: const Icon(AppIcons.delete),
             ),
             IconButton(
-              onPressed: _actionEvent.isValidBeforeSanitation()
-                  ? _saveActionEvent
-                  : null,
+              onPressed:
+                  _actionEvent.isValidBeforeSanitation()
+                      ? _saveActionEvent
+                      : null,
               icon: const Icon(AppIcons.save),
             ),
           ],
@@ -109,10 +112,10 @@ class _ActionEventEditPageState extends State<ActionEventEditPage> {
                 onTap: () async {
                   final action = await showActionPicker(
                     actions: widget.actionProviderDescription.actions,
-                    selectedAction:
-                        widget.actionProviderDescription.actions.firstWhere(
-                      (action) => action.id == _actionEvent.actionId,
-                    ),
+                    selectedAction: widget.actionProviderDescription.actions
+                        .firstWhere(
+                          (action) => action.id == _actionEvent.actionId,
+                        ),
                     context: context,
                   );
                   if (mounted && action != null) {
@@ -143,9 +146,11 @@ class _ActionEventEditPageState extends State<ActionEventEditPage> {
                   labelText: "Arguments",
                 ),
                 initialValue: _actionEvent.arguments,
-                onChanged: (arguments) => setState(() {
-                  _actionEvent.arguments = arguments.isEmpty ? null : arguments;
-                }),
+                onChanged:
+                    (arguments) => setState(() {
+                      _actionEvent.arguments =
+                          arguments.isEmpty ? null : arguments;
+                    }),
               ),
             ],
           ),

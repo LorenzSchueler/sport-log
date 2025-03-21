@@ -19,11 +19,12 @@ extension SortExtension<T> on Iterable<T> {
   }) {
     if (query == null || query.isEmpty) return toList();
 
-    final sortedItems = map(
-      (candidate) =>
-          SortItem<T>(distance(query, toString(candidate)), candidate),
-    ).toList()
-      ..sort((x, y) => x.score.compareTo(y.score));
+    final sortedItems =
+        map(
+            (candidate) =>
+                SortItem<T>(distance(query, toString(candidate)), candidate),
+          ).toList()
+          ..sort((x, y) => x.score.compareTo(y.score));
 
     return sortedItems.map((e) => e.item).toList();
   }
@@ -67,8 +68,11 @@ int distance(
       if (queryLc.codeUnitAt(i - 1) == candidateLc.codeUnitAt(j - 1)) {
         cost = 0;
       }
-      v1[j] =
-          [v1[j - 1] + insert, v0[j] + delete, v0[j - 1] + cost].reduce(min);
+      v1[j] = [
+        v1[j - 1] + insert,
+        v0[j] + delete,
+        v0[j - 1] + cost,
+      ].reduce(min);
     }
 
     vtemp = v0;

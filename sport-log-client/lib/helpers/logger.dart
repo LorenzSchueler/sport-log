@@ -21,10 +21,7 @@ void logDebug(Object? message) {
 
 class Logger extends l.Logger {
   Logger(String key)
-      : super(
-          printer: _Printer(key),
-          level: Config.instance.minLogLevel,
-        );
+    : super(printer: _Printer(key), level: Config.instance.minLogLevel);
 
   /// Log error and invoke [GlobalErrorHandler.handleError]
   @override
@@ -101,7 +98,7 @@ class InitLogger extends l.Logger {
 
 class _Printer extends l.PrettyPrinter {
   _Printer(this.key)
-      : super(methodCount: 0, errorMethodCount: 5, lineLength: 40);
+    : super(methodCount: 0, errorMethodCount: 5, lineLength: 40);
 
   final String key;
 

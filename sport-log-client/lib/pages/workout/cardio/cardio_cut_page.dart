@@ -15,10 +15,7 @@ import 'package:sport_log/widgets/picker/datetime_picker.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
 
 class CardioCutPage extends StatefulWidget {
-  const CardioCutPage({
-    required this.cardioSessionDescription,
-    super.key,
-  });
+  const CardioCutPage({required this.cardioSessionDescription, super.key});
 
   final CardioSessionDescription cardioSessionDescription;
 
@@ -72,8 +69,9 @@ class _CardioCutPageState extends State<CardioCutPage> {
 
     final track = _cardioSessionDescription.cardioSession.track;
     final latLngs1 = track?.where((pos) => pos.time <= time1);
-    final latLngs2 =
-        track?.where((pos) => pos.time >= time1 && pos.time <= time2);
+    final latLngs2 = track?.where(
+      (pos) => pos.time >= time1 && pos.time <= time2,
+    );
     final latLngs3 = track?.where((pos) => pos.time >= time2);
     const cutLineOpacity = 0.4;
     await _mapController?.updateTrackLine(
@@ -94,9 +92,10 @@ class _CardioCutPageState extends State<CardioCutPage> {
 
     final startLatLng =
         track?.firstWhereOrNull((pos) => pos.time >= _cutStartDuration)?.latLng;
-    final endLatLng = track?.reversed
-        .firstWhereOrNull((pos) => pos.time <= _cutEndDuration)
-        ?.latLng;
+    final endLatLng =
+        track?.reversed
+            .firstWhereOrNull((pos) => pos.time <= _cutEndDuration)
+            ?.latLng;
     await _mapController?.updateTrackMarker(_cutStartMarker, startLatLng);
     await _mapController?.updateTrackMarker(_cutEndMarker, endLatLng);
   }
@@ -109,8 +108,10 @@ class _CardioCutPageState extends State<CardioCutPage> {
           "This can not be reversed. All cut out data will be permanently lost.",
     );
     if (approved) {
-      final cutSession = _cardioSessionDescription.cardioSession
-          .cut(_cutStartDuration, _cutEndDuration);
+      final cutSession = _cardioSessionDescription.cardioSession.cut(
+        _cutStartDuration,
+        _cutEndDuration,
+      );
       if (cutSession == null) {
         return;
       }

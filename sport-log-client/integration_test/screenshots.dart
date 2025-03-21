@@ -59,18 +59,14 @@ const serverUrl = "http://10.0.2.2:8001";
 const username = "ScreenshotUser";
 const password = "ScreenshotPassword0";
 
-Finder input(String text) => find.ancestor(
-      of: find.text(text),
-      matching: find.byType(TextFormField),
-    );
+Finder input(String text) =>
+    find.ancestor(of: find.text(text), matching: find.byType(TextFormField));
 final serverUrlInput = input("Server URL");
 final usernameInput = input("Username");
 final passwordInput = input("Password");
 
-Finder button(String text) => find.ancestor(
-      of: find.text(text),
-      matching: find.byType(FilledButton),
-    );
+Finder button(String text) =>
+    find.ancestor(of: find.text(text), matching: find.byType(FilledButton));
 final loginButton = button("Login");
 final okButton = button("OK");
 final cancelButton = button("Cancel");
@@ -81,9 +77,9 @@ final aboutButton = find.ancestor(
 );
 
 Finder fab(IconData icon) => find.ancestor(
-      of: find.byIcon(icon),
-      matching: find.byType(FloatingActionButton),
-    );
+  of: find.byIcon(icon),
+  matching: find.byType(FloatingActionButton),
+);
 final addFab = fab(AppIcons.add);
 final stopwatchFab = fab(AppIcons.stopwatch);
 final routeFab = fab(AppIcons.route);
@@ -92,10 +88,8 @@ final layersFab = fab(AppIcons.layers);
 
 final backButton = find.byType(BackButton);
 
-Finder iconButton(IconData icon) => find.ancestor(
-      of: find.byIcon(icon),
-      matching: find.byType(IconButton),
-    );
+Finder iconButton(IconData icon) =>
+    find.ancestor(of: find.byIcon(icon), matching: find.byType(IconButton));
 final menuButton = iconButton(Icons.menu);
 final routeButton = iconButton(AppIcons.route);
 final editButton = iconButton(AppIcons.edit);
@@ -108,19 +102,17 @@ final discardChanges = find.ancestor(
 );
 
 Finder navItem(String text) => find.ancestor(
-      of: find.text(text),
-      matching: find.byType(NavigationDestination),
-    );
+  of: find.text(text),
+  matching: find.byType(NavigationDestination),
+);
 final strengthNavItem = navItem("Strength");
 final metconNavItem = navItem("Metcon");
 final cardioNavItem = navItem("Cardio");
 final wodNavItem = navItem("Wod");
 final diaryNavItem = navItem("Diary");
 
-Finder drawerItem(String text) => find.ancestor(
-      of: find.text(text),
-      matching: find.byType(ListTile),
-    );
+Finder drawerItem(String text) =>
+    find.ancestor(of: find.text(text), matching: find.byType(ListTile));
 final movementDrawerItem = drawerItem("Movements");
 final timerDrawerItem = drawerItem("Timer");
 final mapDrawerItem = drawerItem("Map");
@@ -160,8 +152,9 @@ Future<void> enterText(WidgetTester tester, Finder finder, String text) async {
 
 Future<void> screenshot(WidgetTester tester, String filename) async {
   if (Platform.isAndroid) {
-    await integrationTestChannel
-        .invokeMethod<void>('convertFlutterSurfaceToImage');
+    await integrationTestChannel.invokeMethod<void>(
+      'convertFlutterSurfaceToImage',
+    );
     // TODO: Change when fixed: https://github.com/flutter/flutter/issues/92381
     // await binding.convertFlutterSurfaceToImage();
   }
@@ -187,11 +180,7 @@ Future<void> screenshot(WidgetTester tester, String filename) async {
   final image = Uint8List.fromList(bytes);
   const dir = '/storage/emulated/0/Download';
   final file = File("$dir/$filename.png");
-  await file.writeAsBytes(
-    image,
-    flush: true,
-    mode: FileMode.writeOnly,
-  );
+  await file.writeAsBytes(image, flush: true, mode: FileMode.writeOnly);
   logger.i(file);
 
   if (Platform.isAndroid) {

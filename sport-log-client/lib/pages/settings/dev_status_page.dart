@@ -94,30 +94,15 @@ class _DevStatusPageState extends State<DevStatusPage> {
   ) {
     return TableRow(
       children: [
-        Align(
-          alignment: Alignment.centerLeft,
-          child: Text(value1),
-        ),
+        Align(alignment: Alignment.centerLeft, child: Text(value1)),
         Container(),
-        Align(
-          alignment: Alignment.centerRight,
-          child: Text(value2),
-        ),
+        Align(alignment: Alignment.centerRight, child: Text(value2)),
         Container(),
-        Align(
-          alignment: Alignment.centerRight,
-          child: Text(value3),
-        ),
+        Align(alignment: Alignment.centerRight, child: Text(value3)),
         Container(),
-        Align(
-          alignment: Alignment.centerRight,
-          child: Text(value4),
-        ),
+        Align(alignment: Alignment.centerRight, child: Text(value4)),
         Container(),
-        Align(
-          alignment: Alignment.centerRight,
-          child: Text(value5),
-        ),
+        Align(alignment: Alignment.centerRight, child: Text(value5)),
       ],
     );
   }
@@ -129,73 +114,74 @@ class _DevStatusPageState extends State<DevStatusPage> {
       appBar: AppBar(title: const Text("Dev Status")),
       body: Padding(
         padding: Defaults.edgeInsets.normal,
-        child: epochMap == null
-            ? const Text("no account")
-            : Table(
-                defaultColumnWidth: const IntrinsicColumnWidth(),
-                columnWidths: const {
-                  1: FlexColumnWidth(),
-                  3: FlexColumnWidth(),
-                  5: FlexColumnWidth(),
-                  7: FlexColumnWidth(),
-                },
-                children: [
-                  row("Table", "Epoch", "Synchronized", "Created", "Updated"),
-                  row("user", "${epochMap.user}", "-", "-", "-"),
-                  countsRow("diary", epochMap.diary, diaryCounts),
-                  countsRow("wod", epochMap.wod, wodCounts),
-                  countsRow("movement", epochMap.movement, movementCounts),
-                  countsRow(
-                    "strength session",
-                    epochMap.strengthSession,
-                    strengthSessionCounts,
-                  ),
-                  countsRow(
-                    "strength set",
-                    epochMap.strengthSet,
-                    strengthSetCounts,
-                  ),
-                  countsRow("metcon", epochMap.metcon, metconCounts),
-                  countsRow(
-                    "metcon session",
-                    epochMap.metconSession,
-                    metconSessionCounts,
-                  ),
-                  countsRow(
-                    "metcon movement",
-                    epochMap.metconMovement,
-                    metconMovementCounts,
-                  ),
-                  countsRow(
-                    "cardio session",
-                    epochMap.cardioSession,
-                    cardioSessionCounts,
-                  ),
-                  countsRow("route", epochMap.route, routeCounts),
-                  countsRow("platform", epochMap.platform, platformCounts),
-                  countsRow(
-                    "platform credentials",
-                    epochMap.platformCredential,
-                    platformCredentialCounts,
-                  ),
-                  countsRow(
-                    "action provider",
-                    epochMap.actionProvider,
-                    actionProviderCounts,
-                  ),
-                  countsRow("action", epochMap.action, actionCounts),
-                  countsRow(
-                    "action rule",
-                    epochMap.actionRule,
-                    actionRuleCounts,
-                  ),
-                  countsRow(
-                    "action event",
-                    epochMap.actionEvent,
-                    actionEventCounts,
-                  ),
-                ],
-              ),
+        child:
+            epochMap == null
+                ? const Text("no account")
+                : Table(
+                  defaultColumnWidth: const IntrinsicColumnWidth(),
+                  columnWidths: const {
+                    1: FlexColumnWidth(),
+                    3: FlexColumnWidth(),
+                    5: FlexColumnWidth(),
+                    7: FlexColumnWidth(),
+                  },
+                  children: [
+                    row("Table", "Epoch", "Synchronized", "Created", "Updated"),
+                    row("user", "${epochMap.user}", "-", "-", "-"),
+                    countsRow("diary", epochMap.diary, diaryCounts),
+                    countsRow("wod", epochMap.wod, wodCounts),
+                    countsRow("movement", epochMap.movement, movementCounts),
+                    countsRow(
+                      "strength session",
+                      epochMap.strengthSession,
+                      strengthSessionCounts,
+                    ),
+                    countsRow(
+                      "strength set",
+                      epochMap.strengthSet,
+                      strengthSetCounts,
+                    ),
+                    countsRow("metcon", epochMap.metcon, metconCounts),
+                    countsRow(
+                      "metcon session",
+                      epochMap.metconSession,
+                      metconSessionCounts,
+                    ),
+                    countsRow(
+                      "metcon movement",
+                      epochMap.metconMovement,
+                      metconMovementCounts,
+                    ),
+                    countsRow(
+                      "cardio session",
+                      epochMap.cardioSession,
+                      cardioSessionCounts,
+                    ),
+                    countsRow("route", epochMap.route, routeCounts),
+                    countsRow("platform", epochMap.platform, platformCounts),
+                    countsRow(
+                      "platform credentials",
+                      epochMap.platformCredential,
+                      platformCredentialCounts,
+                    ),
+                    countsRow(
+                      "action provider",
+                      epochMap.actionProvider,
+                      actionProviderCounts,
+                    ),
+                    countsRow("action", epochMap.action, actionCounts),
+                    countsRow(
+                      "action rule",
+                      epochMap.actionRule,
+                      actionRuleCounts,
+                    ),
+                    countsRow(
+                      "action event",
+                      epochMap.actionEvent,
+                      actionEventCounts,
+                    ),
+                  ],
+                ),
       ),
     );
   }

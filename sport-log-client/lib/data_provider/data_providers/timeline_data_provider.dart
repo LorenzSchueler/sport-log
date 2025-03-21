@@ -44,60 +44,63 @@ class TimelineDataProvider extends DataProvider<TimelineUnion> {
 
   @override
   Future<List<TimelineUnion>> getNonDeleted() async => _combineAndSort(
-        strengthSessionsDescription:
-            await _strengthDataProvider.getNonDeleted(),
-        metconSessionsDescription: await _metconDataProvider.getNonDeleted(),
-        cardioSessionsDescription: await _cardioDataProvider.getNonDeleted(),
-        wods: await _wodDataProvider.getNonDeleted(),
-        diaries: await _diaryDataProvider.getNonDeleted(),
-      );
+    strengthSessionsDescription: await _strengthDataProvider.getNonDeleted(),
+    metconSessionsDescription: await _metconDataProvider.getNonDeleted(),
+    cardioSessionsDescription: await _cardioDataProvider.getNonDeleted(),
+    wods: await _wodDataProvider.getNonDeleted(),
+    diaries: await _diaryDataProvider.getNonDeleted(),
+  );
 
   Future<List<TimelineUnion>> getByTimerangeAndMovementOrMetconAndComment({
     required DateTime? from,
     required DateTime? until,
     required String? comment,
     required MovementOrMetcon? movementOrMetcon,
-  }) async =>
-      _combineAndSort(
-        strengthSessionsDescription: movementOrMetcon?.isMetcon ?? false
+  }) async => _combineAndSort(
+    strengthSessionsDescription:
+        movementOrMetcon?.isMetcon ?? false
             ? []
             : await _strengthDataProvider.getByTimerangeAndMovementAndComment(
-                from: from,
-                until: until,
-                movement: movementOrMetcon?.movement,
-                comment: comment,
-              ),
-        metconSessionsDescription: movementOrMetcon?.isMovement ?? false
+              from: from,
+              until: until,
+              movement: movementOrMetcon?.movement,
+              comment: comment,
+            ),
+    metconSessionsDescription:
+        movementOrMetcon?.isMovement ?? false
             ? []
             : await _metconDataProvider.getByTimerangeAndMetconAndComment(
-                from: from,
-                until: until,
-                metcon: movementOrMetcon?.metcon,
-                comment: comment,
-              ),
-        cardioSessionsDescription: movementOrMetcon?.isMetcon ?? false
+              from: from,
+              until: until,
+              metcon: movementOrMetcon?.metcon,
+              comment: comment,
+            ),
+    cardioSessionsDescription:
+        movementOrMetcon?.isMetcon ?? false
             ? []
             : await _cardioDataProvider.getByTimerangeAndMovementAndComment(
-                from: from,
-                until: until,
-                movement: movementOrMetcon?.movement,
-                comment: comment,
-              ),
-        wods: movementOrMetcon != null
+              from: from,
+              until: until,
+              movement: movementOrMetcon?.movement,
+              comment: comment,
+            ),
+    wods:
+        movementOrMetcon != null
             ? []
             : await _wodDataProvider.getByTimerangeAndDescription(
-                from: from,
-                until: until,
-                description: comment,
-              ),
-        diaries: movementOrMetcon != null
+              from: from,
+              until: until,
+              description: comment,
+            ),
+    diaries:
+        movementOrMetcon != null
             ? []
             : await _diaryDataProvider.getByTimerangeAndComment(
-                from: from,
-                until: until,
-                comment: comment,
-              ),
-      );
+              from: from,
+              until: until,
+              comment: comment,
+            ),
+  );
 
   List<TimelineUnion> _combineAndSort({
     required List<StrengthSessionDescription> strengthSessionsDescription,
@@ -114,7 +117,7 @@ class TimelineDataProvider extends DataProvider<TimelineUnion> {
         ..sort((a, b) => b.datetime.compareTo(a.datetime));
 
   Future<TimelineRecords> getRecords() async => TimelineRecords(
-        await _strengthDataProvider.getStrengthRecords(),
-        await _metconDataProvider.getMetconRecords(),
-      );
+    await _strengthDataProvider.getStrengthRecords(),
+    await _metconDataProvider.getMetconRecords(),
+  );
 }

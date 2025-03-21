@@ -7,10 +7,7 @@ part of 'config.dart';
 // **************************************************************************
 
 Config _$ConfigFromJson(Map<String, dynamic> json) {
-  $checkKeys(
-    json,
-    requiredKeys: const ['access_token'],
-  );
+  $checkKeys(json, requiredKeys: const ['access_token']);
   return Config(
     accessToken: json['access_token'] as String,
     serverAddress: json['server_address'] as String? ?? '',
@@ -26,16 +23,16 @@ Config _$ConfigFromJson(Map<String, dynamic> json) {
 }
 
 Map<String, dynamic> _$ConfigToJson(Config instance) => <String, dynamic>{
-      'access_token': instance.accessToken,
-      'server_address': instance.serverAddress,
-      'min_log_level': _$LevelEnumMap[instance.minLogLevel]!,
-      'delete_database': instance.deleteDatabase,
-      'output_request_json': instance.outputRequestJson,
-      'output_request_headers': instance.outputRequestHeaders,
-      'output_response_json': instance.outputResponseJson,
-      'output_response_headers': instance.outputResponseHeaders,
-      'output_db_statement': instance.outputDbStatement,
-    };
+  'access_token': instance.accessToken,
+  'server_address': instance.serverAddress,
+  'min_log_level': _$LevelEnumMap[instance.minLogLevel]!,
+  'delete_database': instance.deleteDatabase,
+  'output_request_json': instance.outputRequestJson,
+  'output_request_headers': instance.outputRequestHeaders,
+  'output_response_json': instance.outputResponseJson,
+  'output_response_headers': instance.outputResponseHeaders,
+  'output_db_statement': instance.outputDbStatement,
+};
 
 const _$LevelEnumMap = {
   Level.all: 'all',

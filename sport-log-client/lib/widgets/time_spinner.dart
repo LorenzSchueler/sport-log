@@ -54,9 +54,9 @@ class TimeSpinner extends StatefulWidget {
     double width = 250,
     this.alignment = Alignment.center,
     super.key,
-  })  : itemHeight = height / 3,
-        itemWidth =
-            width / (2 + (is24HourMode ? 0 : 1) + (isShowSeconds ? 1 : 0));
+  }) : itemHeight = height / 3,
+       itemWidth =
+           width / (2 + (is24HourMode ? 0 : 1) + (isShowSeconds ? 1 : 0));
 
   final void Function(DateTime) onTimeChange;
   final DateTime? time;
@@ -115,8 +115,9 @@ class _TimeSpinnerState extends State<TimeSpinner> {
 
   @override
   void initState() {
-    WidgetsBinding.instance
-        .addPostFrameCallback((_) => widget.onTimeChange(currentTime));
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => widget.onTimeChange(currentTime),
+    );
 
     super.initState();
   }
@@ -325,8 +326,8 @@ class _AmPmSpinner extends StatelessWidget {
                 index == 1
                     ? "AM"
                     : index == 2
-                        ? "PM"
-                        : "",
+                    ? "PM"
+                    : "",
                 style: selected == index ? selectedTextStyle : normalTextStyle,
               ),
             );

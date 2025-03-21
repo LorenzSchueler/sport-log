@@ -27,24 +27,24 @@ class EpochMap {
   }) : lastSync = DateTime.fromMillisecondsSinceEpoch(0);
 
   EpochMap.zero()
-      : user = Int64.ZERO,
-        diary = Int64.ZERO,
-        wod = Int64.ZERO,
-        movement = Int64.ZERO,
-        strengthSession = Int64.ZERO,
-        strengthSet = Int64.ZERO,
-        metcon = Int64.ZERO,
-        metconSession = Int64.ZERO,
-        metconMovement = Int64.ZERO,
-        cardioSession = Int64.ZERO,
-        route = Int64.ZERO,
-        platform = Int64.ZERO,
-        platformCredential = Int64.ZERO,
-        actionProvider = Int64.ZERO,
-        action = Int64.ZERO,
-        actionRule = Int64.ZERO,
-        actionEvent = Int64.ZERO,
-        lastSync = DateTime.fromMillisecondsSinceEpoch(0);
+    : user = Int64.ZERO,
+      diary = Int64.ZERO,
+      wod = Int64.ZERO,
+      movement = Int64.ZERO,
+      strengthSession = Int64.ZERO,
+      strengthSet = Int64.ZERO,
+      metcon = Int64.ZERO,
+      metconSession = Int64.ZERO,
+      metconMovement = Int64.ZERO,
+      cardioSession = Int64.ZERO,
+      route = Int64.ZERO,
+      platform = Int64.ZERO,
+      platformCredential = Int64.ZERO,
+      actionProvider = Int64.ZERO,
+      action = Int64.ZERO,
+      actionRule = Int64.ZERO,
+      actionEvent = Int64.ZERO,
+      lastSync = DateTime.fromMillisecondsSinceEpoch(0);
 
   factory EpochMap.fromJson(Map<String, dynamic> json) =>
       _$EpochMapFromJson(json);

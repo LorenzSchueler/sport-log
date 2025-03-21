@@ -37,12 +37,12 @@ class ActionProvider extends AtomicEntity {
 
   @override
   ActionProvider clone() => ActionProvider._(
-        id: id.clone(),
-        name: name,
-        platformId: platformId.clone(),
-        description: description,
-        deleted: deleted,
-      );
+    id: id.clone(),
+    name: name,
+    platformId: platformId.clone(),
+    description: description,
+    deleted: deleted,
+  );
 
   /// ActionProviders should never be created.
   @override

@@ -5,8 +5,8 @@ import 'package:sport_log/defaults.dart';
 enum MetronomeAdjustment { increase, decrease, stop }
 
 class MetronomeUtils extends ChangeNotifier {
-  final Metronome _metronome = Metronome()
-    ..init(Defaults.assets.beepMetronomeFile, bpm: 180);
+  final Metronome _metronome =
+      Metronome()..init(Defaults.assets.beepMetronomeFile, bpm: 180);
 
   int _cadence = 180;
   int get cadence => _cadence;

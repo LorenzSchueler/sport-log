@@ -26,9 +26,9 @@ class MapPage extends StatelessWidget {
         SystemUiMode.manual,
         overlays: SystemUiOverlay.values,
       );
-      await SystemChrome.setPreferredOrientations(
-        [DeviceOrientation.portraitUp],
-      );
+      await SystemChrome.setPreferredOrientations([
+        DeviceOrientation.portraitUp,
+      ]);
     } else {
       await _setOrientation();
     }
@@ -50,74 +50,87 @@ class MapPage extends StatelessWidget {
     return NeverPop(
       child: ProviderConsumer(
         create: (_) => BoolToggle.on(),
-        builder: (context, showOverlays, _) => ProviderConsumer(
-          create: (_) => MapSearchUtils(),
-          builder: (context, searchUtils, _) => Scaffold(
-            extendBodyBehindAppBar: true,
-            appBar: showOverlays.isOn
-                ? AppBar(
-                    title: searchUtils.isSearchActive
-                        ? TextFormField(
-                            controller: _searchController,
-                            focusNode: _searchBar,
-                            onChanged: searchUtils.searchPlaces,
-                            onTap: () => searchUtils
-                                .searchPlaces(_searchController.text),
-                            style: const TextStyle(color: Colors.black),
-                          )
-                        : null,
-                    actions: [
-                      IconButton(
-                        onPressed: () => searchUtils.toggleSearch(_searchBar),
-                        icon: Icon(
-                          searchUtils.isSearchActive
-                              ? AppIcons.close
-                              : AppIcons.search,
+        builder:
+            (context, showOverlays, _) => ProviderConsumer(
+              create: (_) => MapSearchUtils(),
+              builder:
+                  (context, searchUtils, _) => Scaffold(
+                    extendBodyBehindAppBar: true,
+                    appBar:
+                        showOverlays.isOn
+                            ? AppBar(
+                              title:
+                                  searchUtils.isSearchActive
+                                      ? TextFormField(
+                                        controller: _searchController,
+                                        focusNode: _searchBar,
+                                        onChanged: searchUtils.searchPlaces,
+                                        onTap:
+                                            () => searchUtils.searchPlaces(
+                                              _searchController.text,
+                                            ),
+                                        style: const TextStyle(
+                                          color: Colors.black,
+                                        ),
+                                      )
+                                      : null,
+                              actions: [
+                                IconButton(
+                                  onPressed:
+                                      () =>
+                                          searchUtils.toggleSearch(_searchBar),
+                                  icon: Icon(
+                                    searchUtils.isSearchActive
+                                        ? AppIcons.close
+                                        : AppIcons.search,
+                                  ),
+                                ),
+                              ],
+                              foregroundColor:
+                                  Theme.of(context).colorScheme.surface,
+                              backgroundColor: _searchBackgroundColor,
+                              elevation: 0,
+                            )
+                            : null,
+                    drawer: const MainDrawer(selectedRoute: Routes.map),
+                    onDrawerChanged: _onDrawerChanged,
+                    body: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        MapboxMapWrapper(
+                          showFullscreenButton: false,
+                          showMapStylesButton: true,
+                          showSelectRouteButton: true,
+                          showSetNorthButton: true,
+                          showCurrentLocationButton: true,
+                          showCenterLocationButton: true,
+                          showAddLocationButton: true,
+                          showOverlays: showOverlays.isOn,
+                          buttonTopOffset: 100,
+                          onMapCreated: searchUtils.setMapController,
+                          onTap:
+                              (_) =>
+                                  searchUtils.isSearchActive
+                                      ? searchUtils.toggleSearch(_searchBar)
+                                      : showOverlays.toggle(),
                         ),
-                      ),
-                    ],
-                    foregroundColor: Theme.of(context).colorScheme.surface,
-                    backgroundColor: _searchBackgroundColor,
-                    elevation: 0,
-                  )
-                : null,
-            drawer: const MainDrawer(selectedRoute: Routes.map),
-            onDrawerChanged: _onDrawerChanged,
-            body: Stack(
-              alignment: Alignment.center,
-              children: [
-                MapboxMapWrapper(
-                  showFullscreenButton: false,
-                  showMapStylesButton: true,
-                  showSelectRouteButton: true,
-                  showSetNorthButton: true,
-                  showCurrentLocationButton: true,
-                  showCenterLocationButton: true,
-                  showAddLocationButton: true,
-                  showOverlays: showOverlays.isOn,
-                  buttonTopOffset: 100,
-                  onMapCreated: searchUtils.setMapController,
-                  onTap: (_) => searchUtils.isSearchActive
-                      ? searchUtils.toggleSearch(_searchBar)
-                      : showOverlays.toggle(),
-                ),
-                if (showOverlays.isOn &&
-                    searchUtils.searchResults != null &&
-                    searchUtils.searchResults!.isNotEmpty)
-                  SafeArea(
-                    child: Align(
-                      alignment: Alignment.topCenter,
-                      child: MapSearchResults(
-                        searchResults: searchUtils.searchResults!,
-                        backgroundColor: _searchBackgroundColor,
-                        onItemTap: searchUtils.goToSearchItem,
-                      ),
+                        if (showOverlays.isOn &&
+                            searchUtils.searchResults != null &&
+                            searchUtils.searchResults!.isNotEmpty)
+                          SafeArea(
+                            child: Align(
+                              alignment: Alignment.topCenter,
+                              child: MapSearchResults(
+                                searchResults: searchUtils.searchResults!,
+                                backgroundColor: _searchBackgroundColor,
+                                onItemTap: searchUtils.goToSearchItem,
+                              ),
+                            ),
+                          ),
+                      ],
                     ),
                   ),
-              ],
             ),
-          ),
-        ),
       ),
     );
   }
@@ -148,13 +161,14 @@ class MapSearchResults extends StatelessWidget {
           thumbVisibility: true,
           child: ListView.separated(
             padding: EdgeInsets.zero,
-            itemBuilder: (context, index) => GestureDetector(
-              onTap: () => onItemTap(searchResults[index]),
-              child: Text(
-                searchResults[index].placeName ?? "unknown",
-                style: const TextStyle(color: Colors.black),
-              ),
-            ),
+            itemBuilder:
+                (context, index) => GestureDetector(
+                  onTap: () => onItemTap(searchResults[index]),
+                  child: Text(
+                    searchResults[index].placeName ?? "unknown",
+                    style: const TextStyle(color: Colors.black),
+                  ),
+                ),
             itemCount: searchResults.length,
             separatorBuilder: (context, index) => const Divider(),
             shrinkWrap: true,

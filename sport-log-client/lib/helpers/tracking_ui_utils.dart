@@ -10,8 +10,8 @@ import 'package:sport_log/models/cardio/route.dart';
 
 class TrackingUiUtils {
   TrackingUiUtils(Route? route, CardioSession? cardioSession)
-      : _routeTrack = route?.track,
-        _cardioSessionTrack = cardioSession?.track;
+    : _routeTrack = route?.track,
+      _cardioSessionTrack = cardioSession?.track;
 
   MapController? _mapController;
   final NullablePointer<PolylineAnnotation> _line =
@@ -33,10 +33,10 @@ class TrackingUiUtils {
   Future<void> onMapCreated(MapController mapController) async {
     _mapController = mapController;
     if (_routeTrack != null) {
-      await _mapController?.addRouteLine(_routeTrack!);
+      await _mapController?.addRouteLine(_routeTrack);
     }
     if (_cardioSessionTrack != null) {
-      await _mapController?.addRouteLine(_cardioSessionTrack!);
+      await _mapController?.addRouteLine(_cardioSessionTrack);
     }
   }
 
@@ -56,12 +56,12 @@ class TrackingUiUtils {
   Future<void> updateSessionProgressMarker(Duration currentDuration) async {
     if (_cardioSessionTrack != null) {
       final comparePositionIdx = binarySearchLargestLE(
-        _cardioSessionTrack!,
+        _cardioSessionTrack,
         (pos) => pos.time,
         currentDuration,
       );
       if (comparePositionIdx != null) {
-        final comparePosition = _cardioSessionTrack![comparePositionIdx];
+        final comparePosition = _cardioSessionTrack[comparePositionIdx];
         await _mapController?.updateRouteMarker(
           _compareLocationMarker,
           comparePosition.latLng,

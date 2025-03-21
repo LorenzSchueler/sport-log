@@ -28,36 +28,36 @@ class StrengthSessionDescription extends CompoundEntity {
   List<StrengthSet> sets;
 
   StrengthSessionStats get stats => StrengthSessionStats.fromStrengthSets(
-        session.datetime,
-        movement.dimension,
-        sets,
-      );
+    session.datetime,
+    movement.dimension,
+    sets,
+  );
 
   static StrengthSessionDescription? defaultValue() =>
       Movement.defaultMovement == null
           ? null
           : StrengthSessionDescription(
-              session: StrengthSession(
-                id: randomId(),
-                datetime: DateTime.now(),
-                movementId: Movement.defaultMovement!.id,
-                interval: null,
-                comments: null,
-                deleted: false,
-              ),
-              movement: Movement.defaultMovement!,
-              sets: [],
-            );
+            session: StrengthSession(
+              id: randomId(),
+              datetime: DateTime.now(),
+              movementId: Movement.defaultMovement!.id,
+              interval: null,
+              comments: null,
+              deleted: false,
+            ),
+            movement: Movement.defaultMovement!,
+            sets: [],
+          );
 
   @override
   Map<String, dynamic> toJson() => _$StrengthSessionDescriptionToJson(this);
 
   @override
   StrengthSessionDescription clone() => StrengthSessionDescription(
-        session: session.clone(),
-        movement: movement.clone(),
-        sets: sets.clone(),
-      );
+    session: session.clone(),
+    movement: movement.clone(),
+    sets: sets.clone(),
+  );
 
   @override
   bool isValidBeforeSanitation() {

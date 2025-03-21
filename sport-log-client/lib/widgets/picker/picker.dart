@@ -37,47 +37,51 @@ class Picker<T, C> extends StatelessWidget {
   Widget build(BuildContext context) {
     return Dialog(
       clipBehavior: Clip.antiAlias,
-      child: items.isEmpty
-          ? ListTile(
-              title: Row(
-                children: [
-                  const Text("Nothing found."),
-                  const Spacer(),
-                  FilledButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: const Text("OK"),
-                  ),
-                ],
+      child:
+          items.isEmpty
+              ? ListTile(
+                title: Row(
+                  children: [
+                    const Text("Nothing found."),
+                    const Spacer(),
+                    FilledButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text("OK"),
+                    ),
+                  ],
+                ),
+              )
+              : ListView.separated(
+                itemBuilder: (context, index) {
+                  final item = items[index];
+                  return ListTile(
+                    title: Text(
+                      title(item),
+                      maxLines: 1,
+                      softWrap: false,
+                      overflow: TextOverflow.fade,
+                    ),
+                    subtitle:
+                        subtitle != null
+                            ? Text(
+                              subtitle!.call(item),
+                              maxLines: 1,
+                              softWrap: false,
+                              overflow: TextOverflow.fade,
+                            )
+                            : null,
+                    selected:
+                        selectedItem != null
+                            ? compareWith(item) ==
+                                compareWith(selectedItem as T)
+                            : false,
+                    onTap: () => Navigator.pop(context, item),
+                  );
+                },
+                itemCount: items.length,
+                separatorBuilder: (context, _) => const Divider(height: 0),
+                shrinkWrap: true,
               ),
-            )
-          : ListView.separated(
-              itemBuilder: (context, index) {
-                final item = items[index];
-                return ListTile(
-                  title: Text(
-                    title(item),
-                    maxLines: 1,
-                    softWrap: false,
-                    overflow: TextOverflow.fade,
-                  ),
-                  subtitle: subtitle != null
-                      ? Text(
-                          subtitle!.call(item),
-                          maxLines: 1,
-                          softWrap: false,
-                          overflow: TextOverflow.fade,
-                        )
-                      : null,
-                  selected: selectedItem != null
-                      ? compareWith(item) == compareWith(selectedItem as T)
-                      : false,
-                  onTap: () => Navigator.pop(context, item),
-                );
-              },
-              itemCount: items.length,
-              separatorBuilder: (context, _) => const Divider(height: 0),
-              shrinkWrap: true,
-            ),
     );
   }
 }
@@ -140,20 +144,18 @@ class _PickerWithSearchState<T, C> extends State<PickerWithSearch<T, C>> {
       child: Column(
         children: [
           _searchBar,
-          const Divider(
-            height: 0,
-            thickness: 2,
-          ),
+          const Divider(height: 0, thickness: 2),
           Expanded(
-            child: _items.isEmpty
-                ? const Center(child: Text('Nothing found.'))
-                : Scrollbar(
-                    child: ListView.separated(
-                      itemBuilder: _routeBuilder,
-                      separatorBuilder: (_, __) => const Divider(height: 0),
-                      itemCount: _items.length,
+            child:
+                _items.isEmpty
+                    ? const Center(child: Text('Nothing found.'))
+                    : Scrollbar(
+                      child: ListView.separated(
+                        itemBuilder: _routeBuilder,
+                        separatorBuilder: (_, __) => const Divider(height: 0),
+                        itemCount: _items.length,
+                      ),
                     ),
-                  ),
           ),
         ],
       ),
@@ -170,15 +172,14 @@ class _PickerWithSearchState<T, C> extends State<PickerWithSearch<T, C>> {
         decoration: InputDecoration(
           labelText: 'Search',
           prefixIcon: const Icon(AppIcons.search),
-          suffixIcon: _search.isNotEmpty && widget.editRoute != null
-              ? IconButton(
-                  onPressed: () => Navigator.pushNamed(
-                    context,
-                    widget.editRoute!,
-                  ),
-                  icon: const Icon(AppIcons.add),
-                )
-              : null,
+          suffixIcon:
+              _search.isNotEmpty && widget.editRoute != null
+                  ? IconButton(
+                    onPressed:
+                        () => Navigator.pushNamed(context, widget.editRoute!),
+                    icon: const Icon(AppIcons.add),
+                  )
+                  : null,
         ),
       ),
     );
@@ -196,17 +197,19 @@ class _PickerWithSearchState<T, C> extends State<PickerWithSearch<T, C>> {
         softWrap: false,
         overflow: TextOverflow.fade,
       ), //warp
-      subtitle: subtitle != null
-          ? Text(
-              subtitle,
-              maxLines: 1,
-              softWrap: false,
-              overflow: TextOverflow.fade,
-            )
-          : null,
-      selected: selectedItem != null
-          ? widget.compareWith(item) == widget.compareWith(selectedItem)
-          : false,
+      subtitle:
+          subtitle != null
+              ? Text(
+                subtitle,
+                maxLines: 1,
+                softWrap: false,
+                overflow: TextOverflow.fade,
+              )
+              : null,
+      selected:
+          selectedItem != null
+              ? widget.compareWith(item) == widget.compareWith(selectedItem)
+              : false,
       onTap: () => Navigator.pop(context, item),
     );
   }
@@ -220,13 +223,14 @@ Future<Action?> showActionPicker({
 }) async {
   FocusManager.instance.primaryFocus?.unfocus();
   return showDialog<Action>(
-    builder: (_) => Picker(
-      items: actions,
-      selectedItem: selectedAction,
-      title: (action) => action.name,
-      subtitle: null,
-      compareWith: (action) => action.id,
-    ),
+    builder:
+        (_) => Picker(
+          items: actions,
+          selectedItem: selectedAction,
+          title: (action) => action.name,
+          subtitle: null,
+          compareWith: (action) => action.id,
+        ),
     barrierDismissible: dismissible,
     context: context,
   );
@@ -239,13 +243,14 @@ Future<CardioType?> showCardioTypePicker({
 }) async {
   FocusManager.instance.primaryFocus?.unfocus();
   return showDialog<CardioType>(
-    builder: (_) => Picker(
-      items: CardioType.values,
-      selectedItem: selectedCardioType,
-      title: (cardioType) => cardioType.name,
-      subtitle: null,
-      compareWith: (cardioType) => cardioType.index,
-    ),
+    builder:
+        (_) => Picker(
+          items: CardioType.values,
+          selectedItem: selectedCardioType,
+          title: (cardioType) => cardioType.name,
+          subtitle: null,
+          compareWith: (cardioType) => cardioType.index,
+        ),
     barrierDismissible: dismissible,
     context: context,
   );
@@ -258,13 +263,14 @@ Future<DateFilterState?> showDateFilterStatePicker({
 }) async {
   FocusManager.instance.primaryFocus?.unfocus();
   return showDialog<DateFilterState>(
-    builder: (_) => Picker(
-      items: DateFilterState.all(selectedDateFilterState),
-      selectedItem: selectedDateFilterState,
-      title: (dateFilterState) => dateFilterState.name,
-      subtitle: null,
-      compareWith: (dateFilterState) => dateFilterState,
-    ),
+    builder:
+        (_) => Picker(
+          items: DateFilterState.all(selectedDateFilterState),
+          selectedItem: selectedDateFilterState,
+          title: (dateFilterState) => dateFilterState.name,
+          subtitle: null,
+          compareWith: (dateFilterState) => dateFilterState,
+        ),
     barrierDismissible: dismissible,
     context: context,
   );
@@ -277,14 +283,15 @@ Future<Metcon?> showMetconPicker({
 }) async {
   FocusManager.instance.primaryFocus?.unfocus();
   return showDialog<Metcon>(
-    builder: (_) => PickerWithSearch(
-      selectedItem: selectedMetcon,
-      getByName: (name) => MetconDataProvider().getByName(name),
-      editRoute: Routes.metconEdit,
-      compareWith: (metcon) => metcon.id,
-      title: (metcon) => metcon.name,
-      subtitle: null,
-    ),
+    builder:
+        (_) => PickerWithSearch(
+          selectedItem: selectedMetcon,
+          getByName: (name) => MetconDataProvider().getByName(name),
+          editRoute: Routes.metconEdit,
+          compareWith: (metcon) => metcon.id,
+          title: (metcon) => metcon.name,
+          subtitle: null,
+        ),
     barrierDismissible: dismissible,
     context: context,
   );
@@ -299,15 +306,20 @@ Future<Movement?> showMovementPicker({
 }) async {
   FocusManager.instance.primaryFocus?.unfocus();
   return showDialog<Movement>(
-    builder: (_) => PickerWithSearch(
-      selectedItem: selectedMovement,
-      getByName: (name) => MovementDataProvider()
-          .getByName(name, cardioOnly: cardioOnly, distanceOnly: distanceOnly),
-      editRoute: Routes.movementEdit,
-      compareWith: (movement) => movement.id,
-      title: (movement) => movement.name,
-      subtitle: (movement) => movement.dimension.name,
-    ),
+    builder:
+        (_) => PickerWithSearch(
+          selectedItem: selectedMovement,
+          getByName:
+              (name) => MovementDataProvider().getByName(
+                name,
+                cardioOnly: cardioOnly,
+                distanceOnly: distanceOnly,
+              ),
+          editRoute: Routes.movementEdit,
+          compareWith: (movement) => movement.id,
+          title: (movement) => movement.name,
+          subtitle: (movement) => movement.dimension.name,
+        ),
     barrierDismissible: dismissible,
     context: context,
   );
@@ -320,20 +332,23 @@ Future<MovementOrMetcon?> showMovementOrMetconPicker({
 }) async {
   FocusManager.instance.primaryFocus?.unfocus();
   return showDialog<MovementOrMetcon>(
-    builder: (_) => PickerWithSearch(
-      selectedItem: selectedMovementOrMetcon,
-      getByName: (name) async => ((await MovementDataProvider().getNonDeleted())
-                  .map(MovementOrMetcon.movement)
-                  .toList() +
-              (await MetconDataProvider().getNonDeleted())
-                  .map(MovementOrMetcon.metcon)
-                  .toList())
-          .fuzzySort(query: name, toString: (m) => m.name),
-      editRoute: null,
-      compareWith: (movementOrMetcon) => movementOrMetcon,
-      title: (movementOrMetcon) => movementOrMetcon.name,
-      subtitle: (movementOrMetcon) => movementOrMetcon.movement?.dimension.name,
-    ),
+    builder:
+        (_) => PickerWithSearch(
+          selectedItem: selectedMovementOrMetcon,
+          getByName:
+              (name) async => ((await MovementDataProvider().getNonDeleted())
+                          .map(MovementOrMetcon.movement)
+                          .toList() +
+                      (await MetconDataProvider().getNonDeleted())
+                          .map(MovementOrMetcon.metcon)
+                          .toList())
+                  .fuzzySort(query: name, toString: (m) => m.name),
+          editRoute: null,
+          compareWith: (movementOrMetcon) => movementOrMetcon,
+          title: (movementOrMetcon) => movementOrMetcon.name,
+          subtitle:
+              (movementOrMetcon) => movementOrMetcon.movement?.dimension.name,
+        ),
     barrierDismissible: dismissible,
     context: context,
   );
@@ -346,14 +361,15 @@ Future<Route?> showRoutePicker({
 }) async {
   FocusManager.instance.primaryFocus?.unfocus();
   return showDialog<Route>(
-    builder: (_) => PickerWithSearch(
-      selectedItem: selectedRoute,
-      getByName: (name) => RouteDataProvider().getByName(name),
-      editRoute: Routes.routeEdit,
-      compareWith: (route) => route.id,
-      title: (route) => route.name,
-      subtitle: null,
-    ),
+    builder:
+        (_) => PickerWithSearch(
+          selectedItem: selectedRoute,
+          getByName: (name) => RouteDataProvider().getByName(name),
+          editRoute: Routes.routeEdit,
+          compareWith: (route) => route.id,
+          title: (route) => route.name,
+          subtitle: null,
+        ),
     barrierDismissible: dismissible,
     context: context,
   );
@@ -370,16 +386,17 @@ Future<CardioSession?> showProvidedCardioSessionPicker({
   FocusManager.instance.primaryFocus?.unfocus();
   return context.mounted
       ? showDialog<CardioSession>(
-          builder: (_) => Picker(
-            selectedItem: selected,
-            items: cardioSessions,
-            compareWith: (cs) => cs.id,
-            title: (_) => movement.name,
-            subtitle: (cs) => cs.datetime.humanDateTime,
-          ),
-          barrierDismissible: dismissible,
-          context: context,
-        )
+        builder:
+            (_) => Picker(
+              selectedItem: selected,
+              items: cardioSessions,
+              compareWith: (cs) => cs.id,
+              title: (_) => movement.name,
+              subtitle: (cs) => cs.datetime.humanDateTime,
+            ),
+        barrierDismissible: dismissible,
+        context: context,
+      )
       : null;
 }
 
@@ -392,22 +409,27 @@ Future<CardioSession?> showCardioSessionPicker({
 }) async {
   FocusManager.instance.primaryFocus?.unfocus();
   final newSelected = await showDialog<(Int64, DateTime, String?)>(
-    builder: (_) => PickerWithSearch(
-      selectedItem: selected != null
-          ? (selected.id, selected.datetime, selected.comments)
-          : null,
-      getByName: (name) => CardioSessionDataProvider()
-          .getIdDatetimeCommentByMovementCommentWithTrack(
-        movement: movement,
-        comment: name,
-        hasTrack: hasTrack,
-      ),
-      editRoute: null,
-      compareWith: (idDatetimeComment) => idDatetimeComment.$1,
-      title: (idDatetimeComment) => idDatetimeComment.$3 ?? "- no comments -",
-      subtitle: (idDatetimeComment) =>
-          '${movement.name} • ${idDatetimeComment.$2.humanDateTime}',
-    ),
+    builder:
+        (_) => PickerWithSearch(
+          selectedItem:
+              selected != null
+                  ? (selected.id, selected.datetime, selected.comments)
+                  : null,
+          getByName:
+              (name) => CardioSessionDataProvider()
+                  .getIdDatetimeCommentByMovementCommentWithTrack(
+                    movement: movement,
+                    comment: name,
+                    hasTrack: hasTrack,
+                  ),
+          editRoute: null,
+          compareWith: (idDatetimeComment) => idDatetimeComment.$1,
+          title:
+              (idDatetimeComment) => idDatetimeComment.$3 ?? "- no comments -",
+          subtitle:
+              (idDatetimeComment) =>
+                  '${movement.name} • ${idDatetimeComment.$2.humanDateTime}',
+        ),
     barrierDismissible: dismissible,
     context: context,
   );
@@ -423,13 +445,14 @@ Future<Weekday?> showWeekdayPicker({
 }) async {
   FocusManager.instance.primaryFocus?.unfocus();
   return showDialog<Weekday>(
-    builder: (_) => Picker(
-      items: Weekday.values,
-      selectedItem: selectedWeekday,
-      title: (weekday) => weekday.name,
-      compareWith: (weekday) => weekday.index,
-      subtitle: null,
-    ),
+    builder:
+        (_) => Picker(
+          items: Weekday.values,
+          selectedItem: selectedWeekday,
+          title: (weekday) => weekday.name,
+          compareWith: (weekday) => weekday.index,
+          subtitle: null,
+        ),
     barrierDismissible: dismissible,
     context: context,
   );

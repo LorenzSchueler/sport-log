@@ -3,11 +3,7 @@ export 'package:sport_log/helpers/validation.dart';
 
 typedef DbRecord = Map<String, Object?>;
 
-enum SyncStatus {
-  synchronized,
-  updated,
-  created,
-}
+enum SyncStatus { synchronized, updated, created }
 
 abstract class DbSerializer<T> {
   DbRecord toDbRecord(T o);

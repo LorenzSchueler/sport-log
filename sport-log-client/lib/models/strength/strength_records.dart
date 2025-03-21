@@ -21,15 +21,14 @@ extension StrengthRecordExtension on StrengthRecords {
   List<StrengthRecordType> _getRecordTypesFromStats(
     StrengthSessionStats strengthSessionStats,
     StrengthRecord? strengthRecord,
-  ) =>
-      [
-        if (isRecord(strengthSessionStats.maxWeight, strengthRecord?.maxWeight))
-          StrengthRecordType.maxWeight,
-        if (isRecord(strengthSessionStats.maxCount, strengthRecord?.maxCount))
-          StrengthRecordType.maxCount,
-        if (isRecord(strengthSessionStats.maxEorm, strengthRecord?.maxEorm))
-          StrengthRecordType.maxEorm,
-      ];
+  ) => [
+    if (isRecord(strengthSessionStats.maxWeight, strengthRecord?.maxWeight))
+      StrengthRecordType.maxWeight,
+    if (isRecord(strengthSessionStats.maxCount, strengthRecord?.maxCount))
+      StrengthRecordType.maxCount,
+    if (isRecord(strengthSessionStats.maxEorm, strengthRecord?.maxEorm))
+      StrengthRecordType.maxEorm,
+  ];
 
   List<StrengthRecordType> getRecordTypes(
     StrengthSet strengthSet,
@@ -66,10 +65,7 @@ class StrengthRecord {
     required this.maxEorm,
   });
 
-  factory StrengthRecord.fromDbRecord(
-    DbRecord r, {
-    String prefix = '',
-  }) {
+  factory StrengthRecord.fromDbRecord(DbRecord r, {String prefix = ''}) {
     return StrengthRecord(
       maxWeight: r[prefix + Columns.maxWeight] as double?,
       maxCount: r[prefix + Columns.maxCount]! as int,

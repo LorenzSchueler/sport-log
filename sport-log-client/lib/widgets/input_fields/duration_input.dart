@@ -95,8 +95,10 @@ class _DurationInputState extends State<DurationInput> {
     if (validated != null) {
       return validated;
     }
-    final duration =
-        Duration(minutes: int.parse(minutes), seconds: int.parse(seconds));
+    final duration = Duration(
+      minutes: int.parse(minutes),
+      seconds: int.parse(seconds),
+    );
     if (duration < widget.minDuration) {
       return "The time must be greater than or equal to ${widget.minDuration.formatM99S}.";
     }
@@ -113,9 +115,10 @@ class _DurationInputState extends State<DurationInput> {
       children: [
         RepeatIconButton(
           icon: const Icon(AppIcons.subtractBox),
-          onClick: _duration - _durationStep < widget.minDuration
-              ? null
-              : () => _setDuration(
+          onClick:
+              _duration - _durationStep < widget.minDuration
+                  ? null
+                  : () => _setDuration(
                     _duration - _durationStep,
                     updateTextField: true,
                   ),
@@ -154,9 +157,10 @@ class _DurationInputState extends State<DurationInput> {
         ),
         RepeatIconButton(
           icon: const Icon(AppIcons.addBox),
-          onClick: _duration + _durationStep > widget.maxDuration
-              ? null
-              : () => _setDuration(
+          onClick:
+              _duration + _durationStep > widget.maxDuration
+                  ? null
+                  : () => _setDuration(
                     _duration + _durationStep,
                     updateTextField: true,
                   ),

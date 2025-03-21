@@ -48,14 +48,14 @@ class Metcon extends AtomicEntity {
   }) : isDefaultMetcon = userId == null;
 
   Metcon.defaultValue()
-      : id = randomId(),
-        isDefaultMetcon = false,
-        name = "",
-        metconType = MetconType.amrap,
-        rounds = null,
-        timecap = timecapDefaultValue,
-        description = null,
-        deleted = false;
+    : id = randomId(),
+      isDefaultMetcon = false,
+      name = "",
+      metconType = MetconType.amrap,
+      rounds = null,
+      timecap = timecapDefaultValue,
+      description = null,
+      deleted = false;
 
   factory Metcon.fromJson(Map<String, dynamic> json) => _$MetconFromJson(json);
 
@@ -85,15 +85,15 @@ class Metcon extends AtomicEntity {
 
   @override
   Metcon clone() => Metcon(
-        id: id.clone(),
-        isDefaultMetcon: isDefaultMetcon,
-        name: name,
-        metconType: metconType,
-        rounds: rounds,
-        timecap: timecap?.clone(),
-        description: description,
-        deleted: deleted,
-      );
+    id: id.clone(),
+    isDefaultMetcon: isDefaultMetcon,
+    name: name,
+    metconType: metconType,
+    rounds: rounds,
+    timecap: timecap?.clone(),
+    description: description,
+    deleted: deleted,
+  );
 
   bool validateMetconType() {
     return switch (metconType) {
@@ -103,8 +103,10 @@ class Metcon extends AtomicEntity {
       MetconType.emom =>
         validate(rounds != null, 'Metcon: emom: rounds == null') &&
             validate(timecap != null, 'Metcon: emom: timecap == null'),
-      MetconType.forTime =>
-        validate(rounds != null, 'Metcon: forTime: rounds == null'),
+      MetconType.forTime => validate(
+        rounds != null,
+        'Metcon: forTime: rounds == null',
+      ),
     };
   }
 
@@ -149,9 +151,10 @@ class DbMetconSerializer extends DbSerializer<Metcon> {
       name: r[prefix + Columns.name]! as String,
       metconType: MetconType.values[r[prefix + Columns.metconType]! as int],
       rounds: r[prefix + Columns.rounds] as int?,
-      timecap: r[prefix + Columns.timecap] == null
-          ? null
-          : Duration(milliseconds: r[prefix + Columns.timecap]! as int),
+      timecap:
+          r[prefix + Columns.timecap] == null
+              ? null
+              : Duration(milliseconds: r[prefix + Columns.timecap]! as int),
       description: r[prefix + Columns.description] as String?,
       deleted: r[prefix + Columns.deleted]! as int == 1,
     );

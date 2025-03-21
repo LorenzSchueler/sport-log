@@ -112,8 +112,7 @@ class StrengthSetTable extends TableAccessor<StrengthSet> {
   }
 
   Future<StrengthRecords> getStrengthRecords() async {
-    final records = await database.rawQuery(
-      """
+    final records = await database.rawQuery("""
       select ${Tables.movement}.${Columns.id} as ${Columns.movementId}, 
         max(${Tables.strengthSet}.${Columns.weight}) as ${Columns.maxWeight}, 
         max(${Tables.strengthSet}.${Columns.count}) as ${Columns.maxCount}, 
@@ -124,18 +123,14 @@ class StrengthSetTable extends TableAccessor<StrengthSet> {
       left join ${Tables.eorm} on ${Tables.strengthSet}.${Columns.count} = ${Tables.eorm}.${Columns.eormReps} 
         and ${Tables.strengthSet}.${Columns.count} <= 10 
         and ${Tables.movement}.${Columns.dimension} = ${MovementDimension.reps.index}
-      where ${TableAccessor.combineFilter([
-            notDeleted,
-            TableAccessor.notDeletedOfTable(Tables.strengthSession),
-            TableAccessor.notDeletedOfTable(Tables.movement),
-          ])}
+      where ${TableAccessor.combineFilter([notDeleted, TableAccessor.notDeletedOfTable(Tables.strengthSession), TableAccessor.notDeletedOfTable(Tables.movement)])}
       group by ${Tables.movement}.${Columns.id}
-      """,
-    );
+      """);
     return {
       for (final record in records)
-        Int64(record[Columns.movementId]! as int):
-            StrengthRecord.fromDbRecord(record),
+        Int64(record[Columns.movementId]! as int): StrengthRecord.fromDbRecord(
+          record,
+        ),
     };
   }
 }
@@ -160,11 +155,7 @@ class StrengthSessionDescriptionTable {
         ${_movementTable.table.allColumns}
       FROM ${Tables.strengthSession}
         JOIN ${Tables.movement} ON ${Tables.movement}.${Columns.id} = ${Tables.strengthSession}.${Columns.movementId}
-      WHERE ${TableAccessor.combineFilter([
-            TableAccessor.notDeletedOfTable(Tables.strengthSession),
-            TableAccessor.notDeletedOfTable(Tables.movement),
-            "${Tables.strengthSession}.${Columns.id} = ?",
-          ])}
+      WHERE ${TableAccessor.combineFilter([TableAccessor.notDeletedOfTable(Tables.strengthSession), TableAccessor.notDeletedOfTable(Tables.movement), "${Tables.strengthSession}.${Columns.id} = ?"])}
       ''',
       [idValue.toInt()],
     );
@@ -177,8 +168,10 @@ class StrengthSessionDescriptionTable {
     );
     return StrengthSessionDescription(
       session: strengthSession,
-      movement: _movementTable.serde
-          .fromDbRecord(records.first, prefix: _movementTable.table.prefix),
+      movement: _movementTable.serde.fromDbRecord(
+        records.first,
+        prefix: _movementTable.table.prefix,
+      ),
       sets: await _strengthSetTable.getByStrengthSession(strengthSession),
     );
   }
@@ -189,37 +182,29 @@ class StrengthSessionDescriptionTable {
     Movement? movement,
     String? comment,
   }) async {
-    final records = await AppDatabase.database.rawQuery(
-      '''
+    final records = await AppDatabase.database.rawQuery('''
       SELECT
         ${_strengthSessionTable.table.allColumns},
         ${_movementTable.table.allColumns}
       FROM ${Tables.strengthSession}
       JOIN ${Tables.movement} ON ${Tables.movement}.${Columns.id} = ${Tables.strengthSession}.${Columns.movementId}
-      WHERE ${TableAccessor.combineFilter([
-            TableAccessor.notDeletedOfTable(Tables.movement),
-            TableAccessor.notDeletedOfTable(Tables.strengthSession),
-            TableAccessor.fromFilterOfTable(Tables.strengthSession, from),
-            TableAccessor.untilFilterOfTable(Tables.strengthSession, until),
-            TableAccessor.movementIdFilterOfTable(
-              Tables.strengthSession,
-              movement,
-            ),
-            TableAccessor.commentFilterOfTable(Tables.strengthSession, comment),
-          ])}
+      WHERE ${TableAccessor.combineFilter([TableAccessor.notDeletedOfTable(Tables.movement), TableAccessor.notDeletedOfTable(Tables.strengthSession), TableAccessor.fromFilterOfTable(Tables.strengthSession, from), TableAccessor.untilFilterOfTable(Tables.strengthSession, until), TableAccessor.movementIdFilterOfTable(Tables.strengthSession, movement), TableAccessor.commentFilterOfTable(Tables.strengthSession, comment)])}
       ORDER BY ${TableAccessor.orderByDatetimeOfTable(Tables.strengthSession)}
-      ''',
-    );
+      ''');
     final strengthSessionDescriptions = <StrengthSessionDescription>[];
     for (final record in records) {
-      final session = _strengthSessionTable.serde
-          .fromDbRecord(record, prefix: _strengthSessionTable.table.prefix);
+      final session = _strengthSessionTable.serde.fromDbRecord(
+        record,
+        prefix: _strengthSessionTable.table.prefix,
+      );
       strengthSessionDescriptions.add(
         StrengthSessionDescription(
           session: session,
           sets: await _strengthSetTable.getByStrengthSession(session),
-          movement: _movementTable.serde
-              .fromDbRecord(record, prefix: _movementTable.table.prefix),
+          movement: _movementTable.serde.fromDbRecord(
+            record,
+            prefix: _movementTable.table.prefix,
+          ),
         ),
       );
     }

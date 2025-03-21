@@ -21,10 +21,10 @@ class PlatformCredential extends AtomicEntity {
   });
 
   PlatformCredential.defaultValue(this.platformId)
-      : id = randomId(),
-        username = "",
-        password = "",
-        deleted = false;
+    : id = randomId(),
+      username = "",
+      password = "",
+      deleted = false;
 
   factory PlatformCredential.fromJson(Map<String, dynamic> json) =>
       _$PlatformCredentialFromJson(json);
@@ -47,12 +47,12 @@ class PlatformCredential extends AtomicEntity {
 
   @override
   PlatformCredential clone() => PlatformCredential(
-        id: id.clone(),
-        platformId: platformId.clone(),
-        username: username,
-        password: password,
-        deleted: deleted,
-      );
+    id: id.clone(),
+    platformId: platformId.clone(),
+    username: username,
+    password: password,
+    deleted: deleted,
+  );
 
   @override
   bool isValidBeforeSanitation() {

@@ -21,16 +21,16 @@ class MetconDescription extends CompoundEntity {
       ); // whether there is a MetconSession referencing this metcon
 
   MetconDescription.defaultValue()
-      : metcon = Metcon.defaultValue(),
-        moves = [],
-        hasReference = false;
+    : metcon = Metcon.defaultValue(),
+      moves = [],
+      hasReference = false;
 
   Metcon metcon;
   List<MetconMovementDescription> moves;
   bool hasReference;
 
   static MetconDescription?
-      _defaultMetconDescription; // default metcon description that already exists in db
+  _defaultMetconDescription; // default metcon description that already exists in db
   static set defaultMetconDescription(MetconDescription? metconDescription) =>
       _defaultMetconDescription = metconDescription;
   static MetconDescription? get defaultMetconDescription =>
@@ -41,10 +41,10 @@ class MetconDescription extends CompoundEntity {
 
   @override
   MetconDescription clone() => MetconDescription(
-        metcon: metcon.clone(),
-        moves: moves.clone(),
-        hasReference: hasReference,
-      );
+    metcon: metcon.clone(),
+    moves: moves.clone(),
+    hasReference: hasReference,
+  );
 
   @override
   bool isValidBeforeSanitation() {
@@ -94,9 +94,10 @@ class MetconDescription extends CompoundEntity {
             ? "${metcon.metconType.name} ${metcon.timecap?.formatTimeShort}"
             : "${metcon.metconType.name} ${metcon.timecap?.formatTimeShort} (${metcon.rounds} x ${Duration(seconds: (metcon.timecap!.inSeconds / metcon.rounds!).round()).formatTimeShort})";
       case MetconType.forTime:
-        final timecap = metcon.timecap == null
-            ? ""
-            : " (Timecap ${metcon.timecap?.formatTimeShort})";
+        final timecap =
+            metcon.timecap == null
+                ? ""
+                : " (Timecap ${metcon.timecap?.formatTimeShort})";
         final rounds = metcon.rounds! > 1 ? "${metcon.rounds!} Rounds " : "";
         return "$rounds${metcon.metconType.name}$timecap";
     }

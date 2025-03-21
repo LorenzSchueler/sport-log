@@ -50,22 +50,23 @@ class Position {
   String toString() => toJson().toString();
 
   Position clone() => Position(
-        longitude: longitude,
-        latitude: latitude,
-        elevation: elevation,
-        distance: distance,
-        time: time.clone(),
-      );
+    longitude: longitude,
+    latitude: latitude,
+    elevation: elevation,
+    distance: distance,
+    time: time.clone(),
+  );
 
   static const int byteSize = 40;
 
   Uint8List asBytesList() {
-    final bytes = ByteData(byteSize)
-      ..setFloat64(0, longitude)
-      ..setFloat64(8, latitude)
-      ..setFloat64(16, elevation)
-      ..setFloat64(24, distance)
-      ..setInt64(32, time.inMilliseconds);
+    final bytes =
+        ByteData(byteSize)
+          ..setFloat64(0, longitude)
+          ..setFloat64(8, latitude)
+          ..setFloat64(16, elevation)
+          ..setFloat64(24, distance)
+          ..setInt64(32, time.inMilliseconds);
     final list = bytes.buffer.asUint8List();
     assert(list.length == byteSize);
     return list;

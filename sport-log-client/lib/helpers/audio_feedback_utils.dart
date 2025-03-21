@@ -33,9 +33,9 @@ class AudioFeedbackUtils {
 
   void onStart() {
     if (_audioFeedbackConfig != null &&
-        _audioFeedbackConfig!.intervalType.isTime) {
+        _audioFeedbackConfig.intervalType.isTime) {
       _audioFeedbackTimer = Timer.periodic(
-        Duration(seconds: _audioFeedbackConfig!.interval),
+        Duration(seconds: _audioFeedbackConfig.interval),
         (_) => _onTimer(),
       );
     }
@@ -70,6 +70,5 @@ class AudioFeedbackUtils {
   Future<void> _audioFeedback(
     AudioFeedbackConfig config,
     CardioSession session,
-  ) =>
-      TtsUtils.speak(config.text(session));
+  ) => TtsUtils.speak(config.text(session));
 }

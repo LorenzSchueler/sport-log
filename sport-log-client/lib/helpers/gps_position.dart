@@ -11,13 +11,14 @@ class GpsPosition {
   });
 
   GpsPosition.fromGeolocatorPosition(Position locationData)
-      : latitude = locationData.latitude,
-        longitude = locationData.longitude,
-        elevation = locationData.altitude,
-        accuracy = locationData.accuracy,
-        satellites = (locationData is AndroidPosition)
-            ? locationData.satellitesUsedInFix.toInt()
-            : 0;
+    : latitude = locationData.latitude,
+      longitude = locationData.longitude,
+      elevation = locationData.altitude,
+      accuracy = locationData.accuracy,
+      satellites =
+          (locationData is AndroidPosition)
+              ? locationData.satellitesUsedInFix.toInt()
+              : 0;
 
   final double latitude;
   final double longitude;

@@ -63,11 +63,12 @@ class _RouteUploadPageState extends State<RouteUploadPage> {
           title: const Text("Create Route"),
           actions: [
             IconButton(
-              onPressed: _formKey.currentContext != null &&
-                      _formKey.currentState!.validate() &&
-                      _route.isValidBeforeSanitation()
-                  ? _saveRoute
-                  : null,
+              onPressed:
+                  _formKey.currentContext != null &&
+                          _formKey.currentState!.validate() &&
+                          _route.isValidBeforeSanitation()
+                      ? _saveRoute
+                      : null,
               icon: const Icon(AppIcons.save),
             ),
           ],

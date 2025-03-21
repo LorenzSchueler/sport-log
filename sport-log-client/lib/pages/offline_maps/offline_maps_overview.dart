@@ -108,9 +108,11 @@ class _OfflineMapsPageState extends State<OfflineMapsPage> {
                     showCenterLocationButton: false,
                     showAddLocationButton: false,
                     onMapCreated: _onMapCreated,
-                    onLongTap: (latLng) => _point1 == null
-                        ? _updatePoint1(latLng)
-                        : _updatePoint2(latLng),
+                    onLongTap:
+                        (latLng) =>
+                            _point1 == null
+                                ? _updatePoint1(latLng)
+                                : _updatePoint2(latLng),
                     rotateGesturesEnabled: false,
                   ),
                 ),
@@ -120,9 +122,11 @@ class _OfflineMapsPageState extends State<OfflineMapsPage> {
                     right: 10,
                     child: FloatingActionButton.small(
                       heroTag: null,
-                      onPressed: () => _point2 != null
-                          ? _updatePoint2(null)
-                          : _updatePoint1(null),
+                      onPressed:
+                          () =>
+                              _point2 != null
+                                  ? _updatePoint2(null)
+                                  : _updatePoint1(null),
                       child: const Icon(AppIcons.undo),
                     ),
                   ),
@@ -132,60 +136,69 @@ class _OfflineMapsPageState extends State<OfflineMapsPage> {
               child: Padding(
                 padding: Defaults.edgeInsets.normal,
                 child: ProviderConsumer<MapDownloadUtils>(
-                  create: (_) =>
-                      MapDownloadUtils(onSuccess: onSuccess, onError: onError)
-                        ..init(),
+                  create:
+                      (_) => MapDownloadUtils(
+                        onSuccess: onSuccess,
+                        onError: onError,
+                      )..init(),
                   builder: (context, mapDownloadUtils, _) {
                     return Column(
                       children: [
                         mapDownloadUtils.progress == null
                             ? Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  const Text("Max Zoom"),
-                                  Slider(
-                                    value: mapDownloadUtils.maxZoom.toDouble(),
-                                    label: mapDownloadUtils.maxZoom.toString(),
-                                    max: 16,
-                                    divisions: 16,
-                                    onChanged: (zoom) {
-                                      mapDownloadUtils.maxZoom = zoom.round();
-                                    },
-                                  ),
-                                  SizedBox(
-                                    width: double.infinity,
-                                    child: FilledButton.icon(
-                                      icon: const Icon(AppIcons.download),
-                                      label: const Text("Download"),
-                                      style: _point1 == null || _point2 == null
-                                          ? ButtonStyle(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Text("Max Zoom"),
+                                Slider(
+                                  value: mapDownloadUtils.maxZoom.toDouble(),
+                                  label: mapDownloadUtils.maxZoom.toString(),
+                                  max: 16,
+                                  divisions: 16,
+                                  onChanged: (zoom) {
+                                    mapDownloadUtils.maxZoom = zoom.round();
+                                  },
+                                ),
+                                SizedBox(
+                                  width: double.infinity,
+                                  child: FilledButton.icon(
+                                    icon: const Icon(AppIcons.download),
+                                    label: const Text("Download"),
+                                    style:
+                                        _point1 == null || _point2 == null
+                                            ? ButtonStyle(
                                               backgroundColor:
                                                   WidgetStatePropertyAll(
-                                                Theme.of(context).disabledColor,
-                                              ),
+                                                    Theme.of(
+                                                      context,
+                                                    ).disabledColor,
+                                                  ),
                                             )
-                                          : null,
-                                      onPressed: () =>
-                                          _downloadMap(mapDownloadUtils),
-                                    ),
+                                            : null,
+                                    onPressed:
+                                        () => _downloadMap(mapDownloadUtils),
                                   ),
-                                ],
-                              )
+                                ),
+                              ],
+                            )
                             : LinearProgressIndicator(
-                                value: mapDownloadUtils.progress,
-                              ),
+                              value: mapDownloadUtils.progress,
+                            ),
                         Defaults.sizedBox.vertical.normal,
                         Expanded(
                           child: ListView.separated(
-                            itemBuilder: (_, index) => RegionCard(
-                              region: mapDownloadUtils.regions[index],
-                              mapDownloadUtils: mapDownloadUtils,
-                              key: ValueKey(
-                                mapDownloadUtils.regions[index].tileRegion.id,
-                              ),
-                            ),
-                            separatorBuilder: (_, __) =>
-                                Defaults.sizedBox.vertical.normal,
+                            itemBuilder:
+                                (_, index) => RegionCard(
+                                  region: mapDownloadUtils.regions[index],
+                                  mapDownloadUtils: mapDownloadUtils,
+                                  key: ValueKey(
+                                    mapDownloadUtils
+                                        .regions[index]
+                                        .tileRegion
+                                        .id,
+                                  ),
+                                ),
+                            separatorBuilder:
+                                (_, __) => Defaults.sizedBox.vertical.normal,
                             itemCount: mapDownloadUtils.regions.length,
                           ),
                         ),
@@ -236,23 +249,24 @@ class RegionCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                DateTime.parse(region.metadata["datetime"]! as String)
-                    .humanDate,
+                DateTime.parse(
+                  region.metadata["datetime"]! as String,
+                ).humanDate,
                 style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                      color: Theme.of(context).colorScheme.surface,
-                    ),
+                  color: Theme.of(context).colorScheme.surface,
+                ),
               ),
               Text(
                 "${region.tileRegion.completedResourceCount} Tiles / ${(region.tileRegion.completedResourceSize / 1000000).round()} MB",
                 style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                      color: Theme.of(context).colorScheme.surface,
-                    ),
+                  color: Theme.of(context).colorScheme.surface,
+                ),
               ),
               Text(
                 "Zoom ${region.metadata["minZoom"]} - ${region.metadata["maxZoom"]}",
                 style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                      color: Theme.of(context).colorScheme.surface,
-                    ),
+                  color: Theme.of(context).colorScheme.surface,
+                ),
               ),
             ],
           ),

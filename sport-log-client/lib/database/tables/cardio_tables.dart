@@ -114,16 +114,18 @@ class CardioSessionTable extends TableAccessor<CardioSession> {
   }) async {
     final records = await database.query(
       tableName,
-      where: TableAccessor.combineFilter(
-        [notDeleted, movementIdFilter(movement), withTrack],
-      ),
+      where: TableAccessor.combineFilter([
+        notDeleted,
+        movementIdFilter(movement),
+        withTrack,
+      ]),
       orderBy: orderByDatetime,
     );
     return records.map(serde.fromDbRecord).toList();
   }
 
   Future<List<(Int64, DateTime, String?)>>
-      getIdDatetimeCommentByMovementCommentWithTrack({
+  getIdDatetimeCommentByMovementCommentWithTrack({
     required Movement movement,
     required String? comment,
     required bool hasTrack,
@@ -131,14 +133,12 @@ class CardioSessionTable extends TableAccessor<CardioSession> {
     final records = await database.query(
       tableName,
       columns: [Columns.id, Columns.datetime, Columns.comments],
-      where: TableAccessor.combineFilter(
-        [
-          notDeleted,
-          movementIdFilter(movement),
-          commentFilter(comment),
-          if (hasTrack) withTrack,
-        ],
-      ),
+      where: TableAccessor.combineFilter([
+        notDeleted,
+        movementIdFilter(movement),
+        commentFilter(comment),
+        if (hasTrack) withTrack,
+      ]),
       orderBy: orderByDatetime,
     );
 
@@ -147,7 +147,7 @@ class CardioSessionTable extends TableAccessor<CardioSession> {
           (r) => (
             Int64(r[Columns.id]! as int),
             DateTime.parse(r[Columns.datetime]! as String),
-            r[Columns.comments] as String?
+            r[Columns.comments] as String?,
           ),
         )
         .toList();
@@ -171,8 +171,7 @@ class CardioSessionDescriptionTable {
     Movement? movement,
     String? comment,
   }) async {
-    final records = await AppDatabase.database.rawQuery(
-      '''
+    final records = await AppDatabase.database.rawQuery('''
       SELECT
         ${_cardioSessionTable.table.allColumns},
         ${_routeTable.table.allColumns},
@@ -183,29 +182,31 @@ class CardioSessionDescriptionTable {
       JOIN ${Tables.movement} 
       ON ${Tables.movement}.${Columns.id} = ${Tables.cardioSession}.${Columns.movementId}
       WHERE ${TableAccessor.combineFilter([
-            TableAccessor.notDeletedOfTable(Tables.movement),
-            "(${TableAccessor.notDeletedOfTable(Tables.route)} or ${Tables.route}.${Columns.deleted} is null)", // left join -> can be null
-            TableAccessor.notDeletedOfTable(Tables.cardioSession),
-            TableAccessor.fromFilterOfTable(Tables.cardioSession, from),
-            TableAccessor.untilFilterOfTable(Tables.cardioSession, until),
-            TableAccessor.movementIdFilterOfTable(
-              Tables.cardioSession,
-              movement,
-            ),
-            TableAccessor.commentFilterOfTable(Tables.cardioSession, comment),
-          ])}
+      TableAccessor.notDeletedOfTable(Tables.movement),
+      "(${TableAccessor.notDeletedOfTable(Tables.route)} or ${Tables.route}.${Columns.deleted} is null)", // left join -> can be null
+      TableAccessor.notDeletedOfTable(Tables.cardioSession),
+      TableAccessor.fromFilterOfTable(Tables.cardioSession, from),
+      TableAccessor.untilFilterOfTable(Tables.cardioSession, until),
+      TableAccessor.movementIdFilterOfTable(Tables.cardioSession, movement),
+      TableAccessor.commentFilterOfTable(Tables.cardioSession, comment),
+    ])}
       ORDER BY ${TableAccessor.orderByDatetimeOfTable(Tables.cardioSession)}
-      ''',
-    );
+      ''');
     return records
         .map(
           (record) => CardioSessionDescription(
-            cardioSession: _cardioSessionTable.serde
-                .fromDbRecord(record, prefix: _cardioSessionTable.table.prefix),
-            route: _routeTable.serde
-                .fromOptionalDbRecord(record, prefix: _routeTable.table.prefix),
-            movement: _movementTable.serde
-                .fromDbRecord(record, prefix: _movementTable.table.prefix),
+            cardioSession: _cardioSessionTable.serde.fromDbRecord(
+              record,
+              prefix: _cardioSessionTable.table.prefix,
+            ),
+            route: _routeTable.serde.fromOptionalDbRecord(
+              record,
+              prefix: _routeTable.table.prefix,
+            ),
+            movement: _movementTable.serde.fromDbRecord(
+              record,
+              prefix: _movementTable.table.prefix,
+            ),
           ),
         )
         .toList();

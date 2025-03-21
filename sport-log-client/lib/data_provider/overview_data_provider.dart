@@ -3,8 +3,8 @@ import 'package:sport_log/data_provider/data_provider.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_state.dart';
 
-typedef EntityAccessor<T, S, D>
-    = Future<List<T>> Function(DateTime?, DateTime?, S?, String?) Function(D);
+typedef EntityAccessor<T, S, D> =
+    Future<List<T>> Function(DateTime?, DateTime?, S?, String?) Function(D);
 typedef RecordAccessor<R, D> = Future<R> Function() Function(D);
 
 class OverviewDataProvider<T, R, D extends DataProvider<T>, S>
@@ -30,8 +30,8 @@ class OverviewDataProvider<T, R, D extends DataProvider<T>, S>
     required this.entityAccessor,
     required this.recordAccessor,
     required String loggerName,
-  })  : _dataProvider = dataProvider,
-        _logger = Logger(loggerName);
+  }) : _dataProvider = dataProvider,
+       _logger = Logger(loggerName);
 
   final Logger _logger;
   final D _dataProvider;

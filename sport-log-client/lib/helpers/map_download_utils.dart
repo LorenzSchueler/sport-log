@@ -15,10 +15,7 @@ class OfflineRegion {
 }
 
 class MapDownloadUtils extends ChangeNotifier {
-  MapDownloadUtils({
-    required this.onSuccess,
-    required this.onError,
-  });
+  MapDownloadUtils({required this.onSuccess, required this.onError});
 
   final Future<void> Function() onSuccess;
   final Future<void> Function(String) onError;

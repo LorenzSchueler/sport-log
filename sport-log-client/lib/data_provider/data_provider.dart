@@ -216,8 +216,10 @@ abstract class EntityDataProvider<T extends AtomicEntity>
   ) async {
     final result = await fnMultiple(records);
     if (result.isErr) {
-      final conflictResolution =
-          await DataProvider.handleApiError(result.err, onNoInternet);
+      final conflictResolution = await DataProvider.handleApiError(
+        result.err,
+        onNoInternet,
+      );
       return conflictResolution != null
           ? await _resolveConflict(conflictResolution, fnSingle, records)
           : false;
@@ -263,8 +265,10 @@ abstract class EntityDataProvider<T extends AtomicEntity>
     if (objects.isEmpty) {
       return true;
     }
-    final result =
-        await table.upsertMultiple(objects, synchronized: synchronized);
+    final result = await table.upsertMultiple(
+      objects,
+      synchronized: synchronized,
+    );
     if (result.isErr) {
       await DataProvider._handleDbError(result.err);
     }
@@ -293,13 +297,11 @@ abstract class EntityDataProvider<T extends AtomicEntity>
   }
 
   static Future<bool> downSync({required VoidCallback? onNoInternet}) async {
-    final accountDataResult =
-        await AccountDataApi().get(Settings.instance.epochMap);
+    final accountDataResult = await AccountDataApi().get(
+      Settings.instance.epochMap,
+    );
     if (accountDataResult.isErr) {
-      await DataProvider.handleApiError(
-        accountDataResult.err,
-        onNoInternet,
-      );
+      await DataProvider.handleApiError(accountDataResult.err, onNoInternet);
       return false;
     } else {
       final accountData = accountDataResult.ok;
@@ -327,21 +329,21 @@ abstract class EntityDataProvider<T extends AtomicEntity>
   }
 
   static List<EntityDataProvider> get all => [
-        DiaryDataProvider(),
-        WodDataProvider(),
-        MovementDataProvider(),
-        MetconDataProvider(),
-        MetconMovementDataProvider(),
-        MetconSessionDataProvider(),
-        RouteDataProvider(),
-        CardioSessionDataProvider(),
-        StrengthSessionDataProvider(),
-        StrengthSetDataProvider(),
-        PlatformDataProvider(),
-        PlatformCredentialDataProvider(),
-        ActionProviderDataProvider(),
-        ActionDataProvider(),
-        ActionRuleDataProvider(),
-        ActionEventDataProvider(),
-      ];
+    DiaryDataProvider(),
+    WodDataProvider(),
+    MovementDataProvider(),
+    MetconDataProvider(),
+    MetconMovementDataProvider(),
+    MetconSessionDataProvider(),
+    RouteDataProvider(),
+    CardioSessionDataProvider(),
+    StrengthSessionDataProvider(),
+    StrengthSetDataProvider(),
+    PlatformDataProvider(),
+    PlatformCredentialDataProvider(),
+    ActionProviderDataProvider(),
+    ActionDataProvider(),
+    ActionRuleDataProvider(),
+    ActionEventDataProvider(),
+  ];
 }

@@ -22,16 +22,17 @@ class LocationUtils extends ChangeNotifier {
 
   late final _settings = AndroidSettings(
     forceLocationManager: true,
-    foregroundNotificationConfig: inBackground
-        ? const ForegroundNotificationConfig(
-            notificationTitle: "Tracking",
-            notificationText: "GPS tracking is active",
-            color: Colors.red,
-            notificationIcon: AndroidResource(name: "notification_icon"),
-            setOngoing: true,
-            enableWakeLock: true,
-          )
-        : null,
+    foregroundNotificationConfig:
+        inBackground
+            ? const ForegroundNotificationConfig(
+              notificationTitle: "Tracking",
+              notificationText: "GPS tracking is active",
+              color: Colors.red,
+              notificationIcon: AndroidResource(name: "notification_icon"),
+              setOngoing: true,
+              enableWakeLock: true,
+            )
+            : null,
   );
 
   @override
@@ -70,9 +71,10 @@ class LocationUtils extends ChangeNotifier {
     if (!await Request.request(
       title: "Precise Location Required",
       text: "Please allow precise location.",
-      check: () async =>
-          (await Geolocator.getLocationAccuracy()) ==
-          LocationAccuracyStatus.precise,
+      check:
+          () async =>
+              (await Geolocator.getLocationAccuracy()) ==
+              LocationAccuracyStatus.precise,
       change: Geolocator.openAppSettings,
     )) {
       return false;
@@ -100,9 +102,9 @@ class LocationUtils extends ChangeNotifier {
       return false;
     }
 
-    _locationSubscription =
-        Geolocator.getPositionStream(locationSettings: _settings)
-            .listen((Position position) {
+    _locationSubscription = Geolocator.getPositionStream(
+      locationSettings: _settings,
+    ).listen((Position position) {
       _onLocationUpdate(
         GpsPosition.fromGeolocatorPosition(position),
         onLocationUpdate,

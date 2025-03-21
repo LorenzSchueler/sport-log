@@ -46,13 +46,13 @@ class StrengthSet extends AtomicEntity {
 
   @override
   StrengthSet clone() => StrengthSet(
-        id: id.clone(),
-        strengthSessionId: strengthSessionId.clone(),
-        setNumber: setNumber,
-        count: count,
-        weight: weight,
-        deleted: deleted,
-      );
+    id: id.clone(),
+    strengthSessionId: strengthSessionId.clone(),
+    setNumber: setNumber,
+    count: count,
+    weight: weight,
+    deleted: deleted,
+  );
 
   @override
   bool isValidBeforeSanitation() {

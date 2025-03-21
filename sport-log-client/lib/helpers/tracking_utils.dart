@@ -30,32 +30,32 @@ enum TrackingMode {
 
 class TrackingUtils extends ChangeNotifier {
   TrackingUtils({required TrackingSettings trackingSettings})
-      : _cardioSessionDescription = CardioSessionDescription(
-          cardioSession:
-              CardioSession.defaultValue(trackingSettings.movement.id)
-                ..cardioType = trackingSettings.cardioType
-                ..track = []
-                ..cadence = []
-                ..heartRate = []
-                ..routeId = trackingSettings.route?.id,
-          movement: trackingSettings.movement,
-          route: trackingSettings.route,
-        ),
-        _trackingUiUtils = TrackingUiUtils(
-          trackingSettings.route,
-          trackingSettings.cardioSession,
-        ),
-        _alarmUtils = AlarmUtils(
-          trackingSettings.route?.track != null
-              ? trackingSettings.routeAlarmDistance
-              : null,
-        ),
-        _audioFeedbackUtils =
-            AudioFeedbackUtils(trackingSettings.audioFeedback),
-        _heartRateUtils = trackingSettings.heartRateUtils.deviceId != null
-            ? (HeartRateUtils() // trackingSettings.heartRateUtils is disposed
-              ..deviceId = trackingSettings.heartRateUtils.deviceId)
-            : null {
+    : _cardioSessionDescription = CardioSessionDescription(
+        cardioSession:
+            CardioSession.defaultValue(trackingSettings.movement.id)
+              ..cardioType = trackingSettings.cardioType
+              ..track = []
+              ..cadence = []
+              ..heartRate = []
+              ..routeId = trackingSettings.route?.id,
+        movement: trackingSettings.movement,
+        route: trackingSettings.route,
+      ),
+      _trackingUiUtils = TrackingUiUtils(
+        trackingSettings.route,
+        trackingSettings.cardioSession,
+      ),
+      _alarmUtils = AlarmUtils(
+        trackingSettings.route?.track != null
+            ? trackingSettings.routeAlarmDistance
+            : null,
+      ),
+      _audioFeedbackUtils = AudioFeedbackUtils(trackingSettings.audioFeedback),
+      _heartRateUtils =
+          trackingSettings.heartRateUtils.deviceId != null
+              ? (HeartRateUtils() // trackingSettings.heartRateUtils is disposed
+                ..deviceId = trackingSettings.heartRateUtils.deviceId)
+              : null {
     _audioFeedbackUtils.setCallbacks(
       () => cardioSessionDescription.cardioSession,
       () => mode,
@@ -179,9 +179,10 @@ class TrackingUtils extends ChangeNotifier {
     cardioSessionDescription.cardioSession.setAvgCadence();
     cardioSessionDescription.cardioSession.setAvgHeartRate();
     cardioSessionDescription.cardioSession.setDistance();
-    final result = _isSaved
-        ? await _dataProvider.updateSingle(cardioSessionDescription)
-        : await _dataProvider.createSingle(cardioSessionDescription);
+    final result =
+        _isSaved
+            ? await _dataProvider.updateSingle(cardioSessionDescription)
+            : await _dataProvider.createSingle(cardioSessionDescription);
     if (context.mounted) {
       if (result.isOk) {
         onSuccess();
@@ -214,8 +215,9 @@ class TrackingUtils extends ChangeNotifier {
   Future<void> deleteIfSaved(BuildContext context) async {
     // do not call showDeleteWarningDialog because DiscardDialog already shown
     if (_isSaved) {
-      final result =
-          await _dataProvider.deleteSingle(_cardioSessionDescription);
+      final result = await _dataProvider.deleteSingle(
+        _cardioSessionDescription,
+      );
       if (context.mounted && result.isErr) {
         await showMessageDialog(
           context: context,
@@ -273,20 +275,24 @@ class TrackingUtils extends ChangeNotifier {
       }
     }
 
-    final elevation =
-        await _elevationMapController?.getElevation(location.latLng);
+    final elevation = await _elevationMapController?.getElevation(
+      location.latLng,
+    );
 
     final position = Position(
       latitude: location.latitude,
       longitude: location.longitude,
       elevation: elevation ?? location.elevation,
-      distance: track.isEmpty
-          ? 0
-          : track.last.distance + track.last.latLng.distanceTo(location.latLng),
+      distance:
+          track.isEmpty
+              ? 0
+              : track.last.distance +
+                  track.last.latLng.distanceTo(location.latLng),
       time: currentDuration,
     );
 
-    _locationInfo = "accuracy: ${location.accuracy.round()} m\n"
+    _locationInfo =
+        "accuracy: ${location.accuracy.round()} m\n"
         "satellites: ${location.satellites}\n"
         "elevation GPS: ${location.elevation.round()} m\n"
         "elevation Mbx: ${elevation?.round()} m\n"
@@ -294,8 +300,9 @@ class TrackingUtils extends ChangeNotifier {
 
     if (_trackingMode.isTracking) {
       track.add(position);
-      await _trackingUiUtils
-          .updateTrack(_cardioSessionDescription.cardioSession.track);
+      await _trackingUiUtils.updateTrack(
+        _cardioSessionDescription.cardioSession.track,
+      );
     }
     await _trackingUiUtils.updateLocation(location);
 

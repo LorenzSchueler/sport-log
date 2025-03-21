@@ -40,9 +40,10 @@ class _MetconSessionEditPageState extends State<MetconSessionEditPage> {
   late bool _finished = _metconSessionDescription.metconSession.time != null;
 
   Future<void> _saveMetconSession() async {
-    final result = widget.isNew
-        ? await _dataProvider.createSingle(_metconSessionDescription)
-        : await _dataProvider.updateSingle(_metconSessionDescription);
+    final result =
+        widget.isNew
+            ? await _dataProvider.createSingle(_metconSessionDescription)
+            : await _dataProvider.updateSingle(_metconSessionDescription);
     if (mounted) {
       if (result.isOk) {
         Navigator.pop(
@@ -67,8 +68,9 @@ class _MetconSessionEditPageState extends State<MetconSessionEditPage> {
       return;
     }
     if (!widget.isNew) {
-      final result =
-          await _dataProvider.deleteSingle(_metconSessionDescription);
+      final result = await _dataProvider.deleteSingle(
+        _metconSessionDescription,
+      );
       if (mounted) {
         if (result.isOk) {
           Navigator.pop(
@@ -105,11 +107,12 @@ class _MetconSessionEditPageState extends State<MetconSessionEditPage> {
               icon: const Icon(AppIcons.delete),
             ),
             IconButton(
-              onPressed: _formKey.currentContext != null &&
-                      _formKey.currentState!.validate() &&
-                      _metconSessionDescription.isValidBeforeSanitation()
-                  ? _saveMetconSession
-                  : null,
+              onPressed:
+                  _formKey.currentContext != null &&
+                          _formKey.currentState!.validate() &&
+                          _metconSessionDescription.isValidBeforeSanitation()
+                      ? _saveMetconSession
+                      : null,
               icon: const Icon(AppIcons.save),
             ),
           ],
@@ -139,17 +142,22 @@ class _MetconSessionEditPageState extends State<MetconSessionEditPage> {
                     );
                     if (metcon != null) {
                       final metconDescription =
-                          await _metconDescriptionDataProvider
-                              .getByMetcon(metcon);
+                          await _metconDescriptionDataProvider.getByMetcon(
+                            metcon,
+                          );
                       if (mounted) {
                         setState(() {
                           _metconSessionDescription.metconDescription =
                               metconDescription;
                           _metconSessionDescription.metconSession.metconId =
                               _metconSessionDescription
-                                  .metconDescription.metcon.id;
+                                  .metconDescription
+                                  .metcon
+                                  .id;
                           switch (_metconSessionDescription
-                              .metconDescription.metcon.metconType) {
+                              .metconDescription
+                              .metcon
+                              .metconType) {
                             case MetconType.amrap:
                               _metconSessionDescription.metconSession.time =
                                   null;
@@ -182,7 +190,9 @@ class _MetconSessionEditPageState extends State<MetconSessionEditPage> {
                   caption: "Start Time",
                   child: Text(
                     _metconSessionDescription
-                        .metconSession.datetime.humanDateTime,
+                        .metconSession
+                        .datetime
+                        .humanDateTime,
                   ),
                   onTap: () async {
                     final datetime = await showDateTimePicker(
@@ -198,7 +208,9 @@ class _MetconSessionEditPageState extends State<MetconSessionEditPage> {
                   },
                 ),
                 if (_metconSessionDescription
-                        .metconDescription.metcon.metconType ==
+                        .metconDescription
+                        .metcon
+                        .metconType ==
                     MetconType.forTime)
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -231,28 +243,37 @@ class _MetconSessionEditPageState extends State<MetconSessionEditPage> {
                     ],
                   ),
                 if (_metconSessionDescription
-                            .metconDescription.metcon.metconType ==
+                            .metconDescription
+                            .metcon
+                            .metconType ==
                         MetconType.forTime &&
                     _finished)
                   EditTile(
                     caption: 'Time',
                     leading: AppIcons.timeInterval,
                     child: DurationInput(
-                      onUpdate: (d) => setState(
-                        () => _metconSessionDescription.metconSession.time = d,
-                      ),
+                      onUpdate:
+                          (d) => setState(
+                            () =>
+                                _metconSessionDescription.metconSession.time =
+                                    d,
+                          ),
                       initialDuration:
                           _metconSessionDescription.metconSession.time ??
-                              Duration.zero,
+                          Duration.zero,
                       minDuration: const Duration(seconds: 1),
                     ),
                   ),
                 if (_metconSessionDescription
-                                .metconDescription.metcon.metconType ==
+                                .metconDescription
+                                .metcon
+                                .metconType ==
                             MetconType.forTime &&
                         !_finished ||
                     _metconSessionDescription
-                            .metconDescription.metcon.metconType ==
+                            .metconDescription
+                            .metcon
+                            .metconType ==
                         MetconType.amrap)
                   Row(
                     children: [
@@ -261,21 +282,31 @@ class _MetconSessionEditPageState extends State<MetconSessionEditPage> {
                           leading: AppIcons.repeat,
                           caption: "Rounds",
                           child: IntInput(
-                            initialValue: _metconSessionDescription
-                                    .metconSession.rounds ??
+                            initialValue:
+                                _metconSessionDescription
+                                    .metconSession
+                                    .rounds ??
                                 0,
                             minValue: 0,
-                            maxValue: _metconSessionDescription
-                                        .metconDescription.metcon.metconType ==
-                                    MetconType.forTime
-                                ? _metconSessionDescription
-                                        .metconDescription.metcon.rounds! -
-                                    1
-                                : 999,
-                            onUpdate: (rounds) => setState(
-                              () => _metconSessionDescription
-                                  .metconSession.rounds = rounds,
-                            ),
+                            maxValue:
+                                _metconSessionDescription
+                                            .metconDescription
+                                            .metcon
+                                            .metconType ==
+                                        MetconType.forTime
+                                    ? _metconSessionDescription
+                                            .metconDescription
+                                            .metcon
+                                            .rounds! -
+                                        1
+                                    : 999,
+                            onUpdate:
+                                (rounds) => setState(
+                                  () =>
+                                      _metconSessionDescription
+                                          .metconSession
+                                          .rounds = rounds,
+                                ),
                           ),
                         ),
                       ),
@@ -287,17 +318,22 @@ class _MetconSessionEditPageState extends State<MetconSessionEditPage> {
                           child: IntInput(
                             initialValue:
                                 _metconSessionDescription.metconSession.reps ??
-                                    0,
+                                0,
                             minValue: 0,
-                            maxValue: _metconSessionDescription
-                                    .metconDescription.moves
+                            maxValue:
+                                _metconSessionDescription
+                                    .metconDescription
+                                    .moves
                                     .map((e) => e.metconMovement.count)
                                     .sum -
                                 1,
-                            onUpdate: (reps) => setState(
-                              () => _metconSessionDescription
-                                  .metconSession.reps = reps,
-                            ),
+                            onUpdate:
+                                (reps) => setState(
+                                  () =>
+                                      _metconSessionDescription
+                                          .metconSession
+                                          .reps = reps,
+                                ),
                           ),
                         ),
                       ),
@@ -324,10 +360,11 @@ class _MetconSessionEditPageState extends State<MetconSessionEditPage> {
                   keyboardType: TextInputType.multiline,
                   minLines: 1,
                   maxLines: 5,
-                  onChanged: (comments) => setState(() {
-                    _metconSessionDescription.metconSession.comments =
-                        comments.isEmpty ? null : comments;
-                  }),
+                  onChanged:
+                      (comments) => setState(() {
+                        _metconSessionDescription.metconSession.comments =
+                            comments.isEmpty ? null : comments;
+                      }),
                 ),
               ],
             ),

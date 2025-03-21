@@ -8,9 +8,7 @@ import 'package:sport_log/models/metcon/metcon_session_description.dart';
 typedef MetconRecords = Map<Int64, MetconRecord>;
 
 extension MetconRecordsExtension on MetconRecords {
-  bool isMetconRecord(
-    MetconSessionDescription metconSessionDescription,
-  ) {
+  bool isMetconRecord(MetconSessionDescription metconSessionDescription) {
     if (!metconSessionDescription.metconSession.rx) {
       return false;
     }
@@ -19,23 +17,26 @@ extension MetconRecordsExtension on MetconRecords {
     if (metconRecord == null) {
       return false;
     }
-    return switch (
-        metconSessionDescription.metconDescription.metcon.metconType) {
+    return switch (metconSessionDescription
+        .metconDescription
+        .metcon
+        .metconType) {
       MetconType.amrap => isRecord(
-          metconSessionDescription.metconSession.rounds
-              ?.mulNullable(MetconRecord.multiplier)
-              ?.addNullable(metconSessionDescription.metconSession.reps),
-          metconRecord.rounds
-              ?.mulNullable(MetconRecord.multiplier)
-              ?.addNullable(metconRecord.reps),
-        ),
-      MetconType.forTime => metconRecord.time != null
-          ? isRecord(
+        metconSessionDescription.metconSession.rounds
+            ?.mulNullable(MetconRecord.multiplier)
+            ?.addNullable(metconSessionDescription.metconSession.reps),
+        metconRecord.rounds
+            ?.mulNullable(MetconRecord.multiplier)
+            ?.addNullable(metconRecord.reps),
+      ),
+      MetconType.forTime =>
+        metconRecord.time != null
+            ? isRecord(
               metconSessionDescription.metconSession.time?.inMilliseconds,
               metconRecord.time?.inMilliseconds,
               minRecord: true,
             )
-          : isRecord(
+            : isRecord(
               metconSessionDescription.metconSession.rounds
                   ?.mulNullable(MetconRecord.multiplier)
                   ?.addNullable(metconSessionDescription.metconSession.reps),
@@ -49,16 +50,9 @@ extension MetconRecordsExtension on MetconRecords {
 }
 
 class MetconRecord {
-  MetconRecord({
-    required this.time,
-    required this.rounds,
-    required this.reps,
-  });
+  MetconRecord({required this.time, required this.rounds, required this.reps});
 
-  factory MetconRecord.fromDbRecord(
-    DbRecord r, {
-    String prefix = '',
-  }) {
+  factory MetconRecord.fromDbRecord(DbRecord r, {String prefix = ''}) {
     final time = r[prefix + Columns.time] as int?;
     final roundsAndReps = r[prefix + Columns.roundsAndReps] as int?;
     int? rounds;

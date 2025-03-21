@@ -72,8 +72,7 @@ class MovementDescriptionTable {
 
   Future<List<MovementDescription>> getNonDeleted() async {
     const hasReference = 'has_reference';
-    final records = await AppDatabase.database.rawQuery(
-      '''
+    final records = await AppDatabase.database.rawQuery('''
       SELECT
         ${MovementTable().table.allColumns},
         (
@@ -91,14 +90,14 @@ class MovementDescriptionTable {
       FROM ${Tables.movement}
       WHERE ${TableAccessor.notDeletedOfTable(Tables.movement)}
       ORDER BY ${TableAccessor.orderByNameOfTable(Tables.movement)}
-      ''',
-    );
+      ''');
     return records
         .map(
           (r) => MovementDescription(
-            movement: MovementTable()
-                .serde
-                .fromDbRecord(r, prefix: MovementTable().table.prefix),
+            movement: MovementTable().serde.fromDbRecord(
+              r,
+              prefix: MovementTable().table.prefix,
+            ),
             hasReference: r[hasReference]! as int == 1,
           ),
         )
@@ -110,8 +109,7 @@ class MovementDescriptionTable {
     bool distanceOnly = false,
   }) async {
     const hasReference = 'has_reference';
-    final records = await AppDatabase.database.rawQuery(
-      '''
+    final records = await AppDatabase.database.rawQuery('''
       SELECT
         ${MovementTable().table.allColumns},
         (
@@ -127,20 +125,16 @@ class MovementDescriptionTable {
           )
         ) AS $hasReference
       FROM ${Tables.movement}
-      WHERE ${TableAccessor.combineFilter([
-            TableAccessor.notDeletedOfTable(Tables.movement),
-            TableAccessor.cardioOnlyOfTable(cardioOnly),
-            TableAccessor.distanceOnlyOfTable(distanceOnly),
-          ])}
+      WHERE ${TableAccessor.combineFilter([TableAccessor.notDeletedOfTable(Tables.movement), TableAccessor.cardioOnlyOfTable(cardioOnly), TableAccessor.distanceOnlyOfTable(distanceOnly)])}
       ORDER BY ${TableAccessor.orderByNameOfTable(Tables.movement)}
-      ''',
-    );
+      ''');
     return records
         .map(
           (r) => MovementDescription(
-            movement: MovementTable()
-                .serde
-                .fromDbRecord(r, prefix: MovementTable().table.prefix),
+            movement: MovementTable().serde.fromDbRecord(
+              r,
+              prefix: MovementTable().table.prefix,
+            ),
             hasReference: r[hasReference]! as int == 1,
           ),
         )

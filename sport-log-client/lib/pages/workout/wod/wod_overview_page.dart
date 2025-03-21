@@ -22,82 +22,91 @@ class WodOverviewPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return NeverPop(
       child: ProviderConsumer<
-          OverviewDataProvider<Wod, void, WodDataProvider, void>>(
-        create: (_) => OverviewDataProvider(
-          dataProvider: WodDataProvider(),
-          entityAccessor: (dataProvider) => (start, end, _, search) =>
-              dataProvider.getByTimerangeAndDescription(
-                from: start,
-                until: end,
-                description: search,
-              ),
-          recordAccessor: (_) => () async {},
-          loggerName: "WodPage",
-        ),
-        builder: (_, dataProvider, __) => Scaffold(
-          appBar: AppBar(
-            title: dataProvider.isSearch
-                ? TextFormField(
-                    focusNode: _searchBar,
-                    onChanged: (comment) => dataProvider.search = comment,
-                  )
-                : const Text("Wod"),
-            actions: [
-              IconButton(
-                onPressed: () {
-                  dataProvider.search = dataProvider.isSearch ? null : "";
-                  if (dataProvider.isSearch) {
-                    _searchBar.requestFocus();
-                  }
-                },
-                icon: Icon(
-                  dataProvider.isSearch ? AppIcons.close : AppIcons.search,
-                ),
-              ),
-            ],
-            bottom: DateFilter(
-              initialState: dataProvider.dateFilter,
-              onFilterChanged: (dateFilter) =>
-                  dataProvider.dateFilter = dateFilter,
-            ),
-          ),
-          body: Stack(
-            alignment: Alignment.topCenter,
-            children: [
-              SyncRefreshIndicator(
-                child: dataProvider.entities.isEmpty
-                    ? RefreshableNoEntriesText(
-                        text: SessionsPageTab.wod.noEntriesText,
-                      )
-                    : Padding(
-                        padding: Defaults.edgeInsets.normal,
-                        child: ListView.separated(
-                          itemBuilder: (_, index) => WodCard(
-                            wod: dataProvider.entities[index],
+        OverviewDataProvider<Wod, void, WodDataProvider, void>
+      >(
+        create:
+            (_) => OverviewDataProvider(
+              dataProvider: WodDataProvider(),
+              entityAccessor:
+                  (dataProvider) =>
+                      (start, end, _, search) =>
+                          dataProvider.getByTimerangeAndDescription(
+                            from: start,
+                            until: end,
+                            description: search,
                           ),
-                          separatorBuilder: (_, __) =>
-                              Defaults.sizedBox.vertical.normal,
-                          itemCount: dataProvider.entities.length,
-                        ),
-                      ),
-              ),
-              if (dataProvider.isLoading)
-                const Positioned(
-                  top: 40,
-                  child: RefreshProgressIndicator(),
+              recordAccessor: (_) => () async {},
+              loggerName: "WodPage",
+            ),
+        builder:
+            (_, dataProvider, __) => Scaffold(
+              appBar: AppBar(
+                title:
+                    dataProvider.isSearch
+                        ? TextFormField(
+                          focusNode: _searchBar,
+                          onChanged: (comment) => dataProvider.search = comment,
+                        )
+                        : const Text("Wod"),
+                actions: [
+                  IconButton(
+                    onPressed: () {
+                      dataProvider.search = dataProvider.isSearch ? null : "";
+                      if (dataProvider.isSearch) {
+                        _searchBar.requestFocus();
+                      }
+                    },
+                    icon: Icon(
+                      dataProvider.isSearch ? AppIcons.close : AppIcons.search,
+                    ),
+                  ),
+                ],
+                bottom: DateFilter(
+                  initialState: dataProvider.dateFilter,
+                  onFilterChanged:
+                      (dateFilter) => dataProvider.dateFilter = dateFilter,
                 ),
-            ],
-          ),
-          bottomNavigationBar: SessionsPageTab.bottomNavigationBar(
-            context: context,
-            sessionsPageTab: SessionsPageTab.wod,
-          ),
-          drawer: const MainDrawer(selectedRoute: Routes.wodOverview),
-          floatingActionButton: FloatingActionButton(
-            child: const Icon(AppIcons.add),
-            onPressed: () => Navigator.pushNamed(context, Routes.wodEdit),
-          ),
-        ),
+              ),
+              body: Stack(
+                alignment: Alignment.topCenter,
+                children: [
+                  SyncRefreshIndicator(
+                    child:
+                        dataProvider.entities.isEmpty
+                            ? RefreshableNoEntriesText(
+                              text: SessionsPageTab.wod.noEntriesText,
+                            )
+                            : Padding(
+                              padding: Defaults.edgeInsets.normal,
+                              child: ListView.separated(
+                                itemBuilder:
+                                    (_, index) => WodCard(
+                                      wod: dataProvider.entities[index],
+                                    ),
+                                separatorBuilder:
+                                    (_, __) =>
+                                        Defaults.sizedBox.vertical.normal,
+                                itemCount: dataProvider.entities.length,
+                              ),
+                            ),
+                  ),
+                  if (dataProvider.isLoading)
+                    const Positioned(
+                      top: 40,
+                      child: RefreshProgressIndicator(),
+                    ),
+                ],
+              ),
+              bottomNavigationBar: SessionsPageTab.bottomNavigationBar(
+                context: context,
+                sessionsPageTab: SessionsPageTab.wod,
+              ),
+              drawer: const MainDrawer(selectedRoute: Routes.wodOverview),
+              floatingActionButton: FloatingActionButton(
+                child: const Icon(AppIcons.add),
+                onPressed: () => Navigator.pushNamed(context, Routes.wodEdit),
+              ),
+            ),
       ),
     );
   }

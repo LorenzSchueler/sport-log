@@ -24,8 +24,7 @@ class ActionProviderApi extends Api<ActionProvider> {
   @override
   Future<ApiResult<EpochResult?>> postMultiple(
     List<ActionProvider> objects,
-  ) async =>
-      Ok(null);
+  ) async => Ok(null);
 
   @override
   Future<ApiResult<EpochResult?>> putSingle(ActionProvider object) async =>
@@ -34,8 +33,7 @@ class ActionProviderApi extends Api<ActionProvider> {
   @override
   Future<ApiResult<EpochResult?>> putMultiple(
     List<ActionProvider> objects,
-  ) async =>
-      Ok(null);
+  ) async => Ok(null);
 }
 
 class ActionApi extends Api<Action> {

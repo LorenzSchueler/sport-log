@@ -31,11 +31,7 @@ class Column {
     _defaultValue = value;
   }
 
-  void references(
-    String table, {
-    String? column,
-    required OnAction onDelete,
-  }) {
+  void references(String table, {String? column, required OnAction onDelete}) {
     _referenceTable = table;
     _referenceColumn = column;
     _onDeleteReference = onDelete;
@@ -95,12 +91,14 @@ class Column {
     if (_referenceTable == null) {
       return '';
     }
-    final referenceName = _referenceColumn == null
-        ? _referenceTable!
-        : '${_referenceTable!}(${_referenceColumn!})';
-    final onDeleteStr = _onDeleteReference == null
-        ? ''
-        : 'on delete ${_onActionToString(_onDeleteReference!)}';
+    final referenceName =
+        _referenceColumn == null
+            ? _referenceTable!
+            : '${_referenceTable!}(${_referenceColumn!})';
+    final onDeleteStr =
+        _onDeleteReference == null
+            ? ''
+            : 'on delete ${_onActionToString(_onDeleteReference!)}';
     return 'references $referenceName $onDeleteStr'.trimRight();
   }
 
@@ -151,20 +149,22 @@ class Table {
   final List<UniqueIndex> uniqueIndices;
   final List<String> rawSql;
 
-  List<String> get setupSql =>
-      [tableSetupSql, ...uniqueIndicesSetupSql, triggerSetupSql, ...rawSql];
+  List<String> get setupSql => [
+    tableSetupSql,
+    ...uniqueIndicesSetupSql,
+    triggerSetupSql,
+    ...rawSql,
+  ];
 
   String get tableSetupSql {
-    final primaryKey =
-        columns.where((c) => c.getIsPrimaryKey()).map((c) => c.name);
+    final primaryKey = columns
+        .where((c) => c.getIsPrimaryKey())
+        .map((c) => c.name);
     final primaryKeyStr =
         primaryKey.isEmpty ? '' : 'primary key(${primaryKey.join(', ')})';
     return '''
     create table $name (
-      ${[
-      ...columns.map((c) => c.setUpSql()),
-      primaryKeyStr,
-    ].map((s) => '\t$s').join(',\n')}
+      ${[...columns.map((c) => c.setUpSql()), primaryKeyStr].map((s) => '\t$s').join(',\n')}
     );
     ''';
   }
@@ -185,11 +185,11 @@ class Table {
   }
 
   Table withName(String name) => Table(
-        name: name,
-        columns: columns,
-        uniqueColumns: uniqueIndices.map((i) => i.columns).toList(),
-        rawSql: rawSql,
-      );
+    name: name,
+    columns: columns,
+    uniqueColumns: uniqueIndices.map((i) => i.columns).toList(),
+    rawSql: rawSql,
+  );
 }
 
 abstract class Tables {

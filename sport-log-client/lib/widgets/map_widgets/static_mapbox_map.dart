@@ -39,10 +39,12 @@ class StaticMapboxMap extends StatelessWidget {
           await _onMapCreated(controller);
         }
       },
-      onTapListener: (gestureContext) =>
-          onTap?.call(LatLng.fromPoint(gestureContext.point)),
-      onLongTapListener: (gestureContext) =>
-          onLongTap?.call(LatLng.fromPoint(gestureContext.point)),
+      onTapListener:
+          (gestureContext) =>
+              onTap?.call(LatLng.fromPoint(gestureContext.point)),
+      onLongTapListener:
+          (gestureContext) =>
+              onLongTap?.call(LatLng.fromPoint(gestureContext.point)),
     );
   }
 }

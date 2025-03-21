@@ -19,6 +19,6 @@ class AccountDataApi {
             ..headers.addAll(ApiHeaders.basicAuthContentTypeJson)
             ..body = epochMap != null ? jsonEncode(epochMap.toJson()) : "null")
           .toApiResultWithValue(
-        (json) => AccountData.fromJson((json as Map).cast()),
-      );
+            (json) => AccountData.fromJson((json as Map).cast()),
+          );
 }

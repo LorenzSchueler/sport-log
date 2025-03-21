@@ -24,12 +24,12 @@ class ActionRule extends AtomicEntity {
   });
 
   ActionRule.defaultValue(this.actionId)
-      : id = randomId(),
-        weekday = Weekday.monday,
-        time = DateTime.now(),
-        arguments = null,
-        enabled = true,
-        deleted = false;
+    : id = randomId(),
+      weekday = Weekday.monday,
+      time = DateTime.now(),
+      arguments = null,
+      enabled = true,
+      deleted = false;
 
   factory ActionRule.fromJson(Map<String, dynamic> json) =>
       _$ActionRuleFromJson(json);
@@ -55,14 +55,14 @@ class ActionRule extends AtomicEntity {
 
   @override
   ActionRule clone() => ActionRule(
-        id: id.clone(),
-        actionId: actionId.clone(),
-        weekday: weekday,
-        time: time.clone(),
-        arguments: arguments,
-        enabled: enabled,
-        deleted: deleted,
-      );
+    id: id.clone(),
+    actionId: actionId.clone(),
+    weekday: weekday,
+    time: time.clone(),
+    arguments: arguments,
+    enabled: enabled,
+    deleted: deleted,
+  );
 
   @override
   bool isValidBeforeSanitation() {

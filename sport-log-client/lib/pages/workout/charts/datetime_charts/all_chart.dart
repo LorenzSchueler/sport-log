@@ -16,7 +16,8 @@ class AllChart extends DateTimePeriodChart {
 
   @override
   Widget build(BuildContext context) {
-    final startDateTime = chartValues.firstOrNull?.datetime.beginningOfDay() ??
+    final startDateTime =
+        chartValues.firstOrNull?.datetime.beginningOfDay() ??
         DateTime.now().beginningOfYear();
     final endDateTime =
         chartValues.lastOrNull?.datetime ?? DateTime.now().endOfYear();
@@ -43,14 +44,15 @@ class AllChart extends DateTimePeriodChart {
         LineChartData(
           lineBarsData: [
             LineChartBarData(
-              spots: chartValues
-                  .map(
-                    (v) => FlSpot(
-                      v.datetime.difference(startDateTime).inDays + 1,
-                      v.value,
-                    ),
-                  )
-                  .toList(),
+              spots:
+                  chartValues
+                      .map(
+                        (v) => FlSpot(
+                          v.datetime.difference(startDateTime).inDays + 1,
+                          v.value,
+                        ),
+                      )
+                      .toList(),
               color: Theme.of(context).colorScheme.primary,
               dotData: const FlDotData(show: false),
             ),

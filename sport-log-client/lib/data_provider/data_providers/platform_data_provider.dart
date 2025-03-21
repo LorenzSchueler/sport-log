@@ -68,10 +68,12 @@ class PlatformDescriptionDataProvider
     if (_instance == null) {
       _instance = PlatformDescriptionDataProvider._();
       _instance!._platformDataProvider.addListener(_instance!.notifyListeners);
-      _instance!._platformCredentialDataProvider
-          .addListener(_instance!.notifyListeners);
-      _instance!._actionProviderDataProvider
-          .addListener(_instance!.notifyListeners);
+      _instance!._platformCredentialDataProvider.addListener(
+        _instance!.notifyListeners,
+      );
+      _instance!._actionProviderDataProvider.addListener(
+        _instance!.notifyListeners,
+      );
     }
     return _instance!;
   }
@@ -89,8 +91,9 @@ class PlatformDescriptionDataProvider
     if (object.platformCredential == null) {
       return Ok(null);
     }
-    return _platformCredentialDataProvider
-        .createSingle(object.platformCredential!);
+    return _platformCredentialDataProvider.createSingle(
+      object.platformCredential!,
+    );
   }
 
   @override
@@ -98,8 +101,9 @@ class PlatformDescriptionDataProvider
     if (object.platformCredential == null) {
       return Ok(null);
     }
-    return _platformCredentialDataProvider
-        .updateSingle(object.platformCredential!);
+    return _platformCredentialDataProvider.updateSingle(
+      object.platformCredential!,
+    );
   }
 
   @override
@@ -107,8 +111,9 @@ class PlatformDescriptionDataProvider
     if (object.platformCredential == null) {
       return Ok(null);
     }
-    return _platformCredentialDataProvider
-        .deleteSingle(object.platformCredential!);
+    return _platformCredentialDataProvider.deleteSingle(
+      object.platformCredential!,
+    );
   }
 
   @override
@@ -118,10 +123,11 @@ class PlatformDescriptionDataProvider
           .map(
             (platform) async => PlatformDescription(
               platform: platform,
-              platformCredential:
-                  await _platformCredentialDataProvider.getByPlatform(platform),
-              actionProviders:
-                  await _actionProviderDataProvider.getByPlatform(platform),
+              platformCredential: await _platformCredentialDataProvider
+                  .getByPlatform(platform),
+              actionProviders: await _actionProviderDataProvider.getByPlatform(
+                platform,
+              ),
             ),
           )
           .toList(),

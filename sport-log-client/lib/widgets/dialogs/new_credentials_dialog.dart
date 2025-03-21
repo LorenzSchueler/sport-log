@@ -94,9 +94,10 @@ class _NewCredentialsDialogState extends State<NewCredentialsDialog> {
       validator: Validator.validateUsername,
       autovalidateMode: AutovalidateMode.onUserInteraction,
       enabled: !_loginPending,
-      style: _loginPending
-          ? TextStyle(color: Theme.of(context).disabledColor)
-          : null,
+      style:
+          _loginPending
+              ? TextStyle(color: Theme.of(context).disabledColor)
+              : null,
       textInputAction: TextInputAction.next,
       keyboardType: TextInputType.emailAddress,
     );
@@ -105,42 +106,46 @@ class _NewCredentialsDialogState extends State<NewCredentialsDialog> {
   Widget _passwordInput() {
     return ProviderConsumer(
       create: (_) => BoolToggle.on(),
-      builder: (context, obscure, _) => TextFormField(
-        onChanged: (password) {
-          final validated = Validator.validatePassword(password);
-          if (validated == null) {
-            setState(() => _password = password);
-          }
-        },
-        decoration: InputDecoration(
-          icon: const Icon(AppIcons.key),
-          labelText: "Password",
-          suffixIcon: IconButton(
-            icon: obscure.isOn
-                ? const Icon(AppIcons.visibility)
-                : const Icon(AppIcons.visibilityOff),
-            onPressed: obscure.toggle,
+      builder:
+          (context, obscure, _) => TextFormField(
+            onChanged: (password) {
+              final validated = Validator.validatePassword(password);
+              if (validated == null) {
+                setState(() => _password = password);
+              }
+            },
+            decoration: InputDecoration(
+              icon: const Icon(AppIcons.key),
+              labelText: "Password",
+              suffixIcon: IconButton(
+                icon:
+                    obscure.isOn
+                        ? const Icon(AppIcons.visibility)
+                        : const Icon(AppIcons.visibilityOff),
+                onPressed: obscure.toggle,
+              ),
+            ),
+            validator: Validator.validatePassword,
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            enabled: !_loginPending,
+            style:
+                _loginPending
+                    ? TextStyle(color: Theme.of(context).disabledColor)
+                    : null,
+            textInputAction: TextInputAction.done,
+            obscureText: obscure.isOn,
           ),
-        ),
-        validator: Validator.validatePassword,
-        autovalidateMode: AutovalidateMode.onUserInteraction,
-        enabled: !_loginPending,
-        style: _loginPending
-            ? TextStyle(color: Theme.of(context).disabledColor)
-            : null,
-        textInputAction: TextInputAction.done,
-        obscureText: obscure.isOn,
-      ),
     );
   }
 
   Widget _submitButton() {
     return FilledButton(
-      onPressed: (!_loginPending &&
-              _formKey.currentContext != null &&
-              _formKey.currentState!.validate())
-          ? _submit
-          : null,
+      onPressed:
+          (!_loginPending &&
+                  _formKey.currentContext != null &&
+                  _formKey.currentState!.validate())
+              ? _submit
+              : null,
       child: const Text("Update"),
     );
   }

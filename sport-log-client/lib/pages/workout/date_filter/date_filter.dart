@@ -41,9 +41,10 @@ class _DateFilterState extends State<DateFilter> {
   Widget build(BuildContext context) {
     final appBarColor = Theme.of(context).appBarTheme.foregroundColor!;
     return Row(
-      mainAxisAlignment: _dateFilterState is AllFilter
-          ? MainAxisAlignment.center
-          : MainAxisAlignment.spaceBetween,
+      mainAxisAlignment:
+          _dateFilterState is AllFilter
+              ? MainAxisAlignment.center
+              : MainAxisAlignment.spaceBetween,
       children: [
         if (_dateFilterState is! AllFilter)
           RepeatIconButton(
@@ -56,10 +57,7 @@ class _DateFilterState extends State<DateFilter> {
             _dateFilterState.label,
             style: TextStyle(color: appBarColor),
           ),
-          label: Icon(
-            AppIcons.arrowDropDown,
-            color: appBarColor,
-          ),
+          label: Icon(AppIcons.arrowDropDown, color: appBarColor),
           // ignore: prefer-extracting-callbacks
           onPressed: () async {
             final dateFilterState = await showDateFilterStatePicker(
@@ -74,9 +72,10 @@ class _DateFilterState extends State<DateFilter> {
         if (_dateFilterState is! AllFilter)
           RepeatIconButton(
             icon: const Icon(AppIcons.arrowRight),
-            onClick: _dateFilterState.goingForwardPossible
-                ? () => setDateFilterState(_dateFilterState.later)
-                : null,
+            onClick:
+                _dateFilterState.goingForwardPossible
+                    ? () => setDateFilterState(_dateFilterState.later)
+                    : null,
             color: appBarColor,
           ),
       ],

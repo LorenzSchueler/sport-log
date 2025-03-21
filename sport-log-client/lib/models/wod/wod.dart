@@ -20,10 +20,10 @@ class Wod extends AtomicEntity {
   });
 
   Wod.defaultValue()
-      : id = randomId(),
-        date = DateTime.now(),
-        description = null,
-        deleted = false;
+    : id = randomId(),
+      date = DateTime.now(),
+      description = null,
+      deleted = false;
 
   factory Wod.fromJson(Map<String, dynamic> json) => _$WodFromJson(json);
 
@@ -44,11 +44,11 @@ class Wod extends AtomicEntity {
 
   @override
   Wod clone() => Wod(
-        id: id.clone(),
-        date: date.clone(),
-        description: description,
-        deleted: deleted,
-      );
+    id: id.clone(),
+    date: date.clone(),
+    description: description,
+    deleted: deleted,
+  );
 
   @override
   bool isValidBeforeSanitation() {

@@ -26,10 +26,9 @@ class _TimePickerDialogState extends State<TimePickerDialog> {
         onTimeChange: (datetime) => _datetime = datetime,
         time: widget.datetime,
         isShowSeconds: widget.withSeconds,
-        normalTextStyle: Theme.of(context)
-            .textTheme
-            .bodyLarge!
-            .copyWith(color: Theme.of(context).disabledColor),
+        normalTextStyle: Theme.of(
+          context,
+        ).textTheme.bodyLarge!.copyWith(color: Theme.of(context).disabledColor),
         selectedTextStyle: Theme.of(context).textTheme.bodyLarge!,
       ),
       actions: [
@@ -54,8 +53,9 @@ Future<DateTime?> showScrollableTimePicker({
   FocusManager.instance.primaryFocus?.unfocus();
   final datetime = await showDialog<DateTime>(
     context: context,
-    builder: (context) =>
-        TimePickerDialog(datetime: initialTime, withSeconds: withSeconds),
+    builder:
+        (context) =>
+            TimePickerDialog(datetime: initialTime, withSeconds: withSeconds),
   );
   return withSeconds
       ? datetime?.beginningOfSecond()
@@ -69,19 +69,21 @@ Future<Duration?> showScrollableDurationPicker({
   FocusManager.instance.primaryFocus?.unfocus();
   final datetime = await showDialog<DateTime>(
     context: context,
-    builder: (context) => TimePickerDialog(
-      datetime:
-          DateTime.now().beginningOfDay().add(initialDuration ?? Duration.zero),
-      withSeconds: true,
-    ),
+    builder:
+        (context) => TimePickerDialog(
+          datetime: DateTime.now().beginningOfDay().add(
+            initialDuration ?? Duration.zero,
+          ),
+          withSeconds: true,
+        ),
   );
   return datetime == null
       ? null
       : Duration(
-          hours: datetime.hour,
-          minutes: datetime.minute,
-          seconds: datetime.second,
-        );
+        hours: datetime.hour,
+        minutes: datetime.minute,
+        seconds: datetime.second,
+      );
 }
 
 Future<DateTime?> showDatePickerWithDefaults({
@@ -97,8 +99,7 @@ Future<DateTime?> showDatePickerWithDefaults({
     lastDate:
         future ? DateTime.now().add(const Duration(days: 365)) : DateTime.now(),
     locale: const Locale("en", "GB"),
-  ))
-      ?.beginningOfDay();
+  ))?.beginningOfDay();
 }
 
 Future<DateTime?> showDateTimePicker({

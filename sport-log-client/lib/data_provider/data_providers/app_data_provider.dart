@@ -16,14 +16,11 @@ class AppDataProvider {
 
   Future<Result<UpdateInfo, void>> getUpdateInfo({
     VoidCallback? onNoInternet,
-  }) =>
-      api.getUpdateInfo().mapErrAsync(
-            (err) => DataProvider.handleApiError(err, onNoInternet),
-          );
+  }) => api.getUpdateInfo().mapErrAsync(
+    (err) => DataProvider.handleApiError(err, onNoInternet),
+  );
 
-  Future<Result<String, void>> downloadUpdate({
-    VoidCallback? onNoInternet,
-  }) =>
+  Future<Result<String, void>> downloadUpdate({VoidCallback? onNoInternet}) =>
       api
           .downloadUpdate()
           .onErrAsync((err) => DataProvider.handleApiError(err, onNoInternet))

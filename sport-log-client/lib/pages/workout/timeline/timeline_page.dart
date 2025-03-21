@@ -27,105 +27,122 @@ class TimelinePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return NeverPop(
       child: ProviderConsumer<
-          OverviewDataProvider<TimelineUnion, TimelineRecords,
-              TimelineDataProvider, MovementOrMetcon>>(
-        create: (_) => OverviewDataProvider(
-          dataProvider: TimelineDataProvider(),
-          entityAccessor: (dataProvider) =>
-              (start, end, movementOrMetcon, search) =>
-                  dataProvider.getByTimerangeAndMovementOrMetconAndComment(
-                    from: start,
-                    until: end,
-                    comment: search,
-                    movementOrMetcon: movementOrMetcon,
-                  ),
-          recordAccessor: (dataProvider) => () => dataProvider.getRecords(),
-          loggerName: "TimelinePage",
-        ),
-        builder: (_, dataProvider, __) => Scaffold(
-          appBar: AppBar(
-            title: dataProvider.isSearch
-                ? TextFormField(
-                    focusNode: _searchBar,
-                    onChanged: (comment) => dataProvider.search = comment,
-                  )
-                : Text(dataProvider.selected?.name ?? "Timeline"),
-            actions: [
-              IconButton(
-                onPressed: () {
-                  dataProvider.search = dataProvider.isSearch ? null : "";
-                  if (dataProvider.isSearch) {
-                    _searchBar.requestFocus();
-                  }
-                },
-                icon: Icon(
-                  dataProvider.isSearch ? AppIcons.close : AppIcons.search,
-                ),
-              ),
-              IconButton(
-                // ignore: prefer-extracting-callbacks
-                onPressed: () async {
-                  final movementOrMetcon = await showMovementOrMetconPicker(
-                    context: context,
-                    selectedMovementOrMetcon: dataProvider.selected,
-                  );
-                  if (movementOrMetcon == null) {
-                    return;
-                  } else if (movementOrMetcon == dataProvider.selected) {
-                    dataProvider.selected = null;
-                  } else {
-                    dataProvider.selected = movementOrMetcon;
-                  }
-                },
-                icon: Icon(
-                  dataProvider.isSelected
-                      ? AppIcons.filterFilled
-                      : AppIcons.filter,
-                ),
-              ),
-            ],
-            bottom: DateFilter(
-              initialState: dataProvider.dateFilter,
-              onFilterChanged: (dateFilter) =>
-                  dataProvider.dateFilter = dateFilter,
-            ),
-          ),
-          body: Stack(
-            alignment: Alignment.topCenter,
-            children: [
-              SyncRefreshIndicator(
-                child: dataProvider.entities.isEmpty
-                    ? RefreshableNoEntriesText(
-                        text: SessionsPageTab.timeline.noEntriesWithoutAddText,
-                      )
-                    : Padding(
-                        padding: Defaults.edgeInsets.normal,
-                        child: ListView.separated(
-                          itemBuilder: (context, index) => _itemCard(
-                            dataProvider.entities[index],
-                            dataProvider.records ?? TimelineRecords({}, {}),
-                            (movementOrMetcon) =>
-                                dataProvider.selected = movementOrMetcon,
+        OverviewDataProvider<
+          TimelineUnion,
+          TimelineRecords,
+          TimelineDataProvider,
+          MovementOrMetcon
+        >
+      >(
+        create:
+            (_) => OverviewDataProvider(
+              dataProvider: TimelineDataProvider(),
+              entityAccessor:
+                  (dataProvider) =>
+                      (start, end, movementOrMetcon, search) => dataProvider
+                          .getByTimerangeAndMovementOrMetconAndComment(
+                            from: start,
+                            until: end,
+                            comment: search,
+                            movementOrMetcon: movementOrMetcon,
                           ),
-                          separatorBuilder: (_, __) =>
-                              Defaults.sizedBox.vertical.normal,
-                          itemCount: dataProvider.entities.length,
-                        ),
-                      ),
-              ),
-              if (dataProvider.isLoading)
-                const Positioned(
-                  top: 40,
-                  child: RefreshProgressIndicator(),
+              recordAccessor: (dataProvider) => () => dataProvider.getRecords(),
+              loggerName: "TimelinePage",
+            ),
+        builder:
+            (_, dataProvider, __) => Scaffold(
+              appBar: AppBar(
+                title:
+                    dataProvider.isSearch
+                        ? TextFormField(
+                          focusNode: _searchBar,
+                          onChanged: (comment) => dataProvider.search = comment,
+                        )
+                        : Text(dataProvider.selected?.name ?? "Timeline"),
+                actions: [
+                  IconButton(
+                    onPressed: () {
+                      dataProvider.search = dataProvider.isSearch ? null : "";
+                      if (dataProvider.isSearch) {
+                        _searchBar.requestFocus();
+                      }
+                    },
+                    icon: Icon(
+                      dataProvider.isSearch ? AppIcons.close : AppIcons.search,
+                    ),
+                  ),
+                  IconButton(
+                    // ignore: prefer-extracting-callbacks
+                    onPressed: () async {
+                      final movementOrMetcon = await showMovementOrMetconPicker(
+                        context: context,
+                        selectedMovementOrMetcon: dataProvider.selected,
+                      );
+                      if (movementOrMetcon == null) {
+                        return;
+                      } else if (movementOrMetcon == dataProvider.selected) {
+                        dataProvider.selected = null;
+                      } else {
+                        dataProvider.selected = movementOrMetcon;
+                      }
+                    },
+                    icon: Icon(
+                      dataProvider.isSelected
+                          ? AppIcons.filterFilled
+                          : AppIcons.filter,
+                    ),
+                  ),
+                ],
+                bottom: DateFilter(
+                  initialState: dataProvider.dateFilter,
+                  onFilterChanged:
+                      (dateFilter) => dataProvider.dateFilter = dateFilter,
                 ),
-            ],
-          ),
-          bottomNavigationBar: SessionsPageTab.bottomNavigationBar(
-            context: context,
-            sessionsPageTab: SessionsPageTab.timeline,
-          ),
-          drawer: const MainDrawer(selectedRoute: Routes.timelineOverview),
-        ),
+              ),
+              body: Stack(
+                alignment: Alignment.topCenter,
+                children: [
+                  SyncRefreshIndicator(
+                    child:
+                        dataProvider.entities.isEmpty
+                            ? RefreshableNoEntriesText(
+                              text:
+                                  SessionsPageTab
+                                      .timeline
+                                      .noEntriesWithoutAddText,
+                            )
+                            : Padding(
+                              padding: Defaults.edgeInsets.normal,
+                              child: ListView.separated(
+                                itemBuilder:
+                                    (context, index) => _itemCard(
+                                      dataProvider.entities[index],
+                                      dataProvider.records ??
+                                          TimelineRecords({}, {}),
+                                      (movementOrMetcon) =>
+                                          dataProvider.selected =
+                                              movementOrMetcon,
+                                    ),
+                                separatorBuilder:
+                                    (_, __) =>
+                                        Defaults.sizedBox.vertical.normal,
+                                itemCount: dataProvider.entities.length,
+                              ),
+                            ),
+                  ),
+                  if (dataProvider.isLoading)
+                    const Positioned(
+                      top: 40,
+                      child: RefreshProgressIndicator(),
+                    ),
+                ],
+              ),
+              bottomNavigationBar: SessionsPageTab.bottomNavigationBar(
+                context: context,
+                sessionsPageTab: SessionsPageTab.timeline,
+              ),
+              drawer: const MainDrawer(selectedRoute: Routes.timelineOverview),
+            ),
       ),
     );
   }
@@ -139,8 +156,8 @@ class TimelinePage extends StatelessWidget {
       (strengthSession) => StrengthSessionCard(
         strengthSessionDescription: strengthSession,
         strengthRecords: timelineRecords.strengthRecords,
-        onSelected: (movement) =>
-            onSelected(MovementOrMetcon.movement(movement)),
+        onSelected:
+            (movement) => onSelected(MovementOrMetcon.movement(movement)),
       ),
       (metconSessionDescription) => MetconSessionCard(
         metconSessionDescription: metconSessionDescription,
@@ -149,8 +166,8 @@ class TimelinePage extends StatelessWidget {
       ),
       (cardioSession) => CardioSessionCard(
         cardioSessionDescription: cardioSession,
-        onSelected: (movement) =>
-            onSelected(MovementOrMetcon.movement(movement)),
+        onSelected:
+            (movement) => onSelected(MovementOrMetcon.movement(movement)),
       ),
       (wod) => WodCard(wod: wod),
       (diary) => DiaryCard(diary: diary),

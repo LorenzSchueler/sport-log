@@ -21,83 +21,89 @@ class TimerPage extends StatelessWidget {
     return NeverPop(
       child: ProviderConsumer<TimerState>(
         create: (_) => TimerState(),
-        builder: (context, timerState, _) => DefaultTabController(
-          length: 3,
-          child: Builder(
-            // needed in order for context to contain DefaultTabController
-            builder: (context) => Scaffold(
-              resizeToAvoidBottomInset: false,
-              appBar: AppBar(
-                title: const Text("Timer"),
-                bottom: DeactivatableTabBar(
-                  disabled: timerState.isRunning,
-                  child: TabBar(
-                    indicatorColor: Theme.of(context).colorScheme.primary,
-                    tabs: const [
-                      Tab(
-                        text: "Timer",
-                        icon: Icon(AppIcons.timeInterval),
-                      ),
-                      Tab(
-                        text: "Interval",
-                        icon: Icon(AppIcons.repeat),
-                      ),
-                      Tab(
-                        text: "Stopwatch",
-                        icon: Icon(AppIcons.stopwatch),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              body: Padding(
-                padding: Defaults.edgeInsets.normal,
-                child: TabBarView(
-                  physics: const NeverScrollableScrollPhysics(),
-                  children: [
-                    Column(
-                      children: [
-                        _timeFormField("Time", timerState),
-                        Defaults.sizedBox.vertical.huge,
-                        _startStopButton(context, timerState),
-                        const SizedBox(height: 100),
-                        _timeText(timerState),
-                      ],
-                    ),
-                    Column(
-                      children: [
-                        _timeFormField("Round Time", timerState),
-                        _restTimeFormField(timerState),
-                        _roundsFormField(timerState),
-                        Defaults.sizedBox.vertical.huge,
-                        _startStopButton(context, timerState),
-                        const SizedBox(height: 50),
-                        FittedBox(
-                          child: Text(
-                            "Round ${timerState.currentRound ?? '0'}",
-                            softWrap: false,
-                            style: const TextStyle(fontSize: 80, height: 1),
+        builder:
+            (context, timerState, _) => DefaultTabController(
+              length: 3,
+              child: Builder(
+                // needed in order for context to contain DefaultTabController
+                builder:
+                    (context) => Scaffold(
+                      resizeToAvoidBottomInset: false,
+                      appBar: AppBar(
+                        title: const Text("Timer"),
+                        bottom: DeactivatableTabBar(
+                          disabled: timerState.isRunning,
+                          child: TabBar(
+                            indicatorColor:
+                                Theme.of(context).colorScheme.primary,
+                            tabs: const [
+                              Tab(
+                                text: "Timer",
+                                icon: Icon(AppIcons.timeInterval),
+                              ),
+                              Tab(
+                                text: "Interval",
+                                icon: Icon(AppIcons.repeat),
+                              ),
+                              Tab(
+                                text: "Stopwatch",
+                                icon: Icon(AppIcons.stopwatch),
+                              ),
+                            ],
                           ),
                         ),
-                        _timeText(timerState),
-                      ],
+                      ),
+                      body: Padding(
+                        padding: Defaults.edgeInsets.normal,
+                        child: TabBarView(
+                          physics: const NeverScrollableScrollPhysics(),
+                          children: [
+                            Column(
+                              children: [
+                                _timeFormField("Time", timerState),
+                                Defaults.sizedBox.vertical.huge,
+                                _startStopButton(context, timerState),
+                                const SizedBox(height: 100),
+                                _timeText(timerState),
+                              ],
+                            ),
+                            Column(
+                              children: [
+                                _timeFormField("Round Time", timerState),
+                                _restTimeFormField(timerState),
+                                _roundsFormField(timerState),
+                                Defaults.sizedBox.vertical.huge,
+                                _startStopButton(context, timerState),
+                                const SizedBox(height: 50),
+                                FittedBox(
+                                  child: Text(
+                                    "Round ${timerState.currentRound ?? '0'}",
+                                    softWrap: false,
+                                    style: const TextStyle(
+                                      fontSize: 80,
+                                      height: 1,
+                                    ),
+                                  ),
+                                ),
+                                _timeText(timerState),
+                              ],
+                            ),
+                            Column(
+                              children: [
+                                _timeFormField("Timecap", timerState),
+                                Defaults.sizedBox.vertical.huge,
+                                _startStopButton(context, timerState),
+                                const SizedBox(height: 100),
+                                _timeText(timerState),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      drawer: const MainDrawer(selectedRoute: Routes.timer),
                     ),
-                    Column(
-                      children: [
-                        _timeFormField("Timecap", timerState),
-                        Defaults.sizedBox.vertical.huge,
-                        _startStopButton(context, timerState),
-                        const SizedBox(height: 100),
-                        _timeText(timerState),
-                      ],
-                    ),
-                  ],
-                ),
               ),
-              drawer: const MainDrawer(selectedRoute: Routes.timer),
             ),
-          ),
-        ),
       ),
     );
   }
@@ -123,11 +129,12 @@ class TimerPage extends StatelessWidget {
         timerState.restTime = const Duration(minutes: 1);
       },
       onTrailingTap: () => timerState.restTime = null,
-      builder: () => DurationInput(
-        onUpdate: (d) => timerState.restTime = d,
-        initialDuration: timerState.restTime!,
-        minDuration: const Duration(seconds: 1),
-      ),
+      builder:
+          () => DurationInput(
+            onUpdate: (d) => timerState.restTime = d,
+            initialDuration: timerState.restTime!,
+            minDuration: const Duration(seconds: 1),
+          ),
     );
   }
 
@@ -147,36 +154,42 @@ class TimerPage extends StatelessWidget {
   Widget _startStopButton(BuildContext context, TimerState timerState) {
     return timerState.isRunning
         ? FilledButton(
-            onPressed: timerState.stop,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Theme.of(context).colorScheme.error,
-            ),
-            child: const Text("Stop", style: TextStyle(fontSize: 50)),
-          )
+          onPressed: timerState.stop,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+          child: const Text("Stop", style: TextStyle(fontSize: 50)),
+        )
         : FilledButton(
-            onPressed: () => timerState.time.inSeconds > 0
-                ? timerState.start(
-                    TimerType.values[DefaultTabController.of(context).index],
-                  )
-                : showMessageDialog(
-                    context: context,
-                    title: "Invalid Time",
-                    text: "The time must be greater than 0.",
-                  ),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Theme.of(context).colorScheme.errorContainer,
-            ),
-            child: const Text("Start", style: TextStyle(fontSize: 50)),
-          );
+          onPressed:
+              () =>
+                  timerState.time.inSeconds > 0
+                      ? timerState.start(
+                        TimerType.values[DefaultTabController.of(
+                          context,
+                        ).index],
+                      )
+                      : showMessageDialog(
+                        context: context,
+                        title: "Invalid Time",
+                        text: "The time must be greater than 0.",
+                      ),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Theme.of(context).colorScheme.errorContainer,
+          ),
+          child: const Text("Start", style: TextStyle(fontSize: 50)),
+        );
   }
 
   Widget _timeText(TimerState timerState) {
-    final timeText = timerState.isRunning
-        ? timerState.displayTime!.abs().formatTimeShort
-        : "00:10";
-    final color = timerState.isNotRunning || timerState.displayTime!.isNegative
-        ? const Color.fromARGB(255, 150, 150, 150)
-        : null;
+    final timeText =
+        timerState.isRunning
+            ? timerState.displayTime!.abs().formatTimeShort
+            : "00:10";
+    final color =
+        timerState.isNotRunning || timerState.displayTime!.isNegative
+            ? const Color.fromARGB(255, 150, 150, 150)
+            : null;
     return FittedBox(
       child: Text(
         timeText,

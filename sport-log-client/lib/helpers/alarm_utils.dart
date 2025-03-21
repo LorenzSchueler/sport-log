@@ -53,7 +53,7 @@ class AlarmUtils {
         (_lastAlarm?.isBefore(DateTime.now().subtract(_minAlarmInterval)) ??
             true)) {
       final (distance, index) = position.minDistanceTo(_getTrack());
-      if (distance > _routeAlarmDistance! && index != null) {
+      if (distance > _routeAlarmDistance && index != null) {
         _lastAlarm = DateTime.now();
         await TtsUtils.speak(
           "You are off route by ${distance.round()} meters.",

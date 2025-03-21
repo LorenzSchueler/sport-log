@@ -25,21 +25,22 @@ class CardioSessionDescription extends CompoundEntity {
       Movement.defaultMovement == null
           ? null
           : CardioSessionDescription(
-              cardioSession:
-                  CardioSession.defaultValue(Movement.defaultMovement!.id),
-              route: null,
-              movement: Movement.defaultMovement!,
-            );
+            cardioSession: CardioSession.defaultValue(
+              Movement.defaultMovement!.id,
+            ),
+            route: null,
+            movement: Movement.defaultMovement!,
+          );
 
   @override
   Map<String, dynamic> toJson() => _$CardioSessionDescriptionToJson(this);
 
   @override
   CardioSessionDescription clone() => CardioSessionDescription(
-        cardioSession: cardioSession.clone(),
-        route: route?.clone(),
-        movement: movement.clone(),
-      );
+    cardioSession: cardioSession.clone(),
+    route: route?.clone(),
+    movement: movement.clone(),
+  );
 
   @override
   bool isValidBeforeSanitation() {

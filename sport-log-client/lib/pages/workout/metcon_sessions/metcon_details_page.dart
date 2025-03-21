@@ -9,10 +9,7 @@ import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/dialogs.dart';
 
 class MetconDetailsPage extends StatefulWidget {
-  const MetconDetailsPage({
-    required this.metconDescription,
-    super.key,
-  });
+  const MetconDetailsPage({required this.metconDescription, super.key});
 
   final MetconDescription metconDescription;
 
@@ -69,10 +66,11 @@ class _MetconDetailsPageState extends State<MetconDetailsPage> {
         title: Text(_metconDescription.metcon.name),
         actions: [
           IconButton(
-            onPressed: () => Navigator.of(context).pushNamed(
-              Routes.metconSessionEdit,
-              arguments: _metconDescription,
-            ),
+            onPressed:
+                () => Navigator.of(context).pushNamed(
+                  Routes.metconSessionEdit,
+                  arguments: _metconDescription,
+                ),
             icon: const Icon(AppIcons.add),
           ),
           if (!_metconDescription.hasReference &&
@@ -90,9 +88,7 @@ class _MetconDetailsPageState extends State<MetconDetailsPage> {
       ),
       body: Padding(
         padding: Defaults.edgeInsets.normal,
-        child: MetconDescriptionCard(
-          metconDescription: _metconDescription,
-        ),
+        child: MetconDescriptionCard(metconDescription: _metconDescription),
       ),
     );
   }

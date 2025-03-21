@@ -21,22 +21,26 @@ String _prettyJson(Object json, {int indent = 2}) {
 }
 
 void _logRequest(Request request) {
-  final headersStr = Config.instance.outputRequestHeaders
-      ? "\n${request.headers.entries.map((e) => '${e.key}: ${e.value}').join('\n')}"
-      : "";
-  final jsonStr = Config.instance.outputRequestJson && request.body.isNotEmpty
-      ? "\n\n${_prettyJson(jsonDecode(request.body) as Object)}"
-      : "";
+  final headersStr =
+      Config.instance.outputRequestHeaders
+          ? "\n${request.headers.entries.map((e) => '${e.key}: ${e.value}').join('\n')}"
+          : "";
+  final jsonStr =
+      Config.instance.outputRequestJson && request.body.isNotEmpty
+          ? "\n\n${_prettyJson(jsonDecode(request.body) as Object)}"
+          : "";
   _logger.t("request: ${request.method} ${request.url}$headersStr$jsonStr");
 }
 
 void _logResponse(StreamedResponse response, Object? json) {
-  final headerStr = Config.instance.outputResponseHeaders
-      ? "\n${response.headers.entries.map((e) => "${e.key}: ${e.value}").join("\n")}"
-      : "";
-  final jsonStr = Config.instance.outputResponseJson && json != null
-      ? "\n\n${_prettyJson(json)}"
-      : "";
+  final headerStr =
+      Config.instance.outputResponseHeaders
+          ? "\n${response.headers.entries.map((e) => "${e.key}: ${e.value}").join("\n")}"
+          : "";
+  final jsonStr =
+      Config.instance.outputResponseJson && json != null
+          ? "\n\n${_prettyJson(json)}"
+          : "";
   _logger.t("response: ${response.statusCode}$headerStr$jsonStr");
 }
 
@@ -61,9 +65,12 @@ enum ApiErrorType {
 
 class ApiError {
   ApiError(this.errorType, this.errorCode, [Object? jsonMessage])
-      : message = jsonMessage != null
-            ? HandlerError.fromJson(jsonMessage as Map<String, dynamic>).message
-            : null;
+    : message =
+          jsonMessage != null
+              ? HandlerError.fromJson(
+                jsonMessage as Map<String, dynamic>,
+              ).message
+              : null;
 
   final ApiErrorType errorType;
   final int? errorCode;
@@ -89,16 +96,18 @@ extension _ToApiResult on StreamedResponse {
     _logResponse(this, json);
 
     return switch (statusCode) {
-      200 => fromJson != null
-          ? json != null
-              ? Ok(fromJson(json))
-              // expected non empty body
-              : Err(ApiError(ApiErrorType.badJson, statusCode))
-          : Ok(null),
-      204 => fromJson == null
-          ? Ok(null)
-          // expected non empty body and status 200
-          : Err(ApiError(ApiErrorType.badJson, statusCode)),
+      200 =>
+        fromJson != null
+            ? json != null
+                ? Ok(fromJson(json))
+                // expected non empty body
+                : Err(ApiError(ApiErrorType.badJson, statusCode))
+            : Ok(null),
+      204 =>
+        fromJson == null
+            ? Ok(null)
+            // expected non empty body and status 200
+            : Err(ApiError(ApiErrorType.badJson, statusCode)),
       400 => Err(ApiError(ApiErrorType.badRequest, statusCode, json)),
       401 => Err(ApiError(ApiErrorType.unauthorized, statusCode, json)),
       403 => Err(ApiError(ApiErrorType.forbidden, statusCode, json)),
@@ -158,25 +167,24 @@ extension RequestExtension on Request {
   }
 
   Future<ApiResult<void>> toApiResult() => _handleError(() async {
-        _logRequest(this);
-        final response = await _client.send(this);
-        return response.toApiResult(null);
-      });
+    _logRequest(this);
+    final response = await _client.send(this);
+    return response.toApiResult(null);
+  });
 
   Future<ApiResult<T>> toApiResultWithValue<T extends Object>(
     T Function(Object) fromJson,
-  ) =>
-      _handleError(() async {
-        _logRequest(this);
-        final response = await _client.send(this);
-        return response.toApiResult(fromJson).mapAsync((success) => success!);
-      });
+  ) => _handleError(() async {
+    _logRequest(this);
+    final response = await _client.send(this);
+    return response.toApiResult(fromJson).mapAsync((success) => success!);
+  });
 
   Future<ApiResult<Uint8List>> toBytes() => _handleError(() async {
-        _logRequest(this);
-        final response = await _client.send(this);
-        return response.toBytes();
-      });
+    _logRequest(this);
+    final response = await _client.send(this);
+    return response.toBytes();
+  });
 }
 
 abstract class Api<T extends JsonSerializable> {
@@ -191,9 +199,9 @@ abstract class Api<T extends JsonSerializable> {
   Map<String, dynamic> _toJson(T object) => object.toJson();
 
   Future<ApiResult<EpochResult?>> postSingle(T object) => (Request("post", _uri)
-            ..headers.addAll(ApiHeaders.basicAuthContentTypeJson)
-            ..body = jsonEncode(_toJson(object)))
-          .toApiResultWithValue(
+        ..headers.addAll(ApiHeaders.basicAuthContentTypeJson)
+        ..body = jsonEncode(_toJson(object)))
+      .toApiResultWithValue(
         (json) => EpochResult.fromJson((json as Map).cast()),
       );
 
@@ -205,14 +213,14 @@ abstract class Api<T extends JsonSerializable> {
           ..headers.addAll(ApiHeaders.basicAuthContentTypeJson)
           ..body = jsonEncode(objects.map(_toJson).toList()))
         .toApiResultWithValue(
-      (json) => EpochResult.fromJson((json as Map).cast()),
-    );
+          (json) => EpochResult.fromJson((json as Map).cast()),
+        );
   }
 
   Future<ApiResult<EpochResult?>> putSingle(T object) => (Request("put", _uri)
-            ..headers.addAll(ApiHeaders.basicAuthContentTypeJson)
-            ..body = jsonEncode(_toJson(object)))
-          .toApiResultWithValue(
+        ..headers.addAll(ApiHeaders.basicAuthContentTypeJson)
+        ..body = jsonEncode(_toJson(object)))
+      .toApiResultWithValue(
         (json) => EpochResult.fromJson((json as Map).cast()),
       );
 
@@ -224,8 +232,8 @@ abstract class Api<T extends JsonSerializable> {
           ..headers.addAll(ApiHeaders.basicAuthContentTypeJson)
           ..body = jsonEncode(objects.map(_toJson).toList()))
         .toApiResultWithValue(
-      (json) => EpochResult.fromJson((json as Map).cast()),
-    );
+          (json) => EpochResult.fromJson((json as Map).cast()),
+        );
   }
 }
 
@@ -233,23 +241,22 @@ class ApiHeaders {
   static Map<String, String> basicAuthFromParts(
     String username,
     String password,
-  ) =>
-      {
-        HttpHeaders.authorizationHeader:
-            "Basic ${base64Encode(utf8.encode('$username:$password'))}",
-      };
+  ) => {
+    HttpHeaders.authorizationHeader:
+        "Basic ${base64Encode(utf8.encode('$username:$password'))}",
+  };
 
   static const Map<String, String> contentTypeJson = {
     HttpHeaders.contentTypeHeader: 'application/json; charset=UTF-8',
   };
 
   static Map<String, String> get basicAuth => basicAuthFromParts(
-        Settings.instance.username!,
-        Settings.instance.password!,
-      );
+    Settings.instance.username!,
+    Settings.instance.password!,
+  );
 
   static Map<String, String> get basicAuthContentTypeJson => {
-        ...basicAuth,
-        ...contentTypeJson,
-      };
+    ...basicAuth,
+    ...contentTypeJson,
+  };
 }

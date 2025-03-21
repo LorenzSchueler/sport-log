@@ -81,7 +81,8 @@ class RoutePlanningUtils {
       track[0].elevation = (await getElevation?.call(track[0].latLng)) ?? 0;
     }
     for (var i = 1; i < track.length; i++) {
-      track[i].distance = track[i - 1].distance +
+      track[i].distance =
+          track[i - 1].distance +
           track[i - 1].latLng.distanceTo(track[i].latLng);
       track[i].elevation =
           (await getElevation?.call(track[i].latLng)) ?? track[i - 1].elevation;
@@ -166,9 +167,10 @@ class RoutePlanningUtils {
         response = await Defaults.mapboxApi.directions.request(
           profile: NavigationProfile.WALKING,
           overview: NavigationOverview.FULL,
-          coordinates: markedPositionsChunk
-              .map((e) => [e.latitude, e.longitude])
-              .toList(),
+          coordinates:
+              markedPositionsChunk
+                  .map((e) => [e.latitude, e.longitude])
+                  .toList(),
         );
       } on SocketException {
         return Err(RoutePlanningError.noInternet);
@@ -183,9 +185,10 @@ class RoutePlanningUtils {
         latLngs.addAll(chunkLatLngs);
       } else {
         final responseError = response.error;
-        final error = responseError == null
-            ? "geometry is null"
-            : responseError is NavigationError
+        final error =
+            responseError == null
+                ? "geometry is null"
+                : responseError is NavigationError
                 ? responseError.message
                 : responseError.toString();
 
@@ -200,17 +203,18 @@ class RoutePlanningUtils {
       }
     }
 
-    final track = latLngs
-        .map(
-          (latLng) => Position(
-            latitude: latLng.lat,
-            longitude: latLng.lng,
-            elevation: 0,
-            distance: 0,
-            time: Duration.zero,
-          ),
-        )
-        .toList();
+    final track =
+        latLngs
+            .map(
+              (latLng) => Position(
+                latitude: latLng.lat,
+                longitude: latLng.lng,
+                elevation: 0,
+                distance: 0,
+                time: Duration.zero,
+              ),
+            )
+            .toList();
 
     if (snapMode == SnapMode.snapIfClose) {
       _snapIfClose(track, markedPositions);

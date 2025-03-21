@@ -5,11 +5,7 @@ import 'package:sport_log/widgets/app_icons.dart';
 
 @immutable
 class ExpandableFab extends StatefulWidget {
-  const ExpandableFab({
-    required this.icon,
-    required this.buttons,
-    super.key,
-  });
+  const ExpandableFab({required this.icon, required this.buttons, super.key});
 
   final Icon icon;
   final List<ActionButton> buttons;
@@ -74,9 +70,7 @@ class _ExpandableFabState extends State<ExpandableFab>
           onPressed: _toggle,
           backgroundColor: Theme.of(context).colorScheme.surface,
           foregroundColor: Theme.of(context).colorScheme.primary,
-          child: const Icon(
-            AppIcons.close,
-          ),
+          child: const Icon(AppIcons.close),
         ),
       ),
     );
@@ -86,9 +80,11 @@ class _ExpandableFabState extends State<ExpandableFab>
     final children = <Widget>[];
     final count = widget.buttons.length;
     final step = 90.0 / (count - 1);
-    for (var i = 0, angleInDegrees = 0.0;
-        i < count;
-        i++, angleInDegrees += step) {
+    for (
+      var i = 0, angleInDegrees = 0.0;
+      i < count;
+      i++, angleInDegrees += step
+    ) {
       children.add(
         _ExpandingActionButton(
           directionInDegrees: angleInDegrees,
@@ -124,10 +120,7 @@ class _ExpandableFabState extends State<ExpandableFab>
           opacity: _open ? 0.0 : 1.0,
           curve: const Interval(0.25, 1, curve: Curves.easeInOut),
           duration: const Duration(milliseconds: 250),
-          child: FloatingActionButton(
-            onPressed: _toggle,
-            child: widget.icon,
-          ),
+          child: FloatingActionButton(onPressed: _toggle, child: widget.icon),
         ),
       ),
     );
@@ -165,20 +158,13 @@ class _ExpandingActionButton extends StatelessWidget {
           ),
         );
       },
-      child: FadeTransition(
-        opacity: progress,
-        child: child,
-      ),
+      child: FadeTransition(opacity: progress, child: child),
     );
   }
 }
 
 class ActionButton extends StatelessWidget {
-  const ActionButton({
-    required this.onPressed,
-    required this.icon,
-    super.key,
-  });
+  const ActionButton({required this.onPressed, required this.icon, super.key});
 
   final VoidCallback onPressed;
   final Widget icon;

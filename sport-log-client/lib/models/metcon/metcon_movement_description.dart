@@ -24,9 +24,9 @@ class MetconMovementDescription extends CompoundEntity {
 
   @override
   MetconMovementDescription clone() => MetconMovementDescription(
-        metconMovement: metconMovement.clone(),
-        movement: movement.clone(),
-      );
+    metconMovement: metconMovement.clone(),
+    movement: movement.clone(),
+  );
 
   @override
   bool isValidBeforeSanitation() {

@@ -10,10 +10,7 @@ class NoTrackPlaceholder extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Icon(
-          AppIcons.route,
-          color: Theme.of(context).colorScheme.onSurface,
-        ),
+        Icon(AppIcons.route, color: Theme.of(context).colorScheme.onSurface),
         Defaults.sizedBox.horizontal.normal,
         const Text("No Track Available"),
       ],

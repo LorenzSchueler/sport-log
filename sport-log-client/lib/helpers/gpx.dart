@@ -33,13 +33,15 @@ Result<List<Position>, String> gpxToTrack(String gpxString) {
         longitude: lng,
         latitude: lat,
         elevation: point.ele ?? 0.0,
-        distance: track.isEmpty
-            ? 0
-            : track.last.distance +
-                track.last.latLng.distanceTo(LatLng(lat: lat, lng: lng)),
-        time: startTime == null || point.time == null
-            ? Duration.zero
-            : point.time!.difference(startTime),
+        distance:
+            track.isEmpty
+                ? 0
+                : track.last.distance +
+                    track.last.latLng.distanceTo(LatLng(lat: lat, lng: lng)),
+        time:
+            startTime == null || point.time == null
+                ? Duration.zero
+                : point.time!.difference(startTime),
       ),
     );
   }
@@ -47,19 +49,21 @@ Result<List<Position>, String> gpxToTrack(String gpxString) {
 }
 
 String trackToGpx(List<Position> track, {DateTime? startTime}) {
-  final points = track
-      .map(
-        (p) => Wpt(
-          lon: p.longitude,
-          lat: p.latitude,
-          ele: p.elevation,
-          time: startTime?.add(p.time),
-        ),
-      )
-      .toList();
-  final gpx = Gpx()
-    ..creator = "Sport Log"
-    ..trks.add(Trk(trksegs: [Trkseg(trkpts: points)]));
+  final points =
+      track
+          .map(
+            (p) => Wpt(
+              lon: p.longitude,
+              lat: p.latitude,
+              ele: p.elevation,
+              time: startTime?.add(p.time),
+            ),
+          )
+          .toList();
+  final gpx =
+      Gpx()
+        ..creator = "Sport Log"
+        ..trks.add(Trk(trksegs: [Trkseg(trkpts: points)]));
   return GpxWriter().asString(gpx);
 }
 

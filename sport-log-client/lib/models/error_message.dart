@@ -6,43 +6,44 @@ enum ErrorMessageType {
   primaryKeyViolation,
   foreignKeyViolation,
   uniqueViolation,
-  other;
+  other,
 }
 
 class ErrorMessage extends JsonSerializable {
   ErrorMessage.primaryKeyViolation(this.table)
-      : type = ErrorMessageType.primaryKeyViolation,
-        column = null,
-        columns = null,
-        error = null;
+    : type = ErrorMessageType.primaryKeyViolation,
+      column = null,
+      columns = null,
+      error = null;
   ErrorMessage.foreignKeyViolation(this.table, this.column)
-      : type = ErrorMessageType.foreignKeyViolation,
-        columns = null,
-        error = null;
+    : type = ErrorMessageType.foreignKeyViolation,
+      columns = null,
+      error = null;
   ErrorMessage.uniqueViolation(this.table, this.columns)
-      : type = ErrorMessageType.uniqueViolation,
-        column = null,
-        error = null;
+    : type = ErrorMessageType.uniqueViolation,
+      column = null,
+      error = null;
   ErrorMessage.other(this.error)
-      : type = ErrorMessageType.other,
-        table = null,
-        column = null,
-        columns = null;
+    : type = ErrorMessageType.other,
+      table = null,
+      column = null,
+      columns = null;
 
   factory ErrorMessage.fromJson(Map<String, dynamic> json) {
     final type = json.keys.first;
     final body = json[type] as Map<String, dynamic>;
     return switch (type) {
-      "primary_key_violation" =>
-        ErrorMessage.primaryKeyViolation(body["table"] as String),
+      "primary_key_violation" => ErrorMessage.primaryKeyViolation(
+        body["table"] as String,
+      ),
       "foreign_key_violation" => ErrorMessage.foreignKeyViolation(
-          body["table"] as String,
-          body["column"] as String,
-        ),
+        body["table"] as String,
+        body["column"] as String,
+      ),
       "unique_violation" => ErrorMessage.uniqueViolation(
-          body["table"] as String,
-          (body["columns"] as List<dynamic>).cast<String>(),
-        ),
+        body["table"] as String,
+        (body["columns"] as List<dynamic>).cast<String>(),
+      ),
       "other" => ErrorMessage.other(body["error"] as String?),
       _ => ErrorMessage.other(null),
     };
@@ -56,13 +57,13 @@ class ErrorMessage extends JsonSerializable {
 
   @override
   Map<String, dynamic> toJson() => <String, dynamic>{
-        '$type': <String, dynamic>{
-          'table': table,
-          'column': column,
-          'columns': columns,
-          'error': error,
-        },
-      };
+    '$type': <String, dynamic>{
+      'table': table,
+      'column': column,
+      'columns': columns,
+      'error': error,
+    },
+  };
 
   @override
   String toString() {

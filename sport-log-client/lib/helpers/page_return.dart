@@ -5,7 +5,7 @@ class ReturnObject<T> {
   ReturnObject.updated(this.payload) : action = ReturnAction.updated;
   ReturnObject.deleted(this.payload) : action = ReturnAction.deleted;
   ReturnObject.isNew(bool isNew, this.payload)
-      : action = isNew ? ReturnAction.created : ReturnAction.updated;
+    : action = isNew ? ReturnAction.created : ReturnAction.updated;
 
   ReturnAction action;
   T payload;

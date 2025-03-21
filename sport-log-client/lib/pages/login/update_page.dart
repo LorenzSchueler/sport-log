@@ -17,20 +17,17 @@ class UpdatePage extends StatelessWidget {
     }
     _updateInProgress = true;
     final updateDownloadResult = await AppDataProvider().downloadUpdate(
-      onNoInternet: () => showMessageDialog(
-        context: context,
-        title: "Update Failed",
-        text: "Internet required.",
-      ),
+      onNoInternet:
+          () => showMessageDialog(
+            context: context,
+            title: "Update Failed",
+            text: "Internet required.",
+          ),
     );
     if (updateDownloadResult.isOk) {
       final filename = updateDownloadResult.ok;
-      if (await PermissionRequest.request(
-            Permission.manageExternalStorage,
-          ) &&
-          await PermissionRequest.request(
-            Permission.requestInstallPackages,
-          )) {
+      if (await PermissionRequest.request(Permission.manageExternalStorage) &&
+          await PermissionRequest.request(Permission.requestInstallPackages)) {
         await OpenFile.open(filename);
       }
     } else if (context.mounted) {
@@ -44,10 +41,7 @@ class UpdatePage extends StatelessWidget {
 
     return const WelcomeScreen(
       content: Column(
-        children: [
-          Text("Downloading Updates ..."),
-          LinearProgressIndicator(),
-        ],
+        children: [Text("Downloading Updates ..."), LinearProgressIndicator()],
       ),
     );
   }

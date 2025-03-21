@@ -72,11 +72,11 @@ class StrengthSessionStats extends JsonSerializable {
   String toDisplayName(MovementDimension dimension) {
     return switch (dimension) {
       MovementDimension.reps => [
-          if (maxEorm != null) '1RM: ${formatWeight(maxEorm!)}',
-          if (sumVolume != null) 'Vol: ${formatWeight(sumVolume!)}',
-          if (maxWeight != null) 'Max Weight: ${formatWeight(maxWeight!)}',
-          'Avg Reps: ${avgCount.toStringAsFixed(1)}',
-        ].join(' • '),
+        if (maxEorm != null) '1RM: ${formatWeight(maxEorm!)}',
+        if (sumVolume != null) 'Vol: ${formatWeight(sumVolume!)}',
+        if (maxWeight != null) 'Max Weight: ${formatWeight(maxWeight!)}',
+        'Avg Reps: ${avgCount.toStringAsFixed(1)}',
+      ].join(' • '),
       MovementDimension.time =>
         'Best time: ${Duration(milliseconds: minCount).formatMsMill}',
       MovementDimension.distance => 'Best distance: $maxCount m',

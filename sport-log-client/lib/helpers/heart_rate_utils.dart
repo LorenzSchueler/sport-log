@@ -82,9 +82,10 @@ class HeartRateUtils extends ChangeNotifier {
     return Request.request(
       title: "Bluetooth Required",
       text: "Please enable bluetooth.",
-      check: () async =>
-          (await FlutterBluePlus.adapterState.first) ==
-          BluetoothAdapterState.on,
+      check:
+          () async =>
+              (await FlutterBluePlus.adapterState.first) ==
+              BluetoothAdapterState.on,
       change: () async {
         try {
           await FlutterBluePlus.turnOn();
@@ -120,9 +121,9 @@ class HeartRateUtils extends ChangeNotifier {
 
     _devices = {
       await for (final d in _polar.searchForDevice().timeout(
-            _searchDuration,
-            onTimeout: (sink) => sink.close(),
-          ))
+        _searchDuration,
+        onTimeout: (sink) => sink.close(),
+      ))
         d.name: d.deviceId,
     };
 
@@ -155,33 +156,35 @@ class HeartRateUtils extends ChangeNotifier {
       (e) => e.identifier == deviceId && e.feature == PolarSdkFeature.hr,
     );
 
-    _heartRateSubscription = _polar.startHrStreaming(deviceId!).listen(
-      (e) {
-        final samples = e.samples;
-        if (samples.isEmpty) {
-          return;
-        }
-        _hr = samples.last.hr;
-        final rrs = <int>[];
-        for (final sample in samples) {
-          rrs.addAll(sample.rrsMs);
-        }
-        if (hrv) {
-          _rrs.addAll(rrs);
-          _setHrv();
-        }
+    _heartRateSubscription = _polar
+        .startHrStreaming(deviceId!)
+        .listen(
+          (e) {
+            final samples = e.samples;
+            if (samples.isEmpty) {
+              return;
+            }
+            _hr = samples.last.hr;
+            final rrs = <int>[];
+            for (final sample in samples) {
+              rrs.addAll(sample.rrsMs);
+            }
+            if (hrv) {
+              _rrs.addAll(rrs);
+              _setHrv();
+            }
 
-        onHeartRateEvent?.call(rrs);
-        if (!_disposed) {
-          notifyListeners();
-        }
-      },
-      onError: (Object error) {
-        if (error is PlatformException) {
-          stopHeartRateStream();
-        }
-      },
-    );
+            onHeartRateEvent?.call(rrs);
+            if (!_disposed) {
+              notifyListeners();
+            }
+          },
+          onError: (Object error) {
+            if (error is PlatformException) {
+              stopHeartRateStream();
+            }
+          },
+        );
     _batterySubscription = _polar.batteryLevel.listen((event) {
       _battery = event.level;
       if (!_disposed) {

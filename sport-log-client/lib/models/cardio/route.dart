@@ -28,12 +28,12 @@ class Route extends AtomicEntity {
   });
 
   Route.defaultValue()
-      : id = randomId(),
-        name = "",
-        distance = 0,
-        ascent = null,
-        descent = null,
-        deleted = false;
+    : id = randomId(),
+      name = "",
+      distance = 0,
+      ascent = null,
+      descent = null,
+      deleted = false;
 
   factory Route.fromJson(Map<String, dynamic> json) => _$RouteFromJson(json);
 
@@ -79,15 +79,15 @@ class Route extends AtomicEntity {
 
   @override
   Route clone() => Route(
-        id: id.clone(),
-        name: name,
-        distance: distance,
-        ascent: ascent,
-        descent: descent,
-        track: track?.clone(),
-        markedPositions: markedPositions?.clone(),
-        deleted: deleted,
-      );
+    id: id.clone(),
+    name: name,
+    distance: distance,
+    ascent: ascent,
+    descent: descent,
+    track: track?.clone(),
+    markedPositions: markedPositions?.clone(),
+    deleted: deleted,
+  );
 
   @override
   bool isValidBeforeSanitation() {
@@ -157,8 +157,9 @@ class DbRouteSerializer extends DbSerializer<Route> {
       Columns.ascent: o.ascent,
       Columns.descent: o.descent,
       Columns.track: DbPositionListConverter.mapToSql(o.track),
-      Columns.markedPositions:
-          DbPositionListConverter.mapToSql(o.markedPositions),
+      Columns.markedPositions: DbPositionListConverter.mapToSql(
+        o.markedPositions,
+      ),
       Columns.deleted: o.deleted ? 1 : 0,
     };
   }

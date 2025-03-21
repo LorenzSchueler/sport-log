@@ -4,9 +4,10 @@ class StopwatchX {
   DateTime _lastResumeTime = DateTime.now(); // gets overwritten anyway
   Duration _lastStopDuration = Duration.zero;
 
-  Duration get elapsed => _isRunning
-      ? _lastStopDuration + DateTime.now().difference(_lastResumeTime)
-      : _lastStopDuration;
+  Duration get elapsed =>
+      _isRunning
+          ? _lastStopDuration + DateTime.now().difference(_lastResumeTime)
+          : _lastStopDuration;
 
   void start() {
     _isRunning = true;

@@ -7,28 +7,30 @@ part of 'route.dart';
 // **************************************************************************
 
 Route _$RouteFromJson(Map<String, dynamic> json) => Route(
-      id: const IdConverter().fromJson(json['id'] as String),
-      name: json['name'] as String,
-      distance: (json['distance'] as num?)?.toInt(),
-      ascent: (json['ascent'] as num?)?.toInt(),
-      descent: (json['descent'] as num?)?.toInt(),
-      track: (json['track'] as List<dynamic>?)
+  id: const IdConverter().fromJson(json['id'] as String),
+  name: json['name'] as String,
+  distance: (json['distance'] as num?)?.toInt(),
+  ascent: (json['ascent'] as num?)?.toInt(),
+  descent: (json['descent'] as num?)?.toInt(),
+  track:
+      (json['track'] as List<dynamic>?)
           ?.map((e) => Position.fromJson(e as Map<String, dynamic>))
           .toList(),
-      markedPositions: (json['marked_positions'] as List<dynamic>?)
+  markedPositions:
+      (json['marked_positions'] as List<dynamic>?)
           ?.map((e) => Position.fromJson(e as Map<String, dynamic>))
           .toList(),
-      deleted: json['deleted'] as bool,
-    );
+  deleted: json['deleted'] as bool,
+);
 
 Map<String, dynamic> _$RouteToJson(Route instance) => <String, dynamic>{
-      'id': const IdConverter().toJson(instance.id),
-      'user_id': const IdConverter().toJson(instance._userId),
-      'name': instance.name,
-      'distance': instance.distance,
-      'ascent': instance.ascent,
-      'descent': instance.descent,
-      'track': instance.track,
-      'marked_positions': instance.markedPositions,
-      'deleted': instance.deleted,
-    };
+  'id': const IdConverter().toJson(instance.id),
+  'user_id': const IdConverter().toJson(instance._userId),
+  'name': instance.name,
+  'distance': instance.distance,
+  'ascent': instance.ascent,
+  'descent': instance.descent,
+  'track': instance.track,
+  'marked_positions': instance.markedPositions,
+  'deleted': instance.deleted,
+};

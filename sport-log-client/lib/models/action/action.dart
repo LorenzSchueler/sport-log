@@ -36,12 +36,12 @@ class Action extends AtomicEntity {
 
   @override
   Action clone() => Action._(
-        id: id.clone(),
-        name: name,
-        actionProviderId: actionProviderId.clone(),
-        description: description,
-        deleted: deleted,
-      );
+    id: id.clone(),
+    name: name,
+    actionProviderId: actionProviderId.clone(),
+    description: description,
+    deleted: deleted,
+  );
 
   /// Actions should never be created.
   @override

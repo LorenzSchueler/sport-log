@@ -11,15 +11,11 @@ import 'package:sport_log/widgets/pop_scopes.dart';
 import 'package:sport_log/widgets/sync_status_button.dart';
 
 class MovementEditPage extends StatefulWidget {
-  const MovementEditPage({
-    required this.movementDescription,
-    super.key,
-  }) : name = null;
+  const MovementEditPage({required this.movementDescription, super.key})
+    : name = null;
 
-  const MovementEditPage.fromName({
-    required String this.name,
-    super.key,
-  }) : movementDescription = null;
+  const MovementEditPage.fromName({required String this.name, super.key})
+    : movementDescription = null;
 
   final MovementDescription? movementDescription;
   final String? name;
@@ -37,7 +33,8 @@ class _MovementEditPageState extends State<MovementEditPage> {
 
   @override
   void initState() {
-    _movementDescription = widget.movementDescription?.clone() ??
+    _movementDescription =
+        widget.movementDescription?.clone() ??
         MovementDescription.defaultValue();
     if (widget.name != null) {
       _movementDescription.movement.name = widget.name!;
@@ -47,9 +44,10 @@ class _MovementEditPageState extends State<MovementEditPage> {
   }
 
   Future<void> _saveMovement() async {
-    final result = widget.isNew
-        ? await _dataProvider.createSingle(_movementDescription.movement)
-        : await _dataProvider.updateSingle(_movementDescription.movement);
+    final result =
+        widget.isNew
+            ? await _dataProvider.createSingle(_movementDescription.movement)
+            : await _dataProvider.updateSingle(_movementDescription.movement);
     if (result.isOk) {
       await _dataProvider.setDefaultMovement();
       if (mounted) {
@@ -72,8 +70,9 @@ class _MovementEditPageState extends State<MovementEditPage> {
     if (!widget.isNew) {
       assert(!_movementDescription.movement.isDefaultMovement);
       assert(!_movementDescription.hasReference);
-      final result =
-          await _dataProvider.deleteSingle(_movementDescription.movement);
+      final result = await _dataProvider.deleteSingle(
+        _movementDescription.movement,
+      );
       if (mounted) {
         if (result.isOk) {
           Navigator.pop(context);
@@ -103,11 +102,12 @@ class _MovementEditPageState extends State<MovementEditPage> {
                 icon: const Icon(AppIcons.delete),
               ),
             IconButton(
-              onPressed: _formKey.currentContext != null &&
-                      _formKey.currentState!.validate() &&
-                      _movementDescription.isValidBeforeSanitation()
-                  ? _saveMovement
-                  : null,
+              onPressed:
+                  _formKey.currentContext != null &&
+                          _formKey.currentState!.validate() &&
+                          _movementDescription.isValidBeforeSanitation()
+                      ? _saveMovement
+                      : null,
               icon: const Icon(AppIcons.save),
             ),
           ],
@@ -146,19 +146,23 @@ class _MovementEditPageState extends State<MovementEditPage> {
                     keyboardType: TextInputType.multiline,
                     minLines: 1,
                     maxLines: 5,
-                    onChanged: (description) => setState(
-                      () => _movementDescription.movement.description =
-                          description,
-                    ),
+                    onChanged:
+                        (description) => setState(
+                          () =>
+                              _movementDescription.movement.description =
+                                  description,
+                        ),
                     decoration: InputDecoration(
                       icon: const Icon(AppIcons.notes),
                       labelText: "Description",
                       suffixIcon: IconButton(
                         icon: const Icon(AppIcons.close),
-                        onPressed: () => setState(
-                          () =>
-                              _movementDescription.movement.description = null,
-                        ),
+                        onPressed:
+                            () => setState(
+                              () =>
+                                  _movementDescription.movement.description =
+                                      null,
+                            ),
                       ),
                     ),
                   ),
@@ -176,20 +180,21 @@ class _MovementEditPageState extends State<MovementEditPage> {
                 ),
                 Defaults.sizedBox.vertical.small,
                 SegmentedButton(
-                  segments: MovementDimension.values
-                      .map(
-                        (md) => ButtonSegment(
-                          value: md,
-                          label: Text(md.name),
-                        ),
-                      )
-                      .toList(),
+                  segments:
+                      MovementDimension.values
+                          .map(
+                            (md) =>
+                                ButtonSegment(value: md, label: Text(md.name)),
+                          )
+                          .toList(),
                   selected: {_movementDescription.movement.dimension},
                   showSelectedIcon: false,
-                  onSelectionChanged: (selected) => setState(
-                    () => _movementDescription.movement.dimension =
-                        selected.first,
-                  ),
+                  onSelectionChanged:
+                      (selected) => setState(
+                        () =>
+                            _movementDescription.movement.dimension =
+                                selected.first,
+                      ),
                 ),
                 CheckboxListTile(
                   value: _movementDescription.movement.cardio,

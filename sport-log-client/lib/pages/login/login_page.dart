@@ -38,12 +38,7 @@ class _LoginPageState extends State<LoginPage> {
 
   String _serverUrl = Settings.instance.serverUrl;
 
-  final _user = User(
-    id: randomId(),
-    email: "",
-    username: "",
-    password: "",
-  );
+  final _user = User(id: randomId(), email: "", username: "", password: "");
 
   bool _loginPending = false;
 
@@ -107,9 +102,10 @@ class _LoginPageState extends State<LoginPage> {
       validator: Validator.validateUrl,
       autovalidateMode: AutovalidateMode.onUserInteraction,
       enabled: !_loginPending,
-      style: _loginPending
-          ? TextStyle(color: Theme.of(context).disabledColor)
-          : null,
+      style:
+          _loginPending
+              ? TextStyle(color: Theme.of(context).disabledColor)
+              : null,
       textInputAction: TextInputAction.next,
     );
   }
@@ -129,9 +125,10 @@ class _LoginPageState extends State<LoginPage> {
       validator: Validator.validateUsername,
       autovalidateMode: AutovalidateMode.onUserInteraction,
       enabled: !_loginPending,
-      style: _loginPending
-          ? TextStyle(color: Theme.of(context).disabledColor)
-          : null,
+      style:
+          _loginPending
+              ? TextStyle(color: Theme.of(context).disabledColor)
+              : null,
       textInputAction: TextInputAction.next,
     );
   }
@@ -139,34 +136,38 @@ class _LoginPageState extends State<LoginPage> {
   Widget _passwordInput() {
     return ProviderConsumer(
       create: (_) => BoolToggle.on(),
-      builder: (context, obscure, _) => TextFormField(
-        onChanged: (password) {
-          final validated = Validator.validatePassword(password);
-          if (validated == null) {
-            setState(() => _user.password = password);
-          }
-        },
-        decoration: InputDecoration(
-          icon: const Icon(AppIcons.key),
-          labelText: "Password",
-          suffixIcon: IconButton(
-            icon: obscure.isOn
-                ? const Icon(AppIcons.visibility)
-                : const Icon(AppIcons.visibilityOff),
-            onPressed: obscure.toggle,
+      builder:
+          (context, obscure, _) => TextFormField(
+            onChanged: (password) {
+              final validated = Validator.validatePassword(password);
+              if (validated == null) {
+                setState(() => _user.password = password);
+              }
+            },
+            decoration: InputDecoration(
+              icon: const Icon(AppIcons.key),
+              labelText: "Password",
+              suffixIcon: IconButton(
+                icon:
+                    obscure.isOn
+                        ? const Icon(AppIcons.visibility)
+                        : const Icon(AppIcons.visibilityOff),
+                onPressed: obscure.toggle,
+              ),
+            ),
+            validator: Validator.validatePassword,
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            enabled: !_loginPending,
+            style:
+                _loginPending
+                    ? TextStyle(color: Theme.of(context).disabledColor)
+                    : null,
+            textInputAction:
+                widget.loginType.isLogin
+                    ? TextInputAction.done
+                    : TextInputAction.next,
+            obscureText: obscure.isOn,
           ),
-        ),
-        validator: Validator.validatePassword,
-        autovalidateMode: AutovalidateMode.onUserInteraction,
-        enabled: !_loginPending,
-        style: _loginPending
-            ? TextStyle(color: Theme.of(context).disabledColor)
-            : null,
-        textInputAction: widget.loginType.isLogin
-            ? TextInputAction.done
-            : TextInputAction.next,
-        obscureText: obscure.isOn,
-      ),
     );
   }
 
@@ -176,13 +177,14 @@ class _LoginPageState extends State<LoginPage> {
         icon: Icon(AppIcons.key),
         labelText: "Repeat password",
       ),
-      validator: (password2) =>
-          Validator.validatePassword2(_user.password, password2),
+      validator:
+          (password2) => Validator.validatePassword2(_user.password, password2),
       autovalidateMode: AutovalidateMode.onUserInteraction,
       enabled: !_loginPending,
-      style: _loginPending
-          ? TextStyle(color: Theme.of(context).disabledColor)
-          : null,
+      style:
+          _loginPending
+              ? TextStyle(color: Theme.of(context).disabledColor)
+              : null,
       textInputAction: TextInputAction.next,
       obscureText: true,
     );
@@ -203,9 +205,10 @@ class _LoginPageState extends State<LoginPage> {
       validator: Validator.validateEmail,
       autovalidateMode: AutovalidateMode.onUserInteraction,
       enabled: !_loginPending,
-      style: _loginPending
-          ? TextStyle(color: Theme.of(context).disabledColor)
-          : null,
+      style:
+          _loginPending
+              ? TextStyle(color: Theme.of(context).disabledColor)
+              : null,
       textInputAction: TextInputAction.done,
       keyboardType: TextInputType.emailAddress,
     );
@@ -213,20 +216,22 @@ class _LoginPageState extends State<LoginPage> {
 
   Widget _submitButton() {
     return FilledButton(
-      onPressed: (!_loginPending &&
-              _formKey.currentContext != null &&
-              _formKey.currentState!.validate())
-          ? _submit
-          : null,
+      onPressed:
+          (!_loginPending &&
+                  _formKey.currentContext != null &&
+                  _formKey.currentState!.validate())
+              ? _submit
+              : null,
       child: Text(widget.loginType.isRegister ? "Register" : "Login"),
     );
   }
 
   Future<void> _submit() async {
     setState(() => _loginPending = true);
-    final result = widget.loginType.isRegister
-        ? await Account.register(_serverUrl, _user)
-        : await Account.login(_serverUrl, _user.username, _user.password);
+    final result =
+        widget.loginType.isRegister
+            ? await Account.register(_serverUrl, _user)
+            : await Account.login(_serverUrl, _user.username, _user.password);
     if (mounted) {
       setState(() => _loginPending = false);
       if (result.isOk) {

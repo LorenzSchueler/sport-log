@@ -9,7 +9,8 @@ class Split {
   }) {
     final distance = endDistance - startDistance;
     final duration = endDuration - startDuration;
-    final speed = ((endDistance - startDistance) / 1000) /
+    final speed =
+        ((endDistance - startDistance) / 1000) /
         (duration.inMilliseconds / 1000 / 3600);
     final tempo = Duration(
       milliseconds:

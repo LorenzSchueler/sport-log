@@ -25,10 +25,10 @@ class PlatformDescription extends CompoundEntity {
 
   @override
   PlatformDescription clone() => PlatformDescription(
-        platform: platform.clone(),
-        platformCredential: platformCredential?.clone(),
-        actionProviders: actionProviders.clone(),
-      );
+    platform: platform.clone(),
+    platformCredential: platformCredential?.clone(),
+    actionProviders: actionProviders.clone(),
+  );
 
   @override
   bool isValidBeforeSanitation() {

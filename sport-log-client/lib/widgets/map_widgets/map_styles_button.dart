@@ -38,9 +38,7 @@ enum MapStyle {
   //     opacity: style with data conditions
   //         index is 5, 10: 0.2
   //         fallback: 0.1
-  satelliteStreetsWithPaths(
-    "mapbox://styles/hi-ker/cm6dk2zkg004x01sg2hm36puk",
-  );
+  satelliteStreetsWithPaths("mapbox://styles/hi-ker/cm6dk2zkg004x01sg2hm36puk");
 
   const MapStyle(this.url);
   // This is needed when a const value is required because MapStyle.outdoor.url is not const.
@@ -59,10 +57,11 @@ class MapStylesButton extends StatelessWidget {
     return FloatingActionButton.small(
       heroTag: null,
       child: const Icon(AppIcons.layers),
-      onPressed: () => showModalBottomSheet<void>(
-        context: context,
-        builder: (_) => MapStylesBottomSheet(mapController: mapController),
-      ),
+      onPressed:
+          () => showModalBottomSheet<void>(
+            context: context,
+            builder: (_) => MapStylesBottomSheet(mapController: mapController),
+          ),
     );
   }
 }
@@ -114,12 +113,12 @@ class _SlopeOption extends _MapOption {
 
   @override
   Future<void> enable(MapController mapController) => mapController.enableLayer(
-        _slopeSourceId,
-        _slopeSourceUrl,
-        _slopeLayerId,
-        opacity: 0.4,
-        minZoom: 10,
-      );
+    _slopeSourceId,
+    _slopeSourceUrl,
+    _slopeLayerId,
+    opacity: 0.4,
+    minZoom: 10,
+  );
 
   @override
   Future<void> disable(MapController mapController) =>
@@ -166,8 +165,9 @@ class _MapStylesBottomSheetState extends State<MapStylesBottomSheet> {
 
   Future<void> _setCurrentState() async {
     final style = await widget.mapController.getStyle();
-    final hasHillshade =
-        await _HillshadeOption().isEnabled(widget.mapController);
+    final hasHillshade = await _HillshadeOption().isEnabled(
+      widget.mapController,
+    );
     final hasSlope = await _SlopeOption().isEnabled(widget.mapController);
     final hasTerrain = await _TerrainOption().isEnabled(widget.mapController);
     if (style == null) {
@@ -212,10 +212,7 @@ class _MapStylesBottomSheetState extends State<MapStylesBottomSheet> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(
-            "Map Type",
-            style: Theme.of(context).textTheme.labelLarge,
-          ),
+          Text("Map Type", style: Theme.of(context).textTheme.labelLarge),
           Defaults.sizedBox.vertical.small,
           SegmentedButton(
             segments: const [
@@ -241,10 +238,7 @@ class _MapStylesBottomSheetState extends State<MapStylesBottomSheet> {
           ),
           Defaults.sizedBox.vertical.small,
           const Divider(),
-          Text(
-            "Map Options",
-            style: Theme.of(context).textTheme.labelLarge,
-          ),
+          Text("Map Options", style: Theme.of(context).textTheme.labelLarge),
           Defaults.sizedBox.vertical.small,
           SegmentedButton(
             segments: const [

@@ -6,14 +6,11 @@ part 'movement_description.g.dart';
 
 @JsonSerializable()
 class MovementDescription extends CompoundEntity {
-  MovementDescription({
-    required this.movement,
-    required this.hasReference,
-  });
+  MovementDescription({required this.movement, required this.hasReference});
 
   MovementDescription.defaultValue()
-      : movement = Movement.defaultValue(),
-        hasReference = false;
+    : movement = Movement.defaultValue(),
+      hasReference = false;
 
   factory MovementDescription.fromJson(Map<String, dynamic> json) =>
       _$MovementDescriptionFromJson(json);
@@ -26,9 +23,9 @@ class MovementDescription extends CompoundEntity {
 
   @override
   MovementDescription clone() => MovementDescription(
-        movement: movement.clone(),
-        hasReference: hasReference,
-      );
+    movement: movement.clone(),
+    hasReference: hasReference,
+  );
 
   @override
   bool isValidBeforeSanitation() {

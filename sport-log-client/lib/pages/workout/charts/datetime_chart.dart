@@ -21,21 +21,24 @@ enum ChartValueFormatter {
   msMilli;
 
   double get width => switch (this) {
-        ChartValueFormatter.float => 40.0,
-        ChartValueFormatter.hms => 60.0,
-        ChartValueFormatter.ms => 40.0,
-        ChartValueFormatter.msMilli => 70.0,
-      };
+    ChartValueFormatter.float => 40.0,
+    ChartValueFormatter.hms => 60.0,
+    ChartValueFormatter.ms => 40.0,
+    ChartValueFormatter.msMilli => 70.0,
+  };
 
   Widget text(double value, TitleMeta meta) => switch (this) {
-        ChartValueFormatter.float => defaultGetTitle(value, meta),
-        ChartValueFormatter.hms =>
-          Text(Duration(milliseconds: value.round()).formatHms),
-        ChartValueFormatter.ms =>
-          Text(Duration(milliseconds: value.round()).formatM99S),
-        ChartValueFormatter.msMilli =>
-          Text(Duration(milliseconds: value.round()).formatMsMill),
-      };
+    ChartValueFormatter.float => defaultGetTitle(value, meta),
+    ChartValueFormatter.hms => Text(
+      Duration(milliseconds: value.round()).formatHms,
+    ),
+    ChartValueFormatter.ms => Text(
+      Duration(milliseconds: value.round()).formatM99S,
+    ),
+    ChartValueFormatter.msMilli => Text(
+      Duration(milliseconds: value.round()).formatMsMill,
+    ),
+  };
 }
 
 enum AggregatorType {
@@ -77,18 +80,18 @@ class DateTimeChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final chartValues = this
-        .chartValues
-        .groupListsBy((v) => dateFilterState.groupFunction(v.datetime))
-        .entries
-        .map(
-          (entry) => DateTimeChartValue(
-            datetime: entry.key,
-            value: aggregatorType.compute(entry.value.map((e) => e.value)),
-          ),
-        )
-        .toList()
-      ..sort((v1, v2) => v1.datetime.compareTo(v2.datetime));
+    final chartValues =
+        this.chartValues
+            .groupListsBy((v) => dateFilterState.groupFunction(v.datetime))
+            .entries
+            .map(
+              (entry) => DateTimeChartValue(
+                datetime: entry.key,
+                value: aggregatorType.compute(entry.value.map((e) => e.value)),
+              ),
+            )
+            .toList()
+          ..sort((v1, v2) => v1.datetime.compareTo(v2.datetime));
 
     return SizedBox(
       height: height,
@@ -103,13 +106,14 @@ abstract class DateTimePeriodChart extends StatelessWidget {
     required this.absolute,
     required this.formatter,
     super.key,
-  })  : _maxY =
-            (chartValues.map((v) => v.value).maxOrNull ?? 0).ceil().toDouble(),
-        _minY = absolute
-            ? 0.0
-            : (chartValues.map((v) => v.value).minOrNull ?? 0)
-                .floor()
-                .toDouble();
+  }) : _maxY =
+           (chartValues.map((v) => v.value).maxOrNull ?? 0).ceil().toDouble(),
+       _minY =
+           absolute
+               ? 0.0
+               : (chartValues.map((v) => v.value).minOrNull ?? 0)
+                   .floor()
+                   .toDouble();
 
   final List<DateTimeChartValue> chartValues;
   final ChartValueFormatter formatter;

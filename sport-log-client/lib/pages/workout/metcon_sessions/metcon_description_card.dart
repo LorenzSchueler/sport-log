@@ -44,17 +44,16 @@ class MetconDescriptionCard extends StatelessWidget {
                         ),
                         Padding(
                           padding: const EdgeInsets.only(right: 10),
-                          child: Text(
-                            switch (mmd.movement.dimension) {
-                              MovementDimension.distance =>
-                                "${mmd.metconMovement.count} ${mmd.metconMovement.distanceUnit!.name}",
-                              MovementDimension.time => Duration(
-                                  milliseconds: mmd.metconMovement.count,
-                                ).formatTimeShort,
-                              _ =>
-                                "${mmd.metconMovement.count} ${mmd.movement.dimension.name}",
-                            },
-                          ),
+                          child: Text(switch (mmd.movement.dimension) {
+                            MovementDimension.distance =>
+                              "${mmd.metconMovement.count} ${mmd.metconMovement.distanceUnit!.name}",
+                            MovementDimension.time =>
+                              Duration(
+                                milliseconds: mmd.metconMovement.count,
+                              ).formatTimeShort,
+                            _ =>
+                              "${mmd.metconMovement.count} ${mmd.movement.dimension.name}",
+                          }),
                         ),
                         Text(
                           mmd.metconMovement.maleWeight != null

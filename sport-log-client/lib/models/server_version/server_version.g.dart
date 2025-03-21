@@ -13,17 +13,11 @@ _ServerVersionString _$ServerVersionStringFromJson(Map<String, dynamic> json) =>
     );
 
 Map<String, dynamic> _$ServerVersionStringToJson(
-        _ServerVersionString instance) =>
-    <String, dynamic>{
-      'min': instance.min,
-      'max': instance.max,
-    };
+  _ServerVersionString instance,
+) => <String, dynamic>{'min': instance.min, 'max': instance.max};
 
-UpdateInfo _$UpdateInfoFromJson(Map<String, dynamic> json) => UpdateInfo(
-      newVersion: json['new_version'] as bool,
-    );
+UpdateInfo _$UpdateInfoFromJson(Map<String, dynamic> json) =>
+    UpdateInfo(newVersion: json['new_version'] as bool);
 
 Map<String, dynamic> _$UpdateInfoToJson(UpdateInfo instance) =>
-    <String, dynamic>{
-      'new_version': instance.newVersion,
-    };
+    <String, dynamic>{'new_version': instance.newVersion};

@@ -15,8 +15,10 @@ MetconMovement _$MetconMovementFromJson(Map<String, dynamic> json) =>
       count: (json['count'] as num).toInt(),
       maleWeight: (json['male_weight'] as num?)?.toDouble(),
       femaleWeight: (json['female_weight'] as num?)?.toDouble(),
-      distanceUnit:
-          $enumDecodeNullable(_$DistanceUnitEnumMap, json['distance_unit']),
+      distanceUnit: $enumDecodeNullable(
+        _$DistanceUnitEnumMap,
+        json['distance_unit'],
+      ),
       deleted: json['deleted'] as bool,
     );
 

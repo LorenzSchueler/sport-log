@@ -34,9 +34,10 @@ abstract class TableAccessor<T extends AtomicEntity> {
   static String cardioOnlyOfTable(bool cardioOnly) =>
       cardioOnly ? '${Tables.movement}.${Columns.cardio} = 1' : '';
 
-  static String distanceOnlyOfTable(bool distanceOnly) => distanceOnly
-      ? "${Tables.movement}.${Columns.dimension} = ${MovementDimension.distance.index}"
-      : '';
+  static String distanceOnlyOfTable(bool distanceOnly) =>
+      distanceOnly
+          ? "${Tables.movement}.${Columns.dimension} = ${MovementDimension.distance.index}"
+          : '';
 
   static String fromFilterOfTable(
     String tableName,
@@ -69,10 +70,7 @@ abstract class TableAccessor<T extends AtomicEntity> {
     }
   }
 
-  String untilFilter(
-    DateTime? until, {
-    bool dateOnly = false,
-  }) =>
+  String untilFilter(DateTime? until, {bool dateOnly = false}) =>
       untilFilterOfTable(tableName, until, dateOnly: dateOnly);
 
   static String movementIdFilterOfTable(String tableName, Movement? movement) =>
@@ -202,8 +200,9 @@ abstract class TableAccessor<T extends AtomicEntity> {
 
   Future<DbResult> createSingle(T object) async {
     return DbResultExt.catchError(() async {
-      final id =
-          await database.insert(tableName, {...serde.toDbRecord(object)});
+      final id = await database.insert(tableName, {
+        ...serde.toDbRecord(object),
+      });
       return DbResultExt.fromBool(id == object.id.toInt());
     });
   }
@@ -236,8 +235,11 @@ abstract class TableAccessor<T extends AtomicEntity> {
   }
 
   Future<T?> getById(Int64 id) async {
-    final result = await database
-        .query(tableName, where: "${Columns.id} = ?", whereArgs: [id.toInt()]);
+    final result = await database.query(
+      tableName,
+      where: "${Columns.id} = ?",
+      whereArgs: [id.toInt()],
+    );
     return result.isEmpty ? null : serde.fromDbRecord(result.first);
   }
 
@@ -271,10 +273,9 @@ abstract class TableAccessor<T extends AtomicEntity> {
   }
 
   Future<void> setAllCreated() async {
-    await database.update(
-      tableName,
-      {Columns.syncStatus: SyncStatus.created.index},
-    );
+    await database.update(tableName, {
+      Columns.syncStatus: SyncStatus.created.index,
+    });
   }
 
   Future<DbResult> upsertMultiple(
@@ -285,14 +286,10 @@ abstract class TableAccessor<T extends AtomicEntity> {
       final batch = database.batch();
       for (final object in objects) {
         // changes coming from server win over local changes
-        batch.insert(
-          tableName,
-          {
-            ...serde.toDbRecord(object),
-            if (synchronized) Columns.syncStatus: SyncStatus.synchronized.index,
-          },
-          conflictAlgorithm: ConflictAlgorithm.replace,
-        );
+        batch.insert(tableName, {
+          ...serde.toDbRecord(object),
+          if (synchronized) Columns.syncStatus: SyncStatus.synchronized.index,
+        }, conflictAlgorithm: ConflictAlgorithm.replace);
       }
       final idList = (await batch.commit(continueOnError: false)).cast<int>();
       return DbResultExt.fromBool(

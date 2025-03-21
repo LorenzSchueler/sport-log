@@ -53,8 +53,9 @@ class _ActionProviderOverviewPageState
 
   Future<void> _update() async {
     _logger.d("updating action provider page");
-    final actionProviderDescription =
-        await _dataProvider.getByActionProvider(widget.actionProvider);
+    final actionProviderDescription = await _dataProvider.getByActionProvider(
+      widget.actionProvider,
+    );
     if (mounted) {
       if (actionProviderDescription == null) {
         await showMessageDialog(
@@ -74,31 +75,30 @@ class _ActionProviderOverviewPageState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("${widget.actionProvider.name} Actions"),
-      ),
-      body: _actionProviderDescription == null
-          ? const CircularProgressIndicator()
-          : SyncRefreshIndicator(
-              child: Padding(
-                padding: Defaults.edgeInsets.normal,
-                child: ListView(
-                  children: [
-                    ActionsCard(
-                      actionProviderDescription: _actionProviderDescription!,
-                    ),
-                    Defaults.sizedBox.vertical.normal,
-                    ActionRulesCard(
-                      actionProviderDescription: _actionProviderDescription!,
-                    ),
-                    Defaults.sizedBox.vertical.normal,
-                    ActionEventsCard(
-                      actionProviderDescription: _actionProviderDescription!,
-                    ),
-                  ],
+      appBar: AppBar(title: Text("${widget.actionProvider.name} Actions")),
+      body:
+          _actionProviderDescription == null
+              ? const CircularProgressIndicator()
+              : SyncRefreshIndicator(
+                child: Padding(
+                  padding: Defaults.edgeInsets.normal,
+                  child: ListView(
+                    children: [
+                      ActionsCard(
+                        actionProviderDescription: _actionProviderDescription!,
+                      ),
+                      Defaults.sizedBox.vertical.normal,
+                      ActionRulesCard(
+                        actionProviderDescription: _actionProviderDescription!,
+                      ),
+                      Defaults.sizedBox.vertical.normal,
+                      ActionEventsCard(
+                        actionProviderDescription: _actionProviderDescription!,
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
     );
   }
 }
@@ -116,39 +116,37 @@ class ActionsCard extends StatelessWidget {
         padding: Defaults.edgeInsets.normal,
         child: ProviderConsumer(
           create: (_) => BoolToggle.off(),
-          builder: (context, expanded, _) => Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          builder:
+              (context, expanded, _) => Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const CaptionTile(caption: "Actions"),
-                  IconButton(
-                    visualDensity: VisualDensity.compact,
-                    onPressed: expanded.toggle,
-                    icon: Icon(
-                      expanded.isOn ? AppIcons.arrowUp : AppIcons.arrowDown,
-                    ),
-                  ),
-                ],
-              ),
-              if (expanded.isOn) ...[
-                for (final action in actionProviderDescription.actions) ...[
-                  const Divider(),
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      SizedBox(
-                        width: 120,
-                        child: Text(action.name),
+                      const CaptionTile(caption: "Actions"),
+                      IconButton(
+                        visualDensity: VisualDensity.compact,
+                        onPressed: expanded.toggle,
+                        icon: Icon(
+                          expanded.isOn ? AppIcons.arrowUp : AppIcons.arrowDown,
+                        ),
                       ),
-                      Defaults.sizedBox.horizontal.normal,
-                      Expanded(child: Text(action.description ?? "")),
                     ],
                   ),
+                  if (expanded.isOn) ...[
+                    for (final action in actionProviderDescription.actions) ...[
+                      const Divider(),
+                      Row(
+                        children: [
+                          SizedBox(width: 120, child: Text(action.name)),
+                          Defaults.sizedBox.horizontal.normal,
+                          Expanded(child: Text(action.description ?? "")),
+                        ],
+                      ),
+                    ],
+                  ],
                 ],
-              ],
-            ],
-          ),
+              ),
         ),
       ),
     );
@@ -176,10 +174,11 @@ class ActionRulesCard extends StatelessWidget {
                 const CaptionTile(caption: "Action Rules"),
                 IconButton(
                   visualDensity: VisualDensity.compact,
-                  onPressed: () => Navigator.of(context).pushNamed(
-                    Routes.actionRuleEdit,
-                    arguments: [actionProviderDescription, null],
-                  ),
+                  onPressed:
+                      () => Navigator.of(context).pushNamed(
+                        Routes.actionRuleEdit,
+                        arguments: [actionProviderDescription, null],
+                      ),
                   icon: const Icon(AppIcons.add),
                 ),
               ],
@@ -187,10 +186,11 @@ class ActionRulesCard extends StatelessWidget {
             for (final actionRule in actionProviderDescription.actionRules) ...[
               const Divider(),
               GestureDetector(
-                onTap: () => Navigator.of(context).pushNamed(
-                  Routes.actionRuleEdit,
-                  arguments: [actionProviderDescription, actionRule],
-                ),
+                onTap:
+                    () => Navigator.of(context).pushNamed(
+                      Routes.actionRuleEdit,
+                      arguments: [actionProviderDescription, actionRule],
+                    ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -261,10 +261,11 @@ class ActionEventsCard extends StatelessWidget {
               children: [
                 const CaptionTile(caption: "Action Events"),
                 IconButton(
-                  onPressed: () => Navigator.of(context).pushNamed(
-                    Routes.actionEventEdit,
-                    arguments: [actionProviderDescription, null],
-                  ),
+                  onPressed:
+                      () => Navigator.of(context).pushNamed(
+                        Routes.actionEventEdit,
+                        arguments: [actionProviderDescription, null],
+                      ),
                   icon: const Icon(AppIcons.add),
                   visualDensity: VisualDensity.compact,
                 ),
@@ -274,10 +275,11 @@ class ActionEventsCard extends StatelessWidget {
                 in actionProviderDescription.actionEvents) ...[
               const Divider(),
               GestureDetector(
-                onTap: () => Navigator.of(context).pushNamed(
-                  Routes.actionEventEdit,
-                  arguments: [actionProviderDescription, actionEvent],
-                ),
+                onTap:
+                    () => Navigator.of(context).pushNamed(
+                      Routes.actionEventEdit,
+                      arguments: [actionProviderDescription, actionEvent],
+                    ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -293,9 +295,7 @@ class ActionEventsCard extends StatelessWidget {
                           ),
                         ),
                         Defaults.sizedBox.horizontal.normal,
-                        Text(
-                          actionEvent.datetime.humanDateTime,
-                        ),
+                        Text(actionEvent.datetime.humanDateTime),
                         const Spacer(),
                         Checkbox(
                           value: actionEvent.enabled,

@@ -27,149 +27,175 @@ class MetconSessionOverviewPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return NeverPop(
       child: ProviderConsumer<
-          OverviewDataProvider<MetconSessionDescription, MetconRecords,
-              MetconSessionDescriptionDataProvider, Metcon>>(
-        create: (_) => OverviewDataProvider(
-          dataProvider: MetconSessionDescriptionDataProvider(),
-          entityAccessor: (dataProvider) => (start, end, metcon, search) =>
-              dataProvider.getByTimerangeAndMetconAndComment(
-                from: start,
-                until: end,
-                metcon: metcon,
-                comment: search,
-              ),
-          recordAccessor: (dataProvider) =>
-              () => dataProvider.getMetconRecords(),
-          loggerName: "MetconSessionsPage",
-        ),
-        builder: (_, dataProvider, __) => Scaffold(
-          appBar: AppBar(
-            title: dataProvider.isSearch
-                ? TextFormField(
-                    focusNode: _searchBar,
-                    onChanged: (comment) => dataProvider.search = comment,
-                  )
-                : Text(dataProvider.selected?.name ?? "Metcon Sessions"),
-            actions: [
-              IconButton(
-                onPressed: () {
-                  dataProvider.search = dataProvider.isSearch ? null : "";
-                  if (dataProvider.isSearch) {
-                    _searchBar.requestFocus();
-                  }
-                },
-                icon: Icon(
-                  dataProvider.isSearch ? AppIcons.close : AppIcons.search,
-                ),
-              ),
-              IconButton(
-                // ignore: prefer-extracting-callbacks
-                onPressed: () async {
-                  final metcon = await showMetconPicker(
-                    context: context,
-                    selectedMetcon: dataProvider.selected,
-                  );
-                  if (metcon == null) {
-                    return;
-                  } else if (metcon.id == dataProvider.selected?.id) {
-                    dataProvider.selected = null;
-                  } else {
-                    dataProvider.selected = metcon;
-                  }
-                },
-                icon: Icon(
-                  dataProvider.selected != null
-                      ? AppIcons.filterFilled
-                      : AppIcons.filter,
-                ),
-              ),
-              IconButton(
-                onPressed: () =>
-                    Navigator.of(context).newBase(Routes.metconOverview),
-                icon: const Icon(AppIcons.notes),
-              ),
-            ],
-            bottom: DateFilter(
-              initialState: dataProvider.dateFilter,
-              onFilterChanged: (dateFilter) =>
-                  dataProvider.dateFilter = dateFilter,
+        OverviewDataProvider<
+          MetconSessionDescription,
+          MetconRecords,
+          MetconSessionDescriptionDataProvider,
+          Metcon
+        >
+      >(
+        create:
+            (_) => OverviewDataProvider(
+              dataProvider: MetconSessionDescriptionDataProvider(),
+              entityAccessor:
+                  (dataProvider) =>
+                      (start, end, metcon, search) =>
+                          dataProvider.getByTimerangeAndMetconAndComment(
+                            from: start,
+                            until: end,
+                            metcon: metcon,
+                            comment: search,
+                          ),
+              recordAccessor:
+                  (dataProvider) => () => dataProvider.getMetconRecords(),
+              loggerName: "MetconSessionsPage",
             ),
-          ),
-          body: Stack(
-            alignment: Alignment.topCenter,
-            children: [
-              SyncRefreshIndicator(
-                child: dataProvider.entities.isEmpty
-                    ? RefreshableNoEntriesText(
-                        text: SessionsPageTab.metcon.noEntriesText,
-                      )
-                    : Padding(
-                        padding: Defaults.edgeInsets.normal,
-                        child: CustomScrollView(
-                          slivers: [
-                            if (dataProvider.selected != null &&
-                                dataProvider.entities.isNotEmpty)
-                              SliverList.list(
-                                children: [
-                                  MetconDescriptionCard(
-                                    metconDescription: dataProvider
-                                        .entities.first.metconDescription,
+        builder:
+            (_, dataProvider, __) => Scaffold(
+              appBar: AppBar(
+                title:
+                    dataProvider.isSearch
+                        ? TextFormField(
+                          focusNode: _searchBar,
+                          onChanged: (comment) => dataProvider.search = comment,
+                        )
+                        : Text(
+                          dataProvider.selected?.name ?? "Metcon Sessions",
+                        ),
+                actions: [
+                  IconButton(
+                    onPressed: () {
+                      dataProvider.search = dataProvider.isSearch ? null : "";
+                      if (dataProvider.isSearch) {
+                        _searchBar.requestFocus();
+                      }
+                    },
+                    icon: Icon(
+                      dataProvider.isSearch ? AppIcons.close : AppIcons.search,
+                    ),
+                  ),
+                  IconButton(
+                    // ignore: prefer-extracting-callbacks
+                    onPressed: () async {
+                      final metcon = await showMetconPicker(
+                        context: context,
+                        selectedMetcon: dataProvider.selected,
+                      );
+                      if (metcon == null) {
+                        return;
+                      } else if (metcon.id == dataProvider.selected?.id) {
+                        dataProvider.selected = null;
+                      } else {
+                        dataProvider.selected = metcon;
+                      }
+                    },
+                    icon: Icon(
+                      dataProvider.selected != null
+                          ? AppIcons.filterFilled
+                          : AppIcons.filter,
+                    ),
+                  ),
+                  IconButton(
+                    onPressed:
+                        () => Navigator.of(
+                          context,
+                        ).newBase(Routes.metconOverview),
+                    icon: const Icon(AppIcons.notes),
+                  ),
+                ],
+                bottom: DateFilter(
+                  initialState: dataProvider.dateFilter,
+                  onFilterChanged:
+                      (dateFilter) => dataProvider.dateFilter = dateFilter,
+                ),
+              ),
+              body: Stack(
+                alignment: Alignment.topCenter,
+                children: [
+                  SyncRefreshIndicator(
+                    child:
+                        dataProvider.entities.isEmpty
+                            ? RefreshableNoEntriesText(
+                              text: SessionsPageTab.metcon.noEntriesText,
+                            )
+                            : Padding(
+                              padding: Defaults.edgeInsets.normal,
+                              child: CustomScrollView(
+                                slivers: [
+                                  if (dataProvider.selected != null &&
+                                      dataProvider.entities.isNotEmpty)
+                                    SliverList.list(
+                                      children: [
+                                        MetconDescriptionCard(
+                                          metconDescription:
+                                              dataProvider
+                                                  .entities
+                                                  .first
+                                                  .metconDescription,
+                                        ),
+                                        Defaults.sizedBox.vertical.normal,
+                                        MetconSessionResultsCard(
+                                          metconSessionDescription: null,
+                                          metconSessionDescriptions:
+                                              dataProvider.entities,
+                                          metconRecords:
+                                              dataProvider.records ?? {},
+                                        ),
+                                        Defaults.sizedBox.vertical.normal,
+                                      ],
+                                    ),
+                                  SliverList.separated(
+                                    itemBuilder:
+                                        (_, index) => MetconSessionCard(
+                                          metconSessionDescription:
+                                              dataProvider.entities[index],
+                                          metconRecords:
+                                              dataProvider.records ?? {},
+                                          onSelected:
+                                              (metcon) =>
+                                                  dataProvider.selected =
+                                                      metcon,
+                                        ),
+                                    separatorBuilder:
+                                        (_, __) =>
+                                            Defaults.sizedBox.vertical.normal,
+                                    itemCount: dataProvider.entities.length,
                                   ),
-                                  Defaults.sizedBox.vertical.normal,
-                                  MetconSessionResultsCard(
-                                    metconSessionDescription: null,
-                                    metconSessionDescriptions:
-                                        dataProvider.entities,
-                                    metconRecords: dataProvider.records ?? {},
-                                  ),
-                                  Defaults.sizedBox.vertical.normal,
                                 ],
                               ),
-                            SliverList.separated(
-                              itemBuilder: (_, index) => MetconSessionCard(
-                                metconSessionDescription:
-                                    dataProvider.entities[index],
-                                metconRecords: dataProvider.records ?? {},
-                                onSelected: (metcon) =>
-                                    dataProvider.selected = metcon,
-                              ),
-                              separatorBuilder: (_, __) =>
-                                  Defaults.sizedBox.vertical.normal,
-                              itemCount: dataProvider.entities.length,
                             ),
-                          ],
-                        ),
-                      ),
+                  ),
+                  if (dataProvider.isLoading)
+                    const Positioned(
+                      top: 40,
+                      child: RefreshProgressIndicator(),
+                    ),
+                ],
               ),
-              if (dataProvider.isLoading)
-                const Positioned(
-                  top: 40,
-                  child: RefreshProgressIndicator(),
-                ),
-            ],
-          ),
-          bottomNavigationBar: SessionsPageTab.bottomNavigationBar(
-            context: context,
-            sessionsPageTab: SessionsPageTab.metcon,
-          ),
-          drawer: const MainDrawer(selectedRoute: Routes.metconOverview),
-          floatingActionButton: FloatingActionButton(
-            child: const Icon(AppIcons.add),
-            onPressed: () async {
-              final arg = dataProvider.selected == null
-                  ? null
-                  : await MetconDescriptionDataProvider()
-                      .getByMetcon(dataProvider.selected!);
-              if (context.mounted) {
-                await Navigator.pushNamed(
-                  context,
-                  Routes.metconSessionEdit,
-                  arguments: arg,
-                );
-              }
-            },
-          ),
-        ),
+              bottomNavigationBar: SessionsPageTab.bottomNavigationBar(
+                context: context,
+                sessionsPageTab: SessionsPageTab.metcon,
+              ),
+              drawer: const MainDrawer(selectedRoute: Routes.metconOverview),
+              floatingActionButton: FloatingActionButton(
+                child: const Icon(AppIcons.add),
+                onPressed: () async {
+                  final arg =
+                      dataProvider.selected == null
+                          ? null
+                          : await MetconDescriptionDataProvider().getByMetcon(
+                            dataProvider.selected!,
+                          );
+                  if (context.mounted) {
+                    await Navigator.pushNamed(
+                      context,
+                      Routes.metconSessionEdit,
+                      arguments: arg,
+                    );
+                  }
+                },
+              ),
+            ),
       ),
     );
   }
@@ -198,11 +224,7 @@ class MetconSessionCard extends StatelessWidget {
         ),
         if (metconRecord) ...[
           Defaults.sizedBox.vertical.normal,
-          const Icon(
-            AppIcons.medal,
-            color: Colors.orange,
-            size: 20,
-          ),
+          const Icon(AppIcons.medal, color: Colors.orange, size: 20),
         ],
       ],
       right: [
@@ -211,13 +233,14 @@ class MetconSessionCard extends StatelessWidget {
         Text(metconSessionDescription.metconSession.rx ? "Rx" : "Scaled"),
       ],
       comments: metconSessionDescription.metconSession.comments,
-      onTap: () => Navigator.pushNamed(
-        context,
-        Routes.metconSessionDetails,
-        arguments: metconSessionDescription,
-      ),
-      onLongPress: () =>
-          onSelected(metconSessionDescription.metconDescription.metcon),
+      onTap:
+          () => Navigator.pushNamed(
+            context,
+            Routes.metconSessionDetails,
+            arguments: metconSessionDescription,
+          ),
+      onLongPress:
+          () => onSelected(metconSessionDescription.metconDescription.metcon),
     );
   }
 }

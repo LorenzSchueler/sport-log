@@ -168,15 +168,14 @@ class MapController {
     Iterable<Position> route,
     Color color, {
     double? lineOpacity,
-  }) async =>
-      await _lineManager?.create(
-        PolylineAnnotationOptions(
-          geometry: route.map((p) => p.latLng).toLineString(),
-          lineWidth: 2,
-          lineColor: _colorToInt(color),
-          lineOpacity: lineOpacity,
-        ),
-      );
+  }) async => await _lineManager?.create(
+    PolylineAnnotationOptions(
+      geometry: route.map((p) => p.latLng).toLineString(),
+      lineWidth: 2,
+      lineColor: _colorToInt(color),
+      lineOpacity: lineOpacity,
+    ),
+  );
 
   Future<void> updateLine(
     NullablePointer<PolylineAnnotation> line,
@@ -210,8 +209,7 @@ class MapController {
   Future<void> updateRouteLine(
     NullablePointer<PolylineAnnotation> line,
     Iterable<Position>? track,
-  ) =>
-      updateLine(line, track, Defaults.mapbox.routeLineColor);
+  ) => updateLine(line, track, Defaults.mapbox.routeLineColor);
 
   Future<PolylineAnnotation?> addTrackLine(Iterable<Position> track) =>
       addLine(track, Defaults.mapbox.trackLineColor);
@@ -220,13 +218,12 @@ class MapController {
     NullablePointer<PolylineAnnotation> line,
     Iterable<Position>? track, {
     double? lineOpacity,
-  }) =>
-      updateLine(
-        line,
-        track,
-        Defaults.mapbox.trackLineColor,
-        lineOpacity: lineOpacity,
-      );
+  }) => updateLine(
+    line,
+    track,
+    Defaults.mapbox.trackLineColor,
+    lineOpacity: lineOpacity,
+  );
 
   Future<List<CircleAnnotation>?> addCurrentLocationMarker(
     LatLng latLng,
@@ -246,8 +243,7 @@ class MapController {
         circleColor: color,
         circleOpacity: 0.4,
       ),
-    ]))
-        ?.cast();
+    ]))?.cast();
   }
 
   Future<void> updateCurrentLocationMarker(
@@ -314,19 +310,14 @@ class MapController {
   Future<void> updateTrackMarker(
     NullablePointer<CircleAnnotation> circle,
     LatLng? latLng,
-  ) =>
-      updateMarker(circle, latLng, Defaults.mapbox.trackLineColor);
+  ) => updateMarker(circle, latLng, Defaults.mapbox.trackLineColor);
 
   Future<void> updateRouteMarker(
     NullablePointer<CircleAnnotation> circle,
     LatLng? latLng,
-  ) =>
-      updateMarker(circle, latLng, Defaults.mapbox.routeLineColor);
+  ) => updateMarker(circle, latLng, Defaults.mapbox.routeLineColor);
 
-  Future<PointAnnotation?> addLabel(
-    LatLng latLng,
-    String label,
-  ) async =>
+  Future<PointAnnotation?> addLabel(LatLng latLng, String label) async =>
       await _pointManager?.create(
         PointAnnotationOptions(
           geometry: latLng.toPoint(),
@@ -443,8 +434,9 @@ class MapController {
   Future<void> hideLogo() async =>
       await _controller?.logo.updateSettings(LogoSettings(enabled: false));
 
-  Future<void> hideCompass() async => await _controller?.compass
-      .updateSettings(CompassSettings(enabled: false));
+  Future<void> hideCompass() async => await _controller?.compass.updateSettings(
+    CompassSettings(enabled: false),
+  );
 
   Future<void> showScaleBar() async =>
       await _controller?.scaleBar.updateSettings(
@@ -460,28 +452,27 @@ class MapController {
     required bool rotateEnabled,
     required bool scrollEnabled,
     required bool pitchEnabled,
-  }) async =>
-      await _controller?.gestures.updateSettings(
-        GesturesSettings(
-          doubleTapToZoomInEnabled: doubleTapZoomEnabled,
-          doubleTouchToZoomOutEnabled: false,
-          rotateEnabled: rotateEnabled,
-          scrollEnabled: scrollEnabled,
-          pitchEnabled: pitchEnabled,
-          pinchToZoomEnabled: zoomEnabled,
-          quickZoomEnabled: false,
-          pinchPanEnabled: false,
-          simultaneousRotateAndPinchToZoomEnabled: rotateEnabled && zoomEnabled,
-        ),
-      );
+  }) async => await _controller?.gestures.updateSettings(
+    GesturesSettings(
+      doubleTapToZoomInEnabled: doubleTapZoomEnabled,
+      doubleTouchToZoomOutEnabled: false,
+      rotateEnabled: rotateEnabled,
+      scrollEnabled: scrollEnabled,
+      pitchEnabled: pitchEnabled,
+      pinchToZoomEnabled: zoomEnabled,
+      quickZoomEnabled: false,
+      pinchPanEnabled: false,
+      simultaneousRotateAndPinchToZoomEnabled: rotateEnabled && zoomEnabled,
+    ),
+  );
 
   Future<void> disableAllGestures() => setGestureSettings(
-        doubleTapZoomEnabled: false,
-        rotateEnabled: false,
-        scrollEnabled: false,
-        pitchEnabled: false,
-        zoomEnabled: false,
-      );
+    doubleTapZoomEnabled: false,
+    rotateEnabled: false,
+    scrollEnabled: false,
+    pitchEnabled: false,
+    zoomEnabled: false,
+  );
 }
 
 class ElevationMapController {
@@ -503,9 +494,7 @@ class ElevationMapController {
         break;
       }
       // ignore: inference_failure_on_instance_creation
-      await Future.delayed(
-        Duration(milliseconds: 10 * pow(2, attempt) as int),
-      );
+      await Future.delayed(Duration(milliseconds: 10 * pow(2, attempt) as int));
     }
     return elevation;
   }

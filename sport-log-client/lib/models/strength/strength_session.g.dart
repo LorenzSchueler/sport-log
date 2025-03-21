@@ -11,8 +11,9 @@ StrengthSession _$StrengthSessionFromJson(Map<String, dynamic> json) =>
       id: const IdConverter().fromJson(json['id'] as String),
       datetime: const DateTimeConverter().fromJson(json['datetime'] as String),
       movementId: const IdConverter().fromJson(json['movement_id'] as String),
-      interval: const OptionalDurationConverter()
-          .fromJson((json['interval'] as num?)?.toInt()),
+      interval: const OptionalDurationConverter().fromJson(
+        (json['interval'] as num?)?.toInt(),
+      ),
       comments: json['comments'] as String?,
       deleted: json['deleted'] as bool,
     );

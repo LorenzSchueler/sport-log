@@ -15,8 +15,7 @@ class ServerVersionDataProvider {
 
   Future<Result<ServerVersion, void>> getServerVersion({
     VoidCallback? onNoInternet,
-  }) =>
-      api.getServerVersion().onErrAsync(
-            (err) => DataProvider.handleApiError(err, onNoInternet),
-          );
+  }) => api.getServerVersion().onErrAsync(
+    (err) => DataProvider.handleApiError(err, onNoInternet),
+  );
 }

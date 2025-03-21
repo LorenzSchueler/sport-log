@@ -10,8 +10,8 @@ int? binarySearchLargestLE<T, V extends Comparable<V>>(
     return range.hasOneElement
         ? range
         : getter(list[range.middle + 1]).compareTo(value) <= 0
-            ? helper(range.divideMiddleUpperHalf())
-            : helper(range.divideMiddleLowerHalf());
+        ? helper(range.divideMiddleUpperHalf())
+        : helper(range.divideMiddleLowerHalf());
   }
 
   if (list.isEmpty || getter(list.first).compareTo(value) > 0) {
@@ -32,8 +32,8 @@ int? binarySearchSmallestGE<T, V extends Comparable<V>>(
     return range.hasOneElement
         ? range
         : getter(list[range.middle]).compareTo(value) >= 0
-            ? helper(range.divideMiddleLowerHalf())
-            : helper(range.divideMiddleUpperHalf());
+        ? helper(range.divideMiddleLowerHalf())
+        : helper(range.divideMiddleUpperHalf());
   }
 
   if (list.isEmpty || getter(list.last).compareTo(value) < 0) {
@@ -45,11 +45,7 @@ int? binarySearchSmallestGE<T, V extends Comparable<V>>(
 /// Returns the index of element in the list with the smallest difference to the given value.
 ///
 /// Assumes the list is sorted ascending and there are no duplicate elements.
-int? binarySearchClosest<T>(
-  List<T> list,
-  num Function(T) getter,
-  num value,
-) {
+int? binarySearchClosest<T>(List<T> list, num Function(T) getter, num value) {
   final index = binarySearchLargestLE(list, getter, value);
 
   if (index == null && list.isNotEmpty) {
@@ -58,8 +54,8 @@ int? binarySearchClosest<T>(
     return list.length == index + 1
         ? index
         : value - getter(list[index]) <= getter(list[index + 1]) - value
-            ? index
-            : index + 1;
+        ? index
+        : index + 1;
   }
   return null;
 }

@@ -45,8 +45,9 @@ abstract final class Validator {
       return "Password must not be empty.";
     } else if (password.length < 8) {
       return "Password must be at least 8 characters long.";
-    } else if (!(password.runes
-            .any((c) => String.fromCharCode(c).isLowercase) &&
+    } else if (!(password.runes.any(
+          (c) => String.fromCharCode(c).isLowercase,
+        ) &&
         password.runes.any((c) => String.fromCharCode(c).isUppercase) &&
         password.runes.any((c) => String.fromCharCode(c).isNumeric))) {
       return "Password must contain at least one lower case and one upper case character and one number.";

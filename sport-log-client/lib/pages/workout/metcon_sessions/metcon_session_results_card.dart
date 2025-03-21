@@ -72,10 +72,10 @@ class MetconSessionResultsCard extends StatelessWidget {
                         Text(msd.metconSession.rx ? "Rx" : "Scaled"),
                         metconRecords.isMetconRecord(msd)
                             ? const Icon(
-                                AppIcons.medal,
-                                color: Colors.orange,
-                                size: 20,
-                              )
+                              AppIcons.medal,
+                              color: Colors.orange,
+                              size: 20,
+                            )
                             : Container(),
                         Padding(
                           padding: const EdgeInsets.only(left: 10),

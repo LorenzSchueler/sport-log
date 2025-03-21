@@ -21,11 +21,11 @@ class Diary extends AtomicEntity {
   });
 
   Diary.defaultValue()
-      : id = randomId(),
-        date = DateTime.now(),
-        bodyweight = null,
-        comments = null,
-        deleted = false;
+    : id = randomId(),
+      date = DateTime.now(),
+      bodyweight = null,
+      comments = null,
+      deleted = false;
 
   factory Diary.fromJson(Map<String, dynamic> json) => _$DiaryFromJson(json);
 
@@ -47,12 +47,12 @@ class Diary extends AtomicEntity {
 
   @override
   Diary clone() => Diary(
-        id: id.clone(),
-        date: date.clone(),
-        bodyweight: bodyweight,
-        comments: comments,
-        deleted: deleted,
-      );
+    id: id.clone(),
+    date: date.clone(),
+    bodyweight: bodyweight,
+    comments: comments,
+    deleted: deleted,
+  );
 
   @override
   bool isValidBeforeSanitation() {

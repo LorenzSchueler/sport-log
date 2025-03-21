@@ -34,11 +34,11 @@ class Platform extends AtomicEntity {
 
   @override
   Platform clone() => Platform._(
-        id: id.clone(),
-        name: name,
-        credential: credential,
-        deleted: deleted,
-      );
+    id: id.clone(),
+    name: name,
+    credential: credential,
+    deleted: deleted,
+  );
 
   /// Platforms should never be created.
   @override

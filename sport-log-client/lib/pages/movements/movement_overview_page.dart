@@ -20,63 +20,75 @@ class MovementOverviewPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return NeverPop(
       child: ProviderConsumer<
-          OverviewDataProvider<MovementDescription, void,
-              MovementDescriptionDataProvider, void>>(
-        create: (_) => OverviewDataProvider(
-          dataProvider: MovementDescriptionDataProvider(),
-          entityAccessor: (dataProvider) =>
-              (_, __, ___, search) => dataProvider.getByName(search),
-          recordAccessor: (_) => () async {},
-          loggerName: "MovementsPage",
-        ),
-        builder: (_, dataProvider, __) => Scaffold(
-          appBar: AppBar(
-            title: dataProvider.isSearch
-                ? TextFormField(
-                    focusNode: _searchBar,
-                    onChanged: (name) => dataProvider.search = name,
-                  )
-                : const Text("Movements"),
-            actions: [
-              IconButton(
-                onPressed: () {
-                  dataProvider.search = dataProvider.isSearch ? null : "";
-                  if (dataProvider.isSearch) {
-                    _searchBar.requestFocus();
-                  }
-                },
-                icon: Icon(
-                  dataProvider.isSearch ? AppIcons.close : AppIcons.search,
-                ),
-              ),
-            ],
-          ),
-          drawer: const MainDrawer(selectedRoute: Routes.movementOverview),
-          body: SyncRefreshIndicator(
-            child: dataProvider.entities.isEmpty
-                ? const RefreshableNoEntriesText(
-                    text:
-                        "Looks like there are no movements there yet 😔\nPress ＋ to create a new one",
-                  )
-                : Padding(
-                    padding: Defaults.edgeInsets.normal,
-                    child: ListView.separated(
-                      itemBuilder: (_, index) => MovementCard(
-                        movementDescription: dataProvider.entities[index],
-                      ),
-                      separatorBuilder: (_, __) =>
-                          Defaults.sizedBox.vertical.normal,
-                      itemCount: dataProvider.entities.length,
+        OverviewDataProvider<
+          MovementDescription,
+          void,
+          MovementDescriptionDataProvider,
+          void
+        >
+      >(
+        create:
+            (_) => OverviewDataProvider(
+              dataProvider: MovementDescriptionDataProvider(),
+              entityAccessor:
+                  (dataProvider) =>
+                      (_, __, ___, search) => dataProvider.getByName(search),
+              recordAccessor: (_) => () async {},
+              loggerName: "MovementsPage",
+            ),
+        builder:
+            (_, dataProvider, __) => Scaffold(
+              appBar: AppBar(
+                title:
+                    dataProvider.isSearch
+                        ? TextFormField(
+                          focusNode: _searchBar,
+                          onChanged: (name) => dataProvider.search = name,
+                        )
+                        : const Text("Movements"),
+                actions: [
+                  IconButton(
+                    onPressed: () {
+                      dataProvider.search = dataProvider.isSearch ? null : "";
+                      if (dataProvider.isSearch) {
+                        _searchBar.requestFocus();
+                      }
+                    },
+                    icon: Icon(
+                      dataProvider.isSearch ? AppIcons.close : AppIcons.search,
                     ),
                   ),
-          ),
-          floatingActionButton: FloatingActionButton(
-            child: const Icon(AppIcons.add),
-            onPressed: () async {
-              await Navigator.pushNamed(context, Routes.movementEdit);
-            },
-          ),
-        ),
+                ],
+              ),
+              drawer: const MainDrawer(selectedRoute: Routes.movementOverview),
+              body: SyncRefreshIndicator(
+                child:
+                    dataProvider.entities.isEmpty
+                        ? const RefreshableNoEntriesText(
+                          text:
+                              "Looks like there are no movements there yet 😔\nPress ＋ to create a new one",
+                        )
+                        : Padding(
+                          padding: Defaults.edgeInsets.normal,
+                          child: ListView.separated(
+                            itemBuilder:
+                                (_, index) => MovementCard(
+                                  movementDescription:
+                                      dataProvider.entities[index],
+                                ),
+                            separatorBuilder:
+                                (_, __) => Defaults.sizedBox.vertical.normal,
+                            itemCount: dataProvider.entities.length,
+                          ),
+                        ),
+              ),
+              floatingActionButton: FloatingActionButton(
+                child: const Icon(AppIcons.add),
+                onPressed: () async {
+                  await Navigator.pushNamed(context, Routes.movementEdit);
+                },
+              ),
+            ),
       ),
     );
   }

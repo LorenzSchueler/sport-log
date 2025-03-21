@@ -17,19 +17,11 @@ class WelcomeScreen extends StatelessWidget {
           margin: const EdgeInsets.only(top: 200),
           child: Column(
             children: [
-              const Icon(
-                AppIcons.plan,
-                size: 96,
-              ),
+              const Icon(AppIcons.plan, size: 96),
               Defaults.sizedBox.vertical.big,
-              const Text(
-                "Sport Log",
-                style: TextStyle(fontSize: 45),
-              ),
+              const Text("Sport Log", style: TextStyle(fontSize: 45)),
               Defaults.sizedBox.vertical.normal,
-              const Text(
-                "License: GPLv3",
-              ),
+              const Text("License: GPLv3"),
               Defaults.sizedBox.vertical.huge,
               content,
             ],

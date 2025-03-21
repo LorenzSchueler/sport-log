@@ -5,10 +5,7 @@ part 'server_version.g.dart';
 
 @JsonSerializable()
 class _ServerVersionString {
-  _ServerVersionString({
-    required this.min,
-    required this.max,
-  });
+  _ServerVersionString({required this.min, required this.max});
 
   factory _ServerVersionString.fromJson(Map<String, dynamic> json) =>
       _$ServerVersionStringFromJson(json);

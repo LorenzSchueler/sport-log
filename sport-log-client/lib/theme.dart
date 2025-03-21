@@ -6,10 +6,7 @@ class AppTheme {
 
   static final _buttonStyle = ButtonStyle(
     textStyle: WidgetStateProperty.all(
-      const TextStyle(
-        fontSize: 20,
-        fontWeight: FontWeight.w500,
-      ),
+      const TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
     ),
   );
 
@@ -34,42 +31,33 @@ class AppTheme {
       backgroundColor: _colorScheme.surface,
     ),
     dividerTheme: DividerThemeData(color: _colorScheme.surfaceContainerHighest),
-    drawerTheme: const DrawerThemeData(
-      backgroundColor: _background,
-    ),
-    elevatedButtonTheme: ElevatedButtonThemeData(
-      style: _buttonStyle,
-    ),
-    filledButtonTheme: FilledButtonThemeData(
-      style: _buttonStyle,
-    ),
+    drawerTheme: const DrawerThemeData(backgroundColor: _background),
+    elevatedButtonTheme: ElevatedButtonThemeData(style: _buttonStyle),
+    filledButtonTheme: FilledButtonThemeData(style: _buttonStyle),
     segmentedButtonTheme: SegmentedButtonThemeData(
       style: ButtonStyle(
         iconSize: const WidgetStatePropertyAll(24),
         iconColor: WidgetStateProperty.resolveWith(
-          (states) => states.contains(WidgetState.selected)
-              ? _colorScheme.surface
-              : Colors.white,
+          (states) =>
+              states.contains(WidgetState.selected)
+                  ? _colorScheme.surface
+                  : Colors.white,
         ),
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
         backgroundColor: WidgetStateProperty.resolveWith(
-          (states) => states.contains(WidgetState.selected)
-              ? _colorScheme.primary.withAlpha(200)
-              : null,
+          (states) =>
+              states.contains(WidgetState.selected)
+                  ? _colorScheme.primary.withAlpha(200)
+                  : null,
         ),
       ),
     ),
-    iconTheme: IconThemeData(
-      color: _colorScheme.primary,
+    iconTheme: IconThemeData(color: _colorScheme.primary),
+    dialogTheme: DialogTheme(backgroundColor: _colorScheme.surface),
+    snackBarTheme: SnackBarThemeData(backgroundColor: _colorScheme.surface),
+    tabBarTheme: TabBarTheme(
+      dividerColor: _colorScheme.surfaceContainerHighest,
     ),
-    dialogTheme: DialogTheme(
-      backgroundColor: _colorScheme.surface,
-    ),
-    snackBarTheme: SnackBarThemeData(
-      backgroundColor: _colorScheme.surface,
-    ),
-    tabBarTheme:
-        TabBarTheme(dividerColor: _colorScheme.surfaceContainerHighest),
     switchTheme: SwitchThemeData(
       trackOutlineColor: WidgetStatePropertyAll(_colorScheme.primary),
       trackColor: WidgetStateProperty.resolveWith(
@@ -87,9 +75,7 @@ class AppTheme {
             states.contains(WidgetState.selected) ? _colorScheme.primary : null,
       ),
     ),
-    sliderTheme: SliderThemeData(
-      overlayShape: SliderComponentShape.noOverlay,
-    ),
+    sliderTheme: SliderThemeData(overlayShape: SliderComponentShape.noOverlay),
     progressIndicatorTheme: ProgressIndicatorThemeData(
       linearTrackColor: _colorScheme.surfaceContainerHighest,
     ),
@@ -101,19 +87,17 @@ class AppTheme {
       labelStyle: const TextStyle(color: EditTile.iconCaptionColor),
       floatingLabelStyle: WidgetStateTextStyle.resolveWith(
         (states) => TextStyle(
-          color: states.contains(WidgetState.selected)
-              ? _colorScheme.primary
-              : EditTile.iconCaptionColor,
+          color:
+              states.contains(WidgetState.selected)
+                  ? _colorScheme.primary
+                  : EditTile.iconCaptionColor,
           fontSize: 18,
         ),
       ),
     ),
     textTheme: const TextTheme(
       // TextFormField
-      bodyLarge: TextStyle(
-        fontSize: 20,
-        height: 1,
-      ),
+      bodyLarge: TextStyle(fontSize: 20, height: 1),
     ),
   );
 }

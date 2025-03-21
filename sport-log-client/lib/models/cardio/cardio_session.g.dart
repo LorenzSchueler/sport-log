@@ -15,20 +15,25 @@ CardioSession _$CardioSessionFromJson(Map<String, dynamic> json) =>
       distance: (json['distance'] as num?)?.toInt(),
       ascent: (json['ascent'] as num?)?.toInt(),
       descent: (json['descent'] as num?)?.toInt(),
-      time: const OptionalDurationConverter()
-          .fromJson((json['time'] as num?)?.toInt()),
+      time: const OptionalDurationConverter().fromJson(
+        (json['time'] as num?)?.toInt(),
+      ),
       calories: (json['calories'] as num?)?.toInt(),
-      track: (json['track'] as List<dynamic>?)
-          ?.map((e) => Position.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      track:
+          (json['track'] as List<dynamic>?)
+              ?.map((e) => Position.fromJson(e as Map<String, dynamic>))
+              .toList(),
       avgCadence: (json['avg_cadence'] as num?)?.toInt(),
-      cadence: const OptionalDurationListConverter()
-          .fromJson(json['cadence'] as List?),
+      cadence: const OptionalDurationListConverter().fromJson(
+        json['cadence'] as List?,
+      ),
       avgHeartRate: (json['avg_heart_rate'] as num?)?.toInt(),
-      heartRate: const OptionalDurationListConverter()
-          .fromJson(json['heart_rate'] as List?),
-      routeId:
-          const OptionalIdConverter().fromJson(json['route_id'] as String?),
+      heartRate: const OptionalDurationListConverter().fromJson(
+        json['heart_rate'] as List?,
+      ),
+      routeId: const OptionalIdConverter().fromJson(
+        json['route_id'] as String?,
+      ),
       comments: json['comments'] as String?,
       deleted: json['deleted'] as bool,
     );
@@ -49,8 +54,9 @@ Map<String, dynamic> _$CardioSessionToJson(CardioSession instance) =>
       'avg_cadence': instance.avgCadence,
       'cadence': const OptionalDurationListConverter().toJson(instance.cadence),
       'avg_heart_rate': instance.avgHeartRate,
-      'heart_rate':
-          const OptionalDurationListConverter().toJson(instance.heartRate),
+      'heart_rate': const OptionalDurationListConverter().toJson(
+        instance.heartRate,
+      ),
       'route_id': const OptionalIdConverter().toJson(instance.routeId),
       'comments': instance.comments,
       'deleted': instance.deleted,

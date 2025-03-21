@@ -112,8 +112,7 @@ class ActionEventDataProvider extends EntityDataProvider<ActionEvent> {
 
   Future<List<ActionEvent>> getByActionProvider(
     ActionProvider actionProvider,
-  ) =>
-      table.getByActionProvider(actionProvider);
+  ) => table.getByActionProvider(actionProvider);
 }
 
 class ActionProviderDescriptionDataProvider
@@ -121,13 +120,16 @@ class ActionProviderDescriptionDataProvider
   factory ActionProviderDescriptionDataProvider() {
     if (_instance == null) {
       _instance = ActionProviderDescriptionDataProvider._();
-      _instance!._actionProviderDataProvider
-          .addListener(_instance!.notifyListeners);
+      _instance!._actionProviderDataProvider.addListener(
+        _instance!.notifyListeners,
+      );
       _instance!._actionDataProvider.addListener(_instance!.notifyListeners);
-      _instance!._actionRuleDataProvider
-          .addListener(_instance!.notifyListeners);
-      _instance!._actionEventDataProvider
-          .addListener(_instance!.notifyListeners);
+      _instance!._actionRuleDataProvider.addListener(
+        _instance!.notifyListeners,
+      );
+      _instance!._actionEventDataProvider.addListener(
+        _instance!.notifyListeners,
+      );
     }
     return _instance!;
   }
@@ -145,8 +147,10 @@ class ActionProviderDescriptionDataProvider
   Future<DbResult> createSingle(ActionProviderDescription object) async {
     object.sanitize();
     assert(object.isValid());
-    final result = await _actionRuleDataProvider
-        .createMultiple(object.actionRules, notify: false);
+    final result = await _actionRuleDataProvider.createMultiple(
+      object.actionRules,
+      notify: false,
+    );
     if (result.isErr) {
       return result;
     }
@@ -171,18 +175,21 @@ class ActionProviderDescriptionDataProvider
   Future<ActionProviderDescription?> getByActionProvider(
     ActionProvider actionProvider,
   ) async {
-    final loadedActionProvider =
-        await _actionProviderDataProvider.getById(actionProvider.id);
+    final loadedActionProvider = await _actionProviderDataProvider.getById(
+      actionProvider.id,
+    );
     if (loadedActionProvider == null) {
       return null;
     }
     return ActionProviderDescription(
       actionProvider: loadedActionProvider,
       actions: await _actionDataProvider.getByActionProvider(actionProvider),
-      actionRules:
-          await _actionRuleDataProvider.getByActionProvider(actionProvider),
-      actionEvents:
-          await _actionEventDataProvider.getByActionProvider(actionProvider),
+      actionRules: await _actionRuleDataProvider.getByActionProvider(
+        actionProvider,
+      ),
+      actionEvents: await _actionEventDataProvider.getByActionProvider(
+        actionProvider,
+      ),
     );
   }
 }

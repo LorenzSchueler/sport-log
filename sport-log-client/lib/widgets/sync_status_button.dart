@@ -34,8 +34,9 @@ class _SyncStatusButtonState extends State<SyncStatusButton> {
 
   Future<void> setSyncStatus(SyncStatus syncStatus) async {
     await widget.dataProvider.setSyncStatus(widget.entity, syncStatus);
-    final newSyncStatus =
-        await widget.dataProvider.getSyncStatus(widget.entity);
+    final newSyncStatus = await widget.dataProvider.getSyncStatus(
+      widget.entity,
+    );
     if (mounted) {
       setState(() => _syncStatus = newSyncStatus);
     }
@@ -45,18 +46,17 @@ class _SyncStatusButtonState extends State<SyncStatusButton> {
   Widget build(BuildContext context) {
     return _syncStatus != null
         ? SegmentedButton(
-            segments: SyncStatus.values
-                .map(
-                  (status) => ButtonSegment(
-                    value: status,
-                    label: Text(status.name),
-                  ),
-                )
-                .toList(),
-            selected: {_syncStatus},
-            showSelectedIcon: false,
-            onSelectionChanged: (selected) => setSyncStatus(selected.first!),
-          )
+          segments:
+              SyncStatus.values
+                  .map(
+                    (status) =>
+                        ButtonSegment(value: status, label: Text(status.name)),
+                  )
+                  .toList(),
+          selected: {_syncStatus},
+          showSelectedIcon: false,
+          onSelectionChanged: (selected) => setSyncStatus(selected.first!),
+        )
         : const Text("???");
   }
 }

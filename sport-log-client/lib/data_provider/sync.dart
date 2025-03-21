@@ -97,11 +97,13 @@ class Sync extends ChangeNotifier {
       _checkedUpdates = true;
     }
 
-    var syncSuccessful =
-        await EntityDataProvider.downSync(onNoInternet: onNoInternet);
+    var syncSuccessful = await EntityDataProvider.downSync(
+      onNoInternet: onNoInternet,
+    );
     if (syncSuccessful) {
-      syncSuccessful =
-          await EntityDataProvider.upSync(onNoInternet: onNoInternet);
+      syncSuccessful = await EntityDataProvider.upSync(
+        onNoInternet: onNoInternet,
+      );
     }
 
     _isSyncing = false;
@@ -112,8 +114,9 @@ class Sync extends ChangeNotifier {
   }
 
   Future<void> update(VoidCallback? onNoInternet) async {
-    final updateInfoResult =
-        await AppDataProvider().getUpdateInfo(onNoInternet: onNoInternet);
+    final updateInfoResult = await AppDataProvider().getUpdateInfo(
+      onNoInternet: onNoInternet,
+    );
     // ignore err
     if (updateInfoResult.isErr) {
       return;

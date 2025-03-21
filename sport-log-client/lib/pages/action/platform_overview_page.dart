@@ -20,36 +20,48 @@ class PlatformOverviewPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return NeverPop(
       child: ProviderConsumer<
-          OverviewDataProvider<PlatformDescription, void,
-              PlatformDescriptionDataProvider, void>>(
-        create: (_) => OverviewDataProvider(
-          dataProvider: PlatformDescriptionDataProvider(),
-          entityAccessor: (dataProvider) =>
-              (_, __, ___, ____) => dataProvider.getNonDeleted(),
-          recordAccessor: (_) => () async {},
-          loggerName: "PlatformOverviewPage",
-        ),
-        builder: (_, dataProvider, __) => Scaffold(
-          appBar: AppBar(title: const Text("Server Actions")),
-          body: SyncRefreshIndicator(
-            child: dataProvider.entities.isEmpty
-                ? const RefreshableNoEntriesText(
-                    text: "Looks like there are no registered platforms 😔",
-                  )
-                : Padding(
-                    padding: Defaults.edgeInsets.normal,
-                    child: ListView.separated(
-                      itemBuilder: (_, index) => PlatformCard(
-                        platformDescription: dataProvider.entities[index],
-                      ),
-                      separatorBuilder: (_, __) =>
-                          Defaults.sizedBox.vertical.normal,
-                      itemCount: dataProvider.entities.length,
-                    ),
-                  ),
-          ),
-          drawer: const MainDrawer(selectedRoute: Routes.platformOverview),
-        ),
+        OverviewDataProvider<
+          PlatformDescription,
+          void,
+          PlatformDescriptionDataProvider,
+          void
+        >
+      >(
+        create:
+            (_) => OverviewDataProvider(
+              dataProvider: PlatformDescriptionDataProvider(),
+              entityAccessor:
+                  (dataProvider) =>
+                      (_, __, ___, ____) => dataProvider.getNonDeleted(),
+              recordAccessor: (_) => () async {},
+              loggerName: "PlatformOverviewPage",
+            ),
+        builder:
+            (_, dataProvider, __) => Scaffold(
+              appBar: AppBar(title: const Text("Server Actions")),
+              body: SyncRefreshIndicator(
+                child:
+                    dataProvider.entities.isEmpty
+                        ? const RefreshableNoEntriesText(
+                          text:
+                              "Looks like there are no registered platforms 😔",
+                        )
+                        : Padding(
+                          padding: Defaults.edgeInsets.normal,
+                          child: ListView.separated(
+                            itemBuilder:
+                                (_, index) => PlatformCard(
+                                  platformDescription:
+                                      dataProvider.entities[index],
+                                ),
+                            separatorBuilder:
+                                (_, __) => Defaults.sizedBox.vertical.normal,
+                            itemCount: dataProvider.entities.length,
+                          ),
+                        ),
+              ),
+              drawer: const MainDrawer(selectedRoute: Routes.platformOverview),
+            ),
       ),
     );
   }
@@ -87,11 +99,13 @@ class PlatformCard extends StatelessWidget {
                   IconButton(
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(),
-                    onPressed: () => showDialog<void>(
-                      builder: (_) =>
-                          PlatformCredentialDialog(platformDescription),
-                      context: context,
-                    ),
+                    onPressed:
+                        () => showDialog<void>(
+                          builder:
+                              (_) =>
+                                  PlatformCredentialDialog(platformDescription),
+                          context: context,
+                        ),
                     icon: const Icon(AppIcons.settings),
                     visualDensity: VisualDensity.compact,
                   ),
@@ -103,13 +117,14 @@ class PlatformCard extends StatelessWidget {
               Defaults.sizedBox.vertical.small,
               GestureDetector(
                 behavior: HitTestBehavior.opaque,
-                onTap: !platformDescription.platform.credential ||
-                        platformDescription.platformCredential != null
-                    ? () => Navigator.of(context).pushNamed(
+                onTap:
+                    !platformDescription.platform.credential ||
+                            platformDescription.platformCredential != null
+                        ? () => Navigator.of(context).pushNamed(
                           Routes.actionProviderOverview,
                           arguments: actionProvider,
                         )
-                    : () => showMessageDialog(
+                        : () => showMessageDialog(
                           context: context,
                           title: "No Credentials",
                           text:
@@ -153,9 +168,10 @@ class _PlatformCredentialDialogState extends State<PlatformCredentialDialog> {
           mainAxisSize: MainAxisSize.min,
           children: [
             TextFormField(
-              onChanged: (username) => setState(() {
-                platformDescription.platformCredential!.username = username;
-              }),
+              onChanged:
+                  (username) => setState(() {
+                    platformDescription.platformCredential!.username = username;
+                  }),
               initialValue: platformDescription.platformCredential!.username,
               decoration: const InputDecoration(
                 icon: Icon(AppIcons.account),
@@ -167,25 +183,30 @@ class _PlatformCredentialDialogState extends State<PlatformCredentialDialog> {
             ),
             ProviderConsumer(
               create: (_) => BoolToggle.on(),
-              builder: (context, obscure, _) => TextFormField(
-                onChanged: (password) => setState(() {
-                  platformDescription.platformCredential!.password = password;
-                }),
-                initialValue: platformDescription.platformCredential!.password,
-                decoration: InputDecoration(
-                  icon: const Icon(AppIcons.key),
-                  labelText: "Password",
-                  suffixIcon: IconButton(
-                    icon: obscure.isOn
-                        ? const Icon(AppIcons.visibility)
-                        : const Icon(AppIcons.visibilityOff),
-                    onPressed: obscure.toggle,
+              builder:
+                  (context, obscure, _) => TextFormField(
+                    onChanged:
+                        (password) => setState(() {
+                          platformDescription.platformCredential!.password =
+                              password;
+                        }),
+                    initialValue:
+                        platformDescription.platformCredential!.password,
+                    decoration: InputDecoration(
+                      icon: const Icon(AppIcons.key),
+                      labelText: "Password",
+                      suffixIcon: IconButton(
+                        icon:
+                            obscure.isOn
+                                ? const Icon(AppIcons.visibility)
+                                : const Icon(AppIcons.visibilityOff),
+                        onPressed: obscure.toggle,
+                      ),
+                    ),
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    textInputAction: TextInputAction.done,
+                    obscureText: obscure.isOn,
                   ),
-                ),
-                autovalidateMode: AutovalidateMode.onUserInteraction,
-                textInputAction: TextInputAction.done,
-                obscureText: obscure.isOn,
-              ),
             ),
             Defaults.sizedBox.vertical.normal,
             Padding(
@@ -212,9 +233,10 @@ class _PlatformCredentialDialogState extends State<PlatformCredentialDialog> {
   }
 
   Future<void> _update() async {
-    final result = widget.isNew
-        ? await _dataProvider.createSingle(platformDescription)
-        : await _dataProvider.updateSingle(platformDescription);
+    final result =
+        widget.isNew
+            ? await _dataProvider.createSingle(platformDescription)
+            : await _dataProvider.updateSingle(platformDescription);
     if (mounted) {
       if (result.isErr) {
         await showMessageDialog(

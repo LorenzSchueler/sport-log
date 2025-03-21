@@ -63,8 +63,7 @@ class StrengthSetDataProvider extends EntityDataProvider<StrengthSet> {
 
   Future<List<StrengthSet>> getByStrengthSession(
     StrengthSession strengthSession,
-  ) =>
-      table.getByStrengthSession(strengthSession);
+  ) => table.getByStrengthSession(strengthSession);
 
   Future<StrengthRecords> getStrengthRecords() => table.getStrengthRecords();
 }
@@ -74,10 +73,12 @@ class StrengthSessionDescriptionDataProvider
   factory StrengthSessionDescriptionDataProvider() {
     if (_instance == null) {
       _instance = StrengthSessionDescriptionDataProvider._();
-      _instance!._strengthSessionDataProvider
-          .addListener(_instance!.notifyListeners);
-      _instance!._strengthSetDataProvider
-          .addListener(_instance!.notifyListeners);
+      _instance!._strengthSessionDataProvider.addListener(
+        _instance!.notifyListeners,
+      );
+      _instance!._strengthSetDataProvider.addListener(
+        _instance!.notifyListeners,
+      );
       _instance!._movementDataProvider.addListener(_instance!.notifyListeners);
     }
     return _instance!;
@@ -97,8 +98,10 @@ class StrengthSessionDescriptionDataProvider
   Future<DbResult> createSingle(StrengthSessionDescription object) async {
     object.sanitize();
     assert(object.isValid());
-    final result = await _strengthSessionDataProvider
-        .createSingle(object.session, notify: false);
+    final result = await _strengthSessionDataProvider.createSingle(
+      object.session,
+      notify: false,
+    );
     if (result.isErr) {
       return result;
     }
@@ -122,13 +125,10 @@ class StrengthSessionDescriptionDataProvider
     // Temporarily setting the setNumber to a higher value and updating it afterwards also does not work
     // because the same problem will occur on the server side when the changes are synchronized.
     // Since this is not an EntityDataProvider this method is not used for updates coming from the server.
-    final oldSets =
-        await _strengthSetDataProvider.getByStrengthSession(object.session);
-    final newSets = object.sets
-        .map(
-          (s) => s..id = randomId(),
-        )
-        .toList();
+    final oldSets = await _strengthSetDataProvider.getByStrengthSession(
+      object.session,
+    );
+    final newSets = object.sets.map((s) => s..id = randomId()).toList();
     result = await _strengthSetDataProvider.deleteMultiple(
       oldSets,
       notify: false,
@@ -160,8 +160,9 @@ class StrengthSessionDescriptionDataProvider
               session: session,
               movement:
                   (await _movementDataProvider.getById(session.movementId))!,
-              sets:
-                  await _strengthSetDataProvider.getByStrengthSession(session),
+              sets: await _strengthSetDataProvider.getByStrengthSession(
+                session,
+              ),
             ),
           )
           .toList(),
@@ -188,8 +189,9 @@ class StrengthSessionDescriptionDataProvider
   Future<StrengthSessionDescription?> getLastByMovement(
     Movement movement,
   ) async {
-    final session =
-        await _strengthSessionDataProvider.getLastByMovement(movement);
+    final session = await _strengthSessionDataProvider.getLastByMovement(
+      movement,
+    );
     if (session == null) {
       return null;
     }
