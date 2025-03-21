@@ -71,6 +71,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <receiver android:exported="false" android:name="com.dexterous.flutterlocalnotifications.ActionBroadcastReceiver" />
         <service
             android:name="com.pravera.flutter_foreground_task.service.ForegroundService"
             android:stopWithTask="false" />

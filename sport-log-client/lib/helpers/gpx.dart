@@ -1,7 +1,5 @@
 import 'dart:io';
-import 'dart:math';
 
-import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:collection/collection.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:gpx/gpx.dart';
@@ -75,26 +73,10 @@ Future<Result<String, void>> saveTrackAsGpx(
     fileExtension: "gpx",
   );
   if (file.isOk) {
-    if (!await AwesomeNotifications().isNotificationAllowed()) {
-      await AwesomeNotifications().requestPermissionToSendNotifications();
-    }
-    if (await AwesomeNotifications().isNotificationAllowed()) {
-      await AwesomeNotifications().createNotification(
-        content: NotificationContent(
-          id: Random.secure().nextInt(1 << 31),
-          channelKey: NotificationController.fileChannel,
-          title: "Track Exported",
-          body: file.ok,
-          payload: {"file": file.ok},
-        ),
-        actionButtons: [
-          NotificationActionButton(
-            key: NotificationController.openFileAction,
-            label: "Open",
-          ),
-        ],
-      );
-    }
+    await NotificationController.showFileNotification(
+      'Track Exported',
+      file.ok,
+    );
   }
   return file;
 }

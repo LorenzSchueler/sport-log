@@ -11,7 +11,6 @@ environment:
 dependencies:
   audio_session: ^0.1.16
   audioplayers: ^6.0.0
-  awesome_notifications: ^0.10.0
   collection: ^1.16.0
   device_info_plus: ^11.1.0
   file_picker: ^8.0.0+1
@@ -20,6 +19,7 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_blue_plus: ^1.7.5
+  flutter_local_notifications: ^19.0.0
   flutter_localizations:
     sdk: flutter
   flutter_tts: ^4.0.2

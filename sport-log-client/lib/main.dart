@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -35,20 +34,7 @@ Stream<double> initialize() async* {
   yield 0.4;
   await Settings.instance.init(override: Config.isTest);
   yield 0.5;
-  await AwesomeNotifications().initialize(
-    null,
-    [
-      NotificationChannel(
-        channelKey: NotificationController.fileChannel,
-        channelName: "File Notifications",
-        channelDescription: "Notification channel for file import/ export",
-      ),
-    ],
-    debug: true,
-  );
-  await AwesomeNotifications().setListeners(
-    onActionReceivedMethod: NotificationController.onActionReceivedMethod,
-  );
+  await NotificationController.init();
   yield 0.6;
   MapboxOptions.setAccessToken(Config.instance.accessToken);
   await MapDownloadUtils.globalInit();
