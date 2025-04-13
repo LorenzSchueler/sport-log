@@ -96,8 +96,8 @@ jobs:
         flutter build apk --debug \
             --flavor production \
             --target-platform android-arm64 \
-            --split-per-abi \
-            --dart-define GIT_REF=$(git show-ref --head --hash=7 HEAD)
+            --split-per-abi # \
+            # --dart-define GIT_REF="$(git show-ref --head --hash=7 HEAD)"
 
   build-linux:
     name: build linux
