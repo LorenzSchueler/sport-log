@@ -23,7 +23,8 @@ class MetronomeUtils extends ChangeNotifier {
   Future<void> startTimer() async {
     _isPlaying = true;
     notifyListeners();
-    await _metronome.play(_cadence);
+    await _metronome.setBPM(_cadence);
+    await _metronome.play();
   }
 
   Future<void> adjustTimer(MetronomeAdjustment change) async {
