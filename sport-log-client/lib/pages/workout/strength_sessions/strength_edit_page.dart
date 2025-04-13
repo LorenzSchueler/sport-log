@@ -53,6 +53,7 @@ class _StrengthEditPageState extends State<StrengthEditPage> {
       _initialCount = lastSet.count;
       _initialWeight = lastSet.weight;
     }
+    _updateInitialCountWeightInterval();
   }
 
   Future<void> _updateInitialCountWeightInterval() async {
