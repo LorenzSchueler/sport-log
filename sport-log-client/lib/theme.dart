@@ -51,9 +51,9 @@ class AppTheme {
       ),
     ),
     iconTheme: IconThemeData(color: _colorScheme.primary),
-    dialogTheme: DialogTheme(backgroundColor: _colorScheme.surface),
+    dialogTheme: DialogThemeData(backgroundColor: _colorScheme.surface),
     snackBarTheme: SnackBarThemeData(backgroundColor: _colorScheme.surface),
-    tabBarTheme: TabBarTheme(
+    tabBarTheme: TabBarThemeData(
       dividerColor: _colorScheme.surfaceContainerHighest,
     ),
     switchTheme: SwitchThemeData(
