@@ -60,7 +60,7 @@ dependencies:
 dev_dependencies:
   build_runner: ^2.1.0 # json
     # dart run build_runner build --delete-conflicting-outputs
-  dart_code_linter: ^2.0.0
+  #dart_code_linter: ^2.0.0
     # dart run dart_code_linter:metrics analyze lib
     # dart run dart_code_linter:metrics check-unnecessary-nullable lib
     # dart run dart_code_linter:metrics check-unused-files lib
