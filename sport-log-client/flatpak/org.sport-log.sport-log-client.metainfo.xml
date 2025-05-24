@@ -5,6 +5,9 @@
     <summary>Log your sport archivements.</summary>
     <metadata_license>CC0-1.0</metadata_license>
     <project_license>GPL-3.0-only</project_license>
+    <categories>
+        <category>Utility</category>
+    </categories>
     <recommends>
         <control>pointing</control>
         <control>keyboard</control>
