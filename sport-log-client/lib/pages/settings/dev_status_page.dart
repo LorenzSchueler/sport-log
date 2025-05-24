@@ -44,27 +44,27 @@ class _DevStatusPageState extends State<DevStatusPage> {
       diaryCounts = await DiaryDataProvider().getCountBySyncStatus();
       wodCounts = await WodDataProvider().getCountBySyncStatus();
       movementCounts = await MovementDataProvider().getCountBySyncStatus();
-      strengthSessionCounts =
-          await StrengthSessionDataProvider().getCountBySyncStatus();
-      strengthSetCounts =
-          await StrengthSetDataProvider().getCountBySyncStatus();
+      strengthSessionCounts = await StrengthSessionDataProvider()
+          .getCountBySyncStatus();
+      strengthSetCounts = await StrengthSetDataProvider()
+          .getCountBySyncStatus();
       metconCounts = await MetconDataProvider().getCountBySyncStatus();
-      metconSessionCounts =
-          await MetconSessionDataProvider().getCountBySyncStatus();
-      metconMovementCounts =
-          await MetconMovementDataProvider().getCountBySyncStatus();
-      cardioSessionCounts =
-          await CardioSessionDataProvider().getCountBySyncStatus();
+      metconSessionCounts = await MetconSessionDataProvider()
+          .getCountBySyncStatus();
+      metconMovementCounts = await MetconMovementDataProvider()
+          .getCountBySyncStatus();
+      cardioSessionCounts = await CardioSessionDataProvider()
+          .getCountBySyncStatus();
       routeCounts = await RouteDataProvider().getCountBySyncStatus();
       platformCounts = await PlatformDataProvider().getCountBySyncStatus();
-      platformCredentialCounts =
-          await PlatformCredentialDataProvider().getCountBySyncStatus();
-      actionProviderCounts =
-          await ActionProviderDataProvider().getCountBySyncStatus();
+      platformCredentialCounts = await PlatformCredentialDataProvider()
+          .getCountBySyncStatus();
+      actionProviderCounts = await ActionProviderDataProvider()
+          .getCountBySyncStatus();
       actionCounts = await ActionDataProvider().getCountBySyncStatus();
       actionRuleCounts = await ActionRuleDataProvider().getCountBySyncStatus();
-      actionEventCounts =
-          await ActionEventDataProvider().getCountBySyncStatus();
+      actionEventCounts = await ActionEventDataProvider()
+          .getCountBySyncStatus();
       if (mounted) {
         setState(() {});
       }
@@ -114,74 +114,73 @@ class _DevStatusPageState extends State<DevStatusPage> {
       appBar: AppBar(title: const Text("Dev Status")),
       body: Padding(
         padding: Defaults.edgeInsets.normal,
-        child:
-            epochMap == null
-                ? const Text("no account")
-                : Table(
-                  defaultColumnWidth: const IntrinsicColumnWidth(),
-                  columnWidths: const {
-                    1: FlexColumnWidth(),
-                    3: FlexColumnWidth(),
-                    5: FlexColumnWidth(),
-                    7: FlexColumnWidth(),
-                  },
-                  children: [
-                    row("Table", "Epoch", "Synchronized", "Created", "Updated"),
-                    row("user", "${epochMap.user}", "-", "-", "-"),
-                    countsRow("diary", epochMap.diary, diaryCounts),
-                    countsRow("wod", epochMap.wod, wodCounts),
-                    countsRow("movement", epochMap.movement, movementCounts),
-                    countsRow(
-                      "strength session",
-                      epochMap.strengthSession,
-                      strengthSessionCounts,
-                    ),
-                    countsRow(
-                      "strength set",
-                      epochMap.strengthSet,
-                      strengthSetCounts,
-                    ),
-                    countsRow("metcon", epochMap.metcon, metconCounts),
-                    countsRow(
-                      "metcon session",
-                      epochMap.metconSession,
-                      metconSessionCounts,
-                    ),
-                    countsRow(
-                      "metcon movement",
-                      epochMap.metconMovement,
-                      metconMovementCounts,
-                    ),
-                    countsRow(
-                      "cardio session",
-                      epochMap.cardioSession,
-                      cardioSessionCounts,
-                    ),
-                    countsRow("route", epochMap.route, routeCounts),
-                    countsRow("platform", epochMap.platform, platformCounts),
-                    countsRow(
-                      "platform credentials",
-                      epochMap.platformCredential,
-                      platformCredentialCounts,
-                    ),
-                    countsRow(
-                      "action provider",
-                      epochMap.actionProvider,
-                      actionProviderCounts,
-                    ),
-                    countsRow("action", epochMap.action, actionCounts),
-                    countsRow(
-                      "action rule",
-                      epochMap.actionRule,
-                      actionRuleCounts,
-                    ),
-                    countsRow(
-                      "action event",
-                      epochMap.actionEvent,
-                      actionEventCounts,
-                    ),
-                  ],
-                ),
+        child: epochMap == null
+            ? const Text("no account")
+            : Table(
+                defaultColumnWidth: const IntrinsicColumnWidth(),
+                columnWidths: const {
+                  1: FlexColumnWidth(),
+                  3: FlexColumnWidth(),
+                  5: FlexColumnWidth(),
+                  7: FlexColumnWidth(),
+                },
+                children: [
+                  row("Table", "Epoch", "Synchronized", "Created", "Updated"),
+                  row("user", "${epochMap.user}", "-", "-", "-"),
+                  countsRow("diary", epochMap.diary, diaryCounts),
+                  countsRow("wod", epochMap.wod, wodCounts),
+                  countsRow("movement", epochMap.movement, movementCounts),
+                  countsRow(
+                    "strength session",
+                    epochMap.strengthSession,
+                    strengthSessionCounts,
+                  ),
+                  countsRow(
+                    "strength set",
+                    epochMap.strengthSet,
+                    strengthSetCounts,
+                  ),
+                  countsRow("metcon", epochMap.metcon, metconCounts),
+                  countsRow(
+                    "metcon session",
+                    epochMap.metconSession,
+                    metconSessionCounts,
+                  ),
+                  countsRow(
+                    "metcon movement",
+                    epochMap.metconMovement,
+                    metconMovementCounts,
+                  ),
+                  countsRow(
+                    "cardio session",
+                    epochMap.cardioSession,
+                    cardioSessionCounts,
+                  ),
+                  countsRow("route", epochMap.route, routeCounts),
+                  countsRow("platform", epochMap.platform, platformCounts),
+                  countsRow(
+                    "platform credentials",
+                    epochMap.platformCredential,
+                    platformCredentialCounts,
+                  ),
+                  countsRow(
+                    "action provider",
+                    epochMap.actionProvider,
+                    actionProviderCounts,
+                  ),
+                  countsRow("action", epochMap.action, actionCounts),
+                  countsRow(
+                    "action rule",
+                    epochMap.actionRule,
+                    actionRuleCounts,
+                  ),
+                  countsRow(
+                    "action event",
+                    epochMap.actionEvent,
+                    actionEventCounts,
+                  ),
+                ],
+              ),
       ),
     );
   }

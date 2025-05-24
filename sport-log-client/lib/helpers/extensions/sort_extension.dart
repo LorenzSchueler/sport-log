@@ -19,12 +19,10 @@ extension SortExtension<T> on Iterable<T> {
   }) {
     if (query == null || query.isEmpty) return toList();
 
-    final sortedItems =
-        map(
-            (candidate) =>
-                SortItem<T>(distance(query, toString(candidate)), candidate),
-          ).toList()
-          ..sort((x, y) => x.score.compareTo(y.score));
+    final sortedItems = map(
+      (candidate) =>
+          SortItem<T>(distance(query, toString(candidate)), candidate),
+    ).toList()..sort((x, y) => x.score.compareTo(y.score));
 
     return sortedItems.map((e) => e.item).toList();
   }

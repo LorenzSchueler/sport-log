@@ -139,57 +139,55 @@ class _RouteDetailsPageState extends State<RouteDetailsPage>
       ),
       body: ProviderConsumer(
         create: (_) => BoolToggle.off(),
-        builder:
-            (context, fullscreen, _) => Column(
-              children: [
-                Expanded(
-                  child:
-                      _route.track != null && _route.track!.isNotEmpty
-                          ? MapboxMapWrapper(
-                            showFullscreenButton: true,
-                            showMapStylesButton: true,
-                            showSelectRouteButton: false,
-                            showSetNorthButton: true,
-                            showCurrentLocationButton: false,
-                            showCenterLocationButton: false,
-                            showAddLocationButton: false,
-                            onFullscreenToggle: fullscreen.setState,
-                            onMapCreated: _onMapCreated,
-                          )
-                          : const NoTrackPlaceholder(),
-                ),
-                if (fullscreen.isOff) ...[
-                  Padding(
-                    padding: Defaults.edgeInsets.normal,
-                    child: RouteValueUnitDescriptionTable(route: _route),
-                  ),
-                  if (_route.track != null) ...[
-                    const Divider(height: 0),
-                    ChartHeader(
-                      fields: [
-                        (
-                          _distance != null
-                              ? "${(_distance! / 1000).toStringAsFixed(3)} km"
-                              : "Distance",
-                          _distanceColor,
-                        ),
-                        (
-                          _elevation != null ? "$_elevation m" : "Elevation",
-                          _elevationColor,
-                        ),
-                      ],
+        builder: (context, fullscreen, _) => Column(
+          children: [
+            Expanded(
+              child: _route.track != null && _route.track!.isNotEmpty
+                  ? MapboxMapWrapper(
+                      showFullscreenButton: true,
+                      showMapStylesButton: true,
+                      showSelectRouteButton: false,
+                      showSetNorthButton: true,
+                      showCurrentLocationButton: false,
+                      showCenterLocationButton: false,
+                      showAddLocationButton: false,
+                      onFullscreenToggle: fullscreen.setState,
+                      onMapCreated: _onMapCreated,
+                    )
+                  : const NoTrackPlaceholder(),
+            ),
+            if (fullscreen.isOff) ...[
+              Padding(
+                padding: Defaults.edgeInsets.normal,
+                child: RouteValueUnitDescriptionTable(route: _route),
+              ),
+              if (_route.track != null) ...[
+                const Divider(height: 0),
+                ChartHeader(
+                  fields: [
+                    (
+                      _distance != null
+                          ? "${(_distance! / 1000).toStringAsFixed(3)} km"
+                          : "Distance",
+                      _distanceColor,
                     ),
-                    SizedBox(
-                      height: 250,
-                      child: DistanceChart(
-                        chartLines: [_elevationLine],
-                        touchCallback: _touchCallback,
-                      ),
+                    (
+                      _elevation != null ? "$_elevation m" : "Elevation",
+                      _elevationColor,
                     ),
                   ],
-                ],
+                ),
+                SizedBox(
+                  height: 250,
+                  child: DistanceChart(
+                    chartLines: [_elevationLine],
+                    touchCallback: _touchCallback,
+                  ),
+                ),
               ],
-            ),
+            ],
+          ],
+        ),
       ),
     );
   }
@@ -206,32 +204,28 @@ class _RouteDetailsPageState extends State<RouteDetailsPage>
   }
 
   Future<void> _touchCallback(double? distance) async {
-    final chartIndex =
-        distance != null
-            ? binarySearchClosest(
-              _elevationLine.chartValues,
-              (value) => value.distance,
-              distance,
-            )
-            : null;
-    final chartValue =
-        chartIndex != null ? _elevationLine.chartValues[chartIndex] : null;
+    final chartIndex = distance != null
+        ? binarySearchClosest(
+            _elevationLine.chartValues,
+            (value) => value.distance,
+            distance,
+          )
+        : null;
+    final chartValue = chartIndex != null
+        ? _elevationLine.chartValues[chartIndex]
+        : null;
 
     setState(() {
       _distance = chartValue?.distance.round();
       _elevation = chartValue?.value.round();
     });
 
-    final positionIndex =
-        distance != null && _route.track != null
-            ? binarySearchClosest(
-              _route.track!,
-              (pos) => pos.distance,
-              distance,
-            )
-            : null;
-    final position =
-        positionIndex != null ? _route.track![positionIndex] : null;
+    final positionIndex = distance != null && _route.track != null
+        ? binarySearchClosest(_route.track!, (pos) => pos.distance, distance)
+        : null;
+    final position = positionIndex != null
+        ? _route.track![positionIndex]
+        : null;
 
     await _mapController?.updateRouteMarker(
       _touchLocationMarker,

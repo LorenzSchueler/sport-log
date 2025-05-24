@@ -183,8 +183,9 @@ abstract final class AppDatabase {
               final newTable = "new_$table";
 
               // create new table
-              final tableSetupSql =
-                  tableAccessor.table.withName(newTable).tableSetupSql;
+              final tableSetupSql = tableAccessor.table
+                  .withName(newTable)
+                  .tableSetupSql;
               await _execute(db, tableSetupSql);
 
               // insert all columns of new table from old table into new table

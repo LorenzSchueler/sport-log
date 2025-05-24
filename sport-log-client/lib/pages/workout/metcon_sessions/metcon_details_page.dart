@@ -66,11 +66,10 @@ class _MetconDetailsPageState extends State<MetconDetailsPage> {
         title: Text(_metconDescription.metcon.name),
         actions: [
           IconButton(
-            onPressed:
-                () => Navigator.of(context).pushNamed(
-                  Routes.metconSessionEdit,
-                  arguments: _metconDescription,
-                ),
+            onPressed: () => Navigator.of(context).pushNamed(
+              Routes.metconSessionEdit,
+              arguments: _metconDescription,
+            ),
             icon: const Icon(AppIcons.add),
           ),
           if (!_metconDescription.hasReference &&

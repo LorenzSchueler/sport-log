@@ -35,11 +35,10 @@ class AddLocationButton extends StatelessWidget {
     );
     route.markedPositions!.add(pos..distance = 0);
     route.track ??= [];
-    final distance =
-        route.track!.isEmpty
-            ? 0.0
-            : route.track!.last.distance +
-                route.track!.last.latLng.distanceTo(gpsPos.latLng);
+    final distance = route.track!.isEmpty
+        ? 0.0
+        : route.track!.last.distance +
+              route.track!.last.latLng.distanceTo(gpsPos.latLng);
     route.track!.add(pos..distance = distance);
     route.setDistance();
     await _dataProvider.updateSingle(route);
@@ -50,15 +49,14 @@ class AddLocationButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return ProviderConsumer.value(
       value: locationUtils,
-      builder:
-          (context, locationUtils, _) => FloatingActionButton.small(
-            heroTag: null,
-            onPressed:
-                locationUtils.hasAccurateLocation ? addLocationToRoute : null,
-            backgroundColor:
-                locationUtils.hasAccurateLocation ? null : Colors.grey,
-            child: const Icon(AppIcons.addLocation),
-          ),
+      builder: (context, locationUtils, _) => FloatingActionButton.small(
+        heroTag: null,
+        onPressed: locationUtils.hasAccurateLocation
+            ? addLocationToRoute
+            : null,
+        backgroundColor: locationUtils.hasAccurateLocation ? null : Colors.grey,
+        child: const Icon(AppIcons.addLocation),
+      ),
     );
   }
 }

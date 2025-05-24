@@ -158,8 +158,9 @@ class StrengthSessionDescriptionDataProvider
           .map(
             (session) async => StrengthSessionDescription(
               session: session,
-              movement:
-                  (await _movementDataProvider.getById(session.movementId))!,
+              movement: (await _movementDataProvider.getById(
+                session.movementId,
+              ))!,
               sets: await _strengthSetDataProvider.getByStrengthSession(
                 session,
               ),

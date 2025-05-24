@@ -148,13 +148,12 @@ class TimerUtils {
   Duration get _currentTime =>
       Duration(seconds: _timer.tick) - initialCountdown;
 
-  int get currentRound =>
-      _currentTime.isNegative || time.inSeconds == 0
-          ? 0
-          : min(
-            ((_currentTime.inSeconds + 1) / totalTime.inSeconds).ceil(),
-            rounds,
-          );
+  int get currentRound => _currentTime.isNegative || time.inSeconds == 0
+      ? 0
+      : min(
+          ((_currentTime.inSeconds + 1) / totalTime.inSeconds).ceil(),
+          rounds,
+        );
 
   Duration get displayTime {
     if (_currentTime.isNegative) {
@@ -166,11 +165,10 @@ class TimerUtils {
         case TimerType.interval:
           final roundTime = _currentTime.inSeconds % totalTime.inSeconds;
           return Duration(
-            seconds:
-                roundTime < time.inSeconds
-                    ? time.inSeconds -
-                        roundTime // round
-                    : roundTime - totalTime.inSeconds, // rest
+            seconds: roundTime < time.inSeconds
+                ? time.inSeconds -
+                      roundTime // round
+                : roundTime - totalTime.inSeconds, // rest
           );
         case TimerType.stopwatch:
           return _currentTime;

@@ -24,18 +24,18 @@ class MapController {
     if (!context.mounted) {
       return null;
     }
-    final lineManager =
-        await mapboxMap.annotations.createPolylineAnnotationManager();
+    final lineManager = await mapboxMap.annotations
+        .createPolylineAnnotationManager();
     if (!context.mounted) {
       return null;
     }
-    final circleManager =
-        await mapboxMap.annotations.createCircleAnnotationManager();
+    final circleManager = await mapboxMap.annotations
+        .createCircleAnnotationManager();
     if (!context.mounted) {
       return null;
     }
-    final pointManager =
-        await mapboxMap.annotations.createPointAnnotationManager();
+    final pointManager = await mapboxMap.annotations
+        .createPointAnnotationManager();
     if (!context.mounted) {
       return null;
     }
@@ -255,10 +255,12 @@ class MapController {
       if (circles.isNull && latLng != null) {
         circles.object = await addCurrentLocationMarker(latLng, isGps);
       } else if (circles.isNotNull && latLng != null) {
-        circles.object =
-            circles.object!.map((c) => c..geometry = latLng.toPoint()).toList();
-        circles.object![1].circleRadius =
-            isGps ? _gpsMarkerRadius : _noGpsMarkerRadius;
+        circles.object = circles.object!
+            .map((c) => c..geometry = latLng.toPoint())
+            .toList();
+        circles.object![1].circleRadius = isGps
+            ? _gpsMarkerRadius
+            : _noGpsMarkerRadius;
         for (final circle in circles.object!) {
           await _circleManager?.update(circle);
         }

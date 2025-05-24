@@ -8,18 +8,17 @@ class ChartHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
-      children:
-          fields
-              .map(
-                (args) => Expanded(
-                  child: Text(
-                    args.$1,
-                    style: TextStyle(color: args.$2),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              )
-              .toList(),
+      children: fields
+          .map(
+            (args) => Expanded(
+              child: Text(
+                args.$1,
+                style: TextStyle(color: args.$2),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          )
+          .toList(),
     );
   }
 }

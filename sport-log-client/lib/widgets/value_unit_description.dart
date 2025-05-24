@@ -182,7 +182,10 @@ class ValueUnitDescription extends StatelessWidget {
             style: TextStyle(fontSize: scale * (smallValue ? 14 : 20)),
           ),
           if (unit != null)
-            TextSpan(text: unit, style: TextStyle(fontSize: scale * 14)),
+            TextSpan(
+              text: unit,
+              style: TextStyle(fontSize: scale * 14),
+            ),
           if (description != null)
             TextSpan(
               text: "\n$description",

@@ -23,13 +23,13 @@ class MetconSessionDescription extends CompoundEntity {
 
   static MetconSessionDescription? defaultValue() =>
       MetconDescription.defaultMetconDescription == null
-          ? null
-          : MetconSessionDescription(
-            metconSession: MetconSession.defaultValue(
-              MetconDescription.defaultMetconDescription!.metcon,
-            ),
-            metconDescription: MetconDescription.defaultMetconDescription!,
-          );
+      ? null
+      : MetconSessionDescription(
+          metconSession: MetconSession.defaultValue(
+            MetconDescription.defaultMetconDescription!.metcon,
+          ),
+          metconDescription: MetconDescription.defaultMetconDescription!,
+        );
 
   @override
   Map<String, dynamic> toJson() => _$MetconSessionDescriptionToJson(this);
@@ -105,10 +105,9 @@ class MetconSessionDescription extends CompoundEntity {
               ? "${metconSession.time?.formatTimeShort} min"
               : "${metconSession.rounds} rounds + ${metconSession.reps} reps";
         } else {
-          final timecap =
-              metconDescription.metcon.timecap == null
-                  ? ""
-                  : "(${Duration(seconds: metconDescription.metcon.timecap!.inSeconds).formatTimeShort} min)";
+          final timecap = metconDescription.metcon.timecap == null
+              ? ""
+              : "(${Duration(seconds: metconDescription.metcon.timecap!.inSeconds).formatTimeShort} min)";
           return metconSession.time != null
               ? "${metconSession.time?.formatTimeShort} min $timecap"
               : "${metconSession.rounds} rounds + ${metconSession.reps} reps (${metconDescription.metcon.rounds} rounds)";

@@ -22,15 +22,14 @@ class YearChart extends DateTimePeriodChart {
       LineChartData(
         lineBarsData: [
           LineChartBarData(
-            spots:
-                chartValues
-                    .map(
-                      (v) => FlSpot(
-                        v.datetime.difference(startDateTime).inDays + 1,
-                        v.value,
-                      ),
-                    )
-                    .toList(),
+            spots: chartValues
+                .map(
+                  (v) => FlSpot(
+                    v.datetime.difference(startDateTime).inDays + 1,
+                    v.value,
+                  ),
+                )
+                .toList(),
             color: Theme.of(context).colorScheme.primary,
           ),
         ],
@@ -39,22 +38,20 @@ class YearChart extends DateTimePeriodChart {
         minY: minY,
         maxY: maxY,
         titlesData: titlesData(
-          getBottomTitles:
-              (value, _) =>
-                  startDateTime.add(Duration(days: value.round())).day == 15
-                      ? Text(
-                        startDateTime
-                            .add(Duration(days: value.round()))
-                            .shortMonthName,
-                      )
-                      : const Text(""),
+          getBottomTitles: (value, _) =>
+              startDateTime.add(Duration(days: value.round())).day == 15
+              ? Text(
+                  startDateTime
+                      .add(Duration(days: value.round()))
+                      .shortMonthName,
+                )
+              : const Text(""),
         ),
         gridData: FlGridData(
           getDrawingHorizontalLine: gridLineDrawer(),
           verticalInterval: 1,
-          checkToShowVerticalLine:
-              (value) =>
-                  startDateTime.add(Duration(days: value.round())).day == 1,
+          checkToShowVerticalLine: (value) =>
+              startDateTime.add(Duration(days: value.round())).day == 1,
           getDrawingVerticalLine: gridLineDrawer(),
         ),
         borderData: FlBorderData(show: false),

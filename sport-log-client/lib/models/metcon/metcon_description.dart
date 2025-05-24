@@ -94,10 +94,9 @@ class MetconDescription extends CompoundEntity {
             ? "${metcon.metconType.name} ${metcon.timecap?.formatTimeShort}"
             : "${metcon.metconType.name} ${metcon.timecap?.formatTimeShort} (${metcon.rounds} x ${Duration(seconds: (metcon.timecap!.inSeconds / metcon.rounds!).round()).formatTimeShort})";
       case MetconType.forTime:
-        final timecap =
-            metcon.timecap == null
-                ? ""
-                : " (Timecap ${metcon.timecap?.formatTimeShort})";
+        final timecap = metcon.timecap == null
+            ? ""
+            : " (Timecap ${metcon.timecap?.formatTimeShort})";
         final rounds = metcon.rounds! > 1 ? "${metcon.rounds!} Rounds " : "";
         return "$rounds${metcon.metconType.name}$timecap";
     }

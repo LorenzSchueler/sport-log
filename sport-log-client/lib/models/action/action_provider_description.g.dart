@@ -12,18 +12,15 @@ ActionProviderDescription _$ActionProviderDescriptionFromJson(
   actionProvider: ActionProvider.fromJson(
     json['action_provider'] as Map<String, dynamic>,
   ),
-  actions:
-      (json['actions'] as List<dynamic>)
-          .map((e) => Action.fromJson(e as Map<String, dynamic>))
-          .toList(),
-  actionRules:
-      (json['action_rules'] as List<dynamic>)
-          .map((e) => ActionRule.fromJson(e as Map<String, dynamic>))
-          .toList(),
-  actionEvents:
-      (json['action_events'] as List<dynamic>)
-          .map((e) => ActionEvent.fromJson(e as Map<String, dynamic>))
-          .toList(),
+  actions: (json['actions'] as List<dynamic>)
+      .map((e) => Action.fromJson(e as Map<String, dynamic>))
+      .toList(),
+  actionRules: (json['action_rules'] as List<dynamic>)
+      .map((e) => ActionRule.fromJson(e as Map<String, dynamic>))
+      .toList(),
+  actionEvents: (json['action_events'] as List<dynamic>)
+      .map((e) => ActionEvent.fromJson(e as Map<String, dynamic>))
+      .toList(),
 );
 
 Map<String, dynamic> _$ActionProviderDescriptionToJson(

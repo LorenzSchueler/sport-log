@@ -21,33 +21,30 @@ class WodOverviewPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return NeverPop(
-      child: ProviderConsumer<
-        OverviewDataProvider<Wod, void, WodDataProvider, void>
-      >(
-        create:
-            (_) => OverviewDataProvider(
+      child:
+          ProviderConsumer<
+            OverviewDataProvider<Wod, void, WodDataProvider, void>
+          >(
+            create: (_) => OverviewDataProvider(
               dataProvider: WodDataProvider(),
-              entityAccessor:
-                  (dataProvider) =>
-                      (start, end, _, search) =>
-                          dataProvider.getByTimerangeAndDescription(
-                            from: start,
-                            until: end,
-                            description: search,
-                          ),
+              entityAccessor: (dataProvider) =>
+                  (start, end, _, search) =>
+                      dataProvider.getByTimerangeAndDescription(
+                        from: start,
+                        until: end,
+                        description: search,
+                      ),
               recordAccessor: (_) => () async {},
               loggerName: "WodPage",
             ),
-        builder:
-            (_, dataProvider, __) => Scaffold(
+            builder: (_, dataProvider, __) => Scaffold(
               appBar: AppBar(
-                title:
-                    dataProvider.isSearch
-                        ? TextFormField(
-                          focusNode: _searchBar,
-                          onChanged: (comment) => dataProvider.search = comment,
-                        )
-                        : const Text("Wod"),
+                title: dataProvider.isSearch
+                    ? TextFormField(
+                        focusNode: _searchBar,
+                        onChanged: (comment) => dataProvider.search = comment,
+                      )
+                    : const Text("Wod"),
                 actions: [
                   IconButton(
                     onPressed: () {
@@ -63,32 +60,28 @@ class WodOverviewPage extends StatelessWidget {
                 ],
                 bottom: DateFilter(
                   initialState: dataProvider.dateFilter,
-                  onFilterChanged:
-                      (dateFilter) => dataProvider.dateFilter = dateFilter,
+                  onFilterChanged: (dateFilter) =>
+                      dataProvider.dateFilter = dateFilter,
                 ),
               ),
               body: Stack(
                 alignment: Alignment.topCenter,
                 children: [
                   SyncRefreshIndicator(
-                    child:
-                        dataProvider.entities.isEmpty
-                            ? RefreshableNoEntriesText(
-                              text: SessionsPageTab.wod.noEntriesText,
-                            )
-                            : Padding(
-                              padding: Defaults.edgeInsets.normal,
-                              child: ListView.separated(
-                                itemBuilder:
-                                    (_, index) => WodCard(
-                                      wod: dataProvider.entities[index],
-                                    ),
-                                separatorBuilder:
-                                    (_, __) =>
-                                        Defaults.sizedBox.vertical.normal,
-                                itemCount: dataProvider.entities.length,
-                              ),
+                    child: dataProvider.entities.isEmpty
+                        ? RefreshableNoEntriesText(
+                            text: SessionsPageTab.wod.noEntriesText,
+                          )
+                        : Padding(
+                            padding: Defaults.edgeInsets.normal,
+                            child: ListView.separated(
+                              itemBuilder: (_, index) =>
+                                  WodCard(wod: dataProvider.entities[index]),
+                              separatorBuilder: (_, __) =>
+                                  Defaults.sizedBox.vertical.normal,
+                              itemCount: dataProvider.entities.length,
                             ),
+                          ),
                   ),
                   if (dataProvider.isLoading)
                     const Positioned(
@@ -107,7 +100,7 @@ class WodOverviewPage extends StatelessWidget {
                 onPressed: () => Navigator.pushNamed(context, Routes.wodEdit),
               ),
             ),
-      ),
+          ),
     );
   }
 }

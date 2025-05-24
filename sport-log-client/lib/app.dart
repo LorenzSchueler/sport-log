@@ -29,9 +29,9 @@ class App extends StatelessWidget {
           routes: Routes.all,
           initialRoute:
               Settings.instance.userId !=
-                      null // changes ignored on purpose
-                  ? Routes.timelineOverview
-                  : Routes.landing,
+                  null // changes ignored on purpose
+              ? Routes.timelineOverview
+              : Routes.landing,
           navigatorKey: navigatorKey,
           debugShowCheckedModeBanner: false,
           darkTheme: AppTheme.darkTheme,
@@ -51,10 +51,8 @@ class App extends StatelessWidget {
 
 Widget ignoreSystemTextScaleFactor(BuildContext context, Widget? child) =>
     child != null
-        ? MediaQuery(
-          data: MediaQuery.of(
-            context,
-          ).copyWith(textScaler: TextScaler.noScaling),
-          child: child,
-        )
-        : Container();
+    ? MediaQuery(
+        data: MediaQuery.of(context).copyWith(textScaler: TextScaler.noScaling),
+        child: child,
+      )
+    : Container();

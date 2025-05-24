@@ -57,49 +57,44 @@ class TimelineDataProvider extends DataProvider<TimelineUnion> {
     required String? comment,
     required MovementOrMetcon? movementOrMetcon,
   }) async => _combineAndSort(
-    strengthSessionsDescription:
-        movementOrMetcon?.isMetcon ?? false
-            ? []
-            : await _strengthDataProvider.getByTimerangeAndMovementAndComment(
-              from: from,
-              until: until,
-              movement: movementOrMetcon?.movement,
-              comment: comment,
-            ),
-    metconSessionsDescription:
-        movementOrMetcon?.isMovement ?? false
-            ? []
-            : await _metconDataProvider.getByTimerangeAndMetconAndComment(
-              from: from,
-              until: until,
-              metcon: movementOrMetcon?.metcon,
-              comment: comment,
-            ),
-    cardioSessionsDescription:
-        movementOrMetcon?.isMetcon ?? false
-            ? []
-            : await _cardioDataProvider.getByTimerangeAndMovementAndComment(
-              from: from,
-              until: until,
-              movement: movementOrMetcon?.movement,
-              comment: comment,
-            ),
-    wods:
-        movementOrMetcon != null
-            ? []
-            : await _wodDataProvider.getByTimerangeAndDescription(
-              from: from,
-              until: until,
-              description: comment,
-            ),
-    diaries:
-        movementOrMetcon != null
-            ? []
-            : await _diaryDataProvider.getByTimerangeAndComment(
-              from: from,
-              until: until,
-              comment: comment,
-            ),
+    strengthSessionsDescription: movementOrMetcon?.isMetcon ?? false
+        ? []
+        : await _strengthDataProvider.getByTimerangeAndMovementAndComment(
+            from: from,
+            until: until,
+            movement: movementOrMetcon?.movement,
+            comment: comment,
+          ),
+    metconSessionsDescription: movementOrMetcon?.isMovement ?? false
+        ? []
+        : await _metconDataProvider.getByTimerangeAndMetconAndComment(
+            from: from,
+            until: until,
+            metcon: movementOrMetcon?.metcon,
+            comment: comment,
+          ),
+    cardioSessionsDescription: movementOrMetcon?.isMetcon ?? false
+        ? []
+        : await _cardioDataProvider.getByTimerangeAndMovementAndComment(
+            from: from,
+            until: until,
+            movement: movementOrMetcon?.movement,
+            comment: comment,
+          ),
+    wods: movementOrMetcon != null
+        ? []
+        : await _wodDataProvider.getByTimerangeAndDescription(
+            from: from,
+            until: until,
+            description: comment,
+          ),
+    diaries: movementOrMetcon != null
+        ? []
+        : await _diaryDataProvider.getByTimerangeAndComment(
+            from: from,
+            until: until,
+            comment: comment,
+          ),
   );
 
   List<TimelineUnion> _combineAndSort({
@@ -108,13 +103,12 @@ class TimelineDataProvider extends DataProvider<TimelineUnion> {
     required List<CardioSessionDescription> cardioSessionsDescription,
     required List<Wod> wods,
     required List<Diary> diaries,
-  }) =>
-      strengthSessionsDescription.map(TimelineUnion.strengthSession).toList()
-        ..addAll(metconSessionsDescription.map(TimelineUnion.metconSession))
-        ..addAll(cardioSessionsDescription.map(TimelineUnion.cardioSession))
-        ..addAll(wods.map(TimelineUnion.wod))
-        ..addAll(diaries.map(TimelineUnion.diary))
-        ..sort((a, b) => b.datetime.compareTo(a.datetime));
+  }) => strengthSessionsDescription.map(TimelineUnion.strengthSession).toList()
+    ..addAll(metconSessionsDescription.map(TimelineUnion.metconSession))
+    ..addAll(cardioSessionsDescription.map(TimelineUnion.cardioSession))
+    ..addAll(wods.map(TimelineUnion.wod))
+    ..addAll(diaries.map(TimelineUnion.diary))
+    ..sort((a, b) => b.datetime.compareTo(a.datetime));
 
   Future<TimelineRecords> getRecords() async => TimelineRecords(
     await _strengthDataProvider.getStrengthRecords(),

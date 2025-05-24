@@ -32,18 +32,18 @@ extension MetconRecordsExtension on MetconRecords {
       MetconType.forTime =>
         metconRecord.time != null
             ? isRecord(
-              metconSessionDescription.metconSession.time?.inMilliseconds,
-              metconRecord.time?.inMilliseconds,
-              minRecord: true,
-            )
+                metconSessionDescription.metconSession.time?.inMilliseconds,
+                metconRecord.time?.inMilliseconds,
+                minRecord: true,
+              )
             : isRecord(
-              metconSessionDescription.metconSession.rounds
-                  ?.mulNullable(MetconRecord.multiplier)
-                  ?.addNullable(metconSessionDescription.metconSession.reps),
-              metconRecord.rounds
-                  ?.mulNullable(MetconRecord.multiplier)
-                  ?.addNullable(metconRecord.reps),
-            ),
+                metconSessionDescription.metconSession.rounds
+                    ?.mulNullable(MetconRecord.multiplier)
+                    ?.addNullable(metconSessionDescription.metconSession.reps),
+                metconRecord.rounds
+                    ?.mulNullable(MetconRecord.multiplier)
+                    ?.addNullable(metconRecord.reps),
+              ),
       MetconType.emom => false,
     };
   }

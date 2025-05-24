@@ -221,26 +221,23 @@ class CardioSession extends AtomicEntity {
   }
 
   void setAvgCadence() {
-    avgCadence =
-        time == null || time!.isZero || cadence == null
-            ? null
-            : (cadence!.length / time!.inMinuteFractions).round();
+    avgCadence = time == null || time!.isZero || cadence == null
+        ? null
+        : (cadence!.length / time!.inMinuteFractions).round();
   }
 
   void setAvgHeartRate() {
-    avgHeartRate =
-        time == null || time!.isZero || heartRate == null
-            ? null
-            : (heartRate!.length / (time!.inMinuteFractions)).round();
+    avgHeartRate = time == null || time!.isZero || heartRate == null
+        ? null
+        : (heartRate!.length / (time!.inMinuteFractions)).round();
   }
 
   CardioSession? cut(Duration start, Duration end) {
     if (end < start) {
       if (end < time!) {
-        final endSession =
-            clone()
-              ..cut(start, time!)
-              ..datetime = datetime.add(end);
+        final endSession = clone()
+          ..cut(start, time!)
+          ..datetime = datetime.add(end);
         cut(Duration.zero, end);
         return combineWith(endSession)
           ?..sanitize()
@@ -256,15 +253,13 @@ class CardioSession extends AtomicEntity {
       if (newTrack.isNotEmpty) {
         final distanceOffset = newTrack.first.distance;
         final timeOffset = newTrack.first.time;
-        track =
-            newTrack
-                .map(
-                  (pos) =>
-                      pos
-                        ..distance -= distanceOffset
-                        ..time -= timeOffset,
-                )
-                .toList();
+        track = newTrack
+            .map(
+              (pos) => pos
+                ..distance -= distanceOffset
+                ..time -= timeOffset,
+            )
+            .toList();
       } else {
         track = null;
       }
@@ -519,10 +514,9 @@ class DbCardioSessionSerializer extends DbSerializer<CardioSession> {
       distance: r[prefix + Columns.distance] as int?,
       ascent: r[prefix + Columns.ascent] as int?,
       descent: r[prefix + Columns.descent] as int?,
-      time:
-          r[prefix + Columns.time] == null
-              ? null
-              : Duration(milliseconds: r[prefix + Columns.time]! as int),
+      time: r[prefix + Columns.time] == null
+          ? null
+          : Duration(milliseconds: r[prefix + Columns.time]! as int),
       calories: r[prefix + Columns.calories] as int?,
       track: DbPositionListConverter.mapToDart(
         r[prefix + Columns.track] as Uint8List?,
@@ -535,10 +529,9 @@ class DbCardioSessionSerializer extends DbSerializer<CardioSession> {
       heartRate: DbDurationListConverter.mapToDart(
         r[prefix + Columns.heartRate] as Uint8List?,
       ),
-      routeId:
-          r[prefix + Columns.routeId] == null
-              ? null
-              : Int64(r[prefix + Columns.routeId]! as int),
+      routeId: r[prefix + Columns.routeId] == null
+          ? null
+          : Int64(r[prefix + Columns.routeId]! as int),
       comments: r[prefix + Columns.comments] as String?,
       deleted: r[prefix + Columns.deleted]! as int == 1,
     );

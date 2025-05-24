@@ -35,8 +35,9 @@ class StrengthEditPage extends StatefulWidget {
 class _StrengthEditPageState extends State<StrengthEditPage> {
   final _dataProvider = StrengthSessionDescriptionDataProvider();
 
-  late final StrengthSessionDescription _strengthSessionDescription =
-      widget.strengthSessionDescription.clone();
+  late final StrengthSessionDescription _strengthSessionDescription = widget
+      .strengthSessionDescription
+      .clone();
 
   int _initialCount = 0;
   double? _initialWeight;
@@ -78,10 +79,9 @@ class _StrengthEditPageState extends State<StrengthEditPage> {
   }
 
   Future<void> _saveStrengthSession() async {
-    final result =
-        widget.isNew
-            ? await _dataProvider.createSingle(_strengthSessionDescription)
-            : await _dataProvider.updateSingle(_strengthSessionDescription);
+    final result = widget.isNew
+        ? await _dataProvider.createSingle(_strengthSessionDescription)
+        : await _dataProvider.updateSingle(_strengthSessionDescription);
     if (mounted) {
       if (result.isOk) {
         Navigator.pop(
@@ -168,10 +168,9 @@ class _StrengthEditPageState extends State<StrengthEditPage> {
               icon: const Icon(AppIcons.delete),
             ),
             IconButton(
-              onPressed:
-                  _strengthSessionDescription.isValidBeforeSanitation()
-                      ? _saveStrengthSession
-                      : null,
+              onPressed: _strengthSessionDescription.isValidBeforeSanitation()
+                  ? _saveStrengthSession
+                  : null,
               icon: const Icon(AppIcons.save),
             ),
           ],
@@ -207,9 +206,8 @@ class _StrengthEditPageState extends State<StrengthEditPage> {
                 child: ListView.builder(
                   controller: _scrollController,
                   shrinkWrap: true,
-                  itemBuilder:
-                      (context, index) =>
-                          _setWidget(_strengthSessionDescription.sets[index]),
+                  itemBuilder: (context, index) =>
+                      _setWidget(_strengthSessionDescription.sets[index]),
                   itemCount: _strengthSessionDescription.sets.length,
                 ),
               ),
@@ -267,20 +265,15 @@ class _StrengthEditPageState extends State<StrengthEditPage> {
       key: ValueKey(_strengthSessionDescription.session.interval),
       caption: 'Interval',
       leading: AppIcons.timeInterval,
-      onTrailingTap:
-          () => setState(
-            () => _strengthSessionDescription.session.interval = null,
-          ),
-      builder:
-          () => DurationInput(
-            onUpdate:
-                (d) => setState(
-                  () => _strengthSessionDescription.session.interval = d,
-                ),
-            initialDuration:
-                _strengthSessionDescription.session.interval ?? Duration.zero,
-            minDuration: const Duration(seconds: 1),
-          ),
+      onTrailingTap: () =>
+          setState(() => _strengthSessionDescription.session.interval = null),
+      builder: () => DurationInput(
+        onUpdate: (d) =>
+            setState(() => _strengthSessionDescription.session.interval = d),
+        initialDuration:
+            _strengthSessionDescription.session.interval ?? Duration.zero,
+        minDuration: const Duration(seconds: 1),
+      ),
       showButton: _strengthSessionDescription.session.interval == null,
       onButtonPressed: () {
         FocusManager.instance.primaryFocus?.unfocus();
@@ -307,10 +300,9 @@ class _StrengthEditPageState extends State<StrengthEditPage> {
           labelText: 'Comment',
           icon: const Icon(AppIcons.edit),
           suffixIcon: IconButton(
-            onPressed:
-                () => setState(
-                  () => _strengthSessionDescription.session.comments = null,
-                ),
+            onPressed: () => setState(
+              () => _strengthSessionDescription.session.comments = null,
+            ),
             icon: const Icon(AppIcons.close),
           ),
         ),
@@ -332,11 +324,10 @@ class _StrengthEditPageState extends State<StrengthEditPage> {
     return EditTile(
       leading: null,
       caption: "Set ${strengthSet.setNumber + 1}",
-      onTrailingTap:
-          () => setState(() {
-            _strengthSessionDescription.sets.remove(strengthSet);
-            _strengthSessionDescription.orderSets();
-          }),
+      onTrailingTap: () => setState(() {
+        _strengthSessionDescription.sets.remove(strengthSet);
+        _strengthSessionDescription.orderSets();
+      }),
       child: Text(
         strengthSet.toDisplayName(
           _strengthSessionDescription.movement.dimension,

@@ -22,15 +22,14 @@ class WeekChart extends DateTimePeriodChart {
       LineChartData(
         lineBarsData: [
           LineChartBarData(
-            spots:
-                chartValues
-                    .map(
-                      (v) => FlSpot(
-                        v.datetime.difference(startDateTime).inDays.toDouble(),
-                        v.value,
-                      ),
-                    )
-                    .toList(),
+            spots: chartValues
+                .map(
+                  (v) => FlSpot(
+                    v.datetime.difference(startDateTime).inDays.toDouble(),
+                    v.value,
+                  ),
+                )
+                .toList(),
             color: Theme.of(context).colorScheme.primary,
           ),
         ],
@@ -39,12 +38,9 @@ class WeekChart extends DateTimePeriodChart {
         minY: minY,
         maxY: maxY,
         titlesData: titlesData(
-          getBottomTitles:
-              (value, _) => Text(
-                startDateTime
-                    .add(Duration(days: value.round()))
-                    .shortWeekdayName,
-              ),
+          getBottomTitles: (value, _) => Text(
+            startDateTime.add(Duration(days: value.round())).shortWeekdayName,
+          ),
         ),
         gridData: FlGridData(
           getDrawingHorizontalLine: gridLineDrawer(),

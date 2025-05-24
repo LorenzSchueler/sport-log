@@ -35,19 +35,19 @@ class StrengthSessionDescription extends CompoundEntity {
 
   static StrengthSessionDescription? defaultValue() =>
       Movement.defaultMovement == null
-          ? null
-          : StrengthSessionDescription(
-            session: StrengthSession(
-              id: randomId(),
-              datetime: DateTime.now(),
-              movementId: Movement.defaultMovement!.id,
-              interval: null,
-              comments: null,
-              deleted: false,
-            ),
-            movement: Movement.defaultMovement!,
-            sets: [],
-          );
+      ? null
+      : StrengthSessionDescription(
+          session: StrengthSession(
+            id: randomId(),
+            datetime: DateTime.now(),
+            movementId: Movement.defaultMovement!.id,
+            interval: null,
+            comments: null,
+            deleted: false,
+          ),
+          movement: Movement.defaultMovement!,
+          sets: [],
+        );
 
   @override
   Map<String, dynamic> toJson() => _$StrengthSessionDescriptionToJson(this);

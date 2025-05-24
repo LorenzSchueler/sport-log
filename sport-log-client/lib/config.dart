@@ -36,19 +36,18 @@ class Config extends JsonSerializable {
       final map =
           (isTest
                   ? loadYaml(
-                    await File("./sport-log-client.yaml").readAsString(),
-                  )
+                      await File("./sport-log-client.yaml").readAsString(),
+                    )
                   : loadYaml(
-                    await rootBundle.loadString('sport-log-client.yaml'),
-                  ))
+                      await rootBundle.loadString('sport-log-client.yaml'),
+                    ))
               as YamlMap;
 
-      final instance =
-          releaseMode
-              ? map["release"]! as YamlMap
-              : profileMode
-              ? map["profile"]! as YamlMap
-              : map["debug"]! as YamlMap;
+      final instance = releaseMode
+          ? map["release"]! as YamlMap
+          : profileMode
+          ? map["profile"]! as YamlMap
+          : map["debug"]! as YamlMap;
       _instance = Config.fromJson(instance.cast<String, dynamic>());
     } on YamlException catch (error, stackTrace) {
       _logger.f(
@@ -145,8 +144,9 @@ class Config extends JsonSerializable {
   @JsonKey(includeFromJson: false)
   late final String packageName;
   @JsonKey(includeFromJson: false)
-  late final flavor =
-      packageName.endsWith(".dev") ? "development" : "production";
+  late final flavor = packageName.endsWith(".dev")
+      ? "development"
+      : "production";
 
   static final Version apiVersion = Version(0, 4);
   // ignore: do_not_use_environment

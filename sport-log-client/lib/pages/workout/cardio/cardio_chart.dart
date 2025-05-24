@@ -93,35 +93,27 @@ class _CardioChartState extends State<CardioChart> {
           child: SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: SegmentedButton(
-              segments:
-                  _SeriesType.values
-                      .map(
-                        (md) => ButtonSegment(value: md, label: Text(md.name)),
-                      )
-                      .toList(),
+              segments: _SeriesType.values
+                  .map((md) => ButtonSegment(value: md, label: Text(md.name)))
+                  .toList(),
               selected: {_selectedSeries},
               showSelectedIcon: false,
-              onSelectionChanged:
-                  (selected) =>
-                      setState(() => _selectedSeries = selected.first),
+              onSelectionChanged: (selected) =>
+                  setState(() => _selectedSeries = selected.first),
             ),
           ),
         ),
         Defaults.sizedBox.vertical.normal,
         DateTimeChart(
-          chartValues:
-              widget.cardioSessions
-                  .map((s) {
-                    final value = _selectedSeries.value(s);
-                    return value == null
-                        ? null
-                        : DateTimeChartValue(
-                          datetime: s.datetime,
-                          value: value,
-                        );
-                  })
-                  .nonNulls
-                  .toList(),
+          chartValues: widget.cardioSessions
+              .map((s) {
+                final value = _selectedSeries.value(s);
+                return value == null
+                    ? null
+                    : DateTimeChartValue(datetime: s.datetime, value: value);
+              })
+              .nonNulls
+              .toList(),
           dateFilterState: widget.dateFilterState,
           absolute: _selectedSeries.yFromZero,
           formatter: _selectedSeries.formatter,

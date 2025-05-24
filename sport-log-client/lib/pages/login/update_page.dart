@@ -17,12 +17,11 @@ class UpdatePage extends StatelessWidget {
     }
     _updateInProgress = true;
     final updateDownloadResult = await AppDataProvider().downloadUpdate(
-      onNoInternet:
-          () => showMessageDialog(
-            context: context,
-            title: "Update Failed",
-            text: "Internet required.",
-          ),
+      onNoInternet: () => showMessageDialog(
+        context: context,
+        title: "Update Failed",
+        text: "Internet required.",
+      ),
     );
     if (updateDownloadResult.isOk) {
       final filename = updateDownloadResult.ok;

@@ -31,14 +31,12 @@ Future<Result<String, void>> writeToFile({
   required String fileExtension,
   bool append = false,
 }) async {
-  final dir =
-      Config.isAndroid
-          ? '/storage/emulated/0/Download'
-          : (await getDownloadsDirectory())!.path;
-  final file =
-      append
-          ? File("$dir/$filename.$fileExtension")
-          : _nextFile(dir, filename, fileExtension);
+  final dir = Config.isAndroid
+      ? '/storage/emulated/0/Download'
+      : (await getDownloadsDirectory())!.path;
+  final file = append
+      ? File("$dir/$filename.$fileExtension")
+      : _nextFile(dir, filename, fileExtension);
   try {
     await file.writeAsString(
       content,
@@ -68,10 +66,9 @@ Future<Result<String, void>> writeBytesToFileInDownloads({
   required String filename,
   required String fileExtension,
 }) async {
-  final dir =
-      Config.isAndroid
-          ? '/storage/emulated/0/Download'
-          : (await getDownloadsDirectory())!.path;
+  final dir = Config.isAndroid
+      ? '/storage/emulated/0/Download'
+      : (await getDownloadsDirectory())!.path;
   final file = _nextFile(dir, filename, fileExtension);
   try {
     await file.writeAsBytes(content, flush: true, mode: FileMode.writeOnly);

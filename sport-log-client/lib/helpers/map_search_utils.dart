@@ -36,10 +36,9 @@ class MapSearchUtils extends ChangeNotifier {
       final pos = await _mapController?.center;
       final places = await _searchApi.getPlaces(
         name,
-        proximity:
-            pos != null
-                ? Proximity.LatLong(lat: pos.lat, long: pos.lng)
-                : Proximity.LocationNone(),
+        proximity: pos != null
+            ? Proximity.LatLong(lat: pos.lat, long: pos.lng)
+            : Proximity.LocationNone(),
       );
       _searchResults = places.success ?? [];
       notifyListeners();
@@ -59,11 +58,10 @@ class MapSearchUtils extends ChangeNotifier {
     final bbox = place.bbox;
     final center = place.center;
     if (bbox != null) {
-      final bounds =
-          [
-            LatLng(lat: bbox.min.lat, lng: bbox.min.long),
-            LatLng(lat: bbox.max.lat, lng: bbox.max.long),
-          ].latLngBounds!;
+      final bounds = [
+        LatLng(lat: bbox.min.lat, lng: bbox.min.long),
+        LatLng(lat: bbox.max.lat, lng: bbox.max.long),
+      ].latLngBounds!;
       await _mapController?.setBoundsX(bounds, padded: false);
     } else if (center != null) {
       await _mapController?.animateCenter(

@@ -57,11 +57,10 @@ class MapStylesButton extends StatelessWidget {
     return FloatingActionButton.small(
       heroTag: null,
       child: const Icon(AppIcons.layers),
-      onPressed:
-          () => showModalBottomSheet<void>(
-            context: context,
-            builder: (_) => MapStylesBottomSheet(mapController: mapController),
-          ),
+      onPressed: () => showModalBottomSheet<void>(
+        context: context,
+        builder: (_) => MapStylesBottomSheet(mapController: mapController),
+      ),
     );
   }
 }

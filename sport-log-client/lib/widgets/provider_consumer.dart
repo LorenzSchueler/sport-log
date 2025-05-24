@@ -22,12 +22,12 @@ class ProviderConsumer<T extends ChangeNotifier> extends StatelessWidget {
   Widget build(BuildContext context) {
     return value != null
         ? ChangeNotifierProvider<T>.value(
-          value: value!,
-          child: Consumer<T>(builder: builder),
-        )
+            value: value!,
+            child: Consumer<T>(builder: builder),
+          )
         : ChangeNotifierProvider<T>(
-          create: create!,
-          child: Consumer<T>(builder: builder),
-        );
+            create: create!,
+            child: Consumer<T>(builder: builder),
+          );
   }
 }

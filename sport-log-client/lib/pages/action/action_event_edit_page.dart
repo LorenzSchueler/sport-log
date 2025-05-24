@@ -35,10 +35,9 @@ class _ActionEventEditPageState extends State<ActionEventEditPage> {
       );
 
   Future<void> _saveActionEvent() async {
-    final result =
-        widget.isNew
-            ? await _dataProvider.createSingle(_actionEvent)
-            : await _dataProvider.updateSingle(_actionEvent);
+    final result = widget.isNew
+        ? await _dataProvider.createSingle(_actionEvent)
+        : await _dataProvider.updateSingle(_actionEvent);
     if (mounted) {
       if (result.isOk) {
         Navigator.pop(context);
@@ -88,10 +87,9 @@ class _ActionEventEditPageState extends State<ActionEventEditPage> {
               icon: const Icon(AppIcons.delete),
             ),
             IconButton(
-              onPressed:
-                  _actionEvent.isValidBeforeSanitation()
-                      ? _saveActionEvent
-                      : null,
+              onPressed: _actionEvent.isValidBeforeSanitation()
+                  ? _saveActionEvent
+                  : null,
               icon: const Icon(AppIcons.save),
             ),
           ],
@@ -146,11 +144,9 @@ class _ActionEventEditPageState extends State<ActionEventEditPage> {
                   labelText: "Arguments",
                 ),
                 initialValue: _actionEvent.arguments,
-                onChanged:
-                    (arguments) => setState(() {
-                      _actionEvent.arguments =
-                          arguments.isEmpty ? null : arguments;
-                    }),
+                onChanged: (arguments) => setState(() {
+                  _actionEvent.arguments = arguments.isEmpty ? null : arguments;
+                }),
               ),
             ],
           ),

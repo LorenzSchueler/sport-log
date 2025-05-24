@@ -21,8 +21,8 @@ class DbDurationListConverter {
     return value == null
         ? null
         : Int64List.fromList(
-          value.map((e) => e.inMilliseconds).toList(),
-        ).buffer.asUint8List();
+            value.map((e) => e.inMilliseconds).toList(),
+          ).buffer.asUint8List();
   }
 }
 

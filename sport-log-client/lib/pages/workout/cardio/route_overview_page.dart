@@ -25,28 +25,25 @@ class RouteOverviewPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return NeverPop(
-      child: ProviderConsumer<
-        OverviewDataProvider<Route, void, RouteDataProvider, void>
-      >(
-        create:
-            (_) => OverviewDataProvider(
+      child:
+          ProviderConsumer<
+            OverviewDataProvider<Route, void, RouteDataProvider, void>
+          >(
+            create: (_) => OverviewDataProvider(
               dataProvider: RouteDataProvider(),
-              entityAccessor:
-                  (dataProvider) =>
-                      (_, __, ___, search) => dataProvider.getByName(search),
+              entityAccessor: (dataProvider) =>
+                  (_, __, ___, search) => dataProvider.getByName(search),
               recordAccessor: (_) => () async {},
               loggerName: "RoutePage",
             ),
-        builder:
-            (_, dataProvider, __) => Scaffold(
+            builder: (_, dataProvider, __) => Scaffold(
               appBar: AppBar(
-                title:
-                    dataProvider.isSearch
-                        ? TextFormField(
-                          focusNode: _searchBar,
-                          onChanged: (name) => dataProvider.search = name,
-                        )
-                        : const Text("Routes"),
+                title: dataProvider.isSearch
+                    ? TextFormField(
+                        focusNode: _searchBar,
+                        onChanged: (name) => dataProvider.search = name,
+                      )
+                    : const Text("Routes"),
                 actions: [
                   IconButton(
                     onPressed: () {
@@ -60,36 +57,30 @@ class RouteOverviewPage extends StatelessWidget {
                     ),
                   ),
                   IconButton(
-                    onPressed:
-                        () => Navigator.of(
-                          context,
-                        ).newBase(Routes.cardioOverview),
+                    onPressed: () =>
+                        Navigator.of(context).newBase(Routes.cardioOverview),
                     icon: const Icon(AppIcons.heartbeat),
                   ),
                 ],
               ),
               body: SyncRefreshIndicator(
-                child:
-                    dataProvider.entities.isEmpty
-                        ? const RefreshableNoEntriesText(
-                          text:
-                              "Looks like there are no routes there yet 😔\nPress ＋ to create a new one",
-                        )
-                        : Padding(
-                          padding: Defaults.edgeInsets.normal,
-                          child: ListView.separated(
-                            itemBuilder:
-                                (_, index) => RouteCard(
-                                  route: dataProvider.entities[index],
-                                  key: ValueKey(
-                                    dataProvider.entities[index].id,
-                                  ),
-                                ),
-                            separatorBuilder:
-                                (_, __) => Defaults.sizedBox.vertical.normal,
-                            itemCount: dataProvider.entities.length,
+                child: dataProvider.entities.isEmpty
+                    ? const RefreshableNoEntriesText(
+                        text:
+                            "Looks like there are no routes there yet 😔\nPress ＋ to create a new one",
+                      )
+                    : Padding(
+                        padding: Defaults.edgeInsets.normal,
+                        child: ListView.separated(
+                          itemBuilder: (_, index) => RouteCard(
+                            route: dataProvider.entities[index],
+                            key: ValueKey(dataProvider.entities[index].id),
                           ),
+                          separatorBuilder: (_, __) =>
+                              Defaults.sizedBox.vertical.normal,
+                          itemCount: dataProvider.entities.length,
                         ),
+                      ),
               ),
               bottomNavigationBar: SessionsPageTab.bottomNavigationBar(
                 context: context,
@@ -101,18 +92,18 @@ class RouteOverviewPage extends StatelessWidget {
                 buttons: [
                   ActionButton(
                     icon: const Icon(AppIcons.route),
-                    onPressed:
-                        () => Navigator.pushNamed(context, Routes.routeEdit),
+                    onPressed: () =>
+                        Navigator.pushNamed(context, Routes.routeEdit),
                   ),
                   ActionButton(
                     icon: const Icon(AppIcons.upload),
-                    onPressed:
-                        () => Navigator.pushNamed(context, Routes.routeUpload),
+                    onPressed: () =>
+                        Navigator.pushNamed(context, Routes.routeUpload),
                   ),
                 ],
               ),
             ),
-      ),
+          ),
     );
   }
 }
@@ -150,13 +141,15 @@ class RouteCard extends StatelessWidget {
             ),
             route.track != null && route.track!.isNotEmpty
                 ? SizedBox(
-                  height: 150,
-                  child: StaticMapboxMap(
-                    key: ObjectKey(route), // update on reload to get new track
-                    onMapCreated: _onMapCreated,
-                    onTap: (_) => showDetails(context),
-                  ),
-                )
+                    height: 150,
+                    child: StaticMapboxMap(
+                      key: ObjectKey(
+                        route,
+                      ), // update on reload to get new track
+                      onMapCreated: _onMapCreated,
+                      onTap: (_) => showDetails(context),
+                    ),
+                  )
                 : const Center(child: NoTrackPlaceholder()),
             Padding(
               padding: Defaults.edgeInsets.normal,

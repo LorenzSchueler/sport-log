@@ -46,17 +46,16 @@ class _SyncStatusButtonState extends State<SyncStatusButton> {
   Widget build(BuildContext context) {
     return _syncStatus != null
         ? SegmentedButton(
-          segments:
-              SyncStatus.values
-                  .map(
-                    (status) =>
-                        ButtonSegment(value: status, label: Text(status.name)),
-                  )
-                  .toList(),
-          selected: {_syncStatus},
-          showSelectedIcon: false,
-          onSelectionChanged: (selected) => setSyncStatus(selected.first!),
-        )
+            segments: SyncStatus.values
+                .map(
+                  (status) =>
+                      ButtonSegment(value: status, label: Text(status.name)),
+                )
+                .toList(),
+            selected: {_syncStatus},
+            showSelectedIcon: false,
+            onSelectionChanged: (selected) => setSyncStatus(selected.first!),
+          )
         : const Text("???");
   }
 }

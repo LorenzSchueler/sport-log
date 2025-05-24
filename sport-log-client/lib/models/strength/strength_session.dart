@@ -95,10 +95,9 @@ class DbStrengthSessionSerializer extends DbSerializer<StrengthSession> {
       id: Int64(r[prefix + Columns.id]! as int),
       datetime: DateTime.parse(r[prefix + Columns.datetime]! as String),
       movementId: Int64(r[prefix + Columns.movementId]! as int),
-      interval:
-          r[prefix + Columns.interval] == null
-              ? null
-              : Duration(milliseconds: r[prefix + Columns.interval]! as int),
+      interval: r[prefix + Columns.interval] == null
+          ? null
+          : Duration(milliseconds: r[prefix + Columns.interval]! as int),
       comments: r[prefix + Columns.comments] as String?,
       deleted: r[prefix + Columns.deleted]! as int == 1,
     );

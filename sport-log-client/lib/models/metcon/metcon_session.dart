@@ -124,10 +124,9 @@ class DbMetconSessionSerializer extends DbSerializer<MetconSession> {
       id: Int64(r[prefix + Columns.id]! as int),
       metconId: Int64(r[prefix + Columns.metconId]! as int),
       datetime: DateTime.parse(r[prefix + Columns.datetime]! as String),
-      time:
-          r[prefix + Columns.time] == null
-              ? null
-              : Duration(milliseconds: r[prefix + Columns.time]! as int),
+      time: r[prefix + Columns.time] == null
+          ? null
+          : Duration(milliseconds: r[prefix + Columns.time]! as int),
       rounds: r[prefix + Columns.rounds] as int?,
       reps: r[prefix + Columns.reps] as int?,
       rx: r[prefix + Columns.rx]! as int == 1,

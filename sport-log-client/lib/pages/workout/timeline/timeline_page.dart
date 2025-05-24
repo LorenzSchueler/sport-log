@@ -26,39 +26,37 @@ class TimelinePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return NeverPop(
-      child: ProviderConsumer<
-        OverviewDataProvider<
-          TimelineUnion,
-          TimelineRecords,
-          TimelineDataProvider,
-          MovementOrMetcon
-        >
-      >(
-        create:
-            (_) => OverviewDataProvider(
+      child:
+          ProviderConsumer<
+            OverviewDataProvider<
+              TimelineUnion,
+              TimelineRecords,
+              TimelineDataProvider,
+              MovementOrMetcon
+            >
+          >(
+            create: (_) => OverviewDataProvider(
               dataProvider: TimelineDataProvider(),
-              entityAccessor:
-                  (dataProvider) =>
-                      (start, end, movementOrMetcon, search) => dataProvider
-                          .getByTimerangeAndMovementOrMetconAndComment(
-                            from: start,
-                            until: end,
-                            comment: search,
-                            movementOrMetcon: movementOrMetcon,
-                          ),
-              recordAccessor: (dataProvider) => () => dataProvider.getRecords(),
+              entityAccessor: (dataProvider) =>
+                  (start, end, movementOrMetcon, search) =>
+                      dataProvider.getByTimerangeAndMovementOrMetconAndComment(
+                        from: start,
+                        until: end,
+                        comment: search,
+                        movementOrMetcon: movementOrMetcon,
+                      ),
+              recordAccessor: (dataProvider) =>
+                  () => dataProvider.getRecords(),
               loggerName: "TimelinePage",
             ),
-        builder:
-            (_, dataProvider, __) => Scaffold(
+            builder: (_, dataProvider, __) => Scaffold(
               appBar: AppBar(
-                title:
-                    dataProvider.isSearch
-                        ? TextFormField(
-                          focusNode: _searchBar,
-                          onChanged: (comment) => dataProvider.search = comment,
-                        )
-                        : Text(dataProvider.selected?.name ?? "Timeline"),
+                title: dataProvider.isSearch
+                    ? TextFormField(
+                        focusNode: _searchBar,
+                        onChanged: (comment) => dataProvider.search = comment,
+                      )
+                    : Text(dataProvider.selected?.name ?? "Timeline"),
                 actions: [
                   IconButton(
                     onPressed: () {
@@ -95,40 +93,34 @@ class TimelinePage extends StatelessWidget {
                 ],
                 bottom: DateFilter(
                   initialState: dataProvider.dateFilter,
-                  onFilterChanged:
-                      (dateFilter) => dataProvider.dateFilter = dateFilter,
+                  onFilterChanged: (dateFilter) =>
+                      dataProvider.dateFilter = dateFilter,
                 ),
               ),
               body: Stack(
                 alignment: Alignment.topCenter,
                 children: [
                   SyncRefreshIndicator(
-                    child:
-                        dataProvider.entities.isEmpty
-                            ? RefreshableNoEntriesText(
-                              text:
-                                  SessionsPageTab
-                                      .timeline
-                                      .noEntriesWithoutAddText,
-                            )
-                            : Padding(
-                              padding: Defaults.edgeInsets.normal,
-                              child: ListView.separated(
-                                itemBuilder:
-                                    (context, index) => _itemCard(
-                                      dataProvider.entities[index],
-                                      dataProvider.records ??
-                                          TimelineRecords({}, {}),
-                                      (movementOrMetcon) =>
-                                          dataProvider.selected =
-                                              movementOrMetcon,
-                                    ),
-                                separatorBuilder:
-                                    (_, __) =>
-                                        Defaults.sizedBox.vertical.normal,
-                                itemCount: dataProvider.entities.length,
+                    child: dataProvider.entities.isEmpty
+                        ? RefreshableNoEntriesText(
+                            text: SessionsPageTab
+                                .timeline
+                                .noEntriesWithoutAddText,
+                          )
+                        : Padding(
+                            padding: Defaults.edgeInsets.normal,
+                            child: ListView.separated(
+                              itemBuilder: (context, index) => _itemCard(
+                                dataProvider.entities[index],
+                                dataProvider.records ?? TimelineRecords({}, {}),
+                                (movementOrMetcon) =>
+                                    dataProvider.selected = movementOrMetcon,
                               ),
+                              separatorBuilder: (_, __) =>
+                                  Defaults.sizedBox.vertical.normal,
+                              itemCount: dataProvider.entities.length,
                             ),
+                          ),
                   ),
                   if (dataProvider.isLoading)
                     const Positioned(
@@ -143,7 +135,7 @@ class TimelinePage extends StatelessWidget {
               ),
               drawer: const MainDrawer(selectedRoute: Routes.timelineOverview),
             ),
-      ),
+          ),
     );
   }
 
@@ -156,8 +148,8 @@ class TimelinePage extends StatelessWidget {
       (strengthSession) => StrengthSessionCard(
         strengthSessionDescription: strengthSession,
         strengthRecords: timelineRecords.strengthRecords,
-        onSelected:
-            (movement) => onSelected(MovementOrMetcon.movement(movement)),
+        onSelected: (movement) =>
+            onSelected(MovementOrMetcon.movement(movement)),
       ),
       (metconSessionDescription) => MetconSessionCard(
         metconSessionDescription: metconSessionDescription,
@@ -166,8 +158,8 @@ class TimelinePage extends StatelessWidget {
       ),
       (cardioSession) => CardioSessionCard(
         cardioSessionDescription: cardioSession,
-        onSelected:
-            (movement) => onSelected(MovementOrMetcon.movement(movement)),
+        onSelected: (movement) =>
+            onSelected(MovementOrMetcon.movement(movement)),
       ),
       (wod) => WodCard(wod: wod),
       (diary) => DiaryCard(diary: diary),

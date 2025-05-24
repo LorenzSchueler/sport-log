@@ -22,15 +22,14 @@ class MonthChart extends DateTimePeriodChart {
       LineChartData(
         lineBarsData: [
           LineChartBarData(
-            spots:
-                chartValues
-                    .map(
-                      (v) => FlSpot(
-                        v.datetime.difference(startDateTime).inDays + 1,
-                        v.value,
-                      ),
-                    )
-                    .toList(),
+            spots: chartValues
+                .map(
+                  (v) => FlSpot(
+                    v.datetime.difference(startDateTime).inDays + 1,
+                    v.value,
+                  ),
+                )
+                .toList(),
             color: Theme.of(context).colorScheme.primary,
           ),
         ],
@@ -39,11 +38,8 @@ class MonthChart extends DateTimePeriodChart {
         minY: minY,
         maxY: maxY,
         titlesData: titlesData(
-          getBottomTitles:
-              (value, _) =>
-                  value % 2 == 0
-                      ? Text(value.round().toString())
-                      : const Text(""),
+          getBottomTitles: (value, _) =>
+              value % 2 == 0 ? Text(value.round().toString()) : const Text(""),
         ),
         gridData: FlGridData(
           getDrawingHorizontalLine: gridLineDrawer(),

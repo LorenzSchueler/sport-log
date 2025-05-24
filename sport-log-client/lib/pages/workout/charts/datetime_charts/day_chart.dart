@@ -19,10 +19,9 @@ class DayChart extends DateTimePeriodChart {
       LineChartData(
         lineBarsData: [
           LineChartBarData(
-            spots:
-                chartValues
-                    .mapIndexed((index, v) => FlSpot(index + 1, v.value))
-                    .toList(),
+            spots: chartValues
+                .mapIndexed((index, v) => FlSpot(index + 1, v.value))
+                .toList(),
             color: Theme.of(context).colorScheme.primary,
           ),
         ],

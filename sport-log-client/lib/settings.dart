@@ -122,10 +122,9 @@ class Settings extends ChangeNotifier {
     notifyListeners();
   }
 
-  String getDefaultServerUrl() =>
-      Config.instance.isAndroidEmulator
-          ? Defaults.server.emulatorUrl
-          : Config.instance.serverAddress;
+  String getDefaultServerUrl() => Config.instance.isAndroidEmulator
+      ? Defaults.server.emulatorUrl
+      : Config.instance.serverAddress;
 
   Future<void> setDefaultServerUrl() => _put(_serverUrl, getDefaultServerUrl());
 
@@ -251,15 +250,14 @@ class Settings extends ChangeNotifier {
     }
   }
 
-  User? get user =>
-      userExists()
-          ? User(
-            id: userId!,
-            username: username!,
-            password: password!,
-            email: email!,
-          )
-          : null;
+  User? get user => userExists()
+      ? User(
+          id: userId!,
+          username: username!,
+          password: password!,
+          email: email!,
+        )
+      : null;
 
   LatLngZoom get lastMapPosition => _getLatLngZoom(_lastMapPosition);
 

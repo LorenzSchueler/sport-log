@@ -12,10 +12,9 @@ CardioSessionDescription _$CardioSessionDescriptionFromJson(
   cardioSession: CardioSession.fromJson(
     json['cardio_session'] as Map<String, dynamic>,
   ),
-  route:
-      json['route'] == null
-          ? null
-          : Route.fromJson(json['route'] as Map<String, dynamic>),
+  route: json['route'] == null
+      ? null
+      : Route.fromJson(json['route'] as Map<String, dynamic>),
   movement: Movement.fromJson(json['movement'] as Map<String, dynamic>),
 );
 

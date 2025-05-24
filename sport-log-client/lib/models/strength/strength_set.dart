@@ -83,8 +83,8 @@ class StrengthSet extends AtomicEntity {
         final eormStr = eormVal != null ? formatWeight(eormVal) : null;
         return weightStr != null
             ? eormStr != null
-                ? '$count x $weightStr  # $eormStr'
-                : '$count x $weightStr'
+                  ? '$count x $weightStr  # $eormStr'
+                  : '$count x $weightStr'
             : '$count reps';
       case MovementDimension.time:
         final result = Duration(milliseconds: count).formatMsMill;

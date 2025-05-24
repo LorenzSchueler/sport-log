@@ -23,14 +23,14 @@ class CardioSessionDescription extends CompoundEntity {
 
   static CardioSessionDescription? defaultValue() =>
       Movement.defaultMovement == null
-          ? null
-          : CardioSessionDescription(
-            cardioSession: CardioSession.defaultValue(
-              Movement.defaultMovement!.id,
-            ),
-            route: null,
-            movement: Movement.defaultMovement!,
-          );
+      ? null
+      : CardioSessionDescription(
+          cardioSession: CardioSession.defaultValue(
+            Movement.defaultMovement!.id,
+          ),
+          route: null,
+          movement: Movement.defaultMovement!,
+        );
 
   @override
   Map<String, dynamic> toJson() => _$CardioSessionDescriptionToJson(this);

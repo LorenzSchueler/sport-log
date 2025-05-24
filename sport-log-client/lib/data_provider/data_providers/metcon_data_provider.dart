@@ -165,8 +165,9 @@ class MetconDescriptionDataProvider extends DataProvider<MetconDescription> {
     final oldMMovements = await _metconMovementDataProvider.getByMetcon(
       object.metcon,
     );
-    final newMMovements =
-        object.moves.map((m) => m.metconMovement..id = randomId()).toList();
+    final newMMovements = object.moves
+        .map((m) => m.metconMovement..id = randomId())
+        .toList();
     result = await _metconMovementDataProvider.deleteMultiple(
       oldMMovements,
       notify: false,
@@ -331,10 +332,9 @@ class MetconSessionDescriptionDataProvider
           .map(
             (session) async => MetconSessionDescription(
               metconSession: session,
-              metconDescription:
-                  (await _metconDescriptionDataProvider.getById(
-                    session.metconId,
-                  ))!,
+              metconDescription: (await _metconDescriptionDataProvider.getById(
+                session.metconId,
+              ))!,
             ),
           )
           .toList(),

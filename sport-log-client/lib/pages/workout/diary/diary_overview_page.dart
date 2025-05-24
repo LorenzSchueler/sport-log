@@ -24,33 +24,30 @@ class DiaryOverviewPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return NeverPop(
-      child: ProviderConsumer<
-        OverviewDataProvider<Diary, void, DiaryDataProvider, void>
-      >(
-        create:
-            (_) => OverviewDataProvider(
+      child:
+          ProviderConsumer<
+            OverviewDataProvider<Diary, void, DiaryDataProvider, void>
+          >(
+            create: (_) => OverviewDataProvider(
               dataProvider: DiaryDataProvider(),
-              entityAccessor:
-                  (dataProvider) =>
-                      (start, end, _, search) =>
-                          dataProvider.getByTimerangeAndComment(
-                            from: start,
-                            until: end,
-                            comment: search,
-                          ),
+              entityAccessor: (dataProvider) =>
+                  (start, end, _, search) =>
+                      dataProvider.getByTimerangeAndComment(
+                        from: start,
+                        until: end,
+                        comment: search,
+                      ),
               recordAccessor: (_) => () async {},
               loggerName: "DiaryPage",
             ),
-        builder:
-            (_, dataProvider, __) => Scaffold(
+            builder: (_, dataProvider, __) => Scaffold(
               appBar: AppBar(
-                title:
-                    dataProvider.isSearch
-                        ? TextFormField(
-                          focusNode: _searchBar,
-                          onChanged: (comment) => dataProvider.search = comment,
-                        )
-                        : const Text("Diary"),
+                title: dataProvider.isSearch
+                    ? TextFormField(
+                        focusNode: _searchBar,
+                        onChanged: (comment) => dataProvider.search = comment,
+                      )
+                    : const Text("Diary"),
                 actions: [
                   IconButton(
                     onPressed: () {
@@ -66,51 +63,48 @@ class DiaryOverviewPage extends StatelessWidget {
                 ],
                 bottom: DateFilter(
                   initialState: dataProvider.dateFilter,
-                  onFilterChanged:
-                      (dateFilter) => dataProvider.dateFilter = dateFilter,
+                  onFilterChanged: (dateFilter) =>
+                      dataProvider.dateFilter = dateFilter,
                 ),
               ),
               body: Stack(
                 alignment: Alignment.topCenter,
                 children: [
                   SyncRefreshIndicator(
-                    child:
-                        dataProvider.entities.isEmpty
-                            ? RefreshableNoEntriesText(
-                              text: SessionsPageTab.diary.noEntriesText,
-                            )
-                            : Padding(
-                              padding: Defaults.edgeInsets.normal,
-                              child: CustomScrollView(
-                                slivers: [
-                                  if (dataProvider.dateFilter is! DayFilter &&
-                                      dataProvider.entities.any(
-                                        (d) => d.bodyweight != null,
-                                      ))
-                                    SliverList.list(
-                                      children: [
-                                        Defaults.sizedBox.vertical.normal,
-                                        DiaryChart(
-                                          diaries: dataProvider.entities,
-                                          dateFilterState:
-                                              dataProvider.dateFilter,
-                                        ),
-                                        Defaults.sizedBox.vertical.normal,
-                                      ],
-                                    ),
-                                  SliverList.separated(
-                                    itemBuilder:
-                                        (_, index) => DiaryCard(
-                                          diary: dataProvider.entities[index],
-                                        ),
-                                    separatorBuilder:
-                                        (_, __) =>
-                                            Defaults.sizedBox.vertical.normal,
-                                    itemCount: dataProvider.entities.length,
+                    child: dataProvider.entities.isEmpty
+                        ? RefreshableNoEntriesText(
+                            text: SessionsPageTab.diary.noEntriesText,
+                          )
+                        : Padding(
+                            padding: Defaults.edgeInsets.normal,
+                            child: CustomScrollView(
+                              slivers: [
+                                if (dataProvider.dateFilter is! DayFilter &&
+                                    dataProvider.entities.any(
+                                      (d) => d.bodyweight != null,
+                                    ))
+                                  SliverList.list(
+                                    children: [
+                                      Defaults.sizedBox.vertical.normal,
+                                      DiaryChart(
+                                        diaries: dataProvider.entities,
+                                        dateFilterState:
+                                            dataProvider.dateFilter,
+                                      ),
+                                      Defaults.sizedBox.vertical.normal,
+                                    ],
                                   ),
-                                ],
-                              ),
+                                SliverList.separated(
+                                  itemBuilder: (_, index) => DiaryCard(
+                                    diary: dataProvider.entities[index],
+                                  ),
+                                  separatorBuilder: (_, __) =>
+                                      Defaults.sizedBox.vertical.normal,
+                                  itemCount: dataProvider.entities.length,
+                                ),
+                              ],
                             ),
+                          ),
                   ),
                   if (dataProvider.isLoading)
                     const Positioned(
@@ -129,7 +123,7 @@ class DiaryOverviewPage extends StatelessWidget {
                 onPressed: () => Navigator.pushNamed(context, Routes.diaryEdit),
               ),
             ),
-      ),
+          ),
     );
   }
 }
@@ -153,9 +147,8 @@ class DiaryCard extends StatelessWidget {
           ),
       ],
       comments: diary.comments,
-      onTap:
-          () =>
-              Navigator.pushNamed(context, Routes.diaryEdit, arguments: diary),
+      onTap: () =>
+          Navigator.pushNamed(context, Routes.diaryEdit, arguments: diary),
       onLongPress: null,
       dateOnly: true,
     );

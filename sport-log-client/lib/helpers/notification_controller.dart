@@ -36,11 +36,10 @@ class NotificationController {
       onDidReceiveNotificationResponse: _instance._onNotificationResponse,
     );
 
-    final androidPlugin =
-        _instance._plugin
-            .resolvePlatformSpecificImplementation<
-              AndroidFlutterLocalNotificationsPlugin
-            >();
+    final androidPlugin = _instance._plugin
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >();
 
     await androidPlugin?.requestNotificationsPermission();
 

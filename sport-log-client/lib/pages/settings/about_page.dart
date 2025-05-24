@@ -46,21 +46,19 @@ class AboutPage extends StatelessWidget {
               leading: AppIcons.github,
               caption: "GitHub",
               child: const Text("github.com/LorenzSchueler/sport-log"),
-              onTap:
-                  () => launchUrl(
-                    Uri.parse("https://github.com/LorenzSchueler/sport-log"),
-                    mode: LaunchMode.externalApplication,
-                  ),
+              onTap: () => launchUrl(
+                Uri.parse("https://github.com/LorenzSchueler/sport-log"),
+                mode: LaunchMode.externalApplication,
+              ),
             ),
             EditTile(
               leading: AppIcons.copyright,
               caption: "Copyright & License",
               child: const Text("GPLv3 license"),
-              onTap:
-                  () => launchUrl(
-                    Uri.parse("https://www.gnu.org/licenses/gpl-3.0.html"),
-                    mode: LaunchMode.externalApplication,
-                  ),
+              onTap: () => launchUrl(
+                Uri.parse("https://www.gnu.org/licenses/gpl-3.0.html"),
+                mode: LaunchMode.externalApplication,
+              ),
             ),
             EditTile(
               leading: AppIcons.contributors,
@@ -68,15 +66,13 @@ class AboutPage extends StatelessWidget {
               unboundedHeight: true,
               child: ListView.separated(
                 shrinkWrap: true,
-                itemBuilder:
-                    (context, index) => GestureDetector(
-                      child: Text(_Contributor.all[index].name),
-                      onTap:
-                          () => launchUrl(
-                            Uri.parse(_Contributor.all[index].github),
-                            mode: LaunchMode.externalApplication,
-                          ),
-                    ),
+                itemBuilder: (context, index) => GestureDetector(
+                  child: Text(_Contributor.all[index].name),
+                  onTap: () => launchUrl(
+                    Uri.parse(_Contributor.all[index].github),
+                    mode: LaunchMode.externalApplication,
+                  ),
+                ),
                 separatorBuilder: (context, index) => const SizedBox(height: 5),
                 itemCount: _Contributor.all.length,
               ),

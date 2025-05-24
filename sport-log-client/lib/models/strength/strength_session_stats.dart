@@ -34,8 +34,10 @@ class StrengthSessionStats extends JsonSerializable {
     final maxCount = sets.map((s) => s.count).maxOrNull ?? 0;
     final sumCount = sets.map((s) => s.count).sum;
     final avgCount = sets.isEmpty ? 0.0 : sumCount / numSets;
-    final maxEorm =
-        sets.map((s) => s.eorm(movementDimension)).nonNulls.maxOrNull;
+    final maxEorm = sets
+        .map((s) => s.eorm(movementDimension))
+        .nonNulls
+        .maxOrNull;
     final sumVolume = sets.map((s) => s.volume).nonNulls.sum;
 
     return StrengthSessionStats(

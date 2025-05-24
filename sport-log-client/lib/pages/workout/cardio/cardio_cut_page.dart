@@ -24,8 +24,9 @@ class CardioCutPage extends StatefulWidget {
 }
 
 class _CardioCutPageState extends State<CardioCutPage> {
-  late final CardioSessionDescription _cardioSessionDescription =
-      widget.cardioSessionDescription.clone();
+  late final CardioSessionDescription _cardioSessionDescription = widget
+      .cardioSessionDescription
+      .clone();
 
   Duration _cutStartDuration = Duration.zero;
   late Duration _cutEndDuration = _cardioSessionDescription.cardioSession.time!;
@@ -90,12 +91,12 @@ class _CardioCutPageState extends State<CardioCutPage> {
       lineOpacity: startLtEnd ? cutLineOpacity : null,
     );
 
-    final startLatLng =
-        track?.firstWhereOrNull((pos) => pos.time >= _cutStartDuration)?.latLng;
-    final endLatLng =
-        track?.reversed
-            .firstWhereOrNull((pos) => pos.time <= _cutEndDuration)
-            ?.latLng;
+    final startLatLng = track
+        ?.firstWhereOrNull((pos) => pos.time >= _cutStartDuration)
+        ?.latLng;
+    final endLatLng = track?.reversed
+        .firstWhereOrNull((pos) => pos.time <= _cutEndDuration)
+        ?.latLng;
     await _mapController?.updateTrackMarker(_cutStartMarker, startLatLng);
     await _mapController?.updateTrackMarker(_cutEndMarker, endLatLng);
   }
@@ -195,8 +196,9 @@ class _CardioCutPageState extends State<CardioCutPage> {
                           label: const Text("Cancel"),
                           onPressed: () => Navigator.of(context).pop(),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor:
-                                Theme.of(context).colorScheme.error,
+                            backgroundColor: Theme.of(
+                              context,
+                            ).colorScheme.error,
                           ),
                         ),
                       ),
@@ -207,8 +209,9 @@ class _CardioCutPageState extends State<CardioCutPage> {
                           label: const Text("Cut"),
                           onPressed: _cutCardioSession,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor:
-                                Theme.of(context).colorScheme.errorContainer,
+                            backgroundColor: Theme.of(
+                              context,
+                            ).colorScheme.errorContainer,
                           ),
                         ),
                       ),

@@ -34,10 +34,9 @@ abstract class TableAccessor<T extends AtomicEntity> {
   static String cardioOnlyOfTable(bool cardioOnly) =>
       cardioOnly ? '${Tables.movement}.${Columns.cardio} = 1' : '';
 
-  static String distanceOnlyOfTable(bool distanceOnly) =>
-      distanceOnly
-          ? "${Tables.movement}.${Columns.dimension} = ${MovementDimension.distance.index}"
-          : '';
+  static String distanceOnlyOfTable(bool distanceOnly) => distanceOnly
+      ? "${Tables.movement}.${Columns.dimension} = ${MovementDimension.distance.index}"
+      : '';
 
   static String fromFilterOfTable(
     String tableName,
@@ -75,25 +74,24 @@ abstract class TableAccessor<T extends AtomicEntity> {
 
   static String movementIdFilterOfTable(String tableName, Movement? movement) =>
       movement == null
-          ? ''
-          : '$tableName.${Columns.movementId} = ${movement.id}';
+      ? ''
+      : '$tableName.${Columns.movementId} = ${movement.id}';
   String movementIdFilter(Movement? movement) =>
       movementIdFilterOfTable(tableName, movement);
 
   static String commentFilterOfTable(String tableName, String? comment) =>
       comment == null || comment.isEmpty
-          ? ''
-          : "$tableName.${Columns.comments} like '%$comment%'";
+      ? ''
+      : "$tableName.${Columns.comments} like '%$comment%'";
   String commentFilter(String? comment) =>
       commentFilterOfTable(tableName, comment);
 
   static String descriptionFilterOfTable(
     String tableName,
     String? description,
-  ) =>
-      description == null || description.isEmpty
-          ? ''
-          : "$tableName.${Columns.description} like '%$description%'";
+  ) => description == null || description.isEmpty
+      ? ''
+      : "$tableName.${Columns.description} like '%$description%'";
   String descriptionFilter(String? description) =>
       descriptionFilterOfTable(tableName, description);
 
@@ -159,8 +157,9 @@ abstract class TableAccessor<T extends AtomicEntity> {
           whereArgs: [object.id.toInt()],
         );
       }
-      final changesList =
-          (await batch.commit(continueOnError: false)).cast<int>();
+      final changesList = (await batch.commit(
+        continueOnError: false,
+      )).cast<int>();
       return DbResultExt.fromBool(
         eq(changesList, List.filled(objects.length, 1)),
       );
@@ -190,8 +189,9 @@ abstract class TableAccessor<T extends AtomicEntity> {
           whereArgs: [object.id.toInt()],
         );
       }
-      final changesList =
-          (await batch.commit(continueOnError: false)).cast<int>();
+      final changesList = (await batch.commit(
+        continueOnError: false,
+      )).cast<int>();
       return DbResultExt.fromBool(
         eq(changesList, List.filled(objects.length, 1)),
       );

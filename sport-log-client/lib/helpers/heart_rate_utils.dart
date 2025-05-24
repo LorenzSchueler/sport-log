@@ -82,10 +82,9 @@ class HeartRateUtils extends ChangeNotifier {
     return Request.request(
       title: "Bluetooth Required",
       text: "Please enable bluetooth.",
-      check:
-          () async =>
-              (await FlutterBluePlus.adapterState.first) ==
-              BluetoothAdapterState.on,
+      check: () async =>
+          (await FlutterBluePlus.adapterState.first) ==
+          BluetoothAdapterState.on,
       change: () async {
         try {
           await FlutterBluePlus.turnOn();

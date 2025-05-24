@@ -31,13 +31,12 @@ enum TrackingMode {
 class TrackingUtils extends ChangeNotifier {
   TrackingUtils({required TrackingSettings trackingSettings})
     : _cardioSessionDescription = CardioSessionDescription(
-        cardioSession:
-            CardioSession.defaultValue(trackingSettings.movement.id)
-              ..cardioType = trackingSettings.cardioType
-              ..track = []
-              ..cadence = []
-              ..heartRate = []
-              ..routeId = trackingSettings.route?.id,
+        cardioSession: CardioSession.defaultValue(trackingSettings.movement.id)
+          ..cardioType = trackingSettings.cardioType
+          ..track = []
+          ..cadence = []
+          ..heartRate = []
+          ..routeId = trackingSettings.route?.id,
         movement: trackingSettings.movement,
         route: trackingSettings.route,
       ),
@@ -51,11 +50,10 @@ class TrackingUtils extends ChangeNotifier {
             : null,
       ),
       _audioFeedbackUtils = AudioFeedbackUtils(trackingSettings.audioFeedback),
-      _heartRateUtils =
-          trackingSettings.heartRateUtils.deviceId != null
-              ? (HeartRateUtils() // trackingSettings.heartRateUtils is disposed
-                ..deviceId = trackingSettings.heartRateUtils.deviceId)
-              : null {
+      _heartRateUtils = trackingSettings.heartRateUtils.deviceId != null
+          ? (HeartRateUtils() // trackingSettings.heartRateUtils is disposed
+              ..deviceId = trackingSettings.heartRateUtils.deviceId)
+          : null {
     _audioFeedbackUtils.setCallbacks(
       () => cardioSessionDescription.cardioSession,
       () => mode,
@@ -179,10 +177,9 @@ class TrackingUtils extends ChangeNotifier {
     cardioSessionDescription.cardioSession.setAvgCadence();
     cardioSessionDescription.cardioSession.setAvgHeartRate();
     cardioSessionDescription.cardioSession.setDistance();
-    final result =
-        _isSaved
-            ? await _dataProvider.updateSingle(cardioSessionDescription)
-            : await _dataProvider.createSingle(cardioSessionDescription);
+    final result = _isSaved
+        ? await _dataProvider.updateSingle(cardioSessionDescription)
+        : await _dataProvider.createSingle(cardioSessionDescription);
     if (context.mounted) {
       if (result.isOk) {
         onSuccess();
@@ -283,11 +280,9 @@ class TrackingUtils extends ChangeNotifier {
       latitude: location.latitude,
       longitude: location.longitude,
       elevation: elevation ?? location.elevation,
-      distance:
-          track.isEmpty
-              ? 0
-              : track.last.distance +
-                  track.last.latLng.distanceTo(location.latLng),
+      distance: track.isEmpty
+          ? 0
+          : track.last.distance + track.last.latLng.distanceTo(location.latLng),
       time: currentDuration,
     );
 

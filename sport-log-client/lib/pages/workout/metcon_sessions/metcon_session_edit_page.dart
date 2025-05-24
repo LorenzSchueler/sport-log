@@ -35,15 +35,15 @@ class _MetconSessionEditPageState extends State<MetconSessionEditPage> {
   final _dataProvider = MetconSessionDescriptionDataProvider();
   final _metconDescriptionDataProvider = MetconDescriptionDataProvider();
 
-  late final MetconSessionDescription _metconSessionDescription =
-      widget.metconSessionDescription.clone();
+  late final MetconSessionDescription _metconSessionDescription = widget
+      .metconSessionDescription
+      .clone();
   late bool _finished = _metconSessionDescription.metconSession.time != null;
 
   Future<void> _saveMetconSession() async {
-    final result =
-        widget.isNew
-            ? await _dataProvider.createSingle(_metconSessionDescription)
-            : await _dataProvider.updateSingle(_metconSessionDescription);
+    final result = widget.isNew
+        ? await _dataProvider.createSingle(_metconSessionDescription)
+        : await _dataProvider.updateSingle(_metconSessionDescription);
     if (mounted) {
       if (result.isOk) {
         Navigator.pop(
@@ -109,10 +109,10 @@ class _MetconSessionEditPageState extends State<MetconSessionEditPage> {
             IconButton(
               onPressed:
                   _formKey.currentContext != null &&
-                          _formKey.currentState!.validate() &&
-                          _metconSessionDescription.isValidBeforeSanitation()
-                      ? _saveMetconSession
-                      : null,
+                      _formKey.currentState!.validate() &&
+                      _metconSessionDescription.isValidBeforeSanitation()
+                  ? _saveMetconSession
+                  : null,
               icon: const Icon(AppIcons.save),
             ),
           ],
@@ -252,12 +252,9 @@ class _MetconSessionEditPageState extends State<MetconSessionEditPage> {
                     caption: 'Time',
                     leading: AppIcons.timeInterval,
                     child: DurationInput(
-                      onUpdate:
-                          (d) => setState(
-                            () =>
-                                _metconSessionDescription.metconSession.time =
-                                    d,
-                          ),
+                      onUpdate: (d) => setState(
+                        () => _metconSessionDescription.metconSession.time = d,
+                      ),
                       initialDuration:
                           _metconSessionDescription.metconSession.time ??
                           Duration.zero,
@@ -290,23 +287,23 @@ class _MetconSessionEditPageState extends State<MetconSessionEditPage> {
                             minValue: 0,
                             maxValue:
                                 _metconSessionDescription
-                                            .metconDescription
-                                            .metcon
-                                            .metconType ==
-                                        MetconType.forTime
-                                    ? _metconSessionDescription
-                                            .metconDescription
-                                            .metcon
-                                            .rounds! -
-                                        1
-                                    : 999,
-                            onUpdate:
-                                (rounds) => setState(
-                                  () =>
-                                      _metconSessionDescription
+                                        .metconDescription
+                                        .metcon
+                                        .metconType ==
+                                    MetconType.forTime
+                                ? _metconSessionDescription
+                                          .metconDescription
+                                          .metcon
+                                          .rounds! -
+                                      1
+                                : 999,
+                            onUpdate: (rounds) => setState(
+                              () =>
+                                  _metconSessionDescription
                                           .metconSession
-                                          .rounds = rounds,
-                                ),
+                                          .rounds =
+                                      rounds,
+                            ),
                           ),
                         ),
                       ),
@@ -327,13 +324,11 @@ class _MetconSessionEditPageState extends State<MetconSessionEditPage> {
                                     .map((e) => e.metconMovement.count)
                                     .sum -
                                 1,
-                            onUpdate:
-                                (reps) => setState(
-                                  () =>
-                                      _metconSessionDescription
-                                          .metconSession
-                                          .reps = reps,
-                                ),
+                            onUpdate: (reps) => setState(
+                              () =>
+                                  _metconSessionDescription.metconSession.reps =
+                                      reps,
+                            ),
                           ),
                         ),
                       ),
@@ -360,11 +355,10 @@ class _MetconSessionEditPageState extends State<MetconSessionEditPage> {
                   keyboardType: TextInputType.multiline,
                   minLines: 1,
                   maxLines: 5,
-                  onChanged:
-                      (comments) => setState(() {
-                        _metconSessionDescription.metconSession.comments =
-                            comments.isEmpty ? null : comments;
-                      }),
+                  onChanged: (comments) => setState(() {
+                    _metconSessionDescription.metconSession.comments =
+                        comments.isEmpty ? null : comments;
+                  }),
                 ),
               ],
             ),

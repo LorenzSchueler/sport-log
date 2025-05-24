@@ -35,10 +35,9 @@ class _ActionRuleEditPageState extends State<ActionRuleEditPage> {
       );
 
   Future<void> _saveActionRule() async {
-    final result =
-        widget.isNew
-            ? await _dataProvider.createSingle(_actionRule)
-            : await _dataProvider.updateSingle(_actionRule);
+    final result = widget.isNew
+        ? await _dataProvider.createSingle(_actionRule)
+        : await _dataProvider.updateSingle(_actionRule);
     if (mounted) {
       if (result.isOk) {
         Navigator.pop(context);
@@ -87,10 +86,9 @@ class _ActionRuleEditPageState extends State<ActionRuleEditPage> {
               icon: const Icon(AppIcons.delete),
             ),
             IconButton(
-              onPressed:
-                  _actionRule.isValidBeforeSanitation()
-                      ? _saveActionRule
-                      : null,
+              onPressed: _actionRule.isValidBeforeSanitation()
+                  ? _saveActionRule
+                  : null,
               icon: const Icon(AppIcons.save),
             ),
           ],
@@ -156,11 +154,9 @@ class _ActionRuleEditPageState extends State<ActionRuleEditPage> {
                   labelText: "Arguments",
                 ),
                 initialValue: _actionRule.arguments,
-                onChanged:
-                    (arguments) => setState(() {
-                      _actionRule.arguments =
-                          arguments.isEmpty ? null : arguments;
-                    }),
+                onChanged: (arguments) => setState(() {
+                  _actionRule.arguments = arguments.isEmpty ? null : arguments;
+                }),
               ),
             ],
           ),

@@ -52,16 +52,15 @@ class CurrentLocationButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return ProviderConsumer.value(
       value: locationUtils,
-      builder:
-          (context, locationUtils, _) => FloatingActionButton.small(
-            heroTag: null,
-            onPressed: _toggleCurrentLocation,
-            child: Icon(
-              locationUtils.enabled
-                  ? AppIcons.myLocation
-                  : AppIcons.myLocationDisabled,
-            ),
-          ),
+      builder: (context, locationUtils, _) => FloatingActionButton.small(
+        heroTag: null,
+        onPressed: _toggleCurrentLocation,
+        child: Icon(
+          locationUtils.enabled
+              ? AppIcons.myLocation
+              : AppIcons.myLocationDisabled,
+        ),
+      ),
     );
   }
 }

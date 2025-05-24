@@ -161,13 +161,10 @@ class _MapboxMapWrapperState extends State<MapboxMapWrapper> {
               await Settings.instance.setLastMapPosition(lastMapPosition);
             }
           },
-          onTapListener:
-              (MapContentGestureContext gestureContext) =>
-                  widget.onTap?.call(LatLng.fromPoint(gestureContext.point)),
-          onLongTapListener:
-              (gestureContext) => widget.onLongTap?.call(
-                LatLng.fromPoint(gestureContext.point),
-              ),
+          onTapListener: (MapContentGestureContext gestureContext) =>
+              widget.onTap?.call(LatLng.fromPoint(gestureContext.point)),
+          onLongTapListener: (gestureContext) =>
+              widget.onLongTap?.call(LatLng.fromPoint(gestureContext.point)),
         ),
         if (_mapController != null && widget.showOverlays)
           Positioned(
@@ -220,17 +217,16 @@ class _MapboxMapWrapperState extends State<MapboxMapWrapper> {
                 ProviderConsumer.value(
                   // Consumer to detect enabled change
                   value: _locationUtils,
-                  builder:
-                      (context, locationUtils, _) =>
-                          widget.showAddLocationButton &&
-                                  _selectedRoute != null &&
-                                  _locationUtils.enabled
-                              ? AddLocationButton(
-                                route: _selectedRoute!,
-                                updateRoute: updateRoute,
-                                locationUtils: _locationUtils,
-                              )
-                              : Container(),
+                  builder: (context, locationUtils, _) =>
+                      widget.showAddLocationButton &&
+                          _selectedRoute != null &&
+                          _locationUtils.enabled
+                      ? AddLocationButton(
+                          route: _selectedRoute!,
+                          updateRoute: updateRoute,
+                          locationUtils: _locationUtils,
+                        )
+                      : Container(),
                 ),
               ],
             ),

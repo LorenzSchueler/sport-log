@@ -44,15 +44,14 @@ class AllChart extends DateTimePeriodChart {
         LineChartData(
           lineBarsData: [
             LineChartBarData(
-              spots:
-                  chartValues
-                      .map(
-                        (v) => FlSpot(
-                          v.datetime.difference(startDateTime).inDays + 1,
-                          v.value,
-                        ),
-                      )
-                      .toList(),
+              spots: chartValues
+                  .map(
+                    (v) => FlSpot(
+                      v.datetime.difference(startDateTime).inDays + 1,
+                      v.value,
+                    ),
+                  )
+                  .toList(),
               color: Theme.of(context).colorScheme.primary,
               dotData: const FlDotData(show: false),
             ),

@@ -30,8 +30,9 @@ class StrengthSessionDetailsPage extends StatefulWidget {
 class StrengthSessionDetailsPageState
     extends State<StrengthSessionDetailsPage> {
   final _dataProvider = StrengthSessionDescriptionDataProvider();
-  late StrengthSessionDescription _strengthSessionDescription =
-      widget.strengthSessionDescription.clone();
+  late StrengthSessionDescription _strengthSessionDescription = widget
+      .strengthSessionDescription
+      .clone();
   StrengthRecords strengthRecords = {};
 
   @override
@@ -268,32 +269,31 @@ class _StrengthSetsCard extends StatelessWidget {
         padding: Defaults.edgeInsets.normal,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children:
-              strengthSessionDescription.sets.mapIndexed((index, set) {
-                final recordTypes = strengthRecords.getRecordTypes(
-                  set,
-                  strengthSessionDescription.movement,
-                );
-                return EditTile(
-                  leading: null,
-                  caption: "Set ${index + 1}",
-                  bigText: false,
-                  child: Row(
-                    children: [
-                      Text(
-                        set.toDisplayName(
-                          strengthSessionDescription.movement.dimension,
-                          withEorm: true,
-                        ),
-                      ),
-                      if (recordTypes.isNotEmpty) ...[
-                        Defaults.sizedBox.horizontal.normal,
-                        StrengthRecordMarkers(strengthRecordTypes: recordTypes),
-                      ],
-                    ],
+          children: strengthSessionDescription.sets.mapIndexed((index, set) {
+            final recordTypes = strengthRecords.getRecordTypes(
+              set,
+              strengthSessionDescription.movement,
+            );
+            return EditTile(
+              leading: null,
+              caption: "Set ${index + 1}",
+              bigText: false,
+              child: Row(
+                children: [
+                  Text(
+                    set.toDisplayName(
+                      strengthSessionDescription.movement.dimension,
+                      withEorm: true,
+                    ),
                   ),
-                );
-              }).toList(),
+                  if (recordTypes.isNotEmpty) ...[
+                    Defaults.sizedBox.horizontal.normal,
+                    StrengthRecordMarkers(strengthRecordTypes: recordTypes),
+                  ],
+                ],
+              ),
+            );
+          }).toList(),
         ),
       ),
     );

@@ -38,17 +38,15 @@ class AppTheme {
       style: ButtonStyle(
         iconSize: const WidgetStatePropertyAll(24),
         iconColor: WidgetStateProperty.resolveWith(
-          (states) =>
-              states.contains(WidgetState.selected)
-                  ? _colorScheme.surface
-                  : Colors.white,
+          (states) => states.contains(WidgetState.selected)
+              ? _colorScheme.surface
+              : Colors.white,
         ),
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
         backgroundColor: WidgetStateProperty.resolveWith(
-          (states) =>
-              states.contains(WidgetState.selected)
-                  ? _colorScheme.primary.withAlpha(200)
-                  : null,
+          (states) => states.contains(WidgetState.selected)
+              ? _colorScheme.primary.withAlpha(200)
+              : null,
         ),
       ),
     ),
@@ -87,10 +85,9 @@ class AppTheme {
       labelStyle: const TextStyle(color: EditTile.iconCaptionColor),
       floatingLabelStyle: WidgetStateTextStyle.resolveWith(
         (states) => TextStyle(
-          color:
-              states.contains(WidgetState.selected)
-                  ? _colorScheme.primary
-                  : EditTile.iconCaptionColor,
+          color: states.contains(WidgetState.selected)
+              ? _colorScheme.primary
+              : EditTile.iconCaptionColor,
           fontSize: 18,
         ),
       ),

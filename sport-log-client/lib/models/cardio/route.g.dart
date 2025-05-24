@@ -12,14 +12,12 @@ Route _$RouteFromJson(Map<String, dynamic> json) => Route(
   distance: (json['distance'] as num?)?.toInt(),
   ascent: (json['ascent'] as num?)?.toInt(),
   descent: (json['descent'] as num?)?.toInt(),
-  track:
-      (json['track'] as List<dynamic>?)
-          ?.map((e) => Position.fromJson(e as Map<String, dynamic>))
-          .toList(),
-  markedPositions:
-      (json['marked_positions'] as List<dynamic>?)
-          ?.map((e) => Position.fromJson(e as Map<String, dynamic>))
-          .toList(),
+  track: (json['track'] as List<dynamic>?)
+      ?.map((e) => Position.fromJson(e as Map<String, dynamic>))
+      .toList(),
+  markedPositions: (json['marked_positions'] as List<dynamic>?)
+      ?.map((e) => Position.fromJson(e as Map<String, dynamic>))
+      .toList(),
   deleted: json['deleted'] as bool,
 );
 

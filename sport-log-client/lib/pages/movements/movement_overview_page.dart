@@ -19,33 +19,30 @@ class MovementOverviewPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return NeverPop(
-      child: ProviderConsumer<
-        OverviewDataProvider<
-          MovementDescription,
-          void,
-          MovementDescriptionDataProvider,
-          void
-        >
-      >(
-        create:
-            (_) => OverviewDataProvider(
+      child:
+          ProviderConsumer<
+            OverviewDataProvider<
+              MovementDescription,
+              void,
+              MovementDescriptionDataProvider,
+              void
+            >
+          >(
+            create: (_) => OverviewDataProvider(
               dataProvider: MovementDescriptionDataProvider(),
-              entityAccessor:
-                  (dataProvider) =>
-                      (_, __, ___, search) => dataProvider.getByName(search),
+              entityAccessor: (dataProvider) =>
+                  (_, __, ___, search) => dataProvider.getByName(search),
               recordAccessor: (_) => () async {},
               loggerName: "MovementsPage",
             ),
-        builder:
-            (_, dataProvider, __) => Scaffold(
+            builder: (_, dataProvider, __) => Scaffold(
               appBar: AppBar(
-                title:
-                    dataProvider.isSearch
-                        ? TextFormField(
-                          focusNode: _searchBar,
-                          onChanged: (name) => dataProvider.search = name,
-                        )
-                        : const Text("Movements"),
+                title: dataProvider.isSearch
+                    ? TextFormField(
+                        focusNode: _searchBar,
+                        onChanged: (name) => dataProvider.search = name,
+                      )
+                    : const Text("Movements"),
                 actions: [
                   IconButton(
                     onPressed: () {
@@ -62,25 +59,22 @@ class MovementOverviewPage extends StatelessWidget {
               ),
               drawer: const MainDrawer(selectedRoute: Routes.movementOverview),
               body: SyncRefreshIndicator(
-                child:
-                    dataProvider.entities.isEmpty
-                        ? const RefreshableNoEntriesText(
-                          text:
-                              "Looks like there are no movements there yet 😔\nPress ＋ to create a new one",
-                        )
-                        : Padding(
-                          padding: Defaults.edgeInsets.normal,
-                          child: ListView.separated(
-                            itemBuilder:
-                                (_, index) => MovementCard(
-                                  movementDescription:
-                                      dataProvider.entities[index],
-                                ),
-                            separatorBuilder:
-                                (_, __) => Defaults.sizedBox.vertical.normal,
-                            itemCount: dataProvider.entities.length,
+                child: dataProvider.entities.isEmpty
+                    ? const RefreshableNoEntriesText(
+                        text:
+                            "Looks like there are no movements there yet 😔\nPress ＋ to create a new one",
+                      )
+                    : Padding(
+                        padding: Defaults.edgeInsets.normal,
+                        child: ListView.separated(
+                          itemBuilder: (_, index) => MovementCard(
+                            movementDescription: dataProvider.entities[index],
                           ),
+                          separatorBuilder: (_, __) =>
+                              Defaults.sizedBox.vertical.normal,
+                          itemCount: dataProvider.entities.length,
                         ),
+                      ),
               ),
               floatingActionButton: FloatingActionButton(
                 child: const Icon(AppIcons.add),
@@ -89,7 +83,7 @@ class MovementOverviewPage extends StatelessWidget {
                 },
               ),
             ),
-      ),
+          ),
     );
   }
 }

@@ -23,17 +23,16 @@ class _SpinningSyncState extends State<SpinningSync>
 
   @override
   void initState() {
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 1),
-    )..addStatusListener((status) {
-      if (status == AnimationStatus.completed) {
-        // repeat animation
-        if (widget.isSpinning) {
-          _controller.forward(from: 0);
-        }
-      }
-    });
+    _controller =
+        AnimationController(vsync: this, duration: const Duration(seconds: 1))
+          ..addStatusListener((status) {
+            if (status == AnimationStatus.completed) {
+              // repeat animation
+              if (widget.isSpinning) {
+                _controller.forward(from: 0);
+              }
+            }
+          });
 
     if (widget.isSpinning) {
       _controller.forward();

@@ -20,34 +20,30 @@ class MetconOverviewPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return NeverPop(
-      child: ProviderConsumer<
-        OverviewDataProvider<
-          MetconDescription,
-          void,
-          MetconDescriptionDataProvider,
-          void
-        >
-      >(
-        create:
-            (_) => OverviewDataProvider(
+      child:
+          ProviderConsumer<
+            OverviewDataProvider<
+              MetconDescription,
+              void,
+              MetconDescriptionDataProvider,
+              void
+            >
+          >(
+            create: (_) => OverviewDataProvider(
               dataProvider: MetconDescriptionDataProvider(),
-              entityAccessor:
-                  (dataProvider) =>
-                      (_, __, ___, search) =>
-                          dataProvider.getByMetconName(search),
+              entityAccessor: (dataProvider) =>
+                  (_, __, ___, search) => dataProvider.getByMetconName(search),
               recordAccessor: (_) => () async {},
               loggerName: "MetconsPage",
             ),
-        builder:
-            (_, dataProvider, __) => Scaffold(
+            builder: (_, dataProvider, __) => Scaffold(
               appBar: AppBar(
-                title:
-                    dataProvider.isSearch
-                        ? TextFormField(
-                          focusNode: _searchBar,
-                          onChanged: (name) => dataProvider.search = name,
-                        )
-                        : const Text("Metcons"),
+                title: dataProvider.isSearch
+                    ? TextFormField(
+                        focusNode: _searchBar,
+                        onChanged: (name) => dataProvider.search = name,
+                      )
+                    : const Text("Metcons"),
                 actions: [
                   IconButton(
                     onPressed: () {
@@ -61,34 +57,30 @@ class MetconOverviewPage extends StatelessWidget {
                     ),
                   ),
                   IconButton(
-                    onPressed:
-                        () => Navigator.of(
-                          context,
-                        ).newBase(Routes.metconSessionOverview),
+                    onPressed: () => Navigator.of(
+                      context,
+                    ).newBase(Routes.metconSessionOverview),
                     icon: const Icon(AppIcons.notes),
                   ),
                 ],
               ),
               body: SyncRefreshIndicator(
-                child:
-                    dataProvider.entities.isEmpty
-                        ? const RefreshableNoEntriesText(
-                          text:
-                              "Looks like there are no metcons there yet 😔\nPress ＋ to create a new one",
-                        )
-                        : Padding(
-                          padding: Defaults.edgeInsets.normal,
-                          child: ListView.separated(
-                            itemBuilder:
-                                (_, index) => MetconCard(
-                                  metconDescription:
-                                      dataProvider.entities[index],
-                                ),
-                            separatorBuilder:
-                                (_, __) => Defaults.sizedBox.vertical.normal,
-                            itemCount: dataProvider.entities.length,
+                child: dataProvider.entities.isEmpty
+                    ? const RefreshableNoEntriesText(
+                        text:
+                            "Looks like there are no metcons there yet 😔\nPress ＋ to create a new one",
+                      )
+                    : Padding(
+                        padding: Defaults.edgeInsets.normal,
+                        child: ListView.separated(
+                          itemBuilder: (_, index) => MetconCard(
+                            metconDescription: dataProvider.entities[index],
                           ),
+                          separatorBuilder: (_, __) =>
+                              Defaults.sizedBox.vertical.normal,
+                          itemCount: dataProvider.entities.length,
                         ),
+                      ),
               ),
               bottomNavigationBar: SessionsPageTab.bottomNavigationBar(
                 context: context,
@@ -97,11 +89,11 @@ class MetconOverviewPage extends StatelessWidget {
               drawer: const MainDrawer(selectedRoute: Routes.metconOverview),
               floatingActionButton: FloatingActionButton(
                 child: const Icon(AppIcons.add),
-                onPressed:
-                    () => Navigator.pushNamed(context, Routes.metconEdit),
+                onPressed: () =>
+                    Navigator.pushNamed(context, Routes.metconEdit),
               ),
             ),
-      ),
+          ),
     );
   }
 }
@@ -114,12 +106,11 @@ class MetconCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap:
-          () => Navigator.pushNamed(
-            context,
-            Routes.metconDetails,
-            arguments: metconDescription,
-          ),
+      onTap: () => Navigator.pushNamed(
+        context,
+        Routes.metconDetails,
+        arguments: metconDescription,
+      ),
       child: Card(
         margin: EdgeInsets.zero,
         child: Padding(

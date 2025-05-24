@@ -32,41 +32,36 @@ class CardioOverviewPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return NeverPop(
-      child: ProviderConsumer<
-        OverviewDataProvider<
-          CardioSessionDescription,
-          void,
-          CardioSessionDescriptionDataProvider,
-          Movement
-        >
-      >(
-        create:
-            (_) => OverviewDataProvider(
+      child:
+          ProviderConsumer<
+            OverviewDataProvider<
+              CardioSessionDescription,
+              void,
+              CardioSessionDescriptionDataProvider,
+              Movement
+            >
+          >(
+            create: (_) => OverviewDataProvider(
               dataProvider: CardioSessionDescriptionDataProvider(),
-              entityAccessor:
-                  (dataProvider) =>
-                      (start, end, movement, search) =>
-                          dataProvider.getByTimerangeAndMovementAndComment(
-                            from: start,
-                            until: end,
-                            movement: movement,
-                            comment: search,
-                          ),
+              entityAccessor: (dataProvider) =>
+                  (start, end, movement, search) =>
+                      dataProvider.getByTimerangeAndMovementAndComment(
+                        from: start,
+                        until: end,
+                        movement: movement,
+                        comment: search,
+                      ),
               recordAccessor: (_) => () async {},
               loggerName: "CardioSessionsPage",
             ),
-        builder:
-            (_, dataProvider, __) => Scaffold(
+            builder: (_, dataProvider, __) => Scaffold(
               appBar: AppBar(
-                title:
-                    dataProvider.isSearch
-                        ? TextFormField(
-                          focusNode: _searchBar,
-                          onChanged: (comment) => dataProvider.search = comment,
-                        )
-                        : Text(
-                          dataProvider.selected?.name ?? "Cardio Sessions",
-                        ),
+                title: dataProvider.isSearch
+                    ? TextFormField(
+                        focusNode: _searchBar,
+                        onChanged: (comment) => dataProvider.search = comment,
+                      )
+                    : Text(dataProvider.selected?.name ?? "Cardio Sessions"),
                 actions: [
                   IconButton(
                     onPressed: () {
@@ -101,73 +96,66 @@ class CardioOverviewPage extends StatelessWidget {
                     ),
                   ),
                   IconButton(
-                    onPressed:
-                        () =>
-                            Navigator.of(context).newBase(Routes.routeOverview),
+                    onPressed: () =>
+                        Navigator.of(context).newBase(Routes.routeOverview),
                     icon: const Icon(AppIcons.route),
                   ),
                 ],
                 bottom: DateFilter(
                   initialState: dataProvider.dateFilter,
-                  onFilterChanged:
-                      (dateFilter) => dataProvider.dateFilter = dateFilter,
+                  onFilterChanged: (dateFilter) =>
+                      dataProvider.dateFilter = dateFilter,
                 ),
               ),
               body: Stack(
                 alignment: Alignment.topCenter,
                 children: [
                   SyncRefreshIndicator(
-                    child:
-                        dataProvider.entities.isEmpty
-                            ? RefreshableNoEntriesText(
-                              text: SessionsPageTab.cardio.noEntriesText,
-                            )
-                            : Padding(
-                              padding: Defaults.edgeInsets.normal,
-                              child: CustomScrollView(
-                                slivers: [
-                                  SliverList.list(
-                                    children: [
-                                      if (dataProvider.isSelected)
-                                        CardioChart(
-                                          cardioSessions:
-                                              dataProvider.entities
-                                                  .map((e) => e.cardioSession)
-                                                  .toList(),
-                                          dateFilterState:
-                                              dataProvider.dateFilter,
-                                        ),
-                                      CardioStatsCard(
-                                        cardioSessionDescriptions:
-                                            dataProvider.entities,
+                    child: dataProvider.entities.isEmpty
+                        ? RefreshableNoEntriesText(
+                            text: SessionsPageTab.cardio.noEntriesText,
+                          )
+                        : Padding(
+                            padding: Defaults.edgeInsets.normal,
+                            child: CustomScrollView(
+                              slivers: [
+                                SliverList.list(
+                                  children: [
+                                    if (dataProvider.isSelected)
+                                      CardioChart(
+                                        cardioSessions: dataProvider.entities
+                                            .map((e) => e.cardioSession)
+                                            .toList(),
+                                        dateFilterState:
+                                            dataProvider.dateFilter,
                                       ),
+                                    CardioStatsCard(
+                                      cardioSessionDescriptions:
+                                          dataProvider.entities,
+                                    ),
+                                    Defaults.sizedBox.vertical.normal,
+                                  ],
+                                ),
+                                SliverList.separated(
+                                  itemBuilder: (_, index) => CardioSessionCard(
+                                    cardioSessionDescription:
+                                        dataProvider.entities[index],
+                                    key: ValueKey(
+                                      dataProvider
+                                          .entities[index]
+                                          .cardioSession
+                                          .id,
+                                    ),
+                                    onSelected: (movement) =>
+                                        dataProvider.selected = movement,
+                                  ),
+                                  separatorBuilder: (_, __) =>
                                       Defaults.sizedBox.vertical.normal,
-                                    ],
-                                  ),
-                                  SliverList.separated(
-                                    itemBuilder:
-                                        (_, index) => CardioSessionCard(
-                                          cardioSessionDescription:
-                                              dataProvider.entities[index],
-                                          key: ValueKey(
-                                            dataProvider
-                                                .entities[index]
-                                                .cardioSession
-                                                .id,
-                                          ),
-                                          onSelected:
-                                              (movement) =>
-                                                  dataProvider.selected =
-                                                      movement,
-                                        ),
-                                    separatorBuilder:
-                                        (_, __) =>
-                                            Defaults.sizedBox.vertical.normal,
-                                    itemCount: dataProvider.entities.length,
-                                  ),
-                                ],
-                              ),
+                                  itemCount: dataProvider.entities.length,
+                                ),
+                              ],
                             ),
+                          ),
                   ),
                   if (dataProvider.isLoading)
                     const Positioned(
@@ -186,26 +174,24 @@ class CardioOverviewPage extends StatelessWidget {
                 buttons: [
                   ActionButton(
                     icon: const Icon(AppIcons.stopwatch),
-                    onPressed:
-                        () => Navigator.pushNamed(
-                          context,
-                          Routes.trackingSettings,
-                          arguments: dataProvider.selected,
-                        ),
+                    onPressed: () => Navigator.pushNamed(
+                      context,
+                      Routes.trackingSettings,
+                      arguments: dataProvider.selected,
+                    ),
                   ),
                   ActionButton(
                     icon: const Icon(AppIcons.notes),
-                    onPressed:
-                        () => Navigator.pushNamed(
-                          context,
-                          Routes.cardioEdit,
-                          arguments: dataProvider.selected,
-                        ),
+                    onPressed: () => Navigator.pushNamed(
+                      context,
+                      Routes.cardioEdit,
+                      arguments: dataProvider.selected,
+                    ),
                   ),
                 ],
               ),
             ),
-      ),
+          ),
     );
   }
 }
@@ -274,15 +260,15 @@ class CardioSessionCard extends StatelessWidget {
             cardioSessionDescription.cardioSession.track != null ||
                     cardioSessionDescription.route != null
                 ? SizedBox(
-                  height: 150,
-                  child: StaticMapboxMap(
-                    key: ObjectKey(
-                      cardioSessionDescription,
-                    ), // update on reload to get new track
-                    onMapCreated: _onMapCreated,
-                    onTap: (_) => showDetails(context),
-                  ),
-                )
+                    height: 150,
+                    child: StaticMapboxMap(
+                      key: ObjectKey(
+                        cardioSessionDescription,
+                      ), // update on reload to get new track
+                      onMapCreated: _onMapCreated,
+                      onTap: (_) => showDetails(context),
+                    ),
+                  )
                 : const NoTrackPlaceholder(),
             Padding(
               padding: Defaults.edgeInsets.normal,
@@ -325,11 +311,10 @@ class CardioStatsCard extends StatelessWidget {
   CardioStatsCard({
     required List<CardioSessionDescription> cardioSessionDescriptions,
     super.key,
-  }) : groupedSessions =
-           groupBy(
-             cardioSessionDescriptions,
-             (c) => c.movement,
-           ).entries.toList();
+  }) : groupedSessions = groupBy(
+         cardioSessionDescriptions,
+         (c) => c.movement,
+       ).entries.toList();
 
   final List<MapEntry<Movement, List<CardioSessionDescription>>>
   groupedSessions;
@@ -347,10 +332,14 @@ class CardioStatsCard extends StatelessWidget {
             final group = groupedSessions[index];
             final movement = group.key.name;
             final number = group.value.length;
-            final distance =
-                group.value.map((s) => s.cardioSession.distance).nonNulls.sum;
-            final time =
-                group.value.map((s) => s.cardioSession.time).nonNulls.sum;
+            final distance = group.value
+                .map((s) => s.cardioSession.distance)
+                .nonNulls
+                .sum;
+            final time = group.value
+                .map((s) => s.cardioSession.time)
+                .nonNulls
+                .sum;
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

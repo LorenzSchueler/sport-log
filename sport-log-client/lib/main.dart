@@ -89,27 +89,27 @@ class InitAppWrapperState extends State<InitAppWrapper> {
     return _progress == null
         ? const App()
         : MaterialApp(
-          debugShowCheckedModeBanner: false,
-          darkTheme: AppTheme.darkTheme,
-          themeMode: ThemeMode.dark,
-          navigatorKey: navigatorKey,
-          home: WelcomeScreen(
-            content: Column(
-              children: [
-                LinearProgressIndicator(value: _progress),
-                if (_error != null) ...[
-                  Defaults.sizedBox.vertical.normal,
-                  Text(
-                    _error.toString(),
-                    style: Theme.of(
-                      context,
-                    ).textTheme.bodyLarge?.copyWith(color: Colors.red),
-                  ),
+            debugShowCheckedModeBanner: false,
+            darkTheme: AppTheme.darkTheme,
+            themeMode: ThemeMode.dark,
+            navigatorKey: navigatorKey,
+            home: WelcomeScreen(
+              content: Column(
+                children: [
+                  LinearProgressIndicator(value: _progress),
+                  if (_error != null) ...[
+                    Defaults.sizedBox.vertical.normal,
+                    Text(
+                      _error.toString(),
+                      style: Theme.of(
+                        context,
+                      ).textTheme.bodyLarge?.copyWith(color: Colors.red),
+                    ),
+                  ],
                 ],
-              ],
+              ),
             ),
-          ),
-          builder: ignoreSystemTextScaleFactor,
-        );
+            builder: ignoreSystemTextScaleFactor,
+          );
   }
 }

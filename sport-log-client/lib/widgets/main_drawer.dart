@@ -41,10 +41,9 @@ class MainDrawer extends StatelessWidget {
                           AppIcons.dumbbell,
                           color: onBackgroundColor,
                         ),
-                        onTap:
-                            () => Navigator.of(
-                              context,
-                            ).newBase(Routes.timelineOverview),
+                        onTap: () => Navigator.of(
+                          context,
+                        ).newBase(Routes.timelineOverview),
                         selected: selectedRoute == Routes.timelineOverview,
                       ),
                       ListTile(
@@ -53,10 +52,9 @@ class MainDrawer extends StatelessWidget {
                           AppIcons.movement,
                           color: onBackgroundColor,
                         ),
-                        onTap:
-                            () => Navigator.of(
-                              context,
-                            ).newBase(Routes.movementOverview),
+                        onTap: () => Navigator.of(
+                          context,
+                        ).newBase(Routes.movementOverview),
                         selected: selectedRoute == Routes.movementOverview,
                       ),
                       ListTile(
@@ -65,8 +63,8 @@ class MainDrawer extends StatelessWidget {
                           color: onBackgroundColor,
                         ),
                         title: const Text('Timer'),
-                        onTap:
-                            () => Navigator.of(context).newBase(Routes.timer),
+                        onTap: () =>
+                            Navigator.of(context).newBase(Routes.timer),
                         selected: selectedRoute == Routes.timer,
                       ),
                       ListTile(
@@ -81,10 +79,8 @@ class MainDrawer extends StatelessWidget {
                           color: onBackgroundColor,
                         ),
                         title: const Text('Offline Maps'),
-                        onTap:
-                            () => Navigator.of(
-                              context,
-                            ).newBase(Routes.offlineMaps),
+                        onTap: () =>
+                            Navigator.of(context).newBase(Routes.offlineMaps),
                         selected: selectedRoute == Routes.offlineMaps,
                       ),
                       ListTile(
@@ -93,9 +89,8 @@ class MainDrawer extends StatelessWidget {
                           color: onBackgroundColor,
                         ),
                         title: const Text('Heart Rate'),
-                        onTap:
-                            () =>
-                                Navigator.of(context).newBase(Routes.heartRate),
+                        onTap: () =>
+                            Navigator.of(context).newBase(Routes.heartRate),
                         selected: selectedRoute == Routes.heartRate,
                       ),
                       if (settings.accountCreated)
@@ -105,10 +100,9 @@ class MainDrawer extends StatelessWidget {
                             color: onBackgroundColor,
                           ),
                           title: const Text('Server Actions'),
-                          onTap:
-                              () => Navigator.of(
-                                context,
-                              ).newBase(Routes.platformOverview),
+                          onTap: () => Navigator.of(
+                            context,
+                          ).newBase(Routes.platformOverview),
                           selected: selectedRoute == Routes.platformOverview,
                         ),
                       ListTile(
@@ -117,9 +111,8 @@ class MainDrawer extends StatelessWidget {
                           color: onBackgroundColor,
                         ),
                         title: const Text('Settings'),
-                        onTap:
-                            () =>
-                                Navigator.of(context).newBase(Routes.settings),
+                        onTap: () =>
+                            Navigator.of(context).newBase(Routes.settings),
                         selected: selectedRoute == Routes.settings,
                       ),
                     ],
@@ -129,34 +122,28 @@ class MainDrawer extends StatelessWidget {
                   Padding(
                     padding: Defaults.edgeInsets.normal,
                     child: Consumer<Sync>(
-                      builder:
-                          (context, sync, _) => Row(
-                            children: [
-                              Text(
-                                sync.isSyncing
-                                    ? 'Syncing...'
-                                    : settings.epochMap == null
-                                    ? 'No syncs yet'
-                                    : 'Last sync: ${settings.epochMap!.lastSync.humanTodayTimeOrDate}',
-                              ),
-                              const Spacer(),
-                              SpinningSync(
-                                color:
-                                    Theme.of(
-                                      context,
-                                    ).colorScheme.errorContainer,
-                                onPressed:
-                                    settings.syncEnabled && !sync.isSyncing
-                                        ? () => sync.sync(
-                                          onNoInternet:
-                                              () =>
-                                                  showNoInternetToast(context),
-                                        )
-                                        : null,
-                                isSpinning: sync.isSyncing,
-                              ),
-                            ],
+                      builder: (context, sync, _) => Row(
+                        children: [
+                          Text(
+                            sync.isSyncing
+                                ? 'Syncing...'
+                                : settings.epochMap == null
+                                ? 'No syncs yet'
+                                : 'Last sync: ${settings.epochMap!.lastSync.humanTodayTimeOrDate}',
                           ),
+                          const Spacer(),
+                          SpinningSync(
+                            color: Theme.of(context).colorScheme.errorContainer,
+                            onPressed: settings.syncEnabled && !sync.isSyncing
+                                ? () => sync.sync(
+                                    onNoInternet: () =>
+                                        showNoInternetToast(context),
+                                  )
+                                : null,
+                            isSpinning: sync.isSyncing,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
               ],

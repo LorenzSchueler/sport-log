@@ -21,26 +21,22 @@ String _prettyJson(Object json, {int indent = 2}) {
 }
 
 void _logRequest(Request request) {
-  final headersStr =
-      Config.instance.outputRequestHeaders
-          ? "\n${request.headers.entries.map((e) => '${e.key}: ${e.value}').join('\n')}"
-          : "";
-  final jsonStr =
-      Config.instance.outputRequestJson && request.body.isNotEmpty
-          ? "\n\n${_prettyJson(jsonDecode(request.body) as Object)}"
-          : "";
+  final headersStr = Config.instance.outputRequestHeaders
+      ? "\n${request.headers.entries.map((e) => '${e.key}: ${e.value}').join('\n')}"
+      : "";
+  final jsonStr = Config.instance.outputRequestJson && request.body.isNotEmpty
+      ? "\n\n${_prettyJson(jsonDecode(request.body) as Object)}"
+      : "";
   _logger.t("request: ${request.method} ${request.url}$headersStr$jsonStr");
 }
 
 void _logResponse(StreamedResponse response, Object? json) {
-  final headerStr =
-      Config.instance.outputResponseHeaders
-          ? "\n${response.headers.entries.map((e) => "${e.key}: ${e.value}").join("\n")}"
-          : "";
-  final jsonStr =
-      Config.instance.outputResponseJson && json != null
-          ? "\n\n${_prettyJson(json)}"
-          : "";
+  final headerStr = Config.instance.outputResponseHeaders
+      ? "\n${response.headers.entries.map((e) => "${e.key}: ${e.value}").join("\n")}"
+      : "";
+  final jsonStr = Config.instance.outputResponseJson && json != null
+      ? "\n\n${_prettyJson(json)}"
+      : "";
   _logger.t("response: ${response.statusCode}$headerStr$jsonStr");
 }
 
@@ -65,12 +61,9 @@ enum ApiErrorType {
 
 class ApiError {
   ApiError(this.errorType, this.errorCode, [Object? jsonMessage])
-    : message =
-          jsonMessage != null
-              ? HandlerError.fromJson(
-                jsonMessage as Map<String, dynamic>,
-              ).message
-              : null;
+    : message = jsonMessage != null
+          ? HandlerError.fromJson(jsonMessage as Map<String, dynamic>).message
+          : null;
 
   final ApiErrorType errorType;
   final int? errorCode;
@@ -99,9 +92,9 @@ extension _ToApiResult on StreamedResponse {
       200 =>
         fromJson != null
             ? json != null
-                ? Ok(fromJson(json))
-                // expected non empty body
-                : Err(ApiError(ApiErrorType.badJson, statusCode))
+                  ? Ok(fromJson(json))
+                  // expected non empty body
+                  : Err(ApiError(ApiErrorType.badJson, statusCode))
             : Ok(null),
       204 =>
         fromJson == null
@@ -198,12 +191,13 @@ abstract class Api<T extends JsonSerializable> {
   Uri get _uri => uriFromRoute(route);
   Map<String, dynamic> _toJson(T object) => object.toJson();
 
-  Future<ApiResult<EpochResult?>> postSingle(T object) => (Request("post", _uri)
-        ..headers.addAll(ApiHeaders.basicAuthContentTypeJson)
-        ..body = jsonEncode(_toJson(object)))
-      .toApiResultWithValue(
-        (json) => EpochResult.fromJson((json as Map).cast()),
-      );
+  Future<ApiResult<EpochResult?>> postSingle(T object) =>
+      (Request("post", _uri)
+            ..headers.addAll(ApiHeaders.basicAuthContentTypeJson)
+            ..body = jsonEncode(_toJson(object)))
+          .toApiResultWithValue(
+            (json) => EpochResult.fromJson((json as Map).cast()),
+          );
 
   Future<ApiResult<EpochResult?>> postMultiple(List<T> objects) async {
     if (objects.isEmpty) {
@@ -217,12 +211,13 @@ abstract class Api<T extends JsonSerializable> {
         );
   }
 
-  Future<ApiResult<EpochResult?>> putSingle(T object) => (Request("put", _uri)
-        ..headers.addAll(ApiHeaders.basicAuthContentTypeJson)
-        ..body = jsonEncode(_toJson(object)))
-      .toApiResultWithValue(
-        (json) => EpochResult.fromJson((json as Map).cast()),
-      );
+  Future<ApiResult<EpochResult?>> putSingle(T object) =>
+      (Request("put", _uri)
+            ..headers.addAll(ApiHeaders.basicAuthContentTypeJson)
+            ..body = jsonEncode(_toJson(object)))
+          .toApiResultWithValue(
+            (json) => EpochResult.fromJson((json as Map).cast()),
+          );
 
   Future<ApiResult<EpochResult?>> putMultiple(List<T> objects) async {
     if (objects.isEmpty) {

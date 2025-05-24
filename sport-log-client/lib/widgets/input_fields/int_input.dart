@@ -66,13 +66,10 @@ class _IntInputState extends State<IntInput> {
       children: [
         RepeatIconButton(
           icon: const Icon(AppIcons.subtractBox),
-          onClick:
-              _value - widget.stepSize < widget.minValue
-                  ? null
-                  : () => _setValue(
-                    _value - widget.stepSize,
-                    updateTextField: true,
-                  ),
+          onClick: _value - widget.stepSize < widget.minValue
+              ? null
+              : () =>
+                    _setValue(_value - widget.stepSize, updateTextField: true),
           materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
         ),
         SizedBox(
@@ -109,12 +106,10 @@ class _IntInputState extends State<IntInput> {
           icon: const Icon(AppIcons.addBox),
           onClick:
               widget.maxValue != null &&
-                      _value + widget.stepSize > widget.maxValue!
-                  ? null
-                  : () => _setValue(
-                    _value + widget.stepSize,
-                    updateTextField: true,
-                  ),
+                  _value + widget.stepSize > widget.maxValue!
+              ? null
+              : () =>
+                    _setValue(_value + widget.stepSize, updateTextField: true),
           materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
         ),
       ],

@@ -91,14 +91,12 @@ class Column {
     if (_referenceTable == null) {
       return '';
     }
-    final referenceName =
-        _referenceColumn == null
-            ? _referenceTable!
-            : '${_referenceTable!}(${_referenceColumn!})';
-    final onDeleteStr =
-        _onDeleteReference == null
-            ? ''
-            : 'on delete ${_onActionToString(_onDeleteReference!)}';
+    final referenceName = _referenceColumn == null
+        ? _referenceTable!
+        : '${_referenceTable!}(${_referenceColumn!})';
+    final onDeleteStr = _onDeleteReference == null
+        ? ''
+        : 'on delete ${_onActionToString(_onDeleteReference!)}';
     return 'references $referenceName $onDeleteStr'.trimRight();
   }
 
@@ -109,8 +107,9 @@ class Column {
     }
     final typeStr = _typeToString(type);
     final nonNullStr = _nonNull ? 'not null' : '';
-    final defaultValueStr =
-        _defaultValue == null ? '' : 'default(${_defaultValue!})';
+    final defaultValueStr = _defaultValue == null
+        ? ''
+        : 'default(${_defaultValue!})';
     final checkStr = _check == null ? '' : 'check(${_check!})';
     return [
       name,
@@ -160,8 +159,9 @@ class Table {
     final primaryKey = columns
         .where((c) => c.getIsPrimaryKey())
         .map((c) => c.name);
-    final primaryKeyStr =
-        primaryKey.isEmpty ? '' : 'primary key(${primaryKey.join(', ')})';
+    final primaryKeyStr = primaryKey.isEmpty
+        ? ''
+        : 'primary key(${primaryKey.join(', ')})';
     return '''
     create table $name (
       ${[...columns.map((c) => c.setUpSql()), primaryKeyStr].map((s) => '\t$s').join(',\n')}
@@ -172,7 +172,8 @@ class Table {
   List<String> get uniqueIndicesSetupSql =>
       uniqueIndices.map((u) => u.setupSql).toList();
 
-  String get triggerSetupSql => '''
+  String get triggerSetupSql =>
+      '''
       create trigger ${name}_update before update on $name
       begin
         update $name set sync_status = 1 where id = new.id and sync_status = 0;

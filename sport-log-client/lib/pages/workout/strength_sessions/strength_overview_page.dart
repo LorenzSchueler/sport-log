@@ -27,42 +27,37 @@ class StrengthOverviewPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return NeverPop(
-      child: ProviderConsumer<
-        OverviewDataProvider<
-          StrengthSessionDescription,
-          StrengthRecords,
-          StrengthSessionDescriptionDataProvider,
-          Movement
-        >
-      >(
-        create:
-            (_) => OverviewDataProvider(
+      child:
+          ProviderConsumer<
+            OverviewDataProvider<
+              StrengthSessionDescription,
+              StrengthRecords,
+              StrengthSessionDescriptionDataProvider,
+              Movement
+            >
+          >(
+            create: (_) => OverviewDataProvider(
               dataProvider: StrengthSessionDescriptionDataProvider(),
-              entityAccessor:
-                  (dataProvider) =>
-                      (start, end, movement, search) =>
-                          dataProvider.getByTimerangeAndMovementAndComment(
-                            from: start,
-                            until: end,
-                            movement: movement,
-                            comment: search,
-                          ),
-              recordAccessor:
-                  (dataProvider) => () => dataProvider.getStrengthRecords(),
+              entityAccessor: (dataProvider) =>
+                  (start, end, movement, search) =>
+                      dataProvider.getByTimerangeAndMovementAndComment(
+                        from: start,
+                        until: end,
+                        movement: movement,
+                        comment: search,
+                      ),
+              recordAccessor: (dataProvider) =>
+                  () => dataProvider.getStrengthRecords(),
               loggerName: "StrengthSessionsPage",
             ),
-        builder:
-            (_, dataProvider, __) => Scaffold(
+            builder: (_, dataProvider, __) => Scaffold(
               appBar: AppBar(
-                title:
-                    dataProvider.isSearch
-                        ? TextFormField(
-                          focusNode: _searchBar,
-                          onChanged: (comment) => dataProvider.search = comment,
-                        )
-                        : Text(
-                          dataProvider.selected?.name ?? "Strength Sessions",
-                        ),
+                title: dataProvider.isSearch
+                    ? TextFormField(
+                        focusNode: _searchBar,
+                        onChanged: (comment) => dataProvider.search = comment,
+                      )
+                    : Text(dataProvider.selected?.name ?? "Strength Sessions"),
                 actions: [
                   IconButton(
                     onPressed: () {
@@ -99,61 +94,57 @@ class StrengthOverviewPage extends StatelessWidget {
                 ],
                 bottom: DateFilter(
                   initialState: dataProvider.dateFilter,
-                  onFilterChanged:
-                      (dateFilter) => dataProvider.dateFilter = dateFilter,
+                  onFilterChanged: (dateFilter) =>
+                      dataProvider.dateFilter = dateFilter,
                 ),
               ),
               body: Stack(
                 alignment: Alignment.topCenter,
                 children: [
                   SyncRefreshIndicator(
-                    child:
-                        dataProvider.entities.isEmpty
-                            ? RefreshableNoEntriesText(
-                              text: SessionsPageTab.strength.noEntriesText,
-                            )
-                            : Padding(
-                              padding: Defaults.edgeInsets.normal,
-                              child: CustomScrollView(
-                                slivers: [
-                                  if (dataProvider.isSelected)
-                                    SliverList.list(
-                                      children: [
-                                        StrengthChart(
-                                          strengthSessionDescriptions:
-                                              dataProvider.entities,
-                                          dateFilterState:
-                                              dataProvider.dateFilter,
-                                        ),
-                                        Defaults.sizedBox.vertical.normal,
-                                        StrengthRecordsCard(
-                                          strengthRecords:
-                                              dataProvider.records ?? {},
-                                          movement: dataProvider.selected!,
-                                        ),
-                                        Defaults.sizedBox.vertical.normal,
-                                      ],
-                                    ),
-                                  SliverList.separated(
-                                    itemBuilder:
-                                        (context, index) => StrengthSessionCard(
-                                          strengthSessionDescription:
-                                              dataProvider.entities[index],
-                                          strengthRecords:
-                                              dataProvider.records ?? {},
-                                          onSelected:
-                                              (movement) =>
-                                                  dataProvider.selected =
-                                                      movement,
-                                        ),
-                                    separatorBuilder:
-                                        (_, __) =>
-                                            Defaults.sizedBox.vertical.normal,
-                                    itemCount: dataProvider.entities.length,
+                    child: dataProvider.entities.isEmpty
+                        ? RefreshableNoEntriesText(
+                            text: SessionsPageTab.strength.noEntriesText,
+                          )
+                        : Padding(
+                            padding: Defaults.edgeInsets.normal,
+                            child: CustomScrollView(
+                              slivers: [
+                                if (dataProvider.isSelected)
+                                  SliverList.list(
+                                    children: [
+                                      StrengthChart(
+                                        strengthSessionDescriptions:
+                                            dataProvider.entities,
+                                        dateFilterState:
+                                            dataProvider.dateFilter,
+                                      ),
+                                      Defaults.sizedBox.vertical.normal,
+                                      StrengthRecordsCard(
+                                        strengthRecords:
+                                            dataProvider.records ?? {},
+                                        movement: dataProvider.selected!,
+                                      ),
+                                      Defaults.sizedBox.vertical.normal,
+                                    ],
                                   ),
-                                ],
-                              ),
+                                SliverList.separated(
+                                  itemBuilder: (context, index) =>
+                                      StrengthSessionCard(
+                                        strengthSessionDescription:
+                                            dataProvider.entities[index],
+                                        strengthRecords:
+                                            dataProvider.records ?? {},
+                                        onSelected: (movement) =>
+                                            dataProvider.selected = movement,
+                                      ),
+                                  separatorBuilder: (_, __) =>
+                                      Defaults.sizedBox.vertical.normal,
+                                  itemCount: dataProvider.entities.length,
+                                ),
+                              ],
                             ),
+                          ),
                   ),
                   if (dataProvider.isLoading)
                     const Positioned(
@@ -169,15 +160,14 @@ class StrengthOverviewPage extends StatelessWidget {
               drawer: const MainDrawer(selectedRoute: Routes.strengthOverview),
               floatingActionButton: FloatingActionButton(
                 child: const Icon(AppIcons.add),
-                onPressed:
-                    () => Navigator.pushNamed(
-                      context,
-                      Routes.strengthEdit,
-                      arguments: dataProvider.selected,
-                    ),
+                onPressed: () => Navigator.pushNamed(
+                  context,
+                  Routes.strengthEdit,
+                  arguments: dataProvider.selected,
+                ),
               ),
             ),
-      ),
+          ),
     );
   }
 }
@@ -217,23 +207,19 @@ class StrengthSessionCard extends StatelessWidget {
           ),
         ],
       ],
-      right:
-          strengthSessionDescription.sets
-              .map(
-                (set) => Text(
-                  set.toDisplayName(
-                    strengthSessionDescription.movement.dimension,
-                  ),
-                ),
-              )
-              .toList(),
+      right: strengthSessionDescription.sets
+          .map(
+            (set) => Text(
+              set.toDisplayName(strengthSessionDescription.movement.dimension),
+            ),
+          )
+          .toList(),
       comments: strengthSessionDescription.session.comments,
-      onTap:
-          () => Navigator.pushNamed(
-            context,
-            Routes.strengthDetails,
-            arguments: strengthSessionDescription,
-          ),
+      onTap: () => Navigator.pushNamed(
+        context,
+        Routes.strengthDetails,
+        arguments: strengthSessionDescription,
+      ),
       onLongPress: () => onSelected(strengthSessionDescription.movement),
     );
   }

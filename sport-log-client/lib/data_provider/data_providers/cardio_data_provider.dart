@@ -143,8 +143,9 @@ class CardioSessionDescriptionDataProvider
             (session) async => CardioSessionDescription(
               cardioSession: session,
               route: await _routeDataProvider.getById(session.id),
-              movement:
-                  (await _movementDataProvider.getById(session.movementId))!,
+              movement: (await _movementDataProvider.getById(
+                session.movementId,
+              ))!,
             ),
           )
           .toList(),

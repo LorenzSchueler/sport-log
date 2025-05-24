@@ -56,59 +56,56 @@ class SwipeButtonState extends State<SwipeButton>
       child: AnimatedBuilder(
         key: _buttonKey,
         animation: _controller,
-        builder:
-            (context, child) => Stack(
-              children: [
-                Container(
+        builder: (context, child) => Stack(
+          children: [
+            Container(
+              height: widget.height,
+              decoration: BoxDecoration(
+                color:
+                    widget.backgroundColor ??
+                    Theme.of(context).colorScheme.surfaceContainerHighest,
+                borderRadius: widget.borderRadius,
+              ),
+            ),
+            Align(
+              alignment: Alignment((_controller.value * 2.0) - 1.0, 0),
+              child: GestureDetector(
+                onHorizontalDragUpdate: _onDragUpdate,
+                onHorizontalDragEnd: _onDragEnd,
+                child: Container(
+                  key: _thumbKey,
                   height: widget.height,
+                  padding: EdgeInsets.only(
+                    left: widget.height / 3,
+                    right: widget.height / 4,
+                  ),
                   decoration: BoxDecoration(
-                    color:
-                        widget.backgroundColor ??
-                        Theme.of(context).colorScheme.surfaceContainerHighest,
+                    color: isSwipeComplete
+                        ? Theme.of(context).colorScheme.errorContainer
+                        : widget.color ?? Theme.of(context).colorScheme.primary,
                     borderRadius: widget.borderRadius,
                   ),
-                ),
-                Align(
-                  alignment: Alignment((_controller.value * 2.0) - 1.0, 0),
-                  child: GestureDetector(
-                    onHorizontalDragUpdate: _onDragUpdate,
-                    onHorizontalDragEnd: _onDragEnd,
-                    child: Container(
-                      key: _thumbKey,
-                      height: widget.height,
-                      padding: EdgeInsets.only(
-                        left: widget.height / 3,
-                        right: widget.height / 4,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        widget.thumbLabel,
+                        style: Theme.of(context)
+                            .filledButtonTheme
+                            .style!
+                            .textStyle!
+                            .resolve({WidgetState.focused})!
+                            .copyWith(color: Colors.black),
                       ),
-                      decoration: BoxDecoration(
-                        color:
-                            isSwipeComplete
-                                ? Theme.of(context).colorScheme.errorContainer
-                                : widget.color ??
-                                    Theme.of(context).colorScheme.primary,
-                        borderRadius: widget.borderRadius,
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            widget.thumbLabel,
-                            style: Theme.of(context)
-                                .filledButtonTheme
-                                .style!
-                                .textStyle!
-                                .resolve({WidgetState.focused})!
-                                .copyWith(color: Colors.black),
-                          ),
-                          const SizedBox(width: 5),
-                          const Icon(AppIcons.arrowRight, color: Colors.black),
-                        ],
-                      ),
-                    ),
+                      const SizedBox(width: 5),
+                      const Icon(AppIcons.arrowRight, color: Colors.black),
+                    ],
                   ),
                 ),
-              ],
+              ),
             ),
+          ],
+        ),
       ),
     );
   }

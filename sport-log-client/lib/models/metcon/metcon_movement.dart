@@ -133,10 +133,9 @@ class DbMetconMovementSerializer extends DbSerializer<MetconMovement> {
       count: r[prefix + Columns.count]! as int,
       maleWeight: r[prefix + Columns.maleWeight] as double?,
       femaleWeight: r[prefix + Columns.femaleWeight] as double?,
-      distanceUnit:
-          r[prefix + Columns.distanceUnit] == null
-              ? null
-              : DistanceUnit.values[r[prefix + Columns.distanceUnit]! as int],
+      distanceUnit: r[prefix + Columns.distanceUnit] == null
+          ? null
+          : DistanceUnit.values[r[prefix + Columns.distanceUnit]! as int],
       deleted: r[prefix + Columns.deleted]! as int == 1,
     );
   }

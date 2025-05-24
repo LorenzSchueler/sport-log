@@ -47,10 +47,9 @@ class MetconDescriptionCard extends StatelessWidget {
                           child: Text(switch (mmd.movement.dimension) {
                             MovementDimension.distance =>
                               "${mmd.metconMovement.count} ${mmd.metconMovement.distanceUnit!.name}",
-                            MovementDimension.time =>
-                              Duration(
-                                milliseconds: mmd.metconMovement.count,
-                              ).formatTimeShort,
+                            MovementDimension.time => Duration(
+                              milliseconds: mmd.metconMovement.count,
+                            ).formatTimeShort,
                             _ =>
                               "${mmd.metconMovement.count} ${mmd.movement.dimension.name}",
                           }),
@@ -58,8 +57,8 @@ class MetconDescriptionCard extends StatelessWidget {
                         Text(
                           mmd.metconMovement.maleWeight != null
                               ? mmd.metconMovement.femaleWeight != null
-                                  ? "@ ${formatWeight(mmd.metconMovement.maleWeight!, mmd.metconMovement.femaleWeight)}"
-                                  : "@ ${formatWeight(mmd.metconMovement.maleWeight!)}"
+                                    ? "@ ${formatWeight(mmd.metconMovement.maleWeight!, mmd.metconMovement.femaleWeight)}"
+                                    : "@ ${formatWeight(mmd.metconMovement.maleWeight!)}"
                               : "",
                         ),
                       ],

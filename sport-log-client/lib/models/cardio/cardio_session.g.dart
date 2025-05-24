@@ -19,10 +19,9 @@ CardioSession _$CardioSessionFromJson(Map<String, dynamic> json) =>
         (json['time'] as num?)?.toInt(),
       ),
       calories: (json['calories'] as num?)?.toInt(),
-      track:
-          (json['track'] as List<dynamic>?)
-              ?.map((e) => Position.fromJson(e as Map<String, dynamic>))
-              .toList(),
+      track: (json['track'] as List<dynamic>?)
+          ?.map((e) => Position.fromJson(e as Map<String, dynamic>))
+          .toList(),
       avgCadence: (json['avg_cadence'] as num?)?.toInt(),
       cadence: const OptionalDurationListConverter().fromJson(
         json['cadence'] as List?,

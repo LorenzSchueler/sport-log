@@ -28,38 +28,33 @@ class CardioTrackingPage extends StatelessWidget {
   ) async {
     await showDialog<void>(
       context: context,
-      builder:
-          (context) => AlertDialog(
-            title: const Text("Save Recording"),
-            content: TextFormField(
-              initialValue:
-                  trackingUtils.cardioSessionDescription.cardioSession.comments,
-              onChanged:
-                  (comments) =>
-                      trackingUtils
-                          .cardioSessionDescription
-                          .cardioSession
-                          .comments = comments,
-              decoration: const InputDecoration(labelText: "Comments"),
-              keyboardType: TextInputType.multiline,
-              minLines: 1,
-              maxLines: 5,
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text("Back"),
-              ),
-              TextButton(
-                onPressed:
-                    trackingUtils.cardioSessionDescription
-                            .isValidBeforeSanitation()
-                        ? () => trackingUtils.saveCardioSession(context)
-                        : null,
-                child: const Text("Save"),
-              ),
-            ],
+      builder: (context) => AlertDialog(
+        title: const Text("Save Recording"),
+        content: TextFormField(
+          initialValue:
+              trackingUtils.cardioSessionDescription.cardioSession.comments,
+          onChanged: (comments) =>
+              trackingUtils.cardioSessionDescription.cardioSession.comments =
+                  comments,
+          decoration: const InputDecoration(labelText: "Comments"),
+          keyboardType: TextInputType.multiline,
+          minLines: 1,
+          maxLines: 5,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Back"),
           ),
+          TextButton(
+            onPressed:
+                trackingUtils.cardioSessionDescription.isValidBeforeSanitation()
+                ? () => trackingUtils.saveCardioSession(context)
+                : null,
+            child: const Text("Save"),
+          ),
+        ],
+      ),
     );
   }
 
@@ -71,86 +66,75 @@ class CardioTrackingPage extends StatelessWidget {
           resizeToAvoidBottomInset: false,
           body: ProviderConsumer(
             create: (_) => TrackingUtils(trackingSettings: trackingSettings),
-            builder:
-                (context, trackingUtils, _) => ProviderConsumer(
-                  create: (_) => BoolToggle.off(),
-                  builder:
-                      (context, fullscreen, _) => Column(
+            builder: (context, trackingUtils, _) => ProviderConsumer(
+              create: (_) => BoolToggle.off(),
+              builder: (context, fullscreen, _) => Column(
+                children: [
+                  if (context.read<Settings>().developerMode)
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(trackingUtils.locationInfo),
+                        Text(trackingUtils.stepInfo),
+                        Text(trackingUtils.heartRateInfo),
+                      ],
+                    ),
+                  Expanded(
+                    child: Stack(
+                      children: [
+                        MapboxMapWrapper(
+                          showFullscreenButton: true,
+                          showMapStylesButton: true,
+                          showSelectRouteButton: false,
+                          showSetNorthButton: true,
+                          showCurrentLocationButton: false,
+                          showCenterLocationButton: true,
+                          showAddLocationButton: false,
+                          onFullscreenToggle: fullscreen.setState,
+                          onCenterLocationToggle:
+                              trackingUtils.setCenterLocation,
+                          initialCameraPosition: LatLngZoom(
+                            latLng: context.read<Settings>().lastGpsLatLng,
+                            zoom: 15,
+                          ),
+                          onMapCreated: trackingUtils.onMapCreated,
+                        ),
+                        Positioned(top: 15, left: 15, child: _CadenceButton()),
+                      ],
+                    ),
+                  ),
+                  ElevationMap(
+                    onMapCreated: trackingUtils.onElevationMapCreated,
+                  ),
+                  if (fullscreen.isOff)
+                    Padding(
+                      padding: Defaults.edgeInsets.normal,
+                      child: Column(
                         children: [
-                          if (context.read<Settings>().developerMode)
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(trackingUtils.locationInfo),
-                                Text(trackingUtils.stepInfo),
-                                Text(trackingUtils.heartRateInfo),
-                              ],
-                            ),
-                          Expanded(
-                            child: Stack(
-                              children: [
-                                MapboxMapWrapper(
-                                  showFullscreenButton: true,
-                                  showMapStylesButton: true,
-                                  showSelectRouteButton: false,
-                                  showSetNorthButton: true,
-                                  showCurrentLocationButton: false,
-                                  showCenterLocationButton: true,
-                                  showAddLocationButton: false,
-                                  onFullscreenToggle: fullscreen.setState,
-                                  onCenterLocationToggle:
-                                      trackingUtils.setCenterLocation,
-                                  initialCameraPosition: LatLngZoom(
-                                    latLng:
-                                        context.read<Settings>().lastGpsLatLng,
-                                    zoom: 15,
-                                  ),
-                                  onMapCreated: trackingUtils.onMapCreated,
-                                ),
-                                Positioned(
-                                  top: 15,
-                                  left: 15,
-                                  child: _CadenceButton(),
-                                ),
-                              ],
-                            ),
+                          CardioValueUnitDescriptionTable(
+                            cardioSessionDescription:
+                                trackingUtils.cardioSessionDescription,
+                            currentDuration: trackingUtils.currentDuration,
                           ),
-                          ElevationMap(
-                            onMapCreated: trackingUtils.onElevationMapCreated,
+                          Defaults.sizedBox.vertical.small,
+                          _TrackingPageButtons(
+                            trackingMode: trackingUtils.mode,
+                            onStart: trackingUtils.start,
+                            onPause: trackingUtils.pause,
+                            onResume: trackingUtils.resume,
+                            onSave: () => _saveDialog(context, trackingUtils),
+                            waitingOnLocation: !trackingUtils.hasLocation,
+                            waitingOnAccurateLocation:
+                                !trackingUtils.hasAccurateLocation,
+                            waitingOnHR: trackingUtils.waitingOnHR,
                           ),
-                          if (fullscreen.isOff)
-                            Padding(
-                              padding: Defaults.edgeInsets.normal,
-                              child: Column(
-                                children: [
-                                  CardioValueUnitDescriptionTable(
-                                    cardioSessionDescription:
-                                        trackingUtils.cardioSessionDescription,
-                                    currentDuration:
-                                        trackingUtils.currentDuration,
-                                  ),
-                                  Defaults.sizedBox.vertical.small,
-                                  _TrackingPageButtons(
-                                    trackingMode: trackingUtils.mode,
-                                    onStart: trackingUtils.start,
-                                    onPause: trackingUtils.pause,
-                                    onResume: trackingUtils.resume,
-                                    onSave:
-                                        () =>
-                                            _saveDialog(context, trackingUtils),
-                                    waitingOnLocation:
-                                        !trackingUtils.hasLocation,
-                                    waitingOnAccurateLocation:
-                                        !trackingUtils.hasAccurateLocation,
-                                    waitingOnHR: trackingUtils.waitingOnHR,
-                                  ),
-                                ],
-                              ),
-                            ),
                         ],
                       ),
-                ),
+                    ),
+                ],
+              ),
+            ),
           ),
         ),
       ),
@@ -163,44 +147,39 @@ class _CadenceButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return ProviderConsumer(
       create: (_) => MetronomeUtils(),
-      builder:
-          (context, metronomeUtils, _) =>
-              metronomeUtils.isPlaying
-                  ? SegmentedButton<MetronomeAdjustment>(
-                    segments: [
-                      ButtonSegment(
-                        value: MetronomeAdjustment.stop,
-                        label: Text("${metronomeUtils.cadence} rpm"),
-                        icon: const Icon(AppIcons.close),
-                      ),
-                      const ButtonSegment(
-                        value: MetronomeAdjustment.increase,
-                        icon: Icon(AppIcons.add),
-                      ),
-                      const ButtonSegment(
-                        value: MetronomeAdjustment.decrease,
-                        icon: Icon(AppIcons.remove),
-                      ),
-                    ],
-                    selected: const {},
-                    emptySelectionAllowed: true,
-                    onSelectionChanged:
-                        (selected) =>
-                            metronomeUtils.adjustTimer(selected.first),
-                    style: ButtonStyle(
-                      backgroundColor: WidgetStatePropertyAll(
-                        Theme.of(context).colorScheme.primary,
-                      ),
-                      foregroundColor: const WidgetStatePropertyAll(
-                        Colors.black,
-                      ),
-                    ),
-                  )
-                  : IconButton.filled(
-                    onPressed: metronomeUtils.startTimer,
-                    icon: const Icon(AppIcons.gauge),
-                    color: Colors.black,
-                  ),
+      builder: (context, metronomeUtils, _) => metronomeUtils.isPlaying
+          ? SegmentedButton<MetronomeAdjustment>(
+              segments: [
+                ButtonSegment(
+                  value: MetronomeAdjustment.stop,
+                  label: Text("${metronomeUtils.cadence} rpm"),
+                  icon: const Icon(AppIcons.close),
+                ),
+                const ButtonSegment(
+                  value: MetronomeAdjustment.increase,
+                  icon: Icon(AppIcons.add),
+                ),
+                const ButtonSegment(
+                  value: MetronomeAdjustment.decrease,
+                  icon: Icon(AppIcons.remove),
+                ),
+              ],
+              selected: const {},
+              emptySelectionAllowed: true,
+              onSelectionChanged: (selected) =>
+                  metronomeUtils.adjustTimer(selected.first),
+              style: ButtonStyle(
+                backgroundColor: WidgetStatePropertyAll(
+                  Theme.of(context).colorScheme.primary,
+                ),
+                foregroundColor: const WidgetStatePropertyAll(Colors.black),
+              ),
+            )
+          : IconButton.filled(
+              onPressed: metronomeUtils.startTimer,
+              icon: const Icon(AppIcons.gauge),
+              color: Colors.black,
+            ),
     );
   }
 }
@@ -277,8 +256,9 @@ class _TrackingPageButtons extends StatelessWidget {
               style: ElevatedButton.styleFrom(
                 backgroundColor: Theme.of(context).colorScheme.errorContainer,
               ),
-              onPressed:
-                  waitingOnAccurateLocation || waitingOnHR ? null : onStart,
+              onPressed: waitingOnAccurateLocation || waitingOnHR
+                  ? null
+                  : onStart,
               child: Text(
                 waitingOnLocation
                     ? "Waiting on Location"
@@ -287,10 +267,9 @@ class _TrackingPageButtons extends StatelessWidget {
                     : waitingOnHR
                     ? "Waiting on HR Monitor"
                     : "Start",
-                style:
-                    waitingOnAccurateLocation || waitingOnHR
-                        ? const TextStyle(fontSize: 14)
-                        : null,
+                style: waitingOnAccurateLocation || waitingOnHR
+                    ? const TextStyle(fontSize: 14)
+                    : null,
                 textAlign: TextAlign.center,
               ),
             ),

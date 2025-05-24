@@ -151,10 +151,9 @@ class DbMetconSerializer extends DbSerializer<Metcon> {
       name: r[prefix + Columns.name]! as String,
       metconType: MetconType.values[r[prefix + Columns.metconType]! as int],
       rounds: r[prefix + Columns.rounds] as int?,
-      timecap:
-          r[prefix + Columns.timecap] == null
-              ? null
-              : Duration(milliseconds: r[prefix + Columns.timecap]! as int),
+      timecap: r[prefix + Columns.timecap] == null
+          ? null
+          : Duration(milliseconds: r[prefix + Columns.timecap]! as int),
       description: r[prefix + Columns.description] as String?,
       deleted: r[prefix + Columns.deleted]! as int == 1,
     );

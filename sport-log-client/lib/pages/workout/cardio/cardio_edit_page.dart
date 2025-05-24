@@ -44,15 +44,14 @@ class _CardioEditPageState extends State<CardioEditPage> {
   final NullablePointer<PolylineAnnotation> _routeLine =
       NullablePointer.nullPointer();
 
-  late CardioSessionDescription _cardioSessionDescription =
-      widget.cardioSessionDescription.clone();
+  late CardioSessionDescription _cardioSessionDescription = widget
+      .cardioSessionDescription
+      .clone();
 
   late final TextEditingController _distanceController = TextEditingController(
-    text:
-        _cardioSessionDescription.cardioSession.distance == null
-            ? null
-            : (_cardioSessionDescription.cardioSession.distance! / 1000)
-                .toString(),
+    text: _cardioSessionDescription.cardioSession.distance == null
+        ? null
+        : (_cardioSessionDescription.cardioSession.distance! / 1000).toString(),
   );
   late final TextEditingController _ascentController = TextEditingController(
     text: _cardioSessionDescription.cardioSession.ascent?.toString(),
@@ -76,9 +75,8 @@ class _CardioEditPageState extends State<CardioEditPage> {
     // only text fields which values are changed by cutting or updating elevation have to be updated
     _distanceController.text =
         _cardioSessionDescription.cardioSession.distance == null
-            ? ""
-            : (_cardioSessionDescription.cardioSession.distance! / 1000)
-                .toString();
+        ? ""
+        : (_cardioSessionDescription.cardioSession.distance! / 1000).toString();
     _ascentController.text =
         _cardioSessionDescription.cardioSession.ascent?.toString() ?? "";
     _descentController.text =
@@ -92,10 +90,9 @@ class _CardioEditPageState extends State<CardioEditPage> {
   }
 
   Future<void> _saveCardioSession() async {
-    final result =
-        widget.isNew
-            ? await _dataProvider.createSingle(_cardioSessionDescription)
-            : await _dataProvider.updateSingle(_cardioSessionDescription);
+    final result = widget.isNew
+        ? await _dataProvider.createSingle(_cardioSessionDescription)
+        : await _dataProvider.updateSingle(_cardioSessionDescription);
     if (mounted) {
       if (result.isOk) {
         Navigator.pop(
@@ -293,10 +290,10 @@ class _CardioEditPageState extends State<CardioEditPage> {
             IconButton(
               onPressed:
                   _formKey.currentContext != null &&
-                          _formKey.currentState!.validate() &&
-                          _cardioSessionDescription.isValidBeforeSanitation()
-                      ? _saveCardioSession
-                      : null,
+                      _formKey.currentState!.validate() &&
+                      _cardioSessionDescription.isValidBeforeSanitation()
+                  ? _saveCardioSession
+                  : null,
               icon: const Icon(AppIcons.save),
             ),
           ],
@@ -355,10 +352,9 @@ class _CardioEditPageState extends State<CardioEditPage> {
                       ),
                       onTap: () async {
                         final cardioType = await showCardioTypePicker(
-                          selectedCardioType:
-                              _cardioSessionDescription
-                                  .cardioSession
-                                  .cardioType,
+                          selectedCardioType: _cardioSessionDescription
+                              .cardioSession
+                              .cardioType,
                           context: context,
                         );
                         if (mounted && cardioType != null) {
@@ -428,25 +424,21 @@ class _CardioEditPageState extends State<CardioEditPage> {
                     TextFormField(
                       controller: _distanceController,
                       keyboardType: TextInputType.number,
-                      validator:
-                          (distance) =>
-                              distance == null || distance.isEmpty
-                                  ? null
-                                  : Validator.validateDoubleGtZero(distance),
+                      validator: (distance) =>
+                          distance == null || distance.isEmpty
+                          ? null
+                          : Validator.validateDoubleGtZero(distance),
                       autovalidateMode: AutovalidateMode.onUserInteraction,
-                      onChanged:
-                          (distance) => setState(() {
-                            if (distance.isEmpty) {
-                              _cardioSessionDescription.cardioSession.distance =
-                                  null;
-                            } else if (Validator.validateDoubleGtZero(
-                                  distance,
-                                ) ==
-                                null) {
-                              _cardioSessionDescription.cardioSession.distance =
-                                  (double.parse(distance) * 1000).round();
-                            }
-                          }),
+                      onChanged: (distance) => setState(() {
+                        if (distance.isEmpty) {
+                          _cardioSessionDescription.cardioSession.distance =
+                              null;
+                        } else if (Validator.validateDoubleGtZero(distance) ==
+                            null) {
+                          _cardioSessionDescription.cardioSession.distance =
+                              (double.parse(distance) * 1000).round();
+                        }
+                      }),
                       decoration: const InputDecoration(
                         icon: Icon(AppIcons.ruler),
                         labelText: "Distance (km)",
@@ -455,24 +447,20 @@ class _CardioEditPageState extends State<CardioEditPage> {
                     TextFormField(
                       controller: _ascentController,
                       keyboardType: TextInputType.number,
-                      validator:
-                          (ascent) =>
-                              ascent == null || ascent.isEmpty
-                                  ? null
-                                  : Validator.validateIntGeZero(ascent),
+                      validator: (ascent) => ascent == null || ascent.isEmpty
+                          ? null
+                          : Validator.validateIntGeZero(ascent),
                       autovalidateMode: AutovalidateMode.onUserInteraction,
-                      onChanged:
-                          (ascent) => setState(() {
-                            if (ascent.isEmpty) {
-                              _cardioSessionDescription.cardioSession.distance =
-                                  null;
-                            } else if (Validator.validateIntGeZero(ascent) ==
-                                null) {
-                              _cardioSessionDescription
-                                  .cardioSession
-                                  .ascent = int.parse(ascent);
-                            }
-                          }),
+                      onChanged: (ascent) => setState(() {
+                        if (ascent.isEmpty) {
+                          _cardioSessionDescription.cardioSession.distance =
+                              null;
+                        } else if (Validator.validateIntGeZero(ascent) ==
+                            null) {
+                          _cardioSessionDescription.cardioSession.ascent =
+                              int.parse(ascent);
+                        }
+                      }),
                       decoration: const InputDecoration(
                         icon: Icon(AppIcons.trendingUp),
                         labelText: "Ascent (m)",
@@ -481,24 +469,20 @@ class _CardioEditPageState extends State<CardioEditPage> {
                     TextFormField(
                       controller: _descentController,
                       keyboardType: TextInputType.number,
-                      validator:
-                          (descent) =>
-                              descent == null || descent.isEmpty
-                                  ? null
-                                  : Validator.validateIntGeZero(descent),
+                      validator: (descent) => descent == null || descent.isEmpty
+                          ? null
+                          : Validator.validateIntGeZero(descent),
                       autovalidateMode: AutovalidateMode.onUserInteraction,
-                      onChanged:
-                          (descent) => setState(() {
-                            if (descent.isEmpty) {
-                              _cardioSessionDescription.cardioSession.distance =
-                                  null;
-                            } else if (Validator.validateIntGeZero(descent) ==
-                                null) {
-                              _cardioSessionDescription
-                                  .cardioSession
-                                  .descent = int.parse(descent);
-                            }
-                          }),
+                      onChanged: (descent) => setState(() {
+                        if (descent.isEmpty) {
+                          _cardioSessionDescription.cardioSession.distance =
+                              null;
+                        } else if (Validator.validateIntGeZero(descent) ==
+                            null) {
+                          _cardioSessionDescription.cardioSession.descent =
+                              int.parse(descent);
+                        }
+                      }),
                       decoration: const InputDecoration(
                         icon: Icon(AppIcons.trendingDown),
                         labelText: "Descent (m)",
@@ -509,19 +493,13 @@ class _CardioEditPageState extends State<CardioEditPage> {
                       caption: "Time",
                       showButton:
                           _cardioSessionDescription.cardioSession.time == null,
-                      onButtonPressed:
-                          () => setState(() {
-                            _cardioSessionDescription
-                                .cardioSession
-                                .time = const Duration(minutes: 1);
-                          }),
-                      builder:
-                          () => Text(
-                            _cardioSessionDescription
-                                .cardioSession
-                                .time!
-                                .formatHms,
-                          ),
+                      onButtonPressed: () => setState(() {
+                        _cardioSessionDescription.cardioSession.time =
+                            const Duration(minutes: 1);
+                      }),
+                      builder: () => Text(
+                        _cardioSessionDescription.cardioSession.time!.formatHms,
+                      ),
                       onTap: () async {
                         final duration = await showScrollableDurationPicker(
                           context: context,
@@ -530,38 +508,33 @@ class _CardioEditPageState extends State<CardioEditPage> {
                         );
                         if (mounted && duration != null) {
                           setState(
-                            () =>
-                                _cardioSessionDescription.cardioSession.time =
-                                    duration,
+                            () => _cardioSessionDescription.cardioSession.time =
+                                duration,
                           );
                         }
                       },
-                      onTrailingTap:
-                          () => setState(() {
-                            _cardioSessionDescription.cardioSession.time = null;
-                          }),
+                      onTrailingTap: () => setState(() {
+                        _cardioSessionDescription.cardioSession.time = null;
+                      }),
                     ),
                     TextFormField(
                       controller: _caloriesController,
                       keyboardType: TextInputType.number,
-                      validator:
-                          (calories) =>
-                              calories == null || calories.isEmpty
-                                  ? null
-                                  : Validator.validateIntGtZero(calories),
+                      validator: (calories) =>
+                          calories == null || calories.isEmpty
+                          ? null
+                          : Validator.validateIntGtZero(calories),
                       autovalidateMode: AutovalidateMode.onUserInteraction,
-                      onChanged:
-                          (calories) => setState(() {
-                            if (calories.isEmpty) {
-                              _cardioSessionDescription.cardioSession.distance =
-                                  null;
-                            } else if (Validator.validateIntGtZero(calories) ==
-                                null) {
-                              _cardioSessionDescription
-                                  .cardioSession
-                                  .calories = int.parse(calories);
-                            }
-                          }),
+                      onChanged: (calories) => setState(() {
+                        if (calories.isEmpty) {
+                          _cardioSessionDescription.cardioSession.distance =
+                              null;
+                        } else if (Validator.validateIntGtZero(calories) ==
+                            null) {
+                          _cardioSessionDescription.cardioSession.calories =
+                              int.parse(calories);
+                        }
+                      }),
                       decoration: const InputDecoration(
                         icon: Icon(AppIcons.food),
                         labelText: "Calories",
@@ -570,26 +543,21 @@ class _CardioEditPageState extends State<CardioEditPage> {
                     TextFormField(
                       controller: _avgCadenceController,
                       keyboardType: TextInputType.number,
-                      validator:
-                          (avgCadence) =>
-                              avgCadence == null || avgCadence.isEmpty
-                                  ? null
-                                  : Validator.validateIntGtZero(avgCadence),
+                      validator: (avgCadence) =>
+                          avgCadence == null || avgCadence.isEmpty
+                          ? null
+                          : Validator.validateIntGtZero(avgCadence),
                       autovalidateMode: AutovalidateMode.onUserInteraction,
-                      onChanged:
-                          (avgCadence) => setState(() {
-                            if (avgCadence.isEmpty) {
-                              _cardioSessionDescription.cardioSession.distance =
-                                  null;
-                            } else if (Validator.validateIntGtZero(
-                                  avgCadence,
-                                ) ==
-                                null) {
-                              _cardioSessionDescription
-                                  .cardioSession
-                                  .avgCadence = int.parse(avgCadence);
-                            }
-                          }),
+                      onChanged: (avgCadence) => setState(() {
+                        if (avgCadence.isEmpty) {
+                          _cardioSessionDescription.cardioSession.distance =
+                              null;
+                        } else if (Validator.validateIntGtZero(avgCadence) ==
+                            null) {
+                          _cardioSessionDescription.cardioSession.avgCadence =
+                              int.parse(avgCadence);
+                        }
+                      }),
                       decoration: const InputDecoration(
                         icon: Icon(AppIcons.gauge),
                         labelText: "Cadence",
@@ -598,37 +566,31 @@ class _CardioEditPageState extends State<CardioEditPage> {
                     TextFormField(
                       controller: _avgHeartRateController,
                       keyboardType: TextInputType.number,
-                      validator:
-                          (avgHeartRate) =>
-                              avgHeartRate == null || avgHeartRate.isEmpty
-                                  ? null
-                                  : Validator.validateIntGtZero(avgHeartRate),
+                      validator: (avgHeartRate) =>
+                          avgHeartRate == null || avgHeartRate.isEmpty
+                          ? null
+                          : Validator.validateIntGtZero(avgHeartRate),
                       autovalidateMode: AutovalidateMode.onUserInteraction,
-                      onChanged:
-                          (avgHeartRate) => setState(() {
-                            if (avgHeartRate.isEmpty) {
-                              _cardioSessionDescription.cardioSession.distance =
-                                  null;
-                            } else if (Validator.validateIntGtZero(
-                                  avgHeartRate,
-                                ) ==
-                                null) {
-                              _cardioSessionDescription
-                                  .cardioSession
-                                  .avgHeartRate = int.parse(avgHeartRate);
-                            }
-                          }),
+                      onChanged: (avgHeartRate) => setState(() {
+                        if (avgHeartRate.isEmpty) {
+                          _cardioSessionDescription.cardioSession.distance =
+                              null;
+                        } else if (Validator.validateIntGtZero(avgHeartRate) ==
+                            null) {
+                          _cardioSessionDescription.cardioSession.avgHeartRate =
+                              int.parse(avgHeartRate);
+                        }
+                      }),
                       decoration: const InputDecoration(
                         icon: Icon(AppIcons.heartbeat),
                         labelText: "Heart Rate",
                       ),
                     ),
                     TextFormField(
-                      onChanged:
-                          (comments) => setState(() {
-                            _cardioSessionDescription.cardioSession.comments =
-                                comments;
-                          }),
+                      onChanged: (comments) => setState(() {
+                        _cardioSessionDescription.cardioSession.comments =
+                            comments;
+                      }),
                       initialValue:
                           _cardioSessionDescription.cardioSession.comments,
                       decoration: const InputDecoration(

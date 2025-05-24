@@ -15,10 +15,9 @@ class GpsPosition {
       longitude = locationData.longitude,
       elevation = locationData.altitude,
       accuracy = locationData.accuracy,
-      satellites =
-          (locationData is AndroidPosition)
-              ? locationData.satellitesUsedInFix.toInt()
-              : 0;
+      satellites = (locationData is AndroidPosition)
+          ? locationData.satellitesUsedInFix.toInt()
+          : 0;
 
   final double latitude;
   final double longitude;

@@ -29,13 +29,12 @@ class SettingsPage extends StatelessWidget {
 
   Future<void> checkSync(BuildContext context) async {
     await Sync.instance.sync(
-      onNoInternet:
-          () => showMessageDialog(
-            context: context,
-            title: "Server Unreachable",
-            text:
-                "The server could not be reached.\nPlease make sure you are connected to the internet and the server URL is right.",
-          ),
+      onNoInternet: () => showMessageDialog(
+        context: context,
+        title: "Server Unreachable",
+        text:
+            "The server could not be reached.\nPlease make sure you are connected to the internet and the server URL is right.",
+      ),
     );
   }
 
@@ -217,328 +216,304 @@ class SettingsPage extends StatelessWidget {
         body: Padding(
           padding: Defaults.edgeInsets.normal,
           child: Consumer<Settings>(
-            builder:
-                (context, settings, _) => ListView(
-                  children: [
-                    const CaptionTile(caption: "Server Settings"),
-                    Defaults.sizedBox.vertical.small,
-                    if (!settings.accountCreated)
-                      EditTile(
-                        leading: AppIcons.sync,
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: FilledButton(
-                                onPressed:
-                                    () => Navigator.of(
-                                      context,
-                                    ).pushNamed(Routes.login),
-                                child: const Text('Login'),
-                              ),
-                            ),
-                            Defaults.sizedBox.horizontal.normal,
-                            Expanded(
-                              child: FilledButton(
-                                onPressed:
-                                    () => Navigator.of(
-                                      context,
-                                    ).pushNamed(Routes.registration),
-                                child: const Text('Register'),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    if (settings.accountCreated) ...[
-                      EditTile.Switch(
-                        caption: "Server Synchronization",
-                        leading: AppIcons.sync,
-                        value: settings.syncEnabled,
-                        onChanged:
-                            (enabled) => _setSyncEnabled(context, enabled),
-                      ),
-                      TextFormField(
-                        // use new initialValue if url changed
-                        key: ValueKey(settings.serverUrl),
-                        decoration: InputDecoration(
-                          icon: const Icon(AppIcons.cloudUpload),
-                          labelText: "Server URL",
-                          suffixIcon: IconButton(
-                            onPressed: settings.setDefaultServerUrl,
-                            icon: const Icon(AppIcons.restore),
+            builder: (context, settings, _) => ListView(
+              children: [
+                const CaptionTile(caption: "Server Settings"),
+                Defaults.sizedBox.vertical.small,
+                if (!settings.accountCreated)
+                  EditTile(
+                    leading: AppIcons.sync,
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: FilledButton(
+                            onPressed: () =>
+                                Navigator.of(context).pushNamed(Routes.login),
+                            child: const Text('Login'),
                           ),
                         ),
-                        initialValue: settings.serverUrl,
-                        validator: Validator.validateUrl,
-                        autovalidateMode: AutovalidateMode.onUserInteraction,
-                        onFieldSubmitted:
-                            (serverUrl) => _setServerUrl(context, serverUrl),
-                      ),
-                    ],
-                    if (settings.syncEnabled) ...[
-                      EditTile(
-                        leading: AppIcons.timeInterval,
-                        caption: "Synchronization Interval (min)",
-                        child: IntInput(
-                          initialValue: settings.syncInterval.inMinutes,
-                          minValue: 1,
-                          maxValue: null,
-                          onUpdate: (syncInterval) async {
-                            await settings.setSyncInterval(
-                              Duration(minutes: syncInterval),
-                            );
-                            Sync.instance.stopSync();
-                            await Sync.instance.startSync();
-                          },
+                        Defaults.sizedBox.horizontal.normal,
+                        Expanded(
+                          child: FilledButton(
+                            onPressed: () => Navigator.of(
+                              context,
+                            ).pushNamed(Routes.registration),
+                            child: const Text('Register'),
+                          ),
                         ),
+                      ],
+                    ),
+                  ),
+                if (settings.accountCreated) ...[
+                  EditTile.Switch(
+                    caption: "Server Synchronization",
+                    leading: AppIcons.sync,
+                    value: settings.syncEnabled,
+                    onChanged: (enabled) => _setSyncEnabled(context, enabled),
+                  ),
+                  TextFormField(
+                    // use new initialValue if url changed
+                    key: ValueKey(settings.serverUrl),
+                    decoration: InputDecoration(
+                      icon: const Icon(AppIcons.cloudUpload),
+                      labelText: "Server URL",
+                      suffixIcon: IconButton(
+                        onPressed: settings.setDefaultServerUrl,
+                        icon: const Icon(AppIcons.restore),
                       ),
-                      EditTile.Switch(
-                        leading: AppIcons.systemUpdate,
-                        caption: "Check for Updates",
-                        value: settings.checkForUpdates,
-                        onChanged: settings.setCheckForUpdates,
-                      ),
-                    ],
-                    Defaults.sizedBox.vertical.small,
-                    const Divider(),
-                    if (settings.accountCreated) ...[
-                      const CaptionTile(caption: "Account"),
-                      TextFormField(
-                        // use new initialValue if username changed
-                        key: ValueKey(settings.username),
-                        decoration: const InputDecoration(
-                          icon: Icon(AppIcons.account),
-                          labelText: "Username",
-                        ),
-                        initialValue: settings.username,
-                        validator: Validator.validateUsername,
-                        autovalidateMode: AutovalidateMode.onUserInteraction,
-                        onFieldSubmitted:
-                            (username) => _setUsername(context, username),
-                      ),
-                      ProviderConsumer(
-                        create: (_) => BoolToggle.on(),
-                        builder:
-                            (context, obscure, _) => TextFormField(
-                              // use new initialValue if password changed
-                              key: ValueKey(settings.password),
-                              decoration: InputDecoration(
-                                icon: const Icon(AppIcons.key),
-                                labelText: "Password",
-                                suffixIcon: IconButton(
-                                  icon:
-                                      obscure.isOn
-                                          ? const Icon(AppIcons.visibility)
-                                          : const Icon(AppIcons.visibilityOff),
-                                  onPressed: obscure.toggle,
-                                ),
-                              ),
-                              obscureText: obscure.isOn,
-                              initialValue: settings.password,
-                              validator: Validator.validatePassword,
-                              autovalidateMode:
-                                  AutovalidateMode.onUserInteraction,
-                              onFieldSubmitted:
-                                  (password) => _setPassword(context, password),
-                            ),
-                      ),
-                      TextFormField(
-                        // use new initialValue if email changed
-                        key: ValueKey(settings.email),
-                        decoration: const InputDecoration(
-                          icon: Icon(AppIcons.email),
-                          labelText: "Email",
-                        ),
-                        initialValue: settings.email,
-                        validator: Validator.validateEmail,
-                        autovalidateMode: AutovalidateMode.onUserInteraction,
-                        keyboardType: TextInputType.emailAddress,
-                        onFieldSubmitted: (email) => _setEmail(context, email),
-                      ),
-                      Consumer<Sync>(
-                        builder:
-                            (context, sync, _) => EditTile(
-                              leading: AppIcons.sync,
-                              child: Container(
-                                constraints: const BoxConstraints(
-                                  minWidth: double.infinity,
-                                ),
-                                child: ElevatedButton(
-                                  style: ButtonStyle(
-                                    foregroundColor: WidgetStateProperty.all(
-                                      Theme.of(
-                                        context,
-                                      ).colorScheme.errorContainer,
-                                    ),
-                                  ),
-                                  onPressed:
-                                      sync.isSyncing
-                                          ? null
-                                          : () => _initSync(context),
-                                  child: const Text('Init Sync'),
-                                ),
-                              ),
-                            ),
-                      ),
-                      Consumer<Sync>(
-                        builder:
-                            (context, sync, _) => EditTile(
-                              leading: AppIcons.logout,
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    child: ElevatedButton(
-                                      style: ButtonStyle(
-                                        foregroundColor:
-                                            WidgetStateProperty.all(
-                                              Theme.of(
-                                                context,
-                                              ).colorScheme.error,
-                                            ),
-                                      ),
-                                      onPressed:
-                                          sync.isSyncing
-                                              ? null
-                                              : () => _logout(context),
-                                      child: const Text('Logout'),
-                                    ),
-                                  ),
-                                  Defaults.sizedBox.horizontal.normal,
-                                  Expanded(
-                                    child: ElevatedButton(
-                                      style: ButtonStyle(
-                                        foregroundColor:
-                                            WidgetStateProperty.all(
-                                              Theme.of(
-                                                context,
-                                              ).colorScheme.error,
-                                            ),
-                                      ),
-                                      onPressed:
-                                          sync.isSyncing
-                                              ? null
-                                              : () => _deleteAccount(context),
-                                      child: const Text('Delete Account'),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                      ),
-                      Defaults.sizedBox.vertical.small,
-                      const Divider(),
-                    ],
-                    const CaptionTile(caption: "Other Settings"),
-                    Defaults.sizedBox.vertical.small,
-                    //EditTile(
-                    //caption: "Units",
-                    //child: SizedBox(
-                    //height: 24,
-                    //child: DropdownButtonHideUnderline(
-                    //child: DropdownButton(
-                    //value: settings.units,
-                    //items: [
-                    //for (final unit in Units.values)
-                    //DropdownMenuItem(
-                    //value: unit,
-                    //child: Text(unit.name),
-                    //),
-                    //],
-                    //onChanged: (units) {
-                    //if (units != null && units is Units) {
-                    //settings.units = units;
-                    //}
-                    //},
-                    //),
-                    //),
-                    //),
-                    //leading: AppIcons.sync,
-                    //),
-                    TextFormField(
-                      decoration: const InputDecoration(
-                        icon: Icon(AppIcons.dumbbell),
-                        labelText: "Weight Increment",
-                      ),
-                      keyboardType: TextInputType.number,
-                      initialValue: settings.weightIncrement.toString(),
-                      validator: Validator.validateDoubleGtZero,
-                      autovalidateMode: AutovalidateMode.onUserInteraction,
-                      onFieldSubmitted: (increment) async {
-                        if (Validator.validateDoubleGtZero(increment) == null) {
-                          await settings.setWeightIncrement(
-                            double.parse(increment),
-                          );
-                        }
+                    ),
+                    initialValue: settings.serverUrl,
+                    validator: Validator.validateUrl,
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    onFieldSubmitted: (serverUrl) =>
+                        _setServerUrl(context, serverUrl),
+                  ),
+                ],
+                if (settings.syncEnabled) ...[
+                  EditTile(
+                    leading: AppIcons.timeInterval,
+                    caption: "Synchronization Interval (min)",
+                    child: IntInput(
+                      initialValue: settings.syncInterval.inMinutes,
+                      minValue: 1,
+                      maxValue: null,
+                      onUpdate: (syncInterval) async {
+                        await settings.setSyncInterval(
+                          Duration(minutes: syncInterval),
+                        );
+                        Sync.instance.stopSync();
+                        await Sync.instance.startSync();
                       },
                     ),
-                    Defaults.sizedBox.vertical.small,
-                    EditTile(
-                      leading: AppIcons.timeInterval,
-                      caption: "Duration Increment",
-                      child: DurationInput(
-                        initialDuration: settings.durationIncrement,
-                        onUpdate: settings.setDurationIncrement,
-                        durationIncrement: const Duration(minutes: 1),
-                        minDuration: const Duration(seconds: 1),
+                  ),
+                  EditTile.Switch(
+                    leading: AppIcons.systemUpdate,
+                    caption: "Check for Updates",
+                    value: settings.checkForUpdates,
+                    onChanged: settings.setCheckForUpdates,
+                  ),
+                ],
+                Defaults.sizedBox.vertical.small,
+                const Divider(),
+                if (settings.accountCreated) ...[
+                  const CaptionTile(caption: "Account"),
+                  TextFormField(
+                    // use new initialValue if username changed
+                    key: ValueKey(settings.username),
+                    decoration: const InputDecoration(
+                      icon: Icon(AppIcons.account),
+                      labelText: "Username",
+                    ),
+                    initialValue: settings.username,
+                    validator: Validator.validateUsername,
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    onFieldSubmitted: (username) =>
+                        _setUsername(context, username),
+                  ),
+                  ProviderConsumer(
+                    create: (_) => BoolToggle.on(),
+                    builder: (context, obscure, _) => TextFormField(
+                      // use new initialValue if password changed
+                      key: ValueKey(settings.password),
+                      decoration: InputDecoration(
+                        icon: const Icon(AppIcons.key),
+                        labelText: "Password",
+                        suffixIcon: IconButton(
+                          icon: obscure.isOn
+                              ? const Icon(AppIcons.visibility)
+                              : const Icon(AppIcons.visibilityOff),
+                          onPressed: obscure.toggle,
+                        ),
+                      ),
+                      obscureText: obscure.isOn,
+                      initialValue: settings.password,
+                      validator: Validator.validatePassword,
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      onFieldSubmitted: (password) =>
+                          _setPassword(context, password),
+                    ),
+                  ),
+                  TextFormField(
+                    // use new initialValue if email changed
+                    key: ValueKey(settings.email),
+                    decoration: const InputDecoration(
+                      icon: Icon(AppIcons.email),
+                      labelText: "Email",
+                    ),
+                    initialValue: settings.email,
+                    validator: Validator.validateEmail,
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    keyboardType: TextInputType.emailAddress,
+                    onFieldSubmitted: (email) => _setEmail(context, email),
+                  ),
+                  Consumer<Sync>(
+                    builder: (context, sync, _) => EditTile(
+                      leading: AppIcons.sync,
+                      child: Container(
+                        constraints: const BoxConstraints(
+                          minWidth: double.infinity,
+                        ),
+                        child: ElevatedButton(
+                          style: ButtonStyle(
+                            foregroundColor: WidgetStateProperty.all(
+                              Theme.of(context).colorScheme.errorContainer,
+                            ),
+                          ),
+                          onPressed: sync.isSyncing
+                              ? null
+                              : () => _initSync(context),
+                          child: const Text('Init Sync'),
+                        ),
                       ),
                     ),
-                    Defaults.sizedBox.vertical.small,
-                    const Divider(),
-                    const CaptionTile(caption: "Developer Mode"),
-                    EditTile.Switch(
-                      caption: "Developer Mode",
-                      leading: AppIcons.developerMode,
-                      value: settings.developerMode,
-                      onChanged: settings.setDeveloperMode,
-                    ),
-                    if (settings.developerMode)
-                      EditTile(
-                        leading: AppIcons.bulletedList,
-                        child: ConstrainedBox(
-                          constraints: const BoxConstraints(
-                            minWidth: double.infinity,
-                          ),
-                          child: ElevatedButton(
-                            child: const Text('Dev Status'),
-                            onPressed:
-                                () => Navigator.pushNamed(
-                                  context,
-                                  Routes.devStatus,
+                  ),
+                  Consumer<Sync>(
+                    builder: (context, sync, _) => EditTile(
+                      leading: AppIcons.logout,
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: ElevatedButton(
+                              style: ButtonStyle(
+                                foregroundColor: WidgetStateProperty.all(
+                                  Theme.of(context).colorScheme.error,
                                 ),
+                              ),
+                              onPressed: sync.isSyncing
+                                  ? null
+                                  : () => _logout(context),
+                              child: const Text('Logout'),
+                            ),
                           ),
-                        ),
-                      ),
-                    const Divider(),
-                    const CaptionTile(caption: "Export"),
-                    EditTile(
-                      leading: AppIcons.upload,
-                      child: ConstrainedBox(
-                        constraints: const BoxConstraints(
-                          minWidth: double.infinity,
-                        ),
-                        child: ElevatedButton(
-                          child: const Text('Export'),
-                          onPressed: () => _exportDb(context),
-                        ),
-                      ),
-                    ),
-                    const Divider(),
-                    const CaptionTile(caption: "About"),
-                    EditTile(
-                      leading: AppIcons.questionMark,
-                      child: ConstrainedBox(
-                        constraints: const BoxConstraints(
-                          minWidth: double.infinity,
-                        ),
-                        child: ElevatedButton(
-                          child: const Text('About'),
-                          onPressed:
-                              () => Navigator.pushNamed(context, Routes.about),
-                        ),
+                          Defaults.sizedBox.horizontal.normal,
+                          Expanded(
+                            child: ElevatedButton(
+                              style: ButtonStyle(
+                                foregroundColor: WidgetStateProperty.all(
+                                  Theme.of(context).colorScheme.error,
+                                ),
+                              ),
+                              onPressed: sync.isSyncing
+                                  ? null
+                                  : () => _deleteAccount(context),
+                              child: const Text('Delete Account'),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                  ],
+                  ),
+                  Defaults.sizedBox.vertical.small,
+                  const Divider(),
+                ],
+                const CaptionTile(caption: "Other Settings"),
+                Defaults.sizedBox.vertical.small,
+                //EditTile(
+                //caption: "Units",
+                //child: SizedBox(
+                //height: 24,
+                //child: DropdownButtonHideUnderline(
+                //child: DropdownButton(
+                //value: settings.units,
+                //items: [
+                //for (final unit in Units.values)
+                //DropdownMenuItem(
+                //value: unit,
+                //child: Text(unit.name),
+                //),
+                //],
+                //onChanged: (units) {
+                //if (units != null && units is Units) {
+                //settings.units = units;
+                //}
+                //},
+                //),
+                //),
+                //),
+                //leading: AppIcons.sync,
+                //),
+                TextFormField(
+                  decoration: const InputDecoration(
+                    icon: Icon(AppIcons.dumbbell),
+                    labelText: "Weight Increment",
+                  ),
+                  keyboardType: TextInputType.number,
+                  initialValue: settings.weightIncrement.toString(),
+                  validator: Validator.validateDoubleGtZero,
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                  onFieldSubmitted: (increment) async {
+                    if (Validator.validateDoubleGtZero(increment) == null) {
+                      await settings.setWeightIncrement(
+                        double.parse(increment),
+                      );
+                    }
+                  },
                 ),
+                Defaults.sizedBox.vertical.small,
+                EditTile(
+                  leading: AppIcons.timeInterval,
+                  caption: "Duration Increment",
+                  child: DurationInput(
+                    initialDuration: settings.durationIncrement,
+                    onUpdate: settings.setDurationIncrement,
+                    durationIncrement: const Duration(minutes: 1),
+                    minDuration: const Duration(seconds: 1),
+                  ),
+                ),
+                Defaults.sizedBox.vertical.small,
+                const Divider(),
+                const CaptionTile(caption: "Developer Mode"),
+                EditTile.Switch(
+                  caption: "Developer Mode",
+                  leading: AppIcons.developerMode,
+                  value: settings.developerMode,
+                  onChanged: settings.setDeveloperMode,
+                ),
+                if (settings.developerMode)
+                  EditTile(
+                    leading: AppIcons.bulletedList,
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(
+                        minWidth: double.infinity,
+                      ),
+                      child: ElevatedButton(
+                        child: const Text('Dev Status'),
+                        onPressed: () =>
+                            Navigator.pushNamed(context, Routes.devStatus),
+                      ),
+                    ),
+                  ),
+                const Divider(),
+                const CaptionTile(caption: "Export"),
+                EditTile(
+                  leading: AppIcons.upload,
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(
+                      minWidth: double.infinity,
+                    ),
+                    child: ElevatedButton(
+                      child: const Text('Export'),
+                      onPressed: () => _exportDb(context),
+                    ),
+                  ),
+                ),
+                const Divider(),
+                const CaptionTile(caption: "About"),
+                EditTile(
+                  leading: AppIcons.questionMark,
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(
+                      minWidth: double.infinity,
+                    ),
+                    child: ElevatedButton(
+                      child: const Text('About'),
+                      onPressed: () =>
+                          Navigator.pushNamed(context, Routes.about),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
         drawer: const MainDrawer(selectedRoute: Routes.settings),

@@ -11,10 +11,9 @@ StrengthSessionDescription _$StrengthSessionDescriptionFromJson(
 ) => StrengthSessionDescription(
   session: StrengthSession.fromJson(json['session'] as Map<String, dynamic>),
   movement: Movement.fromJson(json['movement'] as Map<String, dynamic>),
-  sets:
-      (json['sets'] as List<dynamic>)
-          .map((e) => StrengthSet.fromJson(e as Map<String, dynamic>))
-          .toList(),
+  sets: (json['sets'] as List<dynamic>)
+      .map((e) => StrengthSet.fromJson(e as Map<String, dynamic>))
+      .toList(),
 );
 
 Map<String, dynamic> _$StrengthSessionDescriptionToJson(

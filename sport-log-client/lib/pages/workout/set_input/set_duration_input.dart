@@ -92,10 +92,9 @@ class _SetDurationInputState extends State<SetDurationInput> {
         _weightUnit = unit;
         _weight = _weightUnit == "lb" ? _weight! * _lbToKg : _weight! / _lbToKg;
         if (_secondWeight != null) {
-          _secondWeight =
-              _weightUnit == "lb"
-                  ? _secondWeight! * _lbToKg
-                  : _secondWeight! / _lbToKg;
+          _secondWeight = _weightUnit == "lb"
+              ? _secondWeight! * _lbToKg
+              : _secondWeight! / _lbToKg;
         }
       });
       _submit();
@@ -132,168 +131,152 @@ class _SetDurationInputState extends State<SetDurationInput> {
     return Row(
       children: [
         Consumer<Settings>(
-          builder:
-              (context, settings, _) => Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
+          builder: (context, settings, _) => Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Table(
+                defaultColumnWidth: const IntrinsicColumnWidth(),
                 children: [
-                  Table(
-                    defaultColumnWidth: const IntrinsicColumnWidth(),
+                  TableRow(
                     children: [
-                      TableRow(
-                        children: [
-                          const Align(
-                            alignment: Alignment.centerRight,
-                            child: CaptionTile(caption: "h"),
-                          ),
-                          Container(),
-                          const Align(
-                            alignment: Alignment.centerRight,
-                            child: CaptionTile(caption: "m"),
-                          ),
-                          Container(),
-                          const Align(
-                            alignment: Alignment.centerRight,
-                            child: CaptionTile(caption: "s"),
-                          ),
-                          Container(),
-                          const Align(
-                            alignment: Alignment.centerRight,
-                            child: CaptionTile(caption: "ms"),
-                          ),
-                        ],
+                      const Align(
+                        alignment: Alignment.centerRight,
+                        child: CaptionTile(caption: "h"),
                       ),
-                      TableRow(
-                        children: [
-                          _PaddedIntInput(
-                            initialValue: _hours,
-                            key: _hoursKey,
-                            placeholder: 0,
-                            numberOfDigits: 2,
-                            onChanged:
-                                (value) => setState(() => _hours = value),
-                            onSubmitted: () {
-                              _submit();
-                              _minutesKey.currentState?.requestFocus();
-                            },
-                            submitOnDigitsReached: true,
-                            textInputAction: TextInputAction.next,
-                          ),
-                          Text(
-                            ":",
-                            style: Theme.of(context).textTheme.bodyLarge,
-                          ),
-                          _PaddedIntInput(
-                            initialValue: _minutes,
-                            key: _minutesKey,
-                            placeholder: 0,
-                            numberOfDigits: 2,
-                            maxValue: 59,
-                            onChanged:
-                                (value) => setState(() => _minutes = value),
-                            onSubmitted: () {
-                              _submit();
-                              _secondsKey.currentState?.requestFocus();
-                            },
-                            submitOnDigitsReached: true,
-                            textInputAction: TextInputAction.next,
-                          ),
-                          Text(
-                            ":",
-                            style: Theme.of(context).textTheme.bodyLarge,
-                          ),
-                          _PaddedIntInput(
-                            initialValue: _seconds,
-                            key: _secondsKey,
-                            placeholder: 0,
-                            numberOfDigits: 2,
-                            onChanged:
-                                (value) => setState(() => _seconds = value),
-                            onSubmitted: () {
-                              _submit();
-                              _millisecondsKey.currentState?.requestFocus();
-                            },
-                            submitOnDigitsReached: true,
-                            textInputAction: TextInputAction.next,
-                          ),
-                          Text(
-                            ",",
-                            style: Theme.of(context).textTheme.bodyLarge,
-                          ),
-                          _PaddedIntInput(
-                            initialValue: _milliseconds,
-                            key: _millisecondsKey,
-                            placeholder: 0,
-                            numberOfDigits: 3,
-                            onChanged:
-                                (value) =>
-                                    setState(() => _milliseconds = value),
-                            onSubmitted: _submit,
-                            textInputAction: TextInputAction.done,
-                          ),
-                        ],
+                      Container(),
+                      const Align(
+                        alignment: Alignment.centerRight,
+                        child: CaptionTile(caption: "m"),
+                      ),
+                      Container(),
+                      const Align(
+                        alignment: Alignment.centerRight,
+                        child: CaptionTile(caption: "s"),
+                      ),
+                      Container(),
+                      const Align(
+                        alignment: Alignment.centerRight,
+                        child: CaptionTile(caption: "ms"),
                       ),
                     ],
                   ),
-                  if (_weight != null && widget.editWeightUnit)
-                    EditTile(
-                      leading: null,
-                      caption: "Weight Unit",
-                      shrinkWidth: true,
-                      child: DropdownButtonHideUnderline(
-                        child: DropdownButton(
-                          value: _weightUnit,
-                          items: const [
-                            DropdownMenuItem(value: "kg", child: Text("kg")),
-                            DropdownMenuItem(value: "lb", child: Text("lb")),
-                          ],
-                          onChanged: _setUnit,
-                          isDense: true,
-                        ),
+                  TableRow(
+                    children: [
+                      _PaddedIntInput(
+                        initialValue: _hours,
+                        key: _hoursKey,
+                        placeholder: 0,
+                        numberOfDigits: 2,
+                        onChanged: (value) => setState(() => _hours = value),
+                        onSubmitted: () {
+                          _submit();
+                          _minutesKey.currentState?.requestFocus();
+                        },
+                        submitOnDigitsReached: true,
+                        textInputAction: TextInputAction.next,
                       ),
-                    ),
-                  if (_weight != null)
-                    EditTile(
-                      leading: null,
-                      caption: widget.secondWeight ? "Male Weight" : "Weight",
-                      shrinkWidth: true,
-                      child: DoubleInput(
-                        minValue: 0,
-                        maxValue: null,
-                        initialValue:
-                            _weightUnit == "lb" ? _weight! / _lbToKg : _weight!,
-                        stepSize: settings.weightIncrement,
-                        onUpdate: _setWeight,
+                      Text(":", style: Theme.of(context).textTheme.bodyLarge),
+                      _PaddedIntInput(
+                        initialValue: _minutes,
+                        key: _minutesKey,
+                        placeholder: 0,
+                        numberOfDigits: 2,
+                        maxValue: 59,
+                        onChanged: (value) => setState(() => _minutes = value),
+                        onSubmitted: () {
+                          _submit();
+                          _secondsKey.currentState?.requestFocus();
+                        },
+                        submitOnDigitsReached: true,
+                        textInputAction: TextInputAction.next,
                       ),
-                    ),
-                  if (widget.secondWeight && _secondWeight != null)
-                    EditTile(
-                      leading: null,
-                      caption: "Female Weight",
-                      shrinkWidth: true,
-                      child: DoubleInput(
-                        minValue: 0,
-                        maxValue: null,
-                        initialValue:
-                            _weightUnit == "lb"
-                                ? _secondWeight! / _lbToKg
-                                : _secondWeight!,
-                        stepSize: settings.weightIncrement,
-                        onUpdate: _setFemaleWeight,
+                      Text(":", style: Theme.of(context).textTheme.bodyLarge),
+                      _PaddedIntInput(
+                        initialValue: _seconds,
+                        key: _secondsKey,
+                        placeholder: 0,
+                        numberOfDigits: 2,
+                        onChanged: (value) => setState(() => _seconds = value),
+                        onSubmitted: () {
+                          _submit();
+                          _millisecondsKey.currentState?.requestFocus();
+                        },
+                        submitOnDigitsReached: true,
+                        textInputAction: TextInputAction.next,
                       ),
-                    ),
-                  ElevatedButton.icon(
-                    icon: Icon(
-                      _weight == null ? AppIcons.add : AppIcons.remove,
-                    ),
-                    label: const Text("Weight"),
-                    onPressed: () {
-                      FocusManager.instance.primaryFocus?.unfocus();
-                      _toggleWeight();
-                    },
+                      Text(",", style: Theme.of(context).textTheme.bodyLarge),
+                      _PaddedIntInput(
+                        initialValue: _milliseconds,
+                        key: _millisecondsKey,
+                        placeholder: 0,
+                        numberOfDigits: 3,
+                        onChanged: (value) =>
+                            setState(() => _milliseconds = value),
+                        onSubmitted: _submit,
+                        textInputAction: TextInputAction.done,
+                      ),
+                    ],
                   ),
                 ],
               ),
+              if (_weight != null && widget.editWeightUnit)
+                EditTile(
+                  leading: null,
+                  caption: "Weight Unit",
+                  shrinkWidth: true,
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton(
+                      value: _weightUnit,
+                      items: const [
+                        DropdownMenuItem(value: "kg", child: Text("kg")),
+                        DropdownMenuItem(value: "lb", child: Text("lb")),
+                      ],
+                      onChanged: _setUnit,
+                      isDense: true,
+                    ),
+                  ),
+                ),
+              if (_weight != null)
+                EditTile(
+                  leading: null,
+                  caption: widget.secondWeight ? "Male Weight" : "Weight",
+                  shrinkWidth: true,
+                  child: DoubleInput(
+                    minValue: 0,
+                    maxValue: null,
+                    initialValue: _weightUnit == "lb"
+                        ? _weight! / _lbToKg
+                        : _weight!,
+                    stepSize: settings.weightIncrement,
+                    onUpdate: _setWeight,
+                  ),
+                ),
+              if (widget.secondWeight && _secondWeight != null)
+                EditTile(
+                  leading: null,
+                  caption: "Female Weight",
+                  shrinkWidth: true,
+                  child: DoubleInput(
+                    minValue: 0,
+                    maxValue: null,
+                    initialValue: _weightUnit == "lb"
+                        ? _secondWeight! / _lbToKg
+                        : _secondWeight!,
+                    stepSize: settings.weightIncrement,
+                    onUpdate: _setFemaleWeight,
+                  ),
+                ),
+              ElevatedButton.icon(
+                icon: Icon(_weight == null ? AppIcons.add : AppIcons.remove),
+                label: const Text("Weight"),
+                onPressed: () {
+                  FocusManager.instance.primaryFocus?.unfocus();
+                  _toggleWeight();
+                },
+              ),
+            ],
+          ),
         ),
         if (widget.confirmChanges)
           Expanded(

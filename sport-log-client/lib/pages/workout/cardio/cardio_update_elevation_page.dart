@@ -27,8 +27,9 @@ class CardioUpdateElevationPage extends StatefulWidget {
 class _CardioUpdateElevationPageState extends State<CardioUpdateElevationPage> {
   _CardioUpdateElevationPageState();
 
-  late final CardioSessionDescription _cardioSessionDescription =
-      widget.cardioSessionDescription.clone();
+  late final CardioSessionDescription _cardioSessionDescription = widget
+      .cardioSessionDescription
+      .clone();
 
   ElevationMapController? _elevationMapController;
   double? _progress;
@@ -40,8 +41,8 @@ class _CardioUpdateElevationPageState extends State<CardioUpdateElevationPage> {
       DurationChartLine.fromValues<Position>(
         values: _cardioSessionDescription.cardioSession.track,
         getDuration: (position) => position.time,
-        getGroupValue:
-            (positions, _) => positions.map((p) => p.elevation).average,
+        getGroupValue: (positions, _) =>
+            positions.map((p) => p.elevation).average,
         lineColor: _elevationColor,
         absolute: false,
       );
@@ -52,8 +53,8 @@ class _CardioUpdateElevationPageState extends State<CardioUpdateElevationPage> {
       DurationChartLine.fromValues<Position>(
         values: _cardioSessionDescription.cardioSession.track,
         getDuration: (position) => position.time,
-        getGroupValue:
-            (positions, _) => positions.map((p) => p.elevation).average,
+        getGroupValue: (positions, _) =>
+            positions.map((p) => p.elevation).average,
         lineColor: _updatedElevationColor,
         absolute: false,
       );
@@ -128,42 +129,42 @@ class _CardioUpdateElevationPageState extends State<CardioUpdateElevationPage> {
               Defaults.sizedBox.vertical.normal,
               _changed
                   ? Row(
-                    children: [
-                      Expanded(
-                        child: FilledButton.icon(
-                          icon: const Icon(AppIcons.close),
-                          label: const Text("Cancel"),
-                          onPressed: () => _return(apply: false),
-                          style: ButtonStyle(
-                            backgroundColor: WidgetStatePropertyAll(
-                              Theme.of(context).colorScheme.error,
+                      children: [
+                        Expanded(
+                          child: FilledButton.icon(
+                            icon: const Icon(AppIcons.close),
+                            label: const Text("Cancel"),
+                            onPressed: () => _return(apply: false),
+                            style: ButtonStyle(
+                              backgroundColor: WidgetStatePropertyAll(
+                                Theme.of(context).colorScheme.error,
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                      Defaults.sizedBox.horizontal.normal,
-                      Expanded(
-                        child: FilledButton.icon(
-                          icon: const Icon(AppIcons.check),
-                          label: const Text("Apply"),
-                          onPressed: () => _return(apply: true),
-                          style: ButtonStyle(
-                            backgroundColor: WidgetStatePropertyAll(
-                              Theme.of(context).colorScheme.errorContainer,
+                        Defaults.sizedBox.horizontal.normal,
+                        Expanded(
+                          child: FilledButton.icon(
+                            icon: const Icon(AppIcons.check),
+                            label: const Text("Apply"),
+                            onPressed: () => _return(apply: true),
+                            style: ButtonStyle(
+                              backgroundColor: WidgetStatePropertyAll(
+                                Theme.of(context).colorScheme.errorContainer,
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    ],
-                  )
+                      ],
+                    )
                   : SizedBox(
-                    width: double.infinity,
-                    child: FilledButton.icon(
-                      icon: const Icon(AppIcons.trendingUp),
-                      label: const Text("Update Elevation"),
-                      onPressed: _progress == null ? _updateElevation : null,
+                      width: double.infinity,
+                      child: FilledButton.icon(
+                        icon: const Icon(AppIcons.trendingUp),
+                        label: const Text("Update Elevation"),
+                        onPressed: _progress == null ? _updateElevation : null,
+                      ),
                     ),
-                  ),
             ],
           ),
         ),

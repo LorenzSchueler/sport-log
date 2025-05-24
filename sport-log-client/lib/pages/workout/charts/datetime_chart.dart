@@ -106,14 +106,14 @@ abstract class DateTimePeriodChart extends StatelessWidget {
     required this.absolute,
     required this.formatter,
     super.key,
-  }) : _maxY =
-           (chartValues.map((v) => v.value).maxOrNull ?? 0).ceil().toDouble(),
-       _minY =
-           absolute
-               ? 0.0
-               : (chartValues.map((v) => v.value).minOrNull ?? 0)
-                   .floor()
-                   .toDouble();
+  }) : _maxY = (chartValues.map((v) => v.value).maxOrNull ?? 0)
+           .ceil()
+           .toDouble(),
+       _minY = absolute
+           ? 0.0
+           : (chartValues.map((v) => v.value).minOrNull ?? 0)
+                 .floor()
+                 .toDouble();
 
   final List<DateTimeChartValue> chartValues;
   final ChartValueFormatter formatter;
