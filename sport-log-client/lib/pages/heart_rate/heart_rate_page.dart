@@ -23,7 +23,7 @@ class HeartRatePage extends StatelessWidget {
           child: Center(
             child: ProviderConsumer<HeartRateUtils>(
               create: (_) => HeartRateUtils(),
-              builder: (_, heartRateUtils, __) => Column(
+              builder: (_, heartRateUtils, _) => Column(
                 children: [
                   FilledButton(
                     onPressed: heartRateUtils.isSearching

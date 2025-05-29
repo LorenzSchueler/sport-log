@@ -32,11 +32,11 @@ class RouteOverviewPage extends StatelessWidget {
             create: (_) => OverviewDataProvider(
               dataProvider: RouteDataProvider(),
               entityAccessor: (dataProvider) =>
-                  (_, __, ___, search) => dataProvider.getByName(search),
+                  (_, _, _, search) => dataProvider.getByName(search),
               recordAccessor: (_) => () async {},
               loggerName: "RoutePage",
             ),
-            builder: (_, dataProvider, __) => Scaffold(
+            builder: (_, dataProvider, _) => Scaffold(
               appBar: AppBar(
                 title: dataProvider.isSearch
                     ? TextFormField(
@@ -76,7 +76,7 @@ class RouteOverviewPage extends StatelessWidget {
                             route: dataProvider.entities[index],
                             key: ValueKey(dataProvider.entities[index].id),
                           ),
-                          separatorBuilder: (_, __) =>
+                          separatorBuilder: (_, _) =>
                               Defaults.sizedBox.vertical.normal,
                           itemCount: dataProvider.entities.length,
                         ),

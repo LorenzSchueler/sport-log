@@ -32,11 +32,11 @@ class MetconOverviewPage extends StatelessWidget {
             create: (_) => OverviewDataProvider(
               dataProvider: MetconDescriptionDataProvider(),
               entityAccessor: (dataProvider) =>
-                  (_, __, ___, search) => dataProvider.getByMetconName(search),
+                  (_, _, _, search) => dataProvider.getByMetconName(search),
               recordAccessor: (_) => () async {},
               loggerName: "MetconsPage",
             ),
-            builder: (_, dataProvider, __) => Scaffold(
+            builder: (_, dataProvider, _) => Scaffold(
               appBar: AppBar(
                 title: dataProvider.isSearch
                     ? TextFormField(
@@ -76,7 +76,7 @@ class MetconOverviewPage extends StatelessWidget {
                           itemBuilder: (_, index) => MetconCard(
                             metconDescription: dataProvider.entities[index],
                           ),
-                          separatorBuilder: (_, __) =>
+                          separatorBuilder: (_, _) =>
                               Defaults.sizedBox.vertical.normal,
                           itemCount: dataProvider.entities.length,
                         ),

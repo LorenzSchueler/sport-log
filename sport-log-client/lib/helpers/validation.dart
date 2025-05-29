@@ -40,7 +40,6 @@ abstract final class Validator {
   }
 
   static String? validatePassword(String? password) {
-    // ignore: prefer-conditional-expressions
     if (password == null || password.isEmpty) {
       return "Password must not be empty.";
     } else if (password.length < 8) {

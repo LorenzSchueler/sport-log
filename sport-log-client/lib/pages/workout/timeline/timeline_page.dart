@@ -49,7 +49,7 @@ class TimelinePage extends StatelessWidget {
                   () => dataProvider.getRecords(),
               loggerName: "TimelinePage",
             ),
-            builder: (_, dataProvider, __) => Scaffold(
+            builder: (_, dataProvider, _) => Scaffold(
               appBar: AppBar(
                 title: dataProvider.isSearch
                     ? TextFormField(
@@ -116,7 +116,7 @@ class TimelinePage extends StatelessWidget {
                                 (movementOrMetcon) =>
                                     dataProvider.selected = movementOrMetcon,
                               ),
-                              separatorBuilder: (_, __) =>
+                              separatorBuilder: (_, _) =>
                                   Defaults.sizedBox.vertical.normal,
                               itemCount: dataProvider.entities.length,
                             ),

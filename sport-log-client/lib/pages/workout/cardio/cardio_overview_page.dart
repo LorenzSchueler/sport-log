@@ -54,7 +54,7 @@ class CardioOverviewPage extends StatelessWidget {
               recordAccessor: (_) => () async {},
               loggerName: "CardioSessionsPage",
             ),
-            builder: (_, dataProvider, __) => Scaffold(
+            builder: (_, dataProvider, _) => Scaffold(
               appBar: AppBar(
                 title: dataProvider.isSearch
                     ? TextFormField(
@@ -149,7 +149,7 @@ class CardioOverviewPage extends StatelessWidget {
                                     onSelected: (movement) =>
                                         dataProvider.selected = movement,
                                   ),
-                                  separatorBuilder: (_, __) =>
+                                  separatorBuilder: (_, _) =>
                                       Defaults.sizedBox.vertical.normal,
                                   itemCount: dataProvider.entities.length,
                                 ),
@@ -372,7 +372,7 @@ class CardioStatsCard extends StatelessWidget {
               ],
             );
           },
-          separatorBuilder: (_, __) => const Divider(),
+          separatorBuilder: (_, _) => const Divider(),
           itemCount: groupedSessions.length,
         ),
       ),

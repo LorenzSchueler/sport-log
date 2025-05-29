@@ -31,11 +31,11 @@ class PlatformOverviewPage extends StatelessWidget {
             create: (_) => OverviewDataProvider(
               dataProvider: PlatformDescriptionDataProvider(),
               entityAccessor: (dataProvider) =>
-                  (_, __, ___, ____) => dataProvider.getNonDeleted(),
+                  (_, _, _, _) => dataProvider.getNonDeleted(),
               recordAccessor: (_) => () async {},
               loggerName: "PlatformOverviewPage",
             ),
-            builder: (_, dataProvider, __) => Scaffold(
+            builder: (_, dataProvider, _) => Scaffold(
               appBar: AppBar(title: const Text("Server Actions")),
               body: SyncRefreshIndicator(
                 child: dataProvider.entities.isEmpty
@@ -48,7 +48,7 @@ class PlatformOverviewPage extends StatelessWidget {
                           itemBuilder: (_, index) => PlatformCard(
                             platformDescription: dataProvider.entities[index],
                           ),
-                          separatorBuilder: (_, __) =>
+                          separatorBuilder: (_, _) =>
                               Defaults.sizedBox.vertical.normal,
                           itemCount: dataProvider.entities.length,
                         ),

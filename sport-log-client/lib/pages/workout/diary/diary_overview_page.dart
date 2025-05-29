@@ -40,7 +40,7 @@ class DiaryOverviewPage extends StatelessWidget {
               recordAccessor: (_) => () async {},
               loggerName: "DiaryPage",
             ),
-            builder: (_, dataProvider, __) => Scaffold(
+            builder: (_, dataProvider, _) => Scaffold(
               appBar: AppBar(
                 title: dataProvider.isSearch
                     ? TextFormField(
@@ -98,7 +98,7 @@ class DiaryOverviewPage extends StatelessWidget {
                                   itemBuilder: (_, index) => DiaryCard(
                                     diary: dataProvider.entities[index],
                                   ),
-                                  separatorBuilder: (_, __) =>
+                                  separatorBuilder: (_, _) =>
                                       Defaults.sizedBox.vertical.normal,
                                   itemCount: dataProvider.entities.length,
                                 ),

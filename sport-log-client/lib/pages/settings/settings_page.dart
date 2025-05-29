@@ -245,7 +245,7 @@ class SettingsPage extends StatelessWidget {
                     ),
                   ),
                 if (settings.accountCreated) ...[
-                  EditTile.Switch(
+                  EditTile.switch_(
                     caption: "Server Synchronization",
                     leading: AppIcons.sync,
                     value: settings.syncEnabled,
@@ -286,7 +286,7 @@ class SettingsPage extends StatelessWidget {
                       },
                     ),
                   ),
-                  EditTile.Switch(
+                  EditTile.switch_(
                     leading: AppIcons.systemUpdate,
                     caption: "Check for Updates",
                     value: settings.checkForUpdates,
@@ -463,7 +463,7 @@ class SettingsPage extends StatelessWidget {
                 Defaults.sizedBox.vertical.small,
                 const Divider(),
                 const CaptionTile(caption: "Developer Mode"),
-                EditTile.Switch(
+                EditTile.switch_(
                   caption: "Developer Mode",
                   leading: AppIcons.developerMode,
                   value: settings.developerMode,

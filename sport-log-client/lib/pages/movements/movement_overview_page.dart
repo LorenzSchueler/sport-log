@@ -31,11 +31,11 @@ class MovementOverviewPage extends StatelessWidget {
             create: (_) => OverviewDataProvider(
               dataProvider: MovementDescriptionDataProvider(),
               entityAccessor: (dataProvider) =>
-                  (_, __, ___, search) => dataProvider.getByName(search),
+                  (_, _, _, search) => dataProvider.getByName(search),
               recordAccessor: (_) => () async {},
               loggerName: "MovementsPage",
             ),
-            builder: (_, dataProvider, __) => Scaffold(
+            builder: (_, dataProvider, _) => Scaffold(
               appBar: AppBar(
                 title: dataProvider.isSearch
                     ? TextFormField(
@@ -70,7 +70,7 @@ class MovementOverviewPage extends StatelessWidget {
                           itemBuilder: (_, index) => MovementCard(
                             movementDescription: dataProvider.entities[index],
                           ),
-                          separatorBuilder: (_, __) =>
+                          separatorBuilder: (_, _) =>
                               Defaults.sizedBox.vertical.normal,
                           itemCount: dataProvider.entities.length,
                         ),

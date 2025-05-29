@@ -27,7 +27,7 @@ class CardioTrackingSettingsPage extends StatelessWidget {
         padding: Defaults.edgeInsets.normal,
         child: ProviderConsumer<TrackingSettings>(
           create: (_) => TrackingSettings(initMovement),
-          builder: (_, trackingSettings, __) => ListView(
+          builder: (_, trackingSettings, _) => ListView(
             children: [
               EditTile(
                 leading: AppIcons.movement,
@@ -101,7 +101,7 @@ class CardioTrackingSettingsPage extends StatelessWidget {
                 },
               ),
               if (trackingSettings.route != null) ...[
-                EditTile.Switch(
+                EditTile.switch_(
                   leading: AppIcons.notification,
                   caption: "Alarm when off Route",
                   value: trackingSettings.routeAlarmDistance != null,
@@ -125,7 +125,7 @@ class CardioTrackingSettingsPage extends StatelessWidget {
                     ),
                   ),
               ],
-              EditTile.Switch(
+              EditTile.switch_(
                 leading: Icons.record_voice_over_rounded,
                 caption: "Audio Feedback",
                 value: trackingSettings.audioFeedback != null,

@@ -192,7 +192,7 @@ class _StrengthEditPageState extends State<StrengthEditPage> {
               NewSetInput(
                 // reset input if new initial values
                 key: ValueKey((_initialCount, _initialWeight)),
-                onNewSet: (count, weight, _, __) => _addNewSet(count, weight),
+                onNewSet: (count, weight, _, _) => _addNewSet(count, weight),
                 confirmChanges: true,
                 dimension: _strengthSessionDescription.movement.dimension,
                 editWeightUnit: false,

@@ -334,7 +334,7 @@ class _MetconSessionEditPageState extends State<MetconSessionEditPage> {
                       ),
                     ],
                   ),
-                EditTile.Switch(
+                EditTile.switch_(
                   caption: "Rx",
                   leading: AppIcons.checkBox,
                   value: _metconSessionDescription.metconSession.rx,

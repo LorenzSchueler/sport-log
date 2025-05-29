@@ -50,7 +50,7 @@ class StrengthOverviewPage extends StatelessWidget {
                   () => dataProvider.getStrengthRecords(),
               loggerName: "StrengthSessionsPage",
             ),
-            builder: (_, dataProvider, __) => Scaffold(
+            builder: (_, dataProvider, _) => Scaffold(
               appBar: AppBar(
                 title: dataProvider.isSearch
                     ? TextFormField(
@@ -138,7 +138,7 @@ class StrengthOverviewPage extends StatelessWidget {
                                         onSelected: (movement) =>
                                             dataProvider.selected = movement,
                                       ),
-                                  separatorBuilder: (_, __) =>
+                                  separatorBuilder: (_, _) =>
                                       Defaults.sizedBox.vertical.normal,
                                   itemCount: dataProvider.entities.length,
                                 ),

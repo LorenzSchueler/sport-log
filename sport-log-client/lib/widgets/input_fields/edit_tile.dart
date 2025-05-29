@@ -111,8 +111,7 @@ class EditTile extends StatelessWidget {
     super.key,
   });
 
-  // ignore: non_constant_identifier_names
-  EditTile.Switch({
+  EditTile.switch_({
     required IconData? leading,
     IconData? trailing,
     String? caption,

@@ -187,7 +187,7 @@ class _OfflineMapsPageState extends State<OfflineMapsPage> {
                                 mapDownloadUtils.regions[index].tileRegion.id,
                               ),
                             ),
-                            separatorBuilder: (_, __) =>
+                            separatorBuilder: (_, _) =>
                                 Defaults.sizedBox.vertical.normal,
                             itemCount: mapDownloadUtils.regions.length,
                           ),

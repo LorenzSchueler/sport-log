@@ -147,7 +147,7 @@ class _PickerWithSearchState<T, C> extends State<PickerWithSearch<T, C>> {
                 : Scrollbar(
                     child: ListView.separated(
                       itemBuilder: _routeBuilder,
-                      separatorBuilder: (_, __) => const Divider(height: 0),
+                      separatorBuilder: (_, _) => const Divider(height: 0),
                       itemCount: _items.length,
                     ),
                   ),

@@ -49,7 +49,7 @@ class MetconSessionOverviewPage extends StatelessWidget {
                   () => dataProvider.getMetconRecords(),
               loggerName: "MetconSessionsPage",
             ),
-            builder: (_, dataProvider, __) => Scaffold(
+            builder: (_, dataProvider, _) => Scaffold(
               appBar: AppBar(
                 title: dataProvider.isSearch
                     ? TextFormField(
@@ -143,7 +143,7 @@ class MetconSessionOverviewPage extends StatelessWidget {
                                     onSelected: (metcon) =>
                                         dataProvider.selected = metcon,
                                   ),
-                                  separatorBuilder: (_, __) =>
+                                  separatorBuilder: (_, _) =>
                                       Defaults.sizedBox.vertical.normal,
                                   itemCount: dataProvider.entities.length,
                                 ),

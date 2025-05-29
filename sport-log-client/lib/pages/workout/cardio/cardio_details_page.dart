@@ -486,7 +486,7 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
                                     onHide: () => _hideSession(session),
                                   );
                                 },
-                                separatorBuilder: (_, __) =>
+                                separatorBuilder: (_, _) =>
                                     Defaults.sizedBox.vertical.normal,
                               );
                       },

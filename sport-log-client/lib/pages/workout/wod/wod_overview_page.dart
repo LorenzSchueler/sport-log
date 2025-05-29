@@ -37,7 +37,7 @@ class WodOverviewPage extends StatelessWidget {
               recordAccessor: (_) => () async {},
               loggerName: "WodPage",
             ),
-            builder: (_, dataProvider, __) => Scaffold(
+            builder: (_, dataProvider, _) => Scaffold(
               appBar: AppBar(
                 title: dataProvider.isSearch
                     ? TextFormField(
@@ -77,7 +77,7 @@ class WodOverviewPage extends StatelessWidget {
                             child: ListView.separated(
                               itemBuilder: (_, index) =>
                                   WodCard(wod: dataProvider.entities[index]),
-                              separatorBuilder: (_, __) =>
+                              separatorBuilder: (_, _) =>
                                   Defaults.sizedBox.vertical.normal,
                               itemCount: dataProvider.entities.length,
                             ),

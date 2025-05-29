@@ -59,7 +59,6 @@ class DistanceChartLine {
   static double intervalMeter(double totalDistance) => totalDistance / 100;
 }
 
-// ignore: must_be_immutable
 class DistanceChart extends StatefulWidget {
   DistanceChart({
     required this.chartLines,

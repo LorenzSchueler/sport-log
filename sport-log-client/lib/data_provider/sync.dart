@@ -126,7 +126,6 @@ class Sync extends ChangeNotifier {
       return;
     }
     var context = App.globalContext;
-    // ignore: use_build_context_synchronously
     if (!context.mounted) {
       return;
     }
@@ -135,7 +134,6 @@ class Sync extends ChangeNotifier {
       return;
     }
     context = App.globalContext;
-    // ignore: use_build_context_synchronously
     if (!context.mounted) {
       return;
     }
