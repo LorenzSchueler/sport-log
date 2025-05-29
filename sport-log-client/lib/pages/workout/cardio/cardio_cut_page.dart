@@ -140,6 +140,7 @@ class _CardioCutPageState extends State<CardioCutPage> {
                   showFullscreenButton: false,
                   showMapStylesButton: true,
                   showSelectRouteButton: false,
+                  showZoomButtons: false,
                   showSetNorthButton: true,
                   showCurrentLocationButton: false,
                   showCenterLocationButton: false,

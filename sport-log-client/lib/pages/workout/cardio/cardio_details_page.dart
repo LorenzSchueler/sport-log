@@ -284,6 +284,7 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
                       showMapStylesButton: true,
                       showSelectRouteButton: false,
                       showSetNorthButton: true,
+                      showZoomButtons: false,
                       showCurrentLocationButton: false,
                       showCenterLocationButton: false,
                       showAddLocationButton: false,

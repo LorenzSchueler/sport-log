@@ -88,6 +88,7 @@ class CardioTrackingPage extends StatelessWidget {
                           showMapStylesButton: true,
                           showSelectRouteButton: false,
                           showSetNorthButton: true,
+                          showZoomButtons: true,
                           showCurrentLocationButton: false,
                           showCenterLocationButton: true,
                           showAddLocationButton: false,

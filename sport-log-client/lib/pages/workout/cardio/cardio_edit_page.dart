@@ -313,6 +313,7 @@ class _CardioEditPageState extends State<CardioEditPage> {
                   showMapStylesButton: true,
                   showSelectRouteButton: false,
                   showSetNorthButton: true,
+                  showZoomButtons: false,
                   showCurrentLocationButton: false,
                   showCenterLocationButton: false,
                   showAddLocationButton: false,

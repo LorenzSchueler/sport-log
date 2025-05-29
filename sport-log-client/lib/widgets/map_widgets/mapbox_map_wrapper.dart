@@ -17,6 +17,7 @@ import 'package:sport_log/widgets/map_widgets/select_route_button.dart';
 import 'package:sport_log/widgets/map_widgets/set_north_button.dart';
 import 'package:sport_log/widgets/map_widgets/toggle_center_location_button.dart';
 import 'package:sport_log/widgets/map_widgets/toggle_fullscreen_button.dart';
+import 'package:sport_log/widgets/map_widgets/zoom_map_button.dart';
 import 'package:sport_log/widgets/provider_consumer.dart';
 
 class MapboxMapWrapper extends StatefulWidget {
@@ -25,6 +26,7 @@ class MapboxMapWrapper extends StatefulWidget {
     required this.showMapStylesButton,
     required this.showSelectRouteButton,
     required this.showSetNorthButton,
+    required this.showZoomButtons,
     required this.showCurrentLocationButton,
     required this.showCenterLocationButton,
     required this.showAddLocationButton,
@@ -49,6 +51,7 @@ class MapboxMapWrapper extends StatefulWidget {
   final bool showMapStylesButton;
   final bool showSelectRouteButton;
   final bool showSetNorthButton;
+  final bool showZoomButtons;
   final bool showCurrentLocationButton;
   final bool showCenterLocationButton;
   final bool showAddLocationButton;
@@ -189,6 +192,18 @@ class _MapboxMapWrapperState extends State<MapboxMapWrapper> {
                 ],
                 if (widget.showSetNorthButton) ...[
                   SetNorthButton(mapController: _mapController!),
+                  Defaults.sizedBox.vertical.normal,
+                ],
+                if (widget.showZoomButtons) ...[
+                  ZoomMapButton(
+                    mapController: _mapController!,
+                    zoomDirection: ZoomDirection.zoomIn,
+                  ),
+                  Defaults.sizedBox.vertical.normal,
+                  ZoomMapButton(
+                    mapController: _mapController!,
+                    zoomDirection: ZoomDirection.zoomOut,
+                  ),
                   Defaults.sizedBox.vertical.normal,
                 ],
                 if (widget.showCurrentLocationButton) ...[

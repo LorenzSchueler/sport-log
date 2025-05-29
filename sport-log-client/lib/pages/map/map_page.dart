@@ -92,6 +92,7 @@ class MapPage extends StatelessWidget {
                   showMapStylesButton: true,
                   showSelectRouteButton: true,
                   showSetNorthButton: true,
+                  showZoomButtons: true,
                   showCurrentLocationButton: true,
                   showCenterLocationButton: true,
                   showAddLocationButton: true,

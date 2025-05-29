@@ -95,6 +95,9 @@ class MapController {
   Future<void> setZoom(double zoom) async =>
       await _controller?.setCamera(CameraOptions(zoom: zoom));
 
+  Future<void> animateZoom(double zoom) async =>
+      await _controller?.flyTo(CameraOptions(zoom: zoom), null);
+
   Future<void> animateNorth() async =>
       await _controller?.flyTo(CameraOptions(bearing: 0), null);
 

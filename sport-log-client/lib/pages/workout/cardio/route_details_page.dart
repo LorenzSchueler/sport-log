@@ -148,6 +148,7 @@ class _RouteDetailsPageState extends State<RouteDetailsPage>
                       showMapStylesButton: true,
                       showSelectRouteButton: false,
                       showSetNorthButton: true,
+                      showZoomButtons: false,
                       showCurrentLocationButton: false,
                       showCenterLocationButton: false,
                       showAddLocationButton: false,

@@ -104,6 +104,7 @@ class _OfflineMapsPageState extends State<OfflineMapsPage> {
                     showMapStylesButton: false,
                     showSelectRouteButton: false,
                     showSetNorthButton: false,
+                    showZoomButtons: false,
                     showCurrentLocationButton: false,
                     showCenterLocationButton: false,
                     showAddLocationButton: false,
