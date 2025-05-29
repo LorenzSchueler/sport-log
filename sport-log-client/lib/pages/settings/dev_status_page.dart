@@ -1,5 +1,8 @@
+import 'package:convert/convert.dart';
+import 'package:crypto/crypto.dart';
 import 'package:fixnum/fixnum.dart';
 import 'package:flutter/material.dart';
+import 'package:sport_log/data_provider/data_provider.dart';
 import 'package:sport_log/data_provider/data_providers/action_data_provider.dart';
 import 'package:sport_log/data_provider/data_providers/cardio_data_provider.dart';
 import 'package:sport_log/data_provider/data_providers/diary_data_provider.dart';
@@ -20,51 +23,62 @@ class DevStatusPage extends StatefulWidget {
 }
 
 class _DevStatusPageState extends State<DevStatusPage> {
-  Map<SyncStatus, int>? diaryCounts;
-  Map<SyncStatus, int>? wodCounts;
-  Map<SyncStatus, int>? movementCounts;
-  Map<SyncStatus, int>? strengthSessionCounts;
-  Map<SyncStatus, int>? strengthSetCounts;
-  Map<SyncStatus, int>? metconCounts;
-  Map<SyncStatus, int>? metconSessionCounts;
-  Map<SyncStatus, int>? metconMovementCounts;
-  Map<SyncStatus, int>? cardioSessionCounts;
-  Map<SyncStatus, int>? routeCounts;
-  Map<SyncStatus, int>? platformCounts;
-  Map<SyncStatus, int>? platformCredentialCounts;
-  Map<SyncStatus, int>? actionProviderCounts;
-  Map<SyncStatus, int>? actionCounts;
-  Map<SyncStatus, int>? actionRuleCounts;
-  Map<SyncStatus, int>? actionEventCounts;
+  final epochMap = Settings.instance.epochMap;
+  late final List<(String, EntityDataProvider?, Int64?)> allRaw = [
+    ("User", null, epochMap?.user),
+    ("Diary", DiaryDataProvider(), epochMap?.diary),
+    ("Wod", WodDataProvider(), epochMap?.wod),
+    ("Movement", MovementDataProvider(), epochMap?.movement),
+    (
+      "Strength Session",
+      StrengthSessionDataProvider(),
+      epochMap?.strengthSession,
+    ),
+    ("Strength Set", StrengthSetDataProvider(), epochMap?.strengthSet),
+    ("Metcon", MetconDataProvider(), epochMap?.metcon),
+    ("Metcon Session", MetconSessionDataProvider(), epochMap?.metconSession),
+    ("Metcon Movement", MetconMovementDataProvider(), epochMap?.metconMovement),
+    ("Cardio Session", CardioSessionDataProvider(), epochMap?.cardioSession),
+    ("Route", RouteDataProvider(), epochMap?.route),
+    ("Platform", PlatformDataProvider(), epochMap?.platform),
+    (
+      "Platform Credential",
+      PlatformCredentialDataProvider(),
+      epochMap?.platformCredential,
+    ),
+    ("Action Provider", ActionProviderDataProvider(), epochMap?.actionProvider),
+    ("Action", ActionDataProvider(), epochMap?.action),
+    ("Action Rule", ActionRuleDataProvider(), epochMap?.actionRule),
+    ("Action Event", ActionEventDataProvider(), epochMap?.actionEvent),
+  ];
+  List<(String, Map<SyncStatus, int>?, Int64?)>? all;
+  String? checksum;
 
   @override
   void initState() {
     super.initState();
     Future.delayed(Duration.zero, () async {
-      diaryCounts = await DiaryDataProvider().getCountBySyncStatus();
-      wodCounts = await WodDataProvider().getCountBySyncStatus();
-      movementCounts = await MovementDataProvider().getCountBySyncStatus();
-      strengthSessionCounts = await StrengthSessionDataProvider()
-          .getCountBySyncStatus();
-      strengthSetCounts = await StrengthSetDataProvider()
-          .getCountBySyncStatus();
-      metconCounts = await MetconDataProvider().getCountBySyncStatus();
-      metconSessionCounts = await MetconSessionDataProvider()
-          .getCountBySyncStatus();
-      metconMovementCounts = await MetconMovementDataProvider()
-          .getCountBySyncStatus();
-      cardioSessionCounts = await CardioSessionDataProvider()
-          .getCountBySyncStatus();
-      routeCounts = await RouteDataProvider().getCountBySyncStatus();
-      platformCounts = await PlatformDataProvider().getCountBySyncStatus();
-      platformCredentialCounts = await PlatformCredentialDataProvider()
-          .getCountBySyncStatus();
-      actionProviderCounts = await ActionProviderDataProvider()
-          .getCountBySyncStatus();
-      actionCounts = await ActionDataProvider().getCountBySyncStatus();
-      actionRuleCounts = await ActionRuleDataProvider().getCountBySyncStatus();
-      actionEventCounts = await ActionEventDataProvider()
-          .getCountBySyncStatus();
+      all = await Future.wait(
+        allRaw.map((x) async {
+          final y = await x.$2?.getCountBySyncStatus();
+          return (x.$1, y, x.$3);
+        }),
+      );
+
+      final output = AccumulatorSink<Digest>();
+      final input = sha256.startChunkedConversion(output);
+      for (final (_, syncStatusCounts, epoch) in all!) {
+        input
+          ..add([
+            for (final syncStatus in SyncStatus.values)
+              syncStatusCounts?[syncStatus] ?? 0,
+          ])
+          ..add(epoch?.toBytes() ?? [0]);
+      }
+      input.close();
+      checksum = output.events.single.bytes
+          .map((b) => b.toRadixString(16))
+          .join();
       if (mounted) {
         setState(() {});
       }
@@ -79,9 +93,9 @@ class _DevStatusPageState extends State<DevStatusPage> {
     return row(
       tableName,
       "$epoch",
-      "${counts?[SyncStatus.synchronized]}",
-      "${counts?[SyncStatus.created]}",
-      "${counts?[SyncStatus.updated]}",
+      "${counts?[SyncStatus.synchronized] ?? 0}",
+      "${counts?[SyncStatus.created] ?? 0}",
+      "${counts?[SyncStatus.updated] ?? 0}",
     );
   }
 
@@ -109,12 +123,11 @@ class _DevStatusPageState extends State<DevStatusPage> {
 
   @override
   Widget build(BuildContext context) {
-    final epochMap = Settings.instance.epochMap;
     return Scaffold(
       appBar: AppBar(title: const Text("Dev Status")),
       body: Padding(
         padding: Defaults.edgeInsets.normal,
-        child: epochMap == null
+        child: all == null
             ? const Text("no account")
             : Table(
                 defaultColumnWidth: const IntrinsicColumnWidth(),
@@ -126,59 +139,10 @@ class _DevStatusPageState extends State<DevStatusPage> {
                 },
                 children: [
                   row("Table", "Epoch", "Synchronized", "Created", "Updated"),
-                  row("user", "${epochMap.user}", "-", "-", "-"),
-                  countsRow("diary", epochMap.diary, diaryCounts),
-                  countsRow("wod", epochMap.wod, wodCounts),
-                  countsRow("movement", epochMap.movement, movementCounts),
-                  countsRow(
-                    "strength session",
-                    epochMap.strengthSession,
-                    strengthSessionCounts,
-                  ),
-                  countsRow(
-                    "strength set",
-                    epochMap.strengthSet,
-                    strengthSetCounts,
-                  ),
-                  countsRow("metcon", epochMap.metcon, metconCounts),
-                  countsRow(
-                    "metcon session",
-                    epochMap.metconSession,
-                    metconSessionCounts,
-                  ),
-                  countsRow(
-                    "metcon movement",
-                    epochMap.metconMovement,
-                    metconMovementCounts,
-                  ),
-                  countsRow(
-                    "cardio session",
-                    epochMap.cardioSession,
-                    cardioSessionCounts,
-                  ),
-                  countsRow("route", epochMap.route, routeCounts),
-                  countsRow("platform", epochMap.platform, platformCounts),
-                  countsRow(
-                    "platform credentials",
-                    epochMap.platformCredential,
-                    platformCredentialCounts,
-                  ),
-                  countsRow(
-                    "action provider",
-                    epochMap.actionProvider,
-                    actionProviderCounts,
-                  ),
-                  countsRow("action", epochMap.action, actionCounts),
-                  countsRow(
-                    "action rule",
-                    epochMap.actionRule,
-                    actionRuleCounts,
-                  ),
-                  countsRow(
-                    "action event",
-                    epochMap.actionEvent,
-                    actionEventCounts,
-                  ),
+                  for (final (name, syncStatus, epoch) in all!)
+                    countsRow(name, epoch ?? Int64(), syncStatus),
+                  row("", "", "", "", ""),
+                  row("Checksum", checksum?.substring(0, 8) ?? "", "", "", ""),
                 ],
               ),
       ),

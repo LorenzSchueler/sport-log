@@ -12,6 +12,8 @@ dependencies:
   audio_session: ^0.2.0
   audioplayers: ^6.0.0
   collection: ^1.16.0
+  convert: ^3.1.2
+  crypto: ^3.0.6
   device_info_plus: ^11.1.0
   file_picker: ^10.1.2
   fixnum: ^1.0.0

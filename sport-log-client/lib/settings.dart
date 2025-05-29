@@ -140,7 +140,7 @@ class Settings extends ChangeNotifier {
 
   String? _getStringOptional(String key) => _storage!.get(key) as String?;
 
-  EpochMap? _getEpochMap(String key) => _storage!.get(_epochMap) as EpochMap?;
+  EpochMap? _getEpochMap(String key) => _storage!.get(key) as EpochMap?;
 
   Duration _getDuration(String key) => _storage!.get(key)! as Duration;
 
