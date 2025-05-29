@@ -11,16 +11,15 @@ import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/dialogs/dialogs.dart';
 
 class LocationUtils extends ChangeNotifier {
-  LocationUtils({required this.inBackground});
-
-  final bool inBackground;
+  LocationUtils();
 
   StreamSubscription<Position>? _locationSubscription;
+  bool _inBackground = false;
   GpsPosition? _lastLocation;
 
   bool _disposed = false;
 
-  late final _settings = AndroidSettings(
+  AndroidSettings settings(bool inBackground) => AndroidSettings(
     forceLocationManager: true,
     foregroundNotificationConfig: inBackground
         ? const ForegroundNotificationConfig(
@@ -101,14 +100,15 @@ class LocationUtils extends ChangeNotifier {
     }
 
     _locationSubscription =
-        Geolocator.getPositionStream(locationSettings: _settings).listen((
-          Position position,
-        ) {
-          _onLocationUpdate(
+        Geolocator.getPositionStream(
+          locationSettings: settings(inBackground),
+        ).listen(
+          (position) => _onLocationUpdate(
             GpsPosition.fromGeolocatorPosition(position),
             onLocationUpdate,
-          );
-        });
+          ),
+        );
+    _inBackground = inBackground;
     notifyListeners();
     return true;
   }
@@ -125,6 +125,7 @@ class LocationUtils extends ChangeNotifier {
   Future<void> stopLocationStream() async {
     await _locationSubscription?.cancel();
     _locationSubscription = null;
+    _inBackground = false;
     _lastLocation = null;
     if (!_disposed) {
       notifyListeners();
@@ -138,4 +139,5 @@ class LocationUtils extends ChangeNotifier {
       hasLocation && (_lastLocation?.isGps ?? false);
 
   bool get enabled => _locationSubscription != null;
+  bool get inBackground => _inBackground;
 }

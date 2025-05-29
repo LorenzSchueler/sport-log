@@ -16,6 +16,7 @@ class ToggleCenterLocationButton extends StatelessWidget {
     return FloatingActionButton.small(
       heroTag: null,
       onPressed: onToggle,
+      tooltip: "Center GPS Location",
       child: Icon(
         centerLocation ? AppIcons.centerFocus : AppIcons.centerFocusOff,
       ),

@@ -91,8 +91,9 @@ abstract final class AppIcons {
   static const IconData satellite = Icons.satellite_rounded;
   static const IconData location = Icons.location_on;
   static const IconData addLocation = Icons.add_location_alt_outlined;
-  static const IconData myLocation = Icons.my_location_rounded;
-  static const IconData myLocationDisabled = Icons.location_disabled_rounded;
+  static const IconData myLocationBackground = Icons.my_location_rounded;
+  static const IconData myLocationForeground = Icons.location_searching_rounded;
+  static const IconData myLocationOff = Icons.location_disabled_rounded;
   static const IconData battery = Icons.battery_std_rounded;
   static const IconData radio = Icons.radio_button_checked_rounded;
   static const IconData clock = Icons.access_time_rounded;

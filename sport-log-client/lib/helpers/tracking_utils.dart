@@ -96,7 +96,7 @@ class TrackingUtils extends ChangeNotifier {
   void setCenterLocation(bool centerLocation) => _trackingUiUtils
       .setCenterLocation(centerLocation, _locationUtils.lastLatLng);
 
-  final LocationUtils _locationUtils = LocationUtils(inBackground: true);
+  final LocationUtils _locationUtils = LocationUtils();
   bool get hasLocation => _locationUtils.hasLocation;
   bool get hasAccurateLocation => _locationUtils.hasAccurateLocation;
 
