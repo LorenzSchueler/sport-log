@@ -82,8 +82,8 @@ class MapboxMapWrapper extends StatefulWidget {
 
 class _MapboxMapWrapperState extends State<MapboxMapWrapper> {
   MapController? _mapController;
-  final LocationUtils _locationUtils = LocationUtils();
 
+  // this can not be a BoolToggle because we a pointer to that the callback in CurrentLocationButton sees the update
   final Pointer<bool> _centerLocation = Pointer(true);
   Route? _selectedRoute;
 
@@ -173,77 +173,83 @@ class _MapboxMapWrapperState extends State<MapboxMapWrapper> {
           Positioned(
             top: widget.buttonTopOffset + 15,
             right: 15,
-            child: Column(
-              children: [
-                if (widget.showFullscreenButton) ...[
-                  ToggleFullscreenButton(onToggle: widget.onFullscreenToggle),
-                  Defaults.sizedBox.vertical.normal,
+            child: ProviderConsumer(
+              // Consumer to detect enabled change
+              create: (_) => LocationUtils(),
+              builder: (context, locationUtils, _) => Column(
+                children: [
+                  if (widget.showFullscreenButton) ...[
+                    ToggleFullscreenButton(onToggle: widget.onFullscreenToggle),
+                    Defaults.sizedBox.vertical.normal,
+                  ],
+                  if (widget.showMapStylesButton) ...[
+                    MapStylesButton(mapController: _mapController!),
+                    Defaults.sizedBox.vertical.normal,
+                  ],
+                  if (widget.showSelectRouteButton) ...[
+                    SelectRouteButton(
+                      selectedRoute: _selectedRoute,
+                      updateRoute: updateRoute,
+                    ),
+                    Defaults.sizedBox.vertical.normal,
+                  ],
+                  if (widget.showSetNorthButton) ...[
+                    SetNorthButton(mapController: _mapController!),
+                    Defaults.sizedBox.vertical.normal,
+                  ],
+                  if (widget.showZoomButtons) ...[
+                    ZoomMapButton(
+                      mapController: _mapController!,
+                      zoomDirection: ZoomDirection.zoomIn,
+                    ),
+                    Defaults.sizedBox.vertical.normal,
+                    ZoomMapButton(
+                      mapController: _mapController!,
+                      zoomDirection: ZoomDirection.zoomOut,
+                    ),
+                    Defaults.sizedBox.vertical.normal,
+                  ],
+                  if (widget.showCurrentLocationButton) ...[
+                    CurrentLocationButton(
+                      mapController: _mapController!,
+                      locationUtils: locationUtils,
+                      centerLocation: _centerLocation,
+                      currentLocationMarker: _currentLocationMarker,
+                    ),
+                    Defaults.sizedBox.vertical.normal,
+                  ],
+                  if (widget.showCenterLocationButton &&
+                      locationUtils.enabled) ...[
+                    ToggleCenterLocationButton(
+                      centerLocation: _centerLocation.object,
+                      onToggle: () async {
+                        setState(
+                          () =>
+                              _centerLocation.object = !_centerLocation.object,
+                        );
+                        if (_centerLocation.object) {
+                          final latLng = locationUtils.lastLatLng;
+                          if (latLng != null) {
+                            await _mapController?.animateCenter(latLng);
+                          }
+                        }
+                        widget.onCenterLocationToggle?.call(
+                          _centerLocation.object,
+                        );
+                      },
+                    ),
+                    Defaults.sizedBox.vertical.normal,
+                  ],
+                  if (widget.showAddLocationButton &&
+                      _selectedRoute != null &&
+                      locationUtils.enabled)
+                    AddLocationButton(
+                      route: _selectedRoute!,
+                      updateRoute: updateRoute,
+                      locationUtils: locationUtils,
+                    ),
                 ],
-                if (widget.showMapStylesButton) ...[
-                  MapStylesButton(mapController: _mapController!),
-                  Defaults.sizedBox.vertical.normal,
-                ],
-                if (widget.showSelectRouteButton) ...[
-                  SelectRouteButton(
-                    selectedRoute: _selectedRoute,
-                    updateRoute: updateRoute,
-                  ),
-                  Defaults.sizedBox.vertical.normal,
-                ],
-                if (widget.showSetNorthButton) ...[
-                  SetNorthButton(mapController: _mapController!),
-                  Defaults.sizedBox.vertical.normal,
-                ],
-                if (widget.showZoomButtons) ...[
-                  ZoomMapButton(
-                    mapController: _mapController!,
-                    zoomDirection: ZoomDirection.zoomIn,
-                  ),
-                  Defaults.sizedBox.vertical.normal,
-                  ZoomMapButton(
-                    mapController: _mapController!,
-                    zoomDirection: ZoomDirection.zoomOut,
-                  ),
-                  Defaults.sizedBox.vertical.normal,
-                ],
-                if (widget.showCurrentLocationButton) ...[
-                  CurrentLocationButton(
-                    mapController: _mapController!,
-                    locationUtils: _locationUtils,
-                    centerLocation: _centerLocation,
-                    currentLocationMarker: _currentLocationMarker,
-                  ),
-                  Defaults.sizedBox.vertical.normal,
-                ],
-                if (widget.showCenterLocationButton) ...[
-                  ToggleCenterLocationButton(
-                    centerLocation: _centerLocation.object,
-                    onToggle: () {
-                      setState(
-                        () => _centerLocation.object = !_centerLocation.object,
-                      );
-                      widget.onCenterLocationToggle?.call(
-                        _centerLocation.object,
-                      );
-                    },
-                  ),
-                  Defaults.sizedBox.vertical.normal,
-                ],
-                ProviderConsumer.value(
-                  // Consumer to detect enabled change
-                  value: _locationUtils,
-                  builder: (context, locationUtils, _) =>
-                      widget.showAddLocationButton &&
-                          _selectedRoute != null &&
-                          _locationUtils.enabled
-                      ? AddLocationButton(
-                          route: _selectedRoute!,
-                          updateRoute: updateRoute,
-                          locationUtils: _locationUtils,
-                        )
-                      : Container(),
-                ),
-              ],
+              ),
             ),
           ),
       ],
