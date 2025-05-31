@@ -233,14 +233,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.19.1"
-  color:
-    dependency: transitive
-    description:
-      name: color
-      sha256: ddcdf1b3badd7008233f5acffaf20ca9f5dc2cd0172b75f68f24526a5f5725cb
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.0.0"
   convert:
     dependency: "direct main"
     description:
@@ -305,22 +297,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "7.0.2"
-  dio:
-    dependency: transitive
-    description:
-      name: dio
-      sha256: "253a18bbd4851fecba42f7343a1df3a9a4c1d31a2c1b37e221086b4fa8c8dbc9"
-      url: "https://pub.dev"
-    source: hosted
-    version: "5.8.0+1"
-  dio_web_adapter:
-    dependency: transitive
-    description:
-      name: dio_web_adapter
-      sha256: "7586e476d70caecaf1686d21eee7247ea43ef5c345eab9e0cc3583ff13378d78"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.1.1"
   equatable:
     dependency: transitive
     description:
@@ -788,14 +764,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.8.0"
-  mapbox_search:
-    dependency: "direct main"
-    description:
-      name: mapbox_search
-      sha256: "5e1237301a5485443a675eb65fb709e319f25fbf91fb1de4dcdb5ac5d59a33a5"
-      url: "https://pub.dev"
-    source: hosted
-    version: "4.3.1"
   matcher:
     dependency: transitive
     description:

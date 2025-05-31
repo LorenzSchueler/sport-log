@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:mapbox_search/mapbox_search.dart' hide Color;
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/bool_toggle.dart';
 import 'package:sport_log/helpers/map_search_utils.dart';
@@ -133,9 +132,9 @@ class MapSearchResults extends StatelessWidget {
     super.key,
   });
 
-  final List<MapBoxPlace> searchResults;
+  final List<MapboxSearchResult> searchResults;
   final Color backgroundColor;
-  final void Function(MapBoxPlace) onItemTap;
+  final void Function(MapboxSearchResult) onItemTap;
 
   @override
   Widget build(BuildContext context) {
@@ -150,13 +149,16 @@ class MapSearchResults extends StatelessWidget {
           thumbVisibility: true,
           child: ListView.separated(
             padding: EdgeInsets.zero,
-            itemBuilder: (context, index) => GestureDetector(
-              onTap: () => onItemTap(searchResults[index]),
-              child: Text(
-                searchResults[index].placeName ?? "unknown",
-                style: const TextStyle(color: Colors.black),
-              ),
-            ),
+            itemBuilder: (context, index) {
+              final result = searchResults[index];
+              return GestureDetector(
+                onTap: () => onItemTap(result),
+                child: Text(
+                  "${result.name}   ${result.address ?? ""}",
+                  style: const TextStyle(color: Colors.black),
+                ),
+              );
+            },
             itemCount: searchResults.length,
             separatorBuilder: (context, index) => const Divider(),
             shrinkWrap: true,
