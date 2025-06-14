@@ -28,7 +28,8 @@ class MapboxMapWrapper extends StatefulWidget {
     required this.showSetNorthButton,
     required this.showZoomButtons,
     required this.showCurrentLocationButton,
-    required this.showCenterLocationButton,
+    required this.showCenterLocationButtonWhenEnabled,
+    required this.showCenterLocationButtonAlways,
     required this.showAddLocationButton,
     this.showOverlays = true,
     this.buttonTopOffset = 0,
@@ -53,7 +54,8 @@ class MapboxMapWrapper extends StatefulWidget {
   final bool showSetNorthButton;
   final bool showZoomButtons;
   final bool showCurrentLocationButton;
-  final bool showCenterLocationButton;
+  final bool showCenterLocationButtonWhenEnabled;
+  final bool showCenterLocationButtonAlways;
   final bool showAddLocationButton;
   final bool showOverlays;
   final int buttonTopOffset;
@@ -218,8 +220,9 @@ class _MapboxMapWrapperState extends State<MapboxMapWrapper> {
                     ),
                     Defaults.sizedBox.vertical.normal,
                   ],
-                  if (widget.showCenterLocationButton &&
-                      locationUtils.enabled) ...[
+                  if (widget.showCenterLocationButtonWhenEnabled &&
+                          locationUtils.enabled ||
+                      widget.showCenterLocationButtonAlways) ...[
                     ToggleCenterLocationButton(
                       centerLocation: _centerLocation.object,
                       onToggle: () async {

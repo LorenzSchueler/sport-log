@@ -90,7 +90,8 @@ class CardioTrackingPage extends StatelessWidget {
                           showSetNorthButton: true,
                           showZoomButtons: true,
                           showCurrentLocationButton: false,
-                          showCenterLocationButton: true,
+                          showCenterLocationButtonWhenEnabled: true,
+                          showCenterLocationButtonAlways: true,
                           showAddLocationButton: false,
                           onFullscreenToggle: fullscreen.setState,
                           onCenterLocationToggle:
