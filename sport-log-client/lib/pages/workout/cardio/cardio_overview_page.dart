@@ -307,17 +307,38 @@ class CardioSessionCard extends StatelessWidget {
   }
 }
 
+class _MovementStat implements Comparable<_MovementStat> {
+  _MovementStat.fromList(Movement movement, List<CardioSessionDescription> x)
+    : name = movement.name,
+      number = x.length,
+      distance = x.map((s) => s.cardioSession.distance).nonNulls.sum,
+      time = x.map((s) => s.cardioSession.time).nonNulls.sum;
+
+  final String name;
+  final int number;
+  final int distance;
+  final Duration time;
+
+  @override
+  int compareTo(_MovementStat other) {
+    final comp = number.compareTo(other.number);
+    if (comp != 0) {
+      return comp;
+    }
+    return time.compareTo(other.time);
+  }
+}
+
 class CardioStatsCard extends StatelessWidget {
   CardioStatsCard({
     required List<CardioSessionDescription> cardioSessionDescriptions,
     super.key,
-  }) : groupedSessions = groupBy(
-         cardioSessionDescriptions,
-         (c) => c.movement,
-       ).entries.toList();
+  }) : _movementStats = groupBy(cardioSessionDescriptions, (c) => c.movement)
+           .entries
+           .map((e) => _MovementStat.fromList(e.key, e.value))
+           .sorted((a, b) => -a.compareTo(b)); // reverse order
 
-  final List<MapEntry<Movement, List<CardioSessionDescription>>>
-  groupedSessions;
+  final List<_MovementStat> _movementStats;
 
   @override
   Widget build(BuildContext context) {
@@ -329,40 +350,32 @@ class CardioStatsCard extends StatelessWidget {
           physics: NeverScrollableScrollPhysics(),
           shrinkWrap: true,
           itemBuilder: (context, index) {
-            final group = groupedSessions[index];
-            final movement = group.key.name;
-            final number = group.value.length;
-            final distance = group.value
-                .map((s) => s.cardioSession.distance)
-                .nonNulls
-                .sum;
-            final time = group.value
-                .map((s) => s.cardioSession.time)
-                .nonNulls
-                .sum;
+            final stat = _movementStats[index];
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(movement, style: const TextStyle(fontSize: 20)),
+                Text(stat.name, style: const TextStyle(fontSize: 20)),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Expanded(
                       child: Align(
                         alignment: Alignment.centerLeft,
-                        child: ValueUnitDescription.timeSmall(time),
+                        child: ValueUnitDescription.timeSmall(stat.time),
                       ),
                     ),
                     Expanded(
                       child: Align(
-                        child: ValueUnitDescription.distanceSmall(distance),
+                        child: ValueUnitDescription.distanceSmall(
+                          stat.distance,
+                        ),
                       ),
                     ),
                     Expanded(
                       child: Align(
                         alignment: Alignment.centerRight,
                         child: Text(
-                          "$number times",
+                          "${stat.number} times",
                           style: const TextStyle(fontSize: 20),
                         ),
                       ),
@@ -373,7 +386,7 @@ class CardioStatsCard extends StatelessWidget {
             );
           },
           separatorBuilder: (_, _) => const Divider(),
-          itemCount: groupedSessions.length,
+          itemCount: _movementStats.length,
         ),
       ),
     );
