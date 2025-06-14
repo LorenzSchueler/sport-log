@@ -18,7 +18,7 @@ toml = "0.8"
 thiserror = "2.0.4"
 tracing = "0.1.26"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
-sysinfo = "0.33.0"
+sysinfo = "0.35.2"
 clap = { version = "4.4.11", features = ["derive"] }
 
 [lints]

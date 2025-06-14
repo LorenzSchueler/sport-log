@@ -52,6 +52,3 @@ uninlined_format_args = "warn"
 unnested_or_patterns = "warn"
 unused_async = "warn"
 unused_self = "warn"
-
-[patch.crates-io]
-password-hash = { git = "https://github.com/RustCrypto/traits" } # TODO remove once argon2 updated

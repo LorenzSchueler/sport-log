@@ -30,7 +30,7 @@ diesel-async = { version = "0.5", features = [
     "async-connection-wrapper",
 ] }
 diesel_migrations = "2.1.0"
-argon2 = { git = "https://github.com/RustCrypto/password-hashes" } # TODO
+argon2 = "0.6.0-rc.0"
 rand = { version = "0.9.0", features = ["std"] }
 serde = { version = "1.0", features = ["derive"] }
 toml = "0.8"
