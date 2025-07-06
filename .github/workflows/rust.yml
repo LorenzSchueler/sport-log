@@ -71,8 +71,7 @@ jobs:
       uses: Swatinem/rust-cache@v2
     - name: cargo build
       # build every crate on its own to make sure enabled features from other crates do not mask missing dependencies
-      run: cargo build --manifest-path sport-log-action-provider-boxplanner-login/Cargo.toml &&
-           cargo build --manifest-path sport-log-action-provider-sportstracker/Cargo.toml &&
+      run: cargo build --manifest-path sport-log-action-provider-sportstracker/Cargo.toml &&
            cargo build --manifest-path sport-log-action-provider-wodify-login/Cargo.toml &&
            cargo build --manifest-path sport-log-action-provider-wodify-wod/Cargo.toml &&
            cargo build --manifest-path sport-log-ap-utils/Cargo.toml &&
