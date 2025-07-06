@@ -61,6 +61,7 @@ class CardioSession extends AtomicEntity {
   factory CardioSession.fromJson(Map<String, dynamic> json) =>
       _$CardioSessionFromJson(json);
 
+  static const distanceThreshold = 2;
   static const elevationDifferenceThreshold = 10;
 
   @override
@@ -197,6 +198,20 @@ class CardioSession extends AtomicEntity {
     }
     if (heartRate != null && heartRate!.isEmpty) {
       heartRate = null;
+    }
+  }
+
+  void applyDistanceThresholdFilter() {
+    if (track != null && track!.length > 1) {
+      var i = 1;
+      while (i < track!.length) {
+        if (track![i].latLng.distanceTo(track![i - 1].latLng) <
+            distanceThreshold) {
+          track!.removeAt(i);
+        } else {
+          i += 1;
+        }
+      }
     }
   }
 

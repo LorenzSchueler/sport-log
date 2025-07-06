@@ -173,6 +173,7 @@ class TrackingUtils extends ChangeNotifier {
     final cardioSessionDescription = _cardioSessionDescription.clone();
     cardioSessionDescription.cardioSession.time = currentDuration;
     cardioSessionDescription.cardioSession.setEmptyListsToNull();
+    cardioSessionDescription.cardioSession.applyDistanceThresholdFilter();
     cardioSessionDescription.cardioSession.setAscentDescent();
     cardioSessionDescription.cardioSession.setAvgCadence();
     cardioSessionDescription.cardioSession.setAvgHeartRate();
