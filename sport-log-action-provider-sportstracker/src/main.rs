@@ -18,7 +18,7 @@ use tracing_subscriber::EnvFilter;
 
 const CONFIG_FILE: &str = "sport-log-action-provider-sportstracker.toml";
 const NAME: &str = "sportstracker-fetch";
-const DESCRIPTION: &str = "Sportstracker Fetch can fetch the latests workouts recorded with sportstracker and save them in your cardio sessions.";
+const DESCRIPTION: &str = "Sportstracker Fetch can fetch the latest workouts recorded with sportstracker and save them in your cardio sessions.";
 const PLATFORM_NAME: &str = "sportstracker";
 
 #[derive(Debug, Error)]
