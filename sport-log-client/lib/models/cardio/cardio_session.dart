@@ -61,6 +61,8 @@ class CardioSession extends AtomicEntity {
   factory CardioSession.fromJson(Map<String, dynamic> json) =>
       _$CardioSessionFromJson(json);
 
+  static const elevationDifferenceThreshold = 10;
+
   @override
   @IdConverter()
   Int64 id;
@@ -206,14 +208,20 @@ class CardioSession extends AtomicEntity {
       this.descent = null;
       return;
     }
+
     var ascent = 0.0;
     var descent = 0.0;
-    for (var i = 0; i < track!.length - 1; i++) {
-      final elevationDifference = track![i + 1].elevation - track![i].elevation;
-      if (elevationDifference > 0) {
-        ascent += elevationDifference;
-      } else {
-        descent -= elevationDifference;
+    var lastSignificantElevation = track![0].elevation;
+    for (var i = 1; i < track!.length; i++) {
+      final elevation = track![i].elevation;
+      final elevationDifference = elevation - lastSignificantElevation;
+      if (elevationDifference.abs() > elevationDifferenceThreshold) {
+        if (elevationDifference > 0) {
+          ascent += elevationDifference;
+        } else {
+          descent -= elevationDifference;
+        }
+        lastSignificantElevation = elevation;
       }
     }
     this.ascent = ascent.round();
