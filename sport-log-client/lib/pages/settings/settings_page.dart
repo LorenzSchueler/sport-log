@@ -469,7 +469,7 @@ class SettingsPage extends StatelessWidget {
                   value: settings.developerMode,
                   onChanged: settings.setDeveloperMode,
                 ),
-                if (settings.developerMode)
+                if (settings.developerMode) ...[
                   EditTile(
                     leading: AppIcons.bulletedList,
                     child: ConstrainedBox(
@@ -483,6 +483,20 @@ class SettingsPage extends StatelessWidget {
                       ),
                     ),
                   ),
+                  EditTile(
+                    leading: AppIcons.hammer,
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(
+                        minWidth: double.infinity,
+                      ),
+                      child: ElevatedButton(
+                        child: const Text('Dev Tools'),
+                        onPressed: () =>
+                            Navigator.pushNamed(context, Routes.devTools),
+                      ),
+                    ),
+                  ),
+                ],
                 const Divider(),
                 const CaptionTile(caption: "Export"),
                 EditTile(

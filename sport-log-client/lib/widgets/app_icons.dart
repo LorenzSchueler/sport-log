@@ -56,6 +56,7 @@ abstract final class AppIcons {
   static const IconData info = Icons.info_outline_rounded;
   static const IconData combine = Icons.merge;
   static const IconData colorLens = Icons.color_lens_outlined;
+  static const IconData hammer = Icons.handyman_rounded;
 
   // arrows
   static const IconData arrowLeft = Icons.arrow_back_ios_rounded;
