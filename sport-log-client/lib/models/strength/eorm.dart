@@ -1,7 +1,12 @@
 double? getEorm(int count, double weight) {
+  if (count > eormMaxRepCount) {
+    return null;
+  }
   final percentage = _eormMapping[count];
   return percentage == null ? null : weight / percentage;
 }
+
+const eormMaxRepCount = 10;
 
 const _eormMapping = {
   1: 1.0,

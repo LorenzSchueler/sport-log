@@ -3,6 +3,7 @@ import 'package:sport_log/database/table.dart';
 import 'package:sport_log/database/table_accessor.dart';
 import 'package:sport_log/helpers/extensions/num_extension.dart';
 import 'package:sport_log/models/movement/movement.dart';
+import 'package:sport_log/models/strength/eorm.dart';
 import 'package:sport_log/models/strength/strength_session_description.dart';
 import 'package:sport_log/models/strength/strength_session_stats.dart';
 import 'package:sport_log/models/strength/strength_set.dart';
@@ -11,7 +12,7 @@ enum StrengthRecordType {
   maxWeight,
   maxCount,
 
-  /// only if [Movement] has [MovementDimension.reps] and if [StrengthSet.count] >= 10
+  /// only if [Movement] has [MovementDimension.reps] and if [StrengthSet.count] <= [eormMaxRepCount]
   maxEorm,
 }
 

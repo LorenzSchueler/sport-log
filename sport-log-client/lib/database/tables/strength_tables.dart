@@ -121,7 +121,7 @@ class StrengthSetTable extends TableAccessor<StrengthSet> {
       join ${Tables.strengthSession} on ${Tables.strengthSet}.${Columns.strengthSessionId} = ${Tables.strengthSession}.${Columns.id}
       join ${Tables.movement} on ${Tables.strengthSession}.${Columns.movementId} = ${Tables.movement}.${Columns.id}
       left join ${Tables.eorm} on ${Tables.strengthSet}.${Columns.count} = ${Tables.eorm}.${Columns.eormReps} 
-        and ${Tables.strengthSet}.${Columns.count} <= 10 
+        and ${Tables.strengthSet}.${Columns.count} <= $eormMaxRepCount 
         and ${Tables.movement}.${Columns.dimension} = ${MovementDimension.reps.index}
       where ${TableAccessor.combineFilter([notDeleted, TableAccessor.notDeletedOfTable(Tables.strengthSession), TableAccessor.notDeletedOfTable(Tables.movement)])}
       group by ${Tables.movement}.${Columns.id}
