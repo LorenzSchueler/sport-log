@@ -1,3 +1,5 @@
+import 'dart:isolate';
+
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_log/data_provider/data_providers/cardio_data_provider.dart';
@@ -22,16 +24,27 @@ class _DevToolsPageState extends State<DevToolsPage> {
     setState(() {
       working = true;
     });
-    final cardioSessions = (await cardioDataProvider.getNonDeleted())
-        .where((c) => c.track != null)
-        .sortedBy((c) => c.datetime);
-    final updated = cardioSessions.map((old) {
-      final updated = old.clone()
-        ..applyDistanceThresholdFilter()
-        ..setAscentDescent()
-        ..setDistance();
-      return (old, updated);
-    }).toList();
+    final cardioSessions = await cardioDataProvider.getNonDeleted();
+
+    // workaround to not capture cardioDataProvider
+    // see: https://api.dart.dev/dart-isolate/Isolate/run.html
+    Future<List<(CardioSession, CardioSession)>> task(
+      List<CardioSession> cardioSessions,
+    ) => Isolate.run(
+      () => cardioSessions
+          .where((c) => c.track != null)
+          .sortedBy((c) => c.datetime)
+          .map((old) {
+            final updated = old.clone()
+              ..applyDistanceThresholdFilter()
+              ..setAscentDescent()
+              ..setDistance();
+            return (old, updated);
+          })
+          .toList(),
+    );
+    final updated = await task(cardioSessions);
+
     if (mounted) {
       setState(() {
         updatedCardioSessions = updated;
