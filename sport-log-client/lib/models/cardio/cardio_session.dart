@@ -201,6 +201,7 @@ class CardioSession extends AtomicEntity {
     }
   }
 
+  /// Applies the distance threshold and then calls [setDistances] and [setAscentDescent]
   void applyDistanceThresholdFilter() {
     if (track != null && track!.length > 1) {
       var i = 1;
@@ -212,10 +213,24 @@ class CardioSession extends AtomicEntity {
           i += 1;
         }
       }
+      setDistances();
+      setAscentDescent();
     }
   }
 
-  void setDistance() => distance = track?.lastOrNull?.distance.round();
+  void setLastDistance() => distance = track?.lastOrNull?.distance.round();
+
+  void setDistances() {
+    if (track == null || track!.isEmpty) {
+      return;
+    }
+    track![0].distance = 0;
+    for (var i = 1; i < track!.length; i++) {
+      track![i].distance =
+          track![i - 1].distance + track![i - 1].distanceTo(track![i]);
+    }
+    setLastDistance();
+  }
 
   void setAscentDescent() {
     if (track == null || track!.isEmpty) {
@@ -286,7 +301,7 @@ class CardioSession extends AtomicEntity {
       } else {
         track = null;
       }
-      setDistance();
+      setLastDistance();
       setAscentDescent();
     }
     if (cadence != null && cadence!.isNotEmpty) {
@@ -382,7 +397,7 @@ class CardioSession extends AtomicEntity {
         comments: session1.comments,
         deleted: false,
       )
-      ..setDistance()
+      ..setLastDistance()
       ..setAscentDescent()
       ..setAvgCadence()
       ..setAvgHeartRate();

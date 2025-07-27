@@ -37,8 +37,7 @@ class _DevToolsPageState extends State<DevToolsPage> {
           .map((old) {
             final updated = old.clone()
               ..applyDistanceThresholdFilter()
-              ..setAscentDescent()
-              ..setDistance();
+              ..setAscentDescent();
             return (old, updated);
           })
           .toList(),

@@ -177,7 +177,7 @@ class TrackingUtils extends ChangeNotifier {
     cardioSessionDescription.cardioSession.setAscentDescent();
     cardioSessionDescription.cardioSession.setAvgCadence();
     cardioSessionDescription.cardioSession.setAvgHeartRate();
-    cardioSessionDescription.cardioSession.setDistance();
+    cardioSessionDescription.cardioSession.setLastDistance();
     final result = _isSaved
         ? await _dataProvider.updateSingle(cardioSessionDescription)
         : await _dataProvider.createSingle(cardioSessionDescription);
@@ -232,7 +232,7 @@ class TrackingUtils extends ChangeNotifier {
     _cardioSessionDescription.cardioSession.setAscentDescent();
     _cardioSessionDescription.cardioSession.setAvgCadence();
     _cardioSessionDescription.cardioSession.setAvgHeartRate();
-    _cardioSessionDescription.cardioSession.setDistance();
+    _cardioSessionDescription.cardioSession.setLastDistance();
     _trackingUiUtils.updateSessionProgressMarker(currentDuration);
     notifyListeners();
   }
