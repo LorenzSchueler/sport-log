@@ -122,6 +122,14 @@ class _CardioUpdateElevationPageState extends State<CardioUpdateElevationPage> {
                     _elevationLine,
                     if (_changed) _updatedElevationLine,
                   ],
+                  totalDuration:
+                      _cardioSessionDescription.cardioSession.time ??
+                      _cardioSessionDescription
+                          .cardioSession
+                          .track
+                          ?.last
+                          .time ??
+                      Duration.zero,
                 ),
               ),
               ElevationMap(onMapCreated: (x) => _elevationMapController = x),

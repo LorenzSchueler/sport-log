@@ -62,39 +62,35 @@ class DurationChartLine {
     final groupedValues = values
         .groupListsBy((el) => groupFunction(getDuration(el), totalDuration))
         .entries;
-    final chartValues = groupedValues.map((entry) {
-      final value = getGroupValue(entry.value, interval);
-      return DurationChartValue(
-        duration: entry.key,
-        value: value,
-        rawValue: value,
-      );
-    }).toList();
+    final chartValues = groupedValues
+        .map(
+          (entry) => DurationChartValue(
+            duration: entry.key,
+            value: 0,
+            rawValue: getGroupValue(entry.value, interval),
+          ),
+        )
+        .whereNot((v) => v.rawValue.isNaN)
+        .toList();
     if (getLastGroupValue != null) {
-      final value = getLastGroupValue(groupedValues.last.value, interval);
       chartValues.last = DurationChartValue(
         duration: groupedValues.last.key,
-        value: value,
-        rawValue: value,
+        value: 0,
+        rawValue: getLastGroupValue(groupedValues.last.value, interval),
       );
     }
     if (chartValues.last.value.isNaN && chartValues.length >= 2) {
-      chartValues.last.value = chartValues[chartValues.length - 2].value;
       chartValues.last.rawValue = chartValues[chartValues.length - 2].rawValue;
     }
     chartValues.sort((v1, v2) => v1.duration.compareTo(v2.duration));
     // normalize
-    final maxValue = chartValues.map((e) => e.value).max;
-    final minValue = absolute ? 0 : chartValues.map((e) => e.value).min;
+    final maxValue = chartValues.map((e) => e.rawValue).max;
+    final minValue = absolute ? 0 : chartValues.map((e) => e.rawValue).min;
     final diff = maxValue - minValue;
     for (final chartValue in chartValues) {
-      if (diff > 0) {
-        chartValue
-          ..value -= minValue
-          ..value /= diff;
-      } else {
-        chartValue.value = 0.5;
-      }
+      chartValue.value = diff > 0
+          ? (chartValue.rawValue - minValue) / diff
+          : 0.5;
     }
     return DurationChartLine._(chartValues, lineColor);
   }
@@ -117,30 +113,13 @@ class DurationChartLine {
 class DurationChart extends StatefulWidget {
   DurationChart({
     required this.chartLines,
+    required Duration totalDuration,
     this.touchCallback,
     this.labelColor = Colors.white,
     super.key,
-  }) : _xInterval = chartLines
-           .map(
-             (chartLine) =>
-                 max(
-                   1,
-                   (chartLine.chartValues.lastOrNull?.duration.inMinutes ?? 0) /
-                       6,
-                 ).ceil().toDouble() *
-                 60 *
-                 1000,
-           )
-           .max,
-       _maxX = chartLines
-           .map(
-             (chartLine) =>
-                 (chartLine.chartValues.lastOrNull?.duration.inMinutes ?? 0) *
-                 60 *
-                 1000,
-           )
-           .max
-           .toDouble();
+  }) : _xInterval =
+           max(1, totalDuration.inMinutes / 6).ceil().toDouble() * 60 * 1000,
+       _maxX = (totalDuration.inMinutes * 60 * 1000).toDouble();
 
   final List<DurationChartLine> chartLines;
   final void Function(Duration? x)? touchCallback;

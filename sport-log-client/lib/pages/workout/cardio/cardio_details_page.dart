@@ -433,6 +433,16 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
                                 _cadenceLine,
                                 _heartRateLine,
                               ],
+                              totalDuration:
+                                  _cardioSessionDescription
+                                      .cardioSession
+                                      .time ??
+                                  _cardioSessionDescription
+                                      .cardioSession
+                                      .track
+                                      ?.last
+                                      .time ??
+                                  Duration.zero,
                               touchCallback: _touchCallback,
                             ),
                           ),
