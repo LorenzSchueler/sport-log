@@ -69,6 +69,32 @@ class _DevToolsPageState extends State<DevToolsPage> {
     }
   }
 
+  TableRow row(
+    String value1,
+    String value2,
+    String value3,
+    String value4,
+    String value5,
+    String value6,
+    String value7,
+  ) => TableRow(
+    children: [
+      Text(value1),
+      Container(),
+      Text(value2, textAlign: TextAlign.right),
+      Container(),
+      Text(value3, textAlign: TextAlign.right),
+      Container(),
+      Text(value4, textAlign: TextAlign.right),
+      Container(),
+      Text(value5, textAlign: TextAlign.right),
+      Container(),
+      Text(value6, textAlign: TextAlign.right),
+      Container(),
+      Text(value7, textAlign: TextAlign.right),
+    ],
+  );
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -103,61 +129,27 @@ class _DevToolsPageState extends State<DevToolsPage> {
                   children:
                       updatedCardioSessions!
                           .map(
-                            (c) => TableRow(
-                              children: [
-                                Text(c.$1.datetime.humanDateTime),
-                                Container(),
-                                Align(
-                                  alignment: Alignment.centerRight,
-                                  child: Text("${c.$1.distance}"),
-                                ),
-                                Container(),
-                                Align(
-                                  alignment: Alignment.centerRight,
-                                  child: Text("${c.$2.distance}"),
-                                ),
-                                Container(),
-                                Align(
-                                  alignment: Alignment.centerRight,
-                                  child: Text("${c.$1.ascent}"),
-                                ),
-                                Container(),
-                                Align(
-                                  alignment: Alignment.centerRight,
-                                  child: Text("${c.$2.ascent}"),
-                                ),
-                                Container(),
-                                Align(
-                                  alignment: Alignment.centerRight,
-                                  child: Text("${c.$1.descent}"),
-                                ),
-                                Container(),
-                                Align(
-                                  alignment: Alignment.centerRight,
-                                  child: Text("${c.$2.descent}"),
-                                ),
-                              ],
+                            (c) => row(
+                              c.$1.datetime.humanDateTime,
+                              "${c.$1.distance}",
+                              "${c.$2.distance}",
+                              "${c.$1.ascent}",
+                              "${c.$2.ascent}",
+                              "${c.$1.descent}",
+                              "${c.$2.descent}",
                             ),
                           )
                           .toList()
                         ..insert(
                           0,
-                          TableRow(
-                            children: [
-                              Text("Date"),
-                              Container(),
-                              Text("Distance old"),
-                              Container(),
-                              Text("Distance new"),
-                              Container(),
-                              Text("Ascent old"),
-                              Container(),
-                              Text("Ascent new"),
-                              Container(),
-                              Text("Descent old"),
-                              Container(),
-                              Text("Descent new"),
-                            ],
+                          row(
+                            "Date",
+                            "Distance\nold",
+                            "Distance\nnew",
+                            "Ascent\nold",
+                            "Ascent\nnew",
+                            "Descent\nold",
+                            "Descent\nnew",
                           ),
                         ),
                 ),
