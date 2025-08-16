@@ -309,20 +309,20 @@ async fn wodify_login(
 
     time::sleep(StdDuration::from_secs(10)).await;
 
-    if let Ok(feedback) = driver.find(By::ClassName("feedback-message-text")).await {
-        if feedback.inner_html().await? == "Invalid email or password." {
-            return Ok(Err(UserError::InvalidCredential(
-                exec_action_event.action_event_id,
-            )));
-        }
+    if let Ok(feedback) = driver.find(By::ClassName("feedback-message-text")).await
+        && feedback.inner_html().await? == "Invalid email or password."
+    {
+        return Ok(Err(UserError::InvalidCredential(
+            exec_action_event.action_event_id,
+        )));
     }
 
-    if let Ok(button) = driver.find(By::Id("recaptcha-verify-button")).await {
-        if button.is_clickable().await? {
-            return Ok(Err(UserError::CaptchaRequired(
-                exec_action_event.action_event_id,
-            )));
-        }
+    if let Ok(button) = driver.find(By::Id("recaptcha-verify-button")).await
+        && button.is_clickable().await?
+    {
+        return Ok(Err(UserError::CaptchaRequired(
+            exec_action_event.action_event_id,
+        )));
     }
 
     if driver.find(By::LinkText("Logout")).await.is_err() {
@@ -360,11 +360,10 @@ async fn wodify_login(
         if let Ok(day) = row
             .find(By::XPath("./td[1]/span[contains(@class, \"h3\")]"))
             .await
+            && day.inner_html().await?.contains(&date)
         {
-            if day.inner_html().await?.contains(&date) {
-                start_row_number = i + 1;
-                break;
-            }
+            start_row_number = i + 1;
+            break;
         }
     }
 

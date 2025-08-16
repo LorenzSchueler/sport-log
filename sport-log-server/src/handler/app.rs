@@ -57,16 +57,13 @@ pub async fn get_app_info(
     Query(AppRequest { git_ref }): Query<AppRequest>,
     State(config): State<&Config>,
 ) -> HandlerResult<Json<AppInfo>> {
-    let app_dir = match &config.app_dir {
-        None => {
-            return Err(HandlerError::from((
-                StatusCode::FORBIDDEN,
-                ErrorMessage::Other {
-                    error: "app download is disabled".to_owned(),
-                },
-            )));
-        }
-        Some(app_dir) => app_dir,
+    let Some(app_dir) = &config.app_dir else {
+        return Err(HandlerError::from((
+            StatusCode::FORBIDDEN,
+            ErrorMessage::Other {
+                error: "app download is disabled".to_owned(),
+            },
+        )));
     };
 
     let ref_log = read_to_string(app_dir.join("ref.log"))
@@ -104,16 +101,13 @@ pub async fn download_app(
     }): Query<AppOptions>,
     State(config): State<&Config>,
 ) -> HandlerResult<impl IntoResponse + use<>> {
-    let app_dir = match &config.app_dir {
-        None => {
-            return Err(HandlerError::from((
-                StatusCode::FORBIDDEN,
-                ErrorMessage::Other {
-                    error: "app download is disabled".to_owned(),
-                },
-            )));
-        }
-        Some(app_dir) => app_dir,
+    let Some(app_dir) = &config.app_dir else {
+        return Err(HandlerError::from((
+            StatusCode::FORBIDDEN,
+            ErrorMessage::Other {
+                error: "app download is disabled".to_owned(),
+            },
+        )));
     };
 
     let build = match build {

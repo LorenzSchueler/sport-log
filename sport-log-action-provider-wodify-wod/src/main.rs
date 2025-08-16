@@ -319,20 +319,20 @@ async fn try_create_wod(
 
     time::sleep(StdDuration::from_secs(10)).await;
 
-    if let Ok(feedback) = driver.find(By::ClassName("feedback-message-text")).await {
-        if feedback.inner_html().await? == "Invalid email or password." {
-            return Ok(Err(UserError::InvalidCredential(
-                exec_action_event.action_event_id,
-            )));
-        }
+    if let Ok(feedback) = driver.find(By::ClassName("feedback-message-text")).await
+        && feedback.inner_html().await? == "Invalid email or password."
+    {
+        return Ok(Err(UserError::InvalidCredential(
+            exec_action_event.action_event_id,
+        )));
     }
 
-    if let Ok(button) = driver.find(By::Id("recaptcha-verify-button")).await {
-        if button.is_clickable().await? {
-            return Ok(Err(UserError::CaptchaRequired(
-                exec_action_event.action_event_id,
-            )));
-        }
+    if let Ok(button) = driver.find(By::Id("recaptcha-verify-button")).await
+        && button.is_clickable().await?
+    {
+        return Ok(Err(UserError::CaptchaRequired(
+            exec_action_event.action_event_id,
+        )));
     }
 
     if driver.find(By::LinkText("Logout")).await.is_err() {
