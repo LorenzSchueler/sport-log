@@ -321,9 +321,9 @@ class _CardioEditPageState extends State<CardioEditPage> {
                   onMapCreated: _onMapCreated,
                 ),
               ),
-            Form(
-              key: _formKey,
-              child: Expanded(
+            Expanded(
+              child: Form(
+                key: _formKey,
                 child: ListView(
                   padding: Defaults.edgeInsets.normal,
                   children: [

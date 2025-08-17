@@ -160,7 +160,6 @@ class RoutePlanningUtils {
         start,
         min(start + 25, markedPositions.length),
       );
-      logDebug(markedPositionsChunk.length);
 
       DirectionsApiResponse response;
       try {
@@ -189,8 +188,6 @@ class RoutePlanningUtils {
             : responseError is NavigationError
             ? responseError.message
             : responseError.toString();
-
-        logDebug(error);
 
         _logger.e(
           "mapbox api error",
