@@ -5,6 +5,7 @@ members = [
     "sport-log-types",
     "sport-log-scheduler",
     "sport-log-ap-utils",
+    "sport-log-action-provider-boxbase-login",
     "sport-log-action-provider-sportstracker",
     "sport-log-action-provider-wodify-login",
     "sport-log-action-provider-wodify-wod",
