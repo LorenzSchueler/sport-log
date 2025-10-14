@@ -2013,6 +2013,25 @@ dependencies = [
 ]
 
 [[package]]
+name = "sport-log-action-provider-boxbase-login"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "clap",
+ "reqwest",
+ "serde",
+ "sport-log-ap-utils",
+ "sport-log-types",
+ "sysinfo",
+ "thirtyfour",
+ "thiserror",
+ "tokio",
+ "toml",
+ "tracing",
+ "tracing-subscriber",
+]
+
+[[package]]
 name = "sport-log-action-provider-sportstracker"
 version = "0.1.0"
 dependencies = [
