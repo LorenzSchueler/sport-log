@@ -2050,46 +2050,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "sport-log-action-provider-wodify-login"
-version = "0.1.0"
-dependencies = [
- "chrono",
- "clap",
- "reqwest",
- "serde",
- "sport-log-ap-utils",
- "sport-log-types",
- "sysinfo",
- "thirtyfour",
- "thiserror",
- "tokio",
- "toml",
- "tracing",
- "tracing-subscriber",
-]
-
-[[package]]
-name = "sport-log-action-provider-wodify-wod"
-version = "0.1.0"
-dependencies = [
- "chrono",
- "clap",
- "rand",
- "regex",
- "reqwest",
- "serde",
- "sport-log-ap-utils",
- "sport-log-types",
- "sysinfo",
- "thirtyfour",
- "thiserror",
- "tokio",
- "toml",
- "tracing",
- "tracing-subscriber",
-]
-
-[[package]]
 name = "sport-log-ap-utils"
 version = "0.1.0"
 dependencies = [
