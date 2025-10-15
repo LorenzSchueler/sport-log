@@ -59,8 +59,6 @@ The server and action providers as well as helper tools are structured as follow
 - [sport-log-ap-utils](sport-log-ap-utils) helper functions for rust action providers
 - [sport-log-action-provider-boxbase-login](sport-log-action-provider-boxbase-login) reserves spots in boxbase classes
 - [sport-log-action-provider-sportstracker](sport-log-action-provider-sportstracker) fetches new cardio sessions from sportstracker
-- [sport-log-action-provider-wodify-login](sport-log-action-provider-wodify-login) reserves spots in wodify classes
-- [sport-log-action-provider-wodify-wod](sport-log-action-provider-wodify-wod) fetches and saves the wod description and result from wodify
 
 The flutter app lives in [sport-log-client](sport-log-client)
 
