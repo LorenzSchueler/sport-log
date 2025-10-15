@@ -23,7 +23,7 @@ const CONFIG_FILE: &str = "sport-log-action-provider-boxbase-login.toml";
 const NAME: &str = "boxbase-login";
 const DESCRIPTION: &str =
     "Boxbase Login can reserve spots in classes. The action names correspond to the class types.";
-const PLATFORM_NAME: &str = "boxbase";
+const PLATFORM_NAME: &str = "BoxBase";
 
 const GECKODRIVER: &str = "geckodriver";
 const WEBDRIVER_ADDRESS: &str = "http://localhost:4444/";
@@ -186,16 +186,18 @@ async fn login(config: &Config, mode: Mode) -> Result<()> {
         NAME,
         &config.password,
         Duration::zero(),
-        Duration::try_days(1).unwrap() + Duration::try_minutes(2).unwrap(),
+        Duration::try_days(7).unwrap(),
     )
     .await?;
+
+    info!("got {} action events", exec_action_events.len());
 
     if exec_action_events.is_empty() {
         return Ok(());
     }
 
     for p in System::new_all().processes_by_name(GECKODRIVER.as_ref()) {
-        p.kill();
+        p.kill_and_wait().unwrap();
     }
 
     let mut webdriver = Command::new(GECKODRIVER)
@@ -351,7 +353,7 @@ async fn boxbase_login(
         .await?;
     day_button.click().await?;
 
-    time::sleep(StdDuration::from_secs(3)).await;
+    time::sleep(StdDuration::from_secs(5)).await;
 
     let class_container = driver
         .find(By::XPath(
