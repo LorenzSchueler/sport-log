@@ -286,7 +286,13 @@ async fn boxbase_login(
         .with_timezone(&Local)
         .format("%H:%M")
         .to_string();
+
+    let event_date = exec_action_event.datetime;
     let day = exec_action_event.datetime.day();
+
+    let now = Utc::now();
+    let next_week =
+        event_date.iso_week().week() > now.iso_week().week() || event_date.year() > now.year();
 
     info!("loading website");
 
@@ -344,6 +350,15 @@ async fn boxbase_login(
     }
 
     info!("login successful");
+
+    if next_week {
+        let next_week_button = driver
+            .find(By::XPath("//main/div[1]/div[1]/button[2]"))
+            .await?;
+        next_week_button.click().await?;
+
+        time::sleep(StdDuration::from_secs(5)).await;
+    }
 
     let day_button = driver
         .find(By::XPath(format!(
