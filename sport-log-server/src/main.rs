@@ -18,13 +18,11 @@
 use std::process::ExitCode;
 
 use axum::Router;
-use diesel::Connection;
 use diesel_async::{
-    AsyncPgConnection,
-    async_connection_wrapper::AsyncConnectionWrapper,
+    AsyncMigrationHarness, AsyncPgConnection,
     pooled_connection::{AsyncDieselConnectionManager, deadpool::Pool},
 };
-use diesel_migrations::{EmbeddedMigrations, HarnessWithOutput, MigrationHarness};
+use diesel_migrations::{EmbeddedMigrations, MigrationHarness};
 use tokio::fs;
 use tracing::{error, info};
 use tracing_subscriber::EnvFilter;
@@ -77,19 +75,14 @@ async fn get_db_pool(config: &Config) -> Result<DbPool, String> {
         .map_err(|err| format!("failed to create database connection pool: {err}"))?;
 
     info!("running database migrations...");
-    let db_url = config.database_url.clone();
-    tokio::task::spawn_blocking(move || {
-        let mut conn = AsyncConnectionWrapper::<AsyncPgConnection>::establish(&db_url)
-            .map_err(|err| format!("failed to create migration database connection: {err}"))?;
 
-        HarnessWithOutput::new(&mut conn, std::io::stderr())
-            .run_pending_migrations(MIGRATIONS)
-            .map_err(|err| format!("failed to run database migrations: {err}"))?;
-
-        Result::<(), String>::Ok(())
-    })
-    .await
-    .map_err(|err| format!("failed to run database migrations: {err}"))??;
+    AsyncMigrationHarness::new(
+        pool.get()
+            .await
+            .map_err(|err| format!("failed to get database connection from pool: {err}"))?,
+    )
+    .run_pending_migrations(MIGRATIONS)
+    .map_err(|err| format!("failed to run database migrations: {err}"))?;
 
     info!("database is up to date");
 

@@ -27,7 +27,7 @@ diesel = { version = "2.3.2" }
 diesel-async = { version = "0.7.3", features = [
     "postgres",
     "deadpool",
-    "async-connection-wrapper",
+    "migrations",
 ] }
 diesel_migrations = "2.1.0"
 argon2 = "0.6.0-rc.0"
