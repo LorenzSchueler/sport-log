@@ -212,22 +212,13 @@ async fn login(config: &Config, mode: Mode) -> Result<()> {
         caps.set_headless()?;
     }
 
-    let mut tasks = vec![];
     for exec_action_event in exec_action_events {
-        let caps = caps.clone();
+        debug!("processing {:#?}", exec_action_event);
 
-        tasks.push(tokio::spawn(async move {
-            debug!("processing {:#?}", exec_action_event);
-
-            let (Some(username), Some(password)) =
-                (&exec_action_event.username, &exec_action_event.password)
-            else {
-                return Ok(Err(UserError::NoCredential(
-                    exec_action_event.action_event_id,
-                )));
-            };
-
-            let driver = WebDriver::new(WEBDRIVER_ADDRESS, caps).await?;
+        let result = if let (Some(username), Some(password)) =
+            (&exec_action_event.username, &exec_action_event.password)
+        {
+            let driver = WebDriver::new(WEBDRIVER_ADDRESS, caps.clone()).await?;
 
             let result = boxbase_login(&driver, username, password, &exec_action_event, mode).await;
 
@@ -235,18 +226,37 @@ async fn login(config: &Config, mode: Mode) -> Result<()> {
             driver.quit().await?;
 
             result
-        }));
-    }
+        } else {
+            Ok(Err(UserError::NoCredential(
+                exec_action_event.action_event_id,
+            )))
+        };
 
-    let mut disable_action_event_ids = vec![];
-    for task in tasks {
-        match task.await?? {
-            Ok(action_event_id) => disable_action_event_ids.push(action_event_id),
+        match result? {
+            Ok(action_event_id) => {
+                info!("disabling event");
+                disable_events(
+                    &client,
+                    &config.server_url,
+                    NAME,
+                    &config.password,
+                    &[action_event_id],
+                )
+                .await?;
+            }
             Err(error) => {
                 info!("{error}");
                 match error {
                     UserError::NoCredential(_) | UserError::InvalidCredential(_) => {
-                        disable_action_event_ids.push(error.action_event_id());
+                        info!("disabling event");
+                        disable_events(
+                            &client,
+                            &config.server_url,
+                            NAME,
+                            &config.password,
+                            &[error.action_event_id()],
+                        )
+                        .await?;
                     }
                     UserError::UnknownLoginError(_)
                     | UserError::ClassNotFound(_, _, _)
@@ -256,17 +266,6 @@ async fn login(config: &Config, mode: Mode) -> Result<()> {
                 }
             }
         }
-    }
-
-    if !disable_action_event_ids.is_empty() {
-        disable_events(
-            &client,
-            &config.server_url,
-            NAME,
-            &config.password,
-            &disable_action_event_ids,
-        )
-        .await?;
     }
 
     debug!("terminating webdriver");
