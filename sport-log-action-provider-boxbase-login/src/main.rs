@@ -143,7 +143,7 @@ async fn main() -> ExitCode {
             Mode::Headless
         };
         if let Err(error) = login(&config, mode).await {
-            warn!("login failed: {error}");
+            warn!("reservation failed: {error}");
         }
     }
 
@@ -314,20 +314,8 @@ async fn boxbase_login(
         .send_keys(password)
         .await?;
 
-    let buttons = driver
-        .find(By::Id("password"))
-        .await?
-        .parent()
-        .await?
-        .find_all(By::Tag("button"))
-        .await?;
-
-    for button in buttons {
-        if button.inner_html().await? == "Log in" {
-            button.click().await?;
-            break;
-        }
-    }
+    let login_button = driver.find(By::XPath("//button[text()='Log in']")).await?;
+    login_button.click().await?;
 
     time::sleep(StdDuration::from_secs(5)).await;
 
@@ -352,6 +340,7 @@ async fn boxbase_login(
     info!("login successful");
 
     if next_week {
+        info!("switching to next week");
         let next_week_button = driver
             .find(By::XPath("//main/div[1]/div[1]/button[2]"))
             .await?;
@@ -359,6 +348,8 @@ async fn boxbase_login(
 
         time::sleep(StdDuration::from_secs(5)).await;
     }
+
+    info!("selecting day");
 
     let day_button = driver
         .find(By::XPath(format!(
@@ -369,13 +360,11 @@ async fn boxbase_login(
 
     time::sleep(StdDuration::from_secs(5)).await;
 
-    let class_container = driver
-        .find(By::XPath(
-            "//main/div[2]/div[2]/div[1]/div[1]/div[1]/div[1]",
+    let classes = driver
+        .find_all(By::XPath(
+            "//main/div[2]/div[2]/div[1]/div[1]/div[1]/div[1]/div",
         ))
         .await?;
-
-    let classes = class_container.find_all(By::XPath("./div")).await?;
 
     for class in classes {
         let class_time = class
