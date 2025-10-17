@@ -156,37 +156,25 @@ fn datetimes_for_rule(creatable_action_rule: &CreatableActionRule) -> Vec<DateTi
 
 fn datetimes_for_rule_from_start(
     creatable_action_rule: &CreatableActionRule,
-    mut start: DateTime<Utc>,
+    start: DateTime<Utc>,
 ) -> Vec<DateTime<Utc>> {
-    if start.time() > creatable_action_rule.time.time() {
-        start += Duration::try_days(1).unwrap();
-    }
-    let first_datetime = DateTime::from_naive_utc_and_offset(
-        start
-            .date_naive()
-            .and_time(creatable_action_rule.time.time())
-            + Days::new(
-                (creatable_action_rule.weekday.to_u32() as i64
-                    - start.weekday().num_days_from_monday() as i64)
-                    .rem_euclid(7) as u64,
-            ),
+    let date_monday_this_week =
+        start.date_naive() - Days::new(start.weekday().num_days_from_monday() as u64);
+    let target_date_this_week =
+        date_monday_this_week + Days::new(creatable_action_rule.weekday.to_u32() as u64);
+    let target_datetime_this_week = DateTime::from_naive_utc_and_offset(
+        target_date_this_week.and_time(creatable_action_rule.time.time()),
         Utc,
     );
 
-    let mut datetimes = vec![];
-    for weeks in 0.. {
-        let datetime = first_datetime + Duration::try_weeks(weeks).unwrap();
-        if datetime
-            <= start
-                + Duration::try_milliseconds(creatable_action_rule.create_before as i64).unwrap()
-        {
-            datetimes.push(datetime);
-        } else {
-            break;
-        }
-    }
+    let create_before =
+        Duration::try_milliseconds(creatable_action_rule.create_before as i64).unwrap();
 
-    datetimes
+    (0..)
+        .map(|i| target_datetime_this_week + Days::new(i * 7))
+        .skip_while(|datetime| *datetime < start)
+        .take_while(|datetime| *datetime <= start + create_before)
+        .collect()
 }
 
 fn delete_action_events(client: &Client, config: &Config) -> Result<(), ReqwestError> {
@@ -207,15 +195,14 @@ fn delete_action_events(client: &Client, config: &Config) -> Result<(), ReqwestE
     );
     debug!("{:#?}", deletable_action_events);
 
-    let mut action_event_ids = vec![];
-    for deletable_action_event in deletable_action_events {
-        if Utc::now()
-            >= deletable_action_event.datetime
-                + Duration::try_milliseconds(deletable_action_event.delete_after as i64).unwrap()
-        {
-            action_event_ids.push(deletable_action_event.action_event_id);
-        }
-    }
+    let action_event_ids: Vec<_> = deletable_action_events
+        .into_iter()
+        .filter(|deletable| {
+            let delete_after = Duration::try_milliseconds(deletable.delete_after as i64).unwrap();
+            deletable.datetime + delete_after <= Utc::now()
+        })
+        .map(|deletable| deletable.action_event_id)
+        .collect();
 
     info!("deleting {} action events", action_event_ids.len());
     debug!("{action_event_ids:#?}");
@@ -243,42 +230,102 @@ mod tests {
     use chrono::{DateTime, Duration, NaiveDateTime, Utc};
     use sport_log_types::{ActionId, ActionRuleId, CreatableActionRule, UserId, Weekday};
 
+    use super::*;
+
     fn datetime(datetime: &str) -> DateTime<Utc> {
         DateTime::from_naive_utc_and_offset(NaiveDateTime::from_str(datetime).unwrap(), Utc)
     }
 
     #[test]
-    fn datetimes_for_rule_from_start() {
-        use super::datetimes_for_rule_from_start;
+    fn datetimes_for_rule_from_start_produce_datetimes_in_interval_at_correct_weekday_and_time() {
+        // Tuesday at 12:00 up to 14 day in advance
         let rule = CreatableActionRule {
             action_rule_id: ActionRuleId(1),
             user_id: UserId(1),
             action_id: ActionId(1),
-            weekday: Weekday::Monday,
+            weekday: Weekday::Tuesday,
             time: datetime("2000-01-01T12:00:00"),
             arguments: None,
             create_before: Duration::try_days(14).unwrap().num_milliseconds() as i32,
         };
 
-        // next day and in 8 days
-        let datetimes = datetimes_for_rule_from_start(&rule, datetime("2023-01-01T00:00:00"));
         // 2023-01-01 is Sunday
+        // in 2 and 9 days
         assert_eq!(
-            datetimes,
+            datetimes_for_rule_from_start(&rule, datetime("2023-01-01T11:00:00")),
             [
-                datetime("2023-01-02T12:00:00"),
-                datetime("2023-01-09T12:00:00"),
+                datetime("2023-01-03T12:00:00"),
+                datetime("2023-01-10T12:00:00"),
             ]
         );
 
-        // not on same day but in 7 and 14 days (but earlier time)
-        let datetimes = datetimes_for_rule_from_start(&rule, datetime("2023-01-02T12:00:01"));
-        // 2023-01-02 is Monday
+        // 2023-01-01 is Sunday
+        // in 2 and 9 days
         assert_eq!(
-            datetimes,
+            datetimes_for_rule_from_start(&rule, datetime("2023-01-01T13:00:00")),
             [
-                datetime("2023-01-09T12:00:00"),
-                datetime("2023-01-16T12:00:00"),
+                datetime("2023-01-03T12:00:00"),
+                datetime("2023-01-10T12:00:00"),
+            ]
+        );
+
+        // 2023-01-02 is Monday
+        // in 1 and 8 days
+        assert_eq!(
+            datetimes_for_rule_from_start(&rule, datetime("2023-01-02T11:00:00")),
+            [
+                datetime("2023-01-03T12:00:00"),
+                datetime("2023-01-10T12:00:00"),
+            ]
+        );
+
+        // 2023-01-02 is Monday
+        // in 1 and 8 days
+        assert_eq!(
+            datetimes_for_rule_from_start(&rule, datetime("2023-01-02T13:00:00")),
+            [
+                datetime("2023-01-03T12:00:00"),
+                datetime("2023-01-10T12:00:00"),
+            ]
+        );
+
+        // 2023-01-03 is Tuesday
+        // today at later time and in 7 days
+        assert_eq!(
+            datetimes_for_rule_from_start(&rule, datetime("2023-01-03T11:00:00")),
+            [
+                datetime("2023-01-03T12:00:00"),
+                datetime("2023-01-10T12:00:00"),
+            ]
+        );
+
+        // 2023-01-03 is Tuesday
+        // in 7 and 14 days at earlier time
+        assert_eq!(
+            datetimes_for_rule_from_start(&rule, datetime("2023-01-03T13:00:00")),
+            [
+                datetime("2023-01-10T12:00:00"),
+                datetime("2023-01-17T12:00:00"),
+            ]
+        );
+
+        // 2023-01-04 is Wednesday
+        // in 6 and 13 days at earlier time
+        assert_eq!(
+            datetimes_for_rule_from_start(&rule, datetime("2023-01-04T11:00:00")),
+            [
+                datetime("2023-01-10T12:00:00"),
+                datetime("2023-01-17T12:00:00"),
+            ]
+        );
+
+        // 2023-01-04 is Wednesday
+        // in 6 and 13 days at earlier time
+        assert_eq!(
+            datetimes_for_rule_from_start(&rule, datetime("2023-01-04T13:00:00")),
+            [
+                datetime("2023-01-10T12:00:00"),
+                datetime("2023-01-17T12:00:00"),
             ]
         );
     }
