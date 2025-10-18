@@ -13,7 +13,11 @@ use serde::Deserialize;
 use sport_log_ap_utils::{disable_events, get_events, setup as setup_db};
 use sport_log_types::{ActionEventId, ExecutableActionEvent};
 use sysinfo::System;
-use thirtyfour::{WebDriver, error::WebDriverError, prelude::*};
+use thirtyfour::{
+    WebDriver,
+    error::{WebDriverError, WebDriverErrorInner},
+    prelude::*,
+};
 use thiserror::Error;
 use tokio::{process::Command, task::JoinError, time};
 use tracing::{debug, error, info, warn};
@@ -281,6 +285,26 @@ async fn boxbase_login(
     exec_action_event: &ExecutableActionEvent,
     mode: Mode,
 ) -> Result<UserResult<ActionEventId>> {
+    const URL: &str = "https://admin.boxbase.app/classes";
+
+    const LOGIN_BUTTON_XPATH: &str = "//button[text()='Log in']";
+    const PROFILE_TAB_XPATH: &str = "//a[@href='https://admin.boxbase.app/profile']";
+    const NEXT_WEEK_BUTTON_XPATH: &str = "//main/div[1]/div[1]/button[2]";
+    fn day_button_xpath(day: u32) -> String {
+        format!("//main/div[1]/div[1]/div[1]/button[div/div/span[text()='{day}']]")
+    }
+    fn class_xpath(time: &str, class_name: &str) -> String {
+        format!(
+            "//main/div[2]/div[2]/div[1]/div[1]/div[1]/div[1]/div[ ./div[1]/div[1]/span[1][starts-with(text(),'{time}')] and ./div[1]/div[2]/div[2][text()='{class_name}'] ]"
+        )
+    }
+    const CLASS_SYMBOL_XPATH_IN_CLASS: &str = "div[3]/div/*[local-name()='svg'][1]";
+    const SIGN_UP_BUTTON_XPATH: &str = "/html/body/div[3]/div[4]/div/button";
+
+    const RESERVED_CLASS_NAME: &str = "text-semantic-green-foreground";
+    const WAITLIST_CLASS_NAME: &str = "text-semantic-brown-foreground";
+    const NOT_RESERVED_CLASS_NAME: &str = "text-bblack-700";
+
     let time = exec_action_event
         .datetime
         .with_timezone(&Local)
@@ -297,7 +321,7 @@ async fn boxbase_login(
     info!("loading website");
 
     driver.delete_all_cookies().await?;
-    driver.goto("https://admin.boxbase.app/classes").await?;
+    driver.goto(URL).await?;
 
     time::sleep(StdDuration::from_secs(2)).await;
 
@@ -314,7 +338,7 @@ async fn boxbase_login(
         .send_keys(password)
         .await?;
 
-    let login_button = driver.find(By::XPath("//button[text()='Log in']")).await?;
+    let login_button = driver.find(By::XPath(LOGIN_BUTTON_XPATH)).await?;
     login_button.click().await?;
 
     time::sleep(StdDuration::from_secs(5)).await;
@@ -327,11 +351,7 @@ async fn boxbase_login(
         )));
     }
 
-    if driver
-        .find(By::XPath("//a[@href='https://admin.boxbase.app/profile']"))
-        .await
-        .is_err()
-    {
+    if driver.find(By::XPath(PROFILE_TAB_XPATH)).await.is_err() {
         return Ok(Err(UserError::UnknownLoginError(
             exec_action_event.action_event_id,
         )));
@@ -341,9 +361,7 @@ async fn boxbase_login(
 
     if next_week {
         info!("switching to next week");
-        let next_week_button = driver
-            .find(By::XPath("//main/div[1]/div[1]/button[2]"))
-            .await?;
+        let next_week_button = driver.find(By::XPath(NEXT_WEEK_BUTTON_XPATH)).await?;
         next_week_button.click().await?;
 
         time::sleep(StdDuration::from_secs(5)).await;
@@ -351,91 +369,73 @@ async fn boxbase_login(
 
     info!("selecting day");
 
-    let day_button = driver
-        .find(By::XPath(format!(
-            "//main/div[1]/div[1]/div[1]/button[div/div/span[text()='{day}']]",
-        )))
-        .await?;
+    let day_button = driver.find(By::XPath(day_button_xpath(day))).await?;
     day_button.click().await?;
 
     time::sleep(StdDuration::from_secs(5)).await;
 
-    let classes = driver
-        .find_all(By::XPath(
-            "//main/div[2]/div[2]/div[1]/div[1]/div[1]/div[1]/div",
-        ))
-        .await?;
-
-    for class in classes {
-        let class_time = class
-            .find(By::XPath("./div[1]/div[1]/span[1]"))
-            .await?
-            .inner_html()
-            .await?;
-        let class_name = class
-            .find(By::XPath("./div[1]/div[2]/div[2]"))
-            .await?
-            .inner_html()
-            .await?;
-
-        if class_time.starts_with(&format!("{time} - "))
-            && class_name == exec_action_event.action_name
-        {
-            info!("class found");
-
-            let class_symbol = class
-                .find(By::XPath("./div[3]/div/*[local-name()='svg'][1]"))
-                .await?;
-            match class_symbol.class_name().await?.as_deref() {
-                Some("text-semantic-green-foreground" | "text-semantic-brown-foreground") => {
-                    info!("class already reserved");
-                    return Ok(Ok(exec_action_event.action_event_id));
-                }
-                Some("text-bblack-700") => info!("class not yet reserved"),
-                _ => panic!("unexpected class status symbol"),
-            }
-
-            class.scroll_into_view().await?;
-            class.click().await?;
-
-            time::sleep(StdDuration::from_secs(1)).await;
-
-            driver
-                .find(By::XPath("/html/body/div[3]/div[4]/div/button"))
-                .await?
-                .click()
-                .await?;
-
-            time::sleep(StdDuration::from_secs(1)).await;
-
-            let class_symbol = class
-                .find(By::XPath("./div[3]/div[1]/*[local-name()='svg'][1]"))
-                .await?;
-            match class_symbol.class_name().await?.as_deref() {
-                Some("text-semantic-green-foreground" | "text-semantic-brown-foreground") => {
-                    info!("reservation successful");
-
-                    if mode == Mode::Interactive {
-                        time::sleep(StdDuration::from_secs(5)).await;
-                    }
-
-                    return Ok(Ok(exec_action_event.action_event_id));
-                }
-                Some("text-bblack-700") => {
-                    return Ok(Err(UserError::ReservationFailed(
-                        exec_action_event.action_event_id,
-                        exec_action_event.action_name.clone(),
-                        exec_action_event.datetime,
-                    )));
-                }
-                _ => panic!("unexpected class status symbol"),
-            }
+    let class = match driver
+        .find(By::XPath(class_xpath(
+            &time,
+            &exec_action_event.action_name,
+        )))
+        .await
+    {
+        Ok(class) => class,
+        Err(err) if matches!(err.as_inner(), WebDriverErrorInner::NoSuchElement(_)) => {
+            return Ok(Err(UserError::ClassNotFound(
+                exec_action_event.action_event_id,
+                exec_action_event.action_name.clone(),
+                exec_action_event.datetime,
+            )));
         }
+        Err(err) => return Err(Error::WebDriver(err)),
+    };
+
+    info!("class found");
+
+    let class_symbol = class.find(By::XPath(CLASS_SYMBOL_XPATH_IN_CLASS)).await?;
+    match class_symbol.class_name().await?.as_deref() {
+        Some(RESERVED_CLASS_NAME | WAITLIST_CLASS_NAME) => {
+            info!("class already reserved");
+            return Ok(Ok(exec_action_event.action_event_id));
+        }
+        Some(NOT_RESERVED_CLASS_NAME) => info!("class not yet reserved"),
+        _ => panic!("unexpected class status symbol"),
     }
 
-    Ok(Err(UserError::ClassNotFound(
-        exec_action_event.action_event_id,
-        exec_action_event.action_name.clone(),
-        exec_action_event.datetime,
-    )))
+    class.scroll_into_view().await?;
+    class.click().await?;
+
+    time::sleep(StdDuration::from_secs(1)).await;
+
+    let sign_up_button = driver.find(By::XPath(SIGN_UP_BUTTON_XPATH)).await?;
+    sign_up_button.click().await?;
+
+    time::sleep(StdDuration::from_secs(1)).await;
+
+    let class_symbol = driver
+        .find(By::XPath(format!(
+            "{}/{}",
+            class_xpath(&time, &exec_action_event.action_name),
+            CLASS_SYMBOL_XPATH_IN_CLASS
+        )))
+        .await?; // find class again because DOM changed
+    match class_symbol.class_name().await?.as_deref() {
+        Some(RESERVED_CLASS_NAME | WAITLIST_CLASS_NAME) => {
+            info!("reservation successful");
+
+            if mode == Mode::Interactive {
+                time::sleep(StdDuration::from_secs(5)).await;
+            }
+
+            Ok(Ok(exec_action_event.action_event_id))
+        }
+        Some(NOT_RESERVED_CLASS_NAME) => Ok(Err(UserError::ReservationFailed(
+            exec_action_event.action_event_id,
+            exec_action_event.action_name.clone(),
+            exec_action_event.datetime,
+        ))),
+        _ => panic!("unexpected class status symbol"),
+    }
 }
