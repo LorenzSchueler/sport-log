@@ -28,7 +28,7 @@
 
 use std::{fs, process::ExitCode};
 
-use chrono::{DateTime, Datelike, Days, Duration, Utc};
+use chrono::{DateTime, Datelike, Days, Duration, Local, Utc};
 use rand::Rng;
 use reqwest::{Error as ReqwestError, blocking::Client};
 use serde::Deserialize;
@@ -162,10 +162,11 @@ fn datetimes_for_rule_from_start(
         start.date_naive() - Days::new(start.weekday().num_days_from_monday() as u64);
     let target_date_this_week =
         date_monday_this_week + Days::new(creatable_action_rule.weekday.to_u32() as u64);
-    let target_datetime_this_week = DateTime::from_naive_utc_and_offset(
+    let target_datetime_this_week = DateTime::<Utc>::from_naive_utc_and_offset(
         target_date_this_week.and_time(creatable_action_rule.time.time()),
         Utc,
-    );
+    )
+    .with_timezone(&Local);
 
     let create_before =
         Duration::try_milliseconds(creatable_action_rule.create_before as i64).unwrap();
@@ -174,6 +175,7 @@ fn datetimes_for_rule_from_start(
         .map(|i| target_datetime_this_week + Days::new(i * 7))
         .skip_while(|datetime| *datetime < start)
         .take_while(|datetime| *datetime <= start + create_before)
+        .map(|d| DateTime::to_utc(&d))
         .collect()
 }
 
@@ -326,6 +328,18 @@ mod tests {
             [
                 datetime("2023-01-10T12:00:00"),
                 datetime("2023-01-17T12:00:00"),
+            ]
+        );
+
+        // 2025-10-19 is Sunday
+        // in 1 and 8 days
+        // in 1 day is same timezone
+        // in 8 days is after summer-winter time zone change
+        assert_eq!(
+            datetimes_for_rule_from_start(&rule, datetime("2025-10-19T11:00:00")),
+            [
+                datetime("2025-10-21T12:00:00"),
+                datetime("2025-10-28T13:00:00")
             ]
         );
     }
