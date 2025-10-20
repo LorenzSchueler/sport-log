@@ -288,9 +288,11 @@ async fn boxbase_login(
     const URL: &str = "https://admin.boxbase.app/classes";
 
     const LOGIN_BUTTON_XPATH: &str = "//button[text()='Log in']";
+    const FAILED_LOGIN_MESSAGE_XPATH: &str =
+        "//p[text()='These credentials do not match our records.']";
     const PROFILE_TAB_XPATH: &str = "//a[@href='https://admin.boxbase.app/profile']";
     const NEXT_WEEK_BUTTON_XPATH: &str = "//main/div[1]/div[1]/button[2]";
-    fn day_button_xpath(day: u32) -> String {
+    fn day_button_xpath(day: &str) -> String {
         format!("//main/div[1]/div[1]/div[1]/button[div/div/span[text()='{day}']]")
     }
     fn class_xpath(time: &str, class_name: &str) -> String {
@@ -312,7 +314,7 @@ async fn boxbase_login(
         .to_string();
 
     let event_date = exec_action_event.datetime;
-    let day = exec_action_event.datetime.day();
+    let day = format!("{:02}", exec_action_event.datetime.day());
 
     let now = Utc::now();
     let next_week =
@@ -322,8 +324,6 @@ async fn boxbase_login(
 
     driver.delete_all_cookies().await?;
     driver.goto(URL).await?;
-
-    time::sleep(StdDuration::from_secs(2)).await;
 
     info!("entering credentials");
 
@@ -343,8 +343,10 @@ async fn boxbase_login(
 
     time::sleep(StdDuration::from_secs(5)).await;
 
-    if let Ok(p) = driver.find(By::Tag("p")).await
-        && p.inner_html().await? == "These credentials do not match our records."
+    if driver
+        .find(By::XPath(FAILED_LOGIN_MESSAGE_XPATH))
+        .await
+        .is_ok()
     {
         return Ok(Err(UserError::InvalidCredential(
             exec_action_event.action_event_id,
@@ -362,17 +364,19 @@ async fn boxbase_login(
     if next_week {
         info!("switching to next week");
         let next_week_button = driver.find(By::XPath(NEXT_WEEK_BUTTON_XPATH)).await?;
+        next_week_button.wait_until().clickable().await?;
         next_week_button.click().await?;
-
-        time::sleep(StdDuration::from_secs(5)).await;
     }
 
     info!("selecting day");
 
-    let day_button = driver.find(By::XPath(day_button_xpath(day))).await?;
+    let day_button = driver.find(By::XPath(day_button_xpath(&day))).await?;
+    day_button.wait_until().clickable().await?;
     day_button.click().await?;
 
-    time::sleep(StdDuration::from_secs(5)).await;
+    // loading finished when the button is clickable
+    let next_week_button = driver.find(By::XPath(NEXT_WEEK_BUTTON_XPATH)).await?;
+    next_week_button.wait_until().clickable().await?;
 
     let class = match driver
         .find(By::XPath(class_xpath(
