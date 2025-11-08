@@ -289,10 +289,9 @@ class _RouteEditPageState extends State<RouteEditPage> {
                             ),
                           ),
                         ),
-                      Align(
-                        alignment: Alignment.bottomCenter,
-                        child: Padding(
-                          padding: const EdgeInsets.only(bottom: 10),
+                      SafeArea(
+                        child: Align(
+                          alignment: Alignment.bottomCenter,
                           child: IconButton(
                             onPressed: fullscreen.toggle,
                             iconSize: 50,
