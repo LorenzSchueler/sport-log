@@ -328,9 +328,17 @@ abstract class Routes {
           : CardioTrackingSettingsPage(initMovement: movement);
     }),
     Routes.tracking: (context) => _checkUserIdAndroidIos(context, () {
-      final trackingSettings =
-          ModalRoute.of(context)!.settings.arguments! as TrackingSettings;
-      return CardioTrackingPage(trackingSettings: trackingSettings);
+      final arg = ModalRoute.of(context)!.settings.arguments;
+      final TrackingSettings? trackingSettings;
+      if (arg is TrackingSettings) {
+        trackingSettings = arg;
+      } else {
+        final movement = arg is Movement ? arg : Movement.defaultMovement;
+        trackingSettings = movement != null ? TrackingSettings(movement) : null;
+      }
+      return trackingSettings == null
+          ? const MovementEditPage(movementDescription: null)
+          : CardioTrackingPage(trackingSettings: trackingSettings);
     }),
     // wod
     Routes.wodOverview: (_) => _checkUserId(WodOverviewPage.new),

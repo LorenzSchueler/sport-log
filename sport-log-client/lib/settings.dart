@@ -41,6 +41,7 @@ class Settings extends ChangeNotifier {
 
   static const String _defaultWorkoutTrackingPage =
       "defaultWorkoutTrackingPage";
+  static const String _cardioQuickStart = "cardioQuickStart";
 
   static const String _id = "id";
   static const String _username = "username";
@@ -98,6 +99,9 @@ class Settings extends ChangeNotifier {
     }
     if (!_contains(_defaultWorkoutTrackingPage) || override) {
       await _storage!.put(_defaultWorkoutTrackingPage, Routes.timelineOverview);
+    }
+    if (!_contains(_cardioQuickStart) || override) {
+      await _storage!.put(_cardioQuickStart, false);
     }
     if (!_contains(_id) || override) {
       await _storage!.put(_id, null);
@@ -231,6 +235,11 @@ class Settings extends ChangeNotifier {
 
   Future<void> setDefaultWorkoutTrackingPage(String page) =>
       _put(_defaultWorkoutTrackingPage, page);
+
+  bool get cardioQuickStart => _getBool(_cardioQuickStart);
+
+  Future<void> setCardioQuickStart(bool quickStart) =>
+      _put(_cardioQuickStart, quickStart);
 
   Int64? get userId => _getInt64Optional(_id);
 

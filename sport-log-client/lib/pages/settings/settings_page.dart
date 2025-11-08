@@ -490,6 +490,13 @@ class SettingsPage extends StatelessWidget {
                   ),
                 ),
                 Defaults.sizedBox.vertical.small,
+                EditTile.switch_(
+                  leading: AppIcons.heartbeat,
+                  caption: "Cardio Quick Start",
+                  value: settings.cardioQuickStart,
+                  onChanged: settings.setCardioQuickStart,
+                ),
+                Defaults.sizedBox.vertical.small,
                 const Divider(),
                 const CaptionTile(caption: "Developer Mode"),
                 EditTile.switch_(
