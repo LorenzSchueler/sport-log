@@ -38,7 +38,7 @@ class LandingPage extends StatelessWidget {
           FilledButton(
             onPressed: () {
               Account.noAccount();
-              Navigator.of(context).newBase(Routes.timelineOverview);
+              Navigator.of(context).newBase(Routes.defaultWorkoutTracking);
             },
             style: ButtonStyle(
               backgroundColor: WidgetStateProperty.all(

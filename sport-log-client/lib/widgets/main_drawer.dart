@@ -43,8 +43,9 @@ class MainDrawer extends StatelessWidget {
                         ),
                         onTap: () => Navigator.of(
                           context,
-                        ).newBase(Routes.timelineOverview),
-                        selected: selectedRoute == Routes.timelineOverview,
+                        ).newBase(Routes.defaultWorkoutTracking),
+                        selected:
+                            selectedRoute == Routes.defaultWorkoutTracking,
                       ),
                       ListTile(
                         title: const Text('Movements'),

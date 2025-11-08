@@ -8,6 +8,7 @@ import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/epoch/epoch_map.dart';
 import 'package:sport_log/models/epoch/epoch_result.dart';
 import 'package:sport_log/models/user/user.dart';
+import 'package:sport_log/routes.dart';
 
 enum Units {
   metric,
@@ -33,15 +34,22 @@ class Settings extends ChangeNotifier {
   static const String _syncInterval = "syncInterval";
   static const String _epochMap = "epochMap";
   static const String _checkForUpdates = "checkForUpdates";
+
   static const String _units = "units";
   static const String _weightIncrement = "weightIncrement";
   static const String _durationIncrement = "durationIncrement";
+
+  static const String _defaultWorkoutTrackingPage =
+      "defaultWorkoutTrackingPage";
+
   static const String _id = "id";
   static const String _username = "username";
   static const String _password = "password";
   static const String _email = "email";
+
   static const String _lastMapPosition = "lastMapPosition";
   static const String _lastGpsLatLng = "lastGpsLatLng";
+
   static const String _developer = "developer";
 
   static const Duration _defaultSyncInterval = Duration(minutes: 5);
@@ -87,6 +95,9 @@ class Settings extends ChangeNotifier {
     }
     if (!_contains(_durationIncrement) || override) {
       await _storage!.put(_durationIncrement, const Duration(minutes: 1));
+    }
+    if (!_contains(_defaultWorkoutTrackingPage) || override) {
+      await _storage!.put(_defaultWorkoutTrackingPage, Routes.timelineOverview);
     }
     if (!_contains(_id) || override) {
       await _storage!.put(_id, null);
@@ -214,6 +225,12 @@ class Settings extends ChangeNotifier {
 
   Future<void> setDurationIncrement(Duration increment) =>
       _put(_durationIncrement, increment);
+
+  String get defaultWorkoutTrackingPage =>
+      _getString(_defaultWorkoutTrackingPage);
+
+  Future<void> setDefaultWorkoutTrackingPage(String page) =>
+      _put(_defaultWorkoutTrackingPage, page);
 
   Int64? get userId => _getInt64Optional(_id);
 

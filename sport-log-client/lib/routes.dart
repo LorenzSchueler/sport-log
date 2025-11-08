@@ -102,6 +102,9 @@ abstract class Routes {
   // diary
   static const String diaryOverview = '/diary/overview';
   static const String diaryEdit = '/diary/edit';
+  // default workout tracking
+  static String get defaultWorkoutTracking =>
+      Settings.instance.defaultWorkoutTrackingPage;
 
   /// userId is set after the user has registered/ logged in/ chosen to use without account.
   static Widget _checkUserId(Widget Function() builder) {

@@ -226,7 +226,7 @@ class _LoginPageState extends State<LoginPage> {
     if (mounted) {
       setState(() => _loginPending = false);
       if (result.isOk) {
-        await Navigator.of(context).newBase(Routes.timelineOverview);
+        await Navigator.of(context).newBase(Routes.defaultWorkoutTracking);
       } else {
         await showMessageDialog(
           context: context,

@@ -30,7 +30,7 @@ class App extends StatelessWidget {
           initialRoute:
               Settings.instance.userId !=
                   null // changes ignored on purpose
-              ? Routes.timelineOverview
+              ? Routes.defaultWorkoutTracking
               : Routes.landing,
           navigatorKey: navigatorKey,
           debugShowCheckedModeBanner: false,
