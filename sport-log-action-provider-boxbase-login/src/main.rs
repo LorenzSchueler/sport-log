@@ -193,7 +193,6 @@ async fn login(config: &Config, mode: Mode) -> Result<()> {
         Duration::try_days(7).unwrap(),
     )
     .await?;
-
     info!("got {} action events", exec_action_events.len());
 
     if exec_action_events.is_empty() {
@@ -321,12 +320,10 @@ async fn boxbase_login(
         event_date.iso_week().week() > now.iso_week().week() || event_date.year() > now.year();
 
     info!("loading website");
-
     driver.delete_all_cookies().await?;
     driver.goto(URL).await?;
 
     info!("entering credentials");
-
     driver
         .find(By::Id("email"))
         .await?
@@ -341,7 +338,12 @@ async fn boxbase_login(
     let login_button = driver.find(By::XPath(LOGIN_BUTTON_XPATH)).await?;
     login_button.click().await?;
 
-    time::sleep(StdDuration::from_secs(5)).await;
+    info!("waiting on page load");
+    driver
+        .query(By::XPath(FAILED_LOGIN_MESSAGE_XPATH))
+        .or(By::XPath(PROFILE_TAB_XPATH))
+        .any()
+        .await?;
 
     if driver
         .find(By::XPath(FAILED_LOGIN_MESSAGE_XPATH))
@@ -358,7 +360,6 @@ async fn boxbase_login(
             exec_action_event.action_event_id,
         )));
     }
-
     info!("login successful");
 
     if next_week {
@@ -369,7 +370,6 @@ async fn boxbase_login(
     }
 
     info!("selecting day");
-
     let day_button = driver.find(By::XPath(day_button_xpath(&day))).await?;
     day_button.wait_until().clickable().await?;
     day_button.click().await?;
@@ -395,7 +395,6 @@ async fn boxbase_login(
         }
         Err(err) => return Err(Error::WebDriver(err)),
     };
-
     info!("class found");
 
     let class_symbol = class.find(By::XPath(CLASS_SYMBOL_XPATH_IN_CLASS)).await?;
@@ -411,12 +410,11 @@ async fn boxbase_login(
     class.scroll_into_view().await?;
     class.click().await?;
 
-    time::sleep(StdDuration::from_secs(1)).await;
-
-    let sign_up_button = driver.find(By::XPath(SIGN_UP_BUTTON_XPATH)).await?;
+    let sign_up_button = driver
+        .query(By::XPath(SIGN_UP_BUTTON_XPATH))
+        .first()
+        .await?;
     sign_up_button.click().await?;
-
-    time::sleep(StdDuration::from_secs(1)).await;
 
     let class_symbol = driver
         .find(By::XPath(format!(
