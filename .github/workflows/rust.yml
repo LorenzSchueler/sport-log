@@ -20,7 +20,7 @@ jobs:
 
     steps:
     - name: checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
     - name: install rust
       uses: dtolnay/rust-toolchain@stable
       with:
@@ -34,7 +34,7 @@ jobs:
 
     steps:
     - name: checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
     - name: install rust
       uses: dtolnay/rust-toolchain@stable
       with:
@@ -48,7 +48,7 @@ jobs:
 
     steps:
     - name: checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
     - name: install rust
       uses: dtolnay/rust-toolchain@stable
     - name: load cache
@@ -64,7 +64,7 @@ jobs:
 
     steps:
     - name: checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
     - name: install rust
       uses: dtolnay/rust-toolchain@stable
     - name: load cache
@@ -109,7 +109,7 @@ jobs:
     - name: env
       run: echo "DATABASE_URL=postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@localhost/$POSTGRES_DB" >> $GITHUB_ENV
     - name: checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
     - name: install rust
       uses: dtolnay/rust-toolchain@stable
     - name: load cache
@@ -175,7 +175,7 @@ jobs:
     - name: env
       run: echo "DATABASE_URL=postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@localhost/$POSTGRES_DB" >> $GITHUB_ENV
     - name: checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
     - name: install rust
       uses: dtolnay/rust-toolchain@stable
     - name: load cache
@@ -220,7 +220,7 @@ jobs:
 
     steps:
     - name: checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
     - name: load cache
       uses: Swatinem/rust-cache@v2
     - name: install cargo-machete
