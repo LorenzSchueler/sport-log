@@ -250,7 +250,9 @@ async fn login(config: &Config, mode: Mode) -> Result<()> {
             Err(error) => {
                 info!("{error}");
                 match error {
-                    UserError::NoCredential(_) | UserError::InvalidCredential(_) => {
+                    UserError::NoCredential(_)
+                    | UserError::InvalidCredential(_)
+                    | UserError::ClassNotFound(_, _, _) => {
                         info!("disabling event");
                         disable_events(
                             &client,
@@ -261,9 +263,7 @@ async fn login(config: &Config, mode: Mode) -> Result<()> {
                         )
                         .await?;
                     }
-                    UserError::UnknownLoginError(_)
-                    | UserError::ClassNotFound(_, _, _)
-                    | UserError::ReservationFailed(_, _, _) => {
+                    UserError::UnknownLoginError(_) | UserError::ReservationFailed(_, _, _) => {
                         info!("trying again on next invocation");
                     }
                 }
@@ -412,10 +412,12 @@ async fn boxbase_login(
 
     let sign_up_button = driver
         .query(By::XPath(SIGN_UP_BUTTON_XPATH))
+        .and_clickable()
         .first()
         .await?;
     sign_up_button.click().await?;
 
+    time::sleep(StdDuration::from_secs(1)).await;
     let class_symbol = driver
         .find(By::XPath(format!(
             "{}/{}",
