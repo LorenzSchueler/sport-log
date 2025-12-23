@@ -316,8 +316,7 @@ async fn boxbase_login(
     let day = format!("{:02}", exec_action_event.datetime.day());
 
     let now = Utc::now();
-    let next_week =
-        event_date.iso_week().week() > now.iso_week().week() || event_date.year() > now.year();
+    let next_week = event_date.iso_week() > now.iso_week();
 
     info!("loading website");
     driver.delete_all_cookies().await?;
