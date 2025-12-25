@@ -278,6 +278,34 @@ abstract class TableAccessor<T extends AtomicEntity> {
     });
   }
 
+  (String, List<Object?>) _upsertSql(T object, {required bool synchronized}) {
+    final dbRecord = serde.toDbRecord(object);
+    final columns = dbRecord.keys.toList();
+    final values = dbRecord.values.toList();
+    if (synchronized) {
+      columns.add(Columns.syncStatus);
+      values.add(SyncStatus.synchronized.index);
+    }
+
+    final placeholders = List.filled(columns.length, '?').join(', ');
+
+    final updateSet = columns
+        .where((col) => col != Columns.id)
+        .map((col) => '$col = EXCLUDED.$col')
+        .join(', ');
+
+    return (
+      '''
+      INSERT INTO $tableName (${columns.join(', ')})
+      VALUES ($placeholders)
+      ON CONFLICT(${Columns.id}) 
+      DO UPDATE SET $updateSet
+      RETURNING ${Columns.id}
+      ''',
+      values,
+    );
+  }
+
   Future<DbResult> upsertMultiple(
     List<T> objects, {
     required bool synchronized,
@@ -286,12 +314,13 @@ abstract class TableAccessor<T extends AtomicEntity> {
       final batch = database.batch();
       for (final object in objects) {
         // changes coming from server win over local changes
-        batch.insert(tableName, {
-          ...serde.toDbRecord(object),
-          if (synchronized) Columns.syncStatus: SyncStatus.synchronized.index,
-        }, conflictAlgorithm: ConflictAlgorithm.replace);
+        final sqlAndArgs = _upsertSql(object, synchronized: synchronized);
+        batch.rawQuery(sqlAndArgs.$1, sqlAndArgs.$2);
       }
-      final idList = (await batch.commit(continueOnError: false)).cast<int>();
+      final idList = (await batch.commit(continueOnError: false))
+          .cast<List<Object?>>()
+          .map((e) => (e[0]! as Map<String, Object?>)[Columns.id]! as int)
+          .toList();
       return DbResultExt.fromBool(
         eq(idList, objects.map((e) => e.id.toInt()).toList()),
       );
