@@ -10,13 +10,16 @@ import 'package:sport_log/pages/workout/charts/datetime_charts/year_chart.dart';
 sealed class DateFilterState {
   const DateFilterState();
 
+  // Inclusive
   DateTime? get start;
 
-  DateTime get end;
+  // Exclusive
+  DateTime? get end;
 
   DateTime groupFunction(DateTime datetime);
 
-  bool get goingForwardPossible => end.isBefore(DateTime.now());
+  bool get goingForwardPossible =>
+      end == null ? false : end!.isBefore(DateTime.now());
 
   DateFilterState get earlier;
 
@@ -43,7 +46,9 @@ sealed class DateFilterState {
 
   static List<DateFilterState> all(DateFilterState dateFilterState) {
     final now = DateTime.now();
-    final inclusiveEnd = dateFilterState.end.subtract(const Duration(days: 1));
+    final inclusiveEnd = dateFilterState.end == null
+        ? DateTime.now()
+        : dateFilterState.end!.subtract(const Duration(days: 1));
     final end = now.compareTo(inclusiveEnd) < 0 ? now : inclusiveEnd;
     return [
       DayFilter(end),
@@ -236,7 +241,7 @@ class AllFilter extends DateFilterState {
   final DateTime? start = null;
 
   @override
-  DateTime get end => DateTime.now();
+  final DateTime? end = null;
 
   @override
   DateTime groupFunction(DateTime datetime) =>
