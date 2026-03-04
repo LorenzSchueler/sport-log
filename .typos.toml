@@ -2,4 +2,5 @@
 extend-exclude = [
     "model.svg",
     "sport-log-client/ios/Runner/Base.lproj/Main.storyboard",
+    "sport-log-client/lib/widgets/app_icons.dart",
 ]
