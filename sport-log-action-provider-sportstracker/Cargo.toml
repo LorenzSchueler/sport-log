@@ -8,8 +8,9 @@ sport-log-types = { path = "../sport-log-types" }
 sport-log-ap-utils = { path = "../sport-log-ap-utils" }
 
 tokio = { version = "1", features = ["full"] }
-reqwest = { version = "0.12", default-features = false, features = [
-    "rustls-tls",
+reqwest = { version = "0.13.1", default-features = false, features = [
+    "query",
+    "form",
 ] }
 chrono = { version = "0.4.19", features = ["serde"] }
 serde = { version = "1.0.138", features = ["derive"] }

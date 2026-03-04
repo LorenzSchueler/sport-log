@@ -6,10 +6,7 @@ edition = "2024"
 [dependencies]
 sport-log-types = { path = "../sport-log-types" }
 
-reqwest = { version = "0.12", default-features = false, features = [
-    "json",
-    "rustls-tls",
-] }
+reqwest = { version = "0.13.1", default-features = false, features = ["json"] }
 chrono = { version = "0.4", features = ["serde"] }
 rand = "0.9"
 tracing = "0.1"

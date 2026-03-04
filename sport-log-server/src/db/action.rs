@@ -1,9 +1,8 @@
-use argon2::{PasswordHash, PasswordHasher, PasswordVerifier, password_hash::SaltString};
+use argon2::{PasswordHash, PasswordHasher, PasswordVerifier};
 use chrono::{DateTime, Utc};
 use derive_deftly::Deftly;
 use diesel::{prelude::*, result::Error};
 use diesel_async::RunQueryDsl;
-use rand::rngs::ThreadRng;
 use sport_log_derive::*;
 use sport_log_types::{
     Action, ActionEvent, ActionEventId, ActionProviderId, ActionRuleId, CreatableActionRule,
@@ -32,9 +31,8 @@ impl ActionProviderDb {
         action_provider: &mut <Self as Db>::Type,
         db: &mut AsyncPgConnection,
     ) -> QueryResult<usize> {
-        let salt = SaltString::from_rng(&mut ThreadRng::default());
         action_provider.password = build_hasher()
-            .hash_password(action_provider.password.as_bytes(), &salt)
+            .hash_password(action_provider.password.as_bytes())
             .map_err(|_| Error::RollbackTransaction)? // this should not happen but prevents panic
             .to_string();
 
@@ -49,9 +47,8 @@ impl ActionProviderDb {
         db: &mut AsyncPgConnection,
     ) -> QueryResult<usize> {
         for action_provider in &mut *action_providers {
-            let salt = SaltString::from_rng(&mut ThreadRng::default());
             action_provider.password = build_hasher()
-                .hash_password(action_provider.password.as_bytes(), &salt)
+                .hash_password(action_provider.password.as_bytes())
                 .map_err(|_| Error::RollbackTransaction)? // this should not happen but prevents panic
                 .to_string();
         }

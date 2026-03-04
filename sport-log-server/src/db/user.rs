@@ -1,12 +1,11 @@
 use argon2::{
     PasswordVerifier,
-    password_hash::{PasswordHash, PasswordHasher, SaltString},
+    password_hash::{PasswordHasher, phc::PasswordHash},
 };
 use axum::http::StatusCode;
 use derive_deftly::Deftly;
 use diesel::{prelude::*, result::Error};
 use diesel_async::{AsyncPgConnection, RunQueryDsl};
-use rand::rngs::ThreadRng;
 use sport_log_derive::*;
 use sport_log_types::{Epoch, User, UserId, schema::user};
 
@@ -22,9 +21,8 @@ impl UserDb {
         user: &mut <Self as Db>::Type,
         db: &mut AsyncPgConnection,
     ) -> QueryResult<usize> {
-        let salt = SaltString::from_rng(&mut ThreadRng::default());
         user.password = build_hasher()
-            .hash_password(user.password.as_bytes(), &salt)
+            .hash_password(user.password.as_bytes())
             .map_err(|_| Error::RollbackTransaction)? // this should not happen but prevents panic
             .to_string();
 
@@ -39,9 +37,8 @@ impl UserDb {
         db: &mut AsyncPgConnection,
     ) -> QueryResult<usize> {
         for user in &mut *users {
-            let salt = SaltString::from_rng(&mut ThreadRng::default());
             user.password = build_hasher()
-                .hash_password(user.password.as_bytes(), &salt)
+                .hash_password(user.password.as_bytes())
                 .map_err(|_| Error::RollbackTransaction)? // this should not happen but prevents panic
                 .to_string();
         }
@@ -60,9 +57,8 @@ impl UserDb {
         user: &mut <Self as Db>::Type,
         db: &mut AsyncPgConnection,
     ) -> QueryResult<usize> {
-        let salt = SaltString::from_rng(&mut ThreadRng::default());
         user.password = build_hasher()
-            .hash_password(user.password.as_bytes(), &salt)
+            .hash_password(user.password.as_bytes())
             .map_err(|_| Error::RollbackTransaction)? // this should not happen but prevents panic
             .to_string();
 

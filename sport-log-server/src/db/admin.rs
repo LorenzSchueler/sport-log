@@ -1,4 +1,4 @@
-use argon2::{PasswordVerifier, password_hash::PasswordHash};
+use argon2::{PasswordVerifier, password_hash::phc::PasswordHash};
 use diesel::{QueryResult, result::Error};
 use sport_log_types::ADMIN_USERNAME;
 
