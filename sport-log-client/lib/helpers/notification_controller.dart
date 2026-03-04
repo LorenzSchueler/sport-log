@@ -30,7 +30,7 @@ class NotificationController {
 
   static Future<void> init() async {
     await _instance._plugin.initialize(
-      InitializationSettings(
+      settings: InitializationSettings(
         android: AndroidInitializationSettings('@mipmap/ic_launcher'),
       ),
       onDidReceiveNotificationResponse: _instance._onNotificationResponse,
@@ -50,10 +50,10 @@ class NotificationController {
 
   static Future<void> showFileNotification(String message, String file) async {
     await _instance._plugin.show(
-      Random().nextInt(1 << 31),
-      message,
-      file,
-      _notificationDetails,
+      id: Random().nextInt(1 << 31),
+      title: message,
+      body: file,
+      notificationDetails: _notificationDetails,
       payload: file,
     );
   }
