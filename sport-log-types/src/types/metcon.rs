@@ -120,6 +120,7 @@ pub struct MetconMovement {
     pub user_id: Option<UserId>,
     pub metcon_id: MetconId,
     pub movement_id: MovementId,
+    #[cfg_attr(feature = "db", diesel(treat_none_as_null = true))]
     pub distance_unit: Option<DistanceUnit>,
     pub movement_number: i32,
     pub count: i32,
