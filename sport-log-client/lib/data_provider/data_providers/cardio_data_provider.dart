@@ -123,18 +123,6 @@ class CardioSessionDescriptionDataProvider
     return _cardioDataProvider.deleteSingle(object.cardioSession);
   }
 
-  Future<CardioSessionDescription?> getById(Int64 id) async {
-    final session = await _cardioDataProvider.getById(id);
-    if (session == null) {
-      return null;
-    }
-    return CardioSessionDescription(
-      cardioSession: session,
-      route: await _routeDataProvider.getById(session.id),
-      movement: (await _movementDataProvider.getById(session.movementId))!,
-    );
-  }
-
   @override
   Future<List<CardioSessionDescription>> getNonDeleted() async {
     return Future.wait(
@@ -142,7 +130,9 @@ class CardioSessionDescriptionDataProvider
           .map(
             (session) async => CardioSessionDescription(
               cardioSession: session,
-              route: await _routeDataProvider.getById(session.id),
+              route: session.routeId != null
+                  ? await _routeDataProvider.getById(session.routeId!)
+                  : null,
               movement: (await _movementDataProvider.getById(
                 session.movementId,
               ))!,
