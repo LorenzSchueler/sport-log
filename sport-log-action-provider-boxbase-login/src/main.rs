@@ -408,13 +408,17 @@ async fn boxbase_login(
 
     class.scroll_into_view().await?;
     class.click().await?;
+    info!("class clicked");
 
+    time::sleep(StdDuration::from_secs(1)).await;
     let sign_up_button = driver
         .query(By::XPath(SIGN_UP_BUTTON_XPATH))
         .and_clickable()
         .first()
         .await?;
+    sign_up_button.wait_until().clickable().await?;
     sign_up_button.click().await?;
+    info!("sign in clicked");
 
     time::sleep(StdDuration::from_secs(1)).await;
     let class_symbol = driver
