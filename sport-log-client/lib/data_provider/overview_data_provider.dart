@@ -84,20 +84,34 @@ class OverviewDataProvider<T, R, D extends DataProvider<T>, S>
     super.dispose();
   }
 
+  int _requestId = 0;
+
   Future<void> _update() async {
+    final requestId = ++_requestId;
+
     _isLoading = true;
     notifyListeners();
     _logger.d(
       "updating with start = ${_dateFilter.start}, end = ${_dateFilter.end}, selected = $_selected, search = $_search",
     );
-    _entities = await entityAccessor(_dataProvider)(
+
+    final entities = await entityAccessor(_dataProvider)(
       _dateFilter.start,
       _dateFilter.end,
       selected,
       search,
     );
-    _records = await recordAccessor(_dataProvider)();
+    final records = await recordAccessor(_dataProvider)();
+
+    if (requestId != _requestId) {
+      _logger.d("update results outdated");
+      return;
+    }
+
+    _entities = entities;
+    _records = records;
     _isLoading = false;
+
     if (!_disposed) {
       notifyListeners();
     }
