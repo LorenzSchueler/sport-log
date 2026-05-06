@@ -146,13 +146,10 @@ class _StrengthEditPageState extends State<StrengthEditPage> {
       _strengthSessionDescription.sets.add(newSet);
       _strengthSessionDescription.orderSets();
     });
-    Future.delayed(
-      const Duration(milliseconds: 100),
-      () => _scrollController.animateTo(
-        _scrollController.position.maxScrollExtent,
-        duration: const Duration(milliseconds: 200),
-        curve: Curves.decelerate,
-      ),
+    _scrollController.animateTo(
+      _scrollController.position.maxScrollExtent,
+      duration: const Duration(milliseconds: 200),
+      curve: Curves.decelerate,
     );
   }
 
