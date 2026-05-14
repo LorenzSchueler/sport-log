@@ -66,22 +66,30 @@ pub async fn get_app_info(
         )));
     };
 
+    if git_ref.len() < 7 || git_ref.chars().any(|c| !c.is_ascii_hexdigit()) {
+        return Err(HandlerError::from((
+            StatusCode::BAD_REQUEST,
+            ErrorMessage::Other {
+                error: "the git ref is not a valid git hash".to_owned(),
+            },
+        )));
+    }
+
     let ref_log = read_to_string(app_dir.join("ref.log"))
         .await
         .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
-    let mut refs = ref_log
-        .split('\n')
-        .filter(|current_ref| current_ref.len() == 7);
-    let found_ref = refs.any(|current_ref| current_ref == git_ref);
+    let refs: Vec<_> = ref_log
+        .lines()
+        .map(str::trim)
+        .filter(|r| r.len() >= 7 && r.chars().all(|c| c.is_ascii_hexdigit()))
+        .collect();
+    let pos = refs
+        .iter()
+        .position(|current_ref| current_ref.starts_with(&git_ref));
 
-    if found_ref {
-        if refs.next().is_none() {
-            // ref is last one
-            Ok(Json(AppInfo { new_version: false }))
-        } else {
-            // there are newer refs
-            Ok(Json(AppInfo { new_version: true }))
-        }
+    if let Some(pos) = pos {
+        let new_version = pos < refs.len() - 1;
+        Ok(Json(AppInfo { new_version }))
     } else {
         Err(HandlerError::from((
             StatusCode::BAD_REQUEST,
