@@ -228,7 +228,7 @@ class _MetconSessionEditPageState extends State<MetconSessionEditPage> {
                                   Duration.zero;
                               _metconSessionDescription.metconSession.rounds =
                                   null;
-                              _metconSessionDescription.metconSession.rounds =
+                              _metconSessionDescription.metconSession.reps =
                                   null;
                             } else {
                               _metconSessionDescription.metconSession.time =
