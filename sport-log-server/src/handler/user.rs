@@ -71,8 +71,7 @@ pub async fn update_user(
     Ok(Json(EpochResponse { epoch }))
 }
 
-pub async fn delete_user(auth: AuthUser, mut db: DbConn) -> HandlerResult<Json<EpochResponse>> {
+pub async fn delete_user(auth: AuthUser, mut db: DbConn) -> HandlerResult<StatusCode> {
     UserDb::delete(*auth, &mut db).await?;
-    let epoch = UserDb::get_epoch_by_user(*auth, &mut db).await?;
-    Ok(Json(EpochResponse { epoch }))
+    Ok(StatusCode::OK)
 }
