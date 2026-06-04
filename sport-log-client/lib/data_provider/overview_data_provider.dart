@@ -26,12 +26,11 @@ class OverviewDataProvider<T, R, D extends DataProvider<T>, S>
     return instance;
   }
   OverviewDataProvider._({
-    required D dataProvider,
+    required this._dataProvider,
     required this.entityAccessor,
     required this.recordAccessor,
     required String loggerName,
-  }) : _dataProvider = dataProvider,
-       _logger = Logger(loggerName);
+  }) : _logger = Logger(loggerName);
 
   final Logger _logger;
   final D _dataProvider;
