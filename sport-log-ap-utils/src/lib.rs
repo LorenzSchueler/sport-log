@@ -53,6 +53,7 @@ pub async fn setup(
                 .get(route_max_version(server_url, AP_PLATFORM, None))
                 .send()
                 .await?
+                .error_for_status()?
                 .json()
                 .await?;
             let platform = platforms
@@ -99,6 +100,7 @@ pub async fn setup(
                 .basic_auth(name, Some(&password))
                 .send()
                 .await?
+                .error_for_status()?
                 .json()
                 .await?;
             action_provider.id
@@ -165,6 +167,7 @@ pub async fn get_events(
         .basic_auth(name, Some(&password))
         .send()
         .await?
+        .error_for_status()?
         .json()
         .await?;
 
@@ -191,7 +194,8 @@ pub async fn disable_events(
         .basic_auth(name, Some(&password))
         .json(action_event_ids)
         .send()
-        .await?;
+        .await?
+        .error_for_status()?;
 
     Ok(())
 }

@@ -288,6 +288,7 @@ async fn fetch(config: &Config) -> Result<()> {
                     .header(ID_HEADER, exec_action_event.user_id.0)
                     .send()
                     .await?
+                    .error_for_status()?
                     .json()
                     .await?;
 
@@ -437,6 +438,7 @@ async fn get_token(
         .form(&credentials)
         .send()
         .await?
+        .error_for_status()?
         .json()
         .await?;
 
@@ -456,6 +458,7 @@ async fn get_workout_keys(client: &Client, token: &(&str, &str)) -> Result<Worko
         .query(&[token, limited, limit])
         .send()
         .await?
+        .error_for_status()?
         .json()
         .await?;
 
