@@ -348,7 +348,7 @@ class _RouteEditPageState extends State<RouteEditPage> {
                               contentPadding: const EdgeInsets.only(right: 10),
                             ),
                             itemCount: _route.markedPositions!.length,
-                            onReorder: _switchPoints,
+                            onReorderItem: _switchPoints,
                             shrinkWrap: true,
                           ),
                         ),

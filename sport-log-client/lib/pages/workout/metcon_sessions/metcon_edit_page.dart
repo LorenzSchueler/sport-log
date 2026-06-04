@@ -295,7 +295,7 @@ class _MetconEditPageState extends State<MetconEditPage> {
         );
       },
       itemCount: _metconDescription.moves.length,
-      onReorder: _reorder,
+      onReorderItem: _reorder,
     );
   }
 
