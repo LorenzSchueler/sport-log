@@ -12,7 +12,7 @@ use sport_log_types::{ActionProviderId, ID_HEADER, UserId};
 
 use crate::{
     AppState, Config,
-    db::{ActionProviderDb, AdminDb, UserDb},
+    db::{ActionProviderDb, AdminDb, GetById, UserDb},
     error::HandlerError,
 };
 
@@ -62,6 +62,10 @@ where
         let user_id = parse_id_header(parts, UserId)?;
         let admin_password = &config.admin_password;
         if AdminDb::auth(username, password, admin_password).is_ok() {
+            // verify the user exists
+            UserDb::get_by_id(user_id, &mut db)
+                .await
+                .map_err(|_| HandlerError::from(StatusCode::NOT_FOUND))?;
             return Ok(Self(user_id));
         }
         Err(StatusCode::UNAUTHORIZED.into())
@@ -131,6 +135,10 @@ where
 
         let admin_password = &config.admin_password;
         if AdminDb::auth(username, password, admin_password).is_ok() {
+            // verify the user exists
+            UserDb::get_by_id(user_id, &mut db)
+                .await
+                .map_err(|_| HandlerError::from(StatusCode::NOT_FOUND))?;
             return Ok(Self(user_id));
         }
         Err(StatusCode::UNAUTHORIZED.into())
@@ -189,6 +197,10 @@ where
         let ap_id = parse_id_header(parts, ActionProviderId)?;
         let admin_password = &config.admin_password;
         if AdminDb::auth(username, password, admin_password).is_ok() {
+            // verify the action provider exists
+            ActionProviderDb::get_by_id(ap_id, &mut db)
+                .await
+                .map_err(|_| HandlerError::from(StatusCode::NOT_FOUND))?;
             return Ok(Self(ap_id));
         }
         Err(StatusCode::UNAUTHORIZED.into())
