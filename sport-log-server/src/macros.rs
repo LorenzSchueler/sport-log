@@ -246,10 +246,14 @@ define_derive_deftly! {
             use diesel_async::RunQueryDsl;
             use diesel::prelude::*;
 
-            diesel::update(Self::table().find(value.id))
+            let rows = diesel::update(Self::table().find(value.id))
                 .set(value)
                 .execute(db)
-                .await
+                .await?;
+            if rows == 0 {
+                return Err(diesel::result::Error::NotFound);
+            }
+            Ok(rows)
         }
 
         async fn update_multiple(
@@ -263,10 +267,13 @@ define_derive_deftly! {
             let len = values.len();
             db.transaction(|db| async move {
                 for value in values {
-                    diesel::update(Self::table().find(value.id))
+                    let rows = diesel::update(Self::table().find(value.id))
                         .set(value)
                         .execute(db)
                         .await?;
+                    if rows == 0 {
+                        return Err(diesel::result::Error::NotFound);
+                    }
                 }
 
                 Ok(len)

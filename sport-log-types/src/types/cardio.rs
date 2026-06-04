@@ -41,7 +41,7 @@ pub enum CardioType {
 ///
 /// `distance` is the distance in meter since the start of the recording.
 ///
-/// `time` is the time in seconds since the start of the recording.
+/// `time` is the time in milliseconds since the start of the recording.
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[cfg_attr(
     feature = "db",
