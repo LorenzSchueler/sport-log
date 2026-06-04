@@ -127,8 +127,8 @@ impl UserDb {
             .get_result(db)
             .await?;
 
-        let password_hash = PasswordHash::new(password_hash.as_str())
-            .expect("invalid password hash stored in database");
+        let password_hash =
+            PasswordHash::new(password_hash.as_str()).map_err(|_| Error::RollbackTransaction)?;
         if build_hasher()
             .verify_password(password.as_bytes(), &password_hash)
             .is_ok()
