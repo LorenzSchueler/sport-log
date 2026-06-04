@@ -141,8 +141,8 @@ class LatLngZoom {
   final LatLng latLng;
   final double zoom;
 
-  CameraOptions toCameraOptions() =>
-      CameraOptions(center: latLng.toPoint(), zoom: zoom);
+  CameraViewportState toViewportState() =>
+      CameraViewportState(center: latLng.toPoint(), zoom: zoom);
 }
 
 class LatLngBounds {

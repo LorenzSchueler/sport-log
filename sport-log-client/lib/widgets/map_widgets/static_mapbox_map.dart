@@ -32,17 +32,26 @@ class StaticMapboxMap extends StatelessWidget {
   Widget build(BuildContext context) {
     return MapWidget(
       styleUri: MapStyle.outdoor.url,
-      cameraOptions: context.read<Settings>().lastMapPosition.toCameraOptions(),
+      viewport: context.read<Settings>().lastMapPosition.toViewportState(),
       onMapCreated: (mapboxMap) async {
+        mapboxMap
+          ..addInteraction(
+            TapInteraction.onMap(
+              (gestureContext) =>
+                  onTap?.call(LatLng.fromPoint(gestureContext.point)),
+            ),
+          )
+          ..addInteraction(
+            LongTapInteraction.onMap(
+              (gestureContext) =>
+                  onLongTap?.call(LatLng.fromPoint(gestureContext.point)),
+            ),
+          );
         final controller = await MapController.from(mapboxMap, context);
         if (controller != null) {
           await _onMapCreated(controller);
         }
       },
-      onTapListener: (gestureContext) =>
-          onTap?.call(LatLng.fromPoint(gestureContext.point)),
-      onLongTapListener: (gestureContext) =>
-          onLongTap?.call(LatLng.fromPoint(gestureContext.point)),
     );
   }
 }

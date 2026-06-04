@@ -14,14 +14,14 @@ dependencies:
   collection: ^1.16.0
   convert: ^3.1.2
   crypto: ^3.0.6
-  device_info_plus: ^12.1.0
-  file_picker: ^10.1.2
+  device_info_plus: ^13.1.0
+  file_picker: ^12.0.0-beta.5
   fixnum: ^1.0.0
   fl_chart: ^1.0.0
   flutter:
     sdk: flutter
   flutter_blue_plus: ^2.0.0
-  flutter_local_notifications: ^20.1.0
+  flutter_local_notifications: ^21.0.0
   flutter_localizations:
     sdk: flutter
   flutter_tts: ^4.0.2
@@ -32,7 +32,7 @@ dependencies:
   http: ^1.1.0
   intl: ^0.20.2
   json_annotation: ^4.9.0
-  latlong2: ^0.9.0
+  latlong2: ^0.10.1
   logger: ^2.0.1
   mapbox_api_pro: ^1.0.0
   mapbox_maps_flutter: ^2.17.0-rc.1
@@ -40,7 +40,7 @@ dependencies:
   open_file_plus: #^3.3.1
     git:
       url: https://github.com/postflow/open_file_plus.git
-  package_info_plus: ^9.0.0
+  package_info_plus: ^10.1.0
   path_provider: ^2.0.10
   pedometer: #^3.0.0
     # callback for every step

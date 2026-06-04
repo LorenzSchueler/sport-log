@@ -34,7 +34,7 @@ class MapboxMapWrapper extends StatefulWidget {
     this.onFullscreenToggle,
     this.onCenterLocationToggle,
     this.initStyleUri = MapStyle.outdoorConst,
-    this.initialCameraPosition,
+    this.initialMapPosition,
     this.onMapCreated,
     this.onTap,
     this.onLongTap,
@@ -64,7 +64,7 @@ class MapboxMapWrapper extends StatefulWidget {
   final String initStyleUri;
 
   /// defaults to [Settings.lastMapPosition]
-  final LatLngZoom? initialCameraPosition;
+  final LatLngZoom? initialMapPosition;
 
   final void Function(MapController)? onMapCreated;
   final void Function(LatLng)? onTap;
@@ -144,11 +144,26 @@ class _MapboxMapWrapperState extends State<MapboxMapWrapper> {
       children: [
         MapWidget(
           styleUri: widget.initStyleUri,
-          cameraOptions:
-              (widget.initialCameraPosition ??
+          viewport:
+              (widget.initialMapPosition ??
                       context.read<Settings>().lastMapPosition)
-                  .toCameraOptions(),
+                  .toViewportState(),
           onMapCreated: (mapboxMap) async {
+            mapboxMap
+              ..addInteraction(
+                TapInteraction.onMap(
+                  (gestureContext) => widget.onTap?.call(
+                    LatLng.fromPoint(gestureContext.point),
+                  ),
+                ),
+              )
+              ..addInteraction(
+                LongTapInteraction.onMap(
+                  (gestureContext) => widget.onLongTap?.call(
+                    LatLng.fromPoint(gestureContext.point),
+                  ),
+                ),
+              );
             final controller = await MapController.from(mapboxMap, context);
             if (controller != null) {
               await _onMapCreated(controller);
@@ -160,10 +175,6 @@ class _MapboxMapWrapperState extends State<MapboxMapWrapper> {
               await Settings.instance.setLastMapPosition(lastMapPosition);
             }
           },
-          onTapListener: (MapContentGestureContext gestureContext) =>
-              widget.onTap?.call(LatLng.fromPoint(gestureContext.point)),
-          onLongTapListener: (gestureContext) =>
-              widget.onLongTap?.call(LatLng.fromPoint(gestureContext.point)),
         ),
         if (_mapController != null && widget.showOverlays)
           Positioned(

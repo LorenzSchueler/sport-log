@@ -85,8 +85,8 @@ Future<Result<String, void>> saveTrackAsGpx(
 }
 
 Future<Result<List<Position>, String>?> loadTrackFromGpxFile() async {
-  await FilePicker.platform.clearTemporaryFiles();
-  final result = await FilePicker.platform.pickFiles();
+  await FilePicker.clearTemporaryFiles();
+  final result = await FilePicker.pickFiles();
   if (result == null) {
     return null;
   }

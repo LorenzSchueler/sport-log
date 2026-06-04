@@ -96,7 +96,7 @@ class CardioTrackingPage extends StatelessWidget {
                           onFullscreenToggle: fullscreen.setState,
                           onCenterLocationToggle:
                               trackingUtils.setCenterLocation,
-                          initialCameraPosition: LatLngZoom(
+                          initialMapPosition: LatLngZoom(
                             latLng: context.read<Settings>().lastGpsLatLng,
                             zoom: 15,
                           ),
