@@ -8,7 +8,7 @@ ExtraLinesData? touchLine(double? lastX) => lastX == null
       );
 
 LineTouchData touchCallback(void Function(double?) callback) => LineTouchData(
-  enabled: false,
+  handleBuiltInTouches: false,
   touchSpotThreshold: double.infinity, // always get nearest point
   touchCallback: (event, response) => _touchCallback(event, response, callback),
 );
