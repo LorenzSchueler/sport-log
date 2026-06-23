@@ -196,7 +196,6 @@ pub struct ActionRuleDb;
 )]
 pub struct ActionEventDb;
 
-#[async_trait]
 impl CheckAPId for ActionEventDb {
     async fn check_ap_id(
         id: Self::Id,
@@ -281,7 +280,6 @@ impl Db for CreatableActionRuleDb {
     }
 }
 
-#[async_trait]
 impl GetAll for CreatableActionRuleDb {
     async fn get_all(db: &mut AsyncPgConnection) -> QueryResult<Vec<<Self as Db>::Type>> {
         action_rule::table
@@ -394,7 +392,6 @@ impl Db for DeletableActionEventDb {
     }
 }
 
-#[async_trait]
 impl GetAll for DeletableActionEventDb {
     async fn get_all(db: &mut AsyncPgConnection) -> QueryResult<Vec<<Self as Db>::Type>> {
         Self::table()

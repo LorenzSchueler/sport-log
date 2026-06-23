@@ -69,7 +69,6 @@ impl UserDb {
     }
 }
 
-#[async_trait]
 impl CheckUserId for UserDb {
     async fn check_user_id(
         id: Self::Id,
@@ -94,7 +93,6 @@ impl CheckUserId for UserDb {
     }
 }
 
-#[async_trait::async_trait]
 impl crate::db::GetEpochByUser for UserDb {
     async fn get_epoch_by_user(
         user_id: sport_log_types::UserId,
@@ -158,7 +156,6 @@ impl UserDb {
     }
 }
 
-#[async_trait]
 impl VerifyForUserUpdate for Unverified<User> {
     type Type = User;
 

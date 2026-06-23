@@ -3,7 +3,6 @@ use derive_deftly::define_derive_deftly;
 define_derive_deftly! {
     Create:
 
-    #[async_trait::async_trait]
     impl crate::db::Create for crate::db::$ttype {
         async fn create(
             value: &Self::Type,
@@ -36,7 +35,6 @@ define_derive_deftly! {
 define_derive_deftly! {
     GetById:
 
-    #[async_trait::async_trait]
     impl crate::db::GetById for crate::db::$ttype {
         async fn get_by_id(
             id: Self::Id,
@@ -58,7 +56,6 @@ define_derive_deftly! {
 define_derive_deftly! {
     GetByUser:
 
-    #[async_trait::async_trait]
     impl crate::db::GetByUser for crate::db::$ttype {
         async fn get_by_user(
             user_id: sport_log_types::UserId,
@@ -80,7 +77,6 @@ define_derive_deftly! {
 define_derive_deftly! {
     GetByUserOptional:
 
-    #[async_trait::async_trait]
     impl crate::db::GetByUser for crate::db::$ttype {
         async fn get_by_user(
             user_id: sport_log_types::UserId,
@@ -102,7 +98,6 @@ define_derive_deftly! {
 define_derive_deftly! {
     GetByUserTimespan:
 
-    #[async_trait::async_trait]
     impl crate::db::GetByUserTimespan for crate::db::$ttype {
         async fn get_by_user_and_timespan(
             user_id: sport_log_types::UserId,
@@ -151,7 +146,6 @@ define_derive_deftly! {
 define_derive_deftly! {
     GetByUserAndEpoch:
 
-    #[async_trait::async_trait]
     impl crate::db::GetByUserAndEpoch for crate::db::$ttype {
         async fn get_by_user_and_epoch(
             user_id: sport_log_types::UserId,
@@ -175,7 +169,6 @@ define_derive_deftly! {
 define_derive_deftly! {
     GetByUserAndEpochOptional:
 
-    #[async_trait::async_trait]
     impl crate::db::GetByUserAndEpoch for crate::db::$ttype {
         async fn get_by_user_and_epoch(
             user_id: sport_log_types::UserId,
@@ -199,7 +192,6 @@ define_derive_deftly! {
 define_derive_deftly! {
     GetByEpoch:
 
-    #[async_trait::async_trait]
     impl crate::db::GetByEpoch for crate::db::$ttype {
         async fn get_by_epoch(
             epoch: sport_log_types::Epoch,
@@ -221,7 +213,6 @@ define_derive_deftly! {
 define_derive_deftly! {
     GetAll:
 
-    #[async_trait::async_trait]
     impl crate::db::GetAll for crate::db::$ttype {
         async fn get_all(db: &mut diesel_async::AsyncPgConnection) -> diesel::result::QueryResult<Vec<Self::Type>> {
             use crate::db::Db;
@@ -236,7 +227,6 @@ define_derive_deftly! {
 define_derive_deftly! {
     Update:
 
-    #[async_trait::async_trait]
     impl crate::db::Update for crate::db::$ttype {
         async fn update(
             value: &Self::Type,
@@ -285,7 +275,6 @@ define_derive_deftly! {
 define_derive_deftly! {
     GetEpochByUser:
 
-    #[async_trait::async_trait]
     impl crate::db::GetEpochByUser for crate::db::$ttype {
         async fn get_epoch_by_user(
             user_id: sport_log_types::UserId,
@@ -308,7 +297,6 @@ define_derive_deftly! {
 define_derive_deftly! {
     GetEpochByUserOptional:
 
-    #[async_trait::async_trait]
     impl crate::db::GetEpochByUserOptional for crate::db::$ttype {
         async fn get_epoch_by_user_optional(
             user_id: sport_log_types::UserId,
@@ -334,7 +322,6 @@ define_derive_deftly! {
 define_derive_deftly! {
     GetEpoch:
 
-    #[async_trait::async_trait]
     impl crate::db::GetEpoch for crate::db::$ttype {
         async fn get_epoch(
             db: &mut diesel_async::AsyncPgConnection
@@ -355,7 +342,6 @@ define_derive_deftly! {
 define_derive_deftly! {
     CheckUserId:
 
-    #[async_trait::async_trait]
     impl crate::db::CheckUserId for crate::db::$ttype {
         async fn check_user_id(
             id: Self::Id,
@@ -397,7 +383,6 @@ define_derive_deftly! {
 define_derive_deftly! {
     CheckOptionalUserId:
 
-    #[async_trait::async_trait]
     impl crate::db::CheckOptionalUserId for crate::db::$ttype {
         async fn check_optional_user_id(
             id: Self::Id,
@@ -421,7 +406,6 @@ define_derive_deftly! {
         }
     }
 
-    #[async_trait::async_trait]
     impl crate::db::CheckUserId for crate::db::$ttype {
         async fn check_user_id(
             id: Self::Id,
@@ -463,7 +447,6 @@ define_derive_deftly! {
 define_derive_deftly! {
     CheckAPId:
 
-    #[async_trait::async_trait]
     impl crate::db::CheckAPId for crate::db::$ttype {
         async fn check_ap_id(
             id: Self::Id,
@@ -505,7 +488,6 @@ define_derive_deftly! {
 define_derive_deftly! {
     VerifyForUserGet:
 
-    #[async_trait::async_trait]
     impl crate::db::VerifyForUserGet for crate::db::UnverifiedId<<$ttype as crate::db::Db>::Id> {
         type Id = <$ttype as crate::db::Db>::Id;
 
@@ -531,7 +513,6 @@ define_derive_deftly! {
 define_derive_deftly! {
     VerifyForUserOrAPGet:
 
-    #[async_trait::async_trait]
     impl crate::db::VerifyForUserOrAPGet for crate::db::UnverifiedId<<$ttype as crate::db::Db>::Id> {
         type Id = <$ttype as crate::db::Db>::Id;
 
@@ -557,7 +538,6 @@ define_derive_deftly! {
 define_derive_deftly! {
     VerifyForUserOrAPGetOptional:
 
-    #[async_trait::async_trait]
     impl crate::db::VerifyForUserOrAPGet for crate::db::UnverifiedId<<$ttype as crate::db::Db>::Id> {
         type Id = <$ttype as crate::db::Db>::Id;
 
@@ -583,7 +563,6 @@ define_derive_deftly! {
 define_derive_deftly! {
     VerifyForActionProviderGet:
 
-    #[async_trait::async_trait]
     impl crate::db::VerifyForActionProviderGet for crate::db::UnverifiedId<<$ttype as crate::db::Db>::Id> {
         type Id = <$ttype as crate::db::Db>::Id;
 
@@ -609,7 +588,6 @@ define_derive_deftly! {
 define_derive_deftly! {
     VerifyForActionProviderDisable:
 
-    #[async_trait::async_trait]
     impl crate::db::VerifyForActionProviderDisable for crate::db::UnverifiedIds<<$ttype as crate::db::Db>::Id> {
         type Id = <$ttype as crate::db::Db>::Id;
 
@@ -677,7 +655,6 @@ define_derive_deftly! {
 define_derive_deftly! {
     VerifyForUserUpdate:
 
-    #[async_trait::async_trait]
     impl crate::db::VerifyForUserUpdate for crate::db::Unverified<<$ttype as crate::db::Db>::Type> {
         type Type = <$ttype as crate::db::Db>::Type;
 
@@ -701,7 +678,6 @@ define_derive_deftly! {
         }
     }
 
-    #[async_trait::async_trait]
     impl crate::db::VerifyMultipleForUserUpdate for crate::db::Unverified<Vec<<$ttype as crate::db::Db>::Type>> {
         type Type = <$ttype as crate::db::Db>::Type;
 
@@ -730,7 +706,6 @@ define_derive_deftly! {
 define_derive_deftly! {
     VerifyForUserOrAPUpdate:
 
-    #[async_trait::async_trait]
     impl crate::db::VerifyForUserOrAPUpdate for crate::db::Unverified<<$ttype as crate::db::Db>::Type> {
         type Type = <$ttype as crate::db::Db>::Type;
 
@@ -754,7 +729,6 @@ define_derive_deftly! {
         }
     }
 
-    #[async_trait::async_trait]
     impl crate::db::VerifyMultipleForUserOrAPUpdate for crate::db::Unverified<Vec<<$ttype as crate::db::Db>::Type>> {
         type Type = <$ttype as crate::db::Db>::Type;
 
@@ -783,7 +757,6 @@ define_derive_deftly! {
 define_derive_deftly! {
     VerifyForUserOrAPUpdateOptional:
 
-    #[async_trait::async_trait]
     impl crate::db::VerifyForUserOrAPUpdate for crate::db::Unverified<<$ttype as crate::db::Db>::Type> {
         type Type = <$ttype as crate::db::Db>::Type;
 
@@ -807,7 +780,6 @@ define_derive_deftly! {
         }
     }
 
-    #[async_trait::async_trait]
     impl crate::db::VerifyMultipleForUserOrAPUpdate for crate::db::Unverified<Vec<<$ttype as crate::db::Db>::Type>> {
         type Type = <$ttype as crate::db::Db>::Type;
 
@@ -944,7 +916,6 @@ define_derive_deftly! {
 define_derive_deftly! {
     VerifyForActionProviderUpdate:
 
-    #[async_trait::async_trait]
     impl crate::db::VerifyForActionProviderUpdate for crate::db::Unverified<<$ttype as crate::db::Db>::Type> {
         type Type = <$ttype as crate::db::Db>::Type;
 
@@ -968,7 +939,6 @@ define_derive_deftly! {
         }
     }
 
-    #[async_trait::async_trait]
     impl crate::db::VerifyMultipleForActionProviderUpdate for crate::db::Unverified<Vec<<$ttype as crate::db::Db>::Type>> {
         type Type = <$ttype as crate::db::Db>::Type;
 

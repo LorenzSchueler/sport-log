@@ -1,7 +1,6 @@
 use argon2::Argon2;
 #[cfg(test)]
 use argon2::{Algorithm, Params, Version};
-use async_trait::async_trait;
 use axum::http::StatusCode;
 use chrono::{DateTime, Utc};
 use diesel::{Column, QueryResult, Table};
@@ -119,7 +118,6 @@ pub trait ModifiableDb: Db {
 }
 
 /// A type for which a new database entry can be created.
-#[async_trait]
 pub trait Create: Db {
     async fn create(value: &Self::Type, db: &mut AsyncPgConnection) -> QueryResult<usize>;
 
@@ -130,13 +128,11 @@ pub trait Create: Db {
 }
 
 /// A type for which an entry can be retrieved by id from the database.
-#[async_trait]
 pub trait GetById: Db {
     async fn get_by_id(id: Self::Id, db: &mut AsyncPgConnection) -> QueryResult<Self::Type>;
 }
 
 /// A type for which entries can be retrieved by user from the database.
-#[async_trait]
 pub trait GetByUser: Db {
     async fn get_by_user(
         user_id: UserId,
@@ -146,7 +142,6 @@ pub trait GetByUser: Db {
 
 /// A type for which entries can be retrieved by user and the timespan from the
 /// database.
-#[async_trait]
 pub trait GetByUserTimespan: Db {
     async fn get_by_user_and_timespan(
         user_id: UserId,
@@ -157,7 +152,6 @@ pub trait GetByUserTimespan: Db {
 
 /// A type for which entries can be retrieved by user and the epoch of the
 /// last synchronization from the database.
-#[async_trait]
 pub trait GetByUserAndEpoch: Db {
     async fn get_by_user_and_epoch(
         user_id: UserId,
@@ -168,20 +162,17 @@ pub trait GetByUserAndEpoch: Db {
 
 /// A type for which entries can be retrieved by the epoch of the last
 /// synchronization from the database.
-#[async_trait]
 pub trait GetByEpoch: Db {
     async fn get_by_epoch(epoch: Epoch, db: &mut AsyncPgConnection)
     -> QueryResult<Vec<Self::Type>>;
 }
 
 /// A type for which all entries can be retrieved from the database.
-#[async_trait]
 pub trait GetAll: Db {
     async fn get_all(db: &mut AsyncPgConnection) -> QueryResult<Vec<Self::Type>>;
 }
 
 /// A type which can be used to update an entry in the database.
-#[async_trait]
 pub trait Update: Db {
     async fn update(value: &Self::Type, db: &mut AsyncPgConnection) -> QueryResult<usize>;
 
@@ -192,13 +183,11 @@ pub trait Update: Db {
 }
 
 /// A type for which the maximum epoch of a user can be retrieved.
-#[async_trait]
 pub trait GetEpochByUser: ModifiableDb {
     async fn get_epoch_by_user(user_id: UserId, db: &mut AsyncPgConnection) -> QueryResult<Epoch>;
 }
 
 /// A type for which the maximum epoch of a user can be retrieved.
-#[async_trait]
 pub trait GetEpochByUserOptional: ModifiableDb {
     async fn get_epoch_by_user_optional(
         user_id: UserId,
@@ -207,13 +196,11 @@ pub trait GetEpochByUserOptional: ModifiableDb {
 }
 
 /// A type for which the maximum epoch of a user can be retrieved.
-#[async_trait]
 pub trait GetEpoch: ModifiableDb {
     async fn get_epoch(db: &mut AsyncPgConnection) -> QueryResult<Epoch>;
 }
 
 /// A type which can be checked if it belongs to a User.
-#[async_trait]
 pub trait CheckUserId: Db {
     /// Check if the entry with id `id` in the database belongs to the
     /// [`User`](sport_log_types::User) with `user_id`.
@@ -233,7 +220,6 @@ pub trait CheckUserId: Db {
 }
 
 /// A type which can be checked if it belongs to a User or is public.
-#[async_trait]
 pub trait CheckOptionalUserId: Db {
     /// Check if the entry with id `id` in the database belongs to the
     /// [`User`](sport_log_types::User) with `user_id` or is public (`user_id`
@@ -246,7 +232,6 @@ pub trait CheckOptionalUserId: Db {
 }
 
 /// A type which can be checked if it belongs to an ActionProvider.
-#[async_trait]
 pub trait CheckAPId: Db {
     /// Check if the entry with id `id` in the database belongs to the
     /// [`ActionProvider`](sport_log_types::ActionProvider) with `ap_id`.
@@ -265,7 +250,6 @@ pub trait CheckAPId: Db {
     ) -> QueryResult<bool>;
 }
 
-#[async_trait]
 pub trait VerifyForUserGet {
     type Id;
 
@@ -276,7 +260,6 @@ pub trait VerifyForUserGet {
     ) -> Result<Self::Id, StatusCode>;
 }
 
-#[async_trait]
 pub trait VerifyForUserOrAPGet {
     type Id;
 
@@ -287,7 +270,6 @@ pub trait VerifyForUserOrAPGet {
     ) -> Result<Self::Id, StatusCode>;
 }
 
-#[async_trait]
 pub trait VerifyForActionProviderGet {
     type Id;
 
@@ -298,7 +280,6 @@ pub trait VerifyForActionProviderGet {
     ) -> Result<Self::Id, StatusCode>;
 }
 
-#[async_trait]
 pub trait VerifyForActionProviderDisable {
     type Id;
 
@@ -327,7 +308,6 @@ pub trait VerifyUncheckedGet {
     fn verify_unchecked_get(self) -> Result<Self::Id, StatusCode>;
 }
 
-#[async_trait]
 pub trait VerifyForUserUpdate {
     type Type;
 
@@ -338,7 +318,6 @@ pub trait VerifyForUserUpdate {
     ) -> Result<Self::Type, StatusCode>;
 }
 
-#[async_trait]
 pub trait VerifyMultipleForUserUpdate {
     type Type;
 
@@ -361,7 +340,6 @@ pub trait VerifyMultipleForUserCreate {
     fn verify_user_create(self, auth: AuthUser) -> Result<Vec<Self::Type>, StatusCode>;
 }
 
-#[async_trait]
 pub trait VerifyForUserOrAPUpdate {
     type Type;
 
@@ -372,7 +350,6 @@ pub trait VerifyForUserOrAPUpdate {
     ) -> Result<Self::Type, StatusCode>;
 }
 
-#[async_trait]
 pub trait VerifyMultipleForUserOrAPUpdate {
     type Type;
 
@@ -395,7 +372,6 @@ pub trait VerifyMultipleForUserOrAPCreate {
     fn verify_user_ap_create(self, auth: AuthUserOrAP) -> Result<Vec<Self::Type>, StatusCode>;
 }
 
-#[async_trait]
 pub trait VerifyForActionProviderUpdate {
     type Type;
 
@@ -406,7 +382,6 @@ pub trait VerifyForActionProviderUpdate {
     ) -> Result<Self::Type, StatusCode>;
 }
 
-#[async_trait]
 pub trait VerifyMultipleForActionProviderUpdate {
     type Type;
 
