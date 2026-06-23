@@ -261,11 +261,11 @@ define_derive_deftly! {
             db: &mut diesel_async::AsyncPgConnection
         ) -> diesel::result::QueryResult<usize> {
             use crate::db::Db;
-            use diesel_async::{RunQueryDsl, AsyncConnection, scoped_futures::ScopedFutureExt};
+            use diesel_async::{RunQueryDsl, AsyncConnection};
             use diesel::prelude::*;
 
             let len = values.len();
-            db.transaction(|db| async move {
+            db.transaction(async |db| {
                 for value in values {
                     let rows = diesel::update(Self::table().find(value.id))
                         .set(value)
@@ -277,7 +277,7 @@ define_derive_deftly! {
                 }
 
                 Ok(len)
-            }.scope_boxed()).await
+            }).await
         }
     }
 }

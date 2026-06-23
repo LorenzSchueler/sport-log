@@ -8,15 +8,15 @@ sport-log-types = { path = "../sport-log-types" }
 sport-log-ap-utils = { path = "../sport-log-ap-utils" }
 
 tokio = { version = "1.9", features = ["full"] }
-thirtyfour = "0.36.1"
+thirtyfour = "0.37.1"
 reqwest = { version = "0.13.1", default-features = false }
 chrono = { version = "0.4.19", features = ["serde"] }
 serde = { version = "1.0.138", features = ["derive"] }
-toml = "0.9.8"
+toml = "1.1.2"
 thiserror = "2.0.4"
 tracing = "0.1.26"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
-sysinfo = "0.37.2"
+sysinfo = "0.39.5"
 clap = { version = "4.4.11", features = ["derive"] }
 
 [lints]

@@ -29,7 +29,7 @@
 use std::{fs, process::ExitCode};
 
 use chrono::{DateTime, Datelike, Days, Duration, Local, TimeZone, Utc};
-use rand::Rng;
+use rand::RngExt;
 use reqwest::{Error as ReqwestError, blocking::Client};
 use serde::Deserialize;
 use sport_log_types::{

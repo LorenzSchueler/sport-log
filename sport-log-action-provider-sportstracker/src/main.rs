@@ -2,7 +2,7 @@ use std::{fs, process::ExitCode, result::Result as StdResult};
 
 use chrono::{DateTime, Duration};
 use clap::Parser;
-use rand::Rng;
+use rand::RngExt;
 use reqwest::{Client, Error as ReqwestError};
 use serde::Deserialize;
 use sport_log_ap_utils::{disable_events, get_events, setup as setup_db};

@@ -21,7 +21,7 @@ use diesel_async::{
 use flate2::write::GzDecoder;
 use hyper::header::CONTENT_ENCODING;
 use mime::APPLICATION_JSON;
-use rand::Rng;
+use rand::RngExt;
 use serde::de::DeserializeOwned;
 use sport_log_types::{
     ADMIN_USERNAME, AccountData, Action, ActionEvent, ActionEventId, ActionId, ActionProvider,

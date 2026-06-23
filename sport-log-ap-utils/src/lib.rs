@@ -1,7 +1,7 @@
 //! Collection of functions for use in action providers.
 
 use chrono::{Duration, SecondsFormat, Utc};
-use rand::Rng;
+use rand::RngExt;
 use reqwest::{Client, Error, StatusCode};
 use sport_log_types::{
     Action, ActionEventId, ActionId, ActionProvider, ActionProviderId, ExecutableActionEvent,
