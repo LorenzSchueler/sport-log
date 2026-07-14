@@ -107,9 +107,8 @@ class _MapboxMapWrapperState extends State<MapboxMapWrapper> {
       pitchEnabled: widget.pitchGestureEnabled,
     );
     await _mapController?.showScaleBar();
-    await _mapController?.styleAttribution();
-    //await _mapController?.hideAttribution();
-    //await _mapController?.hideLogo();
+    await _mapController?.hideAttribution();
+    await _mapController?.hideLogo();
     await _mapController?.hideCompass();
   }
 

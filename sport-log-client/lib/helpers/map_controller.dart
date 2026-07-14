@@ -430,9 +430,6 @@ class MapController {
   Future<void> _setStyleTerrainProperty(String key, Object value) async =>
       await _controller?.style.setStyleTerrainProperty(key, value);
 
-  Future<void> styleAttribution() async => await _controller?.attribution
-      .updateSettings(AttributionSettings(iconColor: 0x60000000));
-
   Future<void> hideAttribution() async => await _controller?.attribution
       .updateSettings(AttributionSettings(enabled: false));
 
