@@ -19,7 +19,15 @@ class StaticMapboxMap extends StatelessWidget {
   final void Function(LatLng)? onTap;
   final void Function(LatLng)? onLongTap;
 
-  Future<void> _onMapCreated(MapController mapController) async {
+  Future<void> _onMapCreated(
+    BuildContext context,
+    MapController mapController,
+  ) async {
+    if (context.mounted) {
+      await mapController.setLatLngZoom(
+        context.read<Settings>().lastMapPosition,
+      );
+    }
     await mapController.disableAllGestures();
     await mapController.showScaleBar();
     await mapController.hideAttribution();
@@ -31,7 +39,6 @@ class StaticMapboxMap extends StatelessWidget {
   Widget build(BuildContext context) {
     return MapWidget(
       styleUri: MapStyle.outdoor.url,
-      viewport: context.read<Settings>().lastMapPosition.toViewportState(),
       onMapCreated: (mapboxMap) async {
         mapboxMap
           ..addInteraction(
@@ -47,8 +54,8 @@ class StaticMapboxMap extends StatelessWidget {
             ),
           );
         final controller = await MapController.from(mapboxMap, context);
-        if (controller != null) {
-          await _onMapCreated(controller);
+        if (context.mounted && controller != null) {
+          await _onMapCreated(context, controller);
         }
       },
     );

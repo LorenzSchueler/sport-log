@@ -114,6 +114,9 @@ class _MapboxMapWrapperState extends State<MapboxMapWrapper> {
 
   Future<void> _onMapCreated(MapController mapController) async {
     _mapController = mapController;
+    await mapController.setLatLngZoom(
+      widget.initialMapPosition ?? context.read<Settings>().lastMapPosition,
+    );
     await _setMapSettings();
     widget.onMapCreated?.call(mapController);
     if (mounted) {
@@ -143,10 +146,6 @@ class _MapboxMapWrapperState extends State<MapboxMapWrapper> {
       children: [
         MapWidget(
           styleUri: widget.initStyleUri,
-          viewport:
-              (widget.initialMapPosition ??
-                      context.read<Settings>().lastMapPosition)
-                  .toViewportState(),
           onMapCreated: (mapboxMap) async {
             mapboxMap
               ..addInteraction(
