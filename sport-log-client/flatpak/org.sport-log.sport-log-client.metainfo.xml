@@ -2,7 +2,7 @@
 <component type="desktop-application">
     <id>org.sport_log.sport_log_client</id>
     <name>Sport Log</name>
-    <summary>Log your sport archivements.</summary>
+    <summary>Log your sport achievements.</summary>
     <metadata_license>CC0-1.0</metadata_license>
     <project_license>GPL-3.0-only</project_license>
     <categories>
