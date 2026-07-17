@@ -10,6 +10,7 @@ import 'package:sport_log/models/cardio/route.dart';
 import 'package:sport_log/settings.dart';
 import 'package:sport_log/widgets/map_widgets/add_location_button.dart';
 import 'package:sport_log/widgets/map_widgets/current_location_button.dart';
+import 'package:sport_log/widgets/map_widgets/map_ready_callback.dart';
 import 'package:sport_log/widgets/map_widgets/map_styles_button.dart';
 import 'package:sport_log/widgets/map_widgets/select_route_button.dart';
 import 'package:sport_log/widgets/map_widgets/set_north_button.dart';
@@ -82,6 +83,7 @@ class MapboxMapWrapper extends StatefulWidget {
 
 class _MapboxMapWrapperState extends State<MapboxMapWrapper> {
   MapController? _mapController;
+  late final MapReadyCallback _mapReadyCallback = MapReadyCallback(_onReady);
 
   // this can not be a BoolToggle because we a pointer to that the callback in CurrentLocationButton sees the update
   final Pointer<bool> _centerLocation = Pointer(true);
@@ -112,15 +114,21 @@ class _MapboxMapWrapperState extends State<MapboxMapWrapper> {
     await _mapController?.hideCompass();
   }
 
-  Future<void> _onMapCreated(MapController mapController) async {
+  void _onMapCreated(MapController mapController) {
     _mapController = mapController;
-    await mapController.setLatLngZoom(
-      widget.initialMapPosition ?? context.read<Settings>().lastMapPosition,
-    );
-    await _setMapSettings();
-    widget.onMapCreated?.call(mapController);
     if (mounted) {
       setState(() {});
+    }
+    _mapReadyCallback.onMapCreated(mapController);
+  }
+
+  Future<void> _onReady(MapController mapController) async {
+    if (mounted) {
+      await mapController.setLatLngZoom(
+        widget.initialMapPosition ?? context.read<Settings>().lastMapPosition,
+      );
+      await _setMapSettings();
+      widget.onMapCreated?.call(mapController);
     }
   }
 
@@ -164,9 +172,10 @@ class _MapboxMapWrapperState extends State<MapboxMapWrapper> {
               );
             final controller = await MapController.from(mapboxMap, context);
             if (controller != null) {
-              await _onMapCreated(controller);
+              _onMapCreated(controller);
             }
           },
+          onMapLoadedListener: _mapReadyCallback.onMapLoaded,
           onCameraChangeListener: (_) async {
             final lastMapPosition = await _mapController?.latLngZoom;
             if (lastMapPosition != null) {

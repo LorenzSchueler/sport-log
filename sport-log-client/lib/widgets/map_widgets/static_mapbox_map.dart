@@ -5,9 +5,10 @@ import 'package:provider/provider.dart';
 import 'package:sport_log/helpers/lat_lng.dart';
 import 'package:sport_log/helpers/map_controller.dart';
 import 'package:sport_log/settings.dart';
+import 'package:sport_log/widgets/map_widgets/map_ready_callback.dart';
 import 'package:sport_log/widgets/map_widgets/map_styles_button.dart';
 
-class StaticMapboxMap extends StatelessWidget {
+class StaticMapboxMap extends StatefulWidget {
   const StaticMapboxMap({
     this.onMapCreated,
     this.onTap,
@@ -19,20 +20,24 @@ class StaticMapboxMap extends StatelessWidget {
   final void Function(LatLng)? onTap;
   final void Function(LatLng)? onLongTap;
 
-  Future<void> _onMapCreated(
-    BuildContext context,
-    MapController mapController,
-  ) async {
-    if (context.mounted) {
+  @override
+  State<StaticMapboxMap> createState() => _StaticMapboxMapState();
+}
+
+class _StaticMapboxMapState extends State<StaticMapboxMap> {
+  late final MapReadyCallback _mapReadyCallback = MapReadyCallback(_onReady);
+
+  Future<void> _onReady(MapController mapController) async {
+    if (mounted) {
       await mapController.setLatLngZoom(
         context.read<Settings>().lastMapPosition,
       );
+      await mapController.disableAllGestures();
+      await mapController.showScaleBar();
+      await mapController.hideAttribution();
+      await mapController.hideLogo();
+      widget.onMapCreated?.call(mapController);
     }
-    await mapController.disableAllGestures();
-    await mapController.showScaleBar();
-    await mapController.hideAttribution();
-    await mapController.hideLogo();
-    onMapCreated?.call(mapController);
   }
 
   @override
@@ -44,20 +49,22 @@ class StaticMapboxMap extends StatelessWidget {
           ..addInteraction(
             TapInteraction.onMap(
               (gestureContext) =>
-                  onTap?.call(LatLng.fromPoint(gestureContext.point)),
+                  widget.onTap?.call(LatLng.fromPoint(gestureContext.point)),
             ),
           )
           ..addInteraction(
             LongTapInteraction.onMap(
-              (gestureContext) =>
-                  onLongTap?.call(LatLng.fromPoint(gestureContext.point)),
+              (gestureContext) => widget.onLongTap?.call(
+                LatLng.fromPoint(gestureContext.point),
+              ),
             ),
           );
         final controller = await MapController.from(mapboxMap, context);
         if (context.mounted && controller != null) {
-          await _onMapCreated(context, controller);
+          _mapReadyCallback.onMapCreated(controller);
         }
       },
+      onMapLoadedListener: _mapReadyCallback.onMapLoaded,
     );
   }
 }
