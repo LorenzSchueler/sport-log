@@ -300,11 +300,11 @@ async fn boxbase_login(
         )
     }
     const CLASS_SYMBOL_XPATH_IN_CLASS: &str = "div[3]/div/*[local-name()='svg'][1]";
-    const SIGN_UP_BUTTON_XPATH: &str = "/html/body/div[3]/div[4]/div/div/button";
+    const SIGN_UP_BUTTON_XPATH: &str = "/html/body/div[3]/div[5]/div/div/button";
 
     const RESERVED_CLASS_NAME: &str = "text-semantic-green-foreground";
     const WAITLIST_CLASS_NAME: &str = "text-semantic-brown-foreground";
-    const NOT_RESERVED_CLASS_NAME: &str = "text-bblack-700";
+    const NOT_RESERVED_CLASS_NAME: &str = "text-muted-foreground";
 
     let time = exec_action_event
         .datetime
