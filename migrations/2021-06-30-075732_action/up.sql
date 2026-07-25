@@ -36,7 +36,7 @@ create table action (
     deleted boolean not null default false
 );
 
-create unique index action__action_provider_id__key
+create unique index action__action_provider_id__name__key
     on action (action_provider_id, name) where deleted = false;
 
 create trigger set_epoch before insert or update on action
