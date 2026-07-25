@@ -62,6 +62,8 @@ class MapController {
   static const double _noGpsMarkerRadius = 50;
   static const String _exaggerationProperty = "exaggeration";
 
+  Future<void> triggerRepaint() async => await _controller?.triggerRepaint();
+
   Future<LatLng?> get center async {
     final point = (await _controller?.getCameraState())?.center;
     if (point == null) {

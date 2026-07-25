@@ -25,7 +25,31 @@ class StaticMapboxMap extends StatefulWidget {
 }
 
 class _StaticMapboxMapState extends State<StaticMapboxMap> {
+  late final AppLifecycleListener _lifecycleListener;
+
+  @override
+  void initState() {
+    super.initState();
+    _lifecycleListener = AppLifecycleListener(
+      onResume: () => WidgetsBinding.instance.addPostFrameCallback(
+        (_) => _mapController?.triggerRepaint(),
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _lifecycleListener.dispose();
+    super.dispose();
+  }
+
+  MapController? _mapController;
   late final MapReadyCallback _mapReadyCallback = MapReadyCallback(_onReady);
+
+  void _onMapCreated(MapController mapController) {
+    _mapController = mapController;
+    _mapReadyCallback.onMapCreated(mapController);
+  }
 
   Future<void> _onReady(MapController mapController) async {
     if (mounted) {
@@ -61,7 +85,7 @@ class _StaticMapboxMapState extends State<StaticMapboxMap> {
           );
         final controller = await MapController.from(mapboxMap, context);
         if (context.mounted && controller != null) {
-          _mapReadyCallback.onMapCreated(controller);
+          _onMapCreated(controller);
         }
       },
       onMapLoadedListener: _mapReadyCallback.onMapLoaded,

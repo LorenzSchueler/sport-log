@@ -82,6 +82,24 @@ class MapboxMapWrapper extends StatefulWidget {
 }
 
 class _MapboxMapWrapperState extends State<MapboxMapWrapper> {
+  late final AppLifecycleListener _lifecycleListener;
+
+  @override
+  void initState() {
+    super.initState();
+    _lifecycleListener = AppLifecycleListener(
+      onResume: () => WidgetsBinding.instance.addPostFrameCallback(
+        (_) => _mapController?.triggerRepaint(),
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _lifecycleListener.dispose();
+    super.dispose();
+  }
+
   MapController? _mapController;
   late final MapReadyCallback _mapReadyCallback = MapReadyCallback(_onReady);
 
