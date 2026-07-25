@@ -135,7 +135,7 @@ class ActionRuleTable extends TableAccessor<ActionRule> {
         '${Columns.actionId} in (select ${Columns.id} from ${Tables.action} where ${TableAccessor.combineFilter([TableAccessor.notDeletedOfTable(Tables.action), "${Columns.actionProviderId} = ?"])})',
       ]),
       whereArgs: [actionProvider.id.toInt()],
-      orderBy: Columns.weekday,
+      orderBy: orderByWeekdayAndTime,
     );
     return records.map(serde.fromDbRecord).toList();
   }

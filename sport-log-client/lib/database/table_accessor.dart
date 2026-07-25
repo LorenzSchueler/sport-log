@@ -115,6 +115,10 @@ abstract class TableAccessor<T extends AtomicEntity> {
       "$tableName.${Columns.name} collate nocase";
   String get orderByName => orderByNameOfTable(tableName);
 
+  static String orderByWeekdayAndTimeOfTable(String tableName) =>
+      "$tableName.${Columns.weekday} asc, substr($tableName.${Columns.time}, 12) asc";
+  String get orderByWeekdayAndTime => orderByWeekdayAndTimeOfTable(tableName);
+
   Future<void> setup() async {
     _logger.d("creating table: $tableName");
     for (final statement in table.setupSql) {
