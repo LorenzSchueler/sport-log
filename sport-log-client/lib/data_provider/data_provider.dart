@@ -305,7 +305,6 @@ abstract class EntityDataProvider<T extends AtomicEntity>
       return false;
     } else {
       final accountData = accountDataResult.ok;
-      await Settings.instance.setEpochMap(accountData.epochMap);
       if (accountData.user != null) {
         await Account.updateUserFromDownSync(accountData.user!);
       }
@@ -318,6 +317,9 @@ abstract class EntityDataProvider<T extends AtomicEntity>
           return false;
         }
       }
+      // Update the epoch map if all upserts succeeded.
+      // This turns remaining downsync failures into retries instead of permanent loss.
+      await Settings.instance.setEpochMap(accountData.epochMap);
       return true;
     }
   }
