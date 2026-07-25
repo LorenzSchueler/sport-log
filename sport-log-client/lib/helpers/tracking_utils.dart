@@ -260,32 +260,52 @@ class TrackingUtils extends ChangeNotifier {
   }
 
   Future<void> _onLocationUpdate(GpsPosition location) async {
+    // Sample the clock and tracking state when the fix arrives, not after an await.
+    final time = currentDuration;
+    final tracking = _trackingMode.isTracking;
     final track = _cardioSessionDescription.cardioSession.track!;
 
+    // ---- critical section: no `await` until the track has been mutated ----
+    final last = track.isEmpty ? null : track.last;
+
     // filter GPS jumps in tracking mode
-    if (_trackingMode.isTracking && track.isNotEmpty) {
-      final lastPosition = track.last;
-      final km = lastPosition.latLng.distanceTo(location.latLng) / 1000;
-      final hour = (currentDuration - lastPosition.time).inHourFractions;
-      final speed = km / hour;
+    if (tracking && last != null) {
+      final km = last.latLng.distanceTo(location.latLng) / 1000;
+      final hours = (time - last.time).inHourFractions;
+      // Reject non-advancing / out-of-order fixes explicitly. A negative delta
+      // produces a negative speed, which silently passes the `> _maxSpeed` test.
+      if (hours <= 0) {
+        return;
+      }
+      final speed = km / hours;
       if (speed > _maxSpeed) {
         return;
       }
     }
 
-    final elevation = await _elevationMapController?.getElevation(
-      location.latLng,
-    );
-
     final position = Position(
       latitude: location.latitude,
       longitude: location.longitude,
-      elevation: elevation ?? location.elevation,
-      distance: track.isEmpty
+      elevation: location.elevation, // GPS elevation; refined below
+      distance: last == null
           ? 0
-          : track.last.distance + track.last.latLng.distanceTo(location.latLng),
-      time: currentDuration,
+          : last.distance + last.latLng.distanceTo(location.latLng),
+      time: time,
     );
+
+    if (tracking) {
+      track.add(position);
+    }
+    // ---- end critical section; awaits are safe again ----
+
+    // Refine elevation out of band. `position` is already in the track, so a
+    // slow or late-returning lookup can no longer affect distance or ordering.
+    final elevation = await _elevationMapController?.getElevation(
+      location.latLng,
+    );
+    if (elevation != null) {
+      position.elevation = elevation;
+    }
 
     _locationInfo =
         "accuracy: ${location.accuracy.round()} m\n"
@@ -294,11 +314,8 @@ class TrackingUtils extends ChangeNotifier {
         "elevation Mbx: ${elevation?.round()} m\n"
         "points:      ${track.length}";
 
-    if (_trackingMode.isTracking) {
-      track.add(position);
-      await _trackingUiUtils.updateTrack(
-        _cardioSessionDescription.cardioSession.track,
-      );
+    if (tracking) {
+      await _trackingUiUtils.updateTrack(track);
     }
     await _trackingUiUtils.updateLocation(location);
 
