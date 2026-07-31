@@ -79,10 +79,23 @@ abstract class TableAccessor<T extends AtomicEntity> {
   String movementIdFilter(Movement? movement) =>
       movementIdFilterOfTable(tableName, movement);
 
+  /// Sql string literal matching every value that contains [value].
+  ///
+  /// Quotes and wildcards are escaped because [value] is user input and would
+  /// otherwise break the query or match unintended rows.
+  static String _containsPattern(String value) {
+    final escaped = value
+        .replaceAll(r'\', r'\\')
+        .replaceAll('%', r'\%')
+        .replaceAll('_', r'\_')
+        .replaceAll("'", "''");
+    return "'%$escaped%' escape '\\'";
+  }
+
   static String commentFilterOfTable(String tableName, String? comment) =>
       comment == null || comment.isEmpty
       ? ''
-      : "$tableName.${Columns.comments} like '%$comment%'";
+      : "$tableName.${Columns.comments} like ${_containsPattern(comment)}";
   String commentFilter(String? comment) =>
       commentFilterOfTable(tableName, comment);
 
@@ -91,7 +104,7 @@ abstract class TableAccessor<T extends AtomicEntity> {
     String? description,
   ) => description == null || description.isEmpty
       ? ''
-      : "$tableName.${Columns.description} like '%$description%'";
+      : "$tableName.${Columns.description} like ${_containsPattern(description)}";
   String descriptionFilter(String? description) =>
       descriptionFilterOfTable(tableName, description);
 
