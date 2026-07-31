@@ -41,7 +41,7 @@ class AlarmUtils {
       if (distance > _movingWhenPausedAlarmDistance) {
         _movingWhenPausedAlarmFired = true;
         await TtsUtils.speak(
-          "You more than $_movingWhenPausedAlarmDistance meters from the position where you paused recording. You may want to resume recording.",
+          "You are more than $_movingWhenPausedAlarmDistance meters from the position where you paused recording. You may want to resume recording.",
         );
       }
     }

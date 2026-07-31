@@ -476,7 +476,7 @@ class SettingsPage extends StatelessWidget {
                             (Routes.metconOverview, "Metcon"),
                             (Routes.cardioOverview, "Cardio"),
                             (Routes.wodOverview, "Wod"),
-                            (Routes.diaryOverview, "Dairy"),
+                            (Routes.diaryOverview, "Diary"),
                           ])
                             DropdownMenuItem(value: page, child: Text(name)),
                         ],
