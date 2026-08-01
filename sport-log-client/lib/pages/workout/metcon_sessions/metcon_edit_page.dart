@@ -33,6 +33,12 @@ class _MetconEditPageState extends State<MetconEditPage> {
   final _descriptionFocusNode = FocusNode();
   final _dataProvider = MetconDescriptionDataProvider();
 
+  @override
+  void dispose() {
+    _descriptionFocusNode.dispose();
+    super.dispose();
+  }
+
   Future<void> _saveMetcon() async {
     if (_metconDescription.metcon.description == "") {
       setState(() => _metconDescription.metcon.description = null);

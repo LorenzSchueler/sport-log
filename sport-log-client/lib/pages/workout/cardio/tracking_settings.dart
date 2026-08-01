@@ -16,7 +16,12 @@ class TrackingSettings extends ChangeNotifier {
 
   @override
   void dispose() {
-    _heartRateUtils.dispose();
+    _audioFeedback
+      ?..removeListener(notifyListeners)
+      ..dispose();
+    _heartRateUtils
+      ..removeListener(notifyListeners)
+      ..dispose();
     super.dispose();
   }
 
@@ -58,7 +63,9 @@ class TrackingSettings extends ChangeNotifier {
   AudioFeedbackConfig? _audioFeedback;
   AudioFeedbackConfig? get audioFeedback => _audioFeedback;
   set audioFeedback(AudioFeedbackConfig? audioFeedback) {
-    _audioFeedback?.dispose();
+    _audioFeedback
+      ?..removeListener(notifyListeners)
+      ..dispose();
     _audioFeedback = audioFeedback;
     _audioFeedback?.addListener(notifyListeners);
     notifyListeners();

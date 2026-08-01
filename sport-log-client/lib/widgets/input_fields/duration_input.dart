@@ -37,6 +37,12 @@ class _DurationInputState extends State<DurationInput> {
     text: _duration.formatM99S,
   );
 
+  @override
+  void dispose() {
+    _textController.dispose();
+    super.dispose();
+  }
+
   void _setDuration(Duration duration, {required bool updateTextField}) {
     setState(() => _duration = duration);
     if (updateTextField) {

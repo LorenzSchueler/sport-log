@@ -58,7 +58,9 @@ class AudioFeedbackConfig extends ChangeNotifier {
   @override
   void dispose() {
     for (final metric in metrics) {
-      metric.dispose();
+      metric
+        ..removeListener(notifyListeners)
+        ..dispose();
     }
     super.dispose();
   }

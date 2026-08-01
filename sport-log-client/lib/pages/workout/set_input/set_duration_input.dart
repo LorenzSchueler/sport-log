@@ -333,6 +333,13 @@ class _PaddedIntInputState extends State<_PaddedIntInput> {
     text: widget.initialValue?.toString().padLeft(widget.numberOfDigits, '0'),
   );
 
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    _controller.dispose();
+    super.dispose();
+  }
+
   void requestFocus() {
     _focusNode.requestFocus();
     _controller.selectAll();

@@ -43,6 +43,12 @@ class _MovementEditPageState extends State<MovementEditPage> {
     super.initState();
   }
 
+  @override
+  void dispose() {
+    _descriptionFocusNode.dispose();
+    super.dispose();
+  }
+
   Future<void> _saveMovement() async {
     final result = widget.isNew
         ? await _dataProvider.createSingle(_movementDescription.movement)

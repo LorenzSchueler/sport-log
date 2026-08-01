@@ -43,6 +43,12 @@ class _LoginPageState extends State<LoginPage> {
   bool _loginPending = false;
 
   @override
+  void dispose() {
+    _serverUrlInputController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(

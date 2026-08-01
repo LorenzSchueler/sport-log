@@ -96,6 +96,15 @@ class _TimeSpinnerState extends State<TimeSpinner> {
     initialScrollOffset: (selectedAmPm - 1) * widget.itemHeight,
   );
 
+  @override
+  void dispose() {
+    hourController.dispose();
+    minuteController.dispose();
+    secondController.dispose();
+    amPmController.dispose();
+    super.dispose();
+  }
+
   int get maxHour => widget.is24HourMode ? 24 : 12;
 
   DateTime get currentTime {

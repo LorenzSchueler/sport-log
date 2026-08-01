@@ -71,6 +71,17 @@ class _CardioEditPageState extends State<CardioEditPage> {
         text: _cardioSessionDescription.cardioSession.avgHeartRate?.toString(),
       );
 
+  @override
+  void dispose() {
+    _distanceController.dispose();
+    _ascentController.dispose();
+    _descentController.dispose();
+    _caloriesController.dispose();
+    _avgCadenceController.dispose();
+    _avgHeartRateController.dispose();
+    super.dispose();
+  }
+
   void _updateTextFields() {
     // only text fields which values are changed by cutting or updating elevation have to be updated
     _distanceController.text =

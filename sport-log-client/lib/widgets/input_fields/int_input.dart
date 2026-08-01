@@ -31,6 +31,12 @@ class _IntInputState extends State<IntInput> {
     text: _value.toString(),
   );
 
+  @override
+  void dispose() {
+    _textController.dispose();
+    super.dispose();
+  }
+
   void _setValue(int value, {required bool updateTextField}) {
     setState(() => _value = value);
     if (updateTextField) {

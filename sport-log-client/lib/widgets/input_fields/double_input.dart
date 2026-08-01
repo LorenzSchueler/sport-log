@@ -31,6 +31,12 @@ class _DoubleInputState extends State<DoubleInput> {
     text: _value.toStringAsFixed(2),
   );
 
+  @override
+  void dispose() {
+    _textController.dispose();
+    super.dispose();
+  }
+
   void _setValue(double value, {required bool updateTextField}) {
     setState(() => _value = value);
     if (updateTextField) {

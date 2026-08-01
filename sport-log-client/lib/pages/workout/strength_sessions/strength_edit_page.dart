@@ -57,6 +57,13 @@ class _StrengthEditPageState extends State<StrengthEditPage> {
     _updateInitialCountWeightInterval();
   }
 
+  @override
+  void dispose() {
+    _commentsNode.dispose();
+    _scrollController.dispose();
+    super.dispose();
+  }
+
   Future<void> _updateInitialCountWeightInterval() async {
     if (widget.isNew) {
       final lastSSD = await _dataProvider.getLastByMovement(
