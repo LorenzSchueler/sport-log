@@ -1,5 +1,6 @@
 import 'package:audio_session/audio_session.dart';
 import 'package:flutter_tts/flutter_tts.dart';
+import 'package:synchronized/synchronized.dart';
 
 class TtsUtils {
   static Future<void> init() async {
@@ -51,12 +52,13 @@ class TtsUtils {
 
   static FlutterTts? _tts;
   static AudioSession? _session;
+  static final _lock = Lock();
 
   static bool get ttsEngineFound => _tts != null && _session != null;
 
-  static Future<void> speak(String text) async {
+  static Future<void> speak(String text) => _lock.synchronized(() async {
     await _session?.setActive(true);
     await _tts?.speak(text);
     await _session?.setActive(false);
-  }
+  });
 }

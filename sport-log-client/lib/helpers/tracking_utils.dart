@@ -17,6 +17,7 @@ import 'package:sport_log/helpers/tracking_ui_utils.dart';
 import 'package:sport_log/models/cardio/all.dart';
 import 'package:sport_log/pages/workout/cardio/tracking_settings.dart';
 import 'package:sport_log/widgets/dialogs/dialogs.dart';
+import 'package:synchronized/synchronized.dart';
 
 enum TrackingMode {
   notStarted,
@@ -68,6 +69,7 @@ class TrackingUtils extends ChangeNotifier {
   static const currentDurationOffset = Duration(minutes: 1);
 
   final _dataProvider = CardioSessionDescriptionDataProvider();
+  final _saveLock = Lock();
 
   final CardioSessionDescription _cardioSessionDescription;
   CardioSessionDescription get cardioSessionDescription =>
@@ -170,17 +172,23 @@ class TrackingUtils extends ChangeNotifier {
   }
 
   Future<void> _save(BuildContext context, void Function() onSuccess) async {
-    final cardioSessionDescription = _cardioSessionDescription.clone();
-    cardioSessionDescription.cardioSession.time = currentDuration;
-    cardioSessionDescription.cardioSession.setEmptyListsToNull();
-    cardioSessionDescription.cardioSession.applyDistanceThresholdFilter();
-    cardioSessionDescription.cardioSession.setAscentDescent();
-    cardioSessionDescription.cardioSession.setAvgCadence();
-    cardioSessionDescription.cardioSession.setAvgHeartRate();
-    cardioSessionDescription.cardioSession.setLastDistance();
-    final result = _isSaved
-        ? await _dataProvider.updateSingle(cardioSessionDescription)
-        : await _dataProvider.createSingle(cardioSessionDescription);
+    final result = await _saveLock.synchronized(() async {
+      final cardioSessionDescription = _cardioSessionDescription.clone();
+      cardioSessionDescription.cardioSession.time = currentDuration;
+      cardioSessionDescription.cardioSession.setEmptyListsToNull();
+      cardioSessionDescription.cardioSession.applyDistanceThresholdFilter();
+      cardioSessionDescription.cardioSession.setAscentDescent();
+      cardioSessionDescription.cardioSession.setAvgCadence();
+      cardioSessionDescription.cardioSession.setAvgHeartRate();
+      cardioSessionDescription.cardioSession.setLastDistance();
+      final dbResult = _isSaved
+          ? await _dataProvider.updateSingle(cardioSessionDescription)
+          : await _dataProvider.createSingle(cardioSessionDescription);
+      if (dbResult.isOk) {
+        _isSaved = true;
+      }
+      return dbResult;
+    });
     if (context.mounted) {
       if (result.isOk) {
         onSuccess();
@@ -205,24 +213,7 @@ class TrackingUtils extends ChangeNotifier {
 
   Future<void> _autoSaveCardioSession() async {
     if (mode != TrackingMode.notStarted) {
-      final context = App.globalContext;
-      await _save(context, () => _isSaved = true);
-    }
-  }
-
-  Future<void> deleteIfSaved(BuildContext context) async {
-    // do not call showDeleteWarningDialog because DiscardDialog already shown
-    if (_isSaved) {
-      final result = await _dataProvider.deleteSingle(
-        _cardioSessionDescription,
-      );
-      if (context.mounted && result.isErr) {
-        await showMessageDialog(
-          context: context,
-          title: "Deleting Cardio Session Failed",
-          text: result.err.toString(),
-        );
-      }
+      await _save(App.globalContext, () {});
     }
   }
 
