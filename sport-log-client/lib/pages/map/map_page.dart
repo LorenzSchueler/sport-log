@@ -11,13 +11,9 @@ import 'package:sport_log/widgets/pop_scopes.dart';
 import 'package:sport_log/widgets/provider_consumer.dart';
 
 class MapPage extends StatelessWidget {
-  MapPage({super.key});
+  const MapPage({super.key});
 
   static const _searchBackgroundColor = Color.fromARGB(150, 255, 255, 255);
-
-  final _searchBar = FocusNode();
-
-  final _searchController = TextEditingController();
 
   Future<void> _onDrawerChanged(bool open) async {
     if (open) {
@@ -57,18 +53,18 @@ class MapPage extends StatelessWidget {
                 ? AppBar(
                     title: searchUtils.isSearchActive
                         ? TextFormField(
-                            controller: _searchController,
-                            focusNode: _searchBar,
+                            controller: searchUtils.searchController,
+                            focusNode: searchUtils.searchBar,
                             onChanged: searchUtils.searchPlaces,
                             onTap: () => searchUtils.searchPlaces(
-                              _searchController.text,
+                              searchUtils.searchController.text,
                             ),
                             style: const TextStyle(color: Colors.black),
                           )
                         : null,
                     actions: [
                       IconButton(
-                        onPressed: () => searchUtils.toggleSearch(_searchBar),
+                        onPressed: searchUtils.toggleSearch,
                         icon: Icon(
                           searchUtils.isSearchActive
                               ? AppIcons.close
@@ -100,7 +96,7 @@ class MapPage extends StatelessWidget {
                   buttonTopOffset: 100,
                   onMapCreated: searchUtils.setMapController,
                   onTap: (_) => searchUtils.isSearchActive
-                      ? searchUtils.toggleSearch(_searchBar)
+                      ? searchUtils.toggleSearch()
                       : showOverlays.toggle(),
                 ),
                 if (showOverlays.isOn &&

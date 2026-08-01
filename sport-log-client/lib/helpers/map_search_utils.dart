@@ -50,7 +50,17 @@ class MapSearchUtils extends ChangeNotifier {
   List<MapboxSearchResult>? get searchResults => _searchResults;
   bool get isSearchActive => _searchResults != null;
 
-  void toggleSearch(FocusNode searchBar) {
+  final searchBar = FocusNode();
+  final searchController = TextEditingController();
+
+  @override
+  void dispose() {
+    searchBar.dispose();
+    searchController.dispose();
+    super.dispose();
+  }
+
+  void toggleSearch() {
     _searchResults = _searchResults == null ? [] : null;
     notifyListeners();
     if (_searchResults != null) {
