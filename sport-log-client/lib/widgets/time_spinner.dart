@@ -124,9 +124,11 @@ class _TimeSpinnerState extends State<TimeSpinner> {
 
   @override
   void initState() {
-    WidgetsBinding.instance.addPostFrameCallback(
-      (_) => widget.onTimeChange(currentTime),
-    );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        widget.onTimeChange(currentTime);
+      }
+    });
 
     super.initState();
   }
