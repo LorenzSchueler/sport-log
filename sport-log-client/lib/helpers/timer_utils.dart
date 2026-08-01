@@ -110,13 +110,14 @@ class TimerUtils {
   late final Duration totalTime;
   late final Timer _timer;
 
-  void dispose() {
+  Future<void> dispose() async {
     _timer.cancel();
-    WakelockPlus.disable();
+    await _player.dispose();
+    await WakelockPlus.disable();
   }
 
-  void stopTimer() {
-    dispose();
+  Future<void> stopTimer() async {
+    await dispose();
     onStop();
   }
 
@@ -126,8 +127,9 @@ class TimerUtils {
       await _player.play(Defaults.assets.beepLong, ctx: _audioCtx);
     } else if (_currentTime >=
         totalTime * (timerType == TimerType.interval ? rounds : 1)) {
-      stopTimer();
+      // start the beep before stopping so that dispose can wait for it
       await _player.play(Defaults.assets.beepLong, ctx: _audioCtx);
+      await stopTimer();
     } else if (_currentTime.inSeconds > 0 && timerType == TimerType.interval) {
       final roundStart =
           Duration(
