@@ -19,9 +19,7 @@ import 'package:sport_log/widgets/provider_consumer.dart';
 import 'package:sport_log/widgets/sync_refresh_indicator.dart';
 
 class MetconSessionOverviewPage extends StatelessWidget {
-  MetconSessionOverviewPage({super.key});
-
-  final _searchBar = FocusNode();
+  const MetconSessionOverviewPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -53,18 +51,13 @@ class MetconSessionOverviewPage extends StatelessWidget {
               appBar: AppBar(
                 title: dataProvider.isSearch
                     ? TextFormField(
-                        focusNode: _searchBar,
+                        focusNode: dataProvider.searchBar,
                         onChanged: (comment) => dataProvider.search = comment,
                       )
                     : Text(dataProvider.selected?.name ?? "Metcon Sessions"),
                 actions: [
                   IconButton(
-                    onPressed: () {
-                      dataProvider.search = dataProvider.isSearch ? null : "";
-                      if (dataProvider.isSearch) {
-                        _searchBar.requestFocus();
-                      }
-                    },
+                    onPressed: dataProvider.toggleSearch,
                     icon: Icon(
                       dataProvider.isSearch ? AppIcons.close : AppIcons.search,
                     ),

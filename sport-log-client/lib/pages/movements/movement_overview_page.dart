@@ -12,9 +12,7 @@ import 'package:sport_log/widgets/provider_consumer.dart';
 import 'package:sport_log/widgets/sync_refresh_indicator.dart';
 
 class MovementOverviewPage extends StatelessWidget {
-  MovementOverviewPage({super.key});
-
-  final _searchBar = FocusNode();
+  const MovementOverviewPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -39,18 +37,13 @@ class MovementOverviewPage extends StatelessWidget {
               appBar: AppBar(
                 title: dataProvider.isSearch
                     ? TextFormField(
-                        focusNode: _searchBar,
+                        focusNode: dataProvider.searchBar,
                         onChanged: (name) => dataProvider.search = name,
                       )
                     : const Text("Movements"),
                 actions: [
                   IconButton(
-                    onPressed: () {
-                      dataProvider.search = dataProvider.isSearch ? null : "";
-                      if (dataProvider.isSearch) {
-                        _searchBar.requestFocus();
-                      }
-                    },
+                    onPressed: dataProvider.toggleSearch,
                     icon: Icon(
                       dataProvider.isSearch ? AppIcons.close : AppIcons.search,
                     ),

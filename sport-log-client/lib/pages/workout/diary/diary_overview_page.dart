@@ -17,9 +17,7 @@ import 'package:sport_log/widgets/sync_refresh_indicator.dart';
 import 'package:sport_log/widgets/value_unit_description.dart';
 
 class DiaryOverviewPage extends StatelessWidget {
-  DiaryOverviewPage({super.key});
-
-  final _searchBar = FocusNode();
+  const DiaryOverviewPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -44,18 +42,13 @@ class DiaryOverviewPage extends StatelessWidget {
               appBar: AppBar(
                 title: dataProvider.isSearch
                     ? TextFormField(
-                        focusNode: _searchBar,
+                        focusNode: dataProvider.searchBar,
                         onChanged: (comment) => dataProvider.search = comment,
                       )
                     : const Text("Diary"),
                 actions: [
                   IconButton(
-                    onPressed: () {
-                      dataProvider.search = dataProvider.isSearch ? null : "";
-                      if (dataProvider.isSearch) {
-                        _searchBar.requestFocus();
-                      }
-                    },
+                    onPressed: dataProvider.toggleSearch,
                     icon: Icon(
                       dataProvider.isSearch ? AppIcons.close : AppIcons.search,
                     ),

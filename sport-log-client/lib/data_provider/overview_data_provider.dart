@@ -66,6 +66,15 @@ class OverviewDataProvider<T, R, D extends DataProvider<T>, S>
 
   bool get isSearch => _search != null;
 
+  final searchBar = FocusNode();
+
+  void toggleSearch() {
+    search = isSearch ? null : "";
+    if (isSearch) {
+      searchBar.requestFocus();
+    }
+  }
+
   List<T> _entities = [];
   List<T> get entities => _entities;
   R? _records;
@@ -80,6 +89,7 @@ class OverviewDataProvider<T, R, D extends DataProvider<T>, S>
   void dispose() {
     _disposed = true;
     _dataProvider.removeListener(_update);
+    searchBar.dispose();
     super.dispose();
   }
 
