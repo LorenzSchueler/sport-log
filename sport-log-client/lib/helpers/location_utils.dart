@@ -117,6 +117,10 @@ class LocationUtils extends ChangeNotifier {
     GpsPosition position,
     void Function(GpsPosition) onLocationUpdate,
   ) async {
+    // dispose cannot await stopLocationStream, so updates can still arrive after it
+    if (_disposed) {
+      return;
+    }
     _lastLocation = position;
     onLocationUpdate(position);
     notifyListeners();

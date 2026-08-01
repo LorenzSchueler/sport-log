@@ -107,7 +107,9 @@ class MapDownloadUtils extends ChangeNotifier {
       );
     } on PlatformException {
       _progress = null;
-      notifyListeners();
+      if (!_disposed) {
+        notifyListeners();
+      }
       await onError(
         "Maximum tile count exceeded. "
         "Delete other offline regions or choose a smaller region or decrease the max zoom level.",
@@ -119,7 +121,9 @@ class MapDownloadUtils extends ChangeNotifier {
     if (_error ||
         tileRegion.completedResourceCount < tileRegion.requiredResourceCount) {
       _error = false;
-      notifyListeners();
+      if (!_disposed) {
+        notifyListeners();
+      }
       await onError("Some tiles could not be downloaded.");
     } else {
       await _updateRegions();
