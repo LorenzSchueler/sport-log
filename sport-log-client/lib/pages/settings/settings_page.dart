@@ -40,8 +40,10 @@ class SettingsPage extends StatelessWidget {
 
   Future<void> _setSyncEnabled(BuildContext context, bool syncEnabled) async {
     await context.read<Settings>().setSyncEnabled(syncEnabled);
-    if (context.mounted && syncEnabled) {
-      await checkSync(context);
+    if (syncEnabled) {
+      if (context.mounted) {
+        await checkSync(context);
+      }
       await Sync.instance.startSync();
     } else {
       Sync.instance.stopSync();
