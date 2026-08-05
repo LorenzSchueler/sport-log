@@ -135,7 +135,9 @@ class MapDownloadUtils extends ChangeNotifier {
     if (status.erroredResourceCount > 0) {
       _error = true;
     }
-    _progress = status.completedResourceCount / status.requiredResourceCount;
+    _progress = status.requiredResourceCount == 0
+        ? 0.0
+        : status.completedResourceCount / status.requiredResourceCount;
     if (!_disposed) {
       notifyListeners();
     }

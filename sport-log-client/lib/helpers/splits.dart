@@ -9,14 +9,12 @@ class Split {
   }) {
     final distance = endDistance - startDistance;
     final duration = endDuration - startDuration;
-    final speed =
-        ((endDistance - startDistance) / 1000) /
-        (duration.inMilliseconds / 1000 / 3600);
-    final tempo = Duration(
-      milliseconds:
-          (duration.inMilliseconds / ((endDistance - startDistance) / 1000))
-              .round(),
-    );
+    final km = distance / 1000;
+    final hours = duration.inMilliseconds / 1000 / 3600;
+    final speed = hours > 0 ? km / hours : 0.0;
+    final tempo = km > 0
+        ? Duration(milliseconds: (duration.inMilliseconds / km).round())
+        : Duration.zero;
     return Split._(
       startDistance: startDistance,
       endDistance: endDistance,
@@ -41,7 +39,7 @@ class Split {
   });
 
   static List<Split> computeAll(List<Position>? track, int splitDistance) {
-    if (track == null || track.isEmpty) {
+    if (track == null || track.isEmpty || splitDistance <= 0) {
       return [];
     }
 

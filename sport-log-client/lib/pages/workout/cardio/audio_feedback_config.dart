@@ -83,15 +83,15 @@ class AudioFeedbackConfig extends ChangeNotifier {
 
   List<AudioFeedbackMetric> metrics = [
     AudioFeedbackMetric.enabled("Distance", (c) {
-      final track = c.track;
-      if (track == null) {
+      final distance = c.track?.lastOrNull?.distance;
+      if (distance == null) {
         return null;
       }
-      return (track.last.distance / 1000).toStringMaxFixed(1);
+      return (distance / 1000).toStringMaxFixed(1);
     }, "kilometers"),
     AudioFeedbackMetric.enabled(
       "Duration",
-      (c) => c.track?.last.time.toSpeech(),
+      (c) => c.track?.lastOrNull?.time.toSpeech(),
       "",
     ),
     AudioFeedbackMetric.enabled(
@@ -100,11 +100,10 @@ class AudioFeedbackConfig extends ChangeNotifier {
       "kilometers per hour",
     ),
     AudioFeedbackMetric.enabled("Current Speed", (c) {
-      final track = c.track;
-      if (track == null) {
+      final end = c.track?.lastOrNull?.time;
+      if (end == null) {
         return null;
       }
-      final end = track.last.time;
       final start = end - TrackingUtils.currentDurationOffset;
       return c.currentSpeed(start, end)?.toStringAsFixed(1);
     }, "kilometers per hour"),
@@ -114,11 +113,10 @@ class AudioFeedbackConfig extends ChangeNotifier {
       "per kilometer",
     ),
     AudioFeedbackMetric.disabled("Current Tempo", (c) {
-      final track = c.track;
-      if (track == null) {
+      final end = c.track?.lastOrNull?.time;
+      if (end == null) {
         return null;
       }
-      final end = track.last.time;
       final start = end - TrackingUtils.currentDurationOffset;
       return c.currentTempo(start, end)?.toSpeech();
     }, "per kilometer"),
@@ -128,11 +126,10 @@ class AudioFeedbackConfig extends ChangeNotifier {
       "rounds per minute",
     ),
     AudioFeedbackMetric.disabled("Current Cadence", (c) {
-      final track = c.track;
-      if (track == null) {
+      final end = c.track?.lastOrNull?.time;
+      if (end == null) {
         return null;
       }
-      final end = track.last.time;
       final start = end - TrackingUtils.currentDurationOffset;
       return c.currentCadence(start, end)?.toSpeech();
     }, "rounds per minute"),
@@ -142,17 +139,16 @@ class AudioFeedbackConfig extends ChangeNotifier {
       "beats per minute",
     ),
     AudioFeedbackMetric.disabled("Current Heart Rate", (c) {
-      final track = c.track;
-      if (track == null) {
+      final end = c.track?.lastOrNull?.time;
+      if (end == null) {
         return null;
       }
-      final end = track.last.time;
       final start = end - TrackingUtils.currentDurationOffset;
       return c.currentHeartRate(start, end)?.toSpeech();
     }, "beats per minute"),
     AudioFeedbackMetric.disabled(
       "Elevation",
-      (c) => c.track?.last.elevation.round().toSpeech(),
+      (c) => c.track?.lastOrNull?.elevation.round().toSpeech(),
       "meters",
     ),
     AudioFeedbackMetric.disabled(
