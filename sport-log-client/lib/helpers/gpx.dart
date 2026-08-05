@@ -13,7 +13,8 @@ Result<List<Position>, String> gpxToTrack(String gpxString) {
   final Gpx gpx;
   try {
     gpx = GpxReader().fromString(gpxString);
-  } on StateError {
+  } catch (_) {
+    // XmlException for invalid xml, StateError for xml without data
     return Err("Parsing file failed. This file is not valid GPX.");
   }
   final points = gpx.trks
