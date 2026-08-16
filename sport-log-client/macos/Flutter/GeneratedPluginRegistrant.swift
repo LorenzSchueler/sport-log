@@ -8,7 +8,7 @@ import Foundation
 import audio_session
 import audioplayers_darwin
 import device_info_plus
-import file_picker
+import file_picker_darwin
 import flutter_blue_plus_darwin
 import flutter_local_notifications
 import flutter_tts
