@@ -116,7 +116,8 @@ class StrengthSetTable extends TableAccessor<StrengthSet> {
       select ${Tables.movement}.${Columns.id} as ${Columns.movementId}, 
         max(${Tables.strengthSet}.${Columns.weight}) as ${Columns.maxWeight}, 
         max(${Tables.strengthSet}.${Columns.count}) as ${Columns.maxCount}, 
-        max(${Tables.strengthSet}.${Columns.weight} / ${Tables.eorm}.${Columns.eormPercentage}) as ${Columns.maxEorm}
+        max(${Tables.strengthSet}.${Columns.weight} / ${Tables.eorm}.${Columns.eormPercentage}) as ${Columns.maxEorm},
+        ${[for (var reps = 1; reps <= eormMaxRepCount; reps++) "max(case when ${Tables.movement}.${Columns.dimension} = ${MovementDimension.reps.index} and ${Tables.strengthSet}.${Columns.count} = $reps then ${Tables.strengthSet}.${Columns.weight} end) as ${Columns.maxWeightForReps(reps)}"].join(", ")}
       from ${Tables.strengthSet}
       join ${Tables.strengthSession} on ${Tables.strengthSet}.${Columns.strengthSessionId} = ${Tables.strengthSession}.${Columns.id}
       join ${Tables.movement} on ${Tables.strengthSession}.${Columns.movementId} = ${Tables.movement}.${Columns.id}

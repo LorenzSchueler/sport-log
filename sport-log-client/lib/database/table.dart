@@ -251,6 +251,7 @@ abstract class Columns {
   static const maxCount = 'max_count';
   static const maxEorm = 'max_eorm';
   static const maxWeight = 'max_weight';
+  static String maxWeightForReps(int reps) => 'max_weight_$reps';
   static const metconId = 'metcon_id';
   static const metconType = 'metcon_type';
   static const minCount = 'min_count';

@@ -64,6 +64,7 @@ class StrengthRecord {
     required this.maxWeight,
     required this.maxCount,
     required this.maxEorm,
+    required this.maxWeightForReps,
   });
 
   factory StrengthRecord.fromDbRecord(DbRecord r, {String prefix = ''}) {
@@ -71,6 +72,11 @@ class StrengthRecord {
       maxWeight: r[prefix + Columns.maxWeight] as double?,
       maxCount: r[prefix + Columns.maxCount]! as int,
       maxEorm: r[prefix + Columns.maxEorm] as double?,
+      maxWeightForReps: {
+        for (var reps = 1; reps <= eormMaxRepCount; reps++)
+          if (r[prefix + Columns.maxWeightForReps(reps)] != null)
+            reps: r[prefix + Columns.maxWeightForReps(reps)]! as double,
+      },
     );
   }
 
@@ -78,7 +84,10 @@ class StrengthRecord {
   int maxCount;
   double? maxEorm;
 
+  /// max weight per rep count; only for [Movement]s with [MovementDimension.reps]
+  Map<int, double> maxWeightForReps;
+
   @override
   String toString() =>
-      "{maxWeight: $maxWeight, maxCount: $maxCount, maxEorm: $maxEorm}";
+      "{maxWeight: $maxWeight, maxCount: $maxCount, maxEorm: $maxEorm, maxWeightForReps: $maxWeightForReps}";
 }
