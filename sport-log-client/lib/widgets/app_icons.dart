@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:sport_log/widgets/custom_icons.dart';
 
 abstract final class AppIcons {

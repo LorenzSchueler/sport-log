@@ -1,6 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/pages/workout/charts/datetime_chart.dart';
 import 'package:sport_log/pages/workout/charts/grid_line_drawer.dart';

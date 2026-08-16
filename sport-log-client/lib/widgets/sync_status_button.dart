@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:sport_log/data_provider/data_provider.dart';
 import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/models/entity_interfaces.dart';

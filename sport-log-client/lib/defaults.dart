@@ -1,6 +1,6 @@
 import 'package:audioplayers/audioplayers.dart';
-import 'package:flutter/material.dart';
 import 'package:mapbox_api_pro/mapbox_api_pro.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:sport_log/config.dart';
 import 'package:sport_log/helpers/lat_lng.dart';
 

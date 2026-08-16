@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart' hide Route;
+import 'package:material_ui/material_ui.dart' hide Route;
 import 'package:sport_log/config.dart';
 import 'package:sport_log/models/action/action_provider_description.dart';
 import 'package:sport_log/models/all.dart';

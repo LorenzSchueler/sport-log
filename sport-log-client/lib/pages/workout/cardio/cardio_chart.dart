@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/models/cardio/cardio_session.dart';
 import 'package:sport_log/pages/workout/charts/datetime_chart.dart';

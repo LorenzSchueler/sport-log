@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:fixnum/fixnum.dart';
-import 'package:flutter/material.dart' hide Action, Route;
+import 'package:material_ui/material_ui.dart' hide Action, Route;
 import 'package:sport_log/data_provider/data_providers/cardio_data_provider.dart';
 import 'package:sport_log/data_provider/data_providers/metcon_data_provider.dart';
 import 'package:sport_log/data_provider/data_providers/movement_data_provider.dart';

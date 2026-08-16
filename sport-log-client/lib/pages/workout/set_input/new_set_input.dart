@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/pages/workout/set_input/count_weight_input.dart';
 import 'package:sport_log/pages/workout/set_input/set_duration_input.dart';

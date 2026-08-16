@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/models/strength/strength_session_description.dart';

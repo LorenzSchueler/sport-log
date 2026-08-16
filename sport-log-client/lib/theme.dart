@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:sport_log/widgets/input_fields/edit_tile.dart';
 
 class AppTheme {

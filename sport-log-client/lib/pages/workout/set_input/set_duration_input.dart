@@ -1,7 +1,7 @@
 import 'dart:math';
 
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 import 'package:sport_log/helpers/extensions/text_editing_controller_extension.dart';
 import 'package:sport_log/pages/workout/set_input/new_set_input.dart';

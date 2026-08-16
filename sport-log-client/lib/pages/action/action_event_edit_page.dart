@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart' hide Action;
+import 'package:material_ui/material_ui.dart' hide Action;
 import 'package:sport_log/data_provider/data_providers/action_data_provider.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';

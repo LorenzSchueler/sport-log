@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:sport_log/app.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/heart_rate_utils.dart';

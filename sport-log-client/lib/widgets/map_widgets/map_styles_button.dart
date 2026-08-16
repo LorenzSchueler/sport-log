@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart' hide Visibility;
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
+import 'package:material_ui/material_ui.dart' hide Visibility;
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/map_controller.dart';
 import 'package:sport_log/widgets/app_icons.dart';

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:sport_log/models/diary/diary.dart';
 import 'package:sport_log/pages/workout/charts/datetime_chart.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_state.dart';

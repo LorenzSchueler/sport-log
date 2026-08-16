@@ -2,9 +2,9 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui';
 
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/src/channel.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/main.dart';
 import 'package:sport_log/pages/action/action_event_edit_page.dart';

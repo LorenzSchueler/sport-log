@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:sport_log/helpers/gps_position.dart';
 import 'package:sport_log/helpers/location_utils.dart';
 import 'package:sport_log/helpers/map_controller.dart';

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart' hide Route;
+import 'package:material_ui/material_ui.dart' hide Route;
 import 'package:sport_log/helpers/heart_rate_utils.dart';
 import 'package:sport_log/models/cardio/cardio_session.dart';
 import 'package:sport_log/models/cardio/route.dart';

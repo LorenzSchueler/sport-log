@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:material_ui/material_ui.dart';
 
 void showSimpleToast(BuildContext context, String text) {
   Fluttertoast.showToast(

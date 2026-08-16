@@ -1,6 +1,6 @@
 import 'package:fixnum/fixnum.dart';
-import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:sport_log/config.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/lat_lng.dart';

@@ -1,5 +1,4 @@
-import 'package:flutter/material.dart' hide Route;
-import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:material_ui/material_ui.dart' hide Route;
 import 'package:provider/provider.dart';
 import 'package:sport_log/data_provider/sync.dart';
 import 'package:sport_log/main.dart';
@@ -36,11 +35,7 @@ class App extends StatelessWidget {
           debugShowCheckedModeBanner: false,
           darkTheme: AppTheme.darkTheme,
           themeMode: ThemeMode.dark,
-          localizationsDelegates: const [
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-          ],
+          localizationsDelegates: GlobalMaterialLocalizations.delegates,
           supportedLocales: const [Locale("en", "US"), Locale("en", "GB")],
           builder: ignoreSystemTextScaleFactor,
         ),

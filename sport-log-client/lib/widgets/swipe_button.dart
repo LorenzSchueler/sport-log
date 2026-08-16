@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:flutter/physics.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 
 class SwipeButton extends StatefulWidget {

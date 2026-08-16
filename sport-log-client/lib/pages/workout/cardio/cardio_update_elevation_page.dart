@@ -1,5 +1,5 @@
 import 'package:collection/collection.dart';
-import 'package:flutter/material.dart' hide Route;
+import 'package:material_ui/material_ui.dart' hide Route;
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/map_controller.dart';
 import 'package:sport_log/helpers/page_return.dart';

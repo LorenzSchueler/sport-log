@@ -1,7 +1,7 @@
 import 'package:convert/convert.dart';
 import 'package:crypto/crypto.dart';
 import 'package:fixnum/fixnum.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:sport_log/data_provider/data_provider.dart';
 import 'package:sport_log/data_provider/data_providers/action_data_provider.dart';
 import 'package:sport_log/data_provider/data_providers/cardio_data_provider.dart';

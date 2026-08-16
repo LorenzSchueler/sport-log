@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:sport_log/widgets/dialogs/dialogs.dart';
 
 class NeverPop extends StatelessWidget {
