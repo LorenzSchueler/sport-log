@@ -21,6 +21,13 @@ class LatLng {
   CameraOptions toCameraOptionsCenter() => CameraOptions(center: toPoint());
 
   @override
+  bool operator ==(Object other) =>
+      other is LatLng && lat == other.lat && lng == other.lng;
+
+  @override
+  int get hashCode => Object.hash(lat, lng);
+
+  @override
   String toString() {
     String toDegreeMinDec(double coord, String pos, String neg) {
       final isPos = coord >= 0;
