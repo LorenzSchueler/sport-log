@@ -78,13 +78,13 @@ class MovementDescriptionTable {
         (
           EXISTS (
             SELECT * FROM ${Tables.metconMovement}
-            WHERE ${Tables.metconMovement}.${Columns.movementId} = ${Tables.movement}.${Columns.id}
+            WHERE ${TableAccessor.combineFilter([TableAccessor.notDeletedOfTable(Tables.metconMovement), "${Tables.metconMovement}.${Columns.movementId} = ${Tables.movement}.${Columns.id}"])}
           ) OR EXISTS (
             SELECT * FROM ${Tables.cardioSession}
-            WHERE ${Tables.cardioSession}.${Columns.movementId} = ${Tables.movement}.${Columns.id}
+            WHERE ${TableAccessor.combineFilter([TableAccessor.notDeletedOfTable(Tables.cardioSession), "${Tables.cardioSession}.${Columns.movementId} = ${Tables.movement}.${Columns.id}"])}
           ) OR EXISTS (
             SELECT * FROM ${Tables.strengthSession}
-            WHERE ${Tables.strengthSession}.${Columns.movementId} = ${Tables.movement}.${Columns.id}
+            WHERE ${TableAccessor.combineFilter([TableAccessor.notDeletedOfTable(Tables.strengthSession), "${Tables.strengthSession}.${Columns.movementId} = ${Tables.movement}.${Columns.id}"])}
           )
         ) AS $hasReference
       FROM ${Tables.movement}
@@ -115,13 +115,13 @@ class MovementDescriptionTable {
         (
           EXISTS (
             SELECT * FROM ${Tables.metconMovement}
-            WHERE ${Tables.metconMovement}.${Columns.movementId} = ${Tables.movement}.${Columns.id}
+            WHERE ${TableAccessor.combineFilter([TableAccessor.notDeletedOfTable(Tables.metconMovement), "${Tables.metconMovement}.${Columns.movementId} = ${Tables.movement}.${Columns.id}"])}
           ) OR EXISTS (
             SELECT * FROM ${Tables.cardioSession}
-            WHERE ${Tables.cardioSession}.${Columns.movementId} = ${Tables.movement}.${Columns.id}
+            WHERE ${TableAccessor.combineFilter([TableAccessor.notDeletedOfTable(Tables.cardioSession), "${Tables.cardioSession}.${Columns.movementId} = ${Tables.movement}.${Columns.id}"])}
           ) OR EXISTS (
             SELECT * FROM ${Tables.strengthSession}
-            WHERE ${Tables.strengthSession}.${Columns.movementId} = ${Tables.movement}.${Columns.id}
+            WHERE ${TableAccessor.combineFilter([TableAccessor.notDeletedOfTable(Tables.strengthSession), "${Tables.strengthSession}.${Columns.movementId} = ${Tables.movement}.${Columns.id}"])}
           )
         ) AS $hasReference
       FROM ${Tables.movement}
