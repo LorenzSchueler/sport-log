@@ -414,8 +414,8 @@ class CardioSession extends AtomicEntity {
         (session2.heartRate?.map((time) => time + shiftTime).toList() ?? []);
     return CardioSession(
         id: randomId(),
-        movementId: session1.movementId,
-        cardioType: session1.cardioType,
+        movementId: movementId,
+        cardioType: cardioType,
         datetime: session1.datetime,
         distance: null, // set later
         ascent: null, // set later
@@ -427,8 +427,8 @@ class CardioSession extends AtomicEntity {
         cadence: cadence,
         avgHeartRate: null, // set later
         heartRate: heartRate,
-        routeId: session1.routeId,
-        comments: session1.comments,
+        routeId: routeId,
+        comments: comments,
         deleted: false,
       )
       ..setLastDistance()
