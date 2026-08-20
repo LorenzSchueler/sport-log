@@ -109,8 +109,7 @@ class HeartRateUtils extends ChangeNotifier {
 
     await stopHeartRateStream();
 
-    await requestPermissions();
-    if (!await enableBluetooth()) {
+    if (!await requestPermissions() && !await enableBluetooth()) {
       _isSearching = false;
       if (!_disposed) {
         notifyListeners();
