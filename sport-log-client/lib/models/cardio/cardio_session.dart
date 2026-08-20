@@ -270,19 +270,50 @@ class CardioSession extends AtomicEntity {
         : (heartRate!.length / (time!.inMinuteFractions)).round();
   }
 
+  /// Returns a new session containing only the data within the cut range or
+  /// null if the range does not select any data.
+  ///
+  /// If [end] is before [start] the range wraps around, that is everything
+  /// between [end] and [start] is cut out and the remaining head and tail are
+  /// joined. [start] and [end] are clamped to the duration of the session.
   CardioSession? cut(Duration start, Duration end) {
-    if (end < start) {
-      if (end < time!) {
-        final endSession = clone()
-          ..cut(start, time!)
-          ..datetime = datetime.add(end);
-        cut(Duration.zero, end);
-        return combineWith(endSession)
-          ?..sanitize()
-          ..id = id;
-      }
+    final time = this.time;
+    if (time == null) {
       return null;
     }
+    final cutStart = start.clamp(Duration.zero, time);
+    final cutEnd = end.clamp(Duration.zero, time);
+
+    if (cutStart == cutEnd) {
+      return null;
+    }
+    if (cutEnd < cutStart) {
+      final head = clone().._cutRange(Duration.zero, cutEnd);
+      final tail = clone()
+        .._cutRange(cutStart, time)
+        ..datetime = datetime.add(cutEnd);
+      // a part without a track cannot be combined and is dropped instead
+      if (!head.hasTrack) {
+        return tail.hasTrack ? tail : null;
+      }
+      if (!tail.hasTrack) {
+        return head;
+      }
+      return head.combineWith(tail)
+        ?..sanitize()
+        ..id = id;
+    }
+
+    final cutSession = clone().._cutRange(cutStart, cutEnd);
+    if (cutSession.time == null || !cutSession.hasTrack) {
+      return null;
+    }
+    return cutSession;
+  }
+
+  bool get hasTrack => time != null && track != null && track!.isNotEmpty;
+
+  void _cutRange(Duration start, Duration end) {
     time = end - start;
     if (track != null && track!.isNotEmpty) {
       final newTrack = track!.where(
@@ -326,7 +357,7 @@ class CardioSession extends AtomicEntity {
       }
       setAvgHeartRate();
     }
-    return this..sanitize();
+    sanitize();
   }
 
   // ignore: long-method

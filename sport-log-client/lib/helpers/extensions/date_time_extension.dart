@@ -37,6 +37,9 @@ extension DurationExtension on Duration {
   double get inSecondFractions => inMilliseconds / 1000;
   double get inMinuteFractions => inMilliseconds / 60 / 1000;
   double get inHourFractions => inMilliseconds / 60 / 60 / 1000;
+
+  Duration clamp(Duration min, Duration max) =>
+      this < min ? min : (this > max ? max : this);
 }
 
 extension DateTimeExtension on DateTime {
