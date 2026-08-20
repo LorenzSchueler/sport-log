@@ -466,8 +466,7 @@ class _CardioEditPageState extends State<CardioEditPage> {
                       autovalidateMode: AutovalidateMode.onUserInteraction,
                       onChanged: (ascent) => setState(() {
                         if (ascent.isEmpty) {
-                          _cardioSessionDescription.cardioSession.distance =
-                              null;
+                          _cardioSessionDescription.cardioSession.ascent = null;
                         } else if (Validator.validateIntGeZero(ascent) ==
                             null) {
                           _cardioSessionDescription.cardioSession.ascent =
@@ -488,7 +487,7 @@ class _CardioEditPageState extends State<CardioEditPage> {
                       autovalidateMode: AutovalidateMode.onUserInteraction,
                       onChanged: (descent) => setState(() {
                         if (descent.isEmpty) {
-                          _cardioSessionDescription.cardioSession.distance =
+                          _cardioSessionDescription.cardioSession.descent =
                               null;
                         } else if (Validator.validateIntGeZero(descent) ==
                             null) {
@@ -540,7 +539,7 @@ class _CardioEditPageState extends State<CardioEditPage> {
                       autovalidateMode: AutovalidateMode.onUserInteraction,
                       onChanged: (calories) => setState(() {
                         if (calories.isEmpty) {
-                          _cardioSessionDescription.cardioSession.distance =
+                          _cardioSessionDescription.cardioSession.calories =
                               null;
                         } else if (Validator.validateIntGtZero(calories) ==
                             null) {
@@ -563,7 +562,7 @@ class _CardioEditPageState extends State<CardioEditPage> {
                       autovalidateMode: AutovalidateMode.onUserInteraction,
                       onChanged: (avgCadence) => setState(() {
                         if (avgCadence.isEmpty) {
-                          _cardioSessionDescription.cardioSession.distance =
+                          _cardioSessionDescription.cardioSession.avgCadence =
                               null;
                         } else if (Validator.validateIntGtZero(avgCadence) ==
                             null) {
@@ -586,7 +585,7 @@ class _CardioEditPageState extends State<CardioEditPage> {
                       autovalidateMode: AutovalidateMode.onUserInteraction,
                       onChanged: (avgHeartRate) => setState(() {
                         if (avgHeartRate.isEmpty) {
-                          _cardioSessionDescription.cardioSession.distance =
+                          _cardioSessionDescription.cardioSession.avgHeartRate =
                               null;
                         } else if (Validator.validateIntGtZero(avgHeartRate) ==
                             null) {
