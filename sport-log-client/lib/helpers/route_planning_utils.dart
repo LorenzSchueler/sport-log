@@ -62,7 +62,8 @@ class RoutePlanningUtils {
       } else {
         // since position matching to last markedPos there is no point within max distance to current markedPos
         // insert markedPos and start delete window
-        track.insert(searchStart, markedPos);
+        // clone because _setDistanceAndElevation would modify markedPositions
+        track.insert(searchStart, markedPos.clone());
         searchStart += 1;
         deleteBetween = true;
       }

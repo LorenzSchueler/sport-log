@@ -395,14 +395,17 @@ class CardioSession extends AtomicEntity {
     final shiftTime = time1 + betweenTime;
     final shiftDistance =
         track1.last.distance + track1.last.distanceTo(track2.first);
+    // clone so that shifting does not modify the positions of the sessions
+    // this one is built from
     final track =
-        track1 +
-        track2.map((position) {
-          position
-            ..time += shiftTime
-            ..distance += shiftDistance;
-          return position;
-        }).toList();
+        track1.clone() +
+        track2
+            .map(
+              (position) => position.clone()
+                ..time += shiftTime
+                ..distance += shiftDistance,
+            )
+            .toList();
     final cadence =
         (session1.cadence ?? []) +
         (session2.cadence?.map((time) => time + shiftTime).toList() ?? []);

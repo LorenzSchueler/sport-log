@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:material_ui/material_ui.dart' hide Route;
 import 'package:sport_log/data_provider/data_providers/cardio_data_provider.dart';
 import 'package:sport_log/helpers/location_utils.dart';
@@ -25,7 +26,9 @@ class AddLocationButton extends StatelessWidget {
     if (gpsPos == null) {
       return;
     }
-    route.markedPositions ??= [];
+    route
+      ..markedPositions ??= []
+      ..track ??= [];
     final pos = Position(
       latitude: gpsPos.latitude,
       longitude: gpsPos.longitude,
@@ -33,13 +36,16 @@ class AddLocationButton extends StatelessWidget {
       distance: 0,
       time: Duration.zero,
     );
-    route.markedPositions!.add(pos..distance = 0);
-    route.track ??= [];
-    final distance = route.track!.isEmpty
-        ? 0.0
-        : route.track!.last.distance +
-              route.track!.last.latLng.distanceTo(gpsPos.latLng);
-    route.track!.add(pos..distance = distance);
+    final lastPos = route.track!.lastOrNull;
+    route.markedPositions!.add(pos);
+    // separate instance so that the distance within the track does not also
+    // apply to the marked position
+    route.track!.add(
+      pos.clone()
+        ..distance = lastPos == null
+            ? 0
+            : lastPos.distance + lastPos.latLng.distanceTo(gpsPos.latLng),
+    );
     route.setDistance();
     await _dataProvider.updateSingle(route);
     updateRoute(route);
