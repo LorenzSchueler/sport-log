@@ -38,6 +38,16 @@ class _DurationInputState extends State<DurationInput> {
   );
 
   @override
+  void didUpdateWidget(DurationInput oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.initialDuration != oldWidget.initialDuration &&
+        widget.initialDuration != _duration) {
+      _duration = widget.initialDuration;
+      _textController.text = _duration.formatM99S;
+    }
+  }
+
+  @override
   void dispose() {
     _textController.dispose();
     super.dispose();

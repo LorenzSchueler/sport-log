@@ -32,6 +32,16 @@ class _IntInputState extends State<IntInput> {
   );
 
   @override
+  void didUpdateWidget(IntInput oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.initialValue != oldWidget.initialValue &&
+        widget.initialValue != _value) {
+      _value = widget.initialValue;
+      _textController.text = _value.toString();
+    }
+  }
+
+  @override
   void dispose() {
     _textController.dispose();
     super.dispose();

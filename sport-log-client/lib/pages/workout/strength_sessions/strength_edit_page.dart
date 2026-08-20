@@ -266,7 +266,6 @@ class _StrengthEditPageState extends State<StrengthEditPage> {
 
   Widget get _intervalInput {
     return EditTile.optionalButton(
-      key: ValueKey(_strengthSessionDescription.session.interval),
       caption: 'Interval',
       leading: AppIcons.timeInterval,
       onTrailingTap: () =>
