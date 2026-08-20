@@ -150,14 +150,15 @@ class _MapboxMapWrapperState extends State<MapboxMapWrapper> {
     }
   }
 
-  Future<void> updateRoute(Route? route) async {
-    final changed = _selectedRoute != null && route != null;
+  Future<void> _updateRoute(Route? route) async {
+    // do not change bounds if the current position was added to the route,
+    // but do change them when another route is selected
+    final sameRoute = _selectedRoute != null && route?.id == _selectedRoute!.id;
     if (mounted) {
       setState(() => _selectedRoute = route);
     }
     await _mapController?.updateRouteLine(_line, _selectedRoute?.track);
-    // do not change bounds if the current position was added to the route
-    if (!changed) {
+    if (!sameRoute) {
       await _mapController?.setBoundsFromTracks(
         _selectedRoute?.track,
         null,
@@ -221,7 +222,7 @@ class _MapboxMapWrapperState extends State<MapboxMapWrapper> {
                   if (widget.showSelectRouteButton) ...[
                     SelectRouteButton(
                       selectedRoute: _selectedRoute,
-                      updateRoute: updateRoute,
+                      updateRoute: _updateRoute,
                     ),
                     Defaults.sizedBox.vertical.normal,
                   ],
@@ -278,7 +279,7 @@ class _MapboxMapWrapperState extends State<MapboxMapWrapper> {
                       locationUtils.enabled)
                     AddLocationButton(
                       route: _selectedRoute!,
-                      updateRoute: updateRoute,
+                      updateRoute: _updateRoute,
                       locationUtils: locationUtils,
                     ),
                 ],
