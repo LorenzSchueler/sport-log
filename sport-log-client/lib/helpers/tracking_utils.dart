@@ -16,6 +16,7 @@ import 'package:sport_log/helpers/stopwatch.dart';
 import 'package:sport_log/helpers/tracking_ui_utils.dart';
 import 'package:sport_log/models/cardio/all.dart';
 import 'package:sport_log/pages/workout/cardio/tracking_settings.dart';
+import 'package:sport_log/routes.dart';
 import 'package:sport_log/widgets/dialogs/dialogs.dart';
 import 'package:synchronized/synchronized.dart';
 
@@ -207,7 +208,10 @@ class TrackingUtils extends ChangeNotifier {
     await _save(context, () {
       Navigator.pop(context); // pop dialog
       Navigator.pop(context); // pop tracking page
-      Navigator.pop(context); // pop tracking settings page
+      // the tracking settings page was never pushed when tracking is quick started
+      Navigator.of(
+        context,
+      ).popUntil((route) => route.settings.name != Routes.trackingSettings);
     });
   }
 
