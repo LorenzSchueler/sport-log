@@ -22,6 +22,9 @@ Result<List<Position>, String> gpxToTrack(String gpxString) {
       .flattened
       .map((t) => t.trkpts)
       .flattened;
+  if (points.isEmpty) {
+    return Err("This file does not contain any track points.");
+  }
   final startTime = points
       .map((p) => p.time)
       .firstWhere((element) => element != null, orElse: () => null);
