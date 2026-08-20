@@ -171,10 +171,17 @@ class ActionRulesCard extends StatelessWidget {
                 const CaptionTile(caption: "Action Rules"),
                 IconButton(
                   visualDensity: VisualDensity.compact,
-                  onPressed: () => Navigator.of(context).pushNamed(
-                    Routes.actionRuleEdit,
-                    arguments: [actionProviderDescription, null],
-                  ),
+                  onPressed: actionProviderDescription.actions.isEmpty
+                      ? () => showMessageDialog(
+                          context: context,
+                          title: "No registered actions",
+                          text:
+                              "An action rule needs an action to refer to, but the action provider did not register any.",
+                        )
+                      : () => Navigator.of(context).pushNamed(
+                          Routes.actionRuleEdit,
+                          arguments: [actionProviderDescription, null],
+                        ),
                   icon: const Icon(AppIcons.add),
                 ),
               ],
@@ -256,10 +263,17 @@ class ActionEventsCard extends StatelessWidget {
               children: [
                 const CaptionTile(caption: "Action Events"),
                 IconButton(
-                  onPressed: () => Navigator.of(context).pushNamed(
-                    Routes.actionEventEdit,
-                    arguments: [actionProviderDescription, null],
-                  ),
+                  onPressed: actionProviderDescription.actions.isEmpty
+                      ? () => showMessageDialog(
+                          context: context,
+                          title: "No registered actions",
+                          text:
+                              "An action event needs an action to refer to, but the action provider did not register any.",
+                        )
+                      : () => Navigator.of(context).pushNamed(
+                          Routes.actionEventEdit,
+                          arguments: [actionProviderDescription, null],
+                        ),
                   icon: const Icon(AppIcons.add),
                   visualDensity: VisualDensity.compact,
                 ),
