@@ -246,9 +246,7 @@ abstract class Routes {
         metconSessionDescription = arg;
         isNew = false;
       } else if (arg is MetconDescription) {
-        metconSessionDescription = MetconSessionDescription.defaultValue()
-          ?..metconDescription = arg
-          ..metconSession.metconId = arg.metcon.id;
+        metconSessionDescription = MetconSessionDescription.forMetcon(arg);
         isNew = true;
       } else {
         metconSessionDescription = MetconSessionDescription.defaultValue();
