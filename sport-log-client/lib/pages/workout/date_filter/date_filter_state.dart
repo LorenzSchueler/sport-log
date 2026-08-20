@@ -48,7 +48,7 @@ sealed class DateFilterState {
     final now = DateTime.now();
     final inclusiveEnd = dateFilterState.end == null
         ? DateTime.now()
-        : dateFilterState.end!.subtract(const Duration(days: 1));
+        : dateFilterState.end!.dayEarlier();
     final end = now.compareTo(inclusiveEnd) < 0 ? now : inclusiveEnd;
     return [
       DayFilter(end),
