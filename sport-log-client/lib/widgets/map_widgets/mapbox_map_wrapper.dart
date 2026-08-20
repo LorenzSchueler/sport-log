@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' hide Settings;
 import 'package:material_ui/material_ui.dart' hide Route;
 import 'package:provider/provider.dart';
@@ -84,6 +86,8 @@ class MapboxMapWrapper extends StatefulWidget {
 class _MapboxMapWrapperState extends State<MapboxMapWrapper> {
   late final AppLifecycleListener _lifecycleListener;
 
+  LatLngZoom? _lastMapPosition;
+
   @override
   void initState() {
     super.initState();
@@ -91,11 +95,14 @@ class _MapboxMapWrapperState extends State<MapboxMapWrapper> {
       onResume: () => WidgetsBinding.instance.addPostFrameCallback(
         (_) => _mapController?.triggerRepaint(),
       ),
+      // dispose is not called when the app is killed while paused
+      onPause: _saveMapPosition,
     );
   }
 
   @override
   void dispose() {
+    _saveMapPosition();
     _lifecycleListener.dispose();
     super.dispose();
   }
@@ -116,6 +123,13 @@ class _MapboxMapWrapperState extends State<MapboxMapWrapper> {
   void didUpdateWidget(MapboxMapWrapper old) {
     super.didUpdateWidget(old);
     _setMapSettings();
+  }
+
+  void _saveMapPosition() {
+    final lastMapPosition = _lastMapPosition;
+    if (lastMapPosition != null) {
+      unawaited(Settings.instance.setLastMapPosition(lastMapPosition));
+    }
   }
 
   Future<void> _setMapSettings() async {
@@ -195,12 +209,10 @@ class _MapboxMapWrapperState extends State<MapboxMapWrapper> {
             }
           },
           onMapLoadedListener: _mapReadyCallback.onMapLoaded,
-          onCameraChangeListener: (_) async {
-            final lastMapPosition = await _mapController?.latLngZoom;
-            if (lastMapPosition != null) {
-              await Settings.instance.setLastMapPosition(lastMapPosition);
-            }
-          },
+          onCameraChangeListener: (data) => _lastMapPosition = LatLngZoom(
+            latLng: LatLng.fromPoint(data.cameraState.center),
+            zoom: data.cameraState.zoom,
+          ),
         ),
         if (_mapController != null && widget.showOverlays)
           Positioned(
