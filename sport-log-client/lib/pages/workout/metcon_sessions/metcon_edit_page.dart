@@ -198,9 +198,17 @@ class _MetconEditPageState extends State<MetconEditPage> {
   }
 
   Widget _typeInput() {
+    final typeLocked = _metconDescription.hasReference;
     return SegmentedButton(
       segments: MetconType.values
-          .map((md) => ButtonSegment(value: md, label: Text(md.name)))
+          .map(
+            (md) => ButtonSegment(
+              value: md,
+              label: Text(md.name),
+              enabled:
+                  !typeLocked || md == _metconDescription.metcon.metconType,
+            ),
+          )
           .toList(),
       selected: {_metconDescription.metcon.metconType},
       showSelectedIcon: false,
