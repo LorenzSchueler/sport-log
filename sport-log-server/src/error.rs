@@ -28,7 +28,7 @@ pub enum ErrorMessage {
 pub struct HandlerError {
     status: StatusCode,
     message: Option<ErrorMessage>,
-    headers: Option<HeaderMap>,
+    headers: Option<Box<HeaderMap>>,
 }
 
 impl Serialize for HandlerError {
@@ -74,9 +74,11 @@ impl From<TypedHeaderRejection> for HandlerError {
                     error: format!("header {} missing", rejection.name()),
                 }),
                 headers: (rejection.name() == AUTHORIZATION).then(|| {
-                    [(WWW_AUTHENTICATE, HeaderValue::from_static("Basic"))]
-                        .into_iter()
-                        .collect()
+                    Box::new(
+                        [(WWW_AUTHENTICATE, HeaderValue::from_static("Basic"))]
+                            .into_iter()
+                            .collect(),
+                    )
                 }),
             },
             TypedHeaderRejectionReason::Error(error) => HandlerError {
@@ -190,7 +192,7 @@ impl IntoResponse for HandlerError {
             info!("{message:?}");
         }
         match &self.headers {
-            Some(header) => (self.status, header.to_owned(), Json(self)).into_response(),
+            Some(headers) => (self.status, headers.as_ref().to_owned(), Json(self)).into_response(),
             _ => (self.status, Json(self)).into_response(),
         }
     }
