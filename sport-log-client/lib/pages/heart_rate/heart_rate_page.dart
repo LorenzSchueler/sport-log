@@ -72,8 +72,14 @@ class HeartRatePage extends StatelessWidget {
                     if (heartRateUtils.canConnect) ...[
                       Defaults.sizedBox.vertical.normal,
                       FilledButton(
-                        onPressed: () =>
-                            heartRateUtils.startHeartRateStream(null),
+                        onPressed: () async {
+                          final connected = await heartRateUtils
+                              .startHeartRateStream(null);
+                          final context = App.globalContext;
+                          if (context.mounted && !connected) {
+                            showSimpleToast(context, "Connecting failed.");
+                          }
+                        },
                         child: const Text("Connect"),
                       ),
                     ],
