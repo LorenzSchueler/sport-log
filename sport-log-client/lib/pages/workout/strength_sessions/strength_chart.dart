@@ -102,7 +102,9 @@ class _StrengthChartState extends State<StrengthChart> {
   void didUpdateWidget(StrengthChart oldWidget) {
     _strengthSessionStats = calculateStats();
     _availableSeries = _getAvailableSeries();
-    _selectedSeries = _availableSeries.first;
+    if (!_availableSeries.contains(_selectedSeries)) {
+      _selectedSeries = _availableSeries.first;
+    }
     super.didUpdateWidget(oldWidget);
   }
 
