@@ -209,6 +209,7 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
           _cadenceLine = _getCadenceLine();
           _heartRateLine = _getHeartRateLine();
         });
+        await _hideAllSessions();
         await _setBoundsAndLines();
       }
     }
@@ -276,6 +277,14 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
     );
     if (mounted) {
       setState(() {});
+    }
+  }
+
+  /// The annotations are keyed by identity, so they must be dropped whenever
+  /// the similar sessions are reloaded and therefore replaced by new instances.
+  Future<void> _hideAllSessions() async {
+    for (final session in _similarSessionAnnotations.keys.toList()) {
+      await _hideSession(session);
     }
   }
 
