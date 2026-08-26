@@ -269,6 +269,11 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
       return;
     }
     await _mapController?.removeLine(annotation.trackLine);
+    await _mapController?.updateMarker(
+      annotation.touchMarker,
+      null,
+      annotation.color,
+    );
     if (mounted) {
       setState(() {});
     }
