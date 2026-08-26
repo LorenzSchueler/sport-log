@@ -77,22 +77,15 @@ class _DurationInputState extends State<DurationInput> {
   }
 
   List<String> _parseMinSec(String duration) {
-    var minutes = duration;
-    var seconds = "0";
-    if (duration.contains(":")) {
-      final parts = duration.split(":");
-      minutes = parts[0];
-      seconds = parts[1];
-    } else if (duration.contains(",")) {
-      final parts = duration.split(",");
-      minutes = parts[0];
-      seconds = parts[1];
-    } else if (duration.contains(".")) {
-      final parts = duration.split(".");
-      minutes = parts[0];
-      seconds = parts[1];
+    for (final separator in [":", ",", "."]) {
+      if (duration.contains(separator)) {
+        final parts = duration.split(separator);
+        // keep everything after the first separator so that additional ones are
+        // reported as invalid instead of being silently dropped
+        return [parts.first, parts.skip(1).join(separator)];
+      }
     }
-    return [minutes, seconds];
+    return [duration, "0"];
   }
 
   String? _validateDuration(String durationString) {
