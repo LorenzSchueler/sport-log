@@ -98,8 +98,7 @@ class _RouteEditPageState extends State<RouteEditPage> {
           );
         }
       }
-    }
-    if (mounted) {
+    } else if (mounted) {
       Navigator.pop(
         context,
         // needed for route details page
