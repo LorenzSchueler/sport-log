@@ -55,8 +55,8 @@ class Split {
         final newDistance =
             (pos2.distance / splitDistance).floor() * splitDistance;
         final distanceDiff = pos2.distance - pos1.distance;
-        final weight1 = (newDistance - pos1.distance) / distanceDiff;
-        final weight2 = (pos2.distance - newDistance) / distanceDiff;
+        final weight1 = (pos2.distance - newDistance) / distanceDiff;
+        final weight2 = (newDistance - pos1.distance) / distanceDiff;
         final newTime = pos1.time * weight1 + pos2.time * weight2;
 
         splits.add(
@@ -71,14 +71,18 @@ class Split {
         lastTime = newTime;
       }
     }
-    splits.add(
-      Split._compute(
-        startDistance: lastDistance,
-        endDistance: track[track.length - 1].distance.round(),
-        startDuration: lastTime,
-        endDuration: track[track.length - 1].time,
-      ),
-    );
+    // only if there is anything left after the last full split
+    final endDistance = track[track.length - 1].distance.round();
+    if (endDistance > lastDistance) {
+      splits.add(
+        Split._compute(
+          startDistance: lastDistance,
+          endDistance: endDistance,
+          startDuration: lastTime,
+          endDuration: track[track.length - 1].time,
+        ),
+      );
+    }
 
     return splits;
   }
