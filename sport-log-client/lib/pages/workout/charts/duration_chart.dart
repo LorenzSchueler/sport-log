@@ -81,11 +81,16 @@ class DurationChartLine {
         )
         .where((v) => v.rawValue.isFinite)
         .toList();
-    if (getLastGroupValue != null) {
-      chartValues.last = DurationChartValue(
-        duration: groupedValues.last.key,
-        value: 0,
-        rawValue: getLastGroupValue(groupedValues.last.value, interval),
+    if (chartValues.isEmpty) {
+      return DurationChartLine._([], lineColor);
+    }
+    // only if the last group was not filtered out, otherwise its value would
+    // be written to the group of another duration
+    if (getLastGroupValue != null &&
+        chartValues.last.duration == groupedValues.last.key) {
+      chartValues.last.rawValue = getLastGroupValue(
+        groupedValues.last.value,
+        interval,
       );
       if (!chartValues.last.rawValue.isFinite) {
         if (chartValues.length < 2) {
