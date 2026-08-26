@@ -105,7 +105,11 @@ class TrackingUtils extends ChangeNotifier {
   final StepCountUtils _stepUtils = StepCountUtils();
 
   final HeartRateUtils? _heartRateUtils;
-  bool get waitingOnHR => _heartRateUtils?.isNotConnected ?? false;
+  bool _heartRateFailed = false;
+  // once connecting has failed there is nothing left to wait for, otherwise
+  // tracking could never be started
+  bool get waitingOnHR =>
+      !_heartRateFailed && (_heartRateUtils?.isNotConnected ?? false);
 
   ElevationMapController? _elevationMapController;
 
@@ -135,7 +139,20 @@ class TrackingUtils extends ChangeNotifier {
       inBackground: true,
     );
     await _stepUtils.startStepStream(_onStepUpdate);
-    await _heartRateUtils?.startHeartRateStream(_onHeartRateUpdate);
+    final heartRateConnected =
+        await _heartRateUtils?.startHeartRateStream(_onHeartRateUpdate) ?? true;
+    if (!heartRateConnected) {
+      _heartRateFailed = true;
+      notifyListeners();
+      await showMessageDialog(
+        // ignore: use_build_context_synchronously
+        context: App.globalContext,
+        title: "Warning",
+        text:
+            "The heart rate monitor could not be connected. "
+            "Heart rate is not recorded.",
+      );
+    }
     if (_alarmUtils.noTts || _audioFeedbackUtils.noTts) {
       await showMessageDialog(
         // ignore: use_build_context_synchronously
