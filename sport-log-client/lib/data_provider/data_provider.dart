@@ -198,9 +198,13 @@ abstract class EntityDataProvider<T extends AtomicEntity>
           } else {
             final epoch = result.ok;
             await Settings.instance.setEpoch(setEpoch, epoch);
+            // per record and not for the whole table because the conflict
+            // dialog and the requests above give concurrent changes plenty of
+            // time to be written, and those must stay unsynchronized
+            await table.setSynchronized(record.id);
           }
         }
-        return true; // all entries can be set to synchronized
+        return true;
       case ConflictResolution.manual:
         _logger.d("solving conflict manually");
         return false; // Entries cannot be set to synchronized yet. There are still conflicts.
@@ -220,9 +224,10 @@ abstract class EntityDataProvider<T extends AtomicEntity>
         result.err,
         onNoInternet,
       );
-      return conflictResolution != null
-          ? await _resolveConflict(conflictResolution, fnSingle, records)
-          : false;
+      if (conflictResolution == null) {
+        return false;
+      }
+      return _resolveConflict(conflictResolution, fnSingle, records);
     } else {
       final epoch = result.ok;
       await Settings.instance.setEpoch(setEpoch, epoch);
