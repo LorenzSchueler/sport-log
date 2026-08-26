@@ -26,7 +26,8 @@ class DistanceChartLine {
     required Color lineColor,
     required bool absolute,
   }) {
-    if (values == null || values.isEmpty) {
+    // a totalDistance of 0 would lead to an interval of 0 in _groupFunction
+    if (values == null || values.isEmpty || getDistance(values.last) <= 0) {
       return DistanceChartLine._([], lineColor, absolute);
     }
     final totalDistance = getDistance(values.last);
