@@ -79,7 +79,7 @@ class _CardioUpdateElevationPageState extends State<CardioUpdateElevationPage> {
           return;
         }
         if (mounted) {
-          setState(() => _progress = i / track.length);
+          setState(() => _progress = (i + 1) / track.length);
         } else {
           return;
         }
