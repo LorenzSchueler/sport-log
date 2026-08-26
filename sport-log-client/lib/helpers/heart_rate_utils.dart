@@ -13,6 +13,7 @@ class HeartRateUtils extends ChangeNotifier {
   static final _polar = Polar();
 
   static const _searchDuration = Duration(seconds: 10);
+  static const _connectTimeout = Duration(seconds: 30);
 
   bool _isSearching = false;
   bool get isSearching => _isSearching;
@@ -131,45 +132,58 @@ class HeartRateUtils extends ChangeNotifier {
     _isConnecting = true;
     notifyListeners();
 
-    await _polar.connectToDevice(deviceId!);
-    await _polar.sdkFeatureReady.firstWhere(
-      (e) => e.identifier == deviceId && e.feature == PolarSdkFeature.hr,
-    );
+    // the finally block makes sure _isConnecting is reset even if the device
+    // cannot be connected, otherwise the ui would be stuck on connecting
+    try {
+      await _polar.connectToDevice(deviceId!);
+      await _polar.sdkFeatureReady
+          .firstWhere(
+            (e) => e.identifier == deviceId && e.feature == PolarSdkFeature.hr,
+          )
+          .timeout(_connectTimeout);
 
-    _heartRateSubscription = _polar
-        .startHrStreaming(deviceId!)
-        .listen(
-          (e) {
-            final samples = e.samples;
-            if (samples.isEmpty) {
-              return;
-            }
-            _hr = samples.last.hr;
-            final rrs = <int>[];
-            for (final sample in samples) {
-              rrs.addAll(sample.rrsMs);
-            }
-            onHeartRateEvent?.call(rrs);
-            if (!_disposed) {
-              notifyListeners();
-            }
-          },
-          onError: (Object error) {
-            if (error is PlatformException) {
-              stopHeartRateStream();
-            }
-          },
-        );
-    _batterySubscription = _polar.batteryLevel.listen((event) {
-      _battery = event.level;
+      _heartRateSubscription = _polar
+          .startHrStreaming(deviceId!)
+          .listen(
+            (e) {
+              final samples = e.samples;
+              if (samples.isEmpty) {
+                return;
+              }
+              _hr = samples.last.hr;
+              final rrs = <int>[];
+              for (final sample in samples) {
+                rrs.addAll(sample.rrsMs);
+              }
+
+              onHeartRateEvent?.call(rrs);
+              if (!_disposed) {
+                notifyListeners();
+              }
+            },
+            onError: (Object error) {
+              if (error is PlatformException) {
+                stopHeartRateStream();
+              }
+            },
+          );
+      _batterySubscription = _polar.batteryLevel.listen((event) {
+        _battery = event.level;
+        if (!_disposed) {
+          notifyListeners();
+        }
+      });
+    } on TimeoutException {
+      await stopHeartRateStream();
+      return false;
+    } on PlatformException {
+      await stopHeartRateStream();
+      return false;
+    } finally {
+      _isConnecting = false;
       if (!_disposed) {
         notifyListeners();
       }
-    });
-
-    _isConnecting = false;
-    if (!_disposed) {
-      notifyListeners();
     }
     return true;
   }
