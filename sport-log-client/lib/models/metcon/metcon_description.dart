@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
@@ -79,6 +80,12 @@ class MetconDescription extends CompoundEntity {
       }
       move.sanitize();
     }
+  }
+
+  void orderMoves() {
+    moves.forEachIndexed(
+      (index, move) => move.metconMovement.movementNumber = index,
+    );
   }
 
   static bool areTheSame(MetconDescription m1, MetconDescription m2) =>

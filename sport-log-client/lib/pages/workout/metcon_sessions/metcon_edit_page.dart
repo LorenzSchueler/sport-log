@@ -300,7 +300,10 @@ class _MetconEditPageState extends State<MetconEditPage> {
         return _MetconMovementCard(
           key: ObjectKey(mmd),
           onDelete: () {
-            setState(() => _metconDescription.moves.removeAt(index));
+            setState(() {
+              _metconDescription.moves.removeAt(index);
+              _metconDescription.orderMoves();
+            });
           },
           onUpdate: (mmd) {
             setState(() => _metconDescription.moves[index] = mmd);
@@ -352,9 +355,7 @@ class _MetconEditPageState extends State<MetconEditPage> {
     setState(() {
       final oldMove = _metconDescription.moves.removeAt(oldIndex);
       _metconDescription.moves.insert(insertAt, oldMove);
-      for (final (i, move) in _metconDescription.moves.indexed) {
-        move.metconMovement.movementNumber = i;
-      }
+      _metconDescription.orderMoves();
     });
   }
 }
