@@ -113,6 +113,13 @@ class _CardioCutPageState extends State<CardioCutPage> {
         _cutEndDuration,
       );
       if (cutSession == null) {
+        if (mounted) {
+          await showMessageDialog(
+            context: context,
+            title: "Cutting Cardio Session Failed",
+            text: "The selected start and end time do not result in a valid session.",
+          );
+        }
         return;
       }
       _cardioSessionDescription.cardioSession = cutSession;
