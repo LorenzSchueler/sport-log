@@ -6,22 +6,19 @@ import 'package:sport_log/models/cardio/cardio_session.dart';
 import 'package:sport_log/pages/workout/cardio/audio_feedback_config.dart';
 
 class AudioFeedbackUtils {
-  AudioFeedbackUtils(this._audioFeedbackConfig);
+  AudioFeedbackUtils({
+    required this._audioFeedbackConfig,
+    required this._getCardioSession,
+    required this._getTrackingMode,
+  });
 
-  late final CardioSession Function() _getCardioSession;
-  late final TrackingMode Function() _getTrackingMode;
+  final CardioSession Function() _getCardioSession;
+  final TrackingMode Function() _getTrackingMode;
   final AudioFeedbackConfig? _audioFeedbackConfig;
   Timer? _audioFeedbackTimer;
 
-  bool get noTts => _audioFeedbackConfig != null && !TtsUtils.ttsEngineFound;
-
-  void setCallbacks(
-    CardioSession Function() getCardioSession,
-    TrackingMode Function() getTrackingMode,
-  ) {
-    _getCardioSession = getCardioSession;
-    _getTrackingMode = getTrackingMode;
-  }
+  bool get requiresTtsButNoEngineFound =>
+      _audioFeedbackConfig != null && !TtsUtils.ttsEngineFound;
 
   void dispose() {
     onStop();

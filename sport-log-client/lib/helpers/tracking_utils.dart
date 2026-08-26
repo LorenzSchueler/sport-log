@@ -46,23 +46,20 @@ class TrackingUtils extends ChangeNotifier {
         trackingSettings.route,
         trackingSettings.cardioSession,
       ),
-      _alarmUtils = AlarmUtils(
-        trackingSettings.route?.track != null
-            ? trackingSettings.routeAlarmDistance
-            : null,
-      ),
-      _audioFeedbackUtils = AudioFeedbackUtils(trackingSettings.audioFeedback),
       _heartRateUtils = trackingSettings.heartRateUtils.deviceId != null
           ? (HeartRateUtils() // trackingSettings.heartRateUtils is disposed
               ..deviceId = trackingSettings.heartRateUtils.deviceId)
           : null {
-    _audioFeedbackUtils.setCallbacks(
-      () => cardioSessionDescription.cardioSession,
-      () => mode,
+    _audioFeedbackUtils = AudioFeedbackUtils(
+      audioFeedbackConfig: trackingSettings.audioFeedback,
+      getCardioSession: () => cardioSessionDescription.cardioSession,
+      getTrackingMode: () => mode,
     );
-    _alarmUtils.setCallbacks(
-      () => cardioSessionDescription.cardioSession.track!,
-      () => mode,
+    _alarmUtils = AlarmUtils(
+      routeAlarmDistance: trackingSettings.routeAlarmDistance,
+      routeTrack: trackingSettings.route?.track,
+      getSessionTrack: () => cardioSessionDescription.cardioSession.track!,
+      getTrackingMode: () => mode,
     );
   }
 
@@ -110,8 +107,8 @@ class TrackingUtils extends ChangeNotifier {
 
   ElevationMapController? _elevationMapController;
 
-  final AudioFeedbackUtils _audioFeedbackUtils;
-  final AlarmUtils _alarmUtils;
+  late final AudioFeedbackUtils _audioFeedbackUtils;
+  late final AlarmUtils _alarmUtils;
 
   @override
   void dispose() {
@@ -137,7 +134,8 @@ class TrackingUtils extends ChangeNotifier {
     );
     await _stepUtils.startStepStream(_onStepUpdate);
     await _heartRateUtils?.startHeartRateStream(_onHeartRateUpdate);
-    if (_alarmUtils.noTts || _audioFeedbackUtils.noTts) {
+    if (_alarmUtils.requiresTtsButNoEngineFound ||
+        _audioFeedbackUtils.requiresTtsButNoEngineFound) {
       await showMessageDialog(
         // ignore: use_build_context_synchronously
         context: App.globalContext,

@@ -3,27 +3,28 @@ import 'package:sport_log/helpers/tts_utils.dart';
 import 'package:sport_log/models/all.dart';
 
 class AlarmUtils {
-  AlarmUtils(this._routeAlarmDistance);
+  AlarmUtils({
+    required this._routeAlarmDistance,
+    required this._routeTrack,
+    required this._getSessionTrack,
+    required this._getTrackingMode,
+  });
 
-  late final List<Position> Function() _getTrack;
-  late final TrackingMode Function() _getTrackingMode;
+  final List<Position> Function() _getSessionTrack;
+  final TrackingMode Function() _getTrackingMode;
 
   final int? _routeAlarmDistance;
+  final List<Position>? _routeTrack;
   bool _movingWhenPausedAlarmFired = false;
   DateTime? _lastAlarm;
 
-  bool get noTts => _routeAlarmDistance != null && !TtsUtils.ttsEngineFound;
+  bool get requiresTtsButNoEngineFound =>
+      _routeAlarmDistance != null &&
+      _routeTrack != null &&
+      !TtsUtils.ttsEngineFound;
 
   static const _movingWhenPausedAlarmDistance = 50;
   static const _minAlarmInterval = Duration(minutes: 1);
-
-  void setCallbacks(
-    List<Position> Function() getTrack,
-    TrackingMode Function() getTrackingMode,
-  ) {
-    _getTrack = getTrack;
-    _getTrackingMode = getTrackingMode;
-  }
 
   Future<void> onNewPosition(Position position) async {
     await _movingWhenPausedAlarm(position);
@@ -35,7 +36,7 @@ class AlarmUtils {
       _movingWhenPausedAlarmFired = false;
       return;
     }
-    final lastPosition = _getTrack().lastOrNull;
+    final lastPosition = _getSessionTrack().lastOrNull;
     if (!_movingWhenPausedAlarmFired && lastPosition != null) {
       final distance = position.distanceTo(lastPosition);
       if (distance > _movingWhenPausedAlarmDistance) {
@@ -49,10 +50,11 @@ class AlarmUtils {
 
   Future<void> _routeAlarm(Position position) async {
     if (_routeAlarmDistance != null &&
+        _routeTrack != null &&
         _getTrackingMode().isTracking &&
         (_lastAlarm?.isBefore(DateTime.now().subtract(_minAlarmInterval)) ??
             true)) {
-      final (distance, index) = position.minDistanceTo(_getTrack());
+      final (distance, index) = position.minDistanceTo(_routeTrack);
       if (distance > _routeAlarmDistance && index != null) {
         _lastAlarm = DateTime.now();
         await TtsUtils.speak(
