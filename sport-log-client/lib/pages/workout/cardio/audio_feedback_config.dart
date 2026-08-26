@@ -16,7 +16,7 @@ extension on Duration {
       text += "$inHours hours ";
     }
     text += "${inMinutes - inHours * 60} minutes and ";
-    text += "${inSeconds - inMinutes * 60 - inHours * 60 * 60} seconds";
+    text += "${inSeconds - inMinutes * 60} seconds";
 
     return text;
   }
