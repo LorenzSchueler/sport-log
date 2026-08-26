@@ -102,7 +102,11 @@ class _StrengthChartState extends State<StrengthChart> {
   void didUpdateWidget(StrengthChart oldWidget) {
     _strengthSessionStats = calculateStats();
     _availableSeries = _getAvailableSeries();
-    _selectedSeries = _availableSeries.first;
+    // keep the selection because didUpdateWidget also runs for rebuilds that
+    // do not change the movement and therefore not the available series
+    if (!_availableSeries.contains(_selectedSeries)) {
+      _selectedSeries = _availableSeries.first;
+    }
     super.didUpdateWidget(oldWidget);
   }
 
