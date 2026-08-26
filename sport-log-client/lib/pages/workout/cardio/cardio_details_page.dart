@@ -237,28 +237,38 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
   }
 
   Future<void> _showSession(CardioSession session) async {
+    if (_similarSessionAnnotations.containsKey(session)) {
+      return;
+    }
     final color = Color(
       (Random().nextDouble() * 0xFFFFFF).toInt(),
     ).withAlpha(255);
     final line = await _mapController?.addLine(session.track!, color);
-    if (line != null) {
-      _similarSessionAnnotations.putIfAbsent(
-        session,
-        () => _SimilarSessionAnnotation(
-          trackLine: line,
-          color: color,
-          touchMarker: NullablePointer.nullPointer(),
-        ),
-      );
-      if (mounted) {
-        setState(() {});
-      }
+    if (line == null) {
+      return;
+    }
+    if (_similarSessionAnnotations.containsKey(session)) {
+      // another call added a line for this session in the meantime
+      await _mapController?.removeLine(line);
+      return;
+    }
+    _similarSessionAnnotations[session] = _SimilarSessionAnnotation(
+      trackLine: line,
+      color: color,
+      touchMarker: NullablePointer.nullPointer(),
+    );
+    if (mounted) {
+      setState(() {});
     }
   }
 
   Future<void> _hideSession(CardioSession session) async {
-    final line = _similarSessionAnnotations.remove(session)!.trackLine;
-    await _mapController?.removeLine(line);
+    // may already be removed because the button is only rebuilt after the await
+    final annotation = _similarSessionAnnotations.remove(session);
+    if (annotation == null) {
+      return;
+    }
+    await _mapController?.removeLine(annotation.trackLine);
     if (mounted) {
       setState(() {});
     }
