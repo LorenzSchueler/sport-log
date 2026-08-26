@@ -164,9 +164,9 @@ class _RouteEditPageState extends State<RouteEditPage> {
     _circles = [];
     await _mapController?.removeAllLabels();
     _labels = [];
-    _route.markedPositions!.asMap().forEach((index, pos) {
-      _addPoint(pos.latLng, index + 1);
-    });
+    for (final (index, pos) in _route.markedPositions!.indexed) {
+      await _addPoint(pos.latLng, index + 1);
+    }
   }
 
   Future<void> _extendLine(LatLng location) async {
