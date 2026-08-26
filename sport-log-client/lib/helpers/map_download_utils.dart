@@ -96,6 +96,8 @@ class MapDownloadUtils extends ChangeNotifier {
     );
 
     _progress = 0.0;
+    // reset in case a previous download failed before the error was reported
+    _error = false;
     notifyListeners();
 
     final TileRegion tileRegion;
