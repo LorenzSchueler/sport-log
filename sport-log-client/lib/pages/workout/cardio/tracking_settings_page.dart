@@ -118,7 +118,7 @@ class CardioTrackingSettingsPage extends StatelessWidget {
                       child: IntInput(
                         onUpdate: (alarm) =>
                             trackingSettings.routeAlarmDistance = alarm,
-                        initialValue: 50,
+                        initialValue: trackingSettings.routeAlarmDistance!,
                         minValue: 20,
                         maxValue: null,
                       ),
