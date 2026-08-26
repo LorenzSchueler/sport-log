@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:collection/collection.dart';
@@ -117,12 +118,13 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
   List<CardioSession>? _similarSessions;
 
   List<Split>? _splits;
+  int _splitDistance = 1000;
 
   MapController? _mapController;
   late final TabController _tabController = TabController(
     length: 4,
     vsync: this,
-  )..addListener(() => setState(() {}));
+  )..addListener(_onTabChanged);
 
   final NullablePointer<PolylineAnnotation> _trackLine =
       NullablePointer.nullPointer();
@@ -204,14 +206,33 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
         setState(() {
           _cardioSessionDescription = returnObj.payload;
           _similarSessions = null;
+          _splits = null;
           _elevationLine = _getElevationLine();
           _speedLine = _getSpeedLine();
           _cadenceLine = _getCadenceLine();
           _heartRateLine = _getHeartRateLine();
         });
         await _hideAllSessions();
+        if (!mounted) {
+          return;
+        }
+        _loadTabData();
         await _setBoundsAndLines();
       }
+    }
+  }
+
+  void _onTabChanged() {
+    setState(() {});
+    _loadTabData();
+  }
+
+  /// Loads the data of the currently selected tab if it is not loaded yet.
+  void _loadTabData() {
+    if (_tabController.index == 1 && _splits == null) {
+      _computeSplits(_splitDistance);
+    } else if (_tabController.index == 3 && _similarSessions == null) {
+      unawaited(_findSimilarSessions());
     }
   }
 
@@ -227,12 +248,16 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
   }
 
   void _computeSplits(int distance) {
+    if (!mounted) {
+      return;
+    }
     final splits = Split.computeAll(
       _cardioSessionDescription.cardioSession.track,
       distance,
     );
 
     setState(() {
+      _splitDistance = distance;
       _splits = splits;
     });
   }
@@ -372,62 +397,51 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
               Container(
                 height: 250,
                 padding: Defaults.edgeInsets.normal,
-                child: Builder(
-                  builder: (context) {
-                    // load when compare tab opened for first time
-                    if (_splits == null) {
-                      // delay until build finished because setState can not be called during build
-                      Future.delayed(Duration.zero, () => _computeSplits(1000));
-                    }
-                    return _splits == null
-                        ? const Center(child: CircularProgressIndicator())
-                        : _splits!.isEmpty
-                        ? const Center(
-                            child: Text(
-                              "No Splits available.",
-                              style: TextStyle(fontSize: 20),
-                            ),
-                          )
-                        : SingleChildScrollView(
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                SizedBox(
-                                  width: 100,
-                                  child: TextFormField(
-                                    initialValue: "1.000",
-                                    keyboardType: TextInputType.number,
-                                    validator: (distance) =>
-                                        distance == null || distance.isEmpty
-                                        ? null
-                                        : Validator.validateDoubleGtZero(
+                child: _splits == null
+                    ? const Center(child: CircularProgressIndicator())
+                    : _splits!.isEmpty
+                    ? const Center(
+                        child: Text(
+                          "No Splits available.",
+                          style: TextStyle(fontSize: 20),
+                        ),
+                      )
+                    : SingleChildScrollView(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            SizedBox(
+                              width: 100,
+                              child: TextFormField(
+                                initialValue: (_splitDistance / 1000)
+                                    .toStringAsFixed(3),
+                                keyboardType: TextInputType.number,
+                                validator: (distance) =>
+                                    distance == null || distance.isEmpty
+                                    ? null
+                                    : Validator.validateDoubleGtZero(distance),
+                                autovalidateMode:
+                                    AutovalidateMode.onUserInteraction,
+                                onChanged: (distance) {
+                                  if (distance.isNotEmpty &&
+                                      Validator.validateDoubleGtZero(
                                             distance,
-                                          ),
-                                    autovalidateMode:
-                                        AutovalidateMode.onUserInteraction,
-                                    onChanged: (distance) {
-                                      if (distance.isNotEmpty &&
-                                          Validator.validateDoubleGtZero(
-                                                distance,
-                                              ) ==
-                                              null) {
-                                        final meters =
-                                            (double.parse(distance) * 1000)
-                                                .round();
-                                        _computeSplits(meters);
-                                      }
-                                    },
-                                    decoration: const InputDecoration(
-                                      labelText: "Distance (km)",
-                                    ),
-                                  ),
+                                          ) ==
+                                          null) {
+                                    _computeSplits(
+                                      (double.parse(distance) * 1000).round(),
+                                    );
+                                  }
+                                },
+                                decoration: const InputDecoration(
+                                  labelText: "Distance (km)",
                                 ),
-                                _SplitsTable(splits: _splits!),
-                              ],
+                              ),
                             ),
-                          );
-                  },
-                ),
+                            _SplitsTable(splits: _splits!),
+                          ],
+                        ),
+                      ),
               ),
             if (fullscreen.isOff && _tabController.index == 2)
               SizedBox(
@@ -496,44 +510,35 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
                         Defaults.sizedBox.vertical.normal,
                       ],
                     ),
-                    Builder(
-                      builder: (context) {
-                        // load when compare tab opened for first time
-                        if (_similarSessions == null) {
-                          _findSimilarSessions();
-                        }
-                        return _similarSessions == null
-                            ? const SliverToBoxAdapter(
-                                child: Center(
-                                  child: CircularProgressIndicator(),
-                                ),
-                              )
-                            : _similarSessions!.isEmpty
-                            ? const SliverToBoxAdapter(
-                                child: Center(
-                                  child: Text(
-                                    "No similar Cardio Sessions found.",
-                                    style: TextStyle(fontSize: 20),
-                                  ),
-                                ),
-                              )
-                            : SliverList.separated(
-                                itemCount: _similarSessions!.length,
-                                itemBuilder: (_, index) {
-                                  final session = _similarSessions![index];
-                                  return _SimilarCardioSessionCard(
-                                    session: session,
-                                    sessionAnnotation:
-                                        _similarSessionAnnotations[session],
-                                    onShow: () => _showSession(session),
-                                    onHide: () => _hideSession(session),
-                                  );
-                                },
-                                separatorBuilder: (_, _) =>
-                                    Defaults.sizedBox.vertical.normal,
-                              );
-                      },
-                    ),
+                    if (_similarSessions == null)
+                      const SliverToBoxAdapter(
+                        child: Center(child: CircularProgressIndicator()),
+                      )
+                    else if (_similarSessions!.isEmpty)
+                      const SliverToBoxAdapter(
+                        child: Center(
+                          child: Text(
+                            "No similar Cardio Sessions found.",
+                            style: TextStyle(fontSize: 20),
+                          ),
+                        ),
+                      )
+                    else
+                      SliverList.separated(
+                        itemCount: _similarSessions!.length,
+                        itemBuilder: (_, index) {
+                          final session = _similarSessions![index];
+                          return _SimilarCardioSessionCard(
+                            session: session,
+                            sessionAnnotation:
+                                _similarSessionAnnotations[session],
+                            onShow: () => _showSession(session),
+                            onHide: () => _hideSession(session),
+                          );
+                        },
+                        separatorBuilder: (_, _) =>
+                            Defaults.sizedBox.vertical.normal,
+                      ),
                   ],
                 ),
               ),
