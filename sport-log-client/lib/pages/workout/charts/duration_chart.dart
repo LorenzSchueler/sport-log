@@ -27,11 +27,13 @@ class DurationChartLine {
 
   factory DurationChartLine.fromDurationList({
     required List<Duration>? durations,
+    required Duration totalDuration,
     required Color lineColor,
     required bool absolute,
   }) {
     return DurationChartLine.fromValues(
       values: durations,
+      totalDuration: totalDuration,
       getDuration: (d) => d,
       getGroupValue: (durations, interval) =>
           durations.length.toDouble() / interval.inMinuteFractions,
@@ -45,9 +47,12 @@ class DurationChartLine {
     );
   }
 
+  /// [totalDuration] must be the same for all lines shown in one chart,
+  /// otherwise their values end up in differently sized groups.
   // ignore: long-parameter-list
   static DurationChartLine fromValues<T>({
     required List<T>? values,
+    required Duration totalDuration,
     required Duration Function(T) getDuration,
     required double Function(List<T>, Duration interval) getGroupValue,
     double Function(List<T>, Duration interval)? getLastGroupValue,
@@ -57,7 +62,6 @@ class DurationChartLine {
     if (values == null || values.isEmpty) {
       return DurationChartLine._([], lineColor);
     }
-    final totalDuration = getDuration(values.last);
     final interval = intervalMinutes(totalDuration);
     final groupedValues = values
         .groupListsBy((el) => groupFunction(getDuration(el), totalDuration))

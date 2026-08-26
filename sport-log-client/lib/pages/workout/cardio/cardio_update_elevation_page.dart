@@ -35,11 +35,18 @@ class _CardioUpdateElevationPageState extends State<CardioUpdateElevationPage> {
   double? _progress;
   bool _changed = false;
 
+  Duration get _totalDuration {
+    final session = _cardioSessionDescription.cardioSession;
+    return [session.time, session.track?.lastOrNull?.time].nonNulls.maxOrNull ??
+        Duration.zero;
+  }
+
   static const _elevationColor = Color.fromARGB(255, 170, 130, 100);
   late final DurationChartLine _elevationLine = _getElevationLine();
   DurationChartLine _getElevationLine() =>
       DurationChartLine.fromValues<Position>(
         values: _cardioSessionDescription.cardioSession.track,
+        totalDuration: _totalDuration,
         getDuration: (position) => position.time,
         getGroupValue: (positions, _) =>
             positions.map((p) => p.elevation).average,
@@ -52,6 +59,7 @@ class _CardioUpdateElevationPageState extends State<CardioUpdateElevationPage> {
   DurationChartLine _getUpdatedElevationLine() =>
       DurationChartLine.fromValues<Position>(
         values: _cardioSessionDescription.cardioSession.track,
+        totalDuration: _totalDuration,
         getDuration: (position) => position.time,
         getGroupValue: (positions, _) =>
             positions.map((p) => p.elevation).average,
@@ -122,14 +130,7 @@ class _CardioUpdateElevationPageState extends State<CardioUpdateElevationPage> {
                     _elevationLine,
                     if (_changed) _updatedElevationLine,
                   ],
-                  totalDuration:
-                      _cardioSessionDescription.cardioSession.time ??
-                      _cardioSessionDescription
-                          .cardioSession
-                          .track
-                          ?.last
-                          .time ??
-                      Duration.zero,
+                  totalDuration: _totalDuration,
                 ),
               ),
               ElevationMap(onMapCreated: (x) => _elevationMapController = x),

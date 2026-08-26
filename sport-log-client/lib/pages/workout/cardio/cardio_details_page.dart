@@ -59,9 +59,23 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
       .cardioSessionDescription
       .clone();
 
+  /// Shared by all chart lines, the chart itself and [_touchCallback] so that
+  /// all lines are grouped into the same intervals.
+  Duration get _totalDuration {
+    final session = _cardioSessionDescription.cardioSession;
+    return [
+          session.time,
+          session.track?.lastOrNull?.time,
+          session.cadence?.lastOrNull,
+          session.heartRate?.lastOrNull,
+        ].nonNulls.maxOrNull ??
+        Duration.zero;
+  }
+
   late DurationChartLine _speedLine = _getSpeedLine();
   DurationChartLine _getSpeedLine() => DurationChartLine.fromValues<Position>(
     values: _cardioSessionDescription.cardioSession.track,
+    totalDuration: _totalDuration,
     getDuration: (position) => position.time,
     getGroupValue: (positions, _) {
       final km = (positions.last.distance - positions.first.distance) / 1000;
@@ -76,6 +90,7 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
   DurationChartLine _getElevationLine() =>
       DurationChartLine.fromValues<Position>(
         values: _cardioSessionDescription.cardioSession.track,
+        totalDuration: _totalDuration,
         getDuration: (position) => position.time,
         getGroupValue: (positions, _) =>
             positions.map((p) => p.elevation).average,
@@ -86,6 +101,7 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
   late DurationChartLine _cadenceLine = _getCadenceLine();
   DurationChartLine _getCadenceLine() => DurationChartLine.fromDurationList(
     durations: _cardioSessionDescription.cardioSession.cadence,
+    totalDuration: _totalDuration,
     lineColor: _cadenceColor,
     absolute: true,
   );
@@ -93,6 +109,7 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
   late DurationChartLine _heartRateLine = _getHeartRateLine();
   DurationChartLine _getHeartRateLine() => DurationChartLine.fromDurationList(
     durations: _cardioSessionDescription.cardioSession.heartRate,
+    totalDuration: _totalDuration,
     lineColor: _heartRateColor,
     absolute: true,
   );
@@ -433,16 +450,7 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
                                 _cadenceLine,
                                 _heartRateLine,
                               ],
-                              totalDuration:
-                                  _cardioSessionDescription
-                                      .cardioSession
-                                      .time ??
-                                  _cardioSessionDescription
-                                      .cardioSession
-                                      .track
-                                      ?.last
-                                      .time ??
-                                  Duration.zero,
+                              totalDuration: _totalDuration,
                               touchCallback: _touchCallback,
                             ),
                           ),
@@ -531,18 +539,9 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
       final session = _cardioSessionDescription.cardioSession;
       final track = session.track;
 
-      final totalDuration = [
-        track?.lastOrNull?.time,
-        session.heartRate?.lastOrNull,
-        session.cadence?.lastOrNull,
-      ].nonNulls.maxOrNull;
-      if (totalDuration == null) {
-        // this should not happen because if there is no data the chart is also not shown
-        return;
-      }
       final startDuration = DurationChartLine.groupFunction(
         touchDuration,
-        totalDuration,
+        _totalDuration,
       );
 
       final Position? pos;
