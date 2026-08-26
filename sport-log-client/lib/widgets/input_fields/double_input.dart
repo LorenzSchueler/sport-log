@@ -70,7 +70,7 @@ class _DoubleInputState extends State<DoubleInput> {
         title: "Invalid Value",
         text: validated,
       );
-      _textController.text = "$_value";
+      _textController.text = _value.toStringAsFixed(2);
     }
     // if value is valid it is already set
   }
