@@ -76,23 +76,16 @@ class _DurationInputState extends State<DurationInput> {
     _textController.text = _duration.formatM99S;
   }
 
-  List<String> _parseMinSec(String duration) {
-    var minutes = duration;
-    var seconds = "0";
-    if (duration.contains(":")) {
-      final parts = duration.split(":");
-      minutes = parts[0];
-      seconds = parts[1];
-    } else if (duration.contains(",")) {
-      final parts = duration.split(",");
-      minutes = parts[0];
-      seconds = parts[1];
-    } else if (duration.contains(".")) {
-      final parts = duration.split(".");
-      minutes = parts[0];
-      seconds = parts[1];
+  /// Splits [duration] at its first separator (`:`, `,` or `.`) into minutes and seconds,
+  /// keeping any further separators in the seconds so they are reported as invalid.
+  (String, String) _parseMinSec(String duration) {
+    for (final separator in [":", ",", "."]) {
+      final index = duration.indexOf(separator);
+      if (index != -1) {
+        return (duration.substring(0, index), duration.substring(index + 1));
+      }
     }
-    return [minutes, seconds];
+    return (duration, "0");
   }
 
   String? _validateDuration(String durationString) {
@@ -100,9 +93,7 @@ class _DurationInputState extends State<DurationInput> {
     if (validated != null) {
       return validated;
     }
-    final parts = _parseMinSec(durationString);
-    final minutes = parts[0];
-    final seconds = parts[1];
+    final (minutes, seconds) = _parseMinSec(durationString);
     validated = Validator.validateIntBetween(minutes, 0, 99);
     if (validated != null) {
       return validated;
@@ -148,11 +139,12 @@ class _DurationInputState extends State<DurationInput> {
               textAlign: TextAlign.center,
               onChanged: (duration) {
                 if (_validateDuration(duration) == null) {
-                  final parts = _parseMinSec(duration);
-                  final minutes = int.parse(parts[0]);
-                  final seconds = int.parse(parts[1]);
+                  final (minutes, seconds) = _parseMinSec(duration);
                   _setDuration(
-                    Duration(minutes: minutes, seconds: seconds),
+                    Duration(
+                      minutes: int.parse(minutes),
+                      seconds: int.parse(seconds),
+                    ),
                     updateTextField: false,
                   ); // ignore error for now and report it on unfocus
                 }
