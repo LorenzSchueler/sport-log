@@ -226,6 +226,14 @@ class _CardioEditPageState extends State<CardioEditPage> {
 
     final combinedSession = session.combineWith(otherSession);
     if (combinedSession == null) {
+      if (mounted) {
+        await showMessageDialog(
+          context: context,
+          title: "Combining Cardio Sessions Failed",
+          text:
+              "The sessions must not overlap and both must have a time and a track.",
+        );
+      }
       return;
     }
 
