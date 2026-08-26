@@ -47,9 +47,8 @@ class TrackingUtils extends ChangeNotifier {
         trackingSettings.cardioSession,
       ),
       _alarmUtils = AlarmUtils(
-        trackingSettings.route?.track != null
-            ? trackingSettings.routeAlarmDistance
-            : null,
+        trackingSettings.routeAlarmDistance,
+        trackingSettings.route?.track,
       ),
       _audioFeedbackUtils = AudioFeedbackUtils(trackingSettings.audioFeedback),
       _heartRateUtils = trackingSettings.heartRateUtils.deviceId != null
