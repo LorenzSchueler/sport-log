@@ -37,11 +37,16 @@ class DurationChartLine {
       getDuration: (d) => d,
       getGroupValue: (durations, interval) =>
           durations.length.toDouble() / interval.inMinuteFractions,
-      getLastGroupValue: (durations, interval) =>
-          durations.length.toDouble() *
-          (interval.inMilliseconds /
-              (durations.last.inMilliseconds % interval.inMilliseconds)) /
-          interval.inMinuteFractions,
+      getLastGroupValue: (durations, interval) {
+        // extrapolate the partially elapsed last interval to a full one
+        final elapsed = durations.last.inMilliseconds % interval.inMilliseconds;
+        // undefined if none of the interval elapsed, the caller falls back then
+        return elapsed == 0
+            ? double.nan
+            : durations.length.toDouble() *
+                  (interval.inMilliseconds / elapsed) /
+                  interval.inMinuteFractions;
+      },
       lineColor: lineColor,
       absolute: absolute,
     );
@@ -74,7 +79,7 @@ class DurationChartLine {
             rawValue: getGroupValue(entry.value, interval),
           ),
         )
-        .whereNot((v) => v.rawValue.isNaN)
+        .where((v) => v.rawValue.isFinite)
         .toList();
     if (getLastGroupValue != null) {
       chartValues.last = DurationChartValue(
@@ -82,9 +87,13 @@ class DurationChartLine {
         value: 0,
         rawValue: getLastGroupValue(groupedValues.last.value, interval),
       );
-    }
-    if (chartValues.last.value.isNaN && chartValues.length >= 2) {
-      chartValues.last.rawValue = chartValues[chartValues.length - 2].rawValue;
+      if (!chartValues.last.rawValue.isFinite) {
+        if (chartValues.length < 2) {
+          return DurationChartLine._([], lineColor);
+        }
+        chartValues.last.rawValue =
+            chartValues[chartValues.length - 2].rawValue;
+      }
     }
     chartValues.sort((v1, v2) => v1.duration.compareTo(v2.duration));
     // normalize
