@@ -10,6 +10,8 @@ import 'package:sport_log/models/strength/strength_set.dart';
 
 enum StrengthRecordType {
   maxWeight,
+
+  /// best count, i.e. the smallest one for [MovementDimension.time]
   maxCount,
 
   /// only if [Movement] has [MovementDimension.reps] and if [StrengthSet.count] <= [eormMaxRepCount]
@@ -22,14 +24,25 @@ extension StrengthRecordExtension on StrengthRecords {
   List<StrengthRecordType> _getRecordTypesFromStats(
     StrengthSessionStats strengthSessionStats,
     StrengthRecord? strengthRecord,
-  ) => [
-    if (isRecord(strengthSessionStats.maxWeight, strengthRecord?.maxWeight))
-      StrengthRecordType.maxWeight,
-    if (isRecord(strengthSessionStats.maxCount, strengthRecord?.maxCount))
-      StrengthRecordType.maxCount,
-    if (isRecord(strengthSessionStats.maxEorm, strengthRecord?.maxEorm))
-      StrengthRecordType.maxEorm,
-  ];
+    MovementDimension movementDimension,
+  ) {
+    // for time the smallest count is the best one
+    final minRecord = movementDimension == MovementDimension.time;
+    return [
+      if (isRecord(strengthSessionStats.maxWeight, strengthRecord?.maxWeight))
+        StrengthRecordType.maxWeight,
+      if (isRecord(
+        minRecord
+            ? strengthSessionStats.minCount
+            : strengthSessionStats.maxCount,
+        strengthRecord?.maxCount,
+        minRecord: minRecord,
+      ))
+        StrengthRecordType.maxCount,
+      if (isRecord(strengthSessionStats.maxEorm, strengthRecord?.maxEorm))
+        StrengthRecordType.maxEorm,
+    ];
+  }
 
   List<StrengthRecordType> getRecordTypes(
     StrengthSet strengthSet,
@@ -42,7 +55,11 @@ extension StrengthRecordExtension on StrengthRecords {
     );
     final strengthRecord = this[movement.id];
 
-    return _getRecordTypesFromStats(strengthSessionStats, strengthRecord);
+    return _getRecordTypesFromStats(
+      strengthSessionStats,
+      strengthRecord,
+      movement.dimension,
+    );
   }
 
   List<StrengthRecordType> getCombinedRecordTypes(
@@ -55,7 +72,11 @@ extension StrengthRecordExtension on StrengthRecords {
     );
     final strengthRecord = this[strengthSessionDescription.movement.id];
 
-    return _getRecordTypesFromStats(strengthSessionStats, strengthRecord);
+    return _getRecordTypesFromStats(
+      strengthSessionStats,
+      strengthRecord,
+      strengthSessionDescription.movement.dimension,
+    );
   }
 }
 
@@ -81,6 +102,8 @@ class StrengthRecord {
   }
 
   double? maxWeight;
+
+  /// best count, which is the smallest one for [MovementDimension.time]
   int maxCount;
   double? maxEorm;
 

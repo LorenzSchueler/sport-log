@@ -114,8 +114,11 @@ class StrengthSetTable extends TableAccessor<StrengthSet> {
   Future<StrengthRecords> getStrengthRecords() async {
     final records = await database.rawQuery("""
       select ${Tables.movement}.${Columns.id} as ${Columns.movementId}, 
-        max(${Tables.strengthSet}.${Columns.weight}) as ${Columns.maxWeight}, 
-        max(${Tables.strengthSet}.${Columns.count}) as ${Columns.maxCount}, 
+        max(${Tables.strengthSet}.${Columns.weight}) as ${Columns.maxWeight},
+        case when ${Tables.movement}.${Columns.dimension} = ${MovementDimension.time.index}
+          then min(${Tables.strengthSet}.${Columns.count})
+          else max(${Tables.strengthSet}.${Columns.count})
+        end as ${Columns.maxCount},
         max(${Tables.strengthSet}.${Columns.weight} / ${Tables.eorm}.${Columns.eormPercentage}) as ${Columns.maxEorm},
         ${[for (var reps = 1; reps <= eormMaxRepCount; reps++) "max(case when ${Tables.movement}.${Columns.dimension} = ${MovementDimension.reps.index} and ${Tables.strengthSet}.${Columns.count} = $reps then ${Tables.strengthSet}.${Columns.weight} end) as ${Columns.maxWeightForReps(reps)}"].join(", ")}
       from ${Tables.strengthSet}
