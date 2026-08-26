@@ -28,8 +28,9 @@ class StrengthSessionStats extends JsonSerializable {
     List<StrengthSet> sets,
   ) {
     final numSets = sets.length;
-    final maxWeight = sets.map((s) => s.weight).nonNulls.maxOrNull;
-    final avgWeight = sets.map((s) => s.weight).nonNulls.sum / numSets;
+    final weights = sets.map((s) => s.weight).nonNulls;
+    final maxWeight = weights.maxOrNull;
+    final avgWeight = weights.isEmpty ? null : weights.sum / weights.length;
     final minCount = sets.map((s) => s.count).minOrNull ?? 0;
     final maxCount = sets.map((s) => s.count).maxOrNull ?? 0;
     final sumCount = sets.map((s) => s.count).sum;
