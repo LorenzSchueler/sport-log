@@ -232,5 +232,86 @@
         "count": 1,
         "weight": 102.5,
         "deleted": false
+    },
+    {
+        "id": "1204471938765500001",
+        "user_id": "0",
+        "strength_session_id": "1204471938765412301",
+        "set_number": 0,
+        "count": 5,
+        "weight": 100.0,
+        "deleted": false
+    },
+    {
+        "id": "1204471938765500002",
+        "user_id": "0",
+        "strength_session_id": "1204471938765412301",
+        "set_number": 1,
+        "count": 5,
+        "weight": 100.0,
+        "deleted": false
+    },
+    {
+        "id": "1204471938765500003",
+        "user_id": "0",
+        "strength_session_id": "1204471938765412301",
+        "set_number": 2,
+        "count": 5,
+        "weight": 105.0,
+        "deleted": false
+    },
+    {
+        "id": "1204471938765500004",
+        "user_id": "0",
+        "strength_session_id": "1204471938765412302",
+        "set_number": 0,
+        "count": 5,
+        "weight": 110.0,
+        "deleted": false
+    },
+    {
+        "id": "1204471938765500005",
+        "user_id": "0",
+        "strength_session_id": "1204471938765412302",
+        "set_number": 1,
+        "count": 5,
+        "weight": 110.0,
+        "deleted": false
+    },
+    {
+        "id": "1204471938765500006",
+        "user_id": "0",
+        "strength_session_id": "1204471938765412302",
+        "set_number": 2,
+        "count": 3,
+        "weight": 112.5,
+        "deleted": false
+    },
+    {
+        "id": "1204471938765500007",
+        "user_id": "0",
+        "strength_session_id": "1204471938765412303",
+        "set_number": 0,
+        "count": 3,
+        "weight": 117.5,
+        "deleted": false
+    },
+    {
+        "id": "1204471938765500008",
+        "user_id": "0",
+        "strength_session_id": "1204471938765412303",
+        "set_number": 1,
+        "count": 3,
+        "weight": 120.0,
+        "deleted": false
+    },
+    {
+        "id": "1204471938765500009",
+        "user_id": "0",
+        "strength_session_id": "1204471938765412303",
+        "set_number": 2,
+        "count": 2,
+        "weight": 122.5,
+        "deleted": false
     }
 ]

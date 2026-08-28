@@ -1,10 +1,18 @@
+import 'dart:async';
 import 'dart:io';
-import 'dart:typed_data';
-import 'dart:ui';
 
+import 'package:flutter/foundation.dart' show listEquals;
 import 'package:flutter_test/flutter_test.dart';
-import 'package:integration_test/src/channel.dart';
+import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart'
+    show
+        MapWidget,
+        MapboxMap,
+        RenderedQueryGeometry,
+        RenderedQueryOptions,
+        ScreenBox,
+        ScreenCoordinate;
 import 'package:material_ui/material_ui.dart';
+import 'package:sport_log/data_provider/sync.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/main.dart';
 import 'package:sport_log/pages/action/action_event_edit_page.dart';
@@ -40,6 +48,7 @@ import 'package:sport_log/pages/workout/metcon_sessions/metcon_overview_page.dar
 import 'package:sport_log/pages/workout/metcon_sessions/metcon_session_details_page.dart';
 import 'package:sport_log/pages/workout/metcon_sessions/metcon_session_edit_page.dart';
 import 'package:sport_log/pages/workout/metcon_sessions/metcon_session_overview_page.dart';
+import 'package:sport_log/pages/workout/metcon_sessions/metcon_session_results_card.dart';
 import 'package:sport_log/pages/workout/strength_sessions/strength_details_page.dart';
 import 'package:sport_log/pages/workout/strength_sessions/strength_edit_page.dart';
 import 'package:sport_log/pages/workout/strength_sessions/strength_overview_page.dart';
@@ -52,12 +61,17 @@ import 'package:sport_log/widgets/main_drawer.dart';
 // ignore: unreachable_from_main
 final logger = Logger("Screenshot");
 
-// TODO: Change when fixed: https://github.com/flutter/flutter/issues/92381
-// final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
-
 const serverUrl = "http://10.0.2.2:8001";
 const username = "ScreenshotUser";
 const password = "ScreenshotPassword0";
+
+/// `screenshots.sh` watches for capture markers.
+const screenshotDir = '/storage/emulated/0/Download';
+
+const pollInterval = Duration(milliseconds: 100);
+const waitTimeout = Duration(seconds: 60);
+
+const mapSettleChecks = 5;
 
 Finder input(String text) =>
     find.ancestor(of: find.text(text), matching: find.byType(TextFormField));
@@ -68,6 +82,7 @@ final passwordInput = input("Password");
 Finder button(String text) =>
     find.ancestor(of: find.text(text), matching: find.byType(FilledButton));
 final loginButton = button("Login");
+final registerButton = button("Register");
 final okButton = button("OK");
 final cancelButton = button("Cancel");
 
@@ -92,6 +107,7 @@ Finder iconButton(IconData icon) =>
     find.ancestor(of: find.byIcon(icon), matching: find.byType(IconButton));
 final menuButton = iconButton(Icons.menu);
 final routeButton = iconButton(AppIcons.route);
+final metconButton = iconButton(AppIcons.notes);
 final editButton = iconButton(AppIcons.edit);
 final cutButton = iconButton(AppIcons.cut);
 final elevationButton = iconButton(AppIcons.trendingUp);
@@ -99,6 +115,21 @@ final elevationButton = iconButton(AppIcons.trendingUp);
 final discardChanges = find.ancestor(
   of: find.text("Discard Changes"),
   matching: find.byType(TextButton),
+);
+
+Finder strengthSessionCard(String movement) => find
+    .ancestor(
+      of: find.text(movement),
+      matching: find.byType(StrengthSessionCard),
+    )
+    .first;
+
+final metconScores = find.descendant(
+  of: find.descendant(
+    of: find.byType(MetconSessionResultsCard),
+    matching: find.byType(Table),
+  ),
+  matching: find.byType(Text),
 );
 
 Finder navItem(String text) => find.ancestor(
@@ -131,63 +162,119 @@ Future<void> openDrawer(WidgetTester tester) async {
   expect(find.byType(MainDrawer), findsOneWidget);
 }
 
-Future<void> waitMapRender(WidgetTester tester) =>
-    tester.pumpAndSettle(const Duration(seconds: 10));
+/// Pumps frames until [condition] is met.
+///
+/// Unlike [WidgetTester.pumpAndSettle] this also waits for work that does not
+/// schedule frames, like database queries, http requests and map rendering.
+Future<void> waitUntil(
+  WidgetTester tester,
+  String description,
+  FutureOr<bool> Function() condition,
+) async {
+  final stopwatch = Stopwatch()..start();
+  while (!await condition()) {
+    if (stopwatch.elapsed > waitTimeout) {
+      throw TimeoutException("waiting for $description", waitTimeout);
+    }
+    await tester.pump(pollInterval);
+  }
+  await tester.pumpAndSettle();
+}
+
+Future<void> waitFor(WidgetTester tester, Finder finder) =>
+    waitUntil(tester, finder.describeMatch(Plurality.one), () {
+      try {
+        return finder.tryEvaluate();
+      } on StateError {
+        return false; // `first` finders throw while there is no match
+      }
+    });
+
+/// The controllers of all maps of the current page.
+Iterable<MapboxMap> mapControllers(WidgetTester tester) => tester
+    .stateList<State<StatefulWidget>>(find.byType(MapWidget))
+    .map((state) => (state as dynamic).mapboxMap as MapboxMap?)
+    .nonNulls;
+
+/// Describes what [map] currently shows.
+///
+/// Null while the style is still loading.
+Future<String?> mapContent(MapboxMap map) async {
+  if (!await map.style.isStyleLoaded()) {
+    return null;
+  }
+  final camera = await map.getCameraState();
+  final size = await map.getSize();
+  final features = await map.queryRenderedFeatures(
+    RenderedQueryGeometry.fromScreenBox(
+      ScreenBox(
+        min: ScreenCoordinate(x: 0, y: 0),
+        max: ScreenCoordinate(x: size.width, y: size.height),
+      ),
+    ),
+    RenderedQueryOptions(),
+  );
+  return "${camera.center.coordinates} ${camera.zoom} ${camera.bearing} "
+      "${camera.pitch} ${features.length}";
+}
+
+/// Waits until all maps of the current page have rendered all their tiles.
+///
+/// A map is done once its camera and its rendered features stayed the same for
+/// [mapSettleChecks] checks. Waiting for the camera to come to rest also keeps
+/// the position which is stored as `lastMapPosition` reproducible.
+Future<void> waitMapRender(WidgetTester tester) async {
+  var previous = <String?>[];
+  var unchanged = 0;
+  await waitUntil(tester, "maps to render", () async {
+    final current = [
+      for (final map in mapControllers(tester)) await mapContent(map),
+    ];
+    unchanged = current.contains(null) || !listEquals(current, previous)
+        ? 0
+        : unchanged + 1;
+    previous = current;
+    return unchanged >= mapSettleChecks;
+  });
+}
 
 Future<void> tap(
   WidgetTester tester,
   Finder finder, {
   bool warnIfMissed = true,
 }) async {
-  expect(finder, findsOneWidget);
+  await waitFor(tester, finder);
   await tester.tap(finder, warnIfMissed: warnIfMissed);
   await tester.pumpAndSettle();
 }
 
+/// Long pressing an overview card filters the overview by its movement/metcon.
+Future<void> longPress(WidgetTester tester, Finder finder) async {
+  await waitFor(tester, finder);
+  await tester.longPress(finder);
+  await tester.pumpAndSettle();
+}
+
 Future<void> enterText(WidgetTester tester, Finder finder, String text) async {
-  expect(finder, findsOneWidget);
+  await waitFor(tester, finder);
   await tester.enterText(finder, text);
   await tester.pumpAndSettle();
 }
 
+/// Requests a screenshot from `screenshots.sh` and waits until it was taken.
+///
+/// The screenshot is not taken here because the integration test can only
+/// capture the flutter surface which contains neither the system bars nor the
+/// platform views of the maps.
 Future<void> screenshot(WidgetTester tester, String filename) async {
-  if (Platform.isAndroid) {
-    await integrationTestChannel.invokeMethod<void>(
-      'convertFlutterSurfaceToImage',
-    );
-    // TODO: Change when fixed: https://github.com/flutter/flutter/issues/92381
-    // await binding.convertFlutterSurfaceToImage();
-  }
-
+  // a blinking text cursor would make the screenshot non reproducible
+  FocusManager.instance.primaryFocus?.unfocus();
   await tester.pumpAndSettle();
 
-  integrationTestChannel.setMethodCallHandler((call) async {
-    switch (call.method) {
-      case 'scheduleFrame':
-        PlatformDispatcher.instance.scheduleFrame();
-        break;
-    }
-    return null;
-  });
-  final rawBytes = await integrationTestChannel.invokeMethod<List<int>>(
-    'captureScreenshot',
-    <String, dynamic>{'name': "screenshot.png"},
-  );
-  final bytes = rawBytes!;
-
-  // TODO: Change when fixed: https://github.com/flutter/flutter/issues/92381
-  // final bytes = await binding.takeScreenshot("screenshot.png");
-  final image = Uint8List.fromList(bytes);
-  const dir = '/storage/emulated/0/Download';
-  final file = File("$dir/$filename.png");
-  await file.writeAsBytes(image, flush: true, mode: FileMode.writeOnly);
-  logger.i(file);
-
-  if (Platform.isAndroid) {
-    await integrationTestChannel.invokeMethod<void>('revertFlutterImage');
-    // TODO: Change when fixed: https://github.com/flutter/flutter/issues/92381
-    // await binding.revertFlutterImage();
-  }
+  final marker = File("$screenshotDir/$filename.capture");
+  await marker.writeAsString("", flush: true);
+  await waitUntil(tester, "screenshot $filename", () => !marker.existsSync());
+  logger.i("$screenshotDir/$filename.png");
 }
 
 // ignore: long-method
@@ -197,9 +284,14 @@ void main() {
     runApp(const InitAppWrapper());
 
     // landing
-    await tester.pumpAndSettle(const Duration(seconds: 5));
-    expect(find.byType(LandingPage), findsOneWidget);
+    await waitFor(tester, find.byType(LandingPage));
     await screenshot(tester, "landing");
+
+    // go to register
+    await tap(tester, registerButton);
+    expect(find.byType(LoginPage), findsOneWidget);
+    await screenshot(tester, "register");
+    await tap(tester, backButton); // back to landing
 
     // go to login
     await tap(tester, loginButton);
@@ -211,14 +303,18 @@ void main() {
     await enterText(tester, usernameInput, username);
     await enterText(tester, passwordInput, password);
     await tap(tester, loginButton);
-    expect(find.byType(TimelinePage), findsOneWidget);
+    await waitFor(tester, find.byType(TimelinePage));
+    // a sync during the run would change the last sync time and spin the sync
+    // icon in the drawer
+    await waitUntil(tester, "sync", () => !Sync.instance.isSyncing);
+    Sync.instance.stopSync();
     await waitMapRender(tester);
     await screenshot(tester, "timeline");
 
     // go to strength overview
-    expect(strengthNavItem, findsOneWidget);
     await tap(tester, strengthNavItem);
     expect(find.byType(StrengthOverviewPage), findsOneWidget);
+    await waitFor(tester, find.byType(StrengthSessionCard));
     await screenshot(tester, "strength_overview");
 
     // go to strength details
@@ -233,15 +329,20 @@ void main() {
     await backDiscardChanges(tester); // back to details
     await tap(tester, backButton); // back to overview
 
+    // filter strength overview by movement to show chart and records
+    await longPress(tester, strengthSessionCard("Back Squat"));
+    await screenshot(tester, "strength_overview_filtered");
+
     // go to metcon session overview
     await tap(tester, metconNavItem);
     expect(find.byType(MetconSessionOverviewPage), findsOneWidget);
+    await waitFor(tester, find.byType(MetconSessionCard));
     await screenshot(tester, "metcon_session_overview");
 
     // go to metcon session details
     await tap(tester, find.byType(MetconSessionCard).first);
     expect(find.byType(MetconSessionDetailsPage), findsOneWidget);
-    await tester.pumpAndSettle(); // wait for other sessions to load
+    await waitFor(tester, metconScores);
     await screenshot(tester, "metcon_session_details");
 
     // go to metcon session edit
@@ -251,20 +352,21 @@ void main() {
     await backDiscardChanges(tester); // back to details
     await tap(tester, backButton); // back to overview
 
+    // filter metcon session overview by metcon to show metcon and results
+    await longPress(tester, find.byType(MetconSessionCard).first);
+    await screenshot(tester, "metcon_session_overview_filtered");
+
     // go to metcon overview
-    final metconButton = find.ancestor(
-      of: find.byIcon(AppIcons.notes),
-      matching: find.byType(IconButton),
-    );
     await tap(tester, metconButton);
     expect(find.byType(MetconOverviewPage), findsOneWidget);
-    await tester.pumpAndSettle(); // wait for data to load
+    await waitFor(tester, find.byType(MetconCard));
     await screenshot(tester, "metcon_overview");
 
+    // go to metcon details
     await tap(tester, find.byType(MetconCard).first);
     expect(find.byType(MetconDetailsPage), findsOneWidget);
     await screenshot(tester, "metcon_details");
-    await tap(tester, backButton);
+    await tap(tester, backButton); // back to metcon overview
 
     // go to metcon edit
     await tap(tester, addFab);
@@ -275,6 +377,7 @@ void main() {
     // go to cardio overview
     await tap(tester, cardioNavItem);
     expect(find.byType(CardioOverviewPage), findsOneWidget);
+    await waitFor(tester, find.byType(CardioSessionCard));
     await waitMapRender(tester);
     await screenshot(tester, "cardio_overview");
 
@@ -306,6 +409,11 @@ void main() {
     await backDiscardChanges(tester); // back to details
     await tap(tester, backButton); // back to overview
 
+    // filter cardio overview by movement to show chart
+    await longPress(tester, find.textContaining(" at ").first);
+    await waitMapRender(tester);
+    await screenshot(tester, "cardio_overview_filtered");
+
     // go to tracking settings
     await tap(tester, addFab);
     await tap(tester, stopwatchFab);
@@ -315,6 +423,7 @@ void main() {
     // go to tracking
     await tap(tester, okButton);
     expect(find.byType(CardioTrackingPage), findsOneWidget);
+    await waitFor(tester, cancelButton); // wait for permission requests
     await waitMapRender(tester);
     await screenshot(tester, "tracking");
     await tap(tester, cancelButton); // back to tracking settings
@@ -323,6 +432,7 @@ void main() {
     // go to route overview
     await tap(tester, routeButton);
     expect(find.byType(RouteOverviewPage), findsOneWidget);
+    await waitFor(tester, find.byType(RouteCard));
     await waitMapRender(tester);
     await screenshot(tester, "route_overview");
 
@@ -353,6 +463,7 @@ void main() {
     // go to wod overview
     await tap(tester, wodNavItem);
     expect(find.byType(WodOverviewPage), findsOneWidget);
+    await waitFor(tester, find.byType(WodCard));
     await screenshot(tester, "wod_overview");
 
     // go to wod session edit
@@ -364,6 +475,7 @@ void main() {
     // go to diary overview
     await tap(tester, diaryNavItem);
     expect(find.byType(DiaryOverviewPage), findsOneWidget);
+    await waitFor(tester, find.byType(DiaryCard));
     await screenshot(tester, "diary_overview");
 
     // go to diary session edit
@@ -374,18 +486,18 @@ void main() {
 
     // open drawer
     await openDrawer(tester);
-    expect(find.byType(MainDrawer), findsOneWidget);
     await screenshot(tester, "drawer");
 
     // go to movement overview
     await tap(tester, movementDrawerItem);
     expect(find.byType(MovementOverviewPage), findsOneWidget);
+    await waitFor(tester, find.byType(MovementCard));
     await screenshot(tester, "movement_overview");
 
     // go to movement edit
     await tap(tester, addFab);
-    await screenshot(tester, "movement_edit");
     expect(find.byType(MovementEditPage), findsOneWidget);
+    await screenshot(tester, "movement_edit");
     await backDiscardChanges(tester);
 
     // go to timer
@@ -401,17 +513,13 @@ void main() {
     await waitMapRender(tester);
     await screenshot(tester, "map");
 
+    // show map styles
     await tap(tester, layersFab);
+    await waitMapRender(tester);
     await screenshot(tester, "map_styles");
 
-    await tap(
-      tester,
-      //find.descendant(
-      //of: find.byType(SegmentedButton),
-      //matching:
-      find.byIcon(AppIcons.satellite),
-      //),
-    );
+    // switch to satellite style
+    await tap(tester, find.byIcon(AppIcons.satellite));
     await tap(tester, layersFab, warnIfMissed: false); // hide map style sheet
     await waitMapRender(tester);
     await screenshot(tester, "map_satellite");
@@ -433,12 +541,13 @@ void main() {
     await openDrawer(tester);
     await tap(tester, serverActionsDrawerItem);
     expect(find.byType(PlatformOverviewPage), findsOneWidget);
+    await waitFor(tester, find.text("wodify-login"));
     await screenshot(tester, "platform_overview");
 
     // go to action provider overview
     await tap(tester, find.text("wodify-login"));
     expect(find.byType(ActionProviderOverviewPage), findsOneWidget);
-    await tester.pumpAndSettle(); // wait for data to load
+    await waitFor(tester, find.byType(ActionEventsCard));
     await screenshot(tester, "action_provider_overview");
 
     // go to action rule edit
@@ -477,7 +586,7 @@ void main() {
     await screenshot(tester, "settings");
 
     // go to about
-    expect(aboutButton, findsOneWidget);
+    await waitFor(tester, aboutButton);
     await tester.ensureVisible(aboutButton);
     await tester.pumpAndSettle();
     await tap(tester, aboutButton);

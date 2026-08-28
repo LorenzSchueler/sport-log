@@ -22,8 +22,8 @@ The client has an own database in order to allow offline use. It synchronizes wi
   <tr>
     <td><img src="sport-log-client/screenshots/timeline.png"></td>
     <td><img src="sport-log-client/screenshots/strength_details.png"></td>
-    <td><img src="sport-log-client/screenshots/tracking.png"></td>
-    <td><img src="sport-log-client/screenshots/route_details.png"></td>
+    <td><img src="sport-log-client/screenshots/cardio_details.png"></td>
+    <td><img src="sport-log-client/screenshots/metcon_session_details.png"></td>
     <td><img src="sport-log-client/screenshots/action_provider_overview.png"></td>
   </tr>
 </table>
