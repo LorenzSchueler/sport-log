@@ -20,7 +20,10 @@ class StepCountUtils {
     if (!await PermissionRequest.request(Permission.activityRecognition)) {
       return false;
     }
-    _stepCountSubscription = Pedometer.stepStream.listen((_) => onStep());
+    _stepCountSubscription = Pedometer.stepStream.listen(
+      (_) => onStep(),
+      onError: (Object _) => stopStepCountStream(),
+    );
 
     return true;
   }
