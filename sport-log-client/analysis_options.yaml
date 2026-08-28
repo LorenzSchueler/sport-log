@@ -88,9 +88,6 @@ analyzer:
     strict-inference: true
     strict-raw-types: true
 
-  plugins:
-    - dart_code_linter
-
 dart_code_linter:
   anti-patterns:
     - long-method
