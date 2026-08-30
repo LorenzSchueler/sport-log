@@ -10,7 +10,6 @@ const_format = "0.2.30"
 http = "1.0"
 diesel = { version = "2.3.2", features = [
     "postgres",
-    "r2d2",
     "chrono",
 ], optional = true }
 diesel-derive-enum = { version = "2", features = ["postgres"], optional = true }
