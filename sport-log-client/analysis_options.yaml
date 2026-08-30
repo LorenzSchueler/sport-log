@@ -77,10 +77,8 @@ analyzer:
     - lib/widgets/custom_icons.dart
     - build/**
     - android/**
-    - ios/**
     - web/**
     - windows/**
-    - macos/**
     - linux/**
 
   language:

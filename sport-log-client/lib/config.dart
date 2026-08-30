@@ -158,7 +158,6 @@ class Config extends JsonSerializable {
 
   static const bool isWeb = kIsWeb;
   static bool isAndroid = Platform.isAndroid;
-  static bool isIOS = Platform.isIOS;
   static bool isLinux = Platform.isLinux;
   static bool isWindows = Platform.isWindows;
 

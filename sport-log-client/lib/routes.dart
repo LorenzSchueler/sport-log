@@ -111,12 +111,12 @@ abstract class Routes {
     return Settings.instance.userId != null ? builder() : const LandingPage();
   }
 
-  static Widget _checkUserIdAndroidIos(
+  static Widget _checkUserIdAndroid(
     BuildContext context,
     Widget Function() builder,
   ) {
     return Settings.instance.userId != null
-        ? Config.isAndroid || Config.isIOS
+        ? Config.isAndroid
               ? builder()
               : const PlatformNotSupportedPage()
         : const LandingPage();
@@ -138,11 +138,11 @@ abstract class Routes {
         _checkNoAccount(() => const LoginPage(loginType: LoginType.register)),
     Routes.update: (_) => const UpdatePage(),
     Routes.timer: (_) => _checkUserId(() => const TimerPage()),
-    Routes.map: (context) => _checkUserIdAndroidIos(context, MapPage.new),
+    Routes.map: (context) => _checkUserIdAndroid(context, MapPage.new),
     Routes.offlineMaps: (context) =>
-        _checkUserIdAndroidIos(context, () => const OfflineMapsPage()),
+        _checkUserIdAndroid(context, () => const OfflineMapsPage()),
     Routes.heartRate: (context) =>
-        _checkUserIdAndroidIos(context, () => const HeartRatePage()),
+        _checkUserIdAndroid(context, () => const HeartRatePage()),
     Routes.settings: (_) => _checkUserId(() => const SettingsPage()),
     Routes.devStatus: (_) => _checkUserId(() => const DevStatusPage()),
     Routes.devTools: (_) => _checkUserId(() => const DevToolsPage()),
@@ -317,7 +317,7 @@ abstract class Routes {
               as CardioSessionDescription;
       return CardioCutPage(cardioSessionDescription: cardioSessionDescription);
     }),
-    Routes.trackingSettings: (context) => _checkUserIdAndroidIos(context, () {
+    Routes.trackingSettings: (context) => _checkUserIdAndroid(context, () {
       final movement =
           ModalRoute.of(context)?.settings.arguments as Movement? ??
           Movement.defaultMovement;
@@ -325,7 +325,7 @@ abstract class Routes {
           ? const MovementEditPage(movementDescription: null)
           : CardioTrackingSettingsPage(initMovement: movement);
     }),
-    Routes.tracking: (context) => _checkUserIdAndroidIos(context, () {
+    Routes.tracking: (context) => _checkUserIdAndroid(context, () {
       final arg = ModalRoute.of(context)!.settings.arguments;
       final TrackingSettings? trackingSettings;
       if (arg is TrackingSettings) {
