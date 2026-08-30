@@ -72,10 +72,8 @@ class HeartRatePage extends StatelessWidget {
                     if (heartRateUtils.canConnect) ...[
                       Defaults.sizedBox.vertical.normal,
                       FilledButton(
-                        onPressed: () => heartRateUtils.startHeartRateStream(
-                          null,
-                          hrv: true,
-                        ),
+                        onPressed: () =>
+                            heartRateUtils.startHeartRateStream(null),
                         child: const Text("Connect"),
                       ),
                     ],
@@ -96,13 +94,6 @@ class HeartRatePage extends StatelessWidget {
                             "${heartRateUtils.hr}",
                             style: const TextStyle(fontSize: 120),
                           ),
-                          if (heartRateUtils.hrv != null) ...[
-                            Text(
-                              "HRV: ${heartRateUtils.hrv} ms",
-                              style: const TextStyle(fontSize: 20),
-                            ),
-                            Defaults.sizedBox.vertical.normal,
-                          ],
                           if (heartRateUtils.battery != null)
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,

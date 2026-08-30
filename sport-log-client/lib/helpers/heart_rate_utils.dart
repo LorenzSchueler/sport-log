@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:collection/collection.dart';
 import 'package:cupertino_ui/cupertino_ui.dart';
@@ -28,22 +27,6 @@ class HeartRateUtils extends ChangeNotifier {
   int? get hr => _hr;
   int? _battery;
   int? get battery => _battery;
-  List<int> _rrs = [];
-  //https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5624990/
-  int? _hrv;
-  int? get hrv => _hrv;
-  void _setHrv() {
-    if (_rrs.length < 2) {
-      _hrv = null;
-      return;
-    }
-    var sumOfSquares = 0;
-    for (var i = 0; i < _rrs.length - 1; i++) {
-      sumOfSquares += pow(_rrs[i] - _rrs[i + 1], 2) as int;
-    }
-
-    _hrv = sqrt(sumOfSquares / (_rrs.length - 1)).round();
-  }
 
   bool _disposed = false;
 
@@ -139,9 +122,8 @@ class HeartRateUtils extends ChangeNotifier {
   }
 
   Future<bool> startHeartRateStream(
-    void Function(List<int>)? onHeartRateEvent, {
-    bool hrv = false,
-  }) async {
+    void Function(List<int>)? onHeartRateEvent,
+  ) async {
     if (!canConnect || isConnecting || isConnected) {
       return false;
     }
@@ -167,11 +149,6 @@ class HeartRateUtils extends ChangeNotifier {
             for (final sample in samples) {
               rrs.addAll(sample.rrsMs);
             }
-            if (hrv) {
-              _rrs.addAll(rrs);
-              _setHrv();
-            }
-
             onHeartRateEvent?.call(rrs);
             if (!_disposed) {
               notifyListeners();
@@ -207,8 +184,6 @@ class HeartRateUtils extends ChangeNotifier {
     }
     deviceId = null;
     _hr = null;
-    _rrs = [];
-    _hrv = null;
     _battery = null;
     if (!_disposed) {
       notifyListeners();
