@@ -48,9 +48,6 @@ jobs:
     - name: flutter analyze
       working-directory: sport-log-client
       run: flutter analyze
-    #- name: dart run dart_code_linter
-      #working-directory: sport-log-client
-      #run: dart run dart_code_linter:metrics analyze --set-exit-on-violation-level=warning lib
 
   codegen:
     name: codegen
@@ -96,11 +93,12 @@ jobs:
       working-directory: sport-log-client
       run: |
         cp sport-log-client.yaml.template sport-log-client.yaml
+        ref=$(git rev-parse --short=7 HEAD)
         flutter build apk --debug \
             --flavor production \
             --target-platform android-arm64 \
-            --split-per-abi # \
-            # --dart-define GIT_REF="$(git show-ref --head --hash=7 HEAD)"
+            --split-per-abi \
+            --dart-define "GIT_REF=$ref"
 
   build-linux:
     name: build linux
