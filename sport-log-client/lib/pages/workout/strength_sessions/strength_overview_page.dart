@@ -95,49 +95,55 @@ class StrengthOverviewPage extends StatelessWidget {
                 alignment: Alignment.topCenter,
                 children: [
                   SyncRefreshIndicator(
-                    child: dataProvider.entities.isEmpty
-                        ? RefreshableNoEntriesText(
-                            text: SessionsPageTab.strength.noEntriesText,
-                          )
-                        : Padding(
-                            padding: Defaults.edgeInsets.normal,
-                            child: CustomScrollView(
-                              slivers: [
-                                if (dataProvider.isSelected)
-                                  SliverList.list(
-                                    children: [
-                                      StrengthChart(
-                                        strengthSessionDescriptions:
-                                            dataProvider.entities,
-                                        dateFilterState:
-                                            dataProvider.dateFilter,
-                                      ),
-                                      Defaults.sizedBox.vertical.normal,
-                                      StrengthRecordsCard(
-                                        strengthRecords:
-                                            dataProvider.records ?? {},
-                                        movement: dataProvider.selected!,
-                                      ),
-                                      Defaults.sizedBox.vertical.normal,
-                                    ],
+                    child: Padding(
+                      padding: Defaults.edgeInsets.normal,
+                      child: CustomScrollView(
+                        slivers: [
+                          if (dataProvider.isSelected)
+                            SliverList.list(
+                              children: [
+                                if (dataProvider.entities.isNotEmpty) ...[
+                                  StrengthChart(
+                                    strengthSessionDescriptions:
+                                        dataProvider.entities,
+                                    dateFilterState: dataProvider.dateFilter,
                                   ),
-                                SliverList.separated(
-                                  itemBuilder: (context, index) =>
-                                      StrengthSessionCard(
-                                        strengthSessionDescription:
-                                            dataProvider.entities[index],
-                                        strengthRecords:
-                                            dataProvider.records ?? {},
-                                        onSelected: (movement) =>
-                                            dataProvider.selected = movement,
-                                      ),
-                                  separatorBuilder: (_, _) =>
-                                      Defaults.sizedBox.vertical.normal,
-                                  itemCount: dataProvider.entities.length,
+                                  Defaults.sizedBox.vertical.normal,
+                                ],
+                                StrengthRecordsCard(
+                                  strengthRecords: dataProvider.records ?? {},
+                                  movement: dataProvider.selected!,
                                 ),
+                                Defaults.sizedBox.vertical.normal,
                               ],
                             ),
-                          ),
+                          if (dataProvider.entities.isEmpty)
+                            SliverFillRemaining(
+                              hasScrollBody: false,
+                              child: Center(
+                                child: Text(
+                                  SessionsPageTab.strength.noEntriesText,
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            )
+                          else
+                            SliverList.separated(
+                              itemBuilder: (context, index) =>
+                                  StrengthSessionCard(
+                                    strengthSessionDescription:
+                                        dataProvider.entities[index],
+                                    strengthRecords: dataProvider.records ?? {},
+                                    onSelected: (movement) =>
+                                        dataProvider.selected = movement,
+                                  ),
+                              separatorBuilder: (_, _) =>
+                                  Defaults.sizedBox.vertical.normal,
+                              itemCount: dataProvider.entities.length,
+                            ),
+                        ],
+                      ),
+                    ),
                   ),
                   if (dataProvider.isLoading)
                     const Positioned(
