@@ -140,8 +140,7 @@ class TrackingUtils extends ChangeNotifier {
         // ignore: use_build_context_synchronously
         context: App.globalContext,
         title: "Warning",
-        text:
-            "No Text-To-Speech (TTS) engine found. Audio feedback and alarms not available.",
+        text: "No Text-To-Speech (TTS) engine found. Audio feedback and alarms not available.",
       );
     }
   }
@@ -207,9 +206,8 @@ class TrackingUtils extends ChangeNotifier {
       Navigator.pop(context); // pop dialog
       Navigator.pop(context); // pop tracking page
       // the tracking settings page was never pushed when tracking is quick started
-      Navigator.of(
-        context,
-      ).popUntil((route) => route.settings.name != Routes.trackingSettings);
+      Navigator.of(context)
+          .popUntil((route) => route.settings.name != Routes.trackingSettings);
     });
   }
 

@@ -100,14 +100,13 @@ class LocationUtils extends ChangeNotifier {
     }
 
     _locationSubscription =
-        Geolocator.getPositionStream(
-          locationSettings: settings(inBackground),
-        ).listen(
-          (position) => _onLocationUpdate(
-            GpsPosition.fromGeolocatorPosition(position),
-            onLocationUpdate,
-          ),
-        );
+        Geolocator.getPositionStream(locationSettings: settings(inBackground))
+            .listen(
+              (position) => _onLocationUpdate(
+                GpsPosition.fromGeolocatorPosition(position),
+                onLocationUpdate,
+              ),
+            );
     _inBackground = inBackground;
     notifyListeners();
     return true;

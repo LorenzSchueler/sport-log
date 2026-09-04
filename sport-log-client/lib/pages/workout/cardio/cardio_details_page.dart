@@ -237,9 +237,8 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
   }
 
   Future<void> _showSession(CardioSession session) async {
-    final color = Color(
-      (Random().nextDouble() * 0xFFFFFF).toInt(),
-    ).withAlpha(255);
+    final color = Color((Random().nextDouble() * 0xFFFFFF).toInt())
+        .withAlpha(255);
     final line = await _mapController?.addLine(session.track!, color);
     if (line != null) {
       _similarSessionAnnotations.putIfAbsent(

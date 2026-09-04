@@ -59,8 +59,7 @@ class RouteOverviewPage extends StatelessWidget {
               body: SyncRefreshIndicator(
                 child: dataProvider.entities.isEmpty
                     ? const RefreshableNoEntriesText(
-                        text:
-                            "Looks like there are no routes there yet 😔\nPress ＋ to create a new one",
+                        text: "Looks like there are no routes there yet 😔\nPress ＋ to create a new one",
                       )
                     : Padding(
                         padding: Defaults.edgeInsets.normal,

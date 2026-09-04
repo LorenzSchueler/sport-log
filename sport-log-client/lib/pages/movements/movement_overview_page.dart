@@ -54,8 +54,7 @@ class MovementOverviewPage extends StatelessWidget {
               body: SyncRefreshIndicator(
                 child: dataProvider.entities.isEmpty
                     ? const RefreshableNoEntriesText(
-                        text:
-                            "Looks like there are no movements there yet 😔\nPress ＋ to create a new one",
+                        text: "Looks like there are no movements there yet 😔\nPress ＋ to create a new one",
                       )
                     : Padding(
                         padding: Defaults.edgeInsets.normal,

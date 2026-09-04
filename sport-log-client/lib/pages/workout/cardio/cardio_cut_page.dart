@@ -105,8 +105,7 @@ class _CardioCutPageState extends State<CardioCutPage> {
     final approved = await showApproveDialog(
       context: context,
       title: "Cut Cardio Session",
-      text:
-          "This can not be reversed. All cut out data will be permanently lost.",
+      text: "This can not be reversed. All cut out data will be permanently lost.",
     );
     if (approved) {
       final cutSession = _cardioSessionDescription.cardioSession.cut(
@@ -198,9 +197,9 @@ class _CardioCutPageState extends State<CardioCutPage> {
                           label: const Text("Cancel"),
                           onPressed: () => Navigator.of(context).pop(),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Theme.of(
-                              context,
-                            ).colorScheme.error,
+                            backgroundColor: Theme.of(context)
+                                .colorScheme
+                                .error,
                           ),
                         ),
                       ),
@@ -211,9 +210,9 @@ class _CardioCutPageState extends State<CardioCutPage> {
                           label: const Text("Cut"),
                           onPressed: _cutCardioSession,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Theme.of(
-                              context,
-                            ).colorScheme.errorContainer,
+                            backgroundColor: Theme.of(context)
+                                .colorScheme
+                                .errorContainer,
                           ),
                         ),
                       ),

@@ -32,8 +32,7 @@ class SettingsPage extends StatelessWidget {
       onNoInternet: () => showMessageDialog(
         context: context,
         title: "Server Unreachable",
-        text:
-            "The server could not be reached.\nPlease make sure you are connected to the internet and the server URL is right.",
+        text: "The server could not be reached.\nPlease make sure you are connected to the internet and the server URL is right.",
       ),
     );
   }
@@ -150,8 +149,7 @@ class SettingsPage extends StatelessWidget {
     final approved = await showApproveDialog(
       context: context,
       title: "Logout",
-      text:
-          "Make sure you know you credentials before logging out. Otherwise you will lose access to your account and all your data.",
+      text: "Make sure you know you credentials before logging out. Otherwise you will lose access to your account and all your data.",
     );
     if (approved) {
       await Account.logout();
@@ -237,9 +235,9 @@ class SettingsPage extends StatelessWidget {
                         Defaults.sizedBox.horizontal.normal,
                         Expanded(
                           child: FilledButton(
-                            onPressed: () => Navigator.of(
-                              context,
-                            ).pushNamed(Routes.registration),
+                            onPressed: () =>
+                                Navigator.of(context)
+                                    .pushNamed(Routes.registration),
                             child: const Text('Register'),
                           ),
                         ),

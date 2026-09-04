@@ -169,9 +169,8 @@ class _OfflineMapsPageState extends State<OfflineMapsPage> {
                                           ? ButtonStyle(
                                               backgroundColor:
                                                   WidgetStatePropertyAll(
-                                                    Theme.of(
-                                                      context,
-                                                    ).disabledColor,
+                                                    Theme.of(context)
+                                                        .disabledColor,
                                                   ),
                                             )
                                           : null,
@@ -246,24 +245,20 @@ class RegionCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                DateTime.parse(
-                  region.metadata["datetime"]! as String,
-                ).humanDate,
-                style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                  color: Theme.of(context).colorScheme.surface,
-                ),
+                DateTime.parse(region.metadata["datetime"]! as String)
+                    .humanDate,
+                style: Theme.of(context).textTheme.bodyLarge!
+                    .copyWith(color: Theme.of(context).colorScheme.surface),
               ),
               Text(
                 "${region.tileRegion.completedResourceCount} Tiles / ${(region.tileRegion.completedResourceSize / 1000000).round()} MB",
-                style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                  color: Theme.of(context).colorScheme.surface,
-                ),
+                style: Theme.of(context).textTheme.bodyMedium!
+                    .copyWith(color: Theme.of(context).colorScheme.surface),
               ),
               Text(
                 "Zoom ${region.metadata["minZoom"]} - ${region.metadata["maxZoom"]}",
-                style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                  color: Theme.of(context).colorScheme.surface,
-                ),
+                style: Theme.of(context).textTheme.bodyMedium!
+                    .copyWith(color: Theme.of(context).colorScheme.surface),
               ),
             ],
           ),

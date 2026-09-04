@@ -50,9 +50,9 @@ class MetconOverviewPage extends StatelessWidget {
                     ),
                   ),
                   IconButton(
-                    onPressed: () => Navigator.of(
-                      context,
-                    ).newBase(Routes.metconSessionOverview),
+                    onPressed: () =>
+                        Navigator.of(context)
+                            .newBase(Routes.metconSessionOverview),
                     icon: const Icon(AppIcons.notes),
                   ),
                 ],
@@ -60,8 +60,7 @@ class MetconOverviewPage extends StatelessWidget {
               body: SyncRefreshIndicator(
                 child: dataProvider.entities.isEmpty
                     ? const RefreshableNoEntriesText(
-                        text:
-                            "Looks like there are no metcons there yet 😔\nPress ＋ to create a new one",
+                        text: "Looks like there are no metcons there yet 😔\nPress ＋ to create a new one",
                       )
                     : Padding(
                         padding: Defaults.edgeInsets.normal,

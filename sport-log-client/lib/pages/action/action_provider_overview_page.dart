@@ -175,8 +175,7 @@ class ActionRulesCard extends StatelessWidget {
                       ? () => showMessageDialog(
                           context: context,
                           title: "No registered actions",
-                          text:
-                              "An action rule needs an action to refer to, but the action provider did not register any.",
+                          text: "An action rule needs an action to refer to, but the action provider did not register any.",
                         )
                       : () => Navigator.of(context).pushNamed(
                           Routes.actionRuleEdit,
@@ -267,8 +266,7 @@ class ActionEventsCard extends StatelessWidget {
                       ? () => showMessageDialog(
                           context: context,
                           title: "No registered actions",
-                          text:
-                              "An action event needs an action to refer to, but the action provider did not register any.",
+                          text: "An action event needs an action to refer to, but the action provider did not register any.",
                         )
                       : () => Navigator.of(context).pushNamed(
                           Routes.actionEventEdit,

@@ -41,9 +41,9 @@ class MainDrawer extends StatelessWidget {
                           AppIcons.dumbbell,
                           color: onBackgroundColor,
                         ),
-                        onTap: () => Navigator.of(
-                          context,
-                        ).newBase(Routes.defaultWorkoutTracking),
+                        onTap: () =>
+                            Navigator.of(context)
+                                .newBase(Routes.defaultWorkoutTracking),
                         selected:
                             selectedRoute == Routes.defaultWorkoutTracking,
                       ),
@@ -53,9 +53,9 @@ class MainDrawer extends StatelessWidget {
                           AppIcons.movement,
                           color: onBackgroundColor,
                         ),
-                        onTap: () => Navigator.of(
-                          context,
-                        ).newBase(Routes.movementOverview),
+                        onTap: () =>
+                            Navigator.of(context)
+                                .newBase(Routes.movementOverview),
                         selected: selectedRoute == Routes.movementOverview,
                       ),
                       ListTile(
@@ -101,9 +101,9 @@ class MainDrawer extends StatelessWidget {
                             color: onBackgroundColor,
                           ),
                           title: const Text('Server Actions'),
-                          onTap: () => Navigator.of(
-                            context,
-                          ).newBase(Routes.platformOverview),
+                          onTap: () =>
+                              Navigator.of(context)
+                                  .newBase(Routes.platformOverview),
                           selected: selectedRoute == Routes.platformOverview,
                         ),
                       ListTile(

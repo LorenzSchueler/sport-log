@@ -40,8 +40,8 @@ class LatLng {
     return "${toDegreeMinDec(lat, "N", "S")} ${toDegreeMinDec(lng, "O", "W")}";
   }
 
-  double distanceTo(LatLng other) =>
-      const lat_long.Distance(roundResult: false).distance(
+  double distanceTo(LatLng other) => const lat_long.Distance(roundResult: false)
+      .distance(
         lat_long.LatLng(lat, lng),
         lat_long.LatLng(other.lat, other.lng),
       ); // in m

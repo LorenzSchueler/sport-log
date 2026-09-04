@@ -203,8 +203,7 @@ Future<bool> showUpdateDialog(BuildContext context) async {
     context: context,
     builder: (_) => _Dialog(
       title: 'Install Update?',
-      text:
-          'An update for Sport-Log is available. Do you want to download and install it now?',
+      text: 'An update for Sport-Log is available. Do you want to download and install it now?',
       options: [
         _DialogOption(name: "No", value: false),
         _DialogOption(name: "Yes", value: true),

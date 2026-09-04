@@ -101,9 +101,8 @@ class InitAppWrapperState extends State<InitAppWrapper> {
                     Defaults.sizedBox.vertical.normal,
                     Text(
                       _error.toString(),
-                      style: Theme.of(
-                        context,
-                      ).textTheme.bodyLarge?.copyWith(color: Colors.red),
+                      style: Theme.of(context).textTheme.bodyLarge
+                          ?.copyWith(color: Colors.red),
                     ),
                   ],
                 ],

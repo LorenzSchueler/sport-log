@@ -26,9 +26,8 @@ class _TimePickerDialogState extends State<TimePickerDialog> {
         onTimeChange: (datetime) => _datetime = datetime,
         time: widget.datetime,
         isShowSeconds: widget.withSeconds,
-        normalTextStyle: Theme.of(
-          context,
-        ).textTheme.bodyLarge!.copyWith(color: Theme.of(context).disabledColor),
+        normalTextStyle: Theme.of(context).textTheme.bodyLarge!
+            .copyWith(color: Theme.of(context).disabledColor),
         selectedTextStyle: Theme.of(context).textTheme.bodyLarge!,
       ),
       actions: [

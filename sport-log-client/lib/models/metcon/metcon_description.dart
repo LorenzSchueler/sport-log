@@ -30,8 +30,7 @@ class MetconDescription extends CompoundEntity {
   List<MetconMovementDescription> moves;
   bool hasReference;
 
-  static MetconDescription?
-  _defaultMetconDescription; // default metcon description that already exists in db
+  static MetconDescription? _defaultMetconDescription; // default metcon description that already exists in db
   static set defaultMetconDescription(MetconDescription? metconDescription) =>
       _defaultMetconDescription = metconDescription;
   static MetconDescription? get defaultMetconDescription =>

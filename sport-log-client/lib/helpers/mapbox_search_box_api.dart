@@ -34,9 +34,8 @@ class MapboxSearchBoxApi {
     }
     queryParameters['auto_complete'] = autocomplete.toString();
 
-    final uri = Uri.parse(
-      _baseApiUrl,
-    ).replace(queryParameters: queryParameters);
+    final uri = Uri.parse(_baseApiUrl)
+        .replace(queryParameters: queryParameters);
 
     try {
       final response = await http.get(uri);

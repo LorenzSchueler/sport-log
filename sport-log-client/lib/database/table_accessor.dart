@@ -174,9 +174,8 @@ abstract class TableAccessor<T extends AtomicEntity> {
           whereArgs: [object.id.toInt()],
         );
       }
-      final changesList = (await batch.commit(
-        continueOnError: false,
-      )).cast<int>();
+      final changesList = (await batch.commit(continueOnError: false))
+          .cast<int>();
       return DbResultExt.fromBool(
         eq(changesList, List.filled(objects.length, 1)),
       );
@@ -206,9 +205,8 @@ abstract class TableAccessor<T extends AtomicEntity> {
           whereArgs: [object.id.toInt()],
         );
       }
-      final changesList = (await batch.commit(
-        continueOnError: false,
-      )).cast<int>();
+      final changesList = (await batch.commit(continueOnError: false))
+          .cast<int>();
       return DbResultExt.fromBool(
         eq(changesList, List.filled(objects.length, 1)),
       );

@@ -119,8 +119,7 @@ class PlatformCard extends StatelessWidget {
                     : () => showMessageDialog(
                         context: context,
                         title: "No Credentials",
-                        text:
-                            "Credentials are needed before you can use the action provider.",
+                        text: "Credentials are needed before you can use the action provider.",
                       ),
                 child: Text(actionProvider.name),
               ),

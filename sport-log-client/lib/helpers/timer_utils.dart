@@ -132,9 +132,8 @@ class TimerUtils {
       await stopTimer();
     } else if (_currentTime.inSeconds > 0 && timerType == TimerType.interval) {
       final roundStart =
-          Duration(
-            seconds: _currentTime.inSeconds % totalTime.inSeconds,
-          ).inSeconds ==
+          Duration(seconds: _currentTime.inSeconds % totalTime.inSeconds)
+              .inSeconds ==
           0;
       final restStart =
           Duration(

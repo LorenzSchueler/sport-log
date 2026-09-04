@@ -20,9 +20,8 @@ class DbDurationListConverter {
   static Uint8List? mapToSql(List<Duration>? value) {
     return value == null
         ? null
-        : Int64List.fromList(
-            value.map((e) => e.inMilliseconds).toList(),
-          ).buffer.asUint8List();
+        : Int64List.fromList(value.map((e) => e.inMilliseconds).toList()).buffer
+              .asUint8List();
   }
 }
 
