@@ -28,8 +28,16 @@ class UpdatePage extends StatelessWidget {
       if (await PermissionRequest.request(Permission.manageExternalStorage) &&
           await PermissionRequest.request(Permission.requestInstallPackages)) {
         await OpenFile.open(filename);
+      } else if (context.mounted) {
+        await showMessageDialog(
+          context: context,
+          title: "Update Failed",
+          text: "Permission to install the update is required.",
+        );
       }
-    } else if (context.mounted) {
+    }
+
+    if (context.mounted) {
       Navigator.pop(context);
     }
   }
