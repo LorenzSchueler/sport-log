@@ -121,6 +121,7 @@ impl ActionProviderDb {
         let (action_provider_id, password_hash): (ActionProviderId, String) =
             action_provider::table
                 .filter(action_provider::columns::name.eq(name))
+                .filter(action_provider::columns::deleted.eq(false))
                 .select((
                     action_provider::columns::id,
                     action_provider::columns::password,
@@ -149,6 +150,7 @@ impl ActionProviderDb {
         let (action_provider_id, password_hash): (ActionProviderId, String) =
             action_provider::table
                 .filter(action_provider::columns::name.eq(name))
+                .filter(action_provider::columns::deleted.eq(false))
                 .select((
                     action_provider::columns::id,
                     action_provider::columns::password,
