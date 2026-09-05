@@ -314,7 +314,9 @@ class SettingsPage extends StatelessWidget {
                     create: (_) => BoolToggle.on(),
                     builder: (context, obscure, _) => TextFormField(
                       // use new initialValue if password changed
-                      key: ValueKey(settings.password),
+                      // the password itself must not become part of the key
+                      // because widget keys are rendered into error reports
+                      key: ValueKey(settings.password.hashCode),
                       decoration: InputDecoration(
                         icon: const Icon(AppIcons.key),
                         labelText: "Password",
