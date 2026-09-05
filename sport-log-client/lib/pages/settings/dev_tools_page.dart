@@ -82,13 +82,24 @@ class _DevToolsPageState extends State<DevToolsPage> {
     }
   }
 
+  static bool cardioSessionChanged((CardioSession, CardioSession) c) =>
+      c.$1.distance != c.$2.distance ||
+      c.$1.ascent != c.$2.ascent ||
+      c.$1.descent != c.$2.descent;
+
+  static bool routeChanged((Route, Route) r) =>
+      r.$1.ascent != r.$2.ascent || r.$1.descent != r.$2.descent;
+
   Future<void> applyCardioSessions() async {
     if (updatedCardioSessions != null) {
       setState(() {
         cardioSessionsWorking = true;
       });
       final result = await cardioDataProvider.updateMultiple(
-        updatedCardioSessions!.map((c) => c.$2).toList(),
+        updatedCardioSessions!
+            .where(cardioSessionChanged)
+            .map((c) => c.$2)
+            .toList(),
       );
       if (mounted) {
         setState(() {
@@ -114,7 +125,7 @@ class _DevToolsPageState extends State<DevToolsPage> {
         routesWorking = true;
       });
       final result = await routeDataProvider.updateMultiple(
-        updatedRoutes!.map((r) => r.$2).toList(),
+        updatedRoutes!.where(routeChanged).map((r) => r.$2).toList(),
       );
       if (mounted) {
         setState(() {
@@ -137,7 +148,7 @@ class _DevToolsPageState extends State<DevToolsPage> {
   /// A row with [values] separated by spacer columns.
   ///
   /// The first value is left aligned, all others are right aligned.
-  TableRow row(List<String> values) => TableRow(
+  TableRow row(List<String> values, {bool grayed = false}) => TableRow(
     children: values
         .mapIndexed(
           (index, value) => [
@@ -145,6 +156,9 @@ class _DevToolsPageState extends State<DevToolsPage> {
             Text(
               value,
               textAlign: index == 0 ? TextAlign.left : TextAlign.right,
+              style: grayed
+                  ? TextStyle(color: Theme.of(context).disabledColor)
+                  : null,
             ),
           ],
         )
@@ -152,7 +166,7 @@ class _DevToolsPageState extends State<DevToolsPage> {
         .toList(),
   );
 
-  Widget table(List<String> header, List<List<String>> rows) =>
+  Widget table(List<String> header, List<(List<String>, bool)> rows) =>
       SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: Table(
@@ -161,7 +175,10 @@ class _DevToolsPageState extends State<DevToolsPage> {
             for (var i = 1; i < 2 * header.length - 1; i += 2)
               i: const FixedColumnWidth(10),
           },
-          children: [row(header), ...rows.map(row)],
+          children: [
+            row(header),
+            ...rows.map((r) => row(r.$1, grayed: !r.$2)),
+          ],
         ),
       );
 
@@ -197,15 +214,18 @@ class _DevToolsPageState extends State<DevToolsPage> {
                 ],
                 updatedCardioSessions!
                     .map(
-                      (c) => [
-                        c.$1.datetime.humanDateTime,
-                        "${c.$1.distance}",
-                        "${c.$2.distance}",
-                        "${c.$1.ascent}",
-                        "${c.$2.ascent}",
-                        "${c.$1.descent}",
-                        "${c.$2.descent}",
-                      ],
+                      (c) => (
+                        [
+                          c.$1.datetime.humanDateTime,
+                          "${c.$1.distance}",
+                          "${c.$2.distance}",
+                          "${c.$1.ascent}",
+                          "${c.$2.ascent}",
+                          "${c.$1.descent}",
+                          "${c.$2.descent}",
+                        ],
+                        cardioSessionChanged(c),
+                      ),
                     )
                     .toList(),
               ),
@@ -236,13 +256,16 @@ class _DevToolsPageState extends State<DevToolsPage> {
                 ],
                 updatedRoutes!
                     .map(
-                      (r) => [
-                        r.$1.name,
-                        "${r.$1.ascent}",
-                        "${r.$2.ascent}",
-                        "${r.$1.descent}",
-                        "${r.$2.descent}",
-                      ],
+                      (r) => (
+                        [
+                          r.$1.name,
+                          "${r.$1.ascent}",
+                          "${r.$2.ascent}",
+                          "${r.$1.descent}",
+                          "${r.$2.descent}",
+                        ],
+                        routeChanged(r),
+                      ),
                     )
                     .toList(),
               ),
