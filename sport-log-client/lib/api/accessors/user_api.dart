@@ -12,7 +12,7 @@ class UserApi {
 
   static final _instance = UserApi._();
 
-  final _uri = Api.uriFromRoute("/user");
+  Uri get _uri => Api.uriFromRoute("/user");
 
   Future<ApiResult<User>> getSingle(String username, String password) =>
       (Request("get", _uri)

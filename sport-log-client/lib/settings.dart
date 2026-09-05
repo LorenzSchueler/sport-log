@@ -179,7 +179,9 @@ class Settings extends ChangeNotifier {
 
   Future<void> setSyncEnabled(bool enabled) => _put(_syncEnabled, enabled);
 
-  String get serverUrl => _getString(_serverUrl);
+  /// Trailing slashes are removed so that appending a route cannot produce a double slash.
+  String get serverUrl =>
+      _getString(_serverUrl).replaceFirst(RegExp(r"/+$"), "");
 
   Future<void> setServerUrl(String url) => _put(_serverUrl, url);
 
