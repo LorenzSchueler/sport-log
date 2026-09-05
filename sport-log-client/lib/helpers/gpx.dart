@@ -32,14 +32,21 @@ Result<List<Position>, String> gpxToTrack(String gpxString) {
   for (final point in points) {
     final lat = point.lat;
     final lng = point.lon;
-    if (lat == null || lng == null) {
+    final elevation = point.ele ?? 0.0;
+    if (lat == null ||
+        lng == null ||
+        !lat.isFinite ||
+        !lng.isFinite ||
+        !elevation.isFinite ||
+        lat.abs() > 90 ||
+        lng.abs() > 180) {
       continue;
     }
     track.add(
       Position(
         longitude: lng,
         latitude: lat,
-        elevation: point.ele ?? 0.0,
+        elevation: elevation,
         distance: track.isEmpty
             ? 0
             : track.last.distance +
@@ -49,6 +56,9 @@ Result<List<Position>, String> gpxToTrack(String gpxString) {
             : point.time!.difference(startTime),
       ),
     );
+  }
+  if (track.isEmpty) {
+    return Err("This file does not contain any valid track points.");
   }
   return Ok(track);
 }
