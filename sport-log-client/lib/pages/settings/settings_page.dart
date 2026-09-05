@@ -29,11 +29,14 @@ class SettingsPage extends StatelessWidget {
 
   Future<void> checkSync(BuildContext context) async {
     await Sync.instance.sync(
-      onNoInternet: () => showMessageDialog(
-        context: context,
-        title: "Server Unreachable",
-        text: "The server could not be reached.\nPlease make sure you are connected to the internet and the server URL is right.",
-      ),
+      onNoInternet: () => {
+        if (context.mounted)
+          showMessageDialog(
+            context: context,
+            title: "Server Unreachable",
+            text: "The server could not be reached.\nPlease make sure you are connected to the internet and the server URL is right.",
+          ),
+      },
     );
   }
 
