@@ -62,8 +62,6 @@ class CardioSession extends AtomicEntity {
       _$CardioSessionFromJson(json);
 
   static const distanceThreshold = 2;
-  static const elevationDifferenceThreshold = 10;
-
   @override
   @IdConverter()
   Int64 id;
@@ -239,23 +237,9 @@ class CardioSession extends AtomicEntity {
       return;
     }
 
-    var ascent = 0.0;
-    var descent = 0.0;
-    var lastSignificantElevation = track![0].elevation;
-    for (var i = 1; i < track!.length; i++) {
-      final elevation = track![i].elevation;
-      final elevationDifference = elevation - lastSignificantElevation;
-      if (elevationDifference.abs() > elevationDifferenceThreshold) {
-        if (elevationDifference > 0) {
-          ascent += elevationDifference;
-        } else {
-          descent -= elevationDifference;
-        }
-        lastSignificantElevation = elevation;
-      }
-    }
-    this.ascent = ascent.round();
-    this.descent = descent.round();
+    final (ascent, descent) = track!.noiseFilteredAscentDescent();
+    this.ascent = ascent;
+    this.descent = descent;
   }
 
   void setAvgCadence() {

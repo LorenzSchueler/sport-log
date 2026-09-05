@@ -94,9 +94,35 @@ class Position {
 }
 
 extension TrackExtension on List<Position> {
+  /// Elevation differences of at most this many meters are treated as noise.
+  static const elevationDifferenceThreshold = 10;
+
   List<LatLng> get latLngs => map((pos) => pos.latLng).toList();
 
   LatLngBounds? get latLngBounds => latLngs.latLngBounds;
 
   bool similarTo(List<Position> other) => latLngs.similarTo(other.latLngs);
+
+  /// Ascent and descent in meters, treating elevation changes of at most
+  /// [elevationDifferenceThreshold] as noise and discarding them.
+  (int ascent, int descent) noiseFilteredAscentDescent() {
+    if (isEmpty) {
+      return (0, 0);
+    }
+    var ascent = 0.0;
+    var descent = 0.0;
+    var lastSignificantElevation = first.elevation;
+    for (final position in skip(1)) {
+      final elevationDifference = position.elevation - lastSignificantElevation;
+      if (elevationDifference.abs() > elevationDifferenceThreshold) {
+        if (elevationDifference > 0) {
+          ascent += elevationDifference;
+        } else {
+          descent -= elevationDifference;
+        }
+        lastSignificantElevation = position.elevation;
+      }
+    }
+    return (ascent.round(), descent.round());
+  }
 }

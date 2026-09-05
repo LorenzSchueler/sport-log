@@ -46,7 +46,9 @@ class AddLocationButton extends StatelessWidget {
             ? 0
             : lastPos.distance + lastPos.latLng.distanceTo(gpsPos.latLng),
     );
-    route.setDistance();
+    route
+      ..setDistance()
+      ..setAscentDescent();
     await _dataProvider.updateSingle(route);
     updateRoute(route);
   }
