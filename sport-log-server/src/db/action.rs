@@ -377,7 +377,10 @@ impl ExecutableActionEventDb {
             .left_outer_join(
                 platform_credential::table.on(platform_credential::columns::platform_id
                     .eq(action_provider::columns::platform_id)
-                    .and(platform_credential::columns::user_id.eq(action_event::columns::user_id))),
+                    .and(platform_credential::columns::user_id.eq(action_event::columns::user_id))
+                    // must be part of the join condition because a filter would turn the outer
+                    // join into an inner one and drop events for platforms without credentials
+                    .and(platform_credential::columns::deleted.eq(false))),
             )
             .filter(action_provider::columns::id.eq(action_provider_id))
             .filter(action_event::columns::enabled.eq(true))
@@ -406,7 +409,10 @@ impl ExecutableActionEventDb {
             .left_outer_join(
                 platform_credential::table.on(platform_credential::columns::platform_id
                     .eq(action_provider::columns::platform_id)
-                    .and(platform_credential::columns::user_id.eq(action_event::columns::user_id))),
+                    .and(platform_credential::columns::user_id.eq(action_event::columns::user_id))
+                    // must be part of the join condition because a filter would turn the outer
+                    // join into an inner one and drop events for platforms without credentials
+                    .and(platform_credential::columns::deleted.eq(false))),
             )
             .filter(action_provider::columns::id.eq(action_provider_id))
             .filter(action_event::columns::enabled.eq(true))
