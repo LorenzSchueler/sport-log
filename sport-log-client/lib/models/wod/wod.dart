@@ -77,7 +77,7 @@ class DbWodSerializer extends DbSerializer<Wod> {
   Wod fromDbRecord(DbRecord r, {String prefix = ''}) {
     return Wod(
       id: Int64(r[prefix + Columns.id]! as int),
-      date: DateTime.parse(r[prefix + Columns.date]! as String),
+      date: const DateConverter().fromJson(r[prefix + Columns.date]! as String),
       description: r[prefix + Columns.description] as String?,
       deleted: r[prefix + Columns.deleted]! as int == 1,
     );
@@ -87,7 +87,7 @@ class DbWodSerializer extends DbSerializer<Wod> {
   DbRecord toDbRecord(Wod o) {
     return {
       Columns.id: o.id.toInt(),
-      Columns.date: o.date.toString(),
+      Columns.date: const DateConverter().toJson(o.date),
       Columns.description: o.description,
       Columns.deleted: o.deleted ? 1 : 0,
     };
