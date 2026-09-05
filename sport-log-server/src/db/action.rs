@@ -5,8 +5,8 @@ use diesel::{prelude::*, result::Error};
 use diesel_async::RunQueryDsl;
 use sport_log_derive::*;
 use sport_log_types::{
-    Action, ActionEvent, ActionEventId, ActionProviderId, ActionRuleId, CreatableActionRule,
-    DeletableActionEvent, ExecutableActionEvent, UserId,
+    Action, ActionEvent, ActionEventId, ActionProvider, ActionProviderId, ActionRuleId,
+    CreatableActionRule, DeletableActionEvent, Epoch, ExecutableActionEvent, UserId,
     schema::{action, action_event, action_provider, action_rule, platform_credential},
 };
 
@@ -16,14 +16,65 @@ use crate::{auth::*, db::*};
 #[derive_deftly(
     VerifyForAdminGet,
     VerifyUncheckedGet,
-    GetById,
-    GetAll,
-    GetByEpoch,
     GetEpoch,
     VerifyForAdmin,
     VerifyUncheckedCreate
 )]
 pub struct ActionProviderDb;
+
+/// [`GetById`] is implemented manually in order to remove the password hash, which must never leave
+/// the database.
+impl GetById for ActionProviderDb {
+    async fn get_by_id(id: Self::Id, db: &mut AsyncPgConnection) -> QueryResult<Self::Type> {
+        action_provider::table
+            .find(id)
+            .select(ActionProvider::as_select())
+            .get_result(db)
+            .await
+            .map(|mut ap| {
+                ap.mask_password();
+                ap
+            })
+    }
+}
+
+/// [`GetAll`] is implemented manually in order to remove the password hash, which must never leave
+/// the database.
+impl GetAll for ActionProviderDb {
+    async fn get_all(db: &mut AsyncPgConnection) -> QueryResult<Vec<Self::Type>> {
+        action_provider::table
+            .select(ActionProvider::as_select())
+            .load(db)
+            .await
+            .map(|mut aps: Vec<ActionProvider>| {
+                for ap in &mut aps {
+                    ap.mask_password();
+                }
+                aps
+            })
+    }
+}
+
+/// [`GetByEpoch`] is implemented manually in order to remove the password hash, which must never
+/// leave the database.
+impl GetByEpoch for ActionProviderDb {
+    async fn get_by_epoch(
+        epoch: Epoch,
+        db: &mut AsyncPgConnection,
+    ) -> QueryResult<Vec<Self::Type>> {
+        action_provider::table
+            .filter(Self::epoch_column().gt(epoch))
+            .select(ActionProvider::as_select())
+            .get_results(db)
+            .await
+            .map(|mut aps: Vec<ActionProvider>| {
+                for ap in &mut aps {
+                    ap.mask_password();
+                }
+                aps
+            })
+    }
+}
 
 /// Same as trait [`Create`] but with mutable references
 impl ActionProviderDb {

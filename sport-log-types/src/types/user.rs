@@ -36,3 +36,10 @@ pub struct User {
     pub password: String,
     pub email: String,
 }
+
+impl User {
+    pub fn mask_password(&mut self) {
+        self.password.clear();
+        self.password.push_str("***");
+    }
+}

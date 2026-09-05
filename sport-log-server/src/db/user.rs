@@ -12,8 +12,24 @@ use sport_log_types::{Epoch, User, UserId, schema::user};
 use crate::{auth::AuthUser, db::*};
 
 #[derive(Db, ModifiableDb, Deftly)]
-#[derive_deftly(GetById, VerifyUncheckedCreate, VerifyForAdmin)]
+#[derive_deftly(VerifyUncheckedCreate, VerifyForAdmin)]
 pub struct UserDb;
+
+/// [`GetById`] is implemented manually in order to remove the password hash, which must never leave
+/// the database.
+impl GetById for UserDb {
+    async fn get_by_id(id: Self::Id, db: &mut AsyncPgConnection) -> QueryResult<Self::Type> {
+        user::table
+            .find(id)
+            .select(User::as_select())
+            .get_result(db)
+            .await
+            .map(|mut user: User| {
+                user.mask_password();
+                user
+            })
+    }
+}
 
 /// Same as trait [`Create`] but with mutable references
 impl UserDb {
@@ -148,6 +164,10 @@ impl UserDb {
             .select(User::as_select())
             .get_result(db)
             .await
+            .map(|mut user: User| {
+                user.mask_password();
+                user
+            })
             .optional()
     }
 

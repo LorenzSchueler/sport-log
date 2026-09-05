@@ -48,6 +48,13 @@ pub struct ActionProvider {
     pub deleted: bool,
 }
 
+impl ActionProvider {
+    pub fn mask_password(&mut self) {
+        self.password.clear();
+        self.password.push_str("***");
+    }
+}
+
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, Deftly)]
 #[derive_deftly(IdString)]
 #[serde(try_from = "IdString", into = "IdString")]
