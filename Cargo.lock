@@ -1999,7 +1999,6 @@ dependencies = [
  "rustls-platform-verifier",
  "serde",
  "serde_json",
- "serde_urlencoded",
  "sync_wrapper",
  "tokio",
  "tokio-rustls",
@@ -2409,24 +2408,6 @@ dependencies = [
  "sport-log-types",
  "sysinfo",
  "thirtyfour",
- "thiserror",
- "tokio",
- "toml 1.1.2+spec-1.1.0",
- "tracing",
- "tracing-subscriber",
-]
-
-[[package]]
-name = "sport-log-action-provider-sportstracker"
-version = "0.1.0"
-dependencies = [
- "chrono",
- "clap",
- "rand 0.10.1",
- "reqwest",
- "serde",
- "sport-log-ap-utils",
- "sport-log-types",
  "thiserror",
  "tokio",
  "toml 1.1.2+spec-1.1.0",
