@@ -20,7 +20,7 @@
 
 ### VS Code
 
-* `cp .vscode/launch.json.template .vscode/launch.json` (in root folder) and insert you mapbox registry token
+* `cp .vscode/launch.json.template .vscode/launch.json` (in root folder)
 
 ## Build & Run 
 
