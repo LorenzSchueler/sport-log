@@ -480,6 +480,18 @@ class MapController {
     pitchEnabled: false,
     zoomEnabled: false,
   );
+
+  void onTap(void Function(LatLng) callback) => _controller?.addInteraction(
+    TapInteraction.onMap(
+      (gestureContext) => callback(LatLng.fromPoint(gestureContext.point)),
+    ),
+  );
+
+  void onLongTap(void Function(LatLng) callback) => _controller?.addInteraction(
+    LongTapInteraction.onMap(
+      (gestureContext) => callback(LatLng.fromPoint(gestureContext.point)),
+    ),
+  );
 }
 
 class ElevationMapController {

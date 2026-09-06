@@ -146,13 +146,19 @@ class _MapboxMapWrapperState extends State<MapboxMapWrapper> {
     await _mapController?.hideCompass();
   }
 
-  Future<void> _onMapCreated(MapController mapController) async {
-    _mapController = mapController;
-    if (mounted) {
-      setState(() {});
+  Future<void> _onMapCreated(MapboxMap mapboxMap) async {
+    final mapController = await MapController.from(mapboxMap, context);
+    if (mapController != null) {
+      _mapController = mapController;
+      mapController
+        ..onTap((latLng) => widget.onTap?.call(latLng))
+        ..onLongTap((latLng) => widget.onLongTap?.call(latLng));
+      if (mounted) {
+        setState(() {});
+      }
+      await _setMapSettings();
+      _mapReadyCallback.onMapCreated(mapController);
     }
-    await _setMapSettings();
-    _mapReadyCallback.onMapCreated(mapController);
   }
 
   Future<void> _onReady(MapController mapController) async {
@@ -187,27 +193,7 @@ class _MapboxMapWrapperState extends State<MapboxMapWrapper> {
       children: [
         MapWidget(
           styleUri: widget.initStyleUri,
-          onMapCreated: (mapboxMap) async {
-            mapboxMap
-              ..addInteraction(
-                TapInteraction.onMap(
-                  (gestureContext) => widget.onTap?.call(
-                    LatLng.fromPoint(gestureContext.point),
-                  ),
-                ),
-              )
-              ..addInteraction(
-                LongTapInteraction.onMap(
-                  (gestureContext) => widget.onLongTap?.call(
-                    LatLng.fromPoint(gestureContext.point),
-                  ),
-                ),
-              );
-            final controller = await MapController.from(mapboxMap, context);
-            if (controller != null) {
-              _onMapCreated(controller);
-            }
-          },
+          onMapCreated: _onMapCreated,
           onMapLoadedListener: _mapReadyCallback.onMapLoaded,
           onCameraChangeListener: (data) => _lastMapPosition = LatLngZoom(
             latLng: LatLng.fromPoint(data.cameraState.center),

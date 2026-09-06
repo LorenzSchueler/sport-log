@@ -46,13 +46,19 @@ class _StaticMapboxMapState extends State<StaticMapboxMap> {
   MapController? _mapController;
   late final MapReadyCallback _mapReadyCallback = MapReadyCallback(_onReady);
 
-  Future<void> _onMapCreated(MapController mapController) async {
-    _mapController = mapController;
-    await mapController.disableAllGestures();
-    await mapController.showScaleBar();
-    await mapController.hideAttribution();
-    await mapController.hideLogo();
-    _mapReadyCallback.onMapCreated(mapController);
+  Future<void> _onMapCreated(MapboxMap mapboxMap) async {
+    final mapController = await MapController.from(mapboxMap, context);
+    if (mapController != null) {
+      _mapController = mapController;
+      mapController
+        ..onTap((latLng) => widget.onTap?.call(latLng))
+        ..onLongTap((latLng) => widget.onLongTap?.call(latLng));
+      await mapController.disableAllGestures();
+      await mapController.showScaleBar();
+      await mapController.hideAttribution();
+      await mapController.hideLogo();
+      _mapReadyCallback.onMapCreated(mapController);
+    }
   }
 
   Future<void> _onReady(MapController mapController) async {
@@ -68,26 +74,7 @@ class _StaticMapboxMapState extends State<StaticMapboxMap> {
   Widget build(BuildContext context) {
     return MapWidget(
       styleUri: MapStyle.outdoor.url,
-      onMapCreated: (mapboxMap) async {
-        mapboxMap
-          ..addInteraction(
-            TapInteraction.onMap(
-              (gestureContext) =>
-                  widget.onTap?.call(LatLng.fromPoint(gestureContext.point)),
-            ),
-          )
-          ..addInteraction(
-            LongTapInteraction.onMap(
-              (gestureContext) => widget.onLongTap?.call(
-                LatLng.fromPoint(gestureContext.point),
-              ),
-            ),
-          );
-        final controller = await MapController.from(mapboxMap, context);
-        if (context.mounted && controller != null) {
-          _onMapCreated(controller);
-        }
-      },
+      onMapCreated: _onMapCreated,
       onMapLoadedListener: _mapReadyCallback.onMapLoaded,
     );
   }
