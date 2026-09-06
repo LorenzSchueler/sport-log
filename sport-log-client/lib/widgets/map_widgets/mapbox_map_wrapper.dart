@@ -146,11 +146,12 @@ class _MapboxMapWrapperState extends State<MapboxMapWrapper> {
     await _mapController?.hideCompass();
   }
 
-  void _onMapCreated(MapController mapController) {
+  Future<void> _onMapCreated(MapController mapController) async {
     _mapController = mapController;
     if (mounted) {
       setState(() {});
     }
+    await _setMapSettings();
     _mapReadyCallback.onMapCreated(mapController);
   }
 
@@ -159,7 +160,6 @@ class _MapboxMapWrapperState extends State<MapboxMapWrapper> {
       await mapController.setLatLngZoom(
         widget.initialMapPosition ?? context.read<Settings>().lastMapPosition,
       );
-      await _setMapSettings();
       widget.onMapCreated?.call(mapController);
     }
   }

@@ -46,8 +46,12 @@ class _StaticMapboxMapState extends State<StaticMapboxMap> {
   MapController? _mapController;
   late final MapReadyCallback _mapReadyCallback = MapReadyCallback(_onReady);
 
-  void _onMapCreated(MapController mapController) {
+  Future<void> _onMapCreated(MapController mapController) async {
     _mapController = mapController;
+    await mapController.disableAllGestures();
+    await mapController.showScaleBar();
+    await mapController.hideAttribution();
+    await mapController.hideLogo();
     _mapReadyCallback.onMapCreated(mapController);
   }
 
@@ -56,10 +60,6 @@ class _StaticMapboxMapState extends State<StaticMapboxMap> {
       await mapController.setLatLngZoom(
         context.read<Settings>().lastMapPosition,
       );
-      await mapController.disableAllGestures();
-      await mapController.showScaleBar();
-      await mapController.hideAttribution();
-      await mapController.hideLogo();
       widget.onMapCreated?.call(mapController);
     }
   }
