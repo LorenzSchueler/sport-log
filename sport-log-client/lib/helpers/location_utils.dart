@@ -53,7 +53,7 @@ class LocationUtils extends ChangeNotifier {
       check: () async =>
           (await Geolocator.getLocationAccuracy()) ==
           LocationAccuracyStatus.precise,
-      change: Geolocator.openAppSettings,
+      change: () => _openSettings(Geolocator.openAppSettings),
     )) {
       return false;
     }
@@ -61,11 +61,21 @@ class LocationUtils extends ChangeNotifier {
       title: "GPS Required",
       text: "Please enable GPS.",
       check: Geolocator.isLocationServiceEnabled,
-      change: Geolocator.openLocationSettings,
+      change: () => _openSettings(Geolocator.openLocationSettings),
     )) {
       return false;
     }
     return true;
+  }
+
+  /// Opens settings and waits until the app is resumed.
+  static Future<void> _openSettings(Future<bool> Function() open) async {
+    final resumed = Completer<void>();
+    final listener = AppLifecycleListener(onResume: resumed.complete);
+    if (await open()) {
+      await resumed.future;
+    }
+    listener.dispose();
   }
 
   Future<bool> startLocationStream({
