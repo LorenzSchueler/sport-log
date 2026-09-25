@@ -25,8 +25,7 @@ class UpdatePage extends StatelessWidget {
     );
     if (updateDownloadResult.isOk) {
       final filename = updateDownloadResult.ok;
-      if (await PermissionRequest.request(Permission.manageExternalStorage) &&
-          await PermissionRequest.request(Permission.requestInstallPackages)) {
+      if (await PermissionRequest.request(Permission.requestInstallPackages)) {
         await OpenFile.open(filename);
       } else if (context.mounted) {
         await showMessageDialog(

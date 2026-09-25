@@ -2,8 +2,6 @@ import 'dart:math';
 
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:open_file_plus/open_file_plus.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'package:sport_log/helpers/request_permission.dart';
 
 class NotificationController {
   NotificationController._();
@@ -63,7 +61,6 @@ class NotificationController {
   ) async {
     final payload = notificationResponse.payload;
     if (notificationResponse.actionId == _openFileActionId && payload != null) {
-      await PermissionRequest.request(Permission.manageExternalStorage);
       await OpenFile.open(payload);
     }
   }
