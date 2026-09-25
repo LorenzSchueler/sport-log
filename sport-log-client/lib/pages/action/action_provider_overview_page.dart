@@ -214,10 +214,23 @@ class ActionRulesCard extends StatelessWidget {
                         Checkbox(
                           visualDensity: VisualDensity.compact,
                           value: actionRule.enabled,
-                          onChanged: (value) {
-                            if (value != null) {
-                              actionRule.enabled = value;
-                              _dataProvider.updateSingle(actionRule);
+                          onChanged: (value) async {
+                            if (value == null) {
+                              return;
+                            }
+                            actionRule.enabled = value;
+                            final result = await _dataProvider.updateSingle(
+                              actionRule,
+                            );
+                            if (result.isErr) {
+                              actionRule.enabled = !value;
+                              if (context.mounted) {
+                                await showMessageDialog(
+                                  context: context,
+                                  title: "Updating Action Rule Failed",
+                                  text: result.err.toString(),
+                                );
+                              }
                             }
                           },
                         ),
@@ -304,10 +317,23 @@ class ActionEventsCard extends StatelessWidget {
                         const Spacer(),
                         Checkbox(
                           value: actionEvent.enabled,
-                          onChanged: (value) {
-                            if (value != null) {
-                              actionEvent.enabled = value;
-                              _dataProvider.updateSingle(actionEvent);
+                          onChanged: (value) async {
+                            if (value == null) {
+                              return;
+                            }
+                            actionEvent.enabled = value;
+                            final result = await _dataProvider.updateSingle(
+                              actionEvent,
+                            );
+                            if (result.isErr) {
+                              actionEvent.enabled = !value;
+                              if (context.mounted) {
+                                await showMessageDialog(
+                                  context: context,
+                                  title: "Updating Action Event Failed",
+                                  text: result.err.toString(),
+                                );
+                              }
                             }
                           },
                           visualDensity: VisualDensity.compact,

@@ -131,7 +131,15 @@ class TrackingUtils extends ChangeNotifier {
     await _locationUtils.startLocationStream(
       onLocationUpdate: _onLocationUpdate,
     );
-    await _stepUtils.startStepStream(_onStepUpdate);
+    final stepCountStarted = await _stepUtils.startStepStream(_onStepUpdate);
+    if (!stepCountStarted) {
+      await showMessageDialog(
+        // ignore: use_build_context_synchronously
+        context: App.globalContext,
+        title: "Warning",
+        text: "The step counter could not be started. Cadence is not recorded.",
+      );
+    }
     await _heartRateUtils?.startHeartRateStream(_onHeartRateUpdate);
     if (_alarmUtils.requiresTtsButNoEngineFound ||
         _audioFeedbackUtils.requiresTtsButNoEngineFound) {
