@@ -23,24 +23,15 @@ class CurrentLocationButton extends StatelessWidget {
 
   Future<void> _toggleCurrentLocation() async {
     if (locationUtils.enabled) {
-      if (locationUtils.inBackground) {
-        await locationUtils.stopLocationStream();
-        await mapController.updateCurrentLocationMarker(
-          currentLocationMarker,
-          null,
-          false,
-        );
-      } else {
-        await locationUtils.stopLocationStream();
-        await locationUtils.startLocationStream(
-          onLocationUpdate: _onLocationUpdate,
-          inBackground: true,
-        );
-      }
+      await locationUtils.stopLocationStream();
+      await mapController.updateCurrentLocationMarker(
+        currentLocationMarker,
+        null,
+        false,
+      );
     } else {
       await locationUtils.startLocationStream(
         onLocationUpdate: _onLocationUpdate,
-        inBackground: false,
       );
     }
   }
@@ -63,13 +54,9 @@ class CurrentLocationButton extends StatelessWidget {
       builder: (context, locationUtils, _) => FloatingActionButton.small(
         heroTag: null,
         onPressed: _toggleCurrentLocation,
-        tooltip: "GPS Location (off - foreground - background)",
+        tooltip: "GPS Location",
         child: Icon(
-          locationUtils.enabled
-              ? locationUtils.inBackground
-                    ? AppIcons.myLocationBackground
-                    : AppIcons.myLocationForeground
-              : AppIcons.myLocationOff,
+          locationUtils.enabled ? AppIcons.myLocation : AppIcons.myLocationOff,
         ),
       ),
     );

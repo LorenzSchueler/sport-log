@@ -8,9 +8,7 @@
         tools:remove="android:maxSdkVersion" />
     <!-- location + flutter_blue_plus -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <!-- location background mode -->
-    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
-    <!-- location background mode -->
+    <!-- location background mode (foreground service) -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
@@ -66,9 +64,6 @@
             </intent-filter>
         </activity>
         <receiver android:exported="false" android:name="com.dexterous.flutterlocalnotifications.ActionBroadcastReceiver" />
-        <service
-            android:name="com.pravera.flutter_foreground_task.service.ForegroundService"
-            android:stopWithTask="false" />
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
         <meta-data

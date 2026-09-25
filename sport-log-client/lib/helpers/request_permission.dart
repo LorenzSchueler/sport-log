@@ -2,9 +2,9 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:sport_log/widgets/dialogs/dialogs.dart';
 
 abstract class PermissionRequest {
-  // Repeatedly request permission until it is either granted or the user chooses to ignore the request.
-  //
-  // Returns whether the permission has been granted.
+  /// Repeatedly request permission until it is either granted or the user chooses to ignore the request.
+  ///
+  /// Returns whether the permission has been granted.
   static Future<bool> request(Permission permission) async {
     while (!await permission.request().isGranted) {
       final permissionSettings = await showPermissionRequiredDialog(
@@ -19,9 +19,9 @@ abstract class PermissionRequest {
 }
 
 abstract class Request {
-  // Repeatedly request until check either returns true or the user chooses to ignore the request.
-  //
-  // Returns whether check returned true.
+  /// Repeatedly request until check either returns true or the user chooses to ignore the request.
+  ///
+  /// Returns whether check returned true.
   static Future<bool> request({
     required String title,
     required String text,

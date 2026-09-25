@@ -130,7 +130,6 @@ class TrackingUtils extends ChangeNotifier {
     );
     await _locationUtils.startLocationStream(
       onLocationUpdate: _onLocationUpdate,
-      inBackground: true,
     );
     await _stepUtils.startStepStream(_onStepUpdate);
     await _heartRateUtils?.startHeartRateStream(_onHeartRateUpdate);
