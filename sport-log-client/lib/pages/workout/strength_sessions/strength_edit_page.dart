@@ -153,11 +153,18 @@ class _StrengthEditPageState extends State<StrengthEditPage> {
       _strengthSessionDescription.sets.add(newSet);
       _strengthSessionDescription.orderSets();
     });
-    _scrollController.animateTo(
-      _scrollController.position.maxScrollExtent,
-      duration: const Duration(milliseconds: 200),
-      curve: Curves.decelerate,
-    );
+    // the new set is only laid out in the next frame
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scrollController.hasClients) {
+        unawaited(
+          _scrollController.animateTo(
+            _scrollController.position.maxScrollExtent,
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.decelerate,
+          ),
+        );
+      }
+    });
   }
 
   @override
