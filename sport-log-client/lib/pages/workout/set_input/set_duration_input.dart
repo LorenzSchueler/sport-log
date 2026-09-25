@@ -197,6 +197,7 @@ class _SetDurationInputState extends State<SetDurationInput> {
                         key: _secondsKey,
                         placeholder: 0,
                         numberOfDigits: 2,
+                        maxValue: 59,
                         onChanged: (value) => setState(() => _seconds = value),
                         onSubmitted: () {
                           _submit();
