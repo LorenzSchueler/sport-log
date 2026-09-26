@@ -82,6 +82,16 @@ class _ActionProviderOverviewPageState
                 padding: Defaults.edgeInsets.normal,
                 child: ListView(
                   children: [
+                    if (widget.actionProvider.description != null) ...[
+                      Card(
+                        margin: EdgeInsets.zero,
+                        child: Padding(
+                          padding: Defaults.edgeInsets.normal,
+                          child: Text(widget.actionProvider.description!),
+                        ),
+                      ),
+                      Defaults.sizedBox.vertical.normal,
+                    ],
                     ActionsCard(
                       actionProviderDescription: _actionProviderDescription!,
                     ),
