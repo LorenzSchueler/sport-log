@@ -1,36 +1,4 @@
-create function set_epoch() 
-    returns trigger as $$
-    declare
-        max_epoch bigint;
-    begin
-        execute format('select max(epoch) + 1 from %I.%I', tg_table_schema, tg_table_name)
-        into max_epoch;
-
-        new.epoch := coalesce(max_epoch, 1);
-        return new;
-    end;
-    $$ language plpgsql;
-
-create function set_epoch_for_user() 
-    returns trigger as $$
-    declare
-        max_epoch bigint;
-    begin
-        if new.user_id is null then
-            execute format('select max(epoch) + 1 from %I.%I where user_id is null', tg_table_schema, tg_table_name)
-            into max_epoch;
-        else
-            execute format('select max(epoch) + 1 from %I.%I where user_id = $1', tg_table_schema, tg_table_name)
-            using new.user_id
-            into max_epoch;
-        end if;
-
-        new.epoch := coalesce(max_epoch, 1);
-        return new;
-    end;
-    $$ language plpgsql;
-
--- next epoch of a record that is archived without a set_epoch trigger (hard or cascaded delete)
+-- max(epoch) + 1 of the table, scoped to the record's user_id if the table has one
 create function next_epoch(table_schema name, table_name name, record jsonb)
     returns bigint as $$
     declare
@@ -52,7 +20,17 @@ create function next_epoch(table_schema name, table_name name, record jsonb)
     end;
     $$ language plpgsql;
 
-create function set_epoch_for_user_in_user_table() 
+-- before insert or update: set a new epoch on the row
+create function set_epoch()
+    returns trigger as $$
+    begin
+        new.epoch := next_epoch(tg_table_schema, tg_table_name, to_jsonb(new));
+        return new;
+    end;
+    $$ language plpgsql;
+
+-- before insert or update on "user": set a new epoch scoped to the user itself since the table has no user_id
+create function set_epoch_for_user_in_user_table()
     returns trigger as $$
     declare
         max_epoch bigint;
@@ -89,7 +67,7 @@ create function mark_deleted_and_archive_record()
         execute format('insert into %I.%I select $1.*', tg_table_schema, tg_table_name || '_archive') using old;
         raise notice 'soft deleting % %', tg_table_name, old.id;
         return old;
-    exception when foreign_key_violation then 
+    exception when foreign_key_violation then
         raise notice 'hard deleting % %', tg_table_name, old.id;
         return old;
     end;

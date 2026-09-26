@@ -18,7 +18,7 @@ create index movement__user_id__epoch__idx
     on movement (user_id, epoch) where deleted = false;
 
 create trigger set_epoch before insert or update on movement
-    for each row execute function set_epoch_for_user();
+    for each row execute function set_epoch();
 
 create table movement_archive (
     primary key (id),

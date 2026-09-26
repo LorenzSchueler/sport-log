@@ -14,7 +14,7 @@ create index strength_session__user_id__epoch__idx
     where deleted = false;
 
 create trigger set_epoch before insert or update on strength_session
-    for each row execute function set_epoch_for_user();
+    for each row execute function set_epoch();
 
 create table strength_session_archive (
     primary key (id),
@@ -51,7 +51,7 @@ create index strength_set__user_id__epoch__idx
     where deleted = false;
 
 create trigger set_epoch before insert or update on strength_set
-    for each row execute function set_epoch_for_user();
+    for each row execute function set_epoch();
 
 create table strength_set_archive (
     primary key (id),

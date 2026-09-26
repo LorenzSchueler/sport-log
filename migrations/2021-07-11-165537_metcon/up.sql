@@ -20,7 +20,7 @@ create index metcon__user_id__epoch__idx
     on metcon (user_id, epoch) where deleted = false;
 
 create trigger set_epoch before insert or update on metcon
-    for each row execute function set_epoch_for_user();
+    for each row execute function set_epoch();
 
 create table metcon_archive (
     primary key (id),
@@ -60,7 +60,7 @@ create index metcon_movement__user_id__epoch__idx
     on metcon_movement (user_id, epoch) where deleted = false;
 
 create trigger set_epoch before insert or update on metcon_movement
-    for each row execute function set_epoch_for_user();
+    for each row execute function set_epoch();
 
 create table metcon_movement_archive (
     primary key (id),
@@ -96,7 +96,7 @@ create index metcon_session__user_id__epoch__idx
     where deleted = false;
 
 create trigger set_epoch before insert or update on metcon_session
-    for each row execute function set_epoch_for_user();
+    for each row execute function set_epoch();
 
 create table metcon_session_archive (
     primary key (id),

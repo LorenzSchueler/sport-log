@@ -83,7 +83,7 @@ create index action_rule__user_id__epoch__idx
     where deleted = false;
 
 create trigger set_epoch before insert or update on action_rule
-    for each row execute function set_epoch_for_user();
+    for each row execute function set_epoch();
 
 create table action_rule_archive (
     primary key (id),
@@ -121,7 +121,7 @@ create index action_event__user_id__epoch__idx
     where deleted = false;
 
 create trigger set_epoch before insert or update on action_event
-    for each row execute function set_epoch_for_user();
+    for each row execute function set_epoch();
 
 create table action_event_archive (
     primary key (id),

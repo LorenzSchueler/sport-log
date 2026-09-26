@@ -28,7 +28,7 @@ create index route__user_id__epoch__idx
     on route (user_id, epoch) where deleted = false;
 
 create trigger set_epoch before insert or update on route
-    for each row execute function set_epoch_for_user();
+    for each row execute function set_epoch();
 
 create table route_archive (
     primary key (id),
@@ -73,7 +73,7 @@ create index cardio_session__user_id__epoch__idx
     where deleted = false;
 
 create trigger set_epoch before insert or update on cardio_session
-    for each row execute function set_epoch_for_user();
+    for each row execute function set_epoch();
 
 create table cardio_session_archive (
     primary key (id),

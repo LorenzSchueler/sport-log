@@ -43,7 +43,7 @@ create index platform_credential__user_id__epoch__idx
     on platform_credential (user_id, epoch) where deleted = false;
 
 create trigger set_epoch before insert or update on platform_credential
-    for each row execute function set_epoch_for_user();
+    for each row execute function set_epoch();
 
 create table platform_credential_archive (
     primary key (id),

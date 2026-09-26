@@ -15,7 +15,7 @@ create index diary__user_id__epoch__idx
     on diary (user_id, epoch) where deleted = false;
 
 create trigger set_epoch before insert or update on diary
-    for each row execute function set_epoch_for_user();
+    for each row execute function set_epoch();
 
 create table diary_archive (
     primary key (id),
@@ -49,7 +49,7 @@ create index wod__user_id__epoch__idx
     on wod (user_id, epoch) where deleted = false;
 
 create trigger set_epoch before insert or update on wod
-    for each row execute function set_epoch_for_user();
+    for each row execute function set_epoch();
 
 create table wod_archive (
     primary key (id),
