@@ -20,10 +20,15 @@ create table action_provider_archive (
     check (deleted = true)
 ) inherits (action_provider);
 
-create trigger archive_action_provider
-    after insert or update of deleted or delete
+create trigger delete_soft_deleted_action_provider
+    after insert or update of deleted
     on action_provider
-    for each row execute procedure archive_record();
+    for each row execute procedure delete_soft_deleted_record();
+
+create trigger mark_deleted_and_archive_action_provider
+    before delete
+    on action_provider
+    for each row execute procedure mark_deleted_and_archive_record();
 
 create table action (
     id bigint primary key,
@@ -47,10 +52,15 @@ create table action_archive (
     check (deleted = true)
 ) inherits (action);
 
-create trigger archive_action
-    after insert or update of deleted or delete
+create trigger delete_soft_deleted_action
+    after insert or update of deleted
     on action
-    for each row execute procedure archive_record();
+    for each row execute procedure delete_soft_deleted_record();
+
+create trigger mark_deleted_and_archive_action
+    before delete
+    on action
+    for each row execute procedure mark_deleted_and_archive_record();
 
 create table action_rule (
     id bigint primary key,
@@ -81,10 +91,15 @@ create table action_rule_archive (
     check (deleted = true)
 ) inherits (action_rule);
 
-create trigger archive_action_rule
-    after insert or update of deleted or delete
+create trigger delete_soft_deleted_action_rule
+    after insert or update of deleted
     on action_rule
-    for each row execute procedure archive_record();
+    for each row execute procedure delete_soft_deleted_record();
+
+create trigger mark_deleted_and_archive_action_rule
+    before delete
+    on action_rule
+    for each row execute procedure mark_deleted_and_archive_record();
 
 create table action_event (
     id bigint primary key,
@@ -114,7 +129,12 @@ create table action_event_archive (
     check (deleted = true)
 ) inherits (action_event);
 
-create trigger archive_action_event
-    after insert or update of deleted or delete
+create trigger delete_soft_deleted_action_event
+    after insert or update of deleted
     on action_event
-    for each row execute procedure archive_record();
+    for each row execute procedure delete_soft_deleted_record();
+
+create trigger mark_deleted_and_archive_action_event
+    before delete
+    on action_event
+    for each row execute procedure mark_deleted_and_archive_record();

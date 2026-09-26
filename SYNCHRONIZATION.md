@@ -40,6 +40,7 @@ Synchronization consists of two steps: **Down Sync** and **Up Sync**. Synchroniz
 
 ### Epoch
 `epoch` is an integer which on every insert/ update to the server database gets set to `max(epoch) + 1`.
+Entries removed by a hard or cascaded delete are archived with a new `epoch` as well, so that clients receive these deletions.
 It serves as an abstract identifier for a point in time.
 
 ### Init Sync

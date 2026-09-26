@@ -36,10 +36,15 @@ create table route_archive (
     check (deleted = true)
 ) inherits (route);
 
-create trigger archive_route
-    after insert or update of deleted or delete
+create trigger delete_soft_deleted_route
+    after insert or update of deleted
     on route
-    for each row execute procedure archive_record();
+    for each row execute procedure delete_soft_deleted_record();
+
+create trigger mark_deleted_and_archive_route
+    before delete
+    on route
+    for each row execute procedure mark_deleted_and_archive_record();
 
 create table cardio_session (
     id bigint primary key,
@@ -76,7 +81,12 @@ create table cardio_session_archive (
     check (deleted = true)
 ) inherits (cardio_session);
 
-create trigger archive_cardio_session
-    after insert or update of deleted or delete
+create trigger delete_soft_deleted_cardio_session
+    after insert or update of deleted
     on cardio_session
-    for each row execute procedure archive_record();
+    for each row execute procedure delete_soft_deleted_record();
+
+create trigger mark_deleted_and_archive_cardio_session
+    before delete
+    on cardio_session
+    for each row execute procedure mark_deleted_and_archive_record();

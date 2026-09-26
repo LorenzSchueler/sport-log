@@ -26,10 +26,15 @@ create table movement_archive (
     check (deleted = true)
 ) inherits (movement);
 
-create trigger archive_movement
-    after insert or update of deleted or delete
+create trigger delete_soft_deleted_movement
+    after insert or update of deleted
     on movement
-    for each row execute procedure archive_record();
+    for each row execute procedure delete_soft_deleted_record();
+
+create trigger mark_deleted_and_archive_movement
+    before delete
+    on movement
+    for each row execute procedure mark_deleted_and_archive_record();
 
 create table eorm (
     id bigserial primary key,

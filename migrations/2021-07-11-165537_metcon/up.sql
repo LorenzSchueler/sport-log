@@ -28,10 +28,15 @@ create table metcon_archive (
     check (deleted = true)
 ) inherits (metcon);
 
-create trigger archive_metcon
-    after insert or update of deleted or delete
+create trigger delete_soft_deleted_metcon
+    after insert or update of deleted
     on metcon
-    for each row execute procedure archive_record();
+    for each row execute procedure delete_soft_deleted_record();
+
+create trigger mark_deleted_and_archive_metcon
+    before delete
+    on metcon
+    for each row execute procedure mark_deleted_and_archive_record();
 
 create table metcon_movement (
     id bigint primary key,
@@ -62,10 +67,15 @@ create table metcon_movement_archive (
     check (deleted = true)
 ) inherits (metcon_movement);
 
-create trigger archive_metcon_movement
-    after insert or update of deleted or delete
+create trigger delete_soft_deleted_metcon_movement
+    after insert or update of deleted
     on metcon_movement
-    for each row execute procedure archive_record();
+    for each row execute procedure delete_soft_deleted_record();
+
+create trigger mark_deleted_and_archive_metcon_movement
+    before delete
+    on metcon_movement
+    for each row execute procedure mark_deleted_and_archive_record();
 
 create table metcon_session (
     id bigint primary key,
@@ -94,7 +104,12 @@ create table metcon_session_archive (
     check (deleted = true)
 ) inherits (metcon_session);
 
-create trigger archive_metcon_session
-    after insert or update of deleted or delete
+create trigger delete_soft_deleted_metcon_session
+    after insert or update of deleted
     on metcon_session
-    for each row execute procedure archive_record();
+    for each row execute procedure delete_soft_deleted_record();
+
+create trigger mark_deleted_and_archive_metcon_session
+    before delete
+    on metcon_session
+    for each row execute procedure mark_deleted_and_archive_record();

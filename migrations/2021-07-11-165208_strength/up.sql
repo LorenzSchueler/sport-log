@@ -22,10 +22,15 @@ create table strength_session_archive (
     check (deleted = true)
 ) inherits (strength_session);
 
-create trigger archive_strength_session
-    after insert or update of deleted or delete
+create trigger delete_soft_deleted_strength_session
+    after insert or update of deleted
     on strength_session
-    for each row execute procedure archive_record();
+    for each row execute procedure delete_soft_deleted_record();
+
+create trigger mark_deleted_and_archive_strength_session
+    before delete
+    on strength_session
+    for each row execute procedure mark_deleted_and_archive_record();
 
 create table strength_set (
     id bigint primary key,
@@ -53,7 +58,12 @@ create table strength_set_archive (
     check (deleted = true)
 ) inherits (strength_set);
 
-create trigger archive_strength_set
-    after insert or update of deleted or delete
+create trigger delete_soft_deleted_strength_set
+    after insert or update of deleted
     on strength_set
-    for each row execute procedure archive_record();
+    for each row execute procedure delete_soft_deleted_record();
+
+create trigger mark_deleted_and_archive_strength_set
+    before delete
+    on strength_set
+    for each row execute procedure mark_deleted_and_archive_record();

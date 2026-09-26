@@ -23,10 +23,15 @@ create table diary_archive (
     check (deleted = true)
 ) inherits (diary);
 
-create trigger archive_diary
-    after insert or update of deleted or delete
+create trigger delete_soft_deleted_diary
+    after insert or update of deleted
     on diary
-    for each row execute procedure archive_record();
+    for each row execute procedure delete_soft_deleted_record();
+
+create trigger mark_deleted_and_archive_diary
+    before delete
+    on diary
+    for each row execute procedure mark_deleted_and_archive_record();
 
 create table wod (
     id bigint primary key,
@@ -52,7 +57,12 @@ create table wod_archive (
     check (deleted = true)
 ) inherits (wod);
 
-create trigger archive_wod
-    after insert or update of deleted or delete
+create trigger delete_soft_deleted_wod
+    after insert or update of deleted
     on wod
-    for each row execute procedure archive_record();
+    for each row execute procedure delete_soft_deleted_record();
+
+create trigger mark_deleted_and_archive_wod
+    before delete
+    on wod
+    for each row execute procedure mark_deleted_and_archive_record();

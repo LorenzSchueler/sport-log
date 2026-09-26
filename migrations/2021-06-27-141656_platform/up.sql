@@ -16,10 +16,15 @@ create table platform_archive (
     check (deleted = true)
 ) inherits (platform);
 
-create trigger archive_platform
-    after insert or update of deleted or delete
+create trigger delete_soft_deleted_platform
+    after insert or update of deleted
     on platform
-    for each row execute procedure archive_record();
+    for each row execute procedure delete_soft_deleted_record();
+
+create trigger mark_deleted_and_archive_platform
+    before delete
+    on platform
+    for each row execute procedure mark_deleted_and_archive_record();
 
 create table platform_credential (
     id bigint primary key,
@@ -46,7 +51,12 @@ create table platform_credential_archive (
     check (deleted = true)
 ) inherits (platform_credential);
 
-create trigger archive_platform_credential
-    after insert or update of deleted or delete
+create trigger delete_soft_deleted_platform_credential
+    after insert or update of deleted
     on platform_credential
-    for each row execute procedure archive_record();
+    for each row execute procedure delete_soft_deleted_record();
+
+create trigger mark_deleted_and_archive_platform_credential
+    before delete
+    on platform_credential
+    for each row execute procedure mark_deleted_and_archive_record();

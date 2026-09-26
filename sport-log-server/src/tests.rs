@@ -11,8 +11,9 @@ use axum::{
 };
 use base64::{Engine, engine::general_purpose::STANDARD};
 use chrono::{Duration, Utc};
+use diesel::QueryDsl;
 use diesel_async::{
-    AsyncConnection, AsyncPgConnection,
+    AsyncConnection, AsyncPgConnection, RunQueryDsl,
     pooled_connection::{
         AsyncDieselConnectionManager,
         deadpool::{Hook, Pool},
@@ -26,7 +27,8 @@ use serde::de::DeserializeOwned;
 use sport_log_types::{
     ADMIN_USERNAME, AccountData, Action, ActionEvent, ActionEventId, ActionId, ActionProvider,
     ActionProviderId, Diary, DiaryId, Epoch, EpochMap, EpochResponse, ID_HEADER, Platform,
-    PlatformId, User, UserId,
+    PlatformCredential, PlatformCredentialId, PlatformId, User, UserId,
+    schema::{action_provider, platform},
     uri::{
         ACCOUNT_DATA, ADM_PLATFORM, AP_ACTION_PROVIDER, AP_PLATFORM, DIARY, USER, route_max_version,
     },
@@ -1030,6 +1032,100 @@ async fn epoch_from_create_and_update() {
     assert_eq!(response.status(), StatusCode::OK);
     let epoch_response: EpochResponse = parse_body(response).await;
     assert_eq!(epoch_response.epoch, Epoch(epoch.0 + 2));
+}
+
+#[tokio::test]
+async fn epoch_from_cascaded_delete() {
+    for hard_delete in [false, true] {
+        let (mut router, db_pool, _) = init().await;
+
+        let credential = PlatformCredential {
+            id: PlatformCredentialId(rnd()),
+            user_id: TEST_USER.id,
+            platform_id: TEST_PLATFORM.id,
+            username: String::from("username"),
+            password: String::from("password"),
+            deleted: false,
+        };
+        let mut db = db_pool.get().await.unwrap();
+        PlatformCredentialDb::create(&credential, &mut db)
+            .await
+            .unwrap();
+        drop(db);
+
+        let (_, account_data) = account_data_request(&mut router, None).await;
+        let epoch_map = account_data.epoch_map;
+
+        let mut db = db_pool.get().await.unwrap();
+        if hard_delete {
+            diesel::delete(platform::table.find(TEST_PLATFORM.id))
+                .execute(&mut db)
+                .await
+                .unwrap();
+        } else {
+            let mut platform = TEST_PLATFORM.clone();
+            platform.deleted = true;
+            PlatformDb::update(&platform, &mut db).await.unwrap();
+        }
+        drop(db);
+
+        let (_, account_data) = account_data_request(&mut router, Some(epoch_map.clone())).await;
+
+        assert_eq!(account_data.platform_credentials.len(), 1);
+        assert_eq!(account_data.platform_credentials[0].id, credential.id);
+        assert!(account_data.platform_credentials[0].deleted);
+        assert_eq!(account_data.epoch_map.platform.0, epoch_map.platform.0 + 1);
+        assert_eq!(
+            account_data.epoch_map.platform_credential.0,
+            epoch_map.platform_credential.0 + 1
+        );
+    }
+}
+
+#[tokio::test]
+async fn epoch_from_cascaded_delete_of_multiple_rows() {
+    let (mut router, db_pool, _) = init().await;
+
+    let mut db = db_pool.get().await.unwrap();
+    let mut action_event_ids = Vec::new();
+    for days in 1..=2 {
+        let action_event = ActionEvent {
+            id: ActionEventId(rnd()),
+            user_id: TEST_USER.id,
+            action_id: TEST_ACTION.id,
+            datetime: Utc::now() + Duration::try_days(days).unwrap(),
+            arguments: None,
+            enabled: true,
+            deleted: false,
+        };
+        ActionEventDb::create(&action_event, &mut db).await.unwrap();
+        action_event_ids.push(action_event.id);
+    }
+    drop(db);
+
+    let (_, account_data) = account_data_request(&mut router, None).await;
+    let epoch_map = account_data.epoch_map;
+
+    diesel::delete(action_provider::table.find(TEST_AP.id))
+        .execute(&mut db_pool.get().await.unwrap())
+        .await
+        .unwrap();
+
+    let (_, account_data) = account_data_request(&mut router, Some(epoch_map.clone())).await;
+
+    let mut deleted_ids: Vec<_> = account_data
+        .action_events
+        .iter()
+        .inspect(|action_event| assert!(action_event.deleted))
+        .map(|action_event| action_event.id)
+        .collect();
+    deleted_ids.sort_by_key(|id| id.0);
+    action_event_ids.sort_by_key(|id| id.0);
+    assert_eq!(deleted_ids, action_event_ids);
+    assert_eq!(
+        account_data.epoch_map.action_event.0,
+        epoch_map.action_event.0 + 2
+    );
 }
 
 #[tokio::test]
