@@ -13,7 +13,14 @@ use sport_log_types::{
 };
 use tracing::{debug, error, info};
 
-#[allow(clippy::too_many_arguments)]
+/// An [`Action`] created by [`setup`].
+pub struct ActionSetup<'a> {
+    pub name: &'a str,
+    pub description: &'a str,
+    pub create_before: Duration,
+    pub delete_after: Duration,
+}
+
 pub async fn setup(
     server_url: &str,
     name: &str,
@@ -21,9 +28,7 @@ pub async fn setup(
     description: &str,
     platform_name: &str,
     credential: bool,
-    actions: &[(&str, &str)],
-    create_before: Duration,
-    delete_after: Duration,
+    actions: &[ActionSetup<'_>],
 ) -> Result<(), Error> {
     let client = Client::new();
 
@@ -117,31 +122,31 @@ pub async fn setup(
         }
     };
 
-    let actions: Vec<Action> = actions
-        .iter()
-        .map(|action| Action {
+    for action_setup in actions {
+        let action = Action {
             id: ActionId(rng.random()),
-            name: action.0.to_owned(),
+            name: action_setup.name.to_owned(),
             action_provider_id,
-            description: Some(action.1.to_owned()),
-            create_before: create_before.num_milliseconds() as i32,
-            delete_after: delete_after.num_milliseconds() as i32,
+            description: Some(action_setup.description.to_owned()),
+            create_before: action_setup.create_before.num_milliseconds() as i32,
+            delete_after: action_setup.delete_after.num_milliseconds() as i32,
             deleted: false,
-        })
-        .collect();
+        };
 
-    match client
-        .post(route_max_version(server_url, AP_ACTION, None))
-        .basic_auth(name, Some(&password))
-        .json(&actions)
-        .send()
-        .await?
-        .status()
-    {
-        StatusCode::OK => info!("action created\nsetup successful"),
-        StatusCode::CONFLICT => info!("action already exists\nsetup successful"),
-        status => error!("an error occurred (status {status})"),
+        match client
+            .post(route_max_version(server_url, AP_ACTION, None))
+            .basic_auth(name, Some(&password))
+            .json(&action)
+            .send()
+            .await?
+            .status()
+        {
+            StatusCode::OK => info!("action {} created", action_setup.name),
+            StatusCode::CONFLICT => info!("action {} already exists", action_setup.name),
+            status => error!("an error occurred (status {status})"),
+        }
     }
+    info!("setup successful");
 
     Ok(())
 }

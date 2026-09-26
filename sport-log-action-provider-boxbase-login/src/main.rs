@@ -5,7 +5,7 @@ use clap::Parser;
 use reqwest::{Client, Error as ReqwestError};
 use serde::Deserialize;
 use serde_json::Error as JsonError;
-use sport_log_ap_utils::{disable_events, get_events, setup as setup_db};
+use sport_log_ap_utils::{ActionSetup, disable_events, get_events, setup as setup_db};
 use sport_log_types::ExecutableActionEvent;
 use thiserror::Error;
 use tracing::{debug, error, info, warn};
@@ -16,7 +16,7 @@ use crate::boxbase::{BoxBase, Class};
 mod boxbase;
 
 const CONFIG_FILE: &str = "sport-log-action-provider-boxbase-login.toml";
-const NAME: &str = "Boxbase Login";
+const NAME: &str = "BoxBase Login";
 const DESCRIPTION: &str =
     "Boxbase Login can reserve spots in classes. The action names correspond to the class types.";
 const PLATFORM_NAME: &str = "BoxBase";
@@ -118,6 +118,9 @@ async fn main() -> ExitCode {
 
 /// Creates the platform, the action provider and its actions.
 async fn setup(config: &Config) -> Result<()> {
+    let create_before = Duration::try_days(14).unwrap();
+    let delete_after = Duration::zero();
+
     setup_db(
         &config.server_url,
         NAME,
@@ -126,18 +129,25 @@ async fn setup(config: &Config) -> Result<()> {
         PLATFORM_NAME,
         true,
         &[
-            ("GentleGiants Group", "Reserve a spot in a group class."),
-            (
-                "GentleGiants OG",
-                "Reserve a spot in a Open Gym class in the main gym.",
-            ),
-            (
-                "GentleGiants OG 2",
-                "Reserve a spot in a Open Gym class in gym 2.",
-            ),
+            ActionSetup {
+                name: "GentleGiants Group",
+                description: "Reserve a spot in a group class.",
+                create_before,
+                delete_after,
+            },
+            ActionSetup {
+                name: "GentleGiants OG",
+                description: "Reserve a spot in a Open Gym class in the main gym.",
+                create_before,
+                delete_after,
+            },
+            ActionSetup {
+                name: "GentleGiants OG 2",
+                description: "Reserve a spot in a Open Gym class in gym 2.",
+                create_before,
+                delete_after,
+            },
         ],
-        Duration::try_days(14).unwrap(),
-        Duration::zero(),
     )
     .await?;
 
