@@ -57,7 +57,7 @@ The server and action providers as well as helper tools are structured as follow
 - [sport-log-derive](sport-log-derive) rust macros used in [sport-log-types](sport-log-types) and [sport-log-server](sport-log-server)
 - [sport-log-scheduler](sport-log-scheduler) responsible for creating action events from action rules, deleting old action events and for garbage collection
 - [sport-log-ap-utils](sport-log-ap-utils) helper functions for rust action providers
-- [sport-log-action-provider-boxbase-login](sport-log-action-provider-boxbase-login) reserves spots in boxbase classes
+- [sport-log-action-provider-boxbase-login](sport-log-action-provider-boxbase-login) reserves spots in boxbase classes and saves the wod of reserved GentleGiants group classes
 
 The flutter app lives in [sport-log-client](sport-log-client)
 

@@ -1,2 +1,4 @@
 password = "Boxbase-login-passwd1"
 server_url = "http://localhost:8000"
+wod_username = "username"
+wod_password = "password"
