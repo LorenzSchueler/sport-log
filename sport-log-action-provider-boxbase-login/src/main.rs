@@ -45,7 +45,7 @@ enum Error {
     ReservationFailed(String, DateTime<Utc>),
 }
 
-/// A result with an [`Error`].
+/// A result with an [`enum@Error`].
 type Result<T> = StdResult<T, Error>;
 
 /// An error caused by the user's data after which the action event is disabled, except for
