@@ -24,7 +24,7 @@ use tracing::{debug, error, info, warn};
 use tracing_subscriber::EnvFilter;
 
 const CONFIG_FILE: &str = "sport-log-action-provider-boxbase-login.toml";
-const NAME: &str = "boxbase-login";
+const NAME: &str = "Boxbase Login";
 const DESCRIPTION: &str =
     "Boxbase Login can reserve spots in classes. The action names correspond to the class types.";
 const PLATFORM_NAME: &str = "BoxBase";

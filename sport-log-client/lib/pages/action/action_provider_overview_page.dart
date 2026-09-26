@@ -74,7 +74,7 @@ class _ActionProviderOverviewPageState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("${widget.actionProvider.name} Actions")),
+      appBar: AppBar(title: Text(widget.actionProvider.name)),
       body: _actionProviderDescription == null
           ? const CircularProgressIndicator()
           : SyncRefreshIndicator(
