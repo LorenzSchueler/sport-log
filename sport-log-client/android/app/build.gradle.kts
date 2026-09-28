@@ -54,7 +54,7 @@ android {
             }
         }
     }
-    
+
     flavorDimensions += "appName"
 
     productFlavors {
@@ -82,7 +82,5 @@ flutter {
 }
 
 dependencies {
-    implementation("org.joda:joda-convert:3.0.1")
-    implementation("com.google.j2objc:j2objc-annotations:3.0.0")
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
 }
