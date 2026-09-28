@@ -296,6 +296,14 @@ class TrackingUtils extends ChangeNotifier {
     }
     // ---- end critical section; awaits are safe again ----
 
+    if (tracking) {
+      await _trackingUiUtils.updateTrack(track);
+    }
+    await _trackingUiUtils.updateLocation(location);
+
+    await _audioFeedbackUtils.onNewPosition();
+    await _alarmUtils.onNewPosition(position);
+
     // Refine elevation out of band. `position` is already in the track, so a
     // slow or late-returning lookup can no longer affect distance or ordering.
     final elevation = await _elevationMapController?.getElevation(
@@ -311,13 +319,5 @@ class TrackingUtils extends ChangeNotifier {
         "elevation GPS: ${location.elevation.round()} m\n"
         "elevation Mbx: ${elevation?.round()} m\n"
         "points:      ${track.length}";
-
-    if (tracking) {
-      await _trackingUiUtils.updateTrack(track);
-    }
-    await _trackingUiUtils.updateLocation(location);
-
-    await _audioFeedbackUtils.onNewPosition();
-    await _alarmUtils.onNewPosition(position);
   }
 }
