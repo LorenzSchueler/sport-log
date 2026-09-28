@@ -222,7 +222,7 @@ class _TrackingPageButtons extends StatelessWidget {
         children: [
           Expanded(
             child: FilledButton(
-              style: ElevatedButton.styleFrom(
+              style: FilledButton.styleFrom(
                 backgroundColor: Theme.of(context).colorScheme.errorContainer,
               ),
               onPressed: onResume,
@@ -232,7 +232,7 @@ class _TrackingPageButtons extends StatelessWidget {
           Defaults.sizedBox.horizontal.normal,
           Expanded(
             child: FilledButton(
-              style: ElevatedButton.styleFrom(
+              style: FilledButton.styleFrom(
                 backgroundColor: Theme.of(context).colorScheme.error,
               ),
               onPressed: onSave,
@@ -245,7 +245,7 @@ class _TrackingPageButtons extends StatelessWidget {
         children: [
           Expanded(
             child: FilledButton(
-              style: ElevatedButton.styleFrom(
+              style: FilledButton.styleFrom(
                 backgroundColor: Theme.of(context).colorScheme.error,
               ),
               onPressed: () => Navigator.pop(context),
@@ -255,7 +255,7 @@ class _TrackingPageButtons extends StatelessWidget {
           Defaults.sizedBox.horizontal.normal,
           Expanded(
             child: FilledButton(
-              style: ElevatedButton.styleFrom(
+              style: FilledButton.styleFrom(
                 backgroundColor: Theme.of(context).colorScheme.errorContainer,
               ),
               onPressed: waitingOnAccurateLocation || waitingOnHR

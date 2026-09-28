@@ -203,7 +203,7 @@ class _CardioCutPageState extends State<CardioCutPage> {
                           icon: const Icon(AppIcons.close),
                           label: const Text("Cancel"),
                           onPressed: () => Navigator.of(context).pop(),
-                          style: ElevatedButton.styleFrom(
+                          style: FilledButton.styleFrom(
                             backgroundColor: Theme.of(context)
                                 .colorScheme
                                 .error,
@@ -216,7 +216,7 @@ class _CardioCutPageState extends State<CardioCutPage> {
                           icon: const Icon(AppIcons.cut),
                           label: const Text("Cut"),
                           onPressed: _cutCardioSession,
-                          style: ElevatedButton.styleFrom(
+                          style: FilledButton.styleFrom(
                             backgroundColor: Theme.of(context)
                                 .colorScheme
                                 .errorContainer,

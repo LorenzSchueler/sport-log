@@ -139,7 +139,7 @@ class TimerPage extends StatelessWidget {
     return timerState.isRunning
         ? FilledButton(
             onPressed: timerState.stop,
-            style: ElevatedButton.styleFrom(
+            style: FilledButton.styleFrom(
               backgroundColor: Theme.of(context).colorScheme.error,
             ),
             child: const Text("Stop", style: TextStyle(fontSize: 50)),
@@ -154,7 +154,7 @@ class TimerPage extends StatelessWidget {
                     title: "Invalid Time",
                     text: "The time must be greater than 0.",
                   ),
-            style: ElevatedButton.styleFrom(
+            style: FilledButton.styleFrom(
               backgroundColor: Theme.of(context).colorScheme.errorContainer,
             ),
             child: const Text("Start", style: TextStyle(fontSize: 50)),
