@@ -62,12 +62,20 @@ class AppTheme {
     onInverseSurface: _neutral.onInverseSurface,
   );
 
+  /// Style for [FilledButton.tonal] with a neutral background, so colored labels stand out.
+  /// Not part of the theme, because [FilledButtonThemeData] also applies to regular [FilledButton]s
+  /// and [ColorScheme.secondaryContainer] also colors the navigation and segmented button indicators.
+  static ButtonStyle tonalButtonStyle({Color? foregroundColor}) =>
+      FilledButton.styleFrom(
+        backgroundColor: _colorScheme.surfaceContainerHighest,
+        foregroundColor: foregroundColor ?? _colorScheme.primary,
+      );
+
   // ignore: long-method
   static final darkTheme = ThemeData(
     useMaterial3: true,
     colorScheme: _colorScheme,
     extensions: const [AppColors(success: Colors.lightGreen)],
-    elevatedButtonTheme: ElevatedButtonThemeData(style: _buttonStyle),
     filledButtonTheme: FilledButtonThemeData(style: _buttonStyle),
     segmentedButtonTheme: const SegmentedButtonThemeData(
       style: ButtonStyle(

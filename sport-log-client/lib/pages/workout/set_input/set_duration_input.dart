@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:sport_log/helpers/extensions/text_editing_controller_extension.dart';
 import 'package:sport_log/pages/workout/set_input/new_set_input.dart';
 import 'package:sport_log/settings.dart';
+import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/input_fields/double_input.dart';
 import 'package:sport_log/widgets/input_fields/edit_tile.dart';
@@ -268,7 +269,8 @@ class _SetDurationInputState extends State<SetDurationInput> {
                     onUpdate: _setFemaleWeight,
                   ),
                 ),
-              ElevatedButton.icon(
+              FilledButton.tonalIcon(
+                style: AppTheme.tonalButtonStyle(),
                 icon: Icon(_weight == null ? AppIcons.add : AppIcons.remove),
                 label: const Text("Weight"),
                 onPressed: () {

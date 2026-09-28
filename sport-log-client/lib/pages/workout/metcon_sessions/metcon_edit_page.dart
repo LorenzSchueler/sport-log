@@ -7,6 +7,7 @@ import 'package:sport_log/models/metcon/all.dart';
 import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/pages/workout/set_input/new_set_input.dart';
 import 'package:sport_log/settings.dart';
+import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/dialogs.dart';
 import 'package:sport_log/widgets/input_fields/duration_input.dart';
@@ -317,7 +318,8 @@ class _MetconEditPageState extends State<MetconEditPage> {
   }
 
   Widget _addMetconMovementButton() {
-    return ElevatedButton.icon(
+    return FilledButton.tonalIcon(
+      style: AppTheme.tonalButtonStyle(),
       icon: const Icon(AppIcons.add),
       label: const Text("Movement"),
       // ignore: prefer-extracting-callbacks

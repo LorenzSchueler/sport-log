@@ -88,7 +88,7 @@ final cancelButton = button("Cancel");
 
 final aboutButton = find.ancestor(
   of: find.text("About", skipOffstage: false),
-  matching: find.byType(ElevatedButton, skipOffstage: false),
+  matching: find.byType(FilledButton, skipOffstage: false),
 );
 
 Finder fab(IconData icon) => find.ancestor(

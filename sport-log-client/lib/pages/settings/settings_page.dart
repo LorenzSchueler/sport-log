@@ -359,11 +359,9 @@ class SettingsPage extends StatelessWidget {
                         constraints: const BoxConstraints(
                           minWidth: double.infinity,
                         ),
-                        child: ElevatedButton(
-                          style: ButtonStyle(
-                            foregroundColor: WidgetStateProperty.all(
-                              AppColors.of(context).success,
-                            ),
+                        child: FilledButton.tonal(
+                          style: AppTheme.tonalButtonStyle(
+                            foregroundColor: AppColors.of(context).success,
                           ),
                           onPressed: sync.isSyncing
                               ? null
@@ -379,11 +377,11 @@ class SettingsPage extends StatelessWidget {
                       child: Row(
                         children: [
                           Expanded(
-                            child: ElevatedButton(
-                              style: ButtonStyle(
-                                foregroundColor: WidgetStateProperty.all(
-                                  Theme.of(context).colorScheme.error,
-                                ),
+                            child: FilledButton.tonal(
+                              style: AppTheme.tonalButtonStyle(
+                                foregroundColor: Theme.of(context)
+                                    .colorScheme
+                                    .error,
                               ),
                               onPressed: sync.isSyncing
                                   ? null
@@ -393,11 +391,11 @@ class SettingsPage extends StatelessWidget {
                           ),
                           Defaults.sizedBox.horizontal.normal,
                           Expanded(
-                            child: ElevatedButton(
-                              style: ButtonStyle(
-                                foregroundColor: WidgetStateProperty.all(
-                                  Theme.of(context).colorScheme.error,
-                                ),
+                            child: FilledButton.tonal(
+                              style: AppTheme.tonalButtonStyle(
+                                foregroundColor: Theme.of(context)
+                                    .colorScheme
+                                    .error,
                               ),
                               onPressed: sync.isSyncing
                                   ? null
@@ -518,7 +516,8 @@ class SettingsPage extends StatelessWidget {
                       constraints: const BoxConstraints(
                         minWidth: double.infinity,
                       ),
-                      child: ElevatedButton(
+                      child: FilledButton.tonal(
+                        style: AppTheme.tonalButtonStyle(),
                         child: const Text('Dev Status'),
                         onPressed: () =>
                             Navigator.pushNamed(context, Routes.devStatus),
@@ -531,7 +530,8 @@ class SettingsPage extends StatelessWidget {
                       constraints: const BoxConstraints(
                         minWidth: double.infinity,
                       ),
-                      child: ElevatedButton(
+                      child: FilledButton.tonal(
+                        style: AppTheme.tonalButtonStyle(),
                         child: const Text('Dev Tools'),
                         onPressed: () =>
                             Navigator.pushNamed(context, Routes.devTools),
@@ -547,7 +547,8 @@ class SettingsPage extends StatelessWidget {
                     constraints: const BoxConstraints(
                       minWidth: double.infinity,
                     ),
-                    child: ElevatedButton(
+                    child: FilledButton.tonal(
+                      style: AppTheme.tonalButtonStyle(),
                       child: const Text('Export'),
                       onPressed: () => _exportDb(context),
                     ),
@@ -561,7 +562,8 @@ class SettingsPage extends StatelessWidget {
                     constraints: const BoxConstraints(
                       minWidth: double.infinity,
                     ),
-                    child: ElevatedButton(
+                    child: FilledButton.tonal(
+                      style: AppTheme.tonalButtonStyle(),
                       child: const Text('About'),
                       onPressed: () =>
                           Navigator.pushNamed(context, Routes.about),

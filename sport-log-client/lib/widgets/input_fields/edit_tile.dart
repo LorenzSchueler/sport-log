@@ -1,4 +1,5 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 
 class CaptionTile extends StatelessWidget {
@@ -84,7 +85,8 @@ class OptionalTextFormField extends StatelessWidget {
                       padding: const EdgeInsets.only(right: 15),
                       child: Icon(leading, color: EditTile.iconCaptionColor),
                     ),
-                  ElevatedButton.icon(
+                  FilledButton.tonalIcon(
+                    style: AppTheme.tonalButtonStyle(),
                     icon: const Icon(AppIcons.add),
                     label: Text(buttonText),
                     onPressed: onButtonPressed,
@@ -152,7 +154,8 @@ class EditTile extends StatelessWidget {
          shrinkWidth: shrinkWidth,
          key: key,
          child: showButton
-             ? ElevatedButton.icon(
+             ? FilledButton.tonalIcon(
+                 style: AppTheme.tonalButtonStyle(),
                  icon: const Icon(AppIcons.add),
                  label: Text(caption),
                  onPressed: () {
