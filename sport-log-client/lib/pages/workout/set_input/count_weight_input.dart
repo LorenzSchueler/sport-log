@@ -128,20 +128,17 @@ class _CountWeightInputState extends State<CountWeightInput> {
                   leading: null,
                   caption: "Distance Unit",
                   shrinkWidth: true,
-                  child: DropdownButtonHideUnderline(
-                    child: DropdownButton(
-                      value: _distanceUnit,
-                      items: DistanceUnit.values
-                          .map(
-                            (unit) => DropdownMenuItem(
-                              value: unit,
-                              child: Text(unit.name),
-                            ),
-                          )
-                          .toList(),
-                      onChanged: _setDistanceUnit,
-                      isDense: true,
-                    ),
+                  child: DropdownMenu(
+                    initialSelection: _distanceUnit,
+                    dropdownMenuEntries: DistanceUnit.values
+                        .map(
+                          (unit) =>
+                              DropdownMenuEntry(value: unit, label: unit.name),
+                        )
+                        .toList(),
+                    onSelected: _setDistanceUnit,
+                    selectOnly: true,
+                    inputDecorationTheme: AppTheme.dropdownMenuDecoration,
                   ),
                 ),
               EditTile(
@@ -162,16 +159,15 @@ class _CountWeightInputState extends State<CountWeightInput> {
                   leading: null,
                   caption: "Weight Unit",
                   shrinkWidth: true,
-                  child: DropdownButtonHideUnderline(
-                    child: DropdownButton(
-                      value: _weightUnit,
-                      items: const [
-                        DropdownMenuItem(value: "kg", child: Text("kg")),
-                        DropdownMenuItem(value: "lb", child: Text("lb")),
-                      ],
-                      onChanged: _setUnit,
-                      isDense: true,
-                    ),
+                  child: DropdownMenu(
+                    initialSelection: _weightUnit,
+                    dropdownMenuEntries: const [
+                      DropdownMenuEntry(value: "kg", label: "kg"),
+                      DropdownMenuEntry(value: "lb", label: "lb"),
+                    ],
+                    onSelected: _setUnit,
+                    selectOnly: true,
+                    inputDecorationTheme: AppTheme.dropdownMenuDecoration,
                   ),
                 ),
               if (_weight != null)

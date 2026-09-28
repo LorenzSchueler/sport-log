@@ -227,16 +227,15 @@ class _SetDurationInputState extends State<SetDurationInput> {
                   leading: null,
                   caption: "Weight Unit",
                   shrinkWidth: true,
-                  child: DropdownButtonHideUnderline(
-                    child: DropdownButton(
-                      value: _weightUnit,
-                      items: const [
-                        DropdownMenuItem(value: "kg", child: Text("kg")),
-                        DropdownMenuItem(value: "lb", child: Text("lb")),
-                      ],
-                      onChanged: _setUnit,
-                      isDense: true,
-                    ),
+                  child: DropdownMenu(
+                    initialSelection: _weightUnit,
+                    dropdownMenuEntries: const [
+                      DropdownMenuEntry(value: "kg", label: "kg"),
+                      DropdownMenuEntry(value: "lb", label: "lb"),
+                    ],
+                    onSelected: _setUnit,
+                    selectOnly: true,
+                    inputDecorationTheme: AppTheme.dropdownMenuDecoration,
                   ),
                 ),
               if (_weight != null)

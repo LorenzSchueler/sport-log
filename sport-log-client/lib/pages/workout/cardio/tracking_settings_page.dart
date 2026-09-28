@@ -5,6 +5,7 @@ import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/pages/workout/cardio/audio_feedback_config.dart';
 import 'package:sport_log/pages/workout/cardio/tracking_settings.dart';
 import 'package:sport_log/routes.dart';
+import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/input_fields/double_input.dart';
 import 'package:sport_log/widgets/input_fields/duration_input.dart';
@@ -243,25 +244,27 @@ class CardioTrackingSettingsPage extends StatelessWidget {
                       leading: AppIcons.heartbeat,
                       caption: "Heart Rate Monitors",
                       onTrailingTap: trackingSettings.heartRateUtils.reset,
-                      child: DropdownButtonHideUnderline(
-                        child: DropdownButton(
-                          value: trackingSettings.heartRateUtils.deviceId,
-                          items: trackingSettings.heartRateUtils.devices.entries
-                              .map(
-                                (d) => DropdownMenuItem(
-                                  value: d.value,
-                                  child: Text(d.key),
-                                ),
-                              )
-                              .toList(),
-                          onChanged: (deviceId) {
-                            if (deviceId != null) {
-                              trackingSettings.heartRateUtils.deviceId =
-                                  deviceId;
-                            }
-                          },
-                          isDense: true,
-                        ),
+                      child: DropdownMenu(
+                        initialSelection:
+                            trackingSettings.heartRateUtils.deviceId,
+                        dropdownMenuEntries: trackingSettings
+                            .heartRateUtils
+                            .devices
+                            .entries
+                            .map(
+                              (d) => DropdownMenuEntry(
+                                value: d.value,
+                                label: d.key,
+                              ),
+                            )
+                            .toList(),
+                        onSelected: (deviceId) {
+                          if (deviceId != null) {
+                            trackingSettings.heartRateUtils.deviceId = deviceId;
+                          }
+                        },
+                        selectOnly: true,
+                        inputDecorationTheme: AppTheme.dropdownMenuDecoration,
                       ),
                     ),
               FilledButton(

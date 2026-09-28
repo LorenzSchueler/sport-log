@@ -3,6 +3,7 @@ import 'package:sport_log/app.dart';
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/heart_rate_utils.dart';
 import 'package:sport_log/routes.dart';
+import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/main_drawer.dart';
 import 'package:sport_log/widgets/pop_scopes.dart';
@@ -48,26 +49,21 @@ class HeartRatePage extends StatelessWidget {
                       heartRateUtils.devices.isNotEmpty) ...[
                     Defaults.sizedBox.vertical.normal,
                     const Text("Heart Rate Monitors"),
-                    SizedBox(
-                      height: 24,
-                      child: DropdownButtonHideUnderline(
-                        child: DropdownButton(
-                          value: heartRateUtils.deviceId,
-                          items: heartRateUtils.devices.entries
-                              .map(
-                                (d) => DropdownMenuItem(
-                                  value: d.value,
-                                  child: Text(d.key),
-                                ),
-                              )
-                              .toList(),
-                          onChanged: (deviceId) {
-                            if (deviceId != null) {
-                              heartRateUtils.deviceId = deviceId;
-                            }
-                          },
-                        ),
-                      ),
+                    DropdownMenu(
+                      initialSelection: heartRateUtils.deviceId,
+                      dropdownMenuEntries: heartRateUtils.devices.entries
+                          .map(
+                            (d) =>
+                                DropdownMenuEntry(value: d.value, label: d.key),
+                          )
+                          .toList(),
+                      onSelected: (deviceId) {
+                        if (deviceId != null) {
+                          heartRateUtils.deviceId = deviceId;
+                        }
+                      },
+                      selectOnly: true,
+                      inputDecorationTheme: AppTheme.dropdownMenuDecoration,
                     ),
                     if (heartRateUtils.canConnect) ...[
                       Defaults.sizedBox.vertical.normal,

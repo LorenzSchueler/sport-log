@@ -71,6 +71,17 @@ class AppTheme {
         foregroundColor: foregroundColor ?? _colorScheme.primary,
       );
 
+  /// Borderless 24 px high [DropdownMenu.inputDecorationTheme].
+  /// Passed to each [DropdownMenu] because its trailing icon button ignores [DropdownMenuThemeData].
+  static const dropdownMenuDecoration = InputDecorationThemeData(
+    isCollapsed: true,
+    isDense: true,
+    contentPadding: EdgeInsets.zero,
+    border: InputBorder.none,
+    constraints: BoxConstraints(maxHeight: 24),
+    suffixIconConstraints: BoxConstraints(maxHeight: 24),
+  );
+
   // ignore: long-method
   static final darkTheme = ThemeData(
     useMaterial3: true,

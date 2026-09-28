@@ -468,29 +468,26 @@ class SettingsPage extends StatelessWidget {
                 EditTile(
                   caption: "Default Workout Tracking Page",
                   leading: AppIcons.star,
-                  child: SizedBox(
-                    height: 24,
-                    child: DropdownButtonHideUnderline(
-                      child: DropdownButton(
-                        value: settings.defaultWorkoutTrackingPage,
-                        items: [
-                          for (final (page, name) in [
-                            (Routes.timelineOverview, "Timeline"),
-                            (Routes.strengthOverview, "Strength"),
-                            (Routes.metconOverview, "Metcon"),
-                            (Routes.cardioOverview, "Cardio"),
-                            (Routes.wodOverview, "Wod"),
-                            (Routes.diaryOverview, "Diary"),
-                          ])
-                            DropdownMenuItem(value: page, child: Text(name)),
-                        ],
-                        onChanged: (page) {
-                          if (page != null) {
-                            settings.setDefaultWorkoutTrackingPage(page);
-                          }
-                        },
-                      ),
-                    ),
+                  child: DropdownMenu(
+                    initialSelection: settings.defaultWorkoutTrackingPage,
+                    dropdownMenuEntries: [
+                      for (final (page, name) in [
+                        (Routes.timelineOverview, "Timeline"),
+                        (Routes.strengthOverview, "Strength"),
+                        (Routes.metconOverview, "Metcon"),
+                        (Routes.cardioOverview, "Cardio"),
+                        (Routes.wodOverview, "Wod"),
+                        (Routes.diaryOverview, "Diary"),
+                      ])
+                        DropdownMenuEntry(value: page, label: name),
+                    ],
+                    onSelected: (page) {
+                      if (page != null) {
+                        settings.setDefaultWorkoutTrackingPage(page);
+                      }
+                    },
+                    selectOnly: true,
+                    inputDecorationTheme: AppTheme.dropdownMenuDecoration,
                   ),
                 ),
                 Defaults.sizedBox.vertical.small,
