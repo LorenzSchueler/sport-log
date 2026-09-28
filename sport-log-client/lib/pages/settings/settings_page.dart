@@ -392,15 +392,24 @@ class SettingsPage extends StatelessWidget {
                           Defaults.sizedBox.horizontal.normal,
                           Expanded(
                             child: FilledButton.tonal(
-                              style: AppTheme.tonalButtonStyle(
-                                foregroundColor: Theme.of(context)
-                                    .colorScheme
-                                    .error,
-                              ),
+                              style:
+                                  AppTheme.tonalButtonStyle(
+                                    foregroundColor: Theme.of(context)
+                                        .colorScheme
+                                        .error,
+                                  ).copyWith(
+                                    // fit the label into one line
+                                    padding: const WidgetStatePropertyAll(
+                                      EdgeInsets.symmetric(horizontal: 8),
+                                    ),
+                                  ),
                               onPressed: sync.isSyncing
                                   ? null
                                   : () => _deleteAccount(context),
-                              child: const Text('Delete Account'),
+                              child: const FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Text('Delete Account'),
+                              ),
                             ),
                           ),
                         ],

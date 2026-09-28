@@ -34,6 +34,7 @@ class DefaultSwitch extends StatelessWidget {
     return SizedBox(
       height: 25, // make it fit into EditTile
       child: FittedBox(
+        alignment: AlignmentDirectional.centerStart,
         child: Switch(
           value: value,
           onChanged: (isSet) {
@@ -98,7 +99,7 @@ class OptionalTextFormField extends StatelessWidget {
   }
 }
 
-/// A container with a style similar to TextFormField.
+/// An [InputDecorator] that looks like a TextFormField and holds any [child].
 class EditTile extends StatelessWidget {
   const EditTile({
     required this.child,
@@ -187,21 +188,6 @@ class EditTile extends StatelessWidget {
   static const Color iconCaptionColor = Colors.white70;
   static const double textFormFieldHeight = 49;
 
-  Widget _captionChildColumn(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        if (caption != null) CaptionTile(caption: caption!),
-        bigText
-            ? DefaultTextStyle(
-                style: Theme.of(context).textTheme.bodyLarge!,
-                child: child,
-              )
-            : child,
-      ],
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -213,31 +199,37 @@ class EditTile extends StatelessWidget {
           : null,
       behavior: HitTestBehavior.opaque,
       child: SizedBox(
+        width: shrinkWidth ? null : double.infinity,
         height: unboundedHeight ? null : textFormFieldHeight,
-        child: Row(
-          mainAxisSize: shrinkWidth ? MainAxisSize.min : MainAxisSize.max,
-          children: [
-            if (leading != null)
-              Padding(
-                padding: const EdgeInsets.only(right: 15),
-                child: Icon(leading, color: iconCaptionColor),
-              ),
-            shrinkWidth
-                ? _captionChildColumn(context)
-                : Expanded(child: _captionChildColumn(context)),
-            if (onTrailingTap != null)
-              IconButton(
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(),
-                onPressed: onTrailingTap != null
-                    ? () {
+        // only shrinks the width if it is not tight
+        child: IntrinsicWidth(
+          child: InputDecorator(
+            decoration: InputDecoration(
+              // dense and without bottom padding, so a DefaultSwitch gets its full height
+              // the icons keep the size of a TextFormField
+              isDense: true,
+              contentPadding: const EdgeInsets.only(top: 5),
+              icon: leading != null ? Icon(leading, size: 24) : null,
+              labelText: caption,
+              suffixIcon: onTrailingTap != null
+                  ? IconButton(
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                      onPressed: () {
                         FocusManager.instance.primaryFocus?.unfocus();
                         onTrailingTap!();
-                      }
-                    : null,
-                icon: Icon(trailing ?? AppIcons.close),
-              ),
-          ],
+                      },
+                      icon: Icon(trailing ?? AppIcons.close, size: 24),
+                    )
+                  : null,
+            ),
+            child: bigText
+                ? DefaultTextStyle(
+                    style: Theme.of(context).textTheme.bodyLarge!,
+                    child: child,
+                  )
+                : child,
+          ),
         ),
       ),
     );
