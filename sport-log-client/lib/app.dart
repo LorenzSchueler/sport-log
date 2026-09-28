@@ -10,6 +10,7 @@ class App extends StatelessWidget {
   const App({super.key});
 
   static final navigatorKey = GlobalKey<NavigatorState>();
+  static final scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
   static BuildContext? get globalContextOptional =>
       navigatorKey.currentContext ??
       InitAppWrapperState.navigatorKey.currentContext;
@@ -32,6 +33,7 @@ class App extends StatelessWidget {
               ? Routes.defaultWorkoutTracking
               : Routes.landing,
           navigatorKey: navigatorKey,
+          scaffoldMessengerKey: scaffoldMessengerKey,
           debugShowCheckedModeBanner: false,
           darkTheme: AppTheme.darkTheme,
           themeMode: ThemeMode.dark,

@@ -33,7 +33,7 @@ class HeartRatePage extends StatelessWidget {
                             final context = App.globalContext;
                             if (context.mounted &&
                                 heartRateUtils.devices.isEmpty) {
-                              showSimpleToast(context, "No devices found.");
+                              showSimpleSnackBar("No devices found.");
                             }
                           },
                     child: Text(

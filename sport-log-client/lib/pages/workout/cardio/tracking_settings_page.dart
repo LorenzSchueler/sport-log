@@ -235,7 +235,7 @@ class CardioTrackingSettingsPage extends StatelessWidget {
                         await trackingSettings.heartRateUtils.searchDevices();
                         if (context.mounted &&
                             trackingSettings.heartRateUtils.devices.isEmpty) {
-                          showSimpleToast(context, "No devices found.");
+                          showSimpleSnackBar("No devices found.");
                         }
                       },
                     )

@@ -1,13 +1,7 @@
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:sport_log/app.dart';
 
-void showSimpleToast(BuildContext context, String text) {
-  Fluttertoast.showToast(
-    msg: text,
-    backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
-    textColor: Theme.of(context).colorScheme.onSurfaceVariant,
-  );
-}
+void showSimpleSnackBar(String text) => App.scaffoldMessengerKey.currentState
+    ?.showSnackBar(SnackBar(content: Text(text)));
 
-void showNoInternetToast(BuildContext context) =>
-    showSimpleToast(context, 'No Internet Connection.');
+void showNoInternetSnackBar() => showSimpleSnackBar('No Internet Connection.');

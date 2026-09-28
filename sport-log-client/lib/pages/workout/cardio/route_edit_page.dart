@@ -126,7 +126,7 @@ class _RouteEditPageState extends State<RouteEditPage> {
       if (mounted) {
         setState(() => _isSearching = false);
         if (track.isErr) {
-          showSimpleToast(context, track.err.message);
+          showSimpleSnackBar(track.err.message);
         } else {
           setState(() {
             _route

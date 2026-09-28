@@ -24,7 +24,6 @@ dependencies:
   flutter_blue_plus: ^2.0.0
   flutter_local_notifications: ^22.2.0
   flutter_tts: ^4.0.2
-  fluttertoast: ^10.0.0
   geolocator: ^14.0.0
   gpx: ^2.1.1
   hive_flutter: ^1.1.0

@@ -1,5 +1,4 @@
 import 'package:material_ui/material_ui.dart';
-import 'package:sport_log/app.dart';
 import 'package:sport_log/config.dart';
 import 'package:sport_log/helpers/lat_lng.dart';
 import 'package:sport_log/helpers/map_controller.dart';
@@ -79,12 +78,7 @@ class MapSearchUtils extends ChangeNotifier {
         _searchResults = result.map(MapboxSearchResult.fromFeature).toList();
         notifyListeners();
       })
-      ..onErr((error) {
-        final context = App.globalContext;
-        if (context.mounted) {
-          showNoInternetToast(context);
-        }
-      });
+      ..onErr((_) => showNoInternetSnackBar());
   }
 
   Future<void> goToSearchItem(MapboxSearchResult result) async {

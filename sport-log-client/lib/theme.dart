@@ -52,7 +52,10 @@ class AppTheme {
     ),
     iconTheme: IconThemeData(color: _colorScheme.primary),
     dialogTheme: DialogThemeData(backgroundColor: _colorScheme.surface),
-    snackBarTheme: SnackBarThemeData(backgroundColor: _colorScheme.surface),
+    snackBarTheme: SnackBarThemeData(
+      backgroundColor: _colorScheme.surface,
+      contentTextStyle: TextStyle(color: _colorScheme.onSurface),
+    ),
     tabBarTheme: TabBarThemeData(
       dividerColor: _colorScheme.surfaceContainerHighest,
     ),
