@@ -142,8 +142,10 @@ final cardioNavItem = navItem("Cardio");
 final wodNavItem = navItem("Wod");
 final diaryNavItem = navItem("Diary");
 
-Finder drawerItem(String text) =>
-    find.ancestor(of: find.text(text), matching: find.byType(ListTile));
+Finder drawerItem(String text) => find.ancestor(
+  of: find.text(text),
+  matching: find.byType(NavigationDrawerDestination),
+);
 final movementDrawerItem = drawerItem("Movements");
 final timerDrawerItem = drawerItem("Timer");
 final mapDrawerItem = drawerItem("Map");

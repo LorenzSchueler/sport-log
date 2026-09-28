@@ -16,112 +16,58 @@ class MainDrawer extends StatelessWidget {
 
   final String selectedRoute;
 
+  /// Routes that select the Workout Tracking destination.
+  static const _workoutTrackingRoutes = {
+    Routes.timelineOverview,
+    Routes.strengthOverview,
+    Routes.metconSessionOverview,
+    Routes.metconOverview,
+    Routes.cardioOverview,
+    Routes.routeOverview,
+    Routes.wodOverview,
+    Routes.diaryOverview,
+  };
+
   @override
   Widget build(BuildContext context) {
-    final onBackgroundColor = Theme.of(context).colorScheme.onSurface;
-    return SafeArea(
-      child: Drawer(
-        child: Consumer<Settings>(
-          builder: (context, settings, _) {
-            return Column(
+    return Consumer<Settings>(
+      builder: (context, settings, _) {
+        final destinations = [
+          (
+            Routes.defaultWorkoutTracking,
+            'Workout Tracking',
+            AppIcons.dumbbell,
+          ),
+          (Routes.movementOverview, 'Movements', AppIcons.movement),
+          (Routes.timer, 'Timer', AppIcons.stopwatch),
+          (Routes.map, 'Map', AppIcons.map),
+          (Routes.offlineMaps, 'Offline Maps', AppIcons.fileDownload),
+          (Routes.heartRate, 'Heart Rate', AppIcons.heartbeat),
+          if (settings.accountCreated)
+            (Routes.platformOverview, 'Server Actions', AppIcons.playCircle),
+          (Routes.settings, 'Settings', AppIcons.settings),
+        ];
+        return NavigationDrawer(
+          selectedIndex: destinations.indexWhere(
+            (d) =>
+                d.$1 == selectedRoute ||
+                d.$1 == Routes.defaultWorkoutTracking &&
+                    _workoutTrackingRoutes.contains(selectedRoute),
+          ),
+          onDestinationSelected: (index) =>
+              Navigator.of(context).newBase(destinations[index].$1),
+          header: const DrawerHeader(
+            child: Column(
               children: [
-                const DrawerHeader(
-                  child: Column(
-                    children: [
-                      Icon(AppIcons.plan, size: 90),
-                      Text("Sport Log", style: TextStyle(fontSize: 30)),
-                    ],
-                  ),
-                ),
-                Expanded(
-                  child: ListView(
-                    children: [
-                      ListTile(
-                        title: const Text('Workout Tracking'),
-                        leading: Icon(
-                          AppIcons.dumbbell,
-                          color: onBackgroundColor,
-                        ),
-                        onTap: () =>
-                            Navigator.of(context)
-                                .newBase(Routes.defaultWorkoutTracking),
-                        selected:
-                            selectedRoute == Routes.defaultWorkoutTracking,
-                      ),
-                      ListTile(
-                        title: const Text('Movements'),
-                        leading: Icon(
-                          AppIcons.movement,
-                          color: onBackgroundColor,
-                        ),
-                        onTap: () =>
-                            Navigator.of(context)
-                                .newBase(Routes.movementOverview),
-                        selected: selectedRoute == Routes.movementOverview,
-                      ),
-                      ListTile(
-                        leading: Icon(
-                          AppIcons.stopwatch,
-                          color: onBackgroundColor,
-                        ),
-                        title: const Text('Timer'),
-                        onTap: () =>
-                            Navigator.of(context).newBase(Routes.timer),
-                        selected: selectedRoute == Routes.timer,
-                      ),
-                      ListTile(
-                        leading: Icon(AppIcons.map, color: onBackgroundColor),
-                        title: const Text('Map'),
-                        onTap: () => Navigator.of(context).newBase(Routes.map),
-                        selected: selectedRoute == Routes.map,
-                      ),
-                      ListTile(
-                        leading: Icon(
-                          AppIcons.fileDownload,
-                          color: onBackgroundColor,
-                        ),
-                        title: const Text('Offline Maps'),
-                        onTap: () =>
-                            Navigator.of(context).newBase(Routes.offlineMaps),
-                        selected: selectedRoute == Routes.offlineMaps,
-                      ),
-                      ListTile(
-                        leading: Icon(
-                          AppIcons.heartbeat,
-                          color: onBackgroundColor,
-                        ),
-                        title: const Text('Heart Rate'),
-                        onTap: () =>
-                            Navigator.of(context).newBase(Routes.heartRate),
-                        selected: selectedRoute == Routes.heartRate,
-                      ),
-                      if (settings.accountCreated)
-                        ListTile(
-                          leading: Icon(
-                            AppIcons.playCircle,
-                            color: onBackgroundColor,
-                          ),
-                          title: const Text('Server Actions'),
-                          onTap: () =>
-                              Navigator.of(context)
-                                  .newBase(Routes.platformOverview),
-                          selected: selectedRoute == Routes.platformOverview,
-                        ),
-                      ListTile(
-                        leading: Icon(
-                          AppIcons.settings,
-                          color: onBackgroundColor,
-                        ),
-                        title: const Text('Settings'),
-                        onTap: () =>
-                            Navigator.of(context).newBase(Routes.settings),
-                        selected: selectedRoute == Routes.settings,
-                      ),
-                    ],
-                  ),
-                ),
-                if (settings.accountCreated)
-                  Padding(
+                Icon(AppIcons.plan, size: 90),
+                Text("Sport Log", style: TextStyle(fontSize: 30)),
+              ],
+            ),
+          ),
+          footer: settings.accountCreated
+              ? SafeArea(
+                  top: false,
+                  child: Padding(
                     padding: Defaults.edgeInsets.normal,
                     child: Consumer<Sync>(
                       builder: (context, sync, _) => Row(
@@ -147,11 +93,14 @@ class MainDrawer extends StatelessWidget {
                       ),
                     ),
                   ),
-              ],
-            );
-          },
-        ),
-      ),
+                )
+              : null,
+          children: [
+            for (final (_, label, icon) in destinations)
+              NavigationDrawerDestination(icon: Icon(icon), label: Text(label)),
+          ],
+        );
+      },
     );
   }
 }
