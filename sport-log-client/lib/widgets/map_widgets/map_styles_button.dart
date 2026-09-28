@@ -3,6 +3,7 @@ import 'package:material_ui/material_ui.dart' hide Visibility;
 import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/map_controller.dart';
 import 'package:sport_log/widgets/app_icons.dart';
+import 'package:synchronized/synchronized.dart';
 
 enum MapStyle {
   // based on mapbox OUTDOORS
@@ -148,6 +149,8 @@ class _TerrainOption extends _MapOption {
 }
 
 class _MapStylesBottomSheetState extends State<MapStylesBottomSheet> {
+  final _lock = Lock();
+  bool _loaded = false;
   Set<_MapOption> _options = {};
   MapStyle _style = MapStyle.outdoor;
 
@@ -180,27 +183,41 @@ class _MapStylesBottomSheetState extends State<MapStylesBottomSheet> {
           if (hasSlope) const _SlopeOption(),
           if (hasTerrain) const _TerrainOption(),
         };
+        _loaded = true;
       });
     }
   }
 
   Future<void> _setStyle(Set<MapStyle> style) async {
-    await _setOptions({}); // disable all options
-    await widget.mapController.setStyle(style.first.url);
-    if (mounted) {
-      setState(() => _style = style.first);
-    }
+    setState(() {
+      _style = style.first;
+      _options = {};
+    });
+    await _lock.synchronized(() async {
+      await _applyOptions({});
+      await widget.mapController.setStyle(style.first.url);
+    });
   }
 
   Future<void> _setOptions(Set<_MapOption> options) async {
-    for (final option in _options.difference(options)) {
-      await option.disable(widget.mapController);
-    }
-    for (final option in options.difference(_options)) {
-      await option.enable(widget.mapController);
-    }
-    if (mounted) {
-      setState(() => _options = options);
+    setState(() => _options = options);
+    await _lock.synchronized(() => _applyOptions(options));
+  }
+
+  /// Applies [options] based on the state of the map, since other changes
+  /// may have been requested while the buttons showed an older state.
+  Future<void> _applyOptions(Set<_MapOption> options) async {
+    for (final option in const [
+      _HillshadeOption(),
+      _SlopeOption(),
+      _TerrainOption(),
+    ]) {
+      final enabled = await option.isEnabled(widget.mapController);
+      if (enabled && !options.contains(option)) {
+        await option.disable(widget.mapController);
+      } else if (!enabled && options.contains(option)) {
+        await option.enable(widget.mapController);
+      }
     }
   }
 
@@ -232,7 +249,7 @@ class _MapStylesBottomSheetState extends State<MapStylesBottomSheet> {
               ),
             ],
             selected: {_style},
-            onSelectionChanged: _setStyle,
+            onSelectionChanged: _loaded ? _setStyle : null,
             showSelectedIcon: false,
           ),
           Defaults.sizedBox.vertical.small,
@@ -260,7 +277,7 @@ class _MapStylesBottomSheetState extends State<MapStylesBottomSheet> {
             multiSelectionEnabled: true,
             emptySelectionAllowed: true,
             selected: _options,
-            onSelectionChanged: _setOptions,
+            onSelectionChanged: _loaded ? _setOptions : null,
             showSelectedIcon: false,
           ),
         ],
