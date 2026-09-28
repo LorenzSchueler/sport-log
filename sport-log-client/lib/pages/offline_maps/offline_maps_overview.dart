@@ -160,6 +160,7 @@ class _OfflineMapsPageState extends State<OfflineMapsPage> {
                                       mapDownloadUtils.maxZoom = zoom.round();
                                     },
                                   ),
+                                  Defaults.sizedBox.vertical.normal,
                                   SizedBox(
                                     width: double.infinity,
                                     child: FilledButton.icon(

@@ -73,9 +73,18 @@ class AppTheme {
             states.contains(WidgetState.selected) ? _colorScheme.primary : null,
       ),
     ),
-    sliderTheme: SliderThemeData(overlayShape: SliderComponentShape.noOverlay),
+    sliderTheme: SliderThemeData(
+      overlayShape: SliderComponentShape.noOverlay,
+      inactiveTrackColor: _colorScheme.surfaceContainerHighest,
+      // ignore: deprecated_member_use
+      year2023: false,
+    ),
     progressIndicatorTheme: ProgressIndicatorThemeData(
       linearTrackColor: _colorScheme.surfaceContainerHighest,
+      linearMinHeight: 8,
+      stopIndicatorRadius: 0,
+      // ignore: deprecated_member_use
+      year2023: false,
     ),
     // input decoration for InputDecorator, TextField, and TextFormField
     inputDecorationTheme: InputDecorationTheme(
