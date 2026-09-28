@@ -6,6 +6,7 @@ import 'package:sport_log/helpers/page_return.dart';
 import 'package:sport_log/models/cardio/cardio_session_description.dart';
 import 'package:sport_log/models/cardio/position.dart';
 import 'package:sport_log/pages/workout/charts/duration_chart.dart';
+import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/dialogs.dart';
 import 'package:sport_log/widgets/map_widgets/static_mapbox_map.dart';
@@ -159,7 +160,7 @@ class _CardioUpdateElevationPageState extends State<CardioUpdateElevationPage> {
                             onPressed: () => _return(apply: true),
                             style: ButtonStyle(
                               backgroundColor: WidgetStatePropertyAll(
-                                Theme.of(context).colorScheme.errorContainer,
+                                AppColors.of(context).success,
                               ),
                             ),
                           ),

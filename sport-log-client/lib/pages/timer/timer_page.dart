@@ -3,6 +3,7 @@ import 'package:sport_log/defaults.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/timer_utils.dart';
 import 'package:sport_log/routes.dart';
+import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/dialogs.dart';
 import 'package:sport_log/widgets/disable_tab_bar.dart';
@@ -155,7 +156,7 @@ class TimerPage extends StatelessWidget {
                     text: "The time must be greater than 0.",
                   ),
             style: FilledButton.styleFrom(
-              backgroundColor: Theme.of(context).colorScheme.errorContainer,
+              backgroundColor: AppColors.of(context).success,
             ),
             child: const Text("Start", style: TextStyle(fontSize: 50)),
           );

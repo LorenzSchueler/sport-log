@@ -1,5 +1,6 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:sport_log/app.dart';
+import 'package:sport_log/theme.dart';
 
 class _DialogOption<T> {
   _DialogOption({required this.name, required this.value, this.color});
@@ -141,7 +142,7 @@ Future<bool> showApproveDialog({
         _DialogOption(
           name: "Approve",
           value: true,
-          color: Theme.of(context).colorScheme.errorContainer,
+          color: AppColors.of(context).success,
         ),
       ],
     ),
@@ -164,7 +165,7 @@ Future<bool> showDiscardWarningDialog(BuildContext context) async {
         _DialogOption(
           name: "Discard Changes",
           value: true,
-          color: Theme.of(context).colorScheme.errorContainer,
+          color: AppColors.of(context).success,
         ),
       ],
     ),
@@ -190,7 +191,7 @@ Future<bool> showDeleteWarningDialog(
         _DialogOption(
           name: "Delete",
           value: true,
-          color: Theme.of(context).colorScheme.errorContainer,
+          color: AppColors.of(context).success,
         ),
       ],
     ),

@@ -15,6 +15,7 @@ import 'package:sport_log/helpers/notification_controller.dart';
 import 'package:sport_log/helpers/write_to_file.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/settings.dart';
+import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/dialogs.dart';
 import 'package:sport_log/widgets/input_fields/duration_input.dart';
@@ -361,7 +362,7 @@ class SettingsPage extends StatelessWidget {
                         child: ElevatedButton(
                           style: ButtonStyle(
                             foregroundColor: WidgetStateProperty.all(
-                              Theme.of(context).colorScheme.errorContainer,
+                              AppColors.of(context).success,
                             ),
                           ),
                           onPressed: sync.isSyncing

@@ -1,5 +1,6 @@
 import 'package:flutter/physics.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 
 class SwipeButton extends StatefulWidget {
@@ -81,7 +82,7 @@ class SwipeButtonState extends State<SwipeButton>
                   ),
                   decoration: BoxDecoration(
                     color: isSwipeComplete
-                        ? Theme.of(context).colorScheme.errorContainer
+                        ? AppColors.of(context).success
                         : widget.color ?? Theme.of(context).colorScheme.primary,
                     borderRadius: widget.borderRadius,
                   ),

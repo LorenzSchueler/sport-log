@@ -10,6 +10,7 @@ import 'package:sport_log/helpers/tracking_utils.dart';
 import 'package:sport_log/pages/workout/cardio/cardio_value_unit_description_table.dart';
 import 'package:sport_log/pages/workout/cardio/tracking_settings.dart';
 import 'package:sport_log/settings.dart';
+import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/map_widgets/mapbox_map_wrapper.dart';
 import 'package:sport_log/widgets/map_widgets/static_mapbox_map.dart';
@@ -223,7 +224,7 @@ class _TrackingPageButtons extends StatelessWidget {
           Expanded(
             child: FilledButton(
               style: FilledButton.styleFrom(
-                backgroundColor: Theme.of(context).colorScheme.errorContainer,
+                backgroundColor: AppColors.of(context).success,
               ),
               onPressed: onResume,
               child: const Text("Resume"),
@@ -256,7 +257,7 @@ class _TrackingPageButtons extends StatelessWidget {
           Expanded(
             child: FilledButton(
               style: FilledButton.styleFrom(
-                backgroundColor: Theme.of(context).colorScheme.errorContainer,
+                backgroundColor: AppColors.of(context).success,
               ),
               onPressed: waitingOnAccurateLocation || waitingOnHR
                   ? null

@@ -1,6 +1,27 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:sport_log/widgets/input_fields/edit_tile.dart';
 
+/// App specific colors that have no role in [ColorScheme].
+@immutable
+class AppColors extends ThemeExtension<AppColors> {
+  const AppColors({required this.success});
+
+  /// Used for positive actions like ok, start or resume.
+  final Color success;
+
+  static AppColors of(BuildContext context) =>
+      Theme.of(context).extension<AppColors>()!;
+
+  @override
+  AppColors copyWith({Color? success}) =>
+      AppColors(success: success ?? this.success);
+
+  @override
+  AppColors lerp(AppColors? other, double t) => other == null
+      ? this
+      : AppColors(success: Color.lerp(success, other.success, t)!);
+}
+
 class AppTheme {
   AppTheme._();
 
@@ -17,14 +38,13 @@ class AppTheme {
     surface: Color.fromARGB(255, 30, 30, 30),
     surfaceContainerHighest: Color.fromARGB(255, 45, 45, 45),
     error: Colors.redAccent,
-    errorContainer:
-        Colors.lightGreen, // used for opposite of error like ok, start, ...
   );
 
   // ignore: long-method
   static final darkTheme = ThemeData(
     useMaterial3: true,
     colorScheme: _colorScheme,
+    extensions: const [AppColors(success: Colors.lightGreen)],
     scaffoldBackgroundColor: _background,
     appBarTheme: AppBarTheme(
       foregroundColor: _colorScheme.onSurface,

@@ -7,6 +7,7 @@ import 'package:sport_log/helpers/map_controller.dart';
 import 'package:sport_log/helpers/page_return.dart';
 import 'package:sport_log/helpers/pointer.dart';
 import 'package:sport_log/models/cardio/cardio_session_description.dart';
+import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/dialogs/dialogs.dart';
 import 'package:sport_log/widgets/input_fields/edit_tile.dart';
@@ -217,9 +218,7 @@ class _CardioCutPageState extends State<CardioCutPage> {
                           label: const Text("Cut"),
                           onPressed: _cutCardioSession,
                           style: FilledButton.styleFrom(
-                            backgroundColor: Theme.of(context)
-                                .colorScheme
-                                .errorContainer,
+                            backgroundColor: AppColors.of(context).success,
                           ),
                         ),
                       ),

@@ -6,6 +6,7 @@ import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/extensions/navigator_extension.dart';
 import 'package:sport_log/routes.dart';
 import 'package:sport_log/settings.dart';
+import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 import 'package:sport_log/widgets/snackbar.dart';
 import 'package:sport_log/widgets/spinning_sync.dart';
@@ -134,7 +135,7 @@ class MainDrawer extends StatelessWidget {
                           ),
                           const Spacer(),
                           SpinningSync(
-                            color: Theme.of(context).colorScheme.errorContainer,
+                            color: AppColors.of(context).success,
                             onPressed: settings.syncEnabled && !sync.isSyncing
                                 ? () => sync.sync(
                                     onNoInternet: showNoInternetSnackBar,
