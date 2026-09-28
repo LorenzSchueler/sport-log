@@ -195,12 +195,12 @@ class MapController {
       if (line.isNull && track != null) {
         line.object = await addLine(track, color, lineOpacity: lineOpacity);
       } else if (line.isNotNull && track != null) {
-        await removeLine(line.object!);
-        line.object = await addLine(track, color, lineOpacity: lineOpacity);
-        //line.object!.geometry = track.map((p) => p.latLng).toLineString();
-        //line.object!.lineColor = _colorToInt(color);
-        //line.object!.lineOpacity = lineOpacity;
-        //await _lineManager?.update(line.object!);
+        line.object!
+          ..geometry = track.map((p) => p.latLng).toLineString()
+          ..lineColor = _colorToInt(color)
+          // update ignores null values, so set the default opacity explicitly
+          ..lineOpacity = lineOpacity ?? 1;
+        await _lineManager?.update(line.object!);
       } else if (line.isNotNull && track == null) {
         await removeLine(line.object!);
         line.setNull();
