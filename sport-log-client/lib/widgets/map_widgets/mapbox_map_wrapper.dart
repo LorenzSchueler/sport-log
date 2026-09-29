@@ -92,9 +92,6 @@ class _MapboxMapWrapperState extends State<MapboxMapWrapper> {
   void initState() {
     super.initState();
     _lifecycleListener = AppLifecycleListener(
-      onResume: () => WidgetsBinding.instance.addPostFrameCallback(
-        (_) => _mapController?.triggerRepaint(),
-      ),
       // dispose is not called when the app is killed while paused
       onPause: _saveMapPosition,
     );
@@ -192,6 +189,10 @@ class _MapboxMapWrapperState extends State<MapboxMapWrapper> {
     return Stack(
       children: [
         MapWidget(
+          // with the default hosting mode the map does not show its last
+          // rendered frame, e.g. after removing a layer or resuming the app
+          // ignore: experimental_member_use
+          androidHostingMode: AndroidPlatformViewHostingMode.HC,
           styleUri: widget.initStyleUri,
           onMapCreated: _onMapCreated,
           onMapLoadedListener: _mapReadyCallback.onMapLoaded,

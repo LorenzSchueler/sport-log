@@ -25,31 +25,11 @@ class StaticMapboxMap extends StatefulWidget {
 }
 
 class _StaticMapboxMapState extends State<StaticMapboxMap> {
-  late final AppLifecycleListener _lifecycleListener;
-
-  @override
-  void initState() {
-    super.initState();
-    _lifecycleListener = AppLifecycleListener(
-      onResume: () => WidgetsBinding.instance.addPostFrameCallback(
-        (_) => _mapController?.triggerRepaint(),
-      ),
-    );
-  }
-
-  @override
-  void dispose() {
-    _lifecycleListener.dispose();
-    super.dispose();
-  }
-
-  MapController? _mapController;
   late final MapReadyCallback _mapReadyCallback = MapReadyCallback(_onReady);
 
   Future<void> _onMapCreated(MapboxMap mapboxMap) async {
     final mapController = await MapController.from(mapboxMap, context);
     if (mapController != null) {
-      _mapController = mapController;
       mapController
         ..onTap((latLng) => widget.onTap?.call(latLng))
         ..onLongTap((latLng) => widget.onLongTap?.call(latLng));
@@ -73,6 +53,10 @@ class _StaticMapboxMapState extends State<StaticMapboxMap> {
   @override
   Widget build(BuildContext context) {
     return MapWidget(
+      // with the default hosting mode the map does not show its last
+      // rendered frame, e.g. after resuming the app
+      // ignore: experimental_member_use
+      androidHostingMode: AndroidPlatformViewHostingMode.HC,
       styleUri: MapStyle.outdoor.url,
       onMapCreated: _onMapCreated,
       onMapLoadedListener: _mapReadyCallback.onMapLoaded,
