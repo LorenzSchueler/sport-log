@@ -39,7 +39,7 @@ class _DateFilterState extends State<DateFilter> {
 
   @override
   Widget build(BuildContext context) {
-    final appBarColor = Theme.of(context).appBarTheme.foregroundColor!;
+    final appBarColor = Theme.of(context).colorScheme.onSurface;
     return Row(
       mainAxisAlignment: _dateFilterState is AllFilter
           ? MainAxisAlignment.center

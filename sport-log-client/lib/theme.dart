@@ -31,13 +31,35 @@ class AppTheme {
     ),
   );
 
-  static const _background = Color.fromARGB(255, 15, 15, 15);
+  static const _primary = Color(0xffa8d8ff);
 
-  static const _colorScheme = ColorScheme.dark(
-    primary: Color(0xffa8d8ff),
-    surface: Color.fromARGB(255, 30, 30, 30),
-    surfaceContainerHighest: Color.fromARGB(255, 45, 45, 45),
+  /// Gray surfaces without the tint of the primary color.
+  static final _neutral = ColorScheme.fromSeed(
+    seedColor: _primary,
+    brightness: Brightness.dark,
+    dynamicSchemeVariant: DynamicSchemeVariant.monochrome,
+  );
+
+  static final _colorScheme = ColorScheme.fromSeed(
+    seedColor: _primary,
+    brightness: Brightness.dark,
+    primary: _primary,
+    onPrimary: Colors.black,
     error: Colors.redAccent,
+    surface: _neutral.surface,
+    onSurface: _neutral.onSurface,
+    surfaceDim: _neutral.surfaceDim,
+    surfaceBright: _neutral.surfaceBright,
+    surfaceContainerLowest: _neutral.surfaceContainerLowest,
+    surfaceContainerLow: _neutral.surfaceContainerLow,
+    surfaceContainer: _neutral.surfaceContainer,
+    surfaceContainerHigh: _neutral.surfaceContainerHigh,
+    surfaceContainerHighest: _neutral.surfaceContainerHighest,
+    onSurfaceVariant: _neutral.onSurfaceVariant,
+    outline: _neutral.outline,
+    outlineVariant: _neutral.outlineVariant,
+    inverseSurface: _neutral.inverseSurface,
+    onInverseSurface: _neutral.onInverseSurface,
   );
 
   // ignore: long-method
@@ -45,65 +67,22 @@ class AppTheme {
     useMaterial3: true,
     colorScheme: _colorScheme,
     extensions: const [AppColors(success: Colors.lightGreen)],
-    scaffoldBackgroundColor: _background,
-    appBarTheme: AppBarTheme(
-      foregroundColor: _colorScheme.onSurface,
-      backgroundColor: _colorScheme.surface,
-    ),
-    dividerTheme: DividerThemeData(color: _colorScheme.surfaceContainerHighest),
-    drawerTheme: const DrawerThemeData(backgroundColor: _background),
     elevatedButtonTheme: ElevatedButtonThemeData(style: _buttonStyle),
     filledButtonTheme: FilledButtonThemeData(style: _buttonStyle),
-    segmentedButtonTheme: SegmentedButtonThemeData(
+    segmentedButtonTheme: const SegmentedButtonThemeData(
       style: ButtonStyle(
-        iconSize: const WidgetStatePropertyAll(24),
-        iconColor: WidgetStateProperty.resolveWith(
-          (states) => states.contains(WidgetState.selected)
-              ? _colorScheme.surface
-              : Colors.white,
-        ),
+        iconSize: WidgetStatePropertyAll(24),
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        backgroundColor: WidgetStateProperty.resolveWith(
-          (states) => states.contains(WidgetState.selected)
-              ? _colorScheme.primary.withAlpha(200)
-              : null,
-        ),
       ),
     ),
     iconTheme: IconThemeData(color: _colorScheme.primary),
-    dialogTheme: DialogThemeData(backgroundColor: _colorScheme.surface),
-    snackBarTheme: SnackBarThemeData(
-      backgroundColor: _colorScheme.surface,
-      contentTextStyle: TextStyle(color: _colorScheme.onSurface),
-    ),
-    tabBarTheme: TabBarThemeData(
-      dividerColor: _colorScheme.surfaceContainerHighest,
-    ),
-    switchTheme: SwitchThemeData(
-      trackOutlineColor: WidgetStatePropertyAll(_colorScheme.primary),
-      trackColor: WidgetStateProperty.resolveWith(
-        (states) =>
-            states.contains(WidgetState.selected) ? null : Colors.transparent,
-      ),
-    ),
-    navigationBarTheme: NavigationBarThemeData(
-      height: 65,
-      indicatorColor: _colorScheme.primary,
-    ),
-    checkboxTheme: CheckboxThemeData(
-      fillColor: WidgetStateProperty.resolveWith(
-        (states) =>
-            states.contains(WidgetState.selected) ? _colorScheme.primary : null,
-      ),
-    ),
+    navigationBarTheme: const NavigationBarThemeData(height: 65),
     sliderTheme: SliderThemeData(
       overlayShape: SliderComponentShape.noOverlay,
-      inactiveTrackColor: _colorScheme.surfaceContainerHighest,
       // ignore: deprecated_member_use
       year2023: false,
     ),
     progressIndicatorTheme: ProgressIndicatorThemeData(
-      linearTrackColor: _colorScheme.surfaceContainerHighest,
       linearMinHeight: 8,
       stopIndicatorRadius: 0,
       // ignore: deprecated_member_use
