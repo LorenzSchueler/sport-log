@@ -25,8 +25,6 @@ abstract final class AppIcons {
   // actions
   static const IconData add = Icons.add_rounded;
   static const IconData remove = Icons.remove_rounded;
-  static const IconData addBox = Icons.add_box_rounded;
-  static const IconData subtractBox = Icons.indeterminate_check_box_rounded;
   static const IconData delete = Icons.delete_rounded;
   static const IconData edit = Icons.edit_rounded;
   static const IconData save = Icons.save_rounded;

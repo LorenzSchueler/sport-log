@@ -121,7 +121,7 @@ class _DurationInputState extends State<DurationInput> {
       mainAxisSize: MainAxisSize.min,
       children: [
         RepeatIconButton(
-          icon: const Icon(AppIcons.subtractBox),
+          icon: const Icon(AppIcons.remove),
           onClick: _duration - _durationStep < widget.minDuration
               ? null
               : () => _setDuration(
@@ -129,6 +129,7 @@ class _DurationInputState extends State<DurationInput> {
                   updateTextField: true,
                 ),
           materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          tonal: true,
         ),
         SizedBox(
           width: 70,
@@ -163,7 +164,7 @@ class _DurationInputState extends State<DurationInput> {
           ),
         ),
         RepeatIconButton(
-          icon: const Icon(AppIcons.addBox),
+          icon: const Icon(AppIcons.add),
           onClick: _duration + _durationStep > widget.maxDuration
               ? null
               : () => _setDuration(
@@ -171,6 +172,7 @@ class _DurationInputState extends State<DurationInput> {
                   updateTextField: true,
                 ),
           materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          tonal: true,
         ),
       ],
     );

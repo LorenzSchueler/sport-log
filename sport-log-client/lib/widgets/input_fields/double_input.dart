@@ -81,12 +81,13 @@ class _DoubleInputState extends State<DoubleInput> {
       mainAxisSize: MainAxisSize.min,
       children: [
         RepeatIconButton(
-          icon: const Icon(AppIcons.subtractBox),
+          icon: const Icon(AppIcons.remove),
           onClick: _value - widget.stepSize < widget.minValue
               ? null
               : () =>
                     _setValue(_value - widget.stepSize, updateTextField: true),
           materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          tonal: true,
         ),
         SizedBox(
           width: 70,
@@ -119,7 +120,7 @@ class _DoubleInputState extends State<DoubleInput> {
           ),
         ),
         RepeatIconButton(
-          icon: const Icon(AppIcons.addBox),
+          icon: const Icon(AppIcons.add),
           onClick:
               widget.maxValue != null &&
                   _value + widget.stepSize > widget.maxValue!
@@ -127,6 +128,7 @@ class _DoubleInputState extends State<DoubleInput> {
               : () =>
                     _setValue(_value + widget.stepSize, updateTextField: true),
           materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          tonal: true,
         ),
       ],
     );
