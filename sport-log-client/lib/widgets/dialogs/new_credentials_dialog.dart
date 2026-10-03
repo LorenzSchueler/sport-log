@@ -94,9 +94,6 @@ class _NewCredentialsDialogState extends State<NewCredentialsDialog> {
       validator: Validator.validateUsername,
       autovalidateMode: AutovalidateMode.onUserInteraction,
       enabled: !_loginPending,
-      style: _loginPending
-          ? TextStyle(color: Theme.of(context).disabledColor)
-          : null,
       textInputAction: TextInputAction.next,
       keyboardType: TextInputType.emailAddress,
     );
@@ -125,9 +122,6 @@ class _NewCredentialsDialogState extends State<NewCredentialsDialog> {
         validator: Validator.validatePassword,
         autovalidateMode: AutovalidateMode.onUserInteraction,
         enabled: !_loginPending,
-        style: _loginPending
-            ? TextStyle(color: Theme.of(context).disabledColor)
-            : null,
         textInputAction: TextInputAction.done,
         obscureText: obscure.isOn,
       ),

@@ -108,9 +108,6 @@ class _LoginPageState extends State<LoginPage> {
       validator: Validator.validateUrl,
       autovalidateMode: AutovalidateMode.onUserInteraction,
       enabled: !_loginPending,
-      style: _loginPending
-          ? TextStyle(color: Theme.of(context).disabledColor)
-          : null,
       textInputAction: TextInputAction.next,
     );
   }
@@ -130,9 +127,6 @@ class _LoginPageState extends State<LoginPage> {
       validator: Validator.validateUsername,
       autovalidateMode: AutovalidateMode.onUserInteraction,
       enabled: !_loginPending,
-      style: _loginPending
-          ? TextStyle(color: Theme.of(context).disabledColor)
-          : null,
       textInputAction: TextInputAction.next,
     );
   }
@@ -160,9 +154,6 @@ class _LoginPageState extends State<LoginPage> {
         validator: Validator.validatePassword,
         autovalidateMode: AutovalidateMode.onUserInteraction,
         enabled: !_loginPending,
-        style: _loginPending
-            ? TextStyle(color: Theme.of(context).disabledColor)
-            : null,
         textInputAction: widget.loginType.isLogin
             ? TextInputAction.done
             : TextInputAction.next,
@@ -181,9 +172,6 @@ class _LoginPageState extends State<LoginPage> {
           Validator.validatePassword2(_user.password, password2),
       autovalidateMode: AutovalidateMode.onUserInteraction,
       enabled: !_loginPending,
-      style: _loginPending
-          ? TextStyle(color: Theme.of(context).disabledColor)
-          : null,
       textInputAction: TextInputAction.next,
       obscureText: true,
     );
@@ -204,9 +192,6 @@ class _LoginPageState extends State<LoginPage> {
       validator: Validator.validateEmail,
       autovalidateMode: AutovalidateMode.onUserInteraction,
       enabled: !_loginPending,
-      style: _loginPending
-          ? TextStyle(color: Theme.of(context).disabledColor)
-          : null,
       textInputAction: TextInputAction.done,
       keyboardType: TextInputType.emailAddress,
     );
