@@ -1,5 +1,4 @@
 import 'package:material_ui/material_ui.dart';
-import 'package:sport_log/widgets/input_fields/edit_tile.dart';
 
 /// App specific colors that have no role in [ColorScheme].
 @immutable
@@ -111,13 +110,13 @@ class AppTheme {
     inputDecorationTheme: InputDecorationTheme(
       contentPadding: const EdgeInsets.symmetric(vertical: 5),
       border: InputBorder.none,
-      iconColor: EditTile.iconCaptionColor,
-      labelStyle: const TextStyle(color: EditTile.iconCaptionColor),
+      iconColor: _colorScheme.onSurfaceVariant,
+      labelStyle: TextStyle(color: _colorScheme.onSurfaceVariant),
       floatingLabelStyle: WidgetStateTextStyle.resolveWith(
         (states) => TextStyle(
           color: states.contains(WidgetState.selected)
               ? _colorScheme.primary
-              : EditTile.iconCaptionColor,
+              : _colorScheme.onSurfaceVariant,
           fontSize: 18,
         ),
       ),

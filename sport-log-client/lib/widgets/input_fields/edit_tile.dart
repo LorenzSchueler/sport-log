@@ -13,7 +13,7 @@ class CaptionTile extends StatelessWidget {
       padding: const EdgeInsets.only(top: 2, bottom: 2),
       child: Text(
         caption,
-        style: const TextStyle(color: EditTile.iconCaptionColor),
+        style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
       ),
     );
   }
@@ -84,7 +84,10 @@ class OptionalTextFormField extends StatelessWidget {
                   if (leading != null)
                     Padding(
                       padding: const EdgeInsets.only(right: 15),
-                      child: Icon(leading, color: EditTile.iconCaptionColor),
+                      child: Icon(
+                        leading,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
                     ),
                   FilledButton.tonalIcon(
                     style: AppTheme.tonalButtonStyle(),
@@ -185,7 +188,6 @@ class EditTile extends StatelessWidget {
   /// If true font size is the same as the one of TextFormField. Otherwise it is the default text size.
   final bool bigText;
 
-  static const Color iconCaptionColor = Colors.white70;
   static const double textFormFieldHeight = 49;
 
   @override
