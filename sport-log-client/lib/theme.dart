@@ -93,7 +93,6 @@ class AppTheme {
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
       ),
     ),
-    iconTheme: IconThemeData(color: _colorScheme.primary),
     navigationBarTheme: const NavigationBarThemeData(height: 65),
     sliderTheme: SliderThemeData(
       overlayShape: SliderComponentShape.noOverlay,
