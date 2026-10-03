@@ -45,7 +45,11 @@ class AboutPage extends StatelessWidget {
             EditTile(
               leading: AppIcons.github,
               caption: "GitHub",
-              child: const Text("github.com/LorenzSchueler/sport-log"),
+              child: const FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: AlignmentDirectional.centerStart,
+                child: Text("github.com/LorenzSchueler/sport-log"),
+              ),
               onTap: () => launchUrl(
                 Uri.parse("https://github.com/LorenzSchueler/sport-log"),
                 mode: LaunchMode.externalApplication,
