@@ -235,11 +235,12 @@ class CardioSessionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => showDetails(context),
-      onLongPress: () => onSelected(cardioSessionDescription.movement),
-      child: Card(
-        margin: EdgeInsets.zero,
+    return Card(
+      margin: EdgeInsets.zero,
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: () => showDetails(context),
+        onLongPress: () => onSelected(cardioSessionDescription.movement),
         child: Column(
           children: [
             Padding(

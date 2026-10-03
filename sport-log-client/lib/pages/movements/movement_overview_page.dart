@@ -87,35 +87,36 @@ class MovementCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () async {
-        if (!movementDescription.movement.isDefaultMovement) {
-          if (movementDescription.hasReference) {
-            final approved = await showApproveDialog(
+    return Card(
+      margin: EdgeInsets.zero,
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: () async {
+          if (!movementDescription.movement.isDefaultMovement) {
+            if (movementDescription.hasReference) {
+              final approved = await showApproveDialog(
+                context: context,
+                title: 'Warning',
+                text: 'Changes will be reflected in existing workouts.',
+              );
+              if (!approved) return;
+            }
+            if (context.mounted) {
+              await Navigator.pushNamed(
+                context,
+                Routes.movementEdit,
+                arguments: movementDescription,
+              );
+            }
+          } else {
+            await showMessageDialog(
               context: context,
-              title: 'Warning',
-              text: 'Changes will be reflected in existing workouts.',
-            );
-            if (!approved) return;
-          }
-          if (context.mounted) {
-            await Navigator.pushNamed(
-              context,
-              Routes.movementEdit,
-              arguments: movementDescription,
+              title: "Default Movement",
+              text:
+                  "${movementDescription.movement.name} is a default movement and cannot be edited.",
             );
           }
-        } else {
-          await showMessageDialog(
-            context: context,
-            title: "Default Movement",
-            text:
-                "${movementDescription.movement.name} is a default movement and cannot be edited.",
-          );
-        }
-      },
-      child: Card(
-        margin: EdgeInsets.zero,
+        },
         child: Padding(
           padding: Defaults.edgeInsets.normal,
           child: Row(

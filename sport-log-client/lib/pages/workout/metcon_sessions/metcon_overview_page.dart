@@ -97,14 +97,15 @@ class MetconCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => Navigator.pushNamed(
-        context,
-        Routes.metconDetails,
-        arguments: metconDescription,
-      ),
-      child: Card(
-        margin: EdgeInsets.zero,
+    return Card(
+      margin: EdgeInsets.zero,
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: () => Navigator.pushNamed(
+          context,
+          Routes.metconDetails,
+          arguments: metconDescription,
+        ),
         child: Padding(
           padding: Defaults.edgeInsets.normal,
           child: Column(
