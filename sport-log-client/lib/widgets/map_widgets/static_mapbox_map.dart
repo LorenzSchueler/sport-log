@@ -1,5 +1,4 @@
-import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart'
-    hide Settings, Visibility;
+import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' hide Visibility;
 import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 import 'package:sport_log/helpers/lat_lng.dart';
@@ -53,10 +52,6 @@ class _StaticMapboxMapState extends State<StaticMapboxMap> {
   @override
   Widget build(BuildContext context) {
     return MapWidget(
-      // with the default hosting mode the map does not show its last
-      // rendered frame, e.g. after resuming the app
-      // ignore: experimental_member_use
-      androidHostingMode: AndroidPlatformViewHostingMode.HC,
       styleUri: MapStyle.outdoor.url,
       onMapCreated: _onMapCreated,
       onMapLoadedListener: _mapReadyCallback.onMapLoaded,

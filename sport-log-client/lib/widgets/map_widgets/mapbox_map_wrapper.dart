@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' hide Settings;
+import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:material_ui/material_ui.dart' hide Route;
 import 'package:provider/provider.dart';
 import 'package:sport_log/defaults.dart';
@@ -189,10 +189,6 @@ class _MapboxMapWrapperState extends State<MapboxMapWrapper> {
     return Stack(
       children: [
         MapWidget(
-          // with the default hosting mode the map does not show its last
-          // rendered frame, e.g. after removing a layer or resuming the app
-          // ignore: experimental_member_use
-          androidHostingMode: AndroidPlatformViewHostingMode.HC,
           styleUri: widget.initStyleUri,
           onMapCreated: _onMapCreated,
           onMapLoadedListener: _mapReadyCallback.onMapLoaded,

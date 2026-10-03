@@ -337,9 +337,9 @@ class MapController {
   Future<void> removeAllLabels() async => await _pointManager?.deleteAll();
 
   Future<void> setStyle(String styleUri) async =>
-      await _controller?.style.setStyleURI(styleUri);
+      await _controller?.setStyleURI(styleUri);
 
-  Future<String?> getStyle() async => await _controller?.style.getStyleURI();
+  Future<String?> getStyle() async => await _controller?.getStyleURI();
 
   Future<void> _addTerrainSource(String sourceId) async {
     if (!(await _sourceExists(sourceId) ?? true)) {
@@ -413,25 +413,25 @@ class MapController {
   }
 
   Future<bool?> _sourceExists(String sourceId) async =>
-      await _controller?.style.styleSourceExists(sourceId);
+      await _controller?.styleSourceExists(sourceId);
 
   Future<void> _addSource(Source source) async =>
-      await _controller?.style.addSource(source);
+      await _controller?.addSource(source);
 
   Future<bool> _layerExists(String layerId) async =>
-      await _controller?.style.styleLayerExists(layerId) ?? false;
+      await _controller?.styleLayerExists(layerId) ?? false;
 
   Future<void> _addLayer(Layer layer) async =>
-      await _controller?.style.addLayer(layer);
+      await _controller?.addLayer(layer);
 
   Future<void> _removeLayer(String layerId) async =>
-      await _controller?.style.removeStyleLayer(layerId);
+      await _controller?.removeStyleLayer(layerId);
 
   Future<Object?> _getStyleTerrainProperty(String key) async =>
-      (await _controller?.style.getStyleTerrainProperty(key))?.value;
+      (await _controller?.getStyleTerrainProperty(key))?.value;
 
   Future<void> _setStyleTerrainProperty(String key, Object value) async =>
-      await _controller?.style.setStyleTerrainProperty(key, value);
+      await _controller?.setStyleTerrainProperty(key, value);
 
   Future<void> hideAttribution() async => await _controller?.attribution
       .updateSettings(AttributionSettings(enabled: false));

@@ -202,7 +202,7 @@ Iterable<MapboxMap> mapControllers(WidgetTester tester) => tester
 ///
 /// Null while the style is still loading.
 Future<String?> mapContent(MapboxMap map) async {
-  if (!await map.style.isStyleLoaded()) {
+  if (!await map.isStyleLoaded()) {
     return null;
   }
   final camera = await map.getCameraState();
