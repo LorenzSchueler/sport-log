@@ -7,6 +7,17 @@ ExtraLinesData? touchLine(double? lastX) => lastX == null
         verticalLines: [VerticalLine(x: lastX, color: Colors.white)],
       );
 
+/// Hides the titles fl_chart adds at the min and max of the axis unless they are
+/// on the interval, because they overlap the neighboring title.
+GetTitleWidgetFunction hideOffIntervalMinMax(GetTitleWidgetFunction getTitle) =>
+    (value, meta) {
+      final steps = value / meta.appliedInterval;
+      final onInterval = (steps - steps.round()).abs() < 1e-6;
+      return (value == meta.min || value == meta.max) && !onInterval
+          ? const SizedBox.shrink()
+          : getTitle(value, meta);
+    };
+
 LineTouchData touchCallback(void Function(double?) callback) => LineTouchData(
   handleBuiltInTouches: false,
   touchSpotThreshold: double.infinity, // always get nearest point

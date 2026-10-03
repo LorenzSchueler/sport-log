@@ -161,9 +161,11 @@ class _DistanceChartState extends State<DistanceChart> {
               sideTitles: SideTitles(
                 showTitles: true,
                 reservedSize: 40,
-                getTitlesWidget: (value, _) => Text(
-                  value.round().toString(),
-                  style: TextStyle(color: widget.labelColor),
+                getTitlesWidget: hideOffIntervalMinMax(
+                  (value, _) => Text(
+                    value.round().toString(),
+                    style: TextStyle(color: widget.labelColor),
+                  ),
                 ),
               ),
             ),

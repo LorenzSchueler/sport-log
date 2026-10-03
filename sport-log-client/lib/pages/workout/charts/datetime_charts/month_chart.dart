@@ -18,35 +18,40 @@ class MonthChart extends DateTimePeriodChart {
 
   @override
   Widget build(BuildContext context) {
-    return LineChart(
-      LineChartData(
-        lineBarsData: [
-          LineChartBarData(
-            spots: chartValues
-                .map(
-                  (v) => FlSpot(
-                    v.datetime.difference(startDateTime).inDays + 1,
-                    v.value,
-                  ),
-                )
-                .toList(),
-            color: Theme.of(context).colorScheme.primary,
+    return Padding(
+      // keeps the title of the last day inside the chart
+      padding: const EdgeInsets.only(right: 15),
+      child: LineChart(
+        LineChartData(
+          lineBarsData: [
+            LineChartBarData(
+              spots: chartValues
+                  .map(
+                    (v) => FlSpot(
+                      v.datetime.difference(startDateTime).inDays + 1,
+                      v.value,
+                    ),
+                  )
+                  .toList(),
+              color: Theme.of(context).colorScheme.primary,
+            ),
+          ],
+          minX: 1,
+          maxX: startDateTime.numDaysInMonth.toDouble(),
+          minY: minY,
+          maxY: maxY,
+          titlesData: titlesData(
+            getBottomTitles: (value, _) => value % 2 == 0
+                ? Text(value.round().toString())
+                : const Text(""),
           ),
-        ],
-        minX: 1,
-        maxX: startDateTime.numDaysInMonth.toDouble(),
-        minY: minY,
-        maxY: maxY,
-        titlesData: titlesData(
-          getBottomTitles: (value, _) =>
-              value % 2 == 0 ? Text(value.round().toString()) : const Text(""),
+          gridData: FlGridData(
+            getDrawingHorizontalLine: gridLineDrawer(),
+            verticalInterval: 1,
+            getDrawingVerticalLine: gridLineDrawer(),
+          ),
+          borderData: FlBorderData(show: false),
         ),
-        gridData: FlGridData(
-          getDrawingHorizontalLine: gridLineDrawer(),
-          verticalInterval: 1,
-          getDrawingVerticalLine: gridLineDrawer(),
-        ),
-        borderData: FlBorderData(show: false),
       ),
     );
   }

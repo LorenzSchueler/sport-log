@@ -2,6 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
+import 'package:sport_log/pages/workout/charts/chart_helpers.dart';
 import 'package:sport_log/pages/workout/date_filter/date_filter_state.dart';
 
 class DateTimeChartValue {
@@ -144,7 +145,7 @@ abstract class DateTimePeriodChart extends StatelessWidget {
         sideTitles: SideTitles(
           showTitles: true,
           reservedSize: formatter.width,
-          getTitlesWidget: formatter.text,
+          getTitlesWidget: hideOffIntervalMinMax(formatter.text),
         ),
       ),
     );
