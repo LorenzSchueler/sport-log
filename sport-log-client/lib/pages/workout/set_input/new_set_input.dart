@@ -2,6 +2,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:sport_log/models/all.dart';
 import 'package:sport_log/pages/workout/set_input/count_weight_input.dart';
 import 'package:sport_log/pages/workout/set_input/set_duration_input.dart';
+import 'package:sport_log/theme.dart';
 import 'package:sport_log/widgets/app_icons.dart';
 
 class NewSetInput extends StatelessWidget {
@@ -76,17 +77,15 @@ class SubmitSetButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return IconButton(
+    return IconButton.filledTonal(
+      style: AppTheme.tonalButtonStyle(),
       icon: const Icon(AppIcons.check),
-      iconSize: 40,
       onPressed: isSubmittable
           ? () {
               FocusManager.instance.primaryFocus?.unfocus();
               onSubmitted();
             }
           : null,
-      padding: EdgeInsets.zero,
-      constraints: const BoxConstraints(),
     );
   }
 }
