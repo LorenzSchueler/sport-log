@@ -51,6 +51,16 @@ curl -s -X POST "$BASE_URL/v0.4/user" \
     -H 'Content-Type: application/json' \
     -d @../test/data/user.json
 
+step "update git ref"
+# the server only accepts the last git ref in the ref log of its app dir
+REF_LOG="$(sed -n 's/^app_dir = "\([^"]*\)".*/\1/p' ../sport-log-server/sport-log-server.toml)/ref.log"
+HEAD_REF=$(git rev-parse HEAD)
+if [ "$(tail -n 1 "$REF_LOG" 2>/dev/null)" != "$HEAD_REF" ]; then
+    sed -i "/^$HEAD_REF\$/d" "$REF_LOG" 2>/dev/null
+    echo "$HEAD_REF" >> "$REF_LOG"
+    echo "added $HEAD_REF to $REF_LOG"
+fi
+
 step "check git ref"
 NEW_VERSION=$(curl -s -s -u $USERNAME:$PASSWORD "$BASE_URL/v0.4/app/info?git_ref=$GIT_REF")
 if [ "$NEW_VERSION" = '{"new_version":false}' ]; then

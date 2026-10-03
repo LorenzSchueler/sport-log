@@ -5,7 +5,6 @@ import 'package:flutter/foundation.dart' show listEquals;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart'
     show
-        MapWidget,
         MapboxMap,
         RenderedQueryGeometry,
         RenderedQueryOptions,
@@ -193,10 +192,20 @@ Future<void> waitFor(WidgetTester tester, Finder finder) =>
     });
 
 /// The controllers of all maps of the current page.
+///
+/// They are held by the state of the `MapWidget` of the platform package.
 Iterable<MapboxMap> mapControllers(WidgetTester tester) => tester
-    .stateList<State<StatefulWidget>>(find.byType(MapWidget))
-    .map((state) => (state as dynamic).mapboxMap as MapboxMap?)
-    .nonNulls;
+    .stateList<State<StatefulWidget>>(
+      find.byWidgetPredicate(
+        (widget) =>
+            widget is StatefulWidget && "${widget.runtimeType}" == "MapWidget",
+      ),
+    )
+    .map((state) => (state as dynamic).mapboxMap)
+    .where((map) => map != null)
+    // the public MapboxMap wraps it, but its type is not exported
+    // ignore: invalid_use_of_internal_member
+    .map((map) => (MapboxMap.new as dynamic)(map) as MapboxMap);
 
 /// Describes what [map] currently shows.
 ///
@@ -426,6 +435,11 @@ void main() {
     await tap(tester, okButton);
     expect(find.byType(CardioTrackingPage), findsOneWidget);
     await waitFor(tester, cancelButton); // wait for permission requests
+    await waitUntil(
+      tester,
+      "the first location",
+      () => !find.text("Waiting on Location").tryEvaluate(),
+    );
     await waitMapRender(tester);
     await screenshot(tester, "tracking");
     await tap(tester, cancelButton); // back to tracking settings
