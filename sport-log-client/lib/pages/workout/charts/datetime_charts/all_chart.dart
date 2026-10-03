@@ -1,6 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:sport_log/helpers/clock.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/pages/workout/charts/datetime_chart.dart';
 import 'package:sport_log/pages/workout/charts/grid_line_drawer.dart';
@@ -18,9 +19,9 @@ class AllChart extends DateTimePeriodChart {
   Widget build(BuildContext context) {
     final startDateTime =
         chartValues.firstOrNull?.datetime.beginningOfDay() ??
-        DateTime.now().beginningOfYear();
+        Clock.now().beginningOfYear();
     final endDateTime =
-        chartValues.lastOrNull?.datetime ?? DateTime.now().endOfYear();
+        chartValues.lastOrNull?.datetime ?? Clock.now().endOfYear();
     final months = (endDateTime.difference(startDateTime).inDays / 30).round();
     final titleInterval = (months / 8).ceil();
     final List<int> markedMonths;

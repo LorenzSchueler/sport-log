@@ -11,6 +11,11 @@ APK=build/app/outputs/flutter-apk/app-production-debug.apk
 # must match the directory the integration test writes its capture markers to
 SCREENSHOT_DIR=/sdcard/Download
 GIT_REF=$(git rev-parse --short=7 HEAD)
+# the app, the sample data and the status bar use this date and time instead of
+# the current ones, so that the screenshots do not depend on when they are taken
+DATE=2026-09-24
+TIME=09:00
+TIMEZONE=Europe/Vienna
 
 GREEN='\033[1;32m'
 RED='\033[1;31m'
@@ -80,11 +85,11 @@ step "run user setup"
 entities=(diary wod strength_session strength_set metcon_session route cardio_session platform_credential action_rule action_event)
 for entity in "${entities[@]}"; do
     cat ../test/data/$entity.json | \
-    sed "s/2023-07-04/$(date +%Y-%m-%d)/g" | \
-    sed "s/2023-07-05/$(date -d +1day +%Y-%m-%d)/g" | \
-    sed "s/2023-07-02/$(date -d -2day +%Y-%m-%d)/g" | \
-    sed "s/2023-07-0\([68]\)/$(date +%Y-%m)-0\1/g" | \
-    sed "s/2023-07-\(1[18]\)/$(date +%Y-%m)-\1/g" | \
+    sed "s/2023-07-04/$DATE/g" | \
+    sed "s/2023-07-05/$(date -d "$DATE +1day" +%Y-%m-%d)/g" | \
+    sed "s/2023-07-02/$(date -d "$DATE -2day" +%Y-%m-%d)/g" | \
+    sed "s/2023-07-0\([68]\)/$(date -d "$DATE" +%Y-%m)-0\1/g" | \
+    sed "s/2023-07-\(1[18]\)/$(date -d "$DATE" +%Y-%m)-\1/g" | \
     curl -s -u $USERNAME:$PASSWORD -X POST "$BASE_URL/v0.4/$entity" \
         -H 'Accept: application/json' \
         -H 'Content-Type: application/json' \
@@ -94,7 +99,8 @@ done
 step "start emulator"
 # without -gpu host the emulator may fall back to software rendering which
 # renders the maps desaturated and differently on every run
-~/Android/Sdk/emulator/emulator @$EMULATOR_DEVICE -gpu host &
+# the sample data is in UTC, so the displayed times depend on the timezone
+~/Android/Sdk/emulator/emulator @$EMULATOR_DEVICE -gpu host -timezone $TIMEZONE &
 EMULATOR_PID=$!
 step "wait for device to start"
 while !(adb devices | grep emulator); do
@@ -107,7 +113,7 @@ sleep 2
 
 step "install app"
 # the app must be installed before the test run to reset its state and grant permissions
-flutter build apk --debug --flavor production --dart-define GIT_REF=$GIT_REF
+flutter build apk --debug --flavor production --dart-define GIT_REF=$GIT_REF --dart-define NOW=${DATE}T$TIME
 if ! test -e $APK; then
     error "apk not found at $APK"
     kill $EMULATOR_PID
@@ -147,7 +153,7 @@ demo() {
     adb shell am broadcast -a com.android.systemui.demo -e command "$@" > /dev/null
 }
 demo enter
-demo clock -e hhmm 0900
+demo clock -e hhmm "${TIME/:/}"
 demo battery -e level 100 -e plugged false
 # hide mobile signal strength because it depends on real radio state during the run
 demo network -e mobile hide -e wifi show -e level 4 -e fully true
@@ -172,7 +178,7 @@ capture &
 CAPTURE_PID=$!
 
 step "create new screenshots"
-flutter test integration_test/screenshots.dart --flavor production --dart-define GIT_REF=$GIT_REF
+flutter test integration_test/screenshots.dart --flavor production --dart-define GIT_REF=$GIT_REF --dart-define NOW=${DATE}T$TIME
 
 step "stop screenshot capture"
 kill $CAPTURE_PID

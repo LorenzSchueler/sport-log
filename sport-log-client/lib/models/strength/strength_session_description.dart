@@ -1,6 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/db_interfaces.dart';
+import 'package:sport_log/helpers/clock.dart';
 import 'package:sport_log/helpers/extensions/iterable_extension.dart';
 import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/models/clone_extensions.dart';
@@ -39,7 +40,7 @@ class StrengthSessionDescription extends CompoundEntity {
       : StrengthSessionDescription(
           session: StrengthSession(
             id: randomId(),
-            datetime: DateTime.now(),
+            datetime: Clock.now(),
             movementId: Movement.defaultMovement!.id,
             interval: null,
             comments: null,

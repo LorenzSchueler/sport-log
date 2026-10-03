@@ -3,6 +3,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:sport_log/config.dart';
 import 'package:sport_log/defaults.dart';
+import 'package:sport_log/helpers/clock.dart';
 import 'package:sport_log/helpers/lat_lng.dart';
 import 'package:sport_log/helpers/logger.dart';
 import 'package:sport_log/models/epoch/epoch_map.dart';
@@ -196,7 +197,7 @@ class Settings extends ChangeNotifier {
   EpochMap? get epochMap => _getEpochMap(_epochMap);
 
   Future<void> setEpochMap(EpochMap? map) {
-    map?.lastSync = DateTime.now();
+    map?.lastSync = Clock.now();
     return _put(_epochMap, map);
   }
 
@@ -209,7 +210,7 @@ class Settings extends ChangeNotifier {
     }
     final map = epochMap ?? EpochMap.zero();
     mutator(map, epoch);
-    map.lastSync = DateTime.now();
+    map.lastSync = Clock.now();
     await setEpochMap(map);
   }
 

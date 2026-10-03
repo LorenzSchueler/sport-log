@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:sport_log/helpers/clock.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/pages/workout/charts/datetime_chart.dart';
 import 'package:sport_log/pages/workout/charts/datetime_charts/all_chart.dart';
@@ -19,7 +20,7 @@ sealed class DateFilterState {
   DateTime groupFunction(DateTime datetime);
 
   bool get goingForwardPossible =>
-      end == null ? false : end!.isBefore(DateTime.now());
+      end == null ? false : end!.isBefore(Clock.now());
 
   DateFilterState get earlier;
 
@@ -45,9 +46,9 @@ sealed class DateFilterState {
       other is DateFilterState && other.start == start && other.end == end;
 
   static List<DateFilterState> all(DateFilterState dateFilterState) {
-    final now = DateTime.now();
+    final now = Clock.now();
     final inclusiveEnd = dateFilterState.end == null
-        ? DateTime.now()
+        ? Clock.now()
         : dateFilterState.end!.dayEarlier();
     final end = now.compareTo(inclusiveEnd) < 0 ? now : inclusiveEnd;
     return [
@@ -59,7 +60,7 @@ sealed class DateFilterState {
     ];
   }
 
-  static DateFilterState get init => MonthFilter(DateTime.now());
+  static DateFilterState get init => MonthFilter(Clock.now());
 }
 
 class DayFilter extends DateFilterState {

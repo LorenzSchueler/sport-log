@@ -1,6 +1,7 @@
 import 'package:fixnum/fixnum.dart';
 import 'package:sport_log/database/table.dart';
 import 'package:sport_log/database/table_accessor.dart';
+import 'package:sport_log/helpers/clock.dart';
 import 'package:sport_log/helpers/extensions/num_extension.dart';
 import 'package:sport_log/models/movement/movement.dart';
 import 'package:sport_log/models/strength/eorm.dart';
@@ -36,7 +37,7 @@ extension StrengthRecordExtension on StrengthRecords {
     Movement movement,
   ) {
     final strengthSessionStats = StrengthSessionStats.fromStrengthSets(
-      DateTime.now(),
+      Clock.now(),
       movement.dimension,
       [strengthSet],
     );

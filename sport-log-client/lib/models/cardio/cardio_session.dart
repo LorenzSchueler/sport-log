@@ -5,6 +5,7 @@ import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/database/table.dart';
+import 'package:sport_log/helpers/clock.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/helpers/search.dart';
@@ -55,7 +56,7 @@ class CardioSession extends AtomicEntity {
   CardioSession.defaultValue(this.movementId)
     : id = randomId(),
       cardioType = CardioType.training,
-      datetime = DateTime.now(),
+      datetime = Clock.now(),
       deleted = false;
 
   factory CardioSession.fromJson(Map<String, dynamic> json) =>

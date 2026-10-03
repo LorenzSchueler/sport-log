@@ -1,4 +1,5 @@
 import 'package:intl/intl.dart';
+import 'package:sport_log/helpers/clock.dart';
 
 extension DurationExtension on Duration {
   String _threeDigits(int n) {
@@ -90,7 +91,7 @@ extension DateTimeExtension on DateTime {
   /// 01. February,
   /// 01. February 2022,
   String get humanTodayTimeOrDate =>
-      isOnDay(DateTime.now()) ? humanDateTime : humanDate;
+      isOnDay(Clock.now()) ? humanDateTime : humanDate;
 
   /// examples:
   /// Today,
@@ -100,12 +101,12 @@ extension DateTimeExtension on DateTime {
   /// 01. February,
   /// 01. February 2000,
   String get humanDate {
-    final now = DateTime.now();
+    final now = Clock.now();
     if (isOnDay(now)) {
       return "Today";
-    } else if (isOnDay(DateTime.now().dayEarlier())) {
+    } else if (isOnDay(Clock.now().dayEarlier())) {
       return "Yesterday";
-    } else if (isOnDay(DateTime.now().dayLater())) {
+    } else if (isOnDay(Clock.now().dayLater())) {
       return "Tomorrow";
     } else if (isInWeek(now)) {
       return longWeekdayName;
@@ -122,7 +123,7 @@ extension DateTimeExtension on DateTime {
   /// 01. February - 08. February,
   /// 01. February 2000 - 08. February 2000
   String get humanWeek {
-    final now = DateTime.now();
+    final now = Clock.now();
     if (isInWeek(now)) {
       return "This Week";
     } else if (weekLater().isInWeek(now)) {
@@ -142,7 +143,7 @@ extension DateTimeExtension on DateTime {
   /// February,
   /// February 2000
   String get humanMonth {
-    final now = DateTime.now();
+    final now = Clock.now();
     if (isInMonth(now)) {
       return "This Month";
     } else if (monthLater().isInMonth(now)) {
@@ -159,7 +160,7 @@ extension DateTimeExtension on DateTime {
   /// Last Year,
   /// 2000
   String get humanYear {
-    final now = DateTime.now();
+    final now = Clock.now();
     if (isInYear(now)) {
       return "This Year";
     } else if (yearLater().isInYear(now)) {

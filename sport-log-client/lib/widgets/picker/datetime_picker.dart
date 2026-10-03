@@ -1,4 +1,5 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:sport_log/helpers/clock.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/widgets/time_spinner.dart';
 
@@ -68,7 +69,7 @@ Future<Duration?> showScrollableDurationPicker({
   final datetime = await showDialog<DateTime>(
     context: context,
     builder: (context) => TimePickerDialog(
-      datetime: DateTime.now().beginningOfDay().add(
+      datetime: Clock.now().beginningOfDay().add(
         initialDuration ?? Duration.zero,
       ),
       withSeconds: true,
@@ -93,9 +94,7 @@ Future<DateTime?> showDatePickerWithDefaults({
     context: context,
     initialDate: initialDate,
     firstDate: DateTime(1970),
-    lastDate: future
-        ? DateTime.now().add(const Duration(days: 365))
-        : DateTime.now(),
+    lastDate: future ? Clock.now().add(const Duration(days: 365)) : Clock.now(),
     locale: const Locale("en", "GB"),
   ))?.beginningOfDay();
 }

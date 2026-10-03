@@ -2,6 +2,7 @@ import 'package:fixnum/fixnum.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sport_log/database/db_interfaces.dart';
 import 'package:sport_log/database/table.dart';
+import 'package:sport_log/helpers/clock.dart';
 import 'package:sport_log/helpers/id_generation.dart';
 import 'package:sport_log/helpers/serialization/json_serialization.dart';
 import 'package:sport_log/models/clone_extensions.dart';
@@ -41,7 +42,7 @@ class MetconSession extends AtomicEntity {
     return MetconSession(
       id: randomId(),
       metconId: metcon.id,
-      datetime: DateTime.now(),
+      datetime: Clock.now(),
       time: time,
       rounds: rounds,
       reps: reps,

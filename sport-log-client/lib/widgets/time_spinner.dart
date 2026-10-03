@@ -1,5 +1,6 @@
 import 'package:flutter/rendering.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:sport_log/helpers/clock.dart';
 
 class _ItemScrollPhysics extends ScrollPhysics {
   const _ItemScrollPhysics({
@@ -73,7 +74,7 @@ class TimeSpinner extends StatefulWidget {
 }
 
 class _TimeSpinnerState extends State<TimeSpinner> {
-  late DateTime initTime = widget.time ?? DateTime.now();
+  late DateTime initTime = widget.time ?? Clock.now();
 
   // +max to get into max <= x < 2*max
   late int selectedHour = initTime.hour % maxHour + maxHour;

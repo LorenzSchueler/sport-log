@@ -4,6 +4,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter/services.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:sport_log/helpers/clock.dart';
 import 'package:sport_log/helpers/lat_lng.dart';
 import 'package:sport_log/widgets/map_widgets/map_styles_button.dart';
 
@@ -87,7 +88,7 @@ class MapDownloadUtils extends ChangeNotifier {
       acceptExpired: true,
       networkRestriction: NetworkRestriction.DISALLOW_EXPENSIVE,
       metadata: {
-        "datetime": DateTime.now().toIso8601String(),
+        "datetime": Clock.now().toIso8601String(),
         "bounds": bounds.toList(), // .toPolygon().toJson() causes crash
         "style": MapStyle.outdoor.name,
         "minZoom": 0,

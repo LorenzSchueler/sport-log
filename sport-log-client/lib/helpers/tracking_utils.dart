@@ -6,6 +6,7 @@ import 'package:sport_log/app.dart';
 import 'package:sport_log/data_provider/data_providers/cardio_data_provider.dart';
 import 'package:sport_log/helpers/alarm_utils.dart';
 import 'package:sport_log/helpers/audio_feedback_utils.dart';
+import 'package:sport_log/helpers/clock.dart';
 import 'package:sport_log/helpers/extensions/date_time_extension.dart';
 import 'package:sport_log/helpers/gps_position.dart';
 import 'package:sport_log/helpers/heart_rate_utils.dart';
@@ -159,7 +160,7 @@ class TrackingUtils extends ChangeNotifier {
   void start() {
     _stopwatch.start();
     _trackingMode = TrackingMode.tracking;
-    _cardioSessionDescription.cardioSession.datetime = DateTime.now();
+    _cardioSessionDescription.cardioSession.datetime = Clock.now();
     _audioFeedbackUtils.onStart();
     notifyListeners();
   }
