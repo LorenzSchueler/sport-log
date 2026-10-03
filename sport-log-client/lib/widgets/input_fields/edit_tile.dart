@@ -69,34 +69,14 @@ class OptionalTextFormField extends StatelessWidget {
   Widget build(BuildContext context) {
     return showTextFormField
         ? textFormField
-        : GestureDetector(
-            onTap: onButtonPressed != null
-                ? () {
-                    FocusManager.instance.primaryFocus?.unfocus();
-                    onButtonPressed!();
-                  }
-                : null,
-            behavior: HitTestBehavior.opaque,
-            child: SizedBox(
-              height: EditTile.textFormFieldHeight,
-              child: Row(
-                children: [
-                  if (leading != null)
-                    Padding(
-                      padding: const EdgeInsets.only(right: 15),
-                      child: Icon(
-                        leading,
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  FilledButton.tonalIcon(
-                    style: AppTheme.tonalButtonStyle(),
-                    icon: const Icon(AppIcons.add),
-                    label: Text(buttonText),
-                    onPressed: onButtonPressed,
-                  ),
-                ],
-              ),
+        : EditTile(
+            leading: leading,
+            onTap: onButtonPressed,
+            child: FilledButton.tonalIcon(
+              style: AppTheme.tonalButtonStyle(),
+              icon: const Icon(AppIcons.add),
+              label: Text(buttonText),
+              onPressed: onButtonPressed,
             ),
           );
   }
