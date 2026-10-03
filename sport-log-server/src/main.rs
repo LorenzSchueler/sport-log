@@ -103,7 +103,7 @@ async fn run_server(router: Router, config: &Config) -> Result<(), String> {
     info!("starting server at {address}");
     axum::serve(listener, router)
         .await
-        .map_err(|err| format! {"failed to start server: {err}"})
+        .map_err(|err| format!("failed to start server: {err}"))
 }
 
 #[tokio::main]
