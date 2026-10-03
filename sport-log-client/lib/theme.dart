@@ -94,6 +94,7 @@ class AppTheme {
       ),
     ),
     navigationBarTheme: const NavigationBarThemeData(height: 65),
+    bottomSheetTheme: const BottomSheetThemeData(showDragHandle: true),
     sliderTheme: SliderThemeData(
       overlayShape: SliderComponentShape.noOverlay,
       // ignore: deprecated_member_use
