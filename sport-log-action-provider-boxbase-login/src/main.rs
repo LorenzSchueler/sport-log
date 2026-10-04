@@ -28,8 +28,10 @@ const DESCRIPTION: &str = concat!(
 );
 const PLATFORM_NAME: &str = "BoxBase";
 
-const WOD_ACTION_NAME: &str = "GentleGiants Group Wod";
 const GROUP_CLASS_NAME: &str = "GentleGiants Group";
+const GROUP_2_CLASS_NAME: &str = "GentleGiants Group 2";
+const GROUP_WOD_ACTION_NAME: &str = "GentleGiants Group Wod";
+const GROUP_2_WOD_ACTION_NAME: &str = "GentleGiants Group 2 Wod";
 
 /// An error not caused by the user's data. Action events failing with it are retried on the next
 /// invocation.
@@ -59,8 +61,8 @@ enum UserError {
     #[error("can not reserve class: {0} class at {1} not found")]
     ClassNotFound(String, DateTime<Utc>),
     /// The action event is retried on the next invocation since the class can still be reserved.
-    #[error("can not save wod: no {GROUP_CLASS_NAME} class reserved today")]
-    NoReservation,
+    #[error("can not save wod: no {0} class reserved today")]
+    NoReservation(&'static str),
 }
 
 /// A result with a [`UserError`].
@@ -154,6 +156,12 @@ async fn setup(config: &Config) -> Result<()> {
                 delete_after,
             },
             ActionSetup {
+                name: GROUP_2_CLASS_NAME,
+                description: "Reserve a spot in a group 2 (gymnastics) class.",
+                create_before,
+                delete_after,
+            },
+            ActionSetup {
                 name: "GentleGiants OG",
                 description: "Reserve a spot in a Open Gym class in the main gym.",
                 create_before,
@@ -166,8 +174,14 @@ async fn setup(config: &Config) -> Result<()> {
                 delete_after,
             },
             ActionSetup {
-                name: WOD_ACTION_NAME,
+                name: GROUP_WOD_ACTION_NAME,
                 description: "Save the wod if a spot in a group class is reserved on this day. The time of the rule is ignored.",
+                create_before: Duration::try_days(2).unwrap(),
+                delete_after: Duration::try_days(1).unwrap(),
+            },
+            ActionSetup {
+                name: GROUP_2_WOD_ACTION_NAME,
+                description: "Save the gymnastics class wod if a spot in a group 2 class is reserved on this day. The time of the rule is ignored.",
                 create_before: Duration::try_days(2).unwrap(),
                 delete_after: Duration::try_days(1).unwrap(),
             },
@@ -196,23 +210,23 @@ async fn process_events(config: &Config) -> Result<()> {
     )
     .await?;
 
-    let reservation_events: Vec<_> = exec_action_events
-        .iter()
-        .filter(|exec_action_event| {
-            exec_action_event.action_name != WOD_ACTION_NAME && exec_action_event.datetime >= now
-        })
-        .collect();
-    let wod_events: Vec<_> = exec_action_events
-        .iter()
-        .filter(|exec_action_event| {
-            exec_action_event.action_name == WOD_ACTION_NAME
-                && exec_action_event
+    let mut reservation_events = vec![];
+    let mut wod_events = vec![];
+    for exec_action_event in &exec_action_events {
+        match boxbase_class(&exec_action_event.action_name) {
+            None if exec_action_event.datetime >= now => reservation_events.push(exec_action_event),
+            Some(class_name)
+                if exec_action_event
                     .datetime
                     .with_timezone(&Local)
                     .date_naive()
-                    == today
-        })
-        .collect();
+                    == today =>
+            {
+                wod_events.push((exec_action_event, class_name));
+            }
+            _ => {}
+        }
+    }
 
     info!(
         "got {} reservation and {} wod action events",
@@ -230,26 +244,54 @@ async fn process_events(config: &Config) -> Result<()> {
         return Ok(());
     }
 
-    let wod = wod::fetch_wod(&config.wod_username, &config.wod_password, today).await;
-    let description = match wod {
-        Ok(Some(description)) => description,
-        Ok(None) => {
-            info!("no wod found for {today}, trying again on next invocation");
-            return Ok(());
-        }
+    let wods = match wod::fetch_wod(&config.wod_username, &config.wod_password, today).await {
+        Ok(wods) => wods,
         Err(error) => {
             warn!("failed to fetch wod: {error}, trying again on next invocation");
             return Ok(());
         }
     };
 
-    for exec_action_event in wod_events {
+    for (exec_action_event, class_name) in wod_events {
         debug!("processing {:#?}", exec_action_event);
-        let result = save_wod(&client, config, exec_action_event, today, &description).await;
+        let Some(description) = wod_class(class_name).and_then(|wod_class| wods.get(wod_class))
+        else {
+            info!("no {class_name} wod found for {today}, trying again on next invocation");
+            continue;
+        };
+        let result = save_wod(
+            &client,
+            config,
+            exec_action_event,
+            class_name,
+            today,
+            description,
+        )
+        .await;
         finish_event(&client, config, exec_action_event, result).await?;
     }
 
     Ok(())
+}
+
+/// Returns the BoxBase class that has to be reserved for a wod action, if the action saves a wod.
+fn boxbase_class(action_name: &str) -> Option<&'static str> {
+    match action_name {
+        GROUP_WOD_ACTION_NAME => Some(GROUP_CLASS_NAME),
+        GROUP_2_WOD_ACTION_NAME => Some(GROUP_2_CLASS_NAME),
+        _ => None,
+    }
+}
+
+/// Returns the class name on the wod website for a BoxBase class, if its wod can be saved.
+///
+/// See [`wod::fetch_wod`].
+fn wod_class(class_name: &str) -> Option<&'static str> {
+    match class_name {
+        GROUP_CLASS_NAME => Some(""),
+        GROUP_2_CLASS_NAME => Some("Gymnastics"),
+        _ => None,
+    }
 }
 
 /// Logs the result of processing the event and disables the event unless it is retried.
@@ -261,7 +303,7 @@ async fn finish_event(
 ) -> Result<()> {
     match result {
         Ok(Ok(())) => {}
-        Ok(Err(error @ UserError::NoReservation)) => {
+        Ok(Err(error @ UserError::NoReservation(_))) => {
             info!("{error}, trying again on next invocation");
             return Ok(());
         }
@@ -352,12 +394,13 @@ async fn find_class(
         .find(|class| class.name == exec_action_event.action_name && class.starts_at == time))
 }
 
-/// Logs in to BoxBase and saves the wod if a [`GROUP_CLASS_NAME`] class is reserved at `date`.
+/// Logs in to BoxBase and saves the wod if a `class_name` class is reserved at `date`.
 /// Being on the waiting list does not count.
 async fn save_wod(
     client: &Client,
     config: &Config,
     exec_action_event: &ExecutableActionEvent,
+    class_name: &'static str,
     date: NaiveDate,
     description: &str,
 ) -> Result<UserResult<()>> {
@@ -367,11 +410,11 @@ async fn save_wod(
     };
 
     let reserved = boxbase.classes(date).await?.iter().any(|class| {
-        class.name == GROUP_CLASS_NAME
+        class.name == class_name
             && class.registration_status == Some(RegistrationStatus::Registered)
     });
     if !reserved {
-        return Ok(Err(UserError::NoReservation));
+        return Ok(Err(UserError::NoReservation(class_name)));
     }
     info!("reserved class found");
 

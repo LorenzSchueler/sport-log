@@ -6,7 +6,7 @@
 </p>
 
 <h1 align="center">Sport Log</h1>
-  
+
 ![](https://img.shields.io/github/actions/workflow/status/LorenzSchueler/sport-log/rust.yml?branch=main&label=Rust%20CI)
 ![](https://img.shields.io/github/actions/workflow/status/LorenzSchueler/sport-log/flutter.yml?branch=main&label=Flutter%20CI)
 ![](https://img.shields.io/github/actions/workflow/status/LorenzSchueler/sport-log/sql.yml?branch=main&label=SQL%20CI)
@@ -57,7 +57,7 @@ The server and action providers as well as helper tools are structured as follow
 - [sport-log-derive](sport-log-derive) rust macros used in [sport-log-types](sport-log-types) and [sport-log-server](sport-log-server)
 - [sport-log-scheduler](sport-log-scheduler) responsible for creating action events from action rules, deleting old action events and for garbage collection
 - [sport-log-ap-utils](sport-log-ap-utils) helper functions for rust action providers
-- [sport-log-action-provider-boxbase-login](sport-log-action-provider-boxbase-login) reserves spots in boxbase classes and saves the wod of reserved GentleGiants group classes
+- [sport-log-action-provider-boxbase-login](sport-log-action-provider-boxbase-login) reserves spots in boxbase classes and saves the wod of reserved group classes
 
 The flutter app lives in [sport-log-client](sport-log-client)
 
