@@ -12,6 +12,7 @@ import 'package:sport_log/helpers/gps_position.dart';
 import 'package:sport_log/helpers/heart_rate_utils.dart';
 import 'package:sport_log/helpers/location_utils.dart';
 import 'package:sport_log/helpers/map_controller.dart';
+import 'package:sport_log/helpers/platform/proximity_wake_lock.dart';
 import 'package:sport_log/helpers/step_count_utils.dart';
 import 'package:sport_log/helpers/stopwatch.dart';
 import 'package:sport_log/helpers/tracking_ui_utils.dart';
@@ -119,6 +120,7 @@ class TrackingUtils extends ChangeNotifier {
     _locationUtils.dispose();
     _heartRateUtils?.dispose();
     _audioFeedbackUtils.dispose();
+    ProximityWakeLock.release();
     super.dispose();
   }
 
@@ -162,6 +164,7 @@ class TrackingUtils extends ChangeNotifier {
     _trackingMode = TrackingMode.tracking;
     _cardioSessionDescription.cardioSession.datetime = Clock.now();
     _audioFeedbackUtils.onStart();
+    ProximityWakeLock.acquire();
     notifyListeners();
   }
 
