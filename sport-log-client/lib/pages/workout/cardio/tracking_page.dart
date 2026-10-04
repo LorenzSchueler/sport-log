@@ -146,42 +146,82 @@ class CardioTrackingPage extends StatelessWidget {
 }
 
 class _CadenceButton extends StatelessWidget {
+  static const _height = 40.0;
+  static const _shape = RoundedRectangleBorder(
+    borderRadius: BorderRadius.all(Radius.circular(12)),
+  );
+
+  Widget _segment(VoidCallback onTap, Widget child) => InkWell(
+    onTap: onTap,
+    child: SizedBox(
+      height: _height,
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          child: child,
+        ),
+      ),
+    ),
+  );
+
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return ProviderConsumer(
       create: (_) => MetronomeUtils(),
       builder: (context, metronomeUtils, _) => metronomeUtils.isPlaying
-          ? SegmentedButton<MetronomeAdjustment>(
-              segments: [
-                ButtonSegment(
-                  value: MetronomeAdjustment.stop,
-                  label: Text("${metronomeUtils.cadence} rpm"),
-                  icon: const Icon(AppIcons.close),
+          // matches the padded tap target of the small FAB
+          ? Padding(
+              padding: const EdgeInsets.all(
+                (kMinInteractiveDimension - _height) / 2,
+              ),
+              child: Material(
+                elevation: 6,
+                color: colorScheme.primaryContainer,
+                shape: _shape,
+                clipBehavior: Clip.antiAlias,
+                child: IconTheme.merge(
+                  data: IconThemeData(color: colorScheme.onPrimaryContainer),
+                  child: DefaultTextStyle.merge(
+                    style: TextStyle(color: colorScheme.onPrimaryContainer),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        _segment(
+                          () => metronomeUtils.adjustTimer(
+                            MetronomeAdjustment.stop,
+                          ),
+                          Row(
+                            children: [
+                              const Icon(AppIcons.close),
+                              Defaults.sizedBox.horizontal.small,
+                              Text("${metronomeUtils.cadence} rpm"),
+                            ],
+                          ),
+                        ),
+                        _segment(
+                          () => metronomeUtils.adjustTimer(
+                            MetronomeAdjustment.increase,
+                          ),
+                          const Icon(AppIcons.add),
+                        ),
+                        _segment(
+                          () => metronomeUtils.adjustTimer(
+                            MetronomeAdjustment.decrease,
+                          ),
+                          const Icon(AppIcons.remove),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
-                const ButtonSegment(
-                  value: MetronomeAdjustment.increase,
-                  icon: Icon(AppIcons.add),
-                ),
-                const ButtonSegment(
-                  value: MetronomeAdjustment.decrease,
-                  icon: Icon(AppIcons.remove),
-                ),
-              ],
-              selected: const {},
-              emptySelectionAllowed: true,
-              onSelectionChanged: (selected) =>
-                  metronomeUtils.adjustTimer(selected.first),
-              style: ButtonStyle(
-                backgroundColor: WidgetStatePropertyAll(
-                  Theme.of(context).colorScheme.primary,
-                ),
-                foregroundColor: const WidgetStatePropertyAll(Colors.black),
               ),
             )
-          : IconButton.filled(
+          : FloatingActionButton.small(
+              heroTag: null,
               onPressed: metronomeUtils.startTimer,
-              icon: const Icon(AppIcons.gauge),
-              color: Colors.black,
+              tooltip: "Metronome",
+              child: const Icon(AppIcons.gauge),
             ),
     );
   }
