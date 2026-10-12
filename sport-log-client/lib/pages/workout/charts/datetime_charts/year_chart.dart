@@ -16,6 +16,11 @@ class YearChart extends DateTimePeriodChart {
 
   final DateTime startDateTime;
 
+  String _tickLabel(double value) {
+    final date = startDateTime.add(Duration(days: value.round()));
+    return date.day == 15 ? date.shortMonthName : "";
+  }
+
   @override
   Widget build(BuildContext context) {
     return LineChart(
@@ -38,14 +43,7 @@ class YearChart extends DateTimePeriodChart {
         minY: minY,
         maxY: maxY,
         titlesData: titlesData(
-          getBottomTitles: (value, _) =>
-              startDateTime.add(Duration(days: value.round())).day == 15
-              ? Text(
-                  startDateTime
-                      .add(Duration(days: value.round()))
-                      .shortMonthName,
-                )
-              : const Text(""),
+          getBottomTitles: (value, _) => Text(_tickLabel(value)),
         ),
         gridData: FlGridData(
           getDrawingHorizontalLine: gridLineDrawer(),

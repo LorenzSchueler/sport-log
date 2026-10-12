@@ -16,6 +16,9 @@ class WeekChart extends DateTimePeriodChart {
 
   final DateTime startDateTime;
 
+  String _tickLabel(double value) =>
+      startDateTime.add(Duration(days: value.round())).shortWeekdayName;
+
   @override
   Widget build(BuildContext context) {
     return LineChart(
@@ -38,9 +41,7 @@ class WeekChart extends DateTimePeriodChart {
         minY: minY,
         maxY: maxY,
         titlesData: titlesData(
-          getBottomTitles: (value, _) => Text(
-            startDateTime.add(Duration(days: value.round())).shortWeekdayName,
-          ),
+          getBottomTitles: (value, _) => Text(_tickLabel(value)),
         ),
         gridData: FlGridData(
           getDrawingHorizontalLine: gridLineDrawer(),

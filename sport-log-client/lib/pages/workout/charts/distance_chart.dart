@@ -66,17 +66,13 @@ class DistanceChart extends StatefulWidget {
     required this.touchCallback,
     this.labelColor = Colors.white,
     super.key,
-  }) : // interval in m only at whole km at most 8
-       _xInterval = chartLines
-           .map(
-             (chartLine) =>
-                 max(
-                   1,
-                   (chartLine.chartValues.lastOrNull?.distance ?? 0) / 8 / 1000,
-                 ).ceil().toDouble() *
-                 1000,
-           )
-           .max,
+  }) : _xInterval = _labelInterval(
+         chartLines
+             .map(
+               (chartLine) => chartLine.chartValues.lastOrNull?.distance ?? 0,
+             )
+             .max,
+       ),
        _minY = chartLines
            .map(
              (chartLine) => chartLine.absolute
@@ -99,6 +95,22 @@ class DistanceChart extends StatefulWidget {
   final double _minY;
   final double _maxY;
 
+  /// Smallest step in m from 1, 2, 3, 5, 10, 20, … km with at most
+  /// `maxIntervals` intervals in [totalDistance].
+  static double _labelInterval(double totalDistance) {
+    const maxIntervals = 8;
+    final totalKm = totalDistance / 1000;
+    final steps = [
+      for (var km = 1; km <= max(1, totalKm); km *= 10) ...[
+        km,
+        2 * km,
+        3 * km,
+        5 * km,
+      ],
+    ];
+    return steps.firstWhere((step) => totalKm / step <= maxIntervals) * 1000.0;
+  }
+
   @override
   State<DistanceChart> createState() => _DistanceChartState();
 }
@@ -109,6 +121,12 @@ class _DistanceChartState extends State<DistanceChart> {
   void _onLongPress(double? xValue) {
     setState(() => _lastX = xValue);
     widget.touchCallback(xValue);
+  }
+
+  String _tickLabel(double m) {
+    final intM = m.round();
+    final showLabel = intM % widget._xInterval.round() == 0;
+    return showLabel ? (m / 1000).round().toString() : "";
   }
 
   @override
@@ -148,10 +166,8 @@ class _DistanceChartState extends State<DistanceChart> {
               sideTitles: SideTitles(
                 showTitles: true,
                 interval: widget._xInterval,
-                getTitlesWidget: (m, _) => Text(
-                  m.round() % widget._xInterval.round() == 0
-                      ? (m / 1000).round().toString()
-                      : "", // remove label at last value
+                getTitlesWidget: (value, _) => Text(
+                  _tickLabel(value),
                   style: TextStyle(color: widget.labelColor),
                 ),
                 reservedSize: 20,

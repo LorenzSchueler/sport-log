@@ -13,32 +13,28 @@ class AllChart extends DateTimePeriodChart {
     required super.absolute,
     required super.formatter,
     super.key,
-  });
+  }) : _startDateTime =
+           chartValues.firstOrNull?.datetime.beginningOfDay() ??
+           Clock.now().beginningOfYear(),
+       _endDateTime =
+           chartValues.lastOrNull?.datetime ?? Clock.now().endOfYear();
+
+  final DateTime _startDateTime;
+  final DateTime _endDateTime;
+
+  bool get _isAtMostOneYear =>
+      _endDateTime.difference(_startDateTime).inDays <= 366;
+
+  String _tickLabel(double value) {
+    final date = _startDateTime.add(Duration(days: value.round()));
+    if (_isAtMostOneYear) {
+      return date.day == 15 ? date.shortMonthName : "";
+    }
+    return date.month == 7 && date.day == 1 ? "${date.year}" : "";
+  }
 
   @override
   Widget build(BuildContext context) {
-    final startDateTime =
-        chartValues.firstOrNull?.datetime.beginningOfDay() ??
-        Clock.now().beginningOfYear();
-    final endDateTime =
-        chartValues.lastOrNull?.datetime ?? Clock.now().endOfYear();
-    final months = (endDateTime.difference(startDateTime).inDays / 30).round();
-    final titleInterval = (months / 8).ceil();
-    final List<int> markedMonths;
-    if (titleInterval == 1) {
-      markedMonths = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
-    } else if (titleInterval == 2) {
-      markedMonths = [1, 3, 5, 7, 9, 11];
-    } else if (titleInterval == 3) {
-      markedMonths = [1, 4, 7, 10];
-    } else if (titleInterval == 4) {
-      markedMonths = [1, 5, 9];
-    } else if (titleInterval <= 6) {
-      markedMonths = [1, 7];
-    } else {
-      markedMonths = [1];
-    }
-
     return Padding(
       padding: const EdgeInsets.fromLTRB(0, 5, 15, 0),
       child: LineChart(
@@ -48,7 +44,7 @@ class AllChart extends DateTimePeriodChart {
               spots: chartValues
                   .map(
                     (v) => FlSpot(
-                      v.datetime.difference(startDateTime).inDays + 1,
+                      v.datetime.difference(_startDateTime).inDays + 1,
                       v.value,
                     ),
                   )
@@ -60,22 +56,14 @@ class AllChart extends DateTimePeriodChart {
           minY: minY,
           maxY: maxY,
           titlesData: titlesData(
-            getBottomTitles: (value, _) {
-              final date = startDateTime.add(Duration(days: value.round()));
-              return date.day == 15 && markedMonths.contains(date.month)
-                  ? Text("${date.shortMonthName}\n${date.year}")
-                  : const Text("");
-            },
-            reservedSize: 35,
+            getBottomTitles: (value, _) => Text(_tickLabel(value)),
           ),
           gridData: FlGridData(
             getDrawingHorizontalLine: gridLineDrawer(),
             verticalInterval: 1,
             checkToShowVerticalLine: (value) {
-              final datetime = startDateTime.add(Duration(days: value.round()));
-              return datetime.day == 1 && markedMonths.contains(datetime.month)
-                  ? true
-                  : false;
+              final date = _startDateTime.add(Duration(days: value.round()));
+              return date.day == 1 && (_isAtMostOneYear || date.month == 1);
             },
             getDrawingVerticalLine: gridLineDrawer(),
           ),

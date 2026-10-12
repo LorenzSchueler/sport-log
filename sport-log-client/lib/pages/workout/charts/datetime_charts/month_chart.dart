@@ -41,7 +41,7 @@ class MonthChart extends DateTimePeriodChart {
           minY: minY,
           maxY: maxY,
           titlesData: titlesData(
-            getBottomTitles: (value, _) => value % 2 == 0
+            getBottomTitles: (value, _) => value % 5 == 0
                 ? Text(value.round().toString())
                 : const Text(""),
           ),

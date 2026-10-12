@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:collection/collection.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:material_ui/material_ui.dart';
@@ -121,8 +119,7 @@ class DurationChart extends StatefulWidget {
     this.touchCallback,
     this.labelColor = Colors.white,
     super.key,
-  }) : _xInterval =
-           max(1, totalDuration.inMinutes / 6).ceil().toDouble() * 60 * 1000,
+  }) : _xInterval = _labelInterval(totalDuration).inMilliseconds.toDouble(),
        _maxX = (totalDuration.inMinutes * 60 * 1000).toDouble();
 
   final List<DurationChartLine> chartLines;
@@ -131,6 +128,22 @@ class DurationChart extends StatefulWidget {
 
   final double _xInterval;
   final double _maxX;
+
+  /// Smallest round step with at most `maxIntervals` intervals in
+  /// [totalDuration].
+  static Duration _labelInterval(Duration totalDuration) {
+    const maxIntervals = 6;
+    final steps = [
+      1, 2, 3, 5, 10, 15, 20, 30, //
+      for (var h = 1; h <= totalDuration.inHours ~/ maxIntervals + 1; h++)
+        h * 60,
+    ];
+    return Duration(
+      minutes: steps.firstWhere(
+        (step) => totalDuration.inMinutes / step <= maxIntervals,
+      ),
+    );
+  }
 
   @override
   State<DurationChart> createState() => _DurationChartState();
@@ -144,6 +157,12 @@ class _DurationChartState extends State<DurationChart> {
     widget.touchCallback?.call(
       xValue == null ? null : Duration(milliseconds: xValue.round()),
     );
+  }
+
+  String _tickLabel(double value) {
+    final intValue = value.round();
+    final showLabel = intValue % widget._xInterval.round() == 0;
+    return showLabel ? Duration(milliseconds: intValue).formatHm : "";
   }
 
   @override
@@ -181,11 +200,7 @@ class _DurationChartState extends State<DurationChart> {
                 showTitles: true,
                 interval: widget._xInterval,
                 getTitlesWidget: (value, _) => Text(
-                  value.round() % widget._xInterval.round() == 0 &&
-                          value.round() > 0 &&
-                          value.round() < widget._maxX
-                      ? Duration(milliseconds: value.round()).formatHm
-                      : "", // remove label at 0 and last value
+                  _tickLabel(value),
                   style: TextStyle(color: widget.labelColor),
                 ),
                 reservedSize: 20,
