@@ -167,54 +167,53 @@ class _DurationChartState extends State<DurationChart> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(5, 5, 5, 0),
-      child: LineChart(
-        LineChartData(
-          lineBarsData: [
-            for (final chartLine in widget.chartLines)
-              LineChartBarData(
-                spots: chartLine.chartValues
-                    .map(
-                      (v) =>
-                          FlSpot(v.duration.inMilliseconds.toDouble(), v.value),
-                    )
-                    .toList(),
-                color: chartLine.lineColor,
-                dotData: const FlDotData(show: false),
-                isCurved: true,
-                preventCurveOverShooting: true,
-              ),
-          ],
-          minY: 0,
-          maxY: 1,
-          minX: 0,
-          maxX: widget._maxX,
-          extraLinesData: touchLine(_lastX),
-          lineTouchData: touchCallback(_onLongPress),
-          titlesData: FlTitlesData(
-            topTitles: const AxisTitles(),
-            rightTitles: const AxisTitles(),
-            bottomTitles: AxisTitles(
-              sideTitles: SideTitles(
-                showTitles: true,
-                interval: widget._xInterval,
-                getTitlesWidget: (value, _) => Text(
+    return LineChart(
+      LineChartData(
+        lineBarsData: [
+          for (final chartLine in widget.chartLines)
+            LineChartBarData(
+              spots: chartLine.chartValues
+                  .map(
+                    (v) =>
+                        FlSpot(v.duration.inMilliseconds.toDouble(), v.value),
+                  )
+                  .toList(),
+              color: chartLine.lineColor,
+              dotData: const FlDotData(show: false),
+              isCurved: true,
+              preventCurveOverShooting: true,
+            ),
+        ],
+        minY: 0,
+        maxY: 1,
+        minX: 0,
+        maxX: widget._maxX,
+        extraLinesData: touchLine(_lastX),
+        lineTouchData: touchCallback(_onLongPress),
+        titlesData: FlTitlesData(
+          topTitles: const AxisTitles(),
+          rightTitles: const AxisTitles(),
+          bottomTitles: AxisTitles(
+            sideTitles: SideTitles(
+              showTitles: true,
+              interval: widget._xInterval,
+              getTitlesWidget: fitInside(
+                (value, _) => Text(
                   _tickLabel(value),
                   style: TextStyle(color: widget.labelColor),
                 ),
-                reservedSize: 20,
               ),
+              reservedSize: horizontalAxisReservedSize(context),
             ),
-            leftTitles: const AxisTitles(),
           ),
-          gridData: FlGridData(
-            getDrawingHorizontalLine: gridLineDrawer(),
-            verticalInterval: widget._xInterval,
-            getDrawingVerticalLine: gridLineDrawer(),
-          ),
-          borderData: FlBorderData(show: false),
+          leftTitles: const AxisTitles(),
         ),
+        gridData: FlGridData(
+          getDrawingHorizontalLine: gridLineDrawer(),
+          verticalInterval: widget._xInterval,
+          getDrawingVerticalLine: gridLineDrawer(),
+        ),
+        borderData: FlBorderData(show: false),
       ),
     );
   }

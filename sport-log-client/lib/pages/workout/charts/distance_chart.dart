@@ -135,64 +135,70 @@ class _DistanceChartState extends State<DistanceChart> {
     var maxY = widget._maxY;
     if (widget._maxY == widget._minY) {
       maxY += 1;
-      minY -= 1;
+      minY = max(minY - 1, 0);
     }
 
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(5, 10, 15, 0),
-      child: LineChart(
-        LineChartData(
-          lineBarsData: [
-            for (final chartLine in widget.chartLines)
-              LineChartBarData(
-                spots: chartLine.chartValues
-                    .map((v) => FlSpot(v.distance, v.value))
-                    .toList(),
-                color: chartLine.lineColor,
-                dotData: const FlDotData(show: false),
-                isCurved: true,
-                preventCurveOverShooting: true,
-              ),
-          ],
-          minY: minY,
-          maxY: maxY,
-          minX: 0,
-          extraLinesData: touchLine(_lastX),
-          lineTouchData: touchCallback(_onLongPress),
-          titlesData: FlTitlesData(
-            topTitles: const AxisTitles(),
-            rightTitles: const AxisTitles(),
-            bottomTitles: AxisTitles(
-              sideTitles: SideTitles(
-                showTitles: true,
-                interval: widget._xInterval,
-                getTitlesWidget: (value, _) => Text(
+    return LineChart(
+      LineChartData(
+        lineBarsData: [
+          for (final chartLine in widget.chartLines)
+            LineChartBarData(
+              spots: chartLine.chartValues
+                  .map((v) => FlSpot(v.distance, v.value))
+                  .toList(),
+              color: chartLine.lineColor,
+              dotData: const FlDotData(show: false),
+              isCurved: true,
+              preventCurveOverShooting: true,
+            ),
+        ],
+        minY: minY,
+        maxY: maxY,
+        minX: 0,
+        extraLinesData: touchLine(_lastX),
+        lineTouchData: touchCallback(_onLongPress),
+        titlesData: FlTitlesData(
+          topTitles: const AxisTitles(),
+          rightTitles: const AxisTitles(),
+          bottomTitles: AxisTitles(
+            sideTitles: SideTitles(
+              showTitles: true,
+              interval: widget._xInterval,
+              getTitlesWidget: fitInside(
+                (value, _) => Text(
                   _tickLabel(value),
                   style: TextStyle(color: widget.labelColor),
                 ),
-                reservedSize: 20,
               ),
+              reservedSize: horizontalAxisReservedSize(context),
             ),
-            leftTitles: AxisTitles(
-              sideTitles: SideTitles(
-                showTitles: true,
-                reservedSize: 40,
-                getTitlesWidget: hideOffIntervalMinMax(
-                  (value, _) => Text(
-                    value.round().toString(),
-                    style: TextStyle(color: widget.labelColor),
+          ),
+          leftTitles: AxisTitles(
+            sideTitles: SideTitles(
+              showTitles: true,
+              reservedSize: verticalAxisReservedSize(
+                context,
+                maxY.round().toString(),
+              ),
+              getTitlesWidget: fitInside(
+                hideFractional(
+                  hideOffIntervalMinMax(
+                    (value, _) => Text(
+                      value.round().toString(),
+                      style: TextStyle(color: widget.labelColor),
+                    ),
                   ),
                 ),
               ),
             ),
           ),
-          gridData: FlGridData(
-            getDrawingHorizontalLine: gridLineDrawer(),
-            verticalInterval: widget._xInterval,
-            getDrawingVerticalLine: gridLineDrawer(),
-          ),
-          borderData: FlBorderData(show: false),
         ),
+        gridData: FlGridData(
+          getDrawingHorizontalLine: gridLineDrawer(),
+          verticalInterval: widget._xInterval,
+          getDrawingVerticalLine: gridLineDrawer(),
+        ),
+        borderData: FlBorderData(show: false),
       ),
     );
   }

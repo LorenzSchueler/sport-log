@@ -41,6 +41,7 @@ class WeekChart extends DateTimePeriodChart {
         minY: minY,
         maxY: maxY,
         titlesData: titlesData(
+          context,
           getBottomTitles: (value, _) => Text(_tickLabel(value)),
         ),
         gridData: FlGridData(

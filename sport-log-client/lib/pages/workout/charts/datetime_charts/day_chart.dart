@@ -29,6 +29,7 @@ class DayChart extends DateTimePeriodChart {
         minY: minY,
         maxY: maxY,
         titlesData: titlesData(
+          context,
           getBottomTitles: (value, _) => Text("Session ${value.round()}"),
         ),
         gridData: FlGridData(

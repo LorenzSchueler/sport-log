@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:collection/collection.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:material_ui/material_ui.dart';
@@ -21,24 +23,13 @@ enum ChartValueFormatter {
   ms,
   msMilli;
 
-  double get width => switch (this) {
-    ChartValueFormatter.float => 40.0,
-    ChartValueFormatter.hms => 60.0,
-    ChartValueFormatter.ms => 40.0,
-    ChartValueFormatter.msMilli => 70.0,
-  };
-
-  Widget text(double value, TitleMeta meta) => switch (this) {
-    ChartValueFormatter.float => defaultGetTitle(value, meta),
-    ChartValueFormatter.hms => Text(
-      Duration(milliseconds: value.round()).formatHms,
-    ),
-    ChartValueFormatter.ms => Text(
-      Duration(milliseconds: value.round()).formatM99S,
-    ),
-    ChartValueFormatter.msMilli => Text(
-      Duration(milliseconds: value.round()).formatMsMill,
-    ),
+  String format(double value) => switch (this) {
+    ChartValueFormatter.float => value.round().toString(),
+    ChartValueFormatter.hms => Duration(milliseconds: value.round()).formatHms,
+    ChartValueFormatter.ms => Duration(milliseconds: value.round()).formatM99S,
+    ChartValueFormatter.msMilli => Duration(
+      milliseconds: value.round(),
+    ).formatMsMill,
   };
 }
 
@@ -124,11 +115,11 @@ abstract class DateTimePeriodChart extends StatelessWidget {
 
   double get maxY => _maxY == _minY ? _maxY + 1 : _maxY;
 
-  double get minY => _maxY == _minY ? _minY - 1 : _minY;
+  double get minY => _maxY == _minY ? max(_minY - 1, 0) : _minY;
 
-  FlTitlesData titlesData({
+  FlTitlesData titlesData(
+    BuildContext context, {
     required Widget Function(double, TitleMeta) getBottomTitles,
-    double? reservedSize,
   }) {
     return FlTitlesData(
       topTitles: const AxisTitles(),
@@ -137,15 +128,24 @@ abstract class DateTimePeriodChart extends StatelessWidget {
         sideTitles: SideTitles(
           showTitles: true,
           interval: 1,
-          getTitlesWidget: getBottomTitles,
-          reservedSize: reservedSize ?? 22,
+          getTitlesWidget: fitInside(getBottomTitles),
+          reservedSize: horizontalAxisReservedSize(context),
         ),
       ),
       leftTitles: AxisTitles(
         sideTitles: SideTitles(
           showTitles: true,
-          reservedSize: formatter.width,
-          getTitlesWidget: hideOffIntervalMinMax(formatter.text),
+          reservedSize: verticalAxisReservedSize(
+            context,
+            formatter.format(maxY),
+          ),
+          getTitlesWidget: fitInside(
+            hideFractional(
+              hideOffIntervalMinMax(
+                (value, _) => Text(formatter.format(value)),
+              ),
+            ),
+          ),
         ),
       ),
     );

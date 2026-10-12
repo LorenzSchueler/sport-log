@@ -35,40 +35,38 @@ class AllChart extends DateTimePeriodChart {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(0, 5, 15, 0),
-      child: LineChart(
-        LineChartData(
-          lineBarsData: [
-            LineChartBarData(
-              spots: chartValues
-                  .map(
-                    (v) => FlSpot(
-                      v.datetime.difference(_startDateTime).inDays + 1,
-                      v.value,
-                    ),
-                  )
-                  .toList(),
-              color: Theme.of(context).colorScheme.primary,
-              dotData: const FlDotData(show: false),
-            ),
-          ],
-          minY: minY,
-          maxY: maxY,
-          titlesData: titlesData(
-            getBottomTitles: (value, _) => Text(_tickLabel(value)),
+    return LineChart(
+      LineChartData(
+        lineBarsData: [
+          LineChartBarData(
+            spots: chartValues
+                .map(
+                  (v) => FlSpot(
+                    v.datetime.difference(_startDateTime).inDays + 1,
+                    v.value,
+                  ),
+                )
+                .toList(),
+            color: Theme.of(context).colorScheme.primary,
+            dotData: const FlDotData(show: false),
           ),
-          gridData: FlGridData(
-            getDrawingHorizontalLine: gridLineDrawer(),
-            verticalInterval: 1,
-            checkToShowVerticalLine: (value) {
-              final date = _startDateTime.add(Duration(days: value.round()));
-              return date.day == 1 && (_isAtMostOneYear || date.month == 1);
-            },
-            getDrawingVerticalLine: gridLineDrawer(),
-          ),
-          borderData: FlBorderData(show: false),
+        ],
+        minY: minY,
+        maxY: maxY,
+        titlesData: titlesData(
+          context,
+          getBottomTitles: (value, _) => Text(_tickLabel(value)),
         ),
+        gridData: FlGridData(
+          getDrawingHorizontalLine: gridLineDrawer(),
+          verticalInterval: 1,
+          checkToShowVerticalLine: (value) {
+            final date = _startDateTime.add(Duration(days: value.round()));
+            return date.day == 1 && (_isAtMostOneYear || date.month == 1);
+          },
+          getDrawingVerticalLine: gridLineDrawer(),
+        ),
+        borderData: FlBorderData(show: false),
       ),
     );
   }
