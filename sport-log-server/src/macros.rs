@@ -159,6 +159,7 @@ define_derive_deftly! {
             Self::table()
                 .filter(Self::user_id_column().eq(user_id))
                 .filter(Self::epoch_column().gt(epoch))
+                .order_by(Self::epoch_column())
                 .select(Self::Type::as_select())
                 .get_results(db)
                 .await
@@ -182,6 +183,7 @@ define_derive_deftly! {
             Self::table()
                 .filter(Self::user_id_column().eq(user_id).or(Self::user_id_column().is_null()))
                 .filter(Self::epoch_column().gt(epoch))
+                .order_by(Self::epoch_column())
                 .select(Self::Type::as_select())
                 .get_results(db)
                 .await
@@ -203,6 +205,7 @@ define_derive_deftly! {
 
             Self::table()
                 .filter(Self::epoch_column().gt(epoch))
+                .order_by(Self::epoch_column())
                 .select(Self::Type::as_select())
                 .get_results(db)
                 .await

@@ -992,6 +992,94 @@ async fn get_account_data() {
 }
 
 #[tokio::test]
+async fn get_account_data_in_epoch_order() {
+    // One table for each of the macros `GetByUserAndEpoch`, `GetByUserAndEpochOptional` and
+    // `GetByEpoch`, and one for the manual implementation of action providers.
+    let (mut router, db_pool, _) = init().await;
+
+    let (_, account_data) = account_data_request(&mut router, None).await;
+    let epoch_map = account_data.epoch_map;
+
+    let mut db = db_pool.get().await.unwrap();
+    let mut diary = TEST_DIARY.clone();
+    DiaryDb::create(&diary, &mut db).await.unwrap();
+    diary.deleted = true;
+    DiaryDb::update(&diary, &mut db).await.unwrap();
+    let new_diary = Diary {
+        id: DiaryId(rnd()),
+        ..TEST_DIARY.clone()
+    };
+    DiaryDb::create(&new_diary, &mut db).await.unwrap();
+    let mut movement = Movement {
+        id: MovementId(rnd()),
+        user_id: Some(TEST_USER.id),
+        name: format!("movement{}", rnd()),
+        description: None,
+        movement_dimension: MovementDimension::Reps,
+        cardio: false,
+        deleted: false,
+    };
+    MovementDb::create(&movement, &mut db).await.unwrap();
+    movement.deleted = true;
+    MovementDb::update(&movement, &mut db).await.unwrap();
+    let new_movement = Movement {
+        id: MovementId(rnd()),
+        deleted: false,
+        ..movement.clone()
+    };
+    MovementDb::create(&new_movement, &mut db).await.unwrap();
+    let mut platform = Platform {
+        id: PlatformId(rnd()),
+        name: format!("platform{}", rnd()),
+        ..TEST_PLATFORM.clone()
+    };
+    PlatformDb::create(&platform, &mut db).await.unwrap();
+    platform.deleted = true;
+    PlatformDb::update(&platform, &mut db).await.unwrap();
+    let new_platform = Platform {
+        id: PlatformId(rnd()),
+        deleted: false,
+        ..platform.clone()
+    };
+    PlatformDb::create(&new_platform, &mut db).await.unwrap();
+    let action_provider = ActionProvider {
+        id: ActionProviderId(rnd()),
+        name: format!("ap{}", rnd()),
+        ..TEST_AP.clone()
+    };
+    ActionProviderDb::create(&mut action_provider.clone(), &mut db)
+        .await
+        .unwrap();
+    diesel::delete(action_provider::table.find(action_provider.id))
+        .execute(&mut db)
+        .await
+        .unwrap();
+    let new_action_provider = ActionProvider {
+        id: ActionProviderId(rnd()),
+        ..action_provider.clone()
+    };
+    ActionProviderDb::create(&mut new_action_provider.clone(), &mut db)
+        .await
+        .unwrap();
+    drop(db);
+
+    let (_, account_data) = account_data_request(&mut router, Some(epoch_map)).await;
+
+    let ids: Vec<_> = account_data.diaries.iter().map(|d| d.id).collect();
+    assert_eq!(ids, [diary.id, new_diary.id]);
+    let ids: Vec<_> = account_data.movements.iter().map(|m| m.id).collect();
+    assert_eq!(ids, [movement.id, new_movement.id]);
+    let ids: Vec<_> = account_data.platforms.iter().map(|p| p.id).collect();
+    assert_eq!(ids, [platform.id, new_platform.id]);
+    let ids: Vec<_> = account_data
+        .action_providers
+        .iter()
+        .map(|ap| ap.id)
+        .collect();
+    assert_eq!(ids, [action_provider.id, new_action_provider.id]);
+}
+
+#[tokio::test]
 async fn epoch_from_create_and_update() {
     let (mut router, _, _) = init().await;
 

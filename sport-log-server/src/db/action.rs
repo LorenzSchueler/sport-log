@@ -64,6 +64,7 @@ impl GetByEpoch for ActionProviderDb {
     ) -> QueryResult<Vec<Self::Type>> {
         action_provider::table
             .filter(Self::epoch_column().gt(epoch))
+            .order_by(Self::epoch_column())
             .select(ActionProvider::as_select())
             .get_results(db)
             .await

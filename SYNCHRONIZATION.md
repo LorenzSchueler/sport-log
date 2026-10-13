@@ -30,6 +30,8 @@ Synchronization consists of two steps: **Down Sync** and **Up Sync**. Synchroniz
 - Clients store the last synchronized `epoch` for each table in a `epoch_map` settings variable.
 - During **Down Sync**, the client fetches all changes with `epoch` values greater than those stored in `epoch_map`.
   These changes are upserted into the client database, and `epoch_map` is updated with the highest `epoch` values for each table.
+- The changes of a table are sent in the order of their `epoch`, so that a deleted entry is deleted before an entry replacing it is inserted.
+  This relies on **Up Sync** pushing the updated (including soft deleted) entries of a table before its created ones, which gives the deletion the lower `epoch`.
 
 ### Up Sync
 - Clients only sync with one server. They track which entries exist on the server and which are newly created or updated using the `sync_status` field.
