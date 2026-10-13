@@ -39,7 +39,7 @@ Synchronization consists of two steps: **Down Sync** and **Up Sync**. Synchroniz
   Then, `sync_status` is reset to 0, and the `epoch` of the table is updated in `epoch_map` with the `epoch` value returned by the server.
 
 ### Epoch
-`epoch` is an integer which on every insert/ update to the server database gets set to `max(epoch) + 1`.
+`epoch` is an integer which on every insert/ update to the server database gets set to `max(epoch) + 1` of the entries downloaded together with the record: its user's rows and the global rows, or all rows for a global record or a table without user_id.
 Entries removed by a hard or cascaded delete are archived with a new `epoch` as well, so that clients receive these deletions.
 It serves as an abstract identifier for a point in time.
 

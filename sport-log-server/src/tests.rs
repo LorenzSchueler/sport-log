@@ -26,8 +26,9 @@ use rand::RngExt;
 use serde::de::DeserializeOwned;
 use sport_log_types::{
     ADMIN_USERNAME, AccountData, Action, ActionEvent, ActionEventId, ActionId, ActionProvider,
-    ActionProviderId, Diary, DiaryId, Epoch, EpochMap, EpochResponse, ID_HEADER, Platform,
-    PlatformCredential, PlatformCredentialId, PlatformId, User, UserId,
+    ActionProviderId, Diary, DiaryId, Epoch, EpochMap, EpochResponse, ID_HEADER, Movement,
+    MovementDimension, MovementId, Platform, PlatformCredential, PlatformCredentialId, PlatformId,
+    User, UserId,
     schema::{action_provider, platform},
     uri::{
         ACCOUNT_DATA, ADM_PLATFORM, AP_ACTION_PROVIDER, AP_PLATFORM, DIARY, USER, route_max_version,
@@ -1126,6 +1127,52 @@ async fn epoch_from_cascaded_delete_of_multiple_rows() {
         account_data.epoch_map.action_event.0,
         epoch_map.action_event.0 + 2
     );
+}
+
+#[tokio::test]
+async fn epoch_from_create_of_user_and_global_movements() {
+    for global_first in [true, false] {
+        let (mut router, db_pool, _) = init().await;
+
+        let (first_user_id, second_user_id) = if global_first {
+            (None, Some(TEST_USER.id))
+        } else {
+            (Some(TEST_USER.id), None)
+        };
+        let movement = |user_id| Movement {
+            id: MovementId(rnd()),
+            user_id,
+            name: format!("movement{}", rnd()),
+            description: None,
+            movement_dimension: MovementDimension::Reps,
+            cardio: false,
+            deleted: false,
+        };
+
+        // enough movements to raise their epochs above the user's and the global movements
+        let mut db = db_pool.get().await.unwrap();
+        let epoch = MovementDb::get_epoch_by_user_optional(TEST_USER.id, &mut db)
+            .await
+            .unwrap();
+        let movements: Vec<_> = (0..=epoch.0).map(|_| movement(first_user_id)).collect();
+        MovementDb::create_multiple(&movements, &mut db)
+            .await
+            .unwrap();
+        drop(db);
+
+        let (_, account_data) = account_data_request(&mut router, None).await;
+        let epoch_map = account_data.epoch_map;
+
+        let movement = movement(second_user_id);
+        MovementDb::create(&movement, &mut db_pool.get().await.unwrap())
+            .await
+            .unwrap();
+
+        let (_, account_data) = account_data_request(&mut router, Some(epoch_map)).await;
+
+        let ids: Vec<_> = account_data.movements.iter().map(|m| m.id).collect();
+        assert_eq!(ids, [movement.id]);
+    }
 }
 
 #[tokio::test]

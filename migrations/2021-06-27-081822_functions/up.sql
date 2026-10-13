@@ -1,17 +1,14 @@
--- max(epoch) + 1 of the table, scoped to the record's user_id if the table has one
+-- max(epoch) + 1 of the rows downloaded together with the record: its user's rows and the global rows, or all rows for a global record or a table without user_id
 create function next_epoch(table_schema name, table_name name, record jsonb)
     returns bigint as $$
     declare
         max_epoch bigint;
     begin
-        if not record ? 'user_id' then
+        if not record ? 'user_id' or record ->> 'user_id' is null then
             execute format('select max(epoch) + 1 from %I.%I', table_schema, table_name)
             into max_epoch;
-        elsif record ->> 'user_id' is null then
-            execute format('select max(epoch) + 1 from %I.%I where user_id is null', table_schema, table_name)
-            into max_epoch;
         else
-            execute format('select max(epoch) + 1 from %I.%I where user_id = $1', table_schema, table_name)
+            execute format('select max(epoch) + 1 from %I.%I where user_id = $1 or user_id is null', table_schema, table_name)
             using (record ->> 'user_id')::bigint
             into max_epoch;
         end if;
