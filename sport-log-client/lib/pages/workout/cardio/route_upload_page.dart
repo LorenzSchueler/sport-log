@@ -73,53 +73,55 @@ class _RouteUploadPageState extends State<RouteUploadPage> {
             ),
           ],
         ),
-        body: Column(
-          children: [
-            Expanded(
-              child: MapboxMapWrapper(
-                showFullscreenButton: false,
-                showMapStylesButton: true,
-                showSelectRouteButton: false,
-                showSetNorthButton: true,
-                showZoomButtons: false,
-                showCurrentLocationButton: false,
-                showCenterLocationButtonWhenEnabled: false,
-                showCenterLocationButtonAlways: false,
-                showAddLocationButton: false,
-                onMapCreated: _onMapCreated,
+        body: SafeArea(
+          child: Column(
+            children: [
+              Expanded(
+                child: MapboxMapWrapper(
+                  showFullscreenButton: false,
+                  showMapStylesButton: true,
+                  showSelectRouteButton: false,
+                  showSetNorthButton: true,
+                  showZoomButtons: false,
+                  showCurrentLocationButton: false,
+                  showCenterLocationButtonWhenEnabled: false,
+                  showCenterLocationButtonAlways: false,
+                  showAddLocationButton: false,
+                  onMapCreated: _onMapCreated,
+                ),
               ),
-            ),
-            Padding(
-              padding: Defaults.edgeInsets.normal,
-              child: Column(
-                children: [
-                  SizedBox(
-                    width: double.infinity,
-                    child: FilledButton(
-                      onPressed: _loadFile,
-                      child: const Text("Open GPX File"),
-                    ),
-                  ),
-                  Defaults.sizedBox.vertical.normal,
-                  RouteValueUnitDescriptionTable(route: _route),
-                  Defaults.sizedBox.vertical.normal,
-                  Form(
-                    key: _formKey,
-                    child: TextFormField(
-                      onChanged: (name) => setState(() => _route.name = name),
-                      initialValue: _route.name,
-                      validator: Validator.validateStringNotEmpty,
-                      autovalidateMode: AutovalidateMode.onUserInteraction,
-                      decoration: const InputDecoration(
-                        icon: Icon(AppIcons.route),
-                        labelText: "Name",
+              Padding(
+                padding: Defaults.edgeInsets.normal,
+                child: Column(
+                  children: [
+                    SizedBox(
+                      width: double.infinity,
+                      child: FilledButton(
+                        onPressed: _loadFile,
+                        child: const Text("Open GPX File"),
                       ),
                     ),
-                  ),
-                ],
+                    Defaults.sizedBox.vertical.normal,
+                    RouteValueUnitDescriptionTable(route: _route),
+                    Defaults.sizedBox.vertical.normal,
+                    Form(
+                      key: _formKey,
+                      child: TextFormField(
+                        onChanged: (name) => setState(() => _route.name = name),
+                        initialValue: _route.name,
+                        validator: Validator.validateStringNotEmpty,
+                        autovalidateMode: AutovalidateMode.onUserInteraction,
+                        decoration: const InputDecoration(
+                          icon: Icon(AppIcons.route),
+                          labelText: "Name",
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

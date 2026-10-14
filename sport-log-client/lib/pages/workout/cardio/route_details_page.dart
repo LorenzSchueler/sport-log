@@ -139,56 +139,59 @@ class _RouteDetailsPageState extends State<RouteDetailsPage>
       ),
       body: ProviderConsumer(
         create: (_) => BoolToggle.off(),
-        builder: (context, fullscreen, _) => Column(
-          children: [
-            Expanded(
-              child: _route.track != null && _route.track!.isNotEmpty
-                  ? MapboxMapWrapper(
-                      showFullscreenButton: true,
-                      showMapStylesButton: true,
-                      showSelectRouteButton: false,
-                      showSetNorthButton: true,
-                      showZoomButtons: false,
-                      showCurrentLocationButton: false,
-                      showCenterLocationButtonWhenEnabled: false,
-                      showCenterLocationButtonAlways: false,
-                      showAddLocationButton: false,
-                      onFullscreenToggle: fullscreen.setState,
-                      onMapCreated: _onMapCreated,
-                    )
-                  : const NoTrackPlaceholder(),
-            ),
-            if (fullscreen.isOff) ...[
-              Padding(
-                padding: Defaults.edgeInsets.normal,
-                child: RouteValueUnitDescriptionTable(route: _route),
+        builder: (context, fullscreen, _) => SafeArea(
+          bottom: fullscreen.isOff,
+          child: Column(
+            children: [
+              Expanded(
+                child: _route.track != null && _route.track!.isNotEmpty
+                    ? MapboxMapWrapper(
+                        showFullscreenButton: true,
+                        showMapStylesButton: true,
+                        showSelectRouteButton: false,
+                        showSetNorthButton: true,
+                        showZoomButtons: false,
+                        showCurrentLocationButton: false,
+                        showCenterLocationButtonWhenEnabled: false,
+                        showCenterLocationButtonAlways: false,
+                        showAddLocationButton: false,
+                        onFullscreenToggle: fullscreen.setState,
+                        onMapCreated: _onMapCreated,
+                      )
+                    : const NoTrackPlaceholder(),
               ),
-              if (_route.track != null) ...[
-                const Divider(height: 0),
-                ChartHeader(
-                  fields: [
-                    (
-                      _distance != null
-                          ? "${(_distance! / 1000).toStringAsFixed(3)} km"
-                          : "Distance",
-                      _distanceColor,
-                    ),
-                    (
-                      _elevation != null ? "$_elevation m" : "Elevation",
-                      _elevationColor,
-                    ),
-                  ],
+              if (fullscreen.isOff) ...[
+                Padding(
+                  padding: Defaults.edgeInsets.normal,
+                  child: RouteValueUnitDescriptionTable(route: _route),
                 ),
-                SizedBox(
-                  height: 250,
-                  child: DistanceChart(
-                    chartLines: [_elevationLine],
-                    touchCallback: _touchCallback,
+                if (_route.track != null) ...[
+                  const Divider(height: 0),
+                  ChartHeader(
+                    fields: [
+                      (
+                        _distance != null
+                            ? "${(_distance! / 1000).toStringAsFixed(3)} km"
+                            : "Distance",
+                        _distanceColor,
+                      ),
+                      (
+                        _elevation != null ? "$_elevation m" : "Elevation",
+                        _elevationColor,
+                      ),
+                    ],
                   ),
-                ),
+                  SizedBox(
+                    height: 250,
+                    child: DistanceChart(
+                      chartLines: [_elevationLine],
+                      touchCallback: _touchCallback,
+                    ),
+                  ),
+                ],
               ],
             ],
-          ],
+          ),
         ),
       ),
     );

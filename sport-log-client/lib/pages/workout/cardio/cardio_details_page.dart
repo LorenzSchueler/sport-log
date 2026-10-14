@@ -329,8 +329,8 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
               ),
             // TabBarView needs bounded height so different heights for tabs does not work
             if (fullscreen.isOff && _tabController.index == 0)
-              Padding(
-                padding: Defaults.edgeInsets.normal,
+              SafeArea(
+                minimum: Defaults.edgeInsets.normal,
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -350,172 +350,184 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
                 ),
               ),
             if (fullscreen.isOff && _tabController.index == 1)
-              Container(
-                height: 250,
-                padding: Defaults.edgeInsets.normal,
-                child: Builder(
-                  builder: (context) {
-                    // load when compare tab opened for first time
-                    if (_splits == null) {
-                      // delay until build finished because setState can not be called during build
-                      Future.delayed(Duration.zero, () => _computeSplits(1000));
-                    }
-                    return _splits == null
-                        ? const Center(child: CircularProgressIndicator())
-                        : _splits!.isEmpty
-                        ? const Center(
-                            child: Text(
-                              "No Splits available.",
-                              style: TextStyle(fontSize: 20),
-                            ),
-                          )
-                        : SingleChildScrollView(
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                SizedBox(
-                                  width: 100,
-                                  child: TextFormField(
-                                    initialValue: "1.000",
-                                    keyboardType: TextInputType.number,
-                                    validator: (distance) =>
-                                        distance == null || distance.isEmpty
-                                        ? null
-                                        : Validator.validateDoubleGtZero(
-                                            distance,
-                                          ),
-                                    autovalidateMode:
-                                        AutovalidateMode.onUserInteraction,
-                                    onChanged: (distance) {
-                                      if (distance.isNotEmpty &&
-                                          Validator.validateDoubleGtZero(
-                                                distance,
-                                              ) ==
-                                              null) {
-                                        final meters =
-                                            (double.parse(distance) * 1000)
-                                                .round();
-                                        _computeSplits(meters);
-                                      }
-                                    },
-                                    decoration: const InputDecoration(
-                                      labelText: "Distance (km)",
+              SafeArea(
+                minimum: Defaults.edgeInsets.normal,
+                child: SizedBox(
+                  height: 250,
+                  child: Builder(
+                    builder: (context) {
+                      // load when compare tab opened for first time
+                      if (_splits == null) {
+                        // delay until build finished because setState can not be called during build
+                        Future.delayed(
+                          Duration.zero,
+                          () => _computeSplits(1000),
+                        );
+                      }
+                      return _splits == null
+                          ? const Center(child: CircularProgressIndicator())
+                          : _splits!.isEmpty
+                          ? const Center(
+                              child: Text(
+                                "No Splits available.",
+                                style: TextStyle(fontSize: 20),
+                              ),
+                            )
+                          : SingleChildScrollView(
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  SizedBox(
+                                    width: 100,
+                                    child: TextFormField(
+                                      initialValue: "1.000",
+                                      keyboardType: TextInputType.number,
+                                      validator: (distance) =>
+                                          distance == null || distance.isEmpty
+                                          ? null
+                                          : Validator.validateDoubleGtZero(
+                                              distance,
+                                            ),
+                                      autovalidateMode:
+                                          AutovalidateMode.onUserInteraction,
+                                      onChanged: (distance) {
+                                        if (distance.isNotEmpty &&
+                                            Validator.validateDoubleGtZero(
+                                                  distance,
+                                                ) ==
+                                                null) {
+                                          final meters =
+                                              (double.parse(distance) * 1000)
+                                                  .round();
+                                          _computeSplits(meters);
+                                        }
+                                      },
+                                      decoration: const InputDecoration(
+                                        labelText: "Distance (km)",
+                                      ),
                                     ),
                                   ),
-                                ),
-                                _SplitsTable(splits: _splits!),
-                              ],
-                            ),
-                          );
-                  },
+                                  _SplitsTable(splits: _splits!),
+                                ],
+                              ),
+                            );
+                    },
+                  ),
                 ),
               ),
             if (fullscreen.isOff && _tabController.index == 2)
-              SizedBox(
-                height: 250,
-                child: _cardioSessionDescription.cardioSession.track != null
-                    ? Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          ChartHeader(
-                            fields: [
-                              (
-                                _time != null ? _time!.formatHms : "Time",
-                                _timeColor,
-                              ),
-                              (
-                                _speed != null
-                                    ? "${_speed?.toStringAsFixed(1)} km/h"
-                                    : "Speed",
-                                _speedColor,
-                              ),
-                              (
-                                _elevation != null
-                                    ? "$_elevation m"
-                                    : "Elevation",
-                                _elevationColor,
-                              ),
-                              (
-                                _heartRate != null
-                                    ? "$_heartRate bpm"
-                                    : "Heart Rate",
-                                _heartRateColor,
-                              ),
-                              (
-                                _cadence != null ? "$_cadence rpm" : "Cadence",
-                                _cadenceColor,
-                              ),
-                            ],
-                          ),
-                          Expanded(
-                            child: DurationChart(
-                              chartLines: [
-                                _speedLine,
-                                _elevationLine,
-                                _cadenceLine,
-                                _heartRateLine,
+              SafeArea(
+                minimum: const EdgeInsets.only(bottom: 10),
+                child: SizedBox(
+                  height: 250,
+                  child: _cardioSessionDescription.cardioSession.track != null
+                      ? Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            ChartHeader(
+                              fields: [
+                                (
+                                  _time != null ? _time!.formatHms : "Time",
+                                  _timeColor,
+                                ),
+                                (
+                                  _speed != null
+                                      ? "${_speed?.toStringAsFixed(1)} km/h"
+                                      : "Speed",
+                                  _speedColor,
+                                ),
+                                (
+                                  _elevation != null
+                                      ? "$_elevation m"
+                                      : "Elevation",
+                                  _elevationColor,
+                                ),
+                                (
+                                  _heartRate != null
+                                      ? "$_heartRate bpm"
+                                      : "Heart Rate",
+                                  _heartRateColor,
+                                ),
+                                (
+                                  _cadence != null
+                                      ? "$_cadence rpm"
+                                      : "Cadence",
+                                  _cadenceColor,
+                                ),
                               ],
-                              totalDuration: _totalDuration,
-                              touchCallback: _touchCallback,
                             ),
-                          ),
-                        ],
-                      )
-                    : const NoTrackPlaceholder(),
+                            Expanded(
+                              child: DurationChart(
+                                chartLines: [
+                                  _speedLine,
+                                  _elevationLine,
+                                  _cadenceLine,
+                                  _heartRateLine,
+                                ],
+                                totalDuration: _totalDuration,
+                                touchCallback: _touchCallback,
+                              ),
+                            ),
+                          ],
+                        )
+                      : const NoTrackPlaceholder(),
+                ),
               ),
             if (fullscreen.isOff && _tabController.index == 3)
-              Container(
-                height: 250,
-                padding: Defaults.edgeInsets.normal,
-                child: CustomScrollView(
-                  slivers: [
-                    SliverList.list(
-                      children: [
-                        _SimilarCardioSessionCard.current(
-                          session: _cardioSessionDescription.cardioSession,
-                        ),
-                        Defaults.sizedBox.vertical.normal,
-                      ],
-                    ),
-                    Builder(
-                      builder: (context) {
-                        // load when compare tab opened for first time
-                        if (_similarSessions == null) {
-                          _findSimilarSessions();
-                        }
-                        return _similarSessions == null
-                            ? const SliverToBoxAdapter(
-                                child: Center(
-                                  child: CircularProgressIndicator(),
-                                ),
-                              )
-                            : _similarSessions!.isEmpty
-                            ? const SliverToBoxAdapter(
-                                child: Center(
-                                  child: Text(
-                                    "No similar Cardio Sessions found.",
-                                    style: TextStyle(fontSize: 20),
+              SafeArea(
+                minimum: Defaults.edgeInsets.normal,
+                child: SizedBox(
+                  height: 250,
+                  child: CustomScrollView(
+                    slivers: [
+                      SliverList.list(
+                        children: [
+                          _SimilarCardioSessionCard.current(
+                            session: _cardioSessionDescription.cardioSession,
+                          ),
+                          Defaults.sizedBox.vertical.normal,
+                        ],
+                      ),
+                      Builder(
+                        builder: (context) {
+                          // load when compare tab opened for first time
+                          if (_similarSessions == null) {
+                            _findSimilarSessions();
+                          }
+                          return _similarSessions == null
+                              ? const SliverToBoxAdapter(
+                                  child: Center(
+                                    child: CircularProgressIndicator(),
                                   ),
-                                ),
-                              )
-                            : SliverList.separated(
-                                itemCount: _similarSessions!.length,
-                                itemBuilder: (_, index) {
-                                  final session = _similarSessions![index];
-                                  return _SimilarCardioSessionCard(
-                                    session: session,
-                                    sessionAnnotation:
-                                        _similarSessionAnnotations[session],
-                                    onShow: () => _showSession(session),
-                                    onHide: () => _hideSession(session),
-                                  );
-                                },
-                                separatorBuilder: (_, _) =>
-                                    Defaults.sizedBox.vertical.normal,
-                              );
-                      },
-                    ),
-                  ],
+                                )
+                              : _similarSessions!.isEmpty
+                              ? const SliverToBoxAdapter(
+                                  child: Center(
+                                    child: Text(
+                                      "No similar Cardio Sessions found.",
+                                      style: TextStyle(fontSize: 20),
+                                    ),
+                                  ),
+                                )
+                              : SliverList.separated(
+                                  itemCount: _similarSessions!.length,
+                                  itemBuilder: (_, index) {
+                                    final session = _similarSessions![index];
+                                    return _SimilarCardioSessionCard(
+                                      session: session,
+                                      sessionAnnotation:
+                                          _similarSessionAnnotations[session],
+                                      onShow: () => _showSession(session),
+                                      onHide: () => _hideSession(session),
+                                    );
+                                  },
+                                  separatorBuilder: (_, _) =>
+                                      Defaults.sizedBox.vertical.normal,
+                                );
+                        },
+                      ),
+                    ],
+                  ),
                 ),
               ),
           ],

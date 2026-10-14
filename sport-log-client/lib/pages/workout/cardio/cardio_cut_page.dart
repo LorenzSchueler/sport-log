@@ -139,95 +139,97 @@ class _CardioCutPageState extends State<CardioCutPage> {
     return DiscardWarningOnPop(
       child: Scaffold(
         appBar: AppBar(title: const Text("Cut Cardio Session")),
-        body: Column(
-          children: [
-            if (_cardioSessionDescription.cardioSession.track != null)
-              Expanded(
-                child: MapboxMapWrapper(
-                  showFullscreenButton: false,
-                  showMapStylesButton: true,
-                  showSelectRouteButton: false,
-                  showZoomButtons: false,
-                  showSetNorthButton: true,
-                  showCurrentLocationButton: false,
-                  showCenterLocationButtonWhenEnabled: false,
-                  showCenterLocationButtonAlways: false,
-                  showAddLocationButton: false,
-                  onMapCreated: _onMapCreated,
+        body: SafeArea(
+          child: Column(
+            children: [
+              if (_cardioSessionDescription.cardioSession.track != null)
+                Expanded(
+                  child: MapboxMapWrapper(
+                    showFullscreenButton: false,
+                    showMapStylesButton: true,
+                    showSelectRouteButton: false,
+                    showZoomButtons: false,
+                    showSetNorthButton: true,
+                    showCurrentLocationButton: false,
+                    showCenterLocationButtonWhenEnabled: false,
+                    showCenterLocationButtonAlways: false,
+                    showAddLocationButton: false,
+                    onMapCreated: _onMapCreated,
+                  ),
+                ),
+              Padding(
+                padding: Defaults.edgeInsets.normal,
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        EditTile(
+                          leading: null,
+                          caption: "Start",
+                          shrinkWidth: true,
+                          onTap: () async {
+                            final duration = await showScrollableDurationPicker(
+                              context: context,
+                              initialDuration: _cutStartDuration,
+                            );
+                            if (context.mounted && duration != null) {
+                              setState(() => _cutStartDuration = duration);
+                              await _updateCutMarkerAndTrack();
+                            }
+                          },
+                          child: Text(_cutStartDuration.formatHms),
+                        ),
+                        EditTile(
+                          leading: null,
+                          caption: "End",
+                          shrinkWidth: true,
+                          onTap: () async {
+                            final duration = await showScrollableDurationPicker(
+                              context: context,
+                              initialDuration: _cutEndDuration,
+                            );
+                            if (context.mounted && duration != null) {
+                              setState(() => _cutEndDuration = duration);
+                              await _updateCutMarkerAndTrack();
+                            }
+                          },
+                          child: Text(_cutEndDuration.formatHms),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: FilledButton.icon(
+                            icon: const Icon(AppIcons.close),
+                            label: const Text("Cancel"),
+                            onPressed: () => Navigator.of(context).pop(),
+                            style: FilledButton.styleFrom(
+                              backgroundColor: Theme.of(context)
+                                  .colorScheme
+                                  .error,
+                            ),
+                          ),
+                        ),
+                        Defaults.sizedBox.horizontal.normal,
+                        Expanded(
+                          child: FilledButton.icon(
+                            icon: const Icon(AppIcons.cut),
+                            label: const Text("Cut"),
+                            onPressed: _cutCardioSession,
+                            style: FilledButton.styleFrom(
+                              backgroundColor: AppColors.of(context).success,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
-            Padding(
-              padding: Defaults.edgeInsets.normal,
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      EditTile(
-                        leading: null,
-                        caption: "Start",
-                        shrinkWidth: true,
-                        onTap: () async {
-                          final duration = await showScrollableDurationPicker(
-                            context: context,
-                            initialDuration: _cutStartDuration,
-                          );
-                          if (context.mounted && duration != null) {
-                            setState(() => _cutStartDuration = duration);
-                            await _updateCutMarkerAndTrack();
-                          }
-                        },
-                        child: Text(_cutStartDuration.formatHms),
-                      ),
-                      EditTile(
-                        leading: null,
-                        caption: "End",
-                        shrinkWidth: true,
-                        onTap: () async {
-                          final duration = await showScrollableDurationPicker(
-                            context: context,
-                            initialDuration: _cutEndDuration,
-                          );
-                          if (context.mounted && duration != null) {
-                            setState(() => _cutEndDuration = duration);
-                            await _updateCutMarkerAndTrack();
-                          }
-                        },
-                        child: Text(_cutEndDuration.formatHms),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: FilledButton.icon(
-                          icon: const Icon(AppIcons.close),
-                          label: const Text("Cancel"),
-                          onPressed: () => Navigator.of(context).pop(),
-                          style: FilledButton.styleFrom(
-                            backgroundColor: Theme.of(context)
-                                .colorScheme
-                                .error,
-                          ),
-                        ),
-                      ),
-                      Defaults.sizedBox.horizontal.normal,
-                      Expanded(
-                        child: FilledButton.icon(
-                          icon: const Icon(AppIcons.cut),
-                          label: const Text("Cut"),
-                          onPressed: _cutCardioSession,
-                          style: FilledButton.styleFrom(
-                            backgroundColor: AppColors.of(context).success,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
