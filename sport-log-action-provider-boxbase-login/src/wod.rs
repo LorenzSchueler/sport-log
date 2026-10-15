@@ -1,18 +1,22 @@
 //! Client for the GentleGiants wod website.
 
-use std::collections::HashMap;
+use std::{collections::HashMap, fs};
 
 use chrono::NaiveDate;
 use reqwest::{
     Client, StatusCode,
-    header::{LOCATION, ORIGIN},
+    header::{COOKIE, LOCATION, ORIGIN},
     redirect::Policy,
 };
 use serde::Deserialize;
+use tracing::warn;
 
 use crate::{Error, Result};
 
 const URL: &str = "https://gentle-giants.at";
+/// Stores the session cookie since the website rejects more than ten logins per IP address
+/// within 24 hours.
+const COOKIE_FILE: &str = "wod-cookie.txt";
 const USER_AGENT: &str = "Mozilla/5.0 (X11; Linux x86_64; rv:130.0) Gecko/20100101 Firefox/130.0";
 
 #[derive(Deserialize, Debug)]
@@ -53,41 +57,52 @@ struct WodLine {
 /// description.
 ///
 /// The class name is empty for the regular group class, otherwise the name of the special class.
+///
+/// Logs in only if the cookie in [`COOKIE_FILE`] is missing or no longer valid.
 pub async fn fetch_wod(
     username: &str,
     password: &str,
     date: NaiveDate,
 ) -> Result<HashMap<String, String>> {
     let client = Client::builder()
-        .cookie_store(true)
         .redirect(Policy::none())
         .user_agent(USER_AGENT)
         .build()?;
+    let data_url = format!("{URL}/wod/data.php");
 
-    let response = client
-        .post(format!("{URL}/wod/login.php"))
-        .header(ORIGIN, URL)
-        .form(&[("user", username), ("password", password)])
-        .send()
-        .await?;
-    let location = response
-        .headers()
-        .get(LOCATION)
-        .and_then(|location| location.to_str().ok());
-    if response.status() != StatusCode::SEE_OTHER || location != Some("/wod/") {
-        return Err(Error::UnexpectedResponse(format!(
-            "wod login responded with status {} and location {location:?}",
-            response.status()
-        )));
+    let mut cookie = fs::read_to_string(COOKIE_FILE).unwrap_or_default();
+    let mut response = client.get(&data_url).header(COOKIE, &cookie).send().await?;
+    if response.status() == StatusCode::UNAUTHORIZED {
+        let login_response = client
+            .post(format!("{URL}/wod/login.php"))
+            .header(ORIGIN, URL)
+            .form(&[("user", username), ("password", password)])
+            .send()
+            .await?;
+        let location = login_response
+            .headers()
+            .get(LOCATION)
+            .and_then(|location| location.to_str().ok());
+        if login_response.status() != StatusCode::SEE_OTHER || location != Some("/wod/") {
+            return Err(Error::UnexpectedResponse(format!(
+                "wod login responded with status {} and location {location:?}",
+                login_response.status()
+            )));
+        }
+
+        cookie = login_response
+            .cookies()
+            .map(|cookie| format!("{}={}", cookie.name(), cookie.value()))
+            .collect::<Vec<_>>()
+            .join("; ");
+        if let Err(error) = fs::write(COOKIE_FILE, &cookie) {
+            warn!("failed to write {COOKIE_FILE}: {error}");
+        }
+
+        response = client.get(&data_url).header(COOKIE, &cookie).send().await?;
     }
 
-    let wod: WodResponse = client
-        .get(format!("{URL}/wod/data.php"))
-        .send()
-        .await?
-        .error_for_status()?
-        .json()
-        .await?;
+    let wod: WodResponse = response.error_for_status()?.json().await?;
 
     Ok(wod
         .week

@@ -4,6 +4,7 @@
 .idea/
 
 /sport-log-action-provider-boxbase-login/sport-log-action-provider-boxbase-login.toml
+/sport-log-action-provider-boxbase-login/wod-cookie.txt
 /sport-log-scheduler/sport-log-scheduler.toml
 /sport-log-server/sport-log-server.toml
 /sport-log-client/sport-log-client.yaml
