@@ -26,12 +26,13 @@ use rand::RngExt;
 use serde::de::DeserializeOwned;
 use sport_log_types::{
     ADMIN_USERNAME, AccountData, Action, ActionEvent, ActionEventId, ActionId, ActionProvider,
-    ActionProviderId, Diary, DiaryId, Epoch, EpochMap, EpochResponse, ID_HEADER, Movement,
-    MovementDimension, MovementId, Platform, PlatformCredential, PlatformCredentialId, PlatformId,
-    User, UserId,
-    schema::{action_provider, platform},
+    ActionProviderId, CardioSession, CardioSessionId, CardioType, Diary, DiaryId, Epoch, EpochMap,
+    EpochResponse, ID_HEADER, Movement, MovementDimension, MovementId, Platform,
+    PlatformCredential, PlatformCredentialId, PlatformId, Route, RouteId, User, UserId,
+    schema::{action_provider, cardio_session, platform},
     uri::{
-        ACCOUNT_DATA, ADM_PLATFORM, AP_ACTION_PROVIDER, AP_PLATFORM, DIARY, USER, route_max_version,
+        ACCOUNT_DATA, ADM_PLATFORM, AP_ACTION_PROVIDER, AP_PLATFORM, CARDIO_SESSION, DIARY, USER,
+        route_max_version,
     },
 };
 use tower::Service;
@@ -935,6 +936,106 @@ async fn foreign_update() {
     .await;
 
     assert_eq!(response.status(), StatusCode::FORBIDDEN);
+}
+
+#[tokio::test]
+async fn cardio_session_referencing_missing_route() {
+    // e.g. the route was deleted by one device and synced to the server while another device
+    // created a new cardio session with it
+    for (route_created, route_deleted, session_exists, route_kept) in [
+        // new session with a live route
+        (true, false, false, true),
+        // new session with a route deleted on the server
+        (true, true, false, false),
+        // changed session with a route deleted on the server
+        (true, true, true, false),
+        // new session with a route deleted before its first sync, so it never reached the server
+        (false, false, false, false),
+    ] {
+        let (mut router, db_pool, _) = init().await;
+
+        let mut db = db_pool.get().await.unwrap();
+        let movement = Movement {
+            id: MovementId(rnd()),
+            user_id: Some(TEST_USER.id),
+            name: format!("movement{}", rnd()),
+            description: None,
+            movement_dimension: MovementDimension::Distance,
+            cardio: true,
+            deleted: false,
+        };
+        MovementDb::create(&movement, &mut db).await.unwrap();
+        let mut route = Route {
+            id: RouteId(rnd()),
+            user_id: TEST_USER.id,
+            name: format!("route{}", rnd()),
+            distance: None,
+            ascent: None,
+            descent: None,
+            track: None,
+            marked_positions: None,
+            deleted: false,
+        };
+        if route_created {
+            RouteDb::create(&route, &mut db).await.unwrap();
+        }
+        if route_deleted {
+            route.deleted = true;
+            RouteDb::update(&route, &mut db).await.unwrap();
+        }
+        let mut cardio_session = CardioSession {
+            id: CardioSessionId(rnd()),
+            user_id: TEST_USER.id,
+            movement_id: movement.id,
+            cardio_type: CardioType::Training,
+            datetime: Utc::now(),
+            distance: None,
+            ascent: None,
+            descent: None,
+            time: None,
+            calories: None,
+            track: None,
+            avg_cadence: None,
+            cadence: None,
+            avg_heart_rate: None,
+            heart_rate: None,
+            route_id: None,
+            comments: None,
+            deleted: false,
+        };
+        if session_exists {
+            CardioSessionDb::create(&cardio_session, &mut db)
+                .await
+                .unwrap();
+        }
+        drop(db);
+
+        cardio_session.route_id = Some(route.id);
+        let uri = route_max_version("", CARDIO_SESSION, None);
+        let header = auth_header(&TEST_USER.username, &TEST_USER.password);
+        let response = request(
+            &mut router,
+            if session_exists {
+                Request::put(uri)
+            } else {
+                Request::post(uri)
+            }
+            .header(header.0, header.1)
+            .header(CONTENT_TYPE, APPLICATION_JSON.as_ref())
+            .body(serde_json::to_string(&cardio_session).unwrap().into())
+            .unwrap(),
+        )
+        .await;
+
+        assert_eq!(response.status(), StatusCode::OK);
+        let route_id: Option<RouteId> = cardio_session::table
+            .find(cardio_session.id)
+            .select(cardio_session::route_id)
+            .get_result(&mut db_pool.get().await.unwrap())
+            .await
+            .unwrap();
+        assert_eq!(route_id, route_kept.then_some(route.id));
+    }
 }
 
 #[tokio::test]

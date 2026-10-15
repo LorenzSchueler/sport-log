@@ -75,6 +75,21 @@ create index cardio_session__user_id__epoch__idx
 create trigger set_epoch before insert or update on cardio_session
     for each row execute function set_epoch();
 
+-- before insert or update: a session referencing a deleted or never created route gets no route,
+-- like the sessions referencing a route when it is deleted
+create function clear_missing_route()
+    returns trigger as $$
+    begin
+        if not exists (select 1 from only route where id = new.route_id) then
+            new.route_id := null;
+        end if;
+        return new;
+    end;
+    $$ language plpgsql;
+
+create trigger clear_missing_route before insert or update on cardio_session
+    for each row when (new.route_id is not null) execute function clear_missing_route();
+
 create table cardio_session_archive (
     primary key (id),
     foreign key (user_id) references "user" on delete cascade,

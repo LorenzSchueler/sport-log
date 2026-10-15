@@ -77,12 +77,8 @@ abstract class DataProvider<T> extends ChangeNotifier {
     }
   }
 
-  static Future<void> _handleDbError(DbError error) async {
-    _logger.e(
-      "db error",
-      error: error,
-      caughtBy: "DataProvider._handlerDbError",
-    );
+  static Future<void> handleDbError(DbError error) async {
+    _logger.e("db error", error: error, caughtBy: "DataProvider.handleDbError");
     await showMessageDialog(
       context: App.globalContext,
       title: "An Error Occurred",
@@ -262,7 +258,7 @@ abstract class EntityDataProvider<T extends AtomicEntity>
       await _pushUpdatedToServer(onNoInternet) &&
       await _pushCreatedToServer(onNoInternet);
 
-  Future<bool> _upsertMultiple(
+  Future<bool> upsertMultiple(
     List<T> objects, {
     required bool synchronized,
     bool notify = true,
@@ -275,7 +271,7 @@ abstract class EntityDataProvider<T extends AtomicEntity>
       synchronized: synchronized,
     );
     if (result.isErr) {
-      await DataProvider._handleDbError(result.err);
+      await DataProvider.handleDbError(result.err);
     }
     if (result.isOk && notify && !_disposed) {
       notifyListeners();
@@ -315,7 +311,7 @@ abstract class EntityDataProvider<T extends AtomicEntity>
       }
       // order matters => no parallel execution possible
       for (final dp in EntityDataProvider.all) {
-        if (!await dp._upsertMultiple(
+        if (!await dp.upsertMultiple(
           dp.getFromAccountData(accountData),
           synchronized: true,
         )) {

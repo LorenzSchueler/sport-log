@@ -14,6 +14,7 @@ All tables that can be modified by users have the fields `sync_status` (an `inte
 - Deletions are implemented as soft deletes, meaning they are treated as updates rather than deletions.
 - **Exception:** When a user account is deleted, all data associated with that user is hard-deleted to ensure that users can permanently erase their data from the server.
 - Soft and hard deletes are cascading, with a few exceptions where references are set to `NULL`.
+  The server sets such a reference to `NULL` as well if the entry is pushed after the referenced entry was deleted, like a cardio session whose route was deleted on another device.
 - On the server, each modifiable table has an associated archive table that inherits all fields from the original table.
   When an entry is soft-deleted, it is moved to the archive table via triggers.
   This effectively hard-deletes the entry from the original table, causing cascading deletes.

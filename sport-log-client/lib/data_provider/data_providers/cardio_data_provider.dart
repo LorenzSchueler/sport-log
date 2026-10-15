@@ -33,6 +33,43 @@ class RouteDataProvider extends EntityDataProvider<Route> {
     epochMap.route = epochResult.epoch;
   }
 
+  /// Also removes the route from the cardio sessions referencing it.
+  @override
+  Future<DbResult> deleteSingle(Route object, {bool notify = true}) async {
+    final result = await CardioSessionDataProvider().clearRoutes([
+      object,
+    ], notify: notify);
+    if (result.isErr) {
+      return result;
+    }
+    return super.deleteSingle(object, notify: notify);
+  }
+
+  /// Also removes the deleted routes from the cardio sessions referencing them.
+  @override
+  Future<bool> upsertMultiple(
+    List<Route> objects, {
+    required bool synchronized,
+    bool notify = true,
+  }) async {
+    final deleted = objects.where((route) => route.deleted).toList();
+    if (deleted.isNotEmpty) {
+      final result = await CardioSessionDataProvider().clearRoutes(
+        deleted,
+        notify: notify,
+      );
+      if (result.isErr) {
+        await DataProvider.handleDbError(result.err);
+        return false;
+      }
+    }
+    return super.upsertMultiple(
+      objects,
+      synchronized: synchronized,
+      notify: notify,
+    );
+  }
+
   Future<List<Route>> getByName(String? name) async {
     return (await table.getNonDeleted()).fuzzySort(
       query: name,
@@ -61,6 +98,15 @@ class CardioSessionDataProvider extends EntityDataProvider<CardioSession> {
   @override
   void setEpoch(EpochMap epochMap, EpochResult epochResult) {
     epochMap.cardioSession = epochResult.epoch;
+  }
+
+  /// Sets the route of the sessions referencing one of [routes] to null.
+  Future<DbResult> clearRoutes(List<Route> routes, {bool notify = true}) async {
+    final result = await table.clearRoutes(routes);
+    if (result.isOk && notify) {
+      notifyListeners();
+    }
+    return result;
   }
 
   Future<List<CardioSession>> getSimilarCardioSessions(

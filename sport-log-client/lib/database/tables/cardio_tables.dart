@@ -3,6 +3,7 @@ import 'package:sport_log/database/database.dart';
 import 'package:sport_log/database/table.dart';
 import 'package:sport_log/database/table_accessor.dart';
 import 'package:sport_log/database/tables/movement_table.dart';
+import 'package:sport_log/helpers/result.dart';
 import 'package:sport_log/models/cardio/all.dart';
 import 'package:sport_log/models/movement/movement.dart';
 
@@ -109,6 +110,25 @@ class CardioSessionTable extends TableAccessor<CardioSession> {
     uniqueColumns: [],
   );
 
+  /// Sets the route of the sessions referencing one of [routes] to null, like the server when they are deleted.
+  Future<DbResult> clearRoutes(List<Route> routes) =>
+      DbResultExt.catchError(() async {
+        final batch = database.batch();
+        for (final route in routes) {
+          batch.update(
+            tableName,
+            {Columns.routeId: null},
+            where: TableAccessor.combineFilter([
+              notDeleted,
+              '${Columns.routeId} = ?',
+            ]),
+            whereArgs: [route.id.toInt()],
+          );
+        }
+        await batch.commit(noResult: true);
+        return Ok(null);
+      });
+
   Future<List<CardioSession>> getByMovementWithTrackOrderDatetime({
     Movement? movement,
   }) async {
@@ -177,9 +197,9 @@ class CardioSessionDescriptionTable {
         ${_routeTable.table.allColumns},
         ${_movementTable.table.allColumns}
       FROM ${Tables.cardioSession}
-      LEFT JOIN ${Tables.route} 
+      LEFT JOIN ${Tables.route}
       ON ${Tables.route}.${Columns.id} = ${Tables.cardioSession}.${Columns.routeId}
-      JOIN ${Tables.movement} 
+      JOIN ${Tables.movement}
       ON ${Tables.movement}.${Columns.id} = ${Tables.cardioSession}.${Columns.movementId}
       WHERE ${TableAccessor.combineFilter([
       TableAccessor.notDeletedOfTable(Tables.movement),
