@@ -135,7 +135,7 @@ class SettingsPage extends StatelessWidget {
     final approved = await showApproveDialog(
       context: context,
       title: "Warning",
-      text: "Conflicting entries will get lost.",
+      text: "All local changes that are not synchronized yet will be lost.",
     );
     if (approved) {
       final result = await Account.newInitSync();
