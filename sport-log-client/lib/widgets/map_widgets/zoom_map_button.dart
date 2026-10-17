@@ -28,12 +28,24 @@ class ZoomMapButton extends StatelessWidget {
     }
   }
 
+  Future<void> _zoomMapToMinPathZoom() async {
+    const minPathZoom = 13.0;
+    final zoom = await mapController.zoom;
+    if (zoom != null &&
+        (zoomDirection.isZoomIn ? zoom < minPathZoom : zoom > minPathZoom)) {
+      await mapController.animateZoom(minPathZoom);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return FloatingActionButton.small(
-      heroTag: null,
-      onPressed: _zoomMap,
-      child: Icon(zoomDirection.isZoomIn ? AppIcons.add : AppIcons.remove),
+    return GestureDetector(
+      onLongPress: _zoomMapToMinPathZoom,
+      child: FloatingActionButton.small(
+        heroTag: null,
+        onPressed: _zoomMap,
+        child: Icon(zoomDirection.isZoomIn ? AppIcons.add : AppIcons.remove),
+      ),
     );
   }
 }
