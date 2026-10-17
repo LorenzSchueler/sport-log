@@ -232,48 +232,57 @@ class RegionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        SizedBox(
-          height: 150,
-          child: StaticMapboxMap(onMapCreated: _onMapCreated),
-        ),
-        Positioned(
-          top: 10,
-          left: 10,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                DateTime.parse(region.metadata["datetime"]! as String)
-                    .humanDate,
-                style: Theme.of(context).textTheme.bodyLarge!
-                    .copyWith(color: Theme.of(context).colorScheme.surface),
-              ),
-              Text(
-                "${region.tileRegion.completedResourceCount} Tiles / ${(region.tileRegion.completedResourceSize / 1000000).round()} MB",
-                style: Theme.of(context).textTheme.bodyMedium!
-                    .copyWith(color: Theme.of(context).colorScheme.surface),
-              ),
-              Text(
-                "Zoom ${region.metadata["minZoom"]} - ${region.metadata["maxZoom"]}",
-                style: Theme.of(context).textTheme.bodyMedium!
-                    .copyWith(color: Theme.of(context).colorScheme.surface),
-              ),
-            ],
+    final datetime = region.metadata["datetime"]! as String;
+    final minZoom = region.metadata["minZoom"];
+    final maxZoom = region.metadata["maxZoom"];
+    final mb = (region.tileRegion.completedResourceSize / 1_000_000).round();
+    final tiles = region.tileRegion.completedResourceCount;
+
+    return Card(
+      margin: EdgeInsets.zero,
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        children: [
+          Padding(
+            padding: Defaults.edgeInsets.normal,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  DateTime.parse(datetime).humanDate,
+                  style: Theme.of(context).textTheme.bodyLarge,
+                ),
+                IconButton(
+                  icon: const Icon(AppIcons.delete),
+                  visualDensity: VisualDensity.compact,
+                  onPressed: () =>
+                      mapDownloadUtils.deleteRegion(region.tileRegion),
+                ),
+              ],
+            ),
           ),
-        ),
-        Positioned(
-          top: 10,
-          right: 10,
-          child: FloatingActionButton.small(
-            heroTag: null,
-            child: const Icon(AppIcons.delete),
-            onPressed: () => mapDownloadUtils.deleteRegion(region.tileRegion),
+          SizedBox(
+            height: 150,
+            child: StaticMapboxMap(onMapCreated: _onMapCreated),
           ),
-        ),
-      ],
+          Padding(
+            padding: Defaults.edgeInsets.normal,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "Zoom $minZoom - $maxZoom",
+                  style: Theme.of(context).textTheme.bodyLarge,
+                ),
+                Text(
+                  "$mb MB / $tiles Tiles",
+                  style: Theme.of(context).textTheme.bodyLarge,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
