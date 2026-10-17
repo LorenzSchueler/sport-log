@@ -2470,6 +2470,7 @@ dependencies = [
  "hyper",
  "mime",
  "rand 0.10.1",
+ "rstest",
  "serde",
  "serde_json",
  "sport-log-derive",
