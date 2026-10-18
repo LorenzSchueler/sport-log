@@ -258,33 +258,35 @@ abstract class TableAccessor<T extends AtomicEntity> {
     return result.isEmpty ? null : serde.fromDbRecord(result.first);
   }
 
-  static final synchronized = {
-    Columns.syncStatus: SyncStatus.synchronized.index,
-  };
-
-  Future<void> setSynchronized(Int64 id) async {
-    await database.update(
-      tableName,
-      synchronized,
-      where: '${Columns.id} = ?',
-      whereArgs: [id.toInt()],
-    );
-  }
-
-  Future<void> setAllUpdatedSynchronized() async {
-    await database.update(
-      tableName,
-      synchronized,
-      where: '${Columns.syncStatus} = ${SyncStatus.updated.index}',
-    );
-  }
-
-  Future<void> setAllCreatedSynchronized() async {
-    await database.update(
-      tableName,
-      synchronized,
-      where: '${Columns.syncStatus} = ${SyncStatus.created.index}',
-    );
+  /// Sets the pushed [objects] synchronized, or updated if they changed since they were read,
+  /// because then the server has an older version of them.
+  Future<void> setSynchronizedIfUnchanged(List<T> objects) async {
+    await database.transaction((transaction) async {
+      for (final object in objects) {
+        final rawRecord = (await transaction.query(
+          tableName,
+          where: '${Columns.id} = ? and ${Columns.syncStatus} != ?',
+          whereArgs: [object.id.toInt(), SyncStatus.synchronized.index],
+        )).firstOrNull;
+        if (rawRecord == null) {
+          continue;
+        }
+        // compared as db records, since the models have no deep equality
+        // and the row also holds the sync status
+        final unchanged = const DeepCollectionEquality().equals(
+          serde.toDbRecord(serde.fromDbRecord(rawRecord)),
+          serde.toDbRecord(object),
+        );
+        final newSyncStatus =
+            (unchanged ? SyncStatus.synchronized : SyncStatus.updated).index;
+        await transaction.update(
+          tableName,
+          {Columns.syncStatus: newSyncStatus},
+          where: '${Columns.id} = ?',
+          whereArgs: [object.id.toInt()],
+        );
+      }
+    });
   }
 
   Future<void> setAllCreated() async {
@@ -313,7 +315,7 @@ abstract class TableAccessor<T extends AtomicEntity> {
       '''
       INSERT INTO $tableName (${columns.join(', ')})
       VALUES ($placeholders)
-      ON CONFLICT(${Columns.id}) 
+      ON CONFLICT(${Columns.id})
       DO UPDATE SET $updateSet
       RETURNING ${Columns.id}
       ''',

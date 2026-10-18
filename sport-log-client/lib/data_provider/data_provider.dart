@@ -194,10 +194,7 @@ abstract class EntityDataProvider<T extends AtomicEntity>
           } else {
             final epoch = result.ok;
             await Settings.instance.setEpoch(setEpoch, epoch);
-            // per record and not for the whole table because the conflict
-            // dialog and the requests above give concurrent changes plenty of
-            // time to be written, and those must stay unsynchronized
-            await table.setSynchronized(record.id);
+            await table.setSynchronizedIfUnchanged([record]);
           }
         }
         return true;
@@ -211,7 +208,6 @@ abstract class EntityDataProvider<T extends AtomicEntity>
     Future<ApiResult<EpochResult?>> Function(List<T>) fnMultiple,
     Future<ApiResult<EpochResult?>> Function(T) fnSingle,
     List<T> records,
-    Future<void> Function() setSynchronized,
     VoidCallback? onNoInternet,
   ) async {
     final result = await fnMultiple(records);
@@ -227,7 +223,7 @@ abstract class EntityDataProvider<T extends AtomicEntity>
     } else {
       final epoch = result.ok;
       await Settings.instance.setEpoch(setEpoch, epoch);
-      await setSynchronized();
+      await table.setSynchronizedIfUnchanged(records);
       return true;
     }
   }
@@ -238,7 +234,6 @@ abstract class EntityDataProvider<T extends AtomicEntity>
       api.putMultiple,
       api.putSingle,
       recordsToUpdate,
-      table.setAllUpdatedSynchronized,
       onNoInternet,
     );
   }
@@ -249,7 +244,6 @@ abstract class EntityDataProvider<T extends AtomicEntity>
       api.postMultiple,
       api.postSingle,
       recordsToCreate,
-      table.setAllCreatedSynchronized,
       onNoInternet,
     );
   }

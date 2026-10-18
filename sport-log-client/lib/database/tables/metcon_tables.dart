@@ -100,15 +100,6 @@ class MetconMovementTable extends TableAccessor<MetconMovement> {
     ],
   );
 
-  Future<void> setSynchronizedByMetcon(Metcon metcon) async {
-    await database.update(
-      tableName,
-      TableAccessor.synchronized,
-      where: '${Columns.metconId} = ?',
-      whereArgs: [metcon.id.toInt()],
-    );
-  }
-
   Future<List<MetconMovement>> getByMetcon(Metcon metcon) async {
     final records = await database.query(
       tableName,

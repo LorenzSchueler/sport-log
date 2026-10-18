@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:sport_log/config.dart';
+import 'package:sport_log/helpers/id_generation.dart';
+import 'package:sport_log/models/diary/diary.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 /// Initializes [Config], which reads the local `sport-log-client.yaml` in test mode.
@@ -25,3 +27,11 @@ Future<Directory> initDatabaseFactory() async {
   await databaseFactory.setDatabasesPath(directory.path);
   return directory;
 }
+
+Diary testDiary(int day) => Diary(
+  id: randomId(),
+  date: DateTime(2026, 10, day),
+  bodyweight: null,
+  comments: null,
+  deleted: false,
+);
