@@ -155,7 +155,9 @@ class MetconSessionOverviewPage extends StatelessWidget {
                 context: context,
                 sessionsPageTab: SessionsPageTab.metcon,
               ),
-              drawer: const MainDrawer(selectedRoute: Routes.metconOverview),
+              drawer: const MainDrawer(
+                selectedRoute: Routes.metconSessionOverview,
+              ),
               floatingActionButton: FloatingActionButton(
                 child: const Icon(AppIcons.add),
                 onPressed: () async {

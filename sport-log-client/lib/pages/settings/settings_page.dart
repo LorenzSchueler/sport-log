@@ -483,7 +483,7 @@ class SettingsPage extends StatelessWidget {
                       for (final (page, name) in [
                         (Routes.timelineOverview, "Timeline"),
                         (Routes.strengthOverview, "Strength"),
-                        (Routes.metconOverview, "Metcon"),
+                        (Routes.metconSessionOverview, "Metcon"),
                         (Routes.cardioOverview, "Cardio"),
                         (Routes.wodOverview, "Wod"),
                         (Routes.diaryOverview, "Diary"),

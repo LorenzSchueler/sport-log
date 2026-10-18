@@ -136,7 +136,7 @@ class DbRouteSerializer extends DbSerializer<Route> {
       markedPositions: DbPositionListConverter.mapToDart(
         r[prefix + Columns.markedPositions] as Uint8List?,
       ),
-      deleted: r[prefix + Columns.deleted] == 1,
+      deleted: r[prefix + Columns.deleted]! as int == 1,
     );
   }
 

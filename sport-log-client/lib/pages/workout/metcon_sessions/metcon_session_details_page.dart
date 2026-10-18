@@ -59,9 +59,7 @@ class _MetconSessionDetailsPageState extends State<MetconSessionDetailsPage> {
     if (!delete) {
       return;
     }
-    final result = await _dataProvider.deleteSingle(
-      widget.metconSessionDescription,
-    );
+    final result = await _dataProvider.deleteSingle(_metconSessionDescription);
     if (mounted) {
       if (result.isOk) {
         Navigator.pop(context);
