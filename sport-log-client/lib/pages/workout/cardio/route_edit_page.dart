@@ -195,19 +195,10 @@ class _RouteEditPageState extends State<RouteEditPage> {
 
   Future<void> _switchPoints(int oldIndex, int newIndex) async {
     setState(() {
-      if (oldIndex < newIndex - 1) {
-        final location = _route.markedPositions!.removeAt(oldIndex);
-        if (newIndex - 1 == _route.markedPositions!.length) {
-          _route.markedPositions!.add(location);
-        } else {
-          _route.markedPositions!.insert(newIndex - 1, location);
-        }
-      } else if (oldIndex > newIndex) {
-        _route.markedPositions!.insert(
-          newIndex,
-          _route.markedPositions!.removeAt(oldIndex),
-        );
-      }
+      _route.markedPositions!.insert(
+        newIndex,
+        _route.markedPositions!.removeAt(oldIndex),
+      );
     });
 
     await _updatePoints();
