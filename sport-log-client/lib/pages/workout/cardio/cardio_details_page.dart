@@ -204,11 +204,15 @@ class _CardioDetailsPageState extends State<CardioDetailsPage>
         setState(() {
           _cardioSessionDescription = returnObj.payload;
           _similarSessions = null;
+          _splits = null;
           _elevationLine = _getElevationLine();
           _speedLine = _getSpeedLine();
           _cadenceLine = _getCadenceLine();
           _heartRateLine = _getHeartRateLine();
         });
+        for (final session in _similarSessionAnnotations.keys.toList()) {
+          await _hideSession(session);
+        }
         await _setBoundsAndLines();
       }
     }

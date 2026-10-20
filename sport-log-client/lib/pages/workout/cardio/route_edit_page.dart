@@ -55,15 +55,16 @@ class _RouteEditPageState extends State<RouteEditPage> {
 
   Future<void> _saveRoute() async {
     // clone because sanitation makes track and markedPositions null if empty
+    final route = _route.clone();
     final result = widget.isNew
-        ? await _dataProvider.createSingle(_route.clone())
-        : await _dataProvider.updateSingle(_route.clone());
+        ? await _dataProvider.createSingle(route)
+        : await _dataProvider.updateSingle(route);
     if (mounted) {
       if (result.isOk) {
         Navigator.pop(
           context,
           // needed for route details page
-          ReturnObject.isNew(widget.isNew, _route),
+          ReturnObject.isNew(widget.isNew, route),
         );
       } else {
         await showMessageDialog(

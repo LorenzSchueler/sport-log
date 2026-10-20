@@ -59,6 +59,23 @@ class _MetconDetailsPageState extends State<MetconDetailsPage> {
     }
   }
 
+  Future<void> _pushSessionEditPage() async {
+    final returnObj = await Navigator.pushNamed(
+      context,
+      Routes.metconSessionEdit,
+      arguments: _metconDescription,
+    );
+    if (returnObj is ReturnObject<MetconSessionDescription> &&
+        returnObj.action == ReturnAction.created) {
+      final metconDescription = await _dataProvider.getById(
+        _metconDescription.metcon.id,
+      );
+      if (metconDescription != null && mounted) {
+        setState(() => _metconDescription = metconDescription);
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -66,10 +83,7 @@ class _MetconDetailsPageState extends State<MetconDetailsPage> {
         title: Text(_metconDescription.metcon.name),
         actions: [
           IconButton(
-            onPressed: () => Navigator.of(context).pushNamed(
-              Routes.metconSessionEdit,
-              arguments: _metconDescription,
-            ),
+            onPressed: _pushSessionEditPage,
             icon: const Icon(AppIcons.add),
           ),
           if (!_metconDescription.hasReference &&
