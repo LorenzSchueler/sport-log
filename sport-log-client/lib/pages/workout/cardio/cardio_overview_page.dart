@@ -74,6 +74,7 @@ class CardioOverviewPage extends StatelessWidget {
                       final movement = await showMovementPicker(
                         context: context,
                         selectedMovement: dataProvider.selected,
+                        cardioOnly: true,
                       );
                       if (movement == null) {
                         return;

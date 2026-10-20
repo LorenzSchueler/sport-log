@@ -12,7 +12,7 @@ class AccountDataApi {
 
   static final _instance = AccountDataApi._();
 
-  final _uri = Api.uriFromRoute('/account_data');
+  Uri get _uri => Api.uriFromRoute('/account_data');
 
   Future<ApiResult<AccountData>> get(EpochMap? epochMap) =>
       (Request("get", _uri)

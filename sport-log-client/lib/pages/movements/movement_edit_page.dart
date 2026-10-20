@@ -130,11 +130,8 @@ class _MovementEditPageState extends State<MovementEditPage> {
                   ),
                 TextFormField(
                   initialValue: _movementDescription.movement.name,
-                  onChanged: (name) {
-                    if (Validator.validateStringNotEmpty(name) == null) {
-                      setState(() => _movementDescription.movement.name = name);
-                    }
-                  },
+                  onChanged: (name) =>
+                      setState(() => _movementDescription.movement.name = name),
                   validator: Validator.validateStringNotEmpty,
                   autovalidateMode: AutovalidateMode.onUserInteraction,
                   textInputAction: TextInputAction.next,

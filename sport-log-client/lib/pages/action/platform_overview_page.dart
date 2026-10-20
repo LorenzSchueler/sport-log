@@ -200,7 +200,9 @@ class _PlatformCredentialDialogState extends State<PlatformCredentialDialog> {
               child: Row(
                 children: [
                   FilledButton(
-                    onPressed: _update,
+                    onPressed: platformDescription.isValidBeforeSanitation()
+                        ? _update
+                        : null,
                     child: Text(widget.isNew ? "Create" : "Edit"),
                   ),
                   const Spacer(),
