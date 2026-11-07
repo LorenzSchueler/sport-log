@@ -1,16 +1,51 @@
 [Unit]
 Description=Sport Log Server
-After=network.target
-StartLimitBurst=10
-StartLimitIntervalSec=3600
+After=network.target postgresql.service
 
 [Service]
-Type=simple
-User=sport-admin
+User=sport_admin
+Group=sport_admin
 WorkingDirectory=/etc/sport-log-server
 ExecStart=/usr/local/bin/sport-log-server
 Restart=on-failure
-RestartSec=60
+UMask=0077
+
+# Filesystem
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+PrivateDevices=true
+PrivateUsers=true
+ProtectProc=invisible
+ProcSubset=pid
+
+# Kernel and system settings
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectKernelLogs=true
+ProtectControlGroups=true
+ProtectClock=true
+ProtectHostname=true
+
+# Network: listen only on port 8000, talk only to localhost (Caddy), reach PostgreSQL via its Unix socket
+SocketBindAllow=tcp:8000
+SocketBindDeny=any
+IPAddressAllow=localhost
+IPAddressDeny=any
+
+# What the process itself may do
+CapabilityBoundingSet=
+RestrictAddressFamilies=AF_UNIX AF_INET
+RestrictNamespaces=true
+RestrictRealtime=true
+RestrictSUIDSGID=true
+LockPersonality=true
+MemoryDenyWriteExecute=true
+RemoveIPC=true
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+SystemCallFilter=~@privileged @resources
 
 [Install]
 WantedBy=multi-user.target

@@ -82,31 +82,7 @@ jobs:
     name: test
     runs-on: ubuntu-latest
 
-    env:
-      POSTGRES_DB: sport_log
-      POSTGRES_PASSWORD: test-passwd
-      POSTGRES_USER: sport_admin
-      ADMIN_PASSWORD_HASH: "$argon2id$v=19$m=4096,t=3,p=1$jfQMFwbuWJW6kYF3K6Opxg$8zmHSEMYeXuxhxl7HNv8/zsgSx/LWm6Iy1EciOBJdQM" # = "admin-passwd"
-
-    services:
-      postgres:
-        image: postgres:latest
-        env:
-          POSTGRES_DB: sport_log
-          POSTGRES_PASSWORD: test-passwd
-          POSTGRES_USER: sport_admin
-        ports:
-          - 5432:5432
-        # Set health checks to wait until postgres has started
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
     steps:
-    - name: env
-      run: echo "DATABASE_URL=postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@localhost/$POSTGRES_DB" >> $GITHUB_ENV
     - name: checkout
       uses: actions/checkout@v7
     - name: install rust
@@ -116,7 +92,14 @@ jobs:
     - name: install postgresql
       run: |
         sudo apt-get update -y
-        sudo apt-get install libpq-dev postgresql-client-common postgresql
+        sudo apt-get install libpq-dev postgresql
+    - name: setup postgresql
+      run: |
+        sudo systemctl start postgresql
+        sudo -u postgres createuser --createdb sport_admin
+        echo "sport-log $(whoami) sport_admin" | sudo tee -a /etc/postgresql/*/main/pg_ident.conf
+        sudo sed -i '/^local\s\+all\s\+all\s\+peer/i local all sport_admin peer map=sport-log' /etc/postgresql/*/main/pg_hba.conf
+        sudo systemctl reload postgresql
     - name: install diesel_cli
       run: cargo install diesel_cli --no-default-features --features postgres
     - name: setup database
@@ -126,15 +109,7 @@ jobs:
         patch src/schema.rs src/schema.patch # TODO
     - name: create sport-log-server.toml file
       working-directory: sport-log-server
-      run: |
-        echo "
-        admin_password = \"$ADMIN_PASSWORD_HASH\"
-        user_self_registration = true
-        ap_self_registration = true
-        database_url = \"$DATABASE_URL\"
-        release_address = \"0.0.0.0:8000\"
-        debug_address = \"0.0.0.0:8001\"
-        " > sport-log-server.toml
+      run: cp sport-log-server.toml.template sport-log-server.toml
     - name: cargo test
       run: cargo test --all-features
 
@@ -143,36 +118,14 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      POSTGRES_DB: sport_log
-      POSTGRES_PASSWORD: sport_admin_passwd
-      POSTGRES_USER: sport_admin
       USERNAME: ScreenshotUser
       PASSWORD: ScreenshotPassword0
       AP_USERNAME: wodify-login
       AP_PASSWORD: Wodify-Login-Password1
       ADMIN_PASSWORD: admin-passwd
-      ADMIN_PASSWORD_HASH: "$argon2id$v=19$m=4096,t=3,p=1$jfQMFwbuWJW6kYF3K6Opxg$8zmHSEMYeXuxhxl7HNv8/zsgSx/LWm6Iy1EciOBJdQM"
       BASE_URL: http://localhost:8001
 
-    services:
-      postgres:
-        image: postgres:latest
-        env:
-          POSTGRES_DB: sport_log
-          POSTGRES_PASSWORD: sport_admin_passwd
-          POSTGRES_USER: sport_admin
-        ports:
-          - 5432:5432
-        # Set health checks to wait until postgres has started
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
     steps:
-    - name: env
-      run: echo "DATABASE_URL=postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@localhost/$POSTGRES_DB" >> $GITHUB_ENV
     - name: checkout
       uses: actions/checkout@v7
     - name: install rust
@@ -182,7 +135,14 @@ jobs:
     - name: install postgresql
       run: |
         sudo apt-get update -y
-        sudo apt-get install libpq-dev postgresql-client-common postgresql
+        sudo apt-get install libpq-dev postgresql
+    - name: setup postgresql
+      run: |
+        sudo systemctl start postgresql
+        sudo -u postgres createuser --createdb sport_admin
+        echo "sport-log $(whoami) sport_admin" | sudo tee -a /etc/postgresql/*/main/pg_ident.conf
+        sudo sed -i '/^local\s\+all\s\+all\s\+peer/i local all sport_admin peer map=sport-log' /etc/postgresql/*/main/pg_hba.conf
+        sudo systemctl reload postgresql
     - name: install diesel_cli
       run: cargo install diesel_cli --no-default-features --features postgres
     - name: setup database
@@ -192,15 +152,7 @@ jobs:
         patch src/schema.rs src/schema.patch # TODO
     - name: create sport-log-server.toml file
       working-directory: sport-log-server
-      run: |
-        echo "
-        admin_password = \"$ADMIN_PASSWORD_HASH\"
-        user_self_registration = true
-        ap_self_registration = true
-        database_url = \"postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@localhost/$POSTGRES_DB\"
-        release_address = \"0.0.0.0:8000\"
-        debug_address = \"0.0.0.0:8001\"
-        " > sport-log-server.toml
+      run: cp sport-log-server.toml.template sport-log-server.toml
     - name: run server
       working-directory: sport-log-server
       run: |

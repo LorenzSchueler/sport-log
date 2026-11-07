@@ -1,7 +1,7 @@
 admin_password = "$argon2id$v=19$m=4096,t=3,p=1$jfQMFwbuWJW6kYF3K6Opxg$8zmHSEMYeXuxhxl7HNv8/zsgSx/LWm6Iy1EciOBJdQM" # = "admin-passwd"
 user_self_registration = true
 ap_self_registration = true
-database_url = "postgres://sport_admin:<password>@localhost/sport_log"
-release_address = "0.0.0.0:8000"
+database_url = "postgresql:///sport_log?host=/run/postgresql&user=sport_admin"
+release_address = "127.0.0.1:8000"
 debug_address = "0.0.0.0:8001"
-app_dir = "/path/to/app" # comment out to disable app download
+app_dir = "/var/lib/sport-log-server" # comment out to disable app download

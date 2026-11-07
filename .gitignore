@@ -16,5 +16,3 @@
 /flatpak-build
 /flatpak-repo
 .flatpak-builder
-
-.env
