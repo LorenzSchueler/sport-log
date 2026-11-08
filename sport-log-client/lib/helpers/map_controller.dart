@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart' hide Position;
@@ -60,7 +61,6 @@ class MapController {
   static const double _markerRadius = 8;
   static const double _gpsMarkerRadius = 20;
   static const double _noGpsMarkerRadius = 50;
-  static const String _exaggerationProperty = "exaggeration";
 
   Future<LatLng?> get center async {
     final point = (await _controller?.getCameraState())?.center;
@@ -390,8 +390,7 @@ class MapController {
 
   Future<void> enableTerrain(String sourceId, double initPitch) async {
     await _addTerrainSource(sourceId);
-    await _setStyleTerrainProperty("source", sourceId);
-    await _setStyleTerrainProperty(_exaggerationProperty, 1);
+    await _controller?.setStyleTerrain(jsonEncode({"source": sourceId}));
     final currentPitch = await pitch;
     if (currentPitch != null) {
       await _animatePitchBy(initPitch - currentPitch);
@@ -399,7 +398,7 @@ class MapController {
   }
 
   Future<void> disableTerrain() async {
-    await _setStyleTerrainProperty(_exaggerationProperty, 0);
+    await _controller?.removeStyleTerrain();
     final currentPitch = await pitch;
     if (currentPitch != null) {
       await _animatePitchBy(-currentPitch);
@@ -407,9 +406,8 @@ class MapController {
   }
 
   Future<bool> terrainEnabled() async {
-    final exaggeration = await _getStyleTerrainProperty(_exaggerationProperty);
-    return exaggeration != null &&
-        ![null, 0.0].contains(double.tryParse(exaggeration.toString()));
+    final source = await _controller?.getStyleTerrainProperty("source");
+    return ![null, ""].contains(source?.value);
   }
 
   Future<bool?> _sourceExists(String sourceId) async =>
@@ -426,12 +424,6 @@ class MapController {
 
   Future<void> _removeLayer(String layerId) async =>
       await _controller?.removeStyleLayer(layerId);
-
-  Future<Object?> _getStyleTerrainProperty(String key) async =>
-      (await _controller?.getStyleTerrainProperty(key))?.value;
-
-  Future<void> _setStyleTerrainProperty(String key, Object value) async =>
-      await _controller?.setStyleTerrainProperty(key, value);
 
   Future<void> hideAttribution() async => await _controller?.attribution
       .updateSettings(AttributionSettings(enabled: false));
