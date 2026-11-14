@@ -435,6 +435,7 @@ void main() {
     await tap(tester, okButton);
     expect(find.byType(CardioTrackingPage), findsOneWidget);
     await waitFor(tester, cancelButton); // wait for permission requests
+    await tap(tester, find.text("Ok")); // the emulator has no step detector
     await waitUntil(
       tester,
       "the first location",

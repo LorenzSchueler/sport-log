@@ -1,19 +1,36 @@
-import 'package:flutter/services.dart';
+import 'package:jni/jni.dart';
+import 'package:jni_flutter/jni_flutter.dart';
 import 'package:sport_log/config.dart';
+import 'package:sport_log/helpers/platform/android.g.dart';
 
 /// Turns the screen off while the proximity sensor is covered (Android only).
 class ProximityWakeLock {
-  static const _channel = MethodChannel("org.sport_log/proximity_wake_lock");
+  static final PowerManager$WakeLock? _wakeLock = _newWakeLock();
 
-  static Future<void> acquire() async {
+  static PowerManager$WakeLock? _newWakeLock() {
+    final powerManager = androidApplicationContext
+        .as(Context.type)
+        .getSystemService<PowerManager>(PowerManager.type.jClass)!;
+    if (!powerManager.isWakeLockLevelSupported(
+      PowerManager.PROXIMITY_SCREEN_OFF_WAKE_LOCK,
+    )) {
+      return null;
+    }
+    return powerManager.newWakeLock(
+      PowerManager.PROXIMITY_SCREEN_OFF_WAKE_LOCK,
+      "sport_log:proximity".toJString(),
+    )!..referenceCounted = false;
+  }
+
+  static void acquire() {
     if (Config.isAndroid) {
-      await _channel.invokeMethod<bool>("acquire");
+      _wakeLock?.acquire();
     }
   }
 
-  static Future<void> release() async {
-    if (Config.isAndroid) {
-      await _channel.invokeMethod<void>("release");
+  static void release() {
+    if (Config.isAndroid && (_wakeLock?.isHeld ?? false)) {
+      _wakeLock!.release$1();
     }
   }
 }
