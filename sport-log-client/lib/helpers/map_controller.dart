@@ -109,7 +109,10 @@ class MapController {
 
   Future<CameraOptions?> _cameraForBounds(LatLngBounds bounds) async =>
       await _controller?.cameraForCoordinatesPadding(
-        [bounds.northeast.toPoint(), bounds.southwest.toPoint()],
+        [
+          LatLng(lat: bounds.north, lng: bounds.east).toPoint(),
+          LatLng(lat: bounds.south, lng: bounds.west).toPoint(),
+        ],
         CameraOptions(),
         MbxEdgeInsets(top: 10, left: 10, bottom: 10, right: 10), // pixel
         null,

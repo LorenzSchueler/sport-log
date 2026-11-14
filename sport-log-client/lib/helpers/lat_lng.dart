@@ -127,14 +127,11 @@ extension LatLngIterExtension on Iterable<LatLng> {
       return null;
     }
 
-    final north = map((p) => p.lat).max;
-    final south = map((p) => p.lat).min;
-    final east = map((p) => p.lng).max;
-    final west = map((p) => p.lng).min;
-
     return LatLngBounds(
-      northeast: LatLng(lat: north, lng: east),
-      southwest: LatLng(lat: south, lng: west),
+      north: map((p) => p.lat).max,
+      south: map((p) => p.lat).min,
+      east: map((p) => p.lng).max,
+      west: map((p) => p.lng).min,
     );
   }
 
@@ -153,15 +150,24 @@ class LatLngZoom {
 }
 
 class LatLngBounds {
-  LatLngBounds({required this.northeast, required this.southwest});
+  const LatLngBounds({
+    required this.north,
+    required this.south,
+    required this.east,
+    required this.west,
+  });
 
-  // List of [lat1, lng1, lat2, lng2] like the one produced by `LatLngBounds.toList()`.
+  /// List of [north, east, south, west] like the one produced by `LatLngBounds.toList()`.
   LatLngBounds.fromList(List<double> l)
-    : northeast = LatLng(lat: l[0], lng: l[1]),
-      southwest = LatLng(lat: l[2], lng: l[3]);
+    : north = l[0],
+      east = l[1],
+      south = l[2],
+      west = l[3];
 
-  LatLng northeast;
-  LatLng southwest;
+  final double north;
+  final double south;
+  final double east;
+  final double west;
 
   static LatLngBounds? combinedBounds(
     LatLngBounds? bounds1,
@@ -171,51 +177,37 @@ class LatLngBounds {
       return bounds1 ?? bounds2;
     }
 
-    final north = max(bounds1.northeast.lat, bounds2.northeast.lat);
-    final south = min(bounds1.southwest.lat, bounds2.southwest.lat);
-    final east = max(bounds1.northeast.lng, bounds2.northeast.lng);
-    final west = min(bounds1.southwest.lng, bounds2.southwest.lng);
-
     return LatLngBounds(
-      northeast: LatLng(lat: north, lng: east),
-      southwest: LatLng(lat: south, lng: west),
+      north: max(bounds1.north, bounds2.north),
+      south: min(bounds1.south, bounds2.south),
+      east: max(bounds1.east, bounds2.east),
+      west: min(bounds1.west, bounds2.west),
     );
   }
 
   Polygon toPolygon() => Polygon(
     coordinates: [
       [
-        northeast._toPosition(),
-        LatLng(lat: northeast.lat, lng: southwest.lng)._toPosition(),
-        southwest._toPosition(),
-        LatLng(lat: southwest.lat, lng: northeast.lng)._toPosition(),
+        Position(east, north),
+        Position(west, north),
+        Position(west, south),
+        Position(east, south),
       ],
     ],
   );
 
-  List<double> toList() => [
-    northeast.lat,
-    northeast.lng,
-    southwest.lat,
-    southwest.lng,
-  ];
+  /// List of [north, east, south, west].
+  List<double> toList() => [north, east, south, west];
 
   LineString toLineString() => LineString(
     coordinates: [
-      northeast._toPosition(),
-      LatLng(lat: northeast.lat, lng: southwest.lng)._toPosition(),
-      southwest._toPosition(),
-      LatLng(lat: southwest.lat, lng: northeast.lng)._toPosition(),
-      northeast._toPosition(),
+      Position(east, north),
+      Position(west, north),
+      Position(west, south),
+      Position(east, south),
+      Position(east, north),
     ],
   );
 
-  LatLng get center {
-    final north = northeast.lat;
-    final south = southwest.lat;
-    final east = northeast.lng;
-    final west = southwest.lng;
-
-    return LatLng(lat: (north + south) / 2, lng: (east + west) / 2);
-  }
+  LatLng get center => LatLng(lat: (north + south) / 2, lng: (east + west) / 2);
 }

@@ -23,10 +23,12 @@ class MapboxSearchResult {
       address: props.fullAddress,
       latLng: LatLng(lat: coords.latitude, lng: coords.longitude),
       bounds: bbox != null
-          ? [
-              LatLng(lat: bbox.minLatitude, lng: bbox.minLongitude),
-              LatLng(lat: bbox.maxLatitude, lng: bbox.maxLongitude),
-            ].latLngBounds
+          ? LatLngBounds(
+              north: bbox.maxLatitude,
+              south: bbox.minLatitude,
+              east: bbox.maxLongitude,
+              west: bbox.minLongitude,
+            )
           : null,
     );
   }
