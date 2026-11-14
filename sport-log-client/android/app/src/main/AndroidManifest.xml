@@ -26,7 +26,7 @@
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"
         android:maxSdkVersion="30" />
 
-    <!-- pedometer -->
+    <!-- step detection in MainActivity -->
     <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
 
     <!-- open-file for auto update -->

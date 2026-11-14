@@ -1045,15 +1045,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.3.0"
-  pedometer:
-    dependency: "direct main"
-    description:
-      path: "packages/pedometer"
-      ref: HEAD
-      resolved-ref: "603e1261f30dffa57288128c7060642a805562c2"
-      url: "https://github.com/LorenzSchueler/flutter-plugins"
-    source: git
-    version: "4.1.1"
   permission_handler:
     dependency: "direct main"
     description:

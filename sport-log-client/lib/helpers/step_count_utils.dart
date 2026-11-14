@@ -1,11 +1,13 @@
 import 'dart:async';
 
-import 'package:pedometer/pedometer.dart';
+import 'package:flutter/services.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:sport_log/helpers/request_permission.dart';
 
 class StepCountUtils {
   StreamSubscription<void>? _stepCountSubscription;
+
+  static const _channel = EventChannel('org.sport_log/step_detection');
 
   bool get enabled => _stepCountSubscription != null;
 
@@ -20,7 +22,7 @@ class StepCountUtils {
     if (!await PermissionRequest.request(Permission.activityRecognition)) {
       return false;
     }
-    _stepCountSubscription = Pedometer.stepStream.listen(
+    _stepCountSubscription = _channel.receiveBroadcastStream().listen(
       (_) => onStep(),
       onError: (Object _) => stopStepCountStream(),
     );
