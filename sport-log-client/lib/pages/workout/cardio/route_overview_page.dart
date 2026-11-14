@@ -110,7 +110,7 @@ class RouteCard extends StatelessWidget {
   }
 
   Future<void> _onMapCreated(MapController mapController) async {
-    await mapController.setBoundsFromTracks(route.track, null, padded: true);
+    await mapController.setBoundsFromTracks(route.track, null);
     if (route.track != null) {
       await mapController.addRouteLine(route.track!);
     }

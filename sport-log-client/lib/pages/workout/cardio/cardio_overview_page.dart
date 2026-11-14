@@ -214,7 +214,6 @@ class CardioSessionCard extends StatelessWidget {
     await mapController.setBoundsFromTracks(
       cardioSessionDescription.cardioSession.track,
       cardioSessionDescription.route?.track,
-      padded: true,
     );
     if (cardioSessionDescription.route?.track != null) {
       await mapController.addRouteLine(cardioSessionDescription.route!.track!);

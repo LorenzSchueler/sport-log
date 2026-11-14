@@ -67,7 +67,6 @@ class _RouteDetailsPageState extends State<RouteDetailsPage>
     await _mapController?.setBoundsFromTracks(
       _route.track,
       _route.markedPositions,
-      padded: true,
     );
     await _mapController?.updateRouteLine(_routeLine, _route.track);
     await _mapController?.removeAllMarkers();

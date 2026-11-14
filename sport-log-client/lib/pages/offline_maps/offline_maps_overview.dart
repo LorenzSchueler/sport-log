@@ -226,7 +226,7 @@ class RegionCard extends StatelessWidget {
     final bounds = LatLngBounds.fromList(
       (region.metadata["bounds"]! as List).cast<double>(),
     );
-    await mapController.setBoundsX(bounds, padded: true);
+    await mapController.setBounds(bounds);
     await mapController.addBoundingBoxLine(bounds);
   }
 

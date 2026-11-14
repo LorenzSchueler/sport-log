@@ -211,7 +211,6 @@ class _RouteEditPageState extends State<RouteEditPage> {
     await _mapController?.setBoundsFromTracks(
       _route.track,
       _route.markedPositions,
-      padded: true,
     );
     await _updatePoints();
     await _updateLine(init: true);

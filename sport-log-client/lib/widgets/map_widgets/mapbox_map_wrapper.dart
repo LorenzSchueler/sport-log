@@ -176,11 +176,7 @@ class _MapboxMapWrapperState extends State<MapboxMapWrapper> {
     }
     await _mapController?.updateRouteLine(_line, _selectedRoute?.track);
     if (!sameRoute) {
-      await _mapController?.setBoundsFromTracks(
-        _selectedRoute?.track,
-        null,
-        padded: true,
-      );
+      await _mapController?.setBoundsFromTracks(_selectedRoute?.track, null);
     }
   }
 

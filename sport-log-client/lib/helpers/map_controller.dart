@@ -101,35 +101,45 @@ class MapController {
   Future<void> setLatLngZoom(LatLngZoom position) async =>
       await _controller?.setCamera(position.toCameraOptions());
 
+  Future<void> animateLatLngZoom(LatLngZoom position) async =>
+      await _controller?.flyTo(position.toCameraOptions(), null);
+
   Future<void> animateNorth() async =>
       await _controller?.flyTo(CameraOptions(bearing: 0), null);
 
-  Future<void> setBoundsX(LatLngBounds bounds, {required bool padded}) async {
-    final camera = await _controller?.cameraForCoordinatesPadding(
-      [bounds.northeast.toPoint(), bounds.southwest.toPoint()],
-      CameraOptions(),
-      padded
-          ? MbxEdgeInsets(top: 10, left: 10, bottom: 10, right: 10) // pixel
-          : null,
-      null,
-      null,
-    );
+  Future<CameraOptions?> _cameraForBounds(LatLngBounds bounds) async =>
+      await _controller?.cameraForCoordinatesPadding(
+        [bounds.northeast.toPoint(), bounds.southwest.toPoint()],
+        CameraOptions(),
+        MbxEdgeInsets(top: 10, left: 10, bottom: 10, right: 10), // pixel
+        null,
+        null,
+      );
+
+  Future<void> setBounds(LatLngBounds bounds) async {
+    final camera = await _cameraForBounds(bounds);
     if (camera != null) {
       await _controller?.setCamera(camera);
     }
   }
 
+  Future<void> animateBounds(LatLngBounds bounds) async {
+    final camera = await _cameraForBounds(bounds);
+    if (camera != null) {
+      await _controller?.flyTo(camera, null);
+    }
+  }
+
   Future<void> setBoundsFromTracks(
     Iterable<Position>? track1,
-    Iterable<Position>? track2, {
-    required bool padded,
-  }) async {
+    Iterable<Position>? track2,
+  ) async {
     final bounds = LatLngBounds.combinedBounds(
       track1?.map((p) => p.latLng).latLngBounds,
       track2?.map((p) => p.latLng).latLngBounds,
     );
     if (bounds != null) {
-      await setBoundsX(bounds, padded: padded);
+      await setBounds(bounds);
     }
   }
 

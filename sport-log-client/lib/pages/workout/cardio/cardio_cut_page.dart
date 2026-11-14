@@ -56,7 +56,6 @@ class _CardioCutPageState extends State<CardioCutPage> {
     await _mapController?.setBoundsFromTracks(
       _cardioSessionDescription.cardioSession.track,
       _cardioSessionDescription.route?.track,
-      padded: true,
     );
     await _mapController?.updateRouteLine(
       _routeLine,

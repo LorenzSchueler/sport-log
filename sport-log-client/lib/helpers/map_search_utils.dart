@@ -88,10 +88,11 @@ class MapSearchUtils extends ChangeNotifier {
 
     final bounds = result.bounds;
     if (bounds != null) {
-      await _mapController?.setBoundsX(bounds, padded: false);
+      await _mapController?.animateBounds(bounds);
     } else {
-      await _mapController?.animateCenter(result.latLng);
+      await _mapController?.animateLatLngZoom(
+        LatLngZoom(latLng: result.latLng, zoom: 16),
+      );
     }
-    await _mapController?.setZoom(16);
   }
 }
