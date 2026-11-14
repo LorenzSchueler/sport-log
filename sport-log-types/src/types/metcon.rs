@@ -2,8 +2,6 @@ use chrono::{DateTime, Utc};
 use derive_deftly::Deftly;
 #[cfg(feature = "db")]
 use diesel::{deserialize::FromSqlRow, expression::AsExpression, prelude::*, sql_types::BigInt};
-#[cfg(feature = "db")]
-use diesel_derive_enum::DbEnum;
 use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "db")]
@@ -16,8 +14,8 @@ use crate::{MovementId, UserId, types::IdString};
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq)]
 #[cfg_attr(
     feature = "db",
-    derive(DbEnum),
-    ExistingTypePath = "crate::schema::sql_types::MetconType"
+    derive(diesel::types::Enum),
+    diesel(sql_type = crate::schema::sql_types::MetconType, rename_all = "snake_case")
 )]
 pub enum MetconType {
     Amrap,
@@ -28,8 +26,8 @@ pub enum MetconType {
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq)]
 #[cfg_attr(
     feature = "db",
-    derive(DbEnum),
-    ExistingTypePath = "crate::schema::sql_types::DistanceUnit"
+    derive(diesel::types::Enum),
+    diesel(sql_type = crate::schema::sql_types::DistanceUnit, rename_all = "snake_case")
 )]
 pub enum DistanceUnit {
     Meter,

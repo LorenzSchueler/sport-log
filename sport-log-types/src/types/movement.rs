@@ -1,8 +1,6 @@
 use derive_deftly::Deftly;
 #[cfg(feature = "db")]
 use diesel::{deserialize::FromSqlRow, expression::AsExpression, prelude::*, sql_types::BigInt};
-#[cfg(feature = "db")]
-use diesel_derive_enum::DbEnum;
 use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "db")]
@@ -12,8 +10,8 @@ use crate::{UserId, types::IdString};
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq)]
 #[cfg_attr(
     feature = "db",
-    derive(DbEnum),
-    ExistingTypePath = "crate::schema::sql_types::MovementDimension"
+    derive(diesel::types::Enum),
+    diesel(sql_type = crate::schema::sql_types::MovementDimension, rename_all = "snake_case")
 )]
 pub enum MovementDimension {
     Reps,

@@ -3,18 +3,22 @@
 pub mod sql_types {
     #[derive(diesel::sql_types::SqlType)]
     #[diesel(postgres_type(name = "cardio_type"))]
+    #[diesel(enum_type)]
     pub struct CardioType;
 
     #[derive(diesel::sql_types::SqlType)]
     #[diesel(postgres_type(name = "distance_unit"))]
+    #[diesel(enum_type)]
     pub struct DistanceUnit;
 
     #[derive(diesel::sql_types::SqlType)]
     #[diesel(postgres_type(name = "metcon_type"))]
+    #[diesel(enum_type)]
     pub struct MetconType;
 
     #[derive(diesel::sql_types::SqlType)]
     #[diesel(postgres_type(name = "movement_dimension"))]
+    #[diesel(enum_type)]
     pub struct MovementDimension;
 
     #[derive(diesel::sql_types::SqlType)]
@@ -23,6 +27,7 @@ pub mod sql_types {
 
     #[derive(diesel::sql_types::SqlType)]
     #[diesel(postgres_type(name = "weekday"))]
+    #[diesel(enum_type)]
     pub struct Weekday;
 }
 

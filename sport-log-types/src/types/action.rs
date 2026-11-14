@@ -2,8 +2,6 @@ use chrono::{DateTime, Utc};
 use derive_deftly::Deftly;
 #[cfg(feature = "db")]
 use diesel::{deserialize::FromSqlRow, expression::AsExpression, prelude::*, sql_types::BigInt};
-#[cfg(feature = "db")]
-use diesel_derive_enum::DbEnum;
 use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "db")]
@@ -93,10 +91,9 @@ pub struct Action {
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq)]
 #[cfg_attr(
     feature = "db",
-    derive(DbEnum),
-    ExistingTypePath = "crate::schema::sql_types::Weekday"
+    derive(diesel::types::Enum),
+    diesel(sql_type = crate::schema::sql_types::Weekday, rename_all = "snake_case")
 )]
-
 pub enum Weekday {
     Monday,
     Tuesday,

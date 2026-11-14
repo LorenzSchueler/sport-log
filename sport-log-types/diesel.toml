@@ -2,6 +2,7 @@
 file = "src/schema.rs"
 import_types = ["diesel::sql_types::*"]
 patch_file = "src/schema.patch"         # TODO is not applied
+generate_rust_enum_definitions = false
 
 [print_schema.filter]
 except_tables = [

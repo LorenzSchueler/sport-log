@@ -8,10 +8,8 @@ use diesel::{
     pg::Pg,
     prelude::*,
     serialize::{self, Output, ToSql, WriteTuple},
-    sql_types::{BigInt, Double, Integer, Nullable, Record},
+    sql_types::{BigInt, Double, Integer, Record},
 };
-#[cfg(feature = "db")]
-use diesel_derive_enum::DbEnum;
 use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "db")]
@@ -24,8 +22,8 @@ use crate::{MovementId, UserId, types::IdString};
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq)]
 #[cfg_attr(
     feature = "db",
-    derive(DbEnum),
-    ExistingTypePath = "crate::schema::sql_types::CardioType"
+    derive(diesel::types::Enum),
+    diesel(sql_type = crate::schema::sql_types::CardioType, rename_all = "snake_case")
 )]
 pub enum CardioType {
     Training,
