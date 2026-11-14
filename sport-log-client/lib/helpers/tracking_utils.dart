@@ -144,15 +144,6 @@ class TrackingUtils extends ChangeNotifier {
       );
     }
     await _heartRateUtils?.startHeartRateStream(_onHeartRateUpdate);
-    if (_alarmUtils.requiresTtsButNoEngineFound ||
-        _audioFeedbackUtils.requiresTtsButNoEngineFound) {
-      await showMessageDialog(
-        // ignore: use_build_context_synchronously
-        context: App.globalContext,
-        title: "Warning",
-        text: "No Text-To-Speech (TTS) engine found. Audio feedback and alarms not available.",
-      );
-    }
   }
 
   void onElevationMapCreated(ElevationMapController mapController) {

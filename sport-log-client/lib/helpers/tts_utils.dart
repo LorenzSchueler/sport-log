@@ -1,64 +1,58 @@
-import 'package:audio_session/audio_session.dart';
-import 'package:flutter_tts/flutter_tts.dart';
-import 'package:synchronized/synchronized.dart';
+import 'package:flutter/foundation.dart';
+import 'package:speak/speak.dart';
+import 'package:sport_log/config.dart';
+import 'package:sport_log/helpers/logger.dart';
+
+enum TtsStatus { checking, noEngine, noOfflineEnglishVoice, available }
 
 class TtsUtils {
+  static final _logger = Logger("TtsUtils");
+
+  static final status = ValueNotifier(TtsStatus.checking);
+
+  static Speak? _speak;
+
+  /// Why speech is not available, or null if it is.
+  static String? get unavailableReason => switch (status.value) {
+    TtsStatus.checking => "Checking text-to-speech...",
+    TtsStatus.noEngine => "No text-to-speech engine installed.",
+    TtsStatus.noOfflineEnglishVoice => "No offline English voice installed.",
+    TtsStatus.available => null,
+  };
+
   static Future<void> init() async {
-    final tts = FlutterTts();
-
-    final engines = (await tts.getEngines) as List;
-    if (engines.isEmpty) {
-      return;
-    }
-    await tts.setEngine(engines[0] as String);
-
-    final voices = (await tts.getVoices as List).cast<Map<dynamic, dynamic>>();
-    if (voices.isEmpty) {
-      return;
-    }
-    Map<String, String>? prevVoice;
-    for (final v in voices) {
-      final voice = v.cast<String, String>();
-      if (voice["locale"] == "en-US") {
-        prevVoice = voice;
+    Speak? speak;
+    try {
+      if (!Speak.isSupported ||
+          Config.isAndroid && (await Speak.androidEngines()).isEmpty) {
+        status.value = TtsStatus.noEngine;
+        return;
       }
+      speak = Speak(audio: SpeakAudio.navigation);
+      final voices = await speak.voices(language: "en-US");
+      speak.voice = voices
+          .where((voice) => voice.isInstalled && !voice.requiresNetwork)
+          .firstOrNull;
+    } catch (error) {
+      _logger.w("tts init failed", error: error);
+      status.value = TtsStatus.noEngine;
+      await speak?.dispose();
+      return;
     }
-    await tts.setVoice(prevVoice ?? voices[0].cast<String, String>());
-
-    await tts.awaitSpeakCompletion(true);
-
-    final session = await AudioSession.instance;
-
-    await session.configure(
-      const AudioSessionConfiguration(
-        avAudioSessionCategory: AVAudioSessionCategory.playback,
-        avAudioSessionCategoryOptions: AVAudioSessionCategoryOptions.duckOthers,
-        avAudioSessionMode: AVAudioSessionMode.spokenAudio,
-        avAudioSessionSetActiveOptions:
-            AVAudioSessionSetActiveOptions.notifyOthersOnDeactivation,
-        androidAudioAttributes: AndroidAudioAttributes(
-          contentType: AndroidAudioContentType.speech,
-          usage: AndroidAudioUsage.assistanceNavigationGuidance,
-        ),
-        androidAudioFocusGainType:
-            AndroidAudioFocusGainType.gainTransientMayDuck,
-        androidWillPauseWhenDucked: true,
-      ),
-    );
-
-    TtsUtils._tts = tts;
-    TtsUtils._session = session;
+    if (speak.voice == null) {
+      status.value = TtsStatus.noOfflineEnglishVoice;
+      await speak.dispose();
+      return;
+    }
+    _speak = speak;
+    status.value = TtsStatus.available;
   }
 
-  static FlutterTts? _tts;
-  static AudioSession? _session;
-  static final _lock = Lock();
-
-  static bool get ttsEngineFound => _tts != null && _session != null;
-
-  static Future<void> speak(String text) => _lock.synchronized(() async {
-    await _session?.setActive(true);
-    await _tts?.speak(text);
-    await _session?.setActive(false);
-  });
+  static Future<void> speak(String text) async {
+    try {
+      await _speak?.call(text);
+    } catch (error) {
+      _logger.w("speak failed", error: error);
+    }
+  }
 }

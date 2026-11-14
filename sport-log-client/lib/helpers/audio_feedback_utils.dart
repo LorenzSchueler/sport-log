@@ -17,9 +17,6 @@ class AudioFeedbackUtils {
   final AudioFeedbackConfig? _audioFeedbackConfig;
   Timer? _audioFeedbackTimer;
 
-  bool get requiresTtsButNoEngineFound =>
-      _audioFeedbackConfig != null && !TtsUtils.ttsEngineFound;
-
   void dispose() {
     onStop();
   }

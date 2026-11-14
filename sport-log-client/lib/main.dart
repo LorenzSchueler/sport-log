@@ -38,7 +38,8 @@ Stream<double> initialize() async* {
   yield 0.6;
   MapboxOptions.setAccessToken(Config.instance.accessToken);
   await MapDownloadUtils.globalInit();
-  await TtsUtils.init();
+  // Not awaited: Android's engine can take seconds to list its voices.
+  unawaited(TtsUtils.init());
   yield 0.7;
   if (Config.isWindows || Config.isLinux) {
     sqfliteFfiInit();

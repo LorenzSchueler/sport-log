@@ -27,20 +27,23 @@ class DefaultSwitch extends StatelessWidget {
   });
 
   final bool value;
-  final void Function(bool) onChanged;
+  final void Function(bool)? onChanged;
 
   @override
   Widget build(BuildContext context) {
+    final onChanged = this.onChanged;
     return SizedBox(
       height: 25, // make it fit into EditTile
       child: FittedBox(
         alignment: AlignmentDirectional.centerStart,
         child: Switch(
           value: value,
-          onChanged: (isSet) {
-            FocusManager.instance.primaryFocus?.unfocus();
-            onChanged(isSet);
-          },
+          onChanged: onChanged == null
+              ? null
+              : (isSet) {
+                  FocusManager.instance.primaryFocus?.unfocus();
+                  onChanged(isSet);
+                },
           materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
         ),
       ),
@@ -102,7 +105,7 @@ class EditTile extends StatelessWidget {
     IconData? trailing,
     String? caption,
     required bool value,
-    required void Function(bool) onChanged,
+    required void Function(bool)? onChanged,
     void Function()? onTrailingTap,
     bool shrinkWidth = false,
     Key? key,
