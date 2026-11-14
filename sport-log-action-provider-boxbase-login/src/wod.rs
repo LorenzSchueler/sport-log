@@ -109,8 +109,7 @@ pub async fn fetch_wod(
         .days
         .into_iter()
         .find(|day| day.date == date)
-        .map(|day| format_wods(&day.sections))
-        .unwrap_or_default())
+        .map_or_default(|day| format_wods(&day.sections)))
 }
 
 /// Formats the wod of each class from its sections and returns them as map from class name to

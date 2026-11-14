@@ -205,8 +205,7 @@ impl BoxBase {
         let membership = memberships
             .data
             .first()
-            .map(|membership| format!("/{}", membership.id))
-            .unwrap_or_default();
+            .map_or_default(|membership| format!("/{}", membership.id));
 
         self.api_request(
             Method::POST,
