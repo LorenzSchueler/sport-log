@@ -189,6 +189,9 @@ class _MapboxMapWrapperState extends State<MapboxMapWrapper> {
     return Stack(
       children: [
         MapWidget(
+          // Hybrid Composition++ fades a SurfaceView only if it is the
+          // platform view itself, but mapbox nests it in its MapView
+          textureView: true,
           styleUri: widget.initStyleUri,
           onMapCreated: _onMapCreated,
           onMapLoadedListener: _mapReadyCallback.onMapLoaded,

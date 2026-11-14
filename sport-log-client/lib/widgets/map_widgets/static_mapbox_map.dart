@@ -52,6 +52,9 @@ class _StaticMapboxMapState extends State<StaticMapboxMap> {
   @override
   Widget build(BuildContext context) {
     return MapWidget(
+      // Hybrid Composition++ fades a SurfaceView only if it is the platform
+      // view itself, but mapbox nests it in its MapView
+      textureView: true,
       styleUri: MapStyle.outdoor.url,
       onMapCreated: _onMapCreated,
       onMapLoadedListener: _mapReadyCallback.onMapLoaded,
