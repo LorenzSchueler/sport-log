@@ -26,6 +26,9 @@ class LocationUtils extends ChangeNotifier {
       setOngoing: true,
       enableWakeLock: true,
     ),
+    // without it geolocator reports 0 satellites;
+    // it also aligns the elevation with the Mapbox elevation (above sea level)
+    useMSLAltitude: true,
   );
 
   @override
