@@ -7,8 +7,11 @@ import 'package:synchronized/synchronized.dart';
 
 enum MapStyle {
   // based on mapbox OUTDOORS
+  // -> eject style component natural features to be able to edit filter
   // natural features - natural point label - text field formula
   //     coalesce(name_en, name) & "\n" & elevation_m
+  // natural features - natural point label - select data - filter
+  //     filterrank <= 5
   outdoor(outdoorConst),
   street(MapboxStyles.STANDARD),
   // based on mapbox SATELLITE_STREETS
@@ -32,8 +35,11 @@ enum MapStyle {
   //     opacity: 1
   //     width: 2
   //     dash-array: 2, 1
+  // -> eject style component natural features to be able to edit filter
   // natural features - natural point label - text field formula
   //     coalesce(name_en, name) & "\n" & elevation_m
+  // natural features - natural point label - select data - filter
+  //     filterrank <= 5
   // add layer terrain-v2 - contour
   //     color: white
   //     opacity: style with data conditions
